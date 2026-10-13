@@ -2,7 +2,7 @@
 
 ## Current Blockers
 
-- GitHub 私有仓库 rulesets API 返回套餐限制 403，服务器保护未生效。不要改为公开绕过。
+- 无。用户已明确要求公开；仓库已公开，服务器 ruleset 已 active。此前私有套餐限制已解除。
 
 ## Current Risks
 
@@ -10,6 +10,7 @@
 - AST 边界检查仅检查直接导入；首个真实包必须启用 import-linter 与隔离 wheel 测试。
 - 本任务作者自验不是独立审查；后续产品变更须有绑定 head 的审查证据。
 - Python 3.12 生命周期至预计 2028-10，P0 需评估长期基线。
+- 规则回执只证明加载器输出与版本一致，不能证明模型理解。普通 PR 可修改检查文件，管理员仍可修改服务器规则；不宣称防恶意篡改。
 
 ## Unknowns / Confirmations Needed
 

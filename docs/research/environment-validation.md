@@ -2,6 +2,8 @@
 
 日期：2026-10-13；范围：代码治理与依赖环境，产品开发尚未启动。
 
+后续更新：F-002 中用户明确要求公开，仓库已改 public、PR #1 已合并、main ruleset 已 active。下表的私有套餐 403 是初次安装时的历史结果，当前状态见 `docs/runbooks/rule-enforcement.md` 与 F-002 证据。
+
 ## 主机与 Codex
 
 | 项目 | 实际结果 |

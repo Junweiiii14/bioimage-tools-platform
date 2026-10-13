@@ -12,6 +12,7 @@
 3. [模块地图](docs/module-map.md)、[架构](docs/architecture.md)、[代码规范](docs/coding-standards.md)。
 4. [开发环境](docs/runbooks/development.md)、[工具与技能来源](docs/research/skills-and-plugins.md)。
 5. [贡献流程](CONTRIBUTING.md)、[AI 开发流程](docs/ai-workflow.md)、[发布与恢复](docs/runbooks/release.md)。
+6. [自动规则门禁](docs/runbooks/rule-enforcement.md)、[调研与非编码能力](docs/research-protocol.md)。
 
 ## 可执行的基础检查
 
@@ -32,9 +33,9 @@ uv run --locked pre-commit install
 - 原始输入、已完成结果、最初方案不可覆盖；新的算法定义和数据格式单独版本化。
 - 一个明确任务、一个短分支、可复验的检查和绑定提交的审查结论。
 - 全部依赖通过锁文件升级；新模块须声明边界、公开 API 与独立安装测试。
-- 默认私有仓库；项目自有代码的开放许可证尚未选定。第三方技能按各自许可证保留声明。
+- 用户于 2026-10-13 指定使用公开仓库；项目自有代码的开放许可证尚未选定，公开可见不等同于授予开源许可证。第三方技能按各自许可证保留声明。
 
 ## 当前限制
 
 实际环境、检查状态和剩余缺口以 [环境验收记录](docs/research/environment-validation.md) 为准。
-GitHub 私有仓库 rulesets 是否可用取决于套餐；不能用 CODEOWNERS 或本地 hook 替代服务器强制保护。
+main 已启用 GitHub rulesets：必须通过 PR 和必需检查、禁止强推与删除；规则回执机制见自动规则门禁手册。CODEOWNERS 和本地 hook 仅作补充。

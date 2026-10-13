@@ -40,8 +40,14 @@ def doctor() -> int:
 
 
 def main() -> int:
+    if len(sys.argv) > 1 and sys.argv[1] == "context":
+        from tooling.rule_context import main as context_main
+
+        return context_main(["load", *sys.argv[2:]])
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["doctor", "policy", "check", "smoke-env", "audit"])
+    parser.add_argument(
+        "command", choices=["doctor", "policy", "check", "smoke-env", "audit", "context"]
+    )
     parser.add_argument("--all", action="store_true", help="run all currently implemented checks")
     args = parser.parse_args()
     if args.command == "doctor":
