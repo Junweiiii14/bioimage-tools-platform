@@ -6,7 +6,7 @@
       "repository": "openai/skills",
       "commit": "49f948faa9258a0c61caceaf225e179651397431",
       "source_path": "skills/.curated/gh-fix-ci",
-      "tree_sha256": "3bfd199c2352535fd0ae2a9487b996b8ce58a29227d379f598c70a501101a4c3",
+      "tree_sha256": "cfd48b5727ca3e6fd4906fa5c472739a73301c99f5b4dc30b1589cfdc6cd1a0e",
       "license": "see bundled LICENSE.txt",
       "modifications": "none"
     },
@@ -15,7 +15,7 @@
       "repository": "openai/skills",
       "commit": "49f948faa9258a0c61caceaf225e179651397431",
       "source_path": "skills/.curated/gh-address-comments",
-      "tree_sha256": "c6a8ed3c62e39ac5dd1d7a3502c9157a2aec87cecfe05b4a838ee56081f4315f",
+      "tree_sha256": "cd406b1d6f0e0680817b4b3a5b7c77dc5968694c1d3c0901f5288f128972552d",
       "license": "see bundled LICENSE.txt",
       "modifications": "none"
     },
@@ -24,7 +24,7 @@
       "repository": "openai/skills",
       "commit": "49f948faa9258a0c61caceaf225e179651397431",
       "source_path": "skills/.curated/security-best-practices",
-      "tree_sha256": "5a59e210f1c49cb4ff500a049f2463a7bdd1ef33ea3a58b51593a9860dbef259",
+      "tree_sha256": "c76f1246dcb6f81bf3e7d908d56fb3e448be4b2ed5bec6b5fe5ae66a9df3b69d",
       "license": "see bundled LICENSE.txt",
       "modifications": "none"
     },
@@ -33,7 +33,7 @@
       "repository": "openai/skills",
       "commit": "49f948faa9258a0c61caceaf225e179651397431",
       "source_path": "skills/.curated/security-threat-model",
-      "tree_sha256": "d37f5e5b4a5734f7757924eed5ab882a77c4b1c51828752a04186394463fb601",
+      "tree_sha256": "c3a968004c25b9c7aaf133801adba36962e7ab34a7d073834c084472d7854eee",
       "license": "see bundled LICENSE.txt",
       "modifications": "none"
     },
@@ -42,9 +42,10 @@
       "repository": "trailofbits/skills",
       "commit": "442fc9d6c89b1e937e6f7a477e7071ea75fcbea4",
       "source_path": "plugins/property-based-testing/skills/property-based-testing",
-      "tree_sha256": "9230f6c4d83699b04a3ae90a29f461043d346c22d29aa779ad2dea4c433c7ade",
+      "tree_sha256": "a599dfbe97978723f802d963ab15b65ef0716ad6ab20455319ca5b7d45793ed0",
       "license": "CC-BY-SA-4.0",
       "modifications": "added upstream root LICENSE only"
     }
-  ]
+  ],
+  "hash_format": "UTF-8 relative POSIX path, NUL, file bytes, NUL; case-sensitive path sort; Git LF checkout"
 }

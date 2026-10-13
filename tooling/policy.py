@@ -27,7 +27,7 @@ class Manifest(TypedDict):
 
 def tree_digest(folder: Path) -> str:
     digest = hashlib.sha256()
-    for path in sorted(folder.rglob("*")):
+    for path in sorted(folder.rglob("*"), key=lambda item: item.relative_to(folder).as_posix()):
         if path.is_file() and "__pycache__" not in path.parts:
             digest.update(path.relative_to(folder).as_posix().encode("utf-8") + b"\0")
             digest.update(path.read_bytes())
