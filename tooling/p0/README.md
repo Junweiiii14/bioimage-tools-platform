@@ -37,6 +37,8 @@ ROI 延迟是 Qt mouseMove 处理开始至画布 paint 返回，目标后台 p95
 
 CI foundation 增加锁定的 desktop 组，以便严格类型检查与真实 worker 测试在 Windows/Linux 都运行；Qt 使用 offscreen。检查名称和服务器要求保留。新增依赖为零，锁文件不变。CI 不代替真实 Windows 窗口或干净机。
 
+首次 Linux CI 缺少 `libEGL.so.1`，补装 runner 的 libegl1/libopengl0/libxkbcommon0；属于 Qt 原生系统依赖，不跳过进程测试。
+
 125/150/200% 的进程缩放仅能证明 Qt 在相应 DPR 绘制；必须与实际系统缩放、多显示器切换验收区分。用户已指定干净 Windows 无 Python 验收为后续待办。本机移出仓库、清空 Python/Qt 环境的成功不能替代该验收。
 
 当前限制：仅可信合成 TIFF，未做恶意 TIFF 沙箱/压缩炸弹防御；不包含发布签名、安装器、升级与生产持久化。构建日志/XML 留 `.local`；小型 JSON 和结论进入 `work/evidence/T-002/`。
