@@ -44,7 +44,7 @@ extend-exclude = [".agents", ".local"]
 select = ["E", "F", "I", "UP", "B", "SIM"]
 
 [tool.pyright]
-include = ["dev.py", "tooling", "tests"]
+include = ["dev.py", "p0_probe.py", "tooling", "tests"]
 exclude = [".agents", ".venv", ".local"]
 pythonVersion = "3.12"
 typeCheckingMode = "strict"
