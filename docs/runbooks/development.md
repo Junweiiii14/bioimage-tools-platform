@@ -12,10 +12,10 @@ winget install --id astral-sh.uv --version 0.13.0 --exact --source winget --scop
 
 ```powershell
 uv sync --locked --all-groups
-uv run --locked python dev.py doctor
-uv run --locked python dev.py check --all
-uv run --locked --group desktop python dev.py smoke-env
-uv run --locked pre-commit install
+uv run --locked --no-sync python dev.py doctor
+uv run --locked --no-sync python dev.py check --all
+uv run --locked --no-sync python dev.py smoke-env
+uv run --locked --no-sync pre-commit install
 ```
 
 默认 dev 组用于检查。desktop 组安装 Qt、图像/科学计算和 pytest-qt；build 组准备 Nuitka。`uv run` 默认会同步默认组；要保持额外组，显式加 `--group desktop` 或使用已完整同步环境的 `uv run --no-sync`。不要以运行检查后额外依赖被移除误判为损坏。
@@ -29,8 +29,9 @@ uv run --locked pre-commit install
 | `check --all` | policy＋Ruff＋format＋Pyright strict＋当前所有 pytest；任一非零即失败 |
 | `smoke-env` | Qt offscreen 控件、QProcess、中文路径 uint16 TIFF 原值往返和科学库导入 |
 | `audit` | pip-audit 查询当前环境已知漏洞；网络失败不等价于通过 |
+| `context --task <ID> --scope <目录> --record` | 输出适用规则并记录版本与范围；PR 的 rules-context 独立检查回执 |
 
-没有产品包时不运行虚构的产品检查。`--scope`、契约生成、Nuitka 产品构建和安装包冒烟在真实实现后引入。
+没有产品包时不运行虚构的产品检查。当前 `context --scope` 只选择规则范围；测试范围选择、契约生成、Nuitka 产品构建和安装包冒烟在真实实现后引入。
 
 ## 首个产品包进入前
 
@@ -46,7 +47,9 @@ uv run --locked pre-commit install
 
 用户登录使用 `gh auth login -h github.com --git-protocol https --web`。更新 Actions 文件需要 workflow scope。只通过凭据管理器使用令牌，不写到仓库/日志。
 
-服务器 rulesets 当前被套餐限制。`tooling/github-ruleset.json` 是待启用配置；获得适用套餐后用 GitHub 设置/API 导入，并实际尝试违规 push 验证阻断。不能因模板存在就标记保护已生效。
+用户已要求公开，main-quality ruleset 25008972 active；`tooling/github-ruleset.json` 为对应配置。main 必须经 PR 和四项指定 GitHub Actions 检查，禁止删除/强推，无 bypass actor。实际失败/成功验证见 F-002 证据，不以模板存在代替生效证明。
+
+工作分支只在 PR 跑一次 CI，main 合并后再验证；删除了此前 chore 分支 push 与 PR 的重复执行。本地完整同步后使用 `--no-sync`，避免普通检查移除 desktop/build 依赖再反复安装；修改锁文件或缺包时先明确同步。
 
 ## 编译器环境探针
 

@@ -20,10 +20,10 @@
 
 ```powershell
 uv sync --locked --all-groups
-uv run --locked python dev.py doctor
-uv run --locked python dev.py check --all
-uv run --locked --group desktop python dev.py smoke-env
-uv run --locked pre-commit install
+uv run --locked --no-sync python dev.py doctor
+uv run --locked --no-sync python dev.py check --all
+uv run --locked --no-sync python dev.py smoke-env
+uv run --locked --no-sync pre-commit install
 ```
 
 这些命令验证仓库工具和依赖环境；不存在产品入口、SDK、WB 算法或可交付安装包。当前不提供 `package`、`contract`、`check --scope` 的空壳成功命令。

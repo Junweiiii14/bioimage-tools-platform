@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import io
 import json
 import re
 import subprocess
@@ -196,8 +195,9 @@ def validate(root: Path, base: str, head: str) -> list[str]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    if isinstance(sys.stdout, io.TextIOWrapper):
-        sys.stdout.reconfigure(encoding="utf-8")
+    configure_output = getattr(sys.stdout, "reconfigure", None)
+    if callable(configure_output):
+        configure_output(encoding="utf-8")
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
     load = sub.add_parser("load")

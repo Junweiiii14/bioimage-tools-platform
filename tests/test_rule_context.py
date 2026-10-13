@@ -1,11 +1,15 @@
 """A real temporary Git repository exercises rule drift and scope failures."""
 
 import json
+import os
+import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
 
-from tooling.rule_context import CORE, git, make_receipt, validate
+from tooling.rule_context import CORE, RECOVERY, ROOT, git, make_receipt, validate
 
 
 def commit(root: Path, message: str) -> str:
@@ -118,3 +122,23 @@ def test_missing_core_rule_is_rejected(repo: tuple[Path, str]) -> None:
     record(root, base)
     (root / "AGENTS.md").unlink()
     assert "missing" in validate(root, base, commit(root, "deleted rules"))[0]
+
+
+def test_cli_emits_readable_utf8_in_legacy_windows_encoding(repo: tuple[Path, str]) -> None:
+    root, base = repo
+    script = root / "tooling/rule_context.py"
+    script.parent.mkdir()
+    shutil.copyfile(ROOT / "tooling/rule_context.py", script)
+    for name in RECOVERY:
+        p = root / name
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text("Recovery state", encoding="utf-8")
+    (root / "AGENTS.md").write_text("规则：原始图像不可覆盖。\n", encoding="utf-8")
+    env = {**os.environ, "PYTHONIOENCODING": "cp936"}
+    result = subprocess.run(
+        [sys.executable, str(script), "load", "--task", "F-002", "--scope", ".", "--base", base],
+        capture_output=True,
+        env=env,
+        check=True,
+    )
+    assert "规则：原始图像不可覆盖。" in result.stdout.decode("utf-8")

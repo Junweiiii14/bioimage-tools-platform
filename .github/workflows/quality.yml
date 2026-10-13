@@ -2,7 +2,7 @@ name: quality
 on:
   pull_request:
   push:
-    branches: [main, 'chore/**']
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read

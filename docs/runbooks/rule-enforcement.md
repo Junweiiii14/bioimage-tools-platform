@@ -7,7 +7,7 @@
 开始修改前，AI 建立任务文档，然后执行（例）：
 
 ```powershell
-uv run --locked python dev.py context --task F-002 --scope . --record
+uv run --locked --no-sync python dev.py context --task F-002 --scope . --record
 ```
 
 `--scope` 可重复，建议写目标目录、任务/证据和需要更新的交接目录。`.` 适用于跨仓库治理变更；会加载所有自有嵌套指令。命令输出通用规则、适用目录规则、任务和最新交接；版本不同还输出 main 上的旧规则。

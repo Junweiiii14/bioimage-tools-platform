@@ -4,7 +4,7 @@
 
 先读取 `AGENTS.md` 和交接入口。确认仓库、分支、基线 SHA、未提交改动与任务范围。使用 `work/tasks/TEMPLATE.md` 定义验收；任务文件是状态唯一来源，Issue 只链接。
 
-编辑前运行 `uv run --locked python dev.py context --task <ID> --scope <目录> --record` 并读输出；按需重复 `--scope`。回执随 PR 提交，main/规则/范围变化后刷新。用规则加载器处理嵌套指令，不能靠口头声明已读。
+编辑前运行 `uv run --locked --no-sync python dev.py context --task <ID> --scope <目录> --record` 并读输出；按需重复 `--scope`。回执随 PR 提交，main/规则/范围变化后刷新。用规则加载器处理嵌套指令，不能靠口头声明已读。
 
 默认短分支 `feat/<task>-<topic>`、`fix/<task>-<topic>`、`chore/<topic>`；稳定 `main`，不用长期 develop 分支。已有未提交修改不得覆盖。并行写入确有需要时使用独立 worktree，不能共用工作目录；是否使用子代理由用户请求和适用运行指令决定。
 
