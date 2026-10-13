@@ -1,0 +1,22 @@
+name: rules-context
+on:
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: rules-context-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  rules-context:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify context against the exact PR base and head
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python -I tooling/rule_context.py check --base "$BASE_SHA" --head "$HEAD_SHA"

@@ -1,6 +1,6 @@
 # F-001：长期代码治理与开发环境
 
-- 状态：review（请求范围内建设与安装已完成，草稿 PR #1 待审查）
+- 状态：complete（用户后续要求规则进入公开仓库，PR #1 已合并；产品实现未开始）
 - base commit：f8fd8ed（初始 PDF 提交；完整 SHA 由 Git 获取）
 - 分支：chore/repository-foundation
 - 来源：用户 2026-10-13 的深度调研、规则编写、能力检查和安装请求。

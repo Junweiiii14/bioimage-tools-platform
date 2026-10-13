@@ -19,9 +19,10 @@
     {"type": "required_status_checks", "parameters": {
       "strict_required_status_checks_policy": true,
       "required_status_checks": [
-        {"context": "foundation (windows-latest)"},
-        {"context": "foundation (ubuntu-latest)"},
-        {"context": "desktop-environment"}
+        {"context": "foundation (windows-latest)", "integration_id": 15368},
+        {"context": "foundation (ubuntu-latest)", "integration_id": 15368},
+        {"context": "desktop-environment", "integration_id": 15368},
+        {"context": "rules-context", "integration_id": 15368}
       ]
     }}
   ]

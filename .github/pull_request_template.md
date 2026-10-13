@@ -2,6 +2,7 @@
 
 关联任务：`work/tasks/<ID>.md`
 基线提交：
+规则加载回执：`work/evidence/<ID>/rules-context.json`
 
 ## 影响与证据
 
