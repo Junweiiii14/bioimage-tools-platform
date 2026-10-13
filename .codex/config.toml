@@ -1,0 +1,3 @@
+# Project overrides only; account, selected model and permissions stay user-controlled.
+model_reasoning_effort = "medium"
+project_doc_max_bytes = 32768
