@@ -3,6 +3,7 @@
 ## Current Blockers
 
 - 无。用户已明确要求公开；仓库已公开，服务器 ruleset 已 active。此前私有套餐限制已解除。
+- T-002 的包态窗口操作被用户物理 Esc 停止，本轮不再调用 Computer Use。包态自动进程与性能已通过，原生按钮/ROI/DPI 尚未完成；详见 T-002 记录。
 
 ## Current Risks
 

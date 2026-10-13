@@ -29,6 +29,12 @@ uv run --locked --no-sync python -m tooling.p0.benchmark --fixtures .local/p0/�
 
 样本生成拒绝覆盖目录；基准和界面证据拒绝覆盖文件。手工 GUI：依次加载三种图、拖动 ROI；批处理时拖动、取消；模拟崩溃后再运行并保存记录。不要在未观察完成时将失败改为成功。
 
+`portable.py --build <构建目录> --fixtures <样本目录> --qt-licenses <已核验的许可证目录> --destination <新目录>` 校验构建哈希并装配本机验证包。第三方许可文本来源见本轮 build-audit 与包内 licenses/Qt-upstream/sources.json；发布前还需正式依赖声明审查。
+
+`launch_clean.py --bundle <仓库外已解压包> --evidence <记录目录>`（以 `python -m tooling.p0.launch_clean` 运行）使用仅有 Windows 必需变量的子进程环境，PATH 仅保留系统目录。可加 `--scale <倍率>`，这是乘以系统原生 DPR 的 Qt 进程倍率，不修改系统 DPI。
+
+本轮裁剪后的首次构建约 713 秒，364 个 C 编译文件全部 cache miss；已保留缓存，但没有以实测证明后续增量提速。应用目录 183.5MiB；完整验收包包含约 728MiB 未压缩合成图，不应把该数据集计作未来产品应用体积。
+
 ## 验收口径
 
 三类单图各 5 次、20 图批次 3 次，fresh worker，未清空文件系统缓存。median/nearest-rank p95 同时报 n，小样本 p95 近似最大值。固定尺寸见 manifest；不得为达标缩图。
