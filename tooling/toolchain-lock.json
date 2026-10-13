@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-13",
+  "uv": {
+    "version": "0.13.0",
+    "installer": "WinGet astral-sh.uv user scope",
+    "archive_sha256": "088962f9e7b7bd9ea740c04c650b2a21c8928c345bd99ac24350dc924dba656c"
+  },
+  "python": "3.12.14",
+  "nuitka": "4.3",
+  "compiler": {
+    "name": "MinGW64 GCC",
+    "version": "15.2.0",
+    "release": "15.2.0posix-13.0.0-msvcrt-r6",
+    "url": "https://github.com/brechtsanders/winlibs_mingw/releases/download/15.2.0posix-13.0.0-msvcrt-r6/winlibs-x86_64-posix-seh-gcc-15.2.0-mingw-w64msvcrt-13.0.0-r6.zip",
+    "observed_archive_sha256": "d73d02c9caed172db0f3331fb4030e0a3b85947aefff9cc1da4dd81b7423c3a1",
+    "cache": "~/.cache/bioimage-nuitka",
+    "verification": "minimal accelerated compile and generated-launcher run passed; standalone product untested"
+  }
+}

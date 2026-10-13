@@ -6,9 +6,9 @@
 - Last agent: Codex
 - Workspace root: bioimage-tools-platform
 - Current objective: F-001，完成治理、技能与环境建设，不开始业务开发。
-- Current status: 验证与远程审查准备中；唯一任务状态见 work/tasks/F-001-foundation.md。
+- Current status: 已交付、草稿 PR #1 待审查；唯一任务状态见 work/tasks/F-001-foundation.md。
 - Immediate next actions:
-  - 验证编译探针、提交基础设施、运行 GitHub CI，记录最终证据。
+  - 根据用户后续指示审查 PR #1 或开始明确的新任务；不自动开始业务开发。
 - Active files:
   - work/tasks/F-001-foundation.md
   - docs/research/environment-validation.md
@@ -19,4 +19,4 @@
 
 ## Recovery Summary
 
-GitHub 私有库已建立，main 保留初始 PDF；chore/repository-foundation 建设治理材料。用户最初要求只存方案，后来授权调研/规则/安装，尚未要求实现产品。不要把原方案任务模板当作开始产品工作的命令。
+GitHub 私有库已建立，main 保留初始 PDF；chore/repository-foundation 已提交治理材料，PR #1 待审查。用户最初要求只存方案，后来授权调研/规则/安装，尚未要求实现产品。不要把原方案任务模板当作开始产品工作的命令。

@@ -47,3 +47,11 @@ uv run --locked pre-commit install
 用户登录使用 `gh auth login -h github.com --git-protocol https --web`。更新 Actions 文件需要 workflow scope。只通过凭据管理器使用令牌，不写到仓库/日志。
 
 服务器 rulesets 当前被套餐限制。`tooling/github-ruleset.json` 是待启用配置；获得适用套餐后用 GitHub 设置/API 导入，并实际尝试违规 push 验证阻断。不能因模板存在就标记保护已生效。
+
+## 编译器环境探针
+
+`uv run --locked --all-groups python -m tooling.compiler_probe` 会按 Nuitka 支持的下载方式准备 MinGW64/GCC、用两个编译任务编译一个打印字符串的探针并通过生成的启动器运行。第一次需要下载编译器；产物在 `.local/compiler-probe`，缓存默认 `~/.cache/bioimage-nuitka`。脚本只对 Windows x64 定义，不修改全局环境。
+
+本机 gcc 15.2.0 已实际通过。源码、编译器缓存和 Python DLL 仍在开发机上，因此这不能替代 standalone Qt 和干净机验收。未来产品打包命令须另外实现。
+
+pre-commit 使用 `--no-sync`，提交期间只检查，不改变正在使用的依赖环境；首次提交前仍需按锁文件同步。

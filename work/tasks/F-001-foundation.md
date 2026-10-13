@@ -1,6 +1,6 @@
 # F-001：长期代码治理与开发环境
 
-- 状态：implementing
+- 状态：review（请求范围内建设与安装已完成，草稿 PR #1 待审查）
 - base commit：f8fd8ed（初始 PDF 提交；完整 SHA 由 Git 获取）
 - 分支：chore/repository-foundation
 - 来源：用户 2026-10-13 的深度调研、规则编写、能力检查和安装请求。
@@ -19,7 +19,7 @@
 
 ## 证据
 
-见 `docs/research/environment-validation.md` 和 `work/evidence/F-001/`；收尾时写入真实结果。
+见 `docs/research/environment-validation.md` 和 `work/evidence/F-001/local-validation.json`。14 个本地测试、类型/格式、桌面依赖、编译器探针通过；依赖审计 67 包 0 已知漏洞，Windows/Linux 三项 CI 已通过。PR：https://github.com/Junweiiii14/bioimage-tools-platform/pull/1。
 
 ## 独立审查
 
@@ -27,4 +27,4 @@
 
 ## 回滚
 
-分支提交可 revert；删除新建的本项目虚拟环境后按锁重建。Skills 仅在 `.agents/skills`，没有覆盖全局同名技能；项目 Codex 配置只影响本仓库。uv 是 WinGet 用户级安装，可用 WinGet 卸载。不自动执行任何清理。
+分支提交可 revert；删除新建的本项目虚拟环境后按锁重建。Skills 仅在 `.agents/skills`，没有覆盖全局同名技能；项目 Codex 配置只影响本仓库。uv 是 WinGet 用户级安装，可用 WinGet 卸载；Nuitka 下载的编译器仅在专用用户缓存。不自动执行任何清理。

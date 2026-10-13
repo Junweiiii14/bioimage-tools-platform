@@ -21,6 +21,8 @@ def main() -> int:
     environment = os.environ.copy()
     # Codex may omit this Windows variable; SCons expects it even on a verified x64 host.
     environment.setdefault("PROCESSOR_ARCHITECTURE", "AMD64")
+    # Keep compiler includes below Windows path limits, outside the app's long cache prefix.
+    environment.setdefault("NUITKA_CACHE_DIR", str(Path.home() / ".cache/bioimage-nuitka"))
     result = subprocess.run(
         [
             sys.executable,
@@ -38,11 +40,15 @@ def main() -> int:
     )
     if result.returncode:
         return result.returncode
-    probe = subprocess.run(
-        [str(folder / "probe.exe")], capture_output=True, text=True, timeout=30, check=False
+    # Accelerated builds can need Nuitka's generated launcher to locate uv's Python DLL.
+    launcher = folder / "probe.cmd"
+    command = (
+        ["cmd.exe", "/d", "/c", str(launcher)] if launcher.exists() else [str(folder / "probe.exe")]
     )
+    probe = subprocess.run(command, capture_output=True, text=True, timeout=30, check=False)
     print(probe.stdout.strip())
     if probe.returncode or probe.stdout.strip() != "bioimage-compiler-ok":
+        print(f"Compiler probe exit code: {probe.returncode}")
         print(probe.stderr)
         return 1
     print("Compiler probe passed; this is not a standalone Qt product validation")

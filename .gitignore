@@ -22,3 +22,4 @@ data/raw/
 models/
 node_modules/
 .codex/config.local.toml
+nuitka-crash-report.xml
