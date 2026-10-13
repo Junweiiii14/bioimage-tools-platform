@@ -1,0 +1,58 @@
+[project]
+name = "bioimage-tools-platform"
+version = "0.0.0"
+description = "Development foundation; product implementation has not started"
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[dependency-groups]
+dev = [
+  "ruff==0.17.0",
+  "pyright==1.1.414",
+  "pytest==9.1.1",
+  "pytest-cov==7.1.0",
+  "import-linter==2.15",
+  "hypothesis==6.169.0",
+  "pre-commit==4.7.0",
+  "pip-audit==2.10.1",
+  "pyyaml==6.0.3",
+]
+desktop = [
+  "PySide6==6.12.0",
+  "pytest-qt==4.5.0",
+  "numpy==2.5.4",
+  "scipy==1.18.1",
+  "pillow==12.3.0",
+  "tifffile==2026.9.20",
+  "pydantic==2.14.1",
+]
+build = ["Nuitka==4.3", "ordered-set==4.1.0", "zstandard==0.25.0"]
+
+[tool.uv]
+package = false
+required-version = "==0.13.0"
+
+[tool.uv.workspace]
+members = []
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = [".agents", ".local"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pyright]
+include = ["dev.py", "tooling", "tests"]
+exclude = [".agents", ".venv", ".local"]
+pythonVersion = "3.12"
+typeCheckingMode = "strict"
+venvPath = "."
+venv = ".venv"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["--import-mode=importlib", "--strict-markers", "--strict-config", "-ra"]
+pythonpath = ["."]
+markers = ["environment: optional desktop dependency smoke check, no product behavior"]

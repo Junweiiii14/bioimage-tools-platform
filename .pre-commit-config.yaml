@@ -1,0 +1,21 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: Ruff check (locked)
+        entry: uv run --locked --no-sync ruff check
+        language: system
+        types: [python]
+        exclude: ^\.agents/skills/
+      - id: ruff-format
+        name: Ruff format check (locked)
+        entry: uv run --locked --no-sync ruff format --check
+        language: system
+        types: [python]
+        exclude: ^\.agents/skills/
+      - id: repository-policy
+        name: Repository policy
+        entry: uv run --locked --no-sync python dev.py policy
+        language: system
+        pass_filenames: false
+        always_run: true

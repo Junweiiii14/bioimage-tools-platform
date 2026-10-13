@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-13",
+  "code_base_head": "fdf9a61ca65c11c665ec22600dc04b6885d9f537",
+  "working_change": "compiler_probe cache path fix pending; core checks unchanged",
+  "scope": "foundation and installed dependencies only",
+  "checks": [
+    {
+      "command": "python -X utf8 dev.py doctor",
+      "exit_code": 0,
+      "seconds": 0.241,
+      "stdout": "{\n  \"python\": \"3.12.14\",\n  \"expected_python\": \"3.12.14\",\n  \"platform\": \"Windows-11-10.0.26200-SP0\",\n  \"packages\": {\n    \"ruff\": \"0.17.0\",\n    \"pyright\": \"1.1.414\",\n    \"pytest\": \"9.1.1\",\n    \"import-linter\": \"2.15\",\n    \"hypothesis\": \"6.169.0\",\n    \"pre-commit\": \"4.7.0\"\n  },\n  \"product_status\": \"not-started\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": "python -X utf8 dev.py check --all",
+      "exit_code": 0,
+      "seconds": 4.202,
+      "stdout": "Product boundary scan: 0 files; zero means product is not implemented\nRUN C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-tools-platform\\.venv\\Scripts\\python.exe -m ruff check .\nAll checks passed!\nRUN C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-tools-platform\\.venv\\Scripts\\python.exe -m ruff format --check .\n34 files already formatted\nRUN C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-tools-platform\\.venv\\Scripts\\python.exe -m pyright\n0 errors, 0 warnings, 0 informations\nRUN C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-tools-platform\\.venv\\Scripts\\python.exe -m pytest -q\n..............                                                           [100%]\n14 passed in 0.42s\nRepository foundation checks passed; product and packaged application remain untested\n",
+      "stderr": ""
+    },
+    {
+      "command": "python -X utf8 dev.py smoke-env",
+      "exit_code": 0,
+      "seconds": 1.319,
+      "stdout": "RUN C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-tools-platform\\.venv\\Scripts\\python.exe -m tooling.smoke_environment\n{\n  \"qt\": \"6.12.0\",\n  \"numpy\": \"2.5.4\",\n  \"scipy\": \"1.18.1\",\n  \"pillow\": \"12.3.0\",\n  \"pydantic\": \"2.14.1\",\n  \"utf8_uint16_tiff\": \"passed\",\n  \"qprocess\": \"passed\",\n  \"offscreen_widget\": \"passed\",\n  \"scope\": \"environment only; no DPI, cancellation or packaged-product validation\"\n}\n",
+      "stderr": ""
+    }
+  ],
+  "dependency_audit": {
+    "packages": 67,
+    "known_vulnerabilities": 0
+  },
+  "compiler_probe": {
+    "result": "passed",
+    "compiler": "gcc 15.2.0",
+    "stdout": "bioimage-compiler-ok",
+    "exit_code": 0,
+    "limitations": "accelerated mode via generated launcher; not standalone Qt"
+  },
+  "github_ci": {
+    "head": "fdf9a61ca65c11c665ec22600dc04b6885d9f537",
+    "url": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/38416366026",
+    "conclusion": "success",
+    "jobs": [
+      "foundation (windows-latest)",
+      "foundation (ubuntu-latest)",
+      "desktop-environment"
+    ]
+  }
+}
