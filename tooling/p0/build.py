@@ -9,6 +9,7 @@ import os
 import platform
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -38,6 +39,13 @@ def main() -> int:
         "--enable-plugin=pyside6",
         "--include-qt-plugins=platforms,styles",
         "--include-module=scipy.ndimage",
+        "--nofollow-import-to=pygments",
+        # Explicit P0-only dependency scope, verified by the fixed workload. SciPy's
+        # dynamic top-level imports otherwise pull unrelated experimental subpackages.
+        "--nofollow-import-to=scipy.cluster,scipy.constants,scipy.datasets,scipy.differentiate",
+        "--nofollow-import-to=scipy.fft,scipy.fftpack,scipy.integrate,scipy.interpolate",
+        "--nofollow-import-to=scipy.io,scipy.odr,scipy.optimize,scipy.signal,scipy.sparse",
+        "--nofollow-import-to=scipy.spatial,scipy.stats",
         "--mingw64",
         "--assume-yes-for-downloads",
         "--jobs=2",
@@ -47,6 +55,7 @@ def main() -> int:
         f"--report={output / 'compilation-report.xml'}",
         str(ROOT / "p0_probe.py"),
     ]
+    started = time.perf_counter()
     with (output / "build.log").open("w", encoding="utf-8") as stream:
         code = subprocess.run(
             args, cwd=ROOT, env=environment, stdout=stream, stderr=subprocess.STDOUT, check=False
@@ -62,6 +71,7 @@ def main() -> int:
         },
         "command": args,
         "exit_code": code,
+        "elapsed_seconds": time.perf_counter() - started,
         "artifacts": {
             p.relative_to(output).as_posix(): sha(p)
             for p in sorted((output / "p0_probe.dist").rglob("*"))
