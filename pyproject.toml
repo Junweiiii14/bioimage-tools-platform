@@ -1,9 +1,9 @@
 [project]
 name = "bioimage-tools-platform"
 version = "0.0.0"
-description = "Development foundation; product implementation has not started"
+description = "Bioimage desktop platform and WB quantification tools in development"
 requires-python = ">=3.12,<3.13"
-dependencies = []
+dependencies = ["wb-tool"]
 
 [dependency-groups]
 dev = [
@@ -33,7 +33,10 @@ package = false
 required-version = "==0.13.0"
 
 [tool.uv.workspace]
-members = []
+members = ["tools/wb"]
+
+[tool.uv.sources]
+wb-tool = { workspace = true }
 
 [tool.ruff]
 target-version = "py312"
@@ -44,7 +47,7 @@ extend-exclude = [".agents", ".local"]
 select = ["E", "F", "I", "UP", "B", "SIM"]
 
 [tool.pyright]
-include = ["dev.py", "p0_probe.py", "tooling", "tests"]
+include = ["dev.py", "p0_probe.py", "tooling", "tests", "tools/wb"]
 exclude = [".agents", ".venv", ".local"]
 pythonVersion = "3.12"
 typeCheckingMode = "strict"
@@ -52,7 +55,7 @@ venvPath = "."
 venv = ".venv"
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "tools/wb/tests"]
 addopts = ["--import-mode=importlib", "--strict-markers", "--strict-config", "-ra"]
 pythonpath = ["."]
 markers = ["environment: optional desktop dependency smoke check, no product behavior"]

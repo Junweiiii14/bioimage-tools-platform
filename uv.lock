@@ -2,6 +2,12 @@ version = 1
 revision = 5
 requires-python = "==3.12.*"
 
+[manifest]
+members = [
+    "bioimage-tools-platform",
+    "wb-tool",
+]
+
 [[package]]
 name = "annotated-types"
 version = "0.8.0"
@@ -15,6 +21,9 @@ wheels = [
 name = "bioimage-tools-platform"
 version = "0.0.0"
 source = { virtual = "." }
+dependencies = [
+    { name = "wb-tool" },
+]
 
 [package.dev-dependencies]
 build = [
@@ -44,6 +53,7 @@ dev = [
 ]
 
 [package.metadata]
+requires-dist = [{ name = "wb-tool", editable = "tools/wb" }]
 
 [package.metadata.requires-dev]
 build = [
@@ -1000,6 +1010,11 @@ sdist = { url = "https://files.pythonhosted.org/packages/dc/3f/935cf1757643381fb
 wheels = [
     { url = "https://files.pythonhosted.org/packages/52/5b/799c3e5b8e04d5fa1c9b61a4c1f5079603e747205c7311b92abd30283df5/virtualenv-21.14.7-py3-none-any.whl", hash = "sha256:3769219a308c5d2f093e7729621ad12a6346b5767a7ec4338414e2a0fb0c526b", size = 5487587, upload-time = "2026-10-12T01:27:29.37Z" },
 ]
+
+[[package]]
+name = "wb-tool"
+version = "0.1.0"
+source = { editable = "tools/wb" }
 
 [[package]]
 name = "zstandard"

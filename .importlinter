@@ -1,0 +1,22 @@
+[importlinter]
+root_package = wb_tool
+include_external_packages = True
+
+[importlinter:contract:domain-purity]
+name = WB domain is independent of GUI and storage
+type = forbidden
+source_modules = wb_tool.domain
+forbidden_modules =
+    PySide6
+    sqlite3
+    subprocess
+    multiprocessing
+    pathlib
+
+[importlinter:contract:public-layer]
+name = Public API may depend on domain, never the reverse
+type = layers
+layers =
+    wb_tool.api
+    wb_tool.domain
+

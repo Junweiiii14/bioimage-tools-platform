@@ -1,12 +1,11 @@
 # Handoff Snapshot
 
-- 更新：2026-10-14；Codex；bioimage-tools-platform。
-- 当前任务唯一状态源：`work/tasks/T-002-p0-validation.md`。
-- 授权：P0 本机验证与便携包；干净 Windows 无 Python 验收后续。不扩展 T-001/WB 或归档项目。
-- 分支 `feat/T-002-p0-validation`；PR #3 草稿，未合并。基线 main `221a2df`。
-- 已完成：35 测试、Ruff、Pyright strict；源码原生窗口实操；standalone 构建；ZIP 330 文件解压哈希；包态固定样本、取消/强停/崩溃恢复基准。构建源提交 `293c6c0632e2`，应用 183.5MiB；完整 ZIP（含固定大图集）794MiB。
-- 未完成：用户物理 Esc 停止 Computer Use。本轮没有继续桌面工具；包态原生加载/ROI/按钮、GUI 大图峰值与交互 p95、125/200% 进程缩放未测。干净机和跨显示器亦待后续，独立审查未进行。不能宣称完整本机 P0 通过或栈冻结。
-- 下一步：用户继续时恢复 T-002，仅补上述未完成验收。重新读取 Computer Use 文档，重新选择窗口，不复用 handle；不要重做已通过的源码或完整编译，除非相关代码变化。
-- 包：`../deliverables/BioimageP0-Windows-x64-293c6c0.zip`；已解压到 `../deliverables/P0独立验收/BioimageP0-293c6c0`。GUI PID 40464 启动后留给用户控制，后续须核对进程现状。
-- 证据：`work/evidence/T-002/validation.md`（含 ZIP SHA、包态基准、限制）；脚本：`tooling/p0/README.md`。最小环境启动已完成、实际 DLL 来源已记录，但不等于干净机。
-- 构建日志/XML 在 `.local/p0/build-293c6c0632e2`。首轮宽泛构建主动中止在 `.local/p0/build-d81350859588`；缓存未删除。二进制与原图不进 Git。
+- 更新：2026-10-14；当前目标持续规划开发至 WB 自动化软件完成。
+- 当前任务唯一状态源：`work/tasks/T-003-wb-product.md`，用户已明确扩展 WB 授权。
+- 分支 `feat/T-003-wb-product`，起点 d83e4a0；继承 T-002 分支，PR #3 仍未合并。新任务未创建 PR。
+- 已实现 WB 纯数值包 `tools/wb` / `wb_tool.api`；参考积分、闭区间、人工基线与失败类型。8 来源文件 SHA/本地快照冻结，原方案第 18-19 页核对。真实标注集尚未冻结。
+- 完整质量检查 61 测试通过，2 import-linter 合约及正/负图，隔离 wheel 安装通过；证据 `work/evidence/T-003/validation.md`。
+- 下一步：TIFF 输入、位深/极性、半开泳道 ROI 和原始剖面，再 worker/UI 手工闭环。可选用户问题：先自动候选还是首版也含 Fig/行名 OCR；等待异步回复，不阻止共用部分。
+- 待完成：真实参考集、自动候选、归一化、保存恢复/导出、产品 GUI、产品包、绑定提交独立审查。当前只有核心，不可宣称软件完成。
+- T-002 缺项保留：包态原生交互/ROI/DPI 与 GUI p95 未测；干净 Windows 按用户先前决定后续。技术包位置与历史证据见 T-002 文档，不重复编译技术探针。
+- 原始 TIFF/PDF、旧 wbquant-improvements 未修改；不恢复归档项目。不启动其他工具。

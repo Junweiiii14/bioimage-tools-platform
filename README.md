@@ -1,6 +1,6 @@
 # 生物图像工具平台
 
-当前阶段：**T-002/P0 本机技术验证与便携包；未开始 WB 业务实现。**
+当前阶段：**T-003/WB 产品开发；已实现参考剖面积分核心，图像输入与桌面闭环待实现。**
 
 最初的 [V3.0 技术方案](生物图像工具平台与全AI长期迭代技术方案.pdf) 保持原样，首次提交可追溯。
 本仓库将承载 Windows 本地桌面平台及 WB、IF、IHC 工具，采用 Python/PySide6、独立计算进程、单仓库分包的候选路线。产品选型须经 P0 打包与目标机试验后冻结。
@@ -26,7 +26,7 @@ uv run --locked --no-sync python dev.py smoke-env
 uv run --locked --no-sync pre-commit install
 ```
 
-这些命令验证治理工具与 P0 自动测试；真实桌面、便携包和性能另外验收。P0 探针入口与命令见 [验证手册](tooling/p0/README.md)。当前不存在正式产品 SDK 或 WB 算法，不提供 `package`、`contract`、`check --scope` 的空壳成功命令。
+这些命令验证治理工具、P0 自动测试、WB 数值核心、导入边界与隔离 wheel；真实桌面、便携包和性能另外验收。P0 探针入口与命令见 [验证手册](tooling/p0/README.md)。WB 入口与契约见 [模块说明](tools/wb/README.md)；尚无正式产品 SDK 和 GUI，不提供 `package`、`contract`、`check --scope` 的空壳成功命令。
 
 ## 维护原则
 

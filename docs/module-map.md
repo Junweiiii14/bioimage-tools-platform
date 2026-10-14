@@ -14,7 +14,7 @@
 | `packages/desktop_sdk/` | ToolView、Qt 生命周期、宿主 UI 端口 | 规划；pytest-qt |
 | `packages/imaging_core/` | 原始图像、坐标和纯技术运算 | 规划；位深/几何/性质 |
 | `packages/imaging_ui/` | 真实复用需求出现后的画布适配 | 规划，不预建 |
-| `tools/wb/` | WB 自有领域、用例、适配和 UI | 规划；解析积分和参考集 |
+| `tools/wb/` | `wb_tool.api` 的纯领域剖面积分；用例/适配/UI 待实现 | 已建数值核心；解析样例、import-linter、隔离 wheel |
 | `tools/if_intensity/` | 第二工具验证平台边界 | 规划，WB 最小闭环后 |
 | `tools/if_count/`, `tools/ihc_area/` | 各自独立的实验语义 | 后续规划 |
 
