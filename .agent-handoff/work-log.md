@@ -78,3 +78,6 @@ wb-tool 0.2.0 新增 uint8/16 灰度及显式 RGB 单页 TIFF、极性与半开 
 
 ## 2026-10-14 / T-015 项目归一化
 从9dddcba创建feat/T-015-project-normalization，产品0cd390b实现v5显式目标/参照、逐槽样本/包含/对照、比值与相对单对照/均值、Qt编辑撤回确认/自动表/OCR标签/保存重开/XLSX。派生值从核验run重建，无epsilon或静默丢坏对照；v5可无OCR，旧v4约束保持。284全量/9合约/隔离安装通过，源码Qt截图已查看。T-015 review待独审，T-016生成PNG衔接ready；用户偏好仍未知，Goal active，未推送/发布。证据work/evidence/T-015/validation.md。
+
+## 2026-10-14 / T-016 完整生成拼图与PNG OCR
+从5cf7c71创建feat/T-016-composed-figure-ocr，产品1d5ae2a新增PNG专用解码/已知预处理、完整PNG生成/来源/异步字节导入、真实OCR复核自动表、单图PNG入口。保留原图/归一化，取消与过期保存/成图不覆盖编辑；诊断发现成图错误被刷新覆盖，改为合并计时和错误保留。304全量/隔离安装通过；真实用户组合TIFF的独立PNG显示副本15token/11未确认行、源SHA保持、保存重开一致，两个Qt截图已看。T-016 review、T-017批量元信息/缩略图ready；整体Goal active，未独审/推送/发布。
