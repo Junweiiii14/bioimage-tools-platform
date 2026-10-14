@@ -2,6 +2,8 @@
 
 2026-10-14，本机Windows，base0c8fc3f，feat/T-017-project-metadata-batch。wb-tool0.15.0、bioimage-app0.10.0；Python3.12.14、uv0.13.0、PySide6/Qt6.12.0，锁定数值/OCR依赖不变。规则回执rules-context.json已随范围记录；docs/module-map更新后刷新并读取差异。
 
+产品提交：9ea4089（feat(wb): add reviewed batch metadata import and source thumbnails）。本次补记仅绑定既有作者自验证据，不构成独立审查。
+
 ## 实施
 
 只读有界XLSX/CSV → 明确表头/列/完整键 → 可编辑提议/目标 → 勾选行与字段 → 严格模型原子应用。共同值和字面文件名分段共用提议/应用。名称与顺序不改测量，N/空位撤回审核，保留原run/OCR/归一化配置但拒绝旧有效值。后台原图128边缩略图/显示缓存、坏图继续和重开按需加载；后台表解析和迟到取消/关闭/编辑保护。无schema/积分/外部依赖变化。

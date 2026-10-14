@@ -32,3 +32,5 @@
 | 2026-10-14 | 项目v5保存显式参照/逐槽样本与对照配置，可无OCR；lane_reference_ratio@1从核验run重建q=T/R、f=q/所选对照均值 | 未知实验偏好不能变成默认配对；全部所选对照必须有效，无epsilon/坏对照静默丢弃；原始积分保持 | 0cd390b、wb-project-normalization-v1.md、2026-10-14-project-normalization.md |
 
 | 2026-10-14 | PNG走独立OCR显示解码/白底透明/已知预处理ID；完整生成图先保存来源修订，再导入不可变资产进入OCR | 保持旧TIFF与原图定量语义，不以缩略图或未确认标签推断实验关联；通用存储线程import_bytes无实验字段 | 1d5ae2a、wb-png-ocr-v1.md、T-016/validation.md |
+
+| 2026-10-14 | 批量元信息使用有界字面XLSX/CSV、严格完整键与可改预览，用户显式选行/字段后原子应用；项目schema不变 | 用户项目表含公式/订单编号和嵌图，不能推断科学映射；不解码嵌图、不用公式缓存；名称保留测量，N/空位依原契约失效 | wb-project-metadata-v1.md、2026-10-14-project-metadata.md、T-017/validation.md |
