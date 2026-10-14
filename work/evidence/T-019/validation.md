@@ -1,6 +1,6 @@
 # T-019 ZIP恢复验证
 
-日期2026-10-14；分支feat/T-019-project-archive-restore，起点f79b7b3。作者自验，不等于独立审查。产品提交ID在阶段收尾后记录；整体WB软件尚未完成，Goal active。
+日期2026-10-14；分支feat/T-019-project-archive-restore，起点f79b7b3。作者自验，不等于独立审查。产品提交6a063690bc79b4d9a0c40d242226f7d0e4235082；整体WB软件尚未完成，Goal active。
 
 ## 实现与边界
 
@@ -34,3 +34,5 @@
 已通过QWidget.grab检查源码Qt恢复界面，截图.local/requirements-review/T019-restored.png（私有忽略）：历史来源提示、4000/空/0、来源列可见；随后将列中完整SHA移至提示，保留短来源标签。没有启动原生CUA，没有修改用户WB资料。没有新的真实实验准确率、外部Excel、物理FAT、非Windows逐项发布、断电或大项目性能结论。
 
 未完成：绑定提交的独审、远程必需CI/PR/main集成、直接TIFF/PNG成图（T-020）、精确实验室模板/横向分段/模板库、缩放句柄、旧工具实际衔接、人工真值/工作流及最终Windows安装包/干净机/DPI/签名许可证验收。
+
+收尾执行uv sync --locked --offline --all-groups，退出0，仅将3个本地editable包同步到已验证版本；提交钩子的Ruff检查/格式及Repository policy全部通过。

@@ -1,7 +1,7 @@
 # Handoff Snapshot
 
 - 更新2026-10-14；用户授权持续开发至WB自动化软件完成，Goal active，无token预算。整体软件未完成，阶段测试不能标整体完成。
-- 活动分支feat/T-019-project-archive-restore，base f79b7b3；产品提交在收尾记录，最终HEAD见git。任务状态唯一来源work/tasks：T-019 review待独审，T-020 ready。当前无运行中测试/工具进程，未推送/PR/main集成/发布。
+- 活动分支feat/T-019-project-archive-restore，base f79b7b3；产品6a06369，最终HEAD见git。任务状态唯一来源work/tasks：T-019 review待独审，T-020 ready。当前无运行中测试/工具进程，未推送/PR/main集成/发布。
 - 用户明确忽略CLX；TIFF设备原图/TIF裁剪，_0/_1语义未知，不猜定量源。归一化偏好问题未回答，不推断样本/参照。材料只作证据，本轮未修改用户资料。
 - wb-tool0.17.0/app0.12.0/platform-runtime0.2.0：T-019有界ZIP普通/ZIP64检查、生成内部暂存路径、CRC/SHA/大小/成员集合/角色、原请求结果/OCR副本/CSV/OOXML重建及原通道裁剪/显示像素核对；不extractall、不执行成员。
 - 新schema6/WBRestoredProject保留原ZIP/archive_sources和历史imported_runs，本机AssetRef重映射，原RunRecord内部声明保持。v1–v5继续读；当前运行结果须重读核验并标为历史，本机数据库不登记外来run/PID/退出收据。真实重新计算沿RunSession，新run成为本机运行；旧历史保留，二次归档/恢复保留链。
