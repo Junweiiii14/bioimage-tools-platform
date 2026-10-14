@@ -1,7 +1,7 @@
 # Handoff Snapshot
 
 - 更新：2026-10-14；上位目标 T-003 持续开发至 WB 软件完成；当前任务 work/tasks/T-005-wb-worker.md。
-- 分支 feat/T-005-wb-worker，继承 feat/T-004-wb-analysis (45d0c5f)；T-005 待提交，所有产品阶段独审尚未执行。
+- 分支 feat/T-005-wb-worker，继承 feat/T-004-wb-analysis (45d0c5f)；T-005 实现提交 bd1af2e，所有产品阶段独审尚未执行。
 - wb_tool.api 0.4.0：TIFF/原始剖面/手工分析/严格协议；入口 python -m wb_tool.worker 限制数值线程。
 - 已验证：123 测试、4 import-linter、schema 漂移及隔离 wheel 中真实 worker；signal 10、revision 7、错误源、合作取消/错误身份、旧/重复结果与损坏消息拒绝。证据 work/evidence/T-005/validation.md。
 - 取消确认只是候选，宿主还须确认进程退出。worker 不写 SQLite/工作区，不宣告 host 终态；GUI/持久化/强停未完成。

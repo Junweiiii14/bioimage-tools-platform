@@ -22,3 +22,5 @@ JSON array→tuple 的 strict 模式变为 Python 输入规则。最终改为原
 
 未测：宿主 QProcess/UI、强停/进程树、工作区原子发布/SQLite、重启恢复、Windows 产品包、独立审查。
 干净 Windows 按用户先前决定保留待办。目标继续 active。
+
+代码验证提交：bd1af2e。相对 feat/T-004-wb-analysis 的规则回执检查退出 0。
