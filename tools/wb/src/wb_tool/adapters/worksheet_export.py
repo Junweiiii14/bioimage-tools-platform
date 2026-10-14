@@ -2,6 +2,7 @@
 
 import math
 import os
+from collections.abc import Callable
 from io import BytesIO
 from pathlib import Path
 from uuid import uuid4
@@ -158,19 +159,39 @@ def export_worksheet(worksheet: Worksheet, result: AnalysisResult, destination: 
     return publish_xlsx(data, destination)
 
 
-def publish_xlsx(data: bytes, destination: str | Path) -> Path:
+def publish_xlsx(
+    data: bytes, destination: str | Path, *, cancelled: Callable[[], bool] = lambda: False
+) -> Path:
+    return publish_table_bytes(data, destination, ".xlsx", cancelled=cancelled)
+
+
+def publish_table_bytes(
+    data: bytes,
+    destination: str | Path,
+    suffix: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> Path:
     target = Path(destination).absolute()
-    if target.suffix.lower() != ".xlsx":
-        raise ValueError("请选择新的 .xlsx 文件")
+    if target.suffix.lower() != suffix:
+        raise ValueError(f"请选择新的 {suffix} 文件")
+    if target.exists() or target.is_symlink():
+        raise FileExistsError("目标已存在，请选择新文件")
+    if len(data) > 64 * 1024 * 1024:
+        raise ValueError("结果表超过64MiB预算")
     for parent in (target.parent, *target.parent.parents):
         if parent.is_symlink() or parent.is_junction():
             raise ValueError("导出目录不能经过符号链接或 junction")
     stage = target.parent / (".wb-export-" + uuid4().hex + ".tmp")
     try:
+        if cancelled():
+            raise ValueError("结果导出已取消，未发布输出")
         with stage.open("xb") as file:
             file.write(data)
             file.flush()
             os.fsync(file.fileno())
+        if cancelled():
+            raise ValueError("结果导出已取消，未发布输出")
         # Windows rename refuses existing destinations and does not require hard links.
         # POSIX rename would replace an existing file, so keep its no-replace link path.
         if os.name == "nt":

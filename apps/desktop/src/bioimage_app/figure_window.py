@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
 )
 from tool_contracts.api import AssetRef, DraftSnapshot
 from wb_tool.api import (
+    ArchiveRunEvidence,
     CropSuggestion,
     FigurePNG,
     FigureRender,
@@ -42,6 +43,7 @@ from wb_tool.api import (
     record_crop_suggestion,
 )
 
+from bioimage_app.project_archive import ProjectArchiveSession
 from bioimage_app.project_measurements import ProjectBatchCompletion, ProjectMeasurementSession
 from bioimage_app.project_ocr import ProjectOCRCompletion, ProjectOCRSession
 from bioimage_app.storage import AsyncStorage, StorageCommand, StorageReply
@@ -80,6 +82,8 @@ class FigureProjectWindow(QMainWindow):
         self._project_results: tuple[LoadedProjectResult, ...] = ()
         self._ocr_session: ProjectOCRSession | None = None
         self._loaded_ocr: LoadedProjectOCR | None = None
+        self._archive_session: ProjectArchiveSession | None = None
+        self._export_generation: int | None = None
         self._ocr_refresh_pending = False
         self._ocr_refresh_timer = QTimer(self)
         self._ocr_refresh_timer.setSingleShot(True)
@@ -129,6 +133,7 @@ class FigureProjectWindow(QMainWindow):
         self.view.normalization.refresh_requested.connect(self.refresh_ocr_table)
         self.view.normalization.export_requested.connect(self._choose_normalization_export)
         self.view.changed.connect(self._queue_ocr_refresh)
+        self.view.changed.connect(self._cancel_stale_export)
         self._controls()
 
     def cancel(self) -> None:
@@ -631,14 +636,14 @@ class FigureProjectWindow(QMainWindow):
 
     def _choose_table_export(self, ocr: bool = False) -> None:
         destination, _ = QFileDialog.getSaveFileName(
-            self, "导出新的项目结果表", "", "Excel (*.xlsx)"
+            self, "导出新的项目结果表", "", "Excel (*.xlsx);;CSV（文字采用text:前缀） (*.csv)"
         )
         if destination:
             self.export_project_table(destination, ocr=ocr)
 
     def _choose_normalization_export(self) -> None:
         destination, _ = QFileDialog.getSaveFileName(
-            self, "导出新的归一化结果", "", "Excel (*.xlsx)"
+            self, "导出新的归一化结果", "", "Excel (*.xlsx);;CSV（文字采用text:前缀） (*.csv)"
         )
         if destination:
             self.export_project_table(destination, normalization=True)
@@ -652,7 +657,7 @@ class FigureProjectWindow(QMainWindow):
         def saved() -> None:
             project = self.view.project()
             self._start()
-            self._wb(
+            self._export_with_evidence(
                 WBJob(
                     "project_normalization_export"
                     if normalization
@@ -662,11 +667,51 @@ class FigureProjectWindow(QMainWindow):
                     project_ocr_result=self._loaded_ocr,
                     ocr_labels=bool(self.view.normalization.result_view.labels.currentIndex()),
                     destination=destination,
+                    cancellation=self._cancellation,
                 ),
                 lambda reply: self._done("项目结果表已导出：" + str(reply.value)),
             )
 
         self.save(after=saved)
+
+    def _cancel_stale_export(self) -> None:
+        if self._export_generation is not None and self._export_generation != self.view.generation:
+            self._cancellation.set()
+
+    def _export_with_evidence(self, job: WBJob, callback: Callable[[WBReply], None]) -> None:
+        from dataclasses import replace
+
+        if not isinstance(job.document, WBFigureProject):
+            self._error("缺少导出项目")
+            return
+        generation = self.view.generation
+        self._export_generation = generation
+
+        def collected(evidence: tuple[ArchiveRunEvidence, ...]) -> None:
+            self._archive_session = None
+            if self._cancellation.is_set() or self._closing or generation != self.view.generation:
+                self._done("导出已取消，未发布输出")
+                return
+
+            def completed(reply: WBReply) -> None:
+                if reply.error:
+                    if self._cancellation.is_set():
+                        self._done("导出已取消，未发布输出")
+                    else:
+                        self._error(reply.error)
+                else:
+                    callback(reply)
+
+            self._wb(replace(job, archive_runs=evidence), completed, accept_errors=True)
+
+        try:
+            session = ProjectArchiveSession(
+                self._store, job.document, self._cancellation, collected
+            )
+            self._archive_session = session
+            session.start()
+        except (ValueError, RuntimeError) as error:
+            self._error(str(error))
 
     @property
     def resources_closed(self) -> bool:
@@ -690,6 +735,7 @@ class FigureProjectWindow(QMainWindow):
 
     def _done(self, message: str) -> None:
         self._busy = False
+        self._export_generation = None
         self.view.status.setText(message)
         self._controls()
         if self._closing:
@@ -1129,7 +1175,7 @@ class FigureProjectWindow(QMainWindow):
 
     def _choose_export(self) -> None:
         destination, _ = QFileDialog.getSaveFileName(
-            self, "导出新拼图归档（含原图、原值裁剪和记录）", "", "ZIP (*.zip)"
+            self, "导出新项目归档（原图、裁剪、拼图、结果与记录）", "", "ZIP (*.zip)"
         )
         if destination:
             self.compose(destination)
@@ -1153,11 +1199,12 @@ class FigureProjectWindow(QMainWindow):
                     self.view.show_render(reply.value)
                     self._done("预览已生成；未审核行允许预览，正式导出须逐行确认。")
                 elif isinstance(reply.value, str):
-                    self._done("拼图归档已保存：" + reply.value)
+                    self._done("项目归档已保存（结果缺项见归档内状态表）：" + reply.value)
                 else:
                     self._error("拼图结果无效")
 
-            self._wb(
+            submit = self._export_with_evidence if destination else self._wb
+            submit(
                 WBJob(
                     "figure_export" if destination else "figure_preview",
                     document=project,

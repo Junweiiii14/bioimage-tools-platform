@@ -114,6 +114,13 @@ metadata_preview = preview_metadata(metadata_project, metadata_book.sheets[0], 0
 metadata_updated = apply_metadata(metadata_project, metadata_preview, metadata_preview.entries,
                                   ('protein', 'lane_count'))
 assert metadata_updated.rows[0].protein == 'AKT' and metadata_updated.rows[0].lane_count == 3
+from wb_tool.api import export_project_table, project_runs
+import csv
+export_project_table(metadata_updated, (), 'installed-results.csv')
+with Path('installed-results.csv').open(encoding='utf-8-sig', newline='') as stream:
+    exported = list(csv.DictReader(stream))
+assert len(exported) == 3 and all(row['积分'] == '' for row in exported)
+assert exported[0]['蛋白'] == 'text:AKT' and project_runs(metadata_updated) == ()
 assert not any(name.startswith(('PySide6', 'sqlite3')) for name in sys.modules)
 assert not any(name.startswith(('rapidocr', 'onnxruntime', 'cv2')) for name in sys.modules)
 print('Isolated WB wheel: TIFF/analysis, crop/grid and worker; no GUI/storage dependencies')
@@ -209,6 +216,14 @@ source_path = FigureSourcePath(source.sha256, str(Path('installed-fig.tif').reso
 export_figure_bundle(project, (source_path,),
     str(Path('installed-figure.zip').resolve()))
 assert Path('installed-figure.zip').exists()
+from zipfile import ZipFile
+import json
+from hashlib import sha256
+with ZipFile('installed-figure.zip') as archive:
+    index = json.loads(archive.read('archive.json'))
+    assert index['schema_version'] == 2 and 'tables/source.csv' in archive.namelist()
+    assert all(sha256(archive.read(member['path'])).hexdigest() == member['sha256']
+               for member in index['members'])
 from wb_tool.api import (CropDetectionSettings, WBReviewProject, suggest_crops,
     record_crop_suggestion, read_figure_project)
 suggestion = suggest_crops('installed-fig.tif', source.sha256, 'row', 0,

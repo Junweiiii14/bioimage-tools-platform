@@ -69,6 +69,7 @@ from wb_tool.application.project_analysis import (
     set_row_analysis,
     update_row_analysis_request,
 )
+from wb_tool.application.project_archive import ArchiveRunEvidence, project_runs
 from wb_tool.application.project_metadata import (
     MetadataBook,
     MetadataCell,
@@ -150,6 +151,8 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "ArchiveRunEvidence",
+    "project_runs",
     "MetadataBook",
     "MetadataCell",
     "MetadataEntry",
@@ -328,10 +331,11 @@ def export_figure_bundle(
     destination: str,
     *,
     cancelled: Callable[[], bool] = lambda: False,
+    runs: tuple[ArchiveRunEvidence, ...] = (),
 ) -> str:
     from wb_tool.adapters.figure_export import export_figure_bundle as export
 
-    return export(project, sources, destination, cancelled=cancelled)
+    return export(project, sources, destination, cancelled=cancelled, runs=runs)
 
 
 def create_wb_view(parent: "QWidget | None" = None) -> "WBView":
@@ -376,11 +380,15 @@ def export_worksheet(worksheet: Worksheet, result: AnalysisResult, destination: 
 
 
 def export_project_table(
-    project: WBFigureProject, results: tuple[LoadedProjectResult, ...], destination: str
+    project: WBFigureProject,
+    results: tuple[LoadedProjectResult, ...],
+    destination: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
 ) -> str:
     from wb_tool.adapters.project_export import export_project_table as export
 
-    return str(export(project, results, destination))
+    return str(export(project, results, destination, cancelled=cancelled))
 
 
 def export_project_ocr_table(
@@ -388,10 +396,12 @@ def export_project_ocr_table(
     results: tuple[LoadedProjectResult, ...],
     loaded: LoadedProjectOCR | None,
     destination: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
 ) -> str:
     from wb_tool.adapters.project_ocr_export import export_project_ocr_table as export
 
-    return str(export(project, results, loaded, destination))
+    return str(export(project, results, loaded, destination, cancelled=cancelled))
 
 
 def export_project_normalization(
@@ -401,10 +411,13 @@ def export_project_normalization(
     destination: str,
     *,
     ocr_labels: bool = False,
+    cancelled: Callable[[], bool] = lambda: False,
 ) -> str:
     from wb_tool.adapters.normalization_export import export_project_normalization as export
 
-    return str(export(project, results, loaded, destination, ocr_labels=ocr_labels))
+    return str(
+        export(project, results, loaded, destination, ocr_labels=ocr_labels, cancelled=cancelled)
+    )
 
 
 def export_crop(source: str, request: CropRequest, destination: str) -> str:

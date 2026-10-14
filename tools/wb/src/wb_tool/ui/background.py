@@ -1,5 +1,6 @@
 """Bounded one-shot background requests for preview and document/result codecs."""
 
+from dataclasses import replace
 from hashlib import file_digest
 from math import ceil
 from pathlib import Path
@@ -45,6 +46,20 @@ class _Work(QObject):
     @Slot(str, object)
     def execute(self, request_id: str, job: WBJob) -> None:
         try:
+            cancel = job.cancellation.is_set if job.cancellation is not None else lambda: False
+            if (
+                job.operation
+                in ("project_export", "project_ocr_export", "project_normalization_export")
+                and job.archive_runs is not None
+            ):
+                from wb_tool.adapters.project_evidence import verify_project_evidence
+
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少项目文档")
+                evidence = verify_project_evidence(job.document, job.archive_runs, cancelled=cancel)
+                job = replace(
+                    job, project_results=evidence.results, project_ocr_result=evidence.ocr
+                )
             value: (
                 PreviewRaster
                 | WBDocument
@@ -95,6 +110,7 @@ class _Work(QObject):
                         job.project_ocr_result,
                         job.destination,
                         ocr_labels=job.ocr_labels,
+                        cancelled=cancel,
                     )
                 )
             elif job.operation in (
@@ -122,6 +138,7 @@ class _Work(QObject):
                             job.project_results,
                             job.project_ocr_result,
                             job.destination,
+                            cancelled=cancel,
                         )
                     )
                 else:
@@ -141,7 +158,9 @@ class _Work(QObject):
                     from wb_tool.adapters.project_export import export_project_table
 
                     value = str(
-                        export_project_table(job.document, job.project_results, job.destination)
+                        export_project_table(
+                            job.document, job.project_results, job.destination, cancelled=cancel
+                        )
                     )
                 else:
                     value = ProjectTableSnapshot(
@@ -202,7 +221,11 @@ class _Work(QObject):
                         )
                 else:
                     value = export_figure_bundle(
-                        job.document, job.sources, job.destination, cancelled=cancel
+                        job.document,
+                        job.sources,
+                        job.destination,
+                        cancelled=cancel,
+                        runs=job.archive_runs or (),
                     )
             elif job.operation == "ocr_preview":
                 from wb_tool.adapters.ocr_input import load_ocr_image

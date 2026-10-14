@@ -3,7 +3,7 @@
 import json
 import os
 from collections.abc import Callable
-from hashlib import file_digest, sha256
+from hashlib import sha256
 from io import BytesIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -13,7 +13,9 @@ from zipfile import ZIP_DEFLATED, ZipFile
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, PngImagePlugin
 
+from wb_tool.adapters.archive_io import ArchiveWriter
 from wb_tool.adapters.crop_export import export_crop
+from wb_tool.adapters.project_archive import archive_index_bytes, write_project_results
 from wb_tool.adapters.tiff_input import load_tiff
 from wb_tool.application.crop import CropRequest
 from wb_tool.application.figure_project import (
@@ -23,6 +25,8 @@ from wb_tool.application.figure_project import (
     WBFigureProject,
     plan_figure_layout,
 )
+from wb_tool.application.project_archive import ArchiveRunEvidence
+from wb_tool.application.project_ocr import WBProjectOCR
 
 
 def _paths(sources: tuple[FigureSourcePath, ...]) -> dict[str, str]:
@@ -187,6 +191,7 @@ def export_figure_bundle(
     destination: str,
     *,
     cancelled: Callable[[], bool] = lambda: False,
+    runs: tuple[ArchiveRunEvidence, ...] = (),
 ) -> str:
     target = Path(destination).absolute()
     if target.suffix.lower() != ".zip":
@@ -201,10 +206,11 @@ def export_figure_bundle(
     try:
         with TemporaryDirectory(prefix="wb-figure-") as temporary, stage.open("xb") as output:
             with ZipFile(output, "w", compression=ZIP_DEFLATED) as archive:
+                writer = ArchiveWriter(archive, cancelled)
                 png = encode_figure_png(rendered, project.template.dpi)
-                archive.writestr("figure.png", png.data)
-                archive.writestr("manifest.json", rendered.manifest_json)
-                archive.writestr("project.json", project.model_dump_json())
+                writer.data("figure.png", png.data, "display_figure")
+                writer.data("manifest.json", rendered.manifest_json.encode(), "figure_provenance")
+                writer.data("project.json", project.model_dump_json().encode(), "saved_project")
                 for index, row in enumerate(project.rows):
                     if cancelled():
                         raise ValueError("拼图导出已取消，未发布输出")
@@ -216,26 +222,27 @@ def export_figure_bundle(
                         CropRequest(row.source.sha256, project.revision, row.roi),
                         str(crop),
                     )
-                    archive.write(crop, f"crops/{index + 1:04d}.tif")
+                    writer.file(f"crops/{index + 1:04d}.tif", crop, "original_sample_crop")
                 # The bundle is independently traceable, including originals and custom font.
-                assets = {row.source.sha256 for row in project.rows if row.source is not None}
+                refs = [row.source for row in project.rows if row.source is not None]
                 if project.template.font is not None:
-                    assets.add(project.template.font.sha256)
+                    refs.append(project.template.font)
+                if isinstance(project, WBProjectOCR) and project.ocr:
+                    refs.append(project.ocr.source)
+                assets = {ref.sha256: ref.size_bytes for ref in refs}
+                if any(assets[ref.sha256] != ref.size_bytes for ref in refs):
+                    raise ValueError("同一来源SHA对应不一致的字节数")
                 for digest in sorted(assets):
                     if cancelled():
                         raise ValueError("拼图导出已取消，未发布输出")
-                    with Path(paths[digest]).open("rb") as source:
-                        if file_digest(source, "sha256").hexdigest() != digest:
-                            raise ValueError("归档前来源文件已改变")
-                        source.seek(0)
-                        with archive.open(f"assets/{digest}", "w") as member:
-                            while chunk := source.read(1024 * 1024):
-                                if cancelled():
-                                    raise ValueError("拼图导出已取消，未发布输出")
-                                member.write(chunk)
-                        source.seek(0)
-                        if file_digest(source, "sha256").hexdigest() != digest:
-                            raise ValueError("归档期间来源文件已改变")
+                    if digest not in paths:
+                        raise ValueError("缺少项目原图/OCR/字体资产路径")
+                    writer.file(
+                        f"assets/{digest}", paths[digest], "source_asset", digest, assets[digest]
+                    )
+                index = write_project_results(project, runs, writer)
+                writer.check_cancel()
+                writer.data("archive.json", archive_index_bytes(index), "archive_index")
             output.flush()
             os.fsync(output.fileno())
         if cancelled():

@@ -22,6 +22,7 @@ from wb_tool.application.project_analysis import (
     ProjectTableCell,
     ProjectTableSnapshot,
 )
+from wb_tool.application.project_archive import ArchiveRunEvidence
 from wb_tool.application.project_metadata import MetadataBook
 from wb_tool.application.project_normalization import NormalizationSnapshot
 from wb_tool.application.project_ocr import LoadedProjectOCR
@@ -89,6 +90,7 @@ class WBJob:
     project_ocr_result: LoadedProjectOCR | None = None
     ocr_labels: bool = False
     preview_edge: int = 2048
+    archive_runs: tuple[ArchiveRunEvidence, ...] | None = None
 
 
 @dataclass(frozen=True)

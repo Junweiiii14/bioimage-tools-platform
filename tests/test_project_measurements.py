@@ -630,6 +630,17 @@ def test_composed_png_ocr_full_size_preserves_measurements_and_normalization(
     assert reopened.view.project() == saved
     assert item(reopened.view.ocr.results, 0, 3).text() == "4000"
     assert item(reopened.view.normalization.results, 0, 8).text() == "0.5"
+    archive_path = tmp_path / "full-evidence.zip"
+    reopened.compose(str(archive_path))
+    qtbot.waitUntil(reopened.import_button.isEnabled, timeout=15000)
+    assert archive_path.exists(), reopened.view.status.text()
+    with ZipFile(archive_path) as archive:
+        index = json.loads(archive.read("archive.json"))
+        assert len(index["runs"]) == 3
+        assert all(r["verification"] == "verified_result" for r in index["runs"])
+        assert "tables/normalization_ocr.csv" in archive.namelist()
+        assert b"4000.0" in archive.read("tables/ocr.csv")
+        assert b"0.5" in archive.read("tables/normalization.csv")
 
 
 @pytest.mark.parametrize("action", ["cancel", "close", "edit"])
