@@ -29,6 +29,8 @@ Run `uv run --locked --no-sync python -m bioimage_app` after installing `[wb]`.
 The same static entry handles `--worker wb` without opening Qt; other modules are not
 loaded from document strings. Manual import/ROI/band/baseline/run/save/reopen now works.
 Close saves valid edits, cancels an active run, then drains and closes both threads.
-OCR/Fig mapping, automatic candidates/table writing, normalization, export and packaging
-remain pending. Test with `uv run --locked --no-sync pytest
+Version 0.2.0 includes `--worker wb_ocr`, OCR-first drafts, separate composite assets,
+explicit cell bindings, table review/export and v1/v2 document reopening. Original pixels
+stay the measurement source. Automatic crop candidates, template composition, batch
+normalization and packaging remain pending. Test with `uv run --locked --no-sync pytest
 tests/test_async_storage.py tests/test_process_runner.py tests/test_run_session.py tests/test_wb_host.py`.

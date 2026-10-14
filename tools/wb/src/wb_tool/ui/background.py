@@ -8,9 +8,11 @@ from pydantic import TypeAdapter
 from PySide6.QtCore import QObject, Qt, QThread, QTimer, Signal, Slot
 
 from wb_tool.adapters.tiff_input import load_tiff
+from wb_tool.adapters.worksheet_export import export_worksheet
 from wb_tool.application.analysis import AnalysisResult
 from wb_tool.application.desktop_data import PreviewRaster, WBJob, WBReply
-from wb_tool.application.document import WBDocument
+from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
+from wb_tool.domain.worksheet import OCRRecognition
 
 
 class _Work(QObject):
@@ -19,7 +21,15 @@ class _Work(QObject):
     @Slot(str, object)
     def execute(self, request_id: str, job: WBJob) -> None:
         try:
-            value: PreviewRaster | WBDocument | AnalysisResult | bytes
+            value: (
+                PreviewRaster
+                | WBDocument
+                | WBWorksheetDocument
+                | AnalysisResult
+                | OCRRecognition
+                | bytes
+                | str
+            )
             if job.operation == "preview":
                 image = load_tiff(job.path)
                 height, width = image.pixels.shape
@@ -38,9 +48,19 @@ class _Work(QObject):
                     image.warnings,
                 )
             elif job.operation == "document":
-                value = WBDocument.from_bytes(job.data)
+                value = read_wb_document(job.data)
             elif job.operation == "result":
                 value = TypeAdapter(AnalysisResult).validate_json(job.data, strict=True)
+            elif job.operation == "ocr_result":
+                value = TypeAdapter(OCRRecognition).validate_json(job.data, strict=True)
+            elif job.operation == "stored_result":
+                value = TypeAdapter(AnalysisResult | OCRRecognition).validate_json(
+                    job.data, strict=True
+                )
+            elif job.operation == "export":
+                if job.worksheet is None or job.result is None:
+                    raise ValueError("缺少已复核工作表/测量")
+                value = str(export_worksheet(job.worksheet, job.result, job.path))
             else:
                 if job.document is None:
                     raise ValueError("缺少文档")

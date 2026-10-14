@@ -1,5 +1,10 @@
 # Validation History
 
+## 2026-10-14 / T-009暂停前增量检查（未提交工作树）
+- worker+桌面联合：38 passed/1 failed；旧测试用v1专用读取器读v2失败，已改公开read_wb_document。
+- 修正后旧桌面6 passed；新增真实OCR桌面→自动写表→XLSX→保存重开→ROI失效单测1 passed。
+- 新测试前Pyright零错误。新测试初版Optional/不存在属性9错已修正；最新代码未复跑类型/全量门禁。OCR协议schema/取消反例、隔离wheel及独审未执行。无skip/xfail/容差放宽。
+
 2026-10-14 T-002：最终本地 35 passed（27.22s），Ruff/Pyright strict 通过；standalone 与 ZIP 哈希通过；包态基准 exit 0，20 图整批中位数 21.819s、worker RSS 峰值 257.855MiB。源码原生 UI 通过；包态 UI 因用户 Esc 停止而未验收，不能推断通过。完整证据在 work/evidence/T-002/validation.md。
 
 T-002 进行中：本轮基线 `dev.py check --all` 29 passed；新增协议/原值/真实进程反例后 Ruff、Pyright strict、35 pytest 全部通过（23.74s）。源码基准已执行，standalone 与真实窗口尚未通过；最终结论以 T-002 证据为准。
@@ -39,3 +44,10 @@ T-002 进行中：本轮基线 `dev.py check --all` 29 passed；新增协议/原
 | 2026-10-14 | T-008 dev.py check --all / Qt交互追加验证 | passed | 190全量、9合约、4wheel5安装场景；真实手工GUI信号10保存重开/关闭保存/uint16/取消关闭；最终pytest见T008证据；OCR/独审/包态未完成 |
 
 | 2026-10-14 | T-009后端 dev.py check --all / 独立XLSX reader | passed | 199tests/9合约/4wheel5场景；真实PP-OCRv6禁网6标签/空间关联/3045和1995写表/无覆盖，bundled openpyxl3.1.5读Unicode与值；GUI/worker仍待接入 |
+
+## 2026-10-14 / T-009 完整桌面闭环
+- Windows/Python3.12.14，wb-tool0.7.0/bioimage-app0.2.0；`dev.py check --all`退出0，205测试（59.00s）、9导入合约、4wheel/5安装场景，含安装产物真实OCR worker。
+- 新增实际OCR先于ROI、独立拼图/原图、人工绑定、无效名称、实时写值、保存重开和过期清值；strict协议/取消/模型摘要/schema/旧v1兼容通过。积分数值预期、容差/skip/xfail未放宽。
+- 新资料只读实测发现短编号和高置信误读；布局@2支持短编号及并排重复标签，私人数据留.local；不是准确率验收。
+- 最后修正表格重绘选中位置被循环索引覆盖，并补桌面断言；随后定向桌面测试与静态检查通过（结果以最新命令记录为准）。
+- 锁文件只更新两个本地包版本。独审/远程CI/最终包态未运行；物理FAT未测，Windows已使用无覆盖rename。

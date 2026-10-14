@@ -5,18 +5,21 @@ import os
 from collections.abc import Callable, Iterator
 from pathlib import Path
 from typing import TYPE_CHECKING
+from xml.etree import ElementTree
+from zipfile import ZipFile
 
 import numpy as np
 import pytest
 import tifffile
 from bioimage_app.api import create_wb_window
+from PIL import Image, ImageDraw, ImageFont
 
 if TYPE_CHECKING:
     from bioimage_app.api import WBWindow
 from platform_runtime.api import Workspace
 from PySide6.QtCore import QPoint, Qt, QThread
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QPushButton
+from PySide6.QtWidgets import QPushButton, QTableWidget
 from pytest import MonkeyPatch
 from pytestqt.qtbot import QtBot
 from wb_tool.api import (
@@ -26,13 +29,222 @@ from wb_tool.api import (
     LaneAnnotation,
     LaneROI,
     PreviewRaster,
-    WBDocument,
     WBJob,
     WBReply,
+    WBWorksheetDocument,
     create_wb_background,
     create_wb_view,
     load_tiff,
+    read_wb_document,
 )
+
+
+def cell_text(table: QTableWidget, row: int, column: int) -> str:
+    item = table.item(row, column)
+    assert item is not None
+    return item.text()
+
+
+def test_ocr_before_roi_cross_source_and_explicit_binding(
+    qtbot: QtBot, tmp_path: Path, make_window: Callable[[], "WBWindow"]
+) -> None:
+    source = tmp_path / "measurement.tif"
+    tifffile.imwrite(source, np.repeat(np.array([[245], [235], [245]], dtype=np.uint8), 30, axis=1))
+    composite = tmp_path / "labels.tif"
+    image = Image.new("L", (500, 250), 245)
+    draw = ImageDraw.Draw(image)
+    for text, y in (("1G", 20), ("AKT", 120)):
+        draw.text((30, y), text, font=ImageFont.load_default(size=42), fill=0)
+    tifffile.imwrite(composite, np.array(image))
+    workspace = tmp_path / "cross-source"
+    window = make_window()
+    window.show()
+    window.open_workspace(str(workspace), create=True)
+    qtbot.waitUntil(window.import_button.isEnabled, timeout=10000)
+    window.import_image(str(source))
+    qtbot.waitUntil(lambda: window.view.raster is not None, timeout=10000)
+    window.import_ocr_image(str(composite))
+    qtbot.waitUntil(window.import_ocr_button.isEnabled, timeout=10000)
+    window.recognize()
+    qtbot.waitUntil(lambda: window.view.recognition is not None, timeout=30000)
+    assert not window.view.lanes
+    panel = window.view.worksheet
+    state = panel.state()
+    assert state is not None and len(state.rows) == 1 and not state.bindings
+    assert state.rows[0].figure_name == "1G" and state.rows[0].row_name == "AKT"
+    raster = window.view.raster
+    assert raster is not None and (raster.width, raster.height) == (30, 3)
+    window.view.tabs.setCurrentIndex(0)
+    rect = window.view.canvas.image_rect()
+    QTest.mousePress(
+        window.view.canvas,
+        Qt.MouseButton.LeftButton,
+        pos=QPoint(round(rect.left() + 2), round(rect.top() + 1)),
+    )
+    QTest.mouseRelease(
+        window.view.canvas,
+        Qt.MouseButton.LeftButton,
+        pos=QPoint(round(rect.right() - 2), round(rect.bottom() + 2)),
+    )
+
+    def click(text: str) -> None:
+        button = next(
+            button for button in window.findChildren(QPushButton) if button.text() == text
+        )
+        QTest.mouseClick(button, Qt.MouseButton.LeftButton)
+
+    click("添加条带")
+    window.view.bounds[1].setValue(2)
+    window.view.detected.setChecked(True)
+    window.analyze()
+    qtbot.waitUntil(lambda: window.view.quantitative_result is not None, timeout=15000)
+    window.view.tabs.setCurrentWidget(panel)
+    click("添加列")
+    panel.table.setCurrentCell(0, 3)
+    click("关联所选行/列")
+    assert cell_text(panel.table, 0, 3) == "—"
+    click("确认所有名称")
+    assert cell_text(panel.table, 0, 3) == "10"
+    # A blank edited name automatically returns the row to review and clears its value.
+    name = panel.table.item(0, 1)
+    assert name is not None
+    name.setText("")
+    assert cell_text(panel.table, 0, 3) == "—"
+    click("确认所有名称")
+    assert cell_text(panel.table, 0, 3) == "—"
+    name.setText("AKT corrected")
+    click("确认所有名称")
+    assert cell_text(panel.table, 0, 3) == "10"
+    window.close()
+    qtbot.waitUntil(lambda: window.resources_closed, timeout=15000)
+    with Workspace.open(workspace) as store:
+        draft = store.list_documents()[0]
+        document = read_wb_document(store.read_asset(draft.asset))
+        assert isinstance(document, WBWorksheetDocument) and document.ocr_source is not None
+        assert document.source.sha256 != document.ocr_source.sha256
+        assert document.measurement is not None and document.worksheet is not None
+        assert len(document.worksheet.bindings) == 1
+    reopened = make_window()
+    reopened.open_workspace(str(workspace))
+    qtbot.waitUntil(reopened.import_button.isEnabled, timeout=10000)
+    reopened.load_document(draft.document_id)
+    qtbot.waitUntil(lambda: reopened.view.recognition is not None, timeout=10000)
+    qtbot.waitUntil(reopened.import_ocr_button.isEnabled, timeout=10000)
+    assert cell_text(reopened.view.worksheet.table, 0, 3) == "10"
+    assert reopened.view.ocr_text.rowCount() == 2
+
+
+def test_actual_ocr_desktop_table_save_reopen_export(
+    qtbot: QtBot, tmp_path: Path, make_window: Callable[[], "WBWindow"]
+) -> None:
+    image = Image.new("L", (1200, 500), 245)
+    draw = ImageDraw.Draw(image)
+    font = ImageFont.load_default(size=42)
+    for text, x, y in (
+        ("Fig 1A", 30, 20),
+        ("AKT", 30, 150),
+        ("GAPDH", 30, 320),
+        ("Fig 2B", 650, 20),
+        ("ERK1/2", 650, 150),
+        ("beta-actin", 650, 320),
+    ):
+        draw.text((x, y), text, font=font, fill=0)
+    for x in (280, 380, 900, 1000):
+        draw.rectangle((x, 165, x + 19, 185), fill=100)
+        draw.rectangle((x, 335, x + 19, 355), fill=150)
+    source = tmp_path / "拼图.tif"
+    tifffile.imwrite(source, np.array(image))
+    workspace = tmp_path / "OCR工作区"
+    window = make_window()
+    window.show()
+    window.open_workspace(str(workspace), create=True)
+    qtbot.waitUntil(window.import_button.isEnabled, timeout=10000)
+    window.import_image(str(source))
+    qtbot.waitUntil(lambda: window.view.raster is not None, timeout=10000)
+    lanes = tuple(
+        LaneAnnotation(
+            LaneROI(f"L{index}", x, 120, x + 20, 400),
+            (
+                BandAnnotation("top", BandBounds(40, 70)),
+                BandAnnotation("bottom", BandBounds(210, 240)),
+            ),
+        )
+        for index, x in enumerate((280, 380, 900, 1000))
+    )
+    raster = window.view.raster
+    assert raster is not None
+    window.view.set_image(raster, AnalysisRequest(raster.sha256, 0, "dark", lanes))
+    window.analyze()
+    qtbot.waitUntil(lambda: window.view.quantitative_result is not None, timeout=15000)
+    window.recognize()
+    qtbot.waitUntil(lambda: window.view.recognition is not None, timeout=30000)
+    panel = window.view.worksheet
+    state = panel.state()
+    assert state is not None and len(state.rows) == 4 and len(state.bindings) == 8
+    assert cell_text(panel.table, 0, 3) == "—"
+    name = panel.table.item(0, 1)
+    assert name is not None
+    name.setText("AKT（人工复核）")
+    for row in range(4):
+        check = panel.table.item(row, 2)
+        assert check is not None
+        check.setCheckState(Qt.CheckState.Checked)
+    assert [cell_text(panel.table, row, column) for row in range(4) for column in (3, 4)] == [
+        "3045",
+        "3045",
+        "1995",
+        "1995",
+    ] * 2
+    panel.table.setCurrentCell(0, 3)
+    next(
+        button for button in panel.findChildren(QPushButton) if button.text() == "确认所有名称"
+    ).click()
+    assert (panel.table.currentRow(), panel.table.currentColumn()) == (0, 3)
+    capture = os.environ.get("BIOIMAGE_OCR_CAPTURE")
+    if capture:
+        assert window.grab().save(capture)
+    destination = tmp_path / "自动结果.xlsx"
+    window.export_table(str(destination))
+    qtbot.waitUntil(lambda: destination.exists(), timeout=10000)
+    qtbot.waitUntil(window.view.save_button.isEnabled, timeout=10000)
+    with ZipFile(destination) as archive:
+        root = ElementTree.fromstring(archive.read("xl/worksheets/sheet1.xml"))
+        ns = {"s": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
+        assert [float(node.text or "nan") for node in root.findall(".//s:v", ns)] == [
+            3045,
+            3045,
+            1995,
+            1995,
+            3045,
+            3045,
+            1995,
+            1995,
+        ]
+    window.close()
+    qtbot.waitUntil(lambda: window.resources_closed, timeout=15000)
+    with Workspace.open(workspace) as store:
+        draft = store.list_documents()[0]
+        document = read_wb_document(store.read_asset(draft.asset))
+        assert isinstance(document, WBWorksheetDocument)
+        assert document.recognition is not None and document.measurement is not None
+        assert document.worksheet is not None
+        assert document.worksheet.rows[0].row_name == "AKT（人工复核）"
+        assert all(row.confirmed for row in document.worksheet.rows)
+        runs = store.list_runs(draft.document_id)
+        assert len(runs) == 2 and all(run.state == "succeeded" for run in runs)
+    reopened = make_window()
+    reopened.open_workspace(str(workspace))
+    qtbot.waitUntil(reopened.import_button.isEnabled, timeout=10000)
+    reopened.load_document(draft.document_id)
+    qtbot.waitUntil(lambda: reopened.view.quantitative_result is not None, timeout=10000)
+    assert cell_text(reopened.view.worksheet.table, 0, 1) == "AKT（人工复核）"
+    assert cell_text(reopened.view.worksheet.table, 0, 3) == "3045"
+    current = reopened.view.quantitative_result
+    assert current is not None
+    # Geometry changes invalidate values, while name edits above preserved them.
+    reopened.view.coordinates[0].setValue(281)
+    assert reopened.view.quantitative_result is None
+    assert cell_text(reopened.view.worksheet.table, 0, 3) == "—"
 
 
 @pytest.fixture
@@ -113,12 +325,9 @@ def test_desktop_draw_compute_save_reopen(
     with Workspace.open(workspace) as store:
         draft = store.load_draft(document_id)
         assert draft.revision == 1
-        assert (
-            not WBDocument.from_bytes(store.read_asset(draft.asset))
-            .request.lanes[0]
-            .bands[0]
-            .included
-        )
+        restored = read_wb_document(store.read_asset(draft.asset))
+        assert restored.request is not None
+        assert not restored.request.lanes[0].bands[0].included
 
 
 def test_uint16_preview_is_separate_and_background_closes(qtbot: QtBot, tmp_path: Path) -> None:

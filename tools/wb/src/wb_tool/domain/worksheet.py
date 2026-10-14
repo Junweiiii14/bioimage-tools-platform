@@ -72,7 +72,38 @@ class FigureSuggestion:
     confirmed: bool = False
 
 
-_FIGURE = re.compile(r"fig(?:ure)?[ .-]*\d+[a-z]?", re.IGNORECASE)
+_FIGURE = re.compile(r"(?:fig(?:ure)?[ .-]*\d+[a-z]?|\d{1,3}[a-z])", re.IGNORECASE)
+
+
+def _row_labels(tokens: tuple[TextToken, ...]) -> tuple[TextToken, ...]:
+    """Suggest leading horizontal labels; retain aligned side-by-side panels, never rename text."""
+    horizontal = tuple(
+        token
+        for token in tokens
+        if token.bounds.x1 - token.bounds.x0 >= (token.bounds.y1 - token.bounds.y0) * 1.4
+    )
+    if not horizontal:
+        return ()
+    anchor = min(horizontal, key=lambda token: token.bounds.x0)
+    tolerance = max(4.0, (anchor.bounds.y1 - anchor.bounds.y0) * 1.5)
+    leading = tuple(
+        token
+        for token in horizontal
+        if (
+            token.bounds.x0 <= anchor.bounds.x0 + tolerance
+            or abs(token.bounds.x1 - anchor.bounds.x1) <= tolerance
+        )
+    )
+    return tuple(
+        token
+        for token in horizontal
+        if token in leading
+        or any(
+            abs((token.bounds.y0 + token.bounds.y1 - row.bounds.y0 - row.bounds.y1) / 2)
+            <= min(token.bounds.y1 - token.bounds.y0, row.bounds.y1 - row.bounds.y0) * 0.5
+            for row in leading
+        )
+    )
 
 
 def suggest_figures(recognition: OCRRecognition) -> tuple[FigureSuggestion, ...]:
@@ -83,7 +114,7 @@ def suggest_figures(recognition: OCRRecognition) -> tuple[FigureSuggestion, ...]
     )
     tracks: list[list[TextToken]] = []
     for heading in headings:
-        if not tracks or heading.bounds.x0 - tracks[-1][0].bounds.x0 > recognition.width * 0.06:
+        if not tracks or heading.bounds.x0 - tracks[-1][0].bounds.x0 > recognition.width * 0.10:
             tracks.append([])
         tracks[-1].append(heading)
     anchors = [track[0].bounds.x0 for track in tracks]
@@ -115,7 +146,10 @@ def suggest_figures(recognition: OCRRecognition) -> tuple[FigureSuggestion, ...]
             )
             groups.append(
                 FigureSuggestion(
-                    "F" + heading.token_id, heading, rows, TextBounds(left, top, right, bottom)
+                    "F" + heading.token_id,
+                    heading,
+                    _row_labels(rows),
+                    TextBounds(left, top, right, bottom),
                 )
             )
     return tuple(groups)

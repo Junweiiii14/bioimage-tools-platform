@@ -4,7 +4,8 @@ from dataclasses import dataclass
 from typing import Literal
 
 from wb_tool.application.analysis import AnalysisResult
-from wb_tool.application.document import WBDocument
+from wb_tool.application.document import WBDocument, WBWorksheetDocument
+from wb_tool.domain.worksheet import OCRRecognition, Worksheet
 
 
 @dataclass(frozen=True)
@@ -21,14 +22,27 @@ class PreviewRaster:
 
 @dataclass(frozen=True)
 class WBJob:
-    operation: Literal["preview", "document", "encode", "result"]
+    operation: Literal[
+        "preview", "document", "encode", "result", "ocr_result", "stored_result", "export"
+    ]
     path: str = ""
     data: bytes = b""
-    document: WBDocument | None = None
+    document: WBDocument | WBWorksheetDocument | None = None
+    worksheet: Worksheet | None = None
+    result: AnalysisResult | None = None
 
 
 @dataclass(frozen=True)
 class WBReply:
     request_id: str
-    value: PreviewRaster | WBDocument | AnalysisResult | bytes | None = None
+    value: (
+        PreviewRaster
+        | WBDocument
+        | WBWorksheetDocument
+        | AnalysisResult
+        | OCRRecognition
+        | bytes
+        | str
+        | None
+    ) = None
     error: str = ""

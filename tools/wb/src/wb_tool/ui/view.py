@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
     QSplitter,
     QTableWidget,
     QTableWidgetItem,
+    QTabWidget,
     QVBoxLayout,
     QWidget,
 )
@@ -30,7 +31,9 @@ from wb_tool.application.analysis import (
 from wb_tool.application.desktop_data import PreviewRaster
 from wb_tool.domain.lanes import LaneROI
 from wb_tool.domain.quantify import BandBounds, Baseline, ProfileMeasurement
+from wb_tool.domain.worksheet import OCRRecognition
 from wb_tool.ui.canvas import ImageCanvas
+from wb_tool.ui.worksheet import WorksheetPanel
 
 
 class ProfilePlot(QWidget):
@@ -103,6 +106,8 @@ class WBView(QWidget):
     save_requested = Signal()
     analyze_requested = Signal()
     cancel_requested = Signal()
+    ocr_requested = Signal()
+    export_requested = Signal()
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -150,6 +155,13 @@ class WBView(QWidget):
         self.analyze_button.clicked.connect(self.analyze_requested)
         self.cancel_button.clicked.connect(self.cancel_requested)
         self.cancel_button.setEnabled(False)
+        self.ocr_button = QPushButton("识别 Fig/行名")
+        self.ocr_button.clicked.connect(self.ocr_requested)
+        self.export_button = QPushButton("导出结果表 XLSX")
+        self.export_button.clicked.connect(self.export_requested)
+        self.worksheet = WorksheetPanel()
+        self.recognition: OCRRecognition | None = None
+        self.worksheet.changed.connect(self._metadata_edited)
         form = QFormLayout()
         form.addRow("条带极性", self.polarity)
         form.addRow("泳道", self.lane_selector)
@@ -186,16 +198,38 @@ class WBView(QWidget):
             actions.addWidget(button)
         layout = QVBoxLayout(self)
         layout.addWidget(self.status)
-        layout.addWidget(splitter, 3)
-        layout.addWidget(self.plot, 1)
-        layout.addWidget(self.results, 1)
+        self.tabs = QTabWidget()
+        quantitative = QWidget()
+        quantitative_layout = QVBoxLayout(quantitative)
+        quantitative_layout.addWidget(splitter, 3)
+        quantitative_layout.addWidget(self.plot, 1)
+        quantitative_layout.addWidget(self.results, 1)
+        self.tabs.addTab(quantitative, "原图与定量")
+        self.tabs.addTab(self.worksheet, "Fig/行名与结果表")
+        ocr_page = QWidget()
+        ocr_layout = QVBoxLayout(ocr_page)
+        self.ocr_canvas = ImageCanvas()
+        self.ocr_text = QTableWidget(0, 4)
+        self.ocr_text.setHorizontalHeaderLabels(["原始文字", "置信度", "原图位置", "身份"])
+        self.ocr_text.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        ocr_layout.addWidget(QLabel("识别原文仅供核对；Fig 和行名可在结果表中修改。"))
+        ocr_layout.addWidget(self.ocr_canvas, 3)
+        ocr_layout.addWidget(self.ocr_text, 1)
+        self.tabs.addTab(ocr_page, "拼图与识别原文")
+        layout.addWidget(self.tabs)
+        actions.addWidget(self.ocr_button)
+        actions.addWidget(self.export_button)
         layout.addLayout(actions)
 
     def set_image(self, raster: PreviewRaster, request: AnalysisRequest | None = None) -> None:
         self._result = None
+        self.recognition = None
+        self.worksheet.reset(raster.sha256)
         self._validation_error = ""
         self.raster = raster
         self.canvas.set_image(raster)
+        self.ocr_canvas.set_image(raster)
+        self.ocr_text.setRowCount(0)
         self._loading = True
         self.lanes = list(request.lanes) if request is not None else []
         self.polarity.setCurrentIndex(
@@ -257,8 +291,52 @@ class WBView(QWidget):
         self.plot.values = ()
         self.plot.measurements = ()
         self._result = None
+        self.worksheet.invalidate_result()
         self.plot.update()
         self.changed.emit()
+
+    @property
+    def quantitative_result(self) -> AnalysisResult | None:
+        return self._result
+
+    def _metadata_edited(self) -> None:
+        if not self._loading:
+            self.generation += 1
+            self.changed.emit()
+
+    def show_recognition(self, recognition: OCRRecognition) -> None:
+        if self.raster is None:
+            raise ValueError("缺少原图")
+        self.recognition = recognition
+        self.show_ocr_text(recognition)
+        self.worksheet.set_recognition(recognition, self.raster.sha256)
+        self.tabs.setCurrentWidget(self.worksheet)
+        self.status.setText(f"识别 {len(recognition.tokens)} 段文字；请修正名称并确认关联。")
+
+    def show_ocr_text(self, recognition: OCRRecognition) -> None:
+        self.ocr_text.setRowCount(len(recognition.tokens))
+        for row, token in enumerate(recognition.tokens):
+            bounds = token.bounds
+            for column, text in enumerate(
+                (
+                    token.text,
+                    f"{token.confidence:.1%}",
+                    f"({bounds.x0:.0f}, {bounds.y0:.0f})–({bounds.x1:.0f}, {bounds.y1:.0f})",
+                    token.token_id,
+                )
+            ):
+                self.ocr_text.setItem(row, column, QTableWidgetItem(text))
+        self.ocr_text.resizeColumnsToContents()
+
+    def set_ocr_image(self, raster: PreviewRaster, *, reset: bool) -> None:
+        self.ocr_canvas.set_image(raster)
+        if reset and self.raster is not None:
+            self.recognition = None
+            self.ocr_text.setRowCount(0)
+            self.worksheet.reset(self.raster.sha256)
+            if self._result is not None:
+                self.worksheet.set_result(self._result)
+            self._metadata_edited()
 
     def _refresh_lanes(self) -> None:
         index = self.lane_selector.currentIndex()
@@ -380,6 +458,7 @@ class WBView(QWidget):
 
     def show_result(self, result: AnalysisResult) -> None:
         self._result = result
+        self.worksheet.set_result(result)
         self.results.setRowCount(0)
         labels = {
             "valid": "有效",

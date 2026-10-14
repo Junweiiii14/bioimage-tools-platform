@@ -119,5 +119,5 @@ def propose_worksheet(recognition: OCRRecognition, result: AnalysisResult) -> Wo
         tuple(rows),
         columns,
         tuple(bindings),
-        layout_id="fig_heading_tracks_nearest_row@1",
+        layout_id="fig_heading_tracks_leading_labels_nearest_row@2",
     )

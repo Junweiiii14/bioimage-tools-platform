@@ -172,6 +172,27 @@ def test_layout_preserves_unrecognized_names_and_single_figure() -> None:
     assert suggest_figures(replace(recognition, tokens=(tokens[1],))) == ()
 
 
+def test_short_figures_drifted_titles_and_sample_headers() -> None:
+    tokens = (
+        TextToken("F1", "1G", TextBounds(80, 10, 120, 40), 1.0),
+        TextToken("sample", "Control", TextBounds(320, 40, 410, 130), 1.0),
+        TextToken("R1", "TARGET", TextBounds(130, 160, 270, 190), 1.0),
+        TextToken("R2", "GAPDH", TextBounds(135, 260, 270, 290), 1.0),
+        TextToken("F2", "2B", TextBounds(2, 400, 42, 430), 1.0),
+        TextToken("R3", "Unknown", TextBounds(130, 560, 270, 590), 0.6),
+        TextToken("R4", "Unknown", TextBounds(670, 560, 810, 590), 0.6),
+        TextToken("group", "Treatment", TextBounds(350, 460, 520, 490), 1.0),
+    )
+    recognition = OCRRecognition("a" * 64, 1200, 800, tokens, "fixture", ())
+    figures = suggest_figures(recognition)
+    assert [figure.heading.text for figure in figures] == ["1G", "2B"]
+    assert [[token.token_id for token in figure.rows] for figure in figures] == [
+        ["R1", "R2"],
+        ["R3", "R4"],
+    ]
+    assert len(recognition.tokens) == 8  # Candidate filtering never erases OCR evidence.
+
+
 def test_cancellation_before_model_or_image_load() -> None:
     with pytest.raises(AnalysisCancelled):
         recognize_figure("does-not-exist.tif", "a" * 64, cancelled=lambda: True)

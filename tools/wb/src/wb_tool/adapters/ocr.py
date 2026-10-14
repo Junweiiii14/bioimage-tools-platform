@@ -11,16 +11,8 @@ from numpy.typing import NDArray
 
 from wb_tool.adapters.tiff_input import load_tiff
 from wb_tool.application.analysis import AnalysisCancelled
+from wb_tool.domain.ocr_manifest import ENGINE_ID, MODEL_HASHES, PREPROCESS_ID
 from wb_tool.domain.worksheet import OCRRecognition, TextBounds, TextToken
-
-MODEL_HASHES = (
-    ("PP-OCRv6_det_small.onnx", "090f04abcd9d9a7498bc4ebf677e4cb9bdce1fe4197ddb7e529f1ef44e1ff94f"),
-    ("PP-OCRv6_rec_small.onnx", "6f327246b50388f3c176ae304bd95767ea6dc0c9ae92153ef8cbe210b3c14884"),
-    (
-        "ch_ppocr_mobile_v2.0_cls_mobile.onnx",
-        "e47acedf663230f8863ff1ab0e64dd2d82b838fceb5957146dab185a89d6215c",
-    ),
-)
 
 
 def verify_ocr_models(directory: Path) -> tuple[tuple[str, str], ...]:
@@ -130,7 +122,7 @@ def recognize_figure(
         width,
         height,
         tuple(tokens),
-        "rapidocr@3.9.2/ppocrv6/onnxruntime@1.31.0",
+        ENGINE_ID,
         hashes,
-        preprocess_id="ocr_u16_div257_tiles2048_overlap256@1",
+        preprocess_id=PREPROCESS_ID,
     )

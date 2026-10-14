@@ -1,12 +1,13 @@
 # Handoff Snapshot
 
-- 更新：2026-10-14；上位目标T-003完整WB软件；当前work/tasks/T-009-fig-ocr-table.md，implementing（后端自验完成、GUI/worker继续）。
-- 分支feat/T-009-fig-ocr-table，继承feat/T-008-wb-desktop (34831e4)。所有产品阶段独审尚未执行，尚未集成main。
-- 新增 tool_contracts/platform_runtime 0.1.0：不可变输入资产、草稿 CAS/历史、运行冻结、退出回执、唯一结果目录+SQLite CAS、重启 interrupted/quarantine/orphan 报告与一致性备份。平台不含 WB 字段。
-- 最终完整检查164测试、7导入合约、schema漂移和三独立wheel通过。38工作区用例含3个真实宿主硬退出、同大小损坏、取消竞态、Windows junction/硬链接、真实WB worker→存储及备份恢复。证据 work/evidence/T-006/validation.md。
-- wb_tool.api 0.5.0/core不加载Qt；WBDocument v1/sourceAssetRef/schema、显示专用DTO与可选Qt后台/ROI/条带/基线/曲线页面；bioimage_app中文窗口已装配，`uv run --locked --no-sync python -m bioimage_app`，静态`--worker wb`入口。真实UI拖选→signal10→存储重开、关闭自动保存、取消关闭与uint16显示独立已验证。192完整测试/9合约/4wheel5场景通过，末增延迟join反例Qt6tests通过。一回原生中止未独立重放，补线程非阻塞join后未复现，风险保留。
-- T-009后端wb-tool0.6.0：RapidOCR3.9.2/PP-OCRv6与旧软件同三模型SHA；初始化前缺失/损坏守卫，CPU单线程，2048/256分块+原坐标/去重。Fig/行名未确认建议、显式绑定/有效signal写表、字面XLSX无覆盖导出已实现。199全量/9合约/4wheel5场景通过，安装产物真实离线OCR、socket禁网真实6标签与矩形解析写值、独立openpyxl读取均通过；不代表真实样本准确率。
-- 下一步继续T-009：OCR专用worker协议/取消/宿主，Qt名称/位置/列与关系修正/确认、自动写表/导出，文档v2及旧v1兼容；跨图显式拼图关联必须完成。自动候选、归一化、批次、大图/缩放完善及产品打包验收也保留，不缩小目标。
-- 请求/结果仍为WB工具自己的不透明文档，GUI装配通过各package.api，不导入内部、不给工具数据库连接。
-- 用户2026-10-14已回复：首版也必须包含拼图Fig/行名OCR与结果表自动写入，取消先前“候选优先/OCR可后置”假设。T-001人工认可样本尚未冻结；真实TIFF5张仅输入烟测，私人摘要留.local；原图/旧参考/PDF不变。
-- T-002包态GUI/ROI/DPI/p95与干净Windows待办保留；PR#3未合并，新增产品PR未创建；不恢复归档项目。
+- 更新：2026-10-14。用户补充 WB 资料并明确继续，暂停已解除；上位目标 T-003 完整 WB 软件。当前 T-009：OCR/工作表完整闭环自验完成，独立审查尚未执行。
+- 分支 feat/T-009-fig-ocr-table，base feat/T-008-wb-desktop (34831e4)。本轮从184d018继续；最新提交以 git log 为准。main/PR/远程CI未操作。
+- wb-tool0.7.0 / bioimage-app0.2.0：原TIFF手工ROI/条带/基线定量、离线OCR专用进程、Qt名称/关联复核、自动写表/新文件XLSX、v1/v2草稿保存重开。允许先OCR后ROI，支持单独拼图资产与显式跨图绑定；一次草稿仍只有一个定量原图。
+- 文档v2保存OCR原文/坐标/引擎模型摘要、原图与拼图资产、已确认工作表和当前有效测量；v1保留只读兼容。更改ROI/极性清除当前值，更改名称取消确认；缺失/失败不转零。原图与历史运行不可覆盖。
+- 完整检查退出0：205测试（59秒）、Ruff/Pyright strict、9导入合约、4独立wheel/5安装场景；安装产物真实OCR worker通过。原生Qt实测先识别后ROI、跨图绑定、保存重开、XLSX数值、名称修正及ROI失效。证据见work/evidence/T-009/validation.md。
+- 新资料只读检查，私人提取/预览/原始OCR放.local/requirements-review（忽略目录）。真实组合图含短编号、倾斜样本名、并排同名蛋白、空位。布局@2给长图16组；另一图Fig1C高置信误读为Fig1G，必须复核，未建立准确率指标。
+- 下一步 T-010：用户已知泳道数的固定网格、Marker排除与原坐标条带裁剪复核；随后Fig/蛋白模板合成，再项目批次、归一化与产品打包。详见docs/research/2026-10-14-wb-materials-workflow.md。首版OCR/自动写表要求持续有效。
+- 待用户说明同曝光无后缀/_0/_1 TIFF与CLX含义及定量来源。界面可显式选源，不能根据位深/命名自动选；任务单趋势不作为算法优化目标。Excel数值单位未确认，不作为灰度真值。
+- T-003至T-009产品阶段均尚无绑定提交的独立审查；T-008一次pytest原生Aborted根因未独立重放，后续全量通过不能抹去风险。T-001真实人工标注未冻结，P0包态交互/DPI和干净Windows仍待办。
+- 启动：uv run --locked --no-sync python -m bioimage_app。静态--worker wb/wb_ocr；platform_runtime不含实验语义，各跨包仅用api。
+- 不恢复归档项目；不提交私人资料/模型/安装包。Goal API本轮先前返回null，没有创建替代目标。

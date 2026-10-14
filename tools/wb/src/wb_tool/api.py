@@ -22,7 +22,16 @@ from wb_tool.application.analysis import (
     analyze_annotations,
 )
 from wb_tool.application.desktop_data import PreviewRaster, WBJob, WBReply
-from wb_tool.application.document import WBDocument
+from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
+from wb_tool.application.ocr_protocol import (
+    OCRConversation,
+    OCRRequest,
+    OCRResultFrame,
+    OCRStartFrame,
+    encode_ocr_frame,
+    ocr_protocol_schema,
+    parse_ocr_frame,
+)
 from wb_tool.application.worker_protocol import (
     AcceptedFrame,
     CancelFrame,
@@ -59,6 +68,16 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "WBWorksheetDocument",
+    "read_wb_document",
+    "OCRRequest",
+    "OCRStartFrame",
+    "OCRResultFrame",
+    "OCRConversation",
+    "encode_ocr_frame",
+    "parse_ocr_frame",
+    "ocr_protocol_schema",
+    "run_ocr_worker",
     "FigureSuggestion",
     "MeasurementBinding",
     "OCRRecognition",
@@ -130,6 +149,12 @@ def create_wb_background() -> "WBBackground":
 
 def run_wb_worker() -> int:
     from wb_tool.worker import main
+
+    return main()
+
+
+def run_ocr_worker() -> int:
+    from wb_tool.adapters.ocr_worker import main
 
     return main()
 

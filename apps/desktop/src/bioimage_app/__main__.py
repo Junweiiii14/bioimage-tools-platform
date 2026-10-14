@@ -17,6 +17,10 @@ def main() -> int:
         from wb_tool.api import run_wb_worker
 
         return run_wb_worker()
+    if sys.argv[1:] == ["--worker", "wb_ocr"]:
+        from wb_tool.api import run_ocr_worker
+
+        return run_ocr_worker()
     from PySide6.QtWidgets import QApplication
 
     from bioimage_app.wb_window import WBWindow

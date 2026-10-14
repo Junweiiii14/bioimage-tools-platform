@@ -1,6 +1,6 @@
 # WB 数值核心
 
-公开入口 `wb_tool.api`；包版本0.6.0，实现定量/手工Qt闭环及OCR/工作表后端；OCR表格界面仍在接入。
+公开入口 `wb_tool.api`；包版本0.7.0，实现定量/手工Qt闭环、OCR复核和结果表。
 数值契约与参考来源见 `../../docs/contracts/wb-reference-v1.md`。
 
 - 输入：未平滑且已声明极性的非负有限剖面、闭区间 `BandBounds`、可选 `Baseline`。
@@ -26,10 +26,12 @@
 create_wb_view/create_wb_background 是延迟装配入口；PreviewRaster 是显示专用字节，
 不会传给定量用例。WBDocument v1 保存原输入资产/标注，契约见 wb-document-v1.md。
 桌面入口由apps显式装配：`uv run --locked --no-sync python -m bioimage_app`。
-当前手工界面可拖ROI/编辑闭区间与基线/查看原始曲线和结果状态；OCR/自动写表尚未完成。
+当前界面可拖ROI/编辑闭区间与基线/查看原始曲线、OCR原文和自动结果表。
 
 可选`[ocr]`固定RapidOCR3.9.2/PP-OCRv6/ONNXRuntime1.31.0/OpenCV5；普通API不加载OCR/native模型。
 recognize_figure校验模型后本地CPU识别，suggest_figures/propose_worksheet只给未确认的空间建议。
 Worksheet保存明确Fig/行/列与lane/band关系；fill_worksheet保留失败/缺失/排除与零值差别。
-export_worksheet输出新的XLSX（原子无覆盖，需硬链接文件系统），字面名称不成为公式。
-后端已实测，GUI/OCR worker/文档持久化尚未接入，不以CLI测试宣称完整首版已完成。
+export_worksheet输出新的XLSX，Windows采用无覆盖rename发布，POSIX采用link；字面名称不成为公式。
+0.7.0已接入OCR worker、Qt复核表和v2文档；可以先识别后画ROI，或关联另一张拼图。
+跨图由用户指定lane/band，禁止按像素坐标猜配。布局建议@2支持短编号、主标签列与并排重复标签，原OCR不丢弃。
+v1草稿继续读取，协议/文档契约见wb-document-v2.md。自动裁剪、模板拼图、项目批次及完整产品验收仍待完成。

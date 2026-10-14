@@ -175,6 +175,18 @@ assert len(groups) == 1 and groups[0].heading.text == 'Fig 1A'
 assert groups[0].rows[0].text == 'AKT'
 print('Installed WB desktop window: real widgets/entry assembly and async close passed')
 print('Installed optional OCR: verified bundled PP-OCRv6 CPU recognition passed')
+import subprocess
+from wb_tool.api import OCRStartFrame, OCRRequest, OCRResultFrame, encode_ocr_frame, parse_ocr_frame
+start = OCRStartFrame(protocol_version=1, kind='start', sequence=0,
+    run_id='installed', attempt_id='installed', request_id='installed',
+    source_path=str(Path('installed-fig.tif').resolve()),
+    request=OCRRequest(source_sha256=source.sha256, revision=0))
+process = subprocess.run([sys.executable, '-I', '-m', 'bioimage_app', '--worker', 'wb_ocr'],
+    input=encode_ocr_frame(start), capture_output=True, timeout=30)
+assert process.returncode == 0, process.stderr
+frames = process.stdout.splitlines()
+assert len(frames) == 3 and isinstance(parse_ocr_frame(frames[-1]), OCRResultFrame)
+print('Installed OCR worker: real protocol, bundled models and static route passed')
 """
 
 

@@ -160,8 +160,12 @@ def export_worksheet(worksheet: Worksheet, result: AnalysisResult, destination: 
             file.write(data)
             file.flush()
             os.fsync(file.fileno())
-        # Atomic no-replace publication on NTFS and normal Linux filesystems.
-        os.link(stage, target)
+        # Windows rename refuses existing destinations and does not require hard links.
+        # POSIX rename would replace an existing file, so keep its no-replace link path.
+        if os.name == "nt":
+            os.rename(stage, target)
+        else:
+            os.link(stage, target)
     finally:
         if stage.exists():
             stage.unlink()
