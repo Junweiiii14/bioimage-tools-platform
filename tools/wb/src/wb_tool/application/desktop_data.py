@@ -22,6 +22,7 @@ from wb_tool.application.project_analysis import (
     ProjectTableCell,
     ProjectTableSnapshot,
 )
+from wb_tool.application.project_metadata import MetadataBook
 from wb_tool.application.project_normalization import NormalizationSnapshot
 from wb_tool.application.project_ocr import LoadedProjectOCR
 from wb_tool.domain.crop_detection import CropDetectionSettings
@@ -44,6 +45,7 @@ class PreviewRaster:
 class WBJob:
     operation: Literal[
         "preview",
+        "metadata_read",
         "ocr_preview",
         "document",
         "encode",
@@ -86,6 +88,7 @@ class WBJob:
     ocr_run: RunRecord | None = None
     project_ocr_result: LoadedProjectOCR | None = None
     ocr_labels: bool = False
+    preview_edge: int = 2048
 
 
 @dataclass(frozen=True)
@@ -104,6 +107,7 @@ class WBReply:
         | WBFigureProject
         | FigureRender
         | FigurePNG
+        | MetadataBook
         | CropSuggestion
         | LoadedProjectResult
         | ProjectTableSnapshot

@@ -23,6 +23,7 @@ from wb_tool.application.project_analysis import (
     fill_project_table,
     read_project_result,
 )
+from wb_tool.application.project_metadata import MetadataBook
 from wb_tool.application.project_normalization import (
     NormalizationSnapshot,
     WBNormalizedProject,
@@ -51,6 +52,7 @@ class _Work(QObject):
                 | WBFigureProject
                 | FigureRender
                 | FigurePNG
+                | MetadataBook
                 | CropSuggestion
                 | LoadedProjectResult
                 | ProjectTableSnapshot
@@ -61,7 +63,14 @@ class _Work(QObject):
                 | bytes
                 | str
             )
-            if job.operation == "project_derived_tables":
+            if job.operation == "metadata_read":
+                from wb_tool.adapters.metadata_input import read_metadata_file
+
+                value = read_metadata_file(
+                    job.path,
+                    cancelled=job.cancellation.is_set if job.cancellation else lambda: False,
+                )
+            elif job.operation == "project_derived_tables":
                 if not isinstance(job.document, WBProjectOCR):
                     raise ValueError("缺少项目派生结果配置")
                 value = ProjectDerivedTables(
@@ -214,9 +223,11 @@ class _Work(QObject):
                     ocr_image.warnings,
                 )
             elif job.operation == "preview":
+                if not 1 <= job.preview_edge <= 2048:
+                    raise ValueError("预览边长必须位于 1..2048")
                 image = load_tiff(job.path)
                 height, width = image.pixels.shape
-                step = max(1, ceil(max(height, width) / 2048))
+                step = max(1, ceil(max(height, width) / job.preview_edge))
                 sampled = image.pixels[::step, ::step]
                 display = (sampled // 257).astype(np.uint8) if image.bit_depth == 16 else sampled
                 ph, pw = display.shape

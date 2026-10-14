@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from wb_tool.ui.figure_view import FigureProjectView
     from wb_tool.ui.view import WBView
 
+from wb_tool.adapters.metadata_input import read_metadata_file
 from wb_tool.adapters.ocr_input import OCRImage, load_ocr_image
 from wb_tool.adapters.tiff_input import ImageInputError, LoadedTiff, load_tiff
 from wb_tool.application.analysis import (
@@ -67,6 +68,17 @@ from wb_tool.application.project_analysis import (
     record_project_run,
     set_row_analysis,
     update_row_analysis_request,
+)
+from wb_tool.application.project_metadata import (
+    MetadataBook,
+    MetadataCell,
+    MetadataEntry,
+    MetadataKey,
+    MetadataPreview,
+    MetadataSheet,
+    apply_metadata,
+    filename_metadata,
+    preview_metadata,
 )
 from wb_tool.application.project_normalization import (
     ControlMode,
@@ -138,6 +150,16 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "MetadataBook",
+    "MetadataCell",
+    "MetadataEntry",
+    "MetadataKey",
+    "MetadataPreview",
+    "MetadataSheet",
+    "apply_metadata",
+    "filename_metadata",
+    "preview_metadata",
+    "read_metadata_file",
     "ProjectDerivedTables",
     "ControlMode",
     "NormalizationPlan",

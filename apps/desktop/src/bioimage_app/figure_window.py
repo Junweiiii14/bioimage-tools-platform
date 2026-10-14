@@ -24,6 +24,7 @@ from wb_tool.api import (
     FigureSourcePath,
     LoadedProjectOCR,
     LoadedProjectResult,
+    MetadataBook,
     PreviewRaster,
     ProjectDerivedTables,
     ProjectOCRState,
@@ -115,6 +116,8 @@ class FigureProjectWindow(QMainWindow):
         self.view.export_requested.connect(self._choose_export)
         self.view.font_requested.connect(self._choose_font)
         self.view.detection_requested.connect(self.detect_crops)
+        self.view.metadata.import_requested.connect(self._choose_metadata_import)
+        self.view.metadata.thumbnails_requested.connect(self.load_thumbnails)
         self.view.analysis.run_requested.connect(self.analyze_project)
         self.view.analysis.refresh_requested.connect(self.refresh_project_table)
         self.view.analysis.export_requested.connect(self._choose_table_export)
@@ -134,6 +137,87 @@ class FigureProjectWindow(QMainWindow):
             self._measurement_session.cancel()
         if self._ocr_session:
             self._ocr_session.cancel()
+
+    def _choose_metadata_import(self) -> None:
+        path, _ = QFileDialog.getOpenFileName(
+            self, "选择元信息表", "", "Excel / CSV (*.xlsx *.csv)"
+        )
+        if path:
+            self.import_metadata(path)
+
+    def import_metadata(self, path: str) -> None:
+        if self._busy or not self._workspace or self._closing:
+            return
+        generation = self.view.generation
+        self._start()
+
+        def parsed(reply: WBReply) -> None:
+            if self._closing or self._cancellation.is_set() or generation != self.view.generation:
+                self._done("元信息导入已取消或项目已修改；原预览保持。")
+            elif reply.error or not isinstance(reply.value, MetadataBook):
+                self._error(reply.error or "元信息读取结果无效")
+            else:
+                self.view.metadata.install_book(reply.value, Path(path).name)
+                self._done("元信息表已读取，请在“批量元信息”选择列并预览。")
+
+        self._wb(
+            WBJob("metadata_read", path=path, cancellation=self._cancellation),
+            parsed,
+            accept_errors=True,
+        )
+
+    def load_thumbnails(self) -> None:
+        if self._busy or not self._workspace or self._closing:
+            return
+        try:
+            project = self.view.project()
+        except ValueError as error:
+            self._error(str(error))
+            return
+        generation = self.view.generation
+        sources = {
+            r.source.sha256: self._paths.get(r.source.sha256, "")
+            for r in project.rows
+            if r.source and not self.view.has_thumbnail(r.source.sha256)
+        }
+        pending = list(sources.items())
+        errors: list[str] = []
+        self._start()
+
+        def next_image() -> None:
+            if (
+                self._closing
+                or self._cancellation.is_set()
+                or generation != self.view.generation
+                or not pending
+            ):
+                message = f"缩略图加载结束；{len(errors)} 张失败。" + (
+                    " " + "; ".join(errors[:3]) if errors else ""
+                )
+                self._done(message)
+                return
+            digest, path = pending.pop(0)
+            self.view.status.setText(f"正在加载原图缩略图；剩余 {len(pending)} 张。")
+
+            def received(reply: WBReply) -> None:
+                if (
+                    generation == self.view.generation
+                    and not self._closing
+                    and not self._cancellation.is_set()
+                ):
+                    if (
+                        reply.error
+                        or not isinstance(reply.value, PreviewRaster)
+                        or reply.value.sha256 != digest
+                    ):
+                        errors.append(reply.error or "原图摘要不符")
+                    else:
+                        self.view.install_thumbnail(reply.value)
+                next_image()
+
+            self._wb(WBJob("preview", path=path, preview_edge=128), received, accept_errors=True)
+
+        next_image()
 
     def _queue_ocr_refresh(self) -> None:
         self._ocr_refresh_pending = True
@@ -811,18 +895,35 @@ class FigureProjectWindow(QMainWindow):
         self._start()
         pending = list(paths)
         duplicates = 0
+        errors: list[str] = []
+        generation = self.view.generation
 
         def next_image() -> None:
-            if not pending or self._cancellation.is_set():
-                self._done(f"导入结束；跳过 {duplicates} 个重复原图。请填写名称并复核裁剪。")
+            if (
+                not pending
+                or self._cancellation.is_set()
+                or self._closing
+                or generation != self.view.generation
+            ):
+                self._done(
+                    f"导入结束；跳过 {duplicates} 个重复原图，{len(errors)} 个失败。"
+                    + ("; ".join(errors[:3]) if errors else "请填写名称并复核裁剪。")
+                )
+                return
+            if len(self.view.project().rows) >= 512:
+                self._done(f"项目已达 512 行；剩余 {len(pending)} 张未导入，请另建项目。")
                 return
             path = pending.pop(0)
             self.view.status.setText(f"正在导入 {Path(path).name}；剩余 {len(pending)} 张")
 
             def previewed(reply: WBReply) -> None:
                 nonlocal duplicates
+                if generation != self.view.generation:
+                    next_image()
+                    return
                 if not isinstance(reply.value, PreviewRaster):
-                    self._error("图像预览无效")
+                    errors.append(f"{Path(path).name}: {reply.error or '图像预览无效'}")
+                    next_image()
                     return
                 raster = reply.value
                 current = self.view.project()
@@ -838,8 +939,12 @@ class FigureProjectWindow(QMainWindow):
                     asset = reply.value
 
                     def resolved(reply: StorageReply) -> None:
+                        nonlocal generation
                         if not isinstance(reply.value, str):
                             self._error("原图路径无效")
+                            return
+                        if generation != self.view.generation:
+                            next_image()
                             return
                         self._paths[asset.sha256] = reply.value
                         row = FigureRow(
@@ -860,6 +965,8 @@ class FigureProjectWindow(QMainWindow):
                             )
                         )
                         self.view.generation += 1
+                        generation = self.view.generation
+                        self.view.install_thumbnail(raster)
                         next_image()
 
                     self._storage(StorageCommand("asset", asset=asset), resolved)
@@ -868,7 +975,7 @@ class FigureProjectWindow(QMainWindow):
                     StorageCommand("import", path=path, source_sha256=raster.sha256), imported
                 )
 
-            self._wb(WBJob("preview", path=path), previewed)
+            self._wb(WBJob("preview", path=path, preview_edge=128), previewed, accept_errors=True)
 
         next_image()
 

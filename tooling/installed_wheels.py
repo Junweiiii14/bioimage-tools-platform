@@ -71,6 +71,7 @@ from wb_tool.api import (
     analyze_annotations, compute_lane_profiles, integrate_profile, load_tiff,
     StartFrame, WorkerConversation, encode_worker_frame, ResultFrame,
     CropRequest, export_crop, fixed_lane_grid,
+    FigureRow, WBFigureProject, read_metadata_file, preview_metadata, apply_metadata,
 )
 import numpy as np
 import tifffile
@@ -102,6 +103,17 @@ session = WorkerConversation(start)
 received = [session.accept(data) for data in frames]
 assert isinstance(received[-1], ResultFrame)
 assert received[-1].result.lanes[0].bands[0].signal == 10
+metadata_path = Path('installed-metadata.csv')
+metadata_path.write_text(chr(10).join(('row_id,protein,lane_count', 'r,AKT,3', '')),
+                         encoding='utf-8')
+metadata_book = read_metadata_file(metadata_path)
+metadata_project = WBFigureProject(project_id='p', rows=(FigureRow(row_id='r'),),
+                                   figure_order=('Fig1',))
+metadata_preview = preview_metadata(metadata_project, metadata_book.sheets[0], 0,
+                                   'row_id', 0, (('protein', 1), ('lane_count', 2)))
+metadata_updated = apply_metadata(metadata_project, metadata_preview, metadata_preview.entries,
+                                  ('protein', 'lane_count'))
+assert metadata_updated.rows[0].protein == 'AKT' and metadata_updated.rows[0].lane_count == 3
 assert not any(name.startswith(('PySide6', 'sqlite3')) for name in sys.modules)
 assert not any(name.startswith(('rapidocr', 'onnxruntime', 'cv2')) for name in sys.modules)
 print('Isolated WB wheel: TIFF/analysis, crop/grid and worker; no GUI/storage dependencies')
