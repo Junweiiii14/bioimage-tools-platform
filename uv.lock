@@ -5,6 +5,8 @@ requires-python = "==3.12.*"
 [manifest]
 members = [
     "bioimage-tools-platform",
+    "platform-runtime",
+    "tool-contracts",
     "wb-tool",
 ]
 
@@ -22,6 +24,7 @@ name = "bioimage-tools-platform"
 version = "0.0.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "platform-runtime" },
     { name = "wb-tool" },
 ]
 
@@ -53,7 +56,10 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "wb-tool", editable = "tools/wb" }]
+requires-dist = [
+    { name = "platform-runtime", editable = "packages/platform_runtime" },
+    { name = "wb-tool", editable = "tools/wb" },
+]
 
 [package.metadata.requires-dev]
 build = [
@@ -558,6 +564,17 @@ wheels = [
 ]
 
 [[package]]
+name = "platform-runtime"
+version = "0.1.0"
+source = { editable = "packages/platform_runtime" }
+dependencies = [
+    { name = "tool-contracts" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "tool-contracts", editable = "packages/tool_contracts" }]
+
+[[package]]
 name = "platformdirs"
 version = "4.13.0"
 source = { registry = "https://pypi.org/simple" }
@@ -964,6 +981,17 @@ sdist = { url = "https://files.pythonhosted.org/packages/19/75/241269d1da26b624c
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c7/18/c86eb8e0202e32dd3df50d43d7ff9854f8e0603945ff398974c1d91ac1ef/tomli_w-1.2.0-py3-none-any.whl", hash = "sha256:188306098d013b691fcadc011abd66727d3c414c571bb01b1a174ba8c983cf90", size = 6675, upload-time = "2025-01-15T12:07:22.074Z" },
 ]
+
+[[package]]
+name = "tool-contracts"
+version = "0.1.0"
+source = { editable = "packages/tool_contracts" }
+dependencies = [
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "pydantic", specifier = "==2.14.1" }]
 
 [[package]]
 name = "typing-extensions"

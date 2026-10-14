@@ -11,7 +11,17 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 @pytest.mark.parametrize(
-    "violation", ["none", "storage", "reverse-layer", "independence", "concrete-adapter"]
+    "violation",
+    [
+        "none",
+        "storage",
+        "reverse-layer",
+        "independence",
+        "concrete-adapter",
+        "runtime-tool",
+        "contracts-storage",
+        "contracts-runtime",
+    ],
 )
 def test_import_linter_rejects_transitive_dependencies(tmp_path: Path, violation: str) -> None:
     package = tmp_path / "wb_tool"
@@ -26,6 +36,11 @@ def test_import_linter_rejects_transitive_dependencies(tmp_path: Path, violation
     (adapters / "__init__.py").write_text("", encoding="utf-8")
     (adapters / "tiff_input.py").write_text("VALUE = 1\n", encoding="utf-8")
     (package / "__init__.py").write_text("", encoding="utf-8")
+    for owner in ("tool_contracts", "platform_runtime"):
+        folder = tmp_path / owner
+        folder.mkdir()
+        (folder / "__init__.py").write_text("", encoding="utf-8")
+        (folder / "api.py").write_text("VALUE = 1\n", encoding="utf-8")
     (domain / "__init__.py").write_text("", encoding="utf-8")
     (package / "api.py").write_text("from wb_tool.domain import quantify\n", encoding="utf-8")
     (domain / "quantify.py").write_text("from wb_tool.domain import bridge\n", encoding="utf-8")
@@ -35,8 +50,21 @@ def test_import_linter_rejects_transitive_dependencies(tmp_path: Path, violation
         "reverse-layer": "from wb_tool import api\n",
         "independence": "VALUE = 1\n",
         "concrete-adapter": "VALUE = 1\n",
+        "runtime-tool": "VALUE = 1\n",
+        "contracts-storage": "VALUE = 1\n",
+        "contracts-runtime": "VALUE = 1\n",
     }[violation]
     (domain / "bridge.py").write_text(bridge, encoding="utf-8")
+    if violation in ("runtime-tool", "contracts-storage", "contracts-runtime"):
+        owner = "platform_runtime" if violation == "runtime-tool" else "tool_contracts"
+        folder = tmp_path / owner
+        (folder / "api.py").write_text(f"from {owner} import bridge\n", encoding="utf-8")
+        dependency = {
+            "runtime-tool": "from wb_tool import api\n",
+            "contracts-storage": "import sqlite3\n",
+            "contracts-runtime": "from platform_runtime import api\n",
+        }[violation]
+        (folder / "bridge.py").write_text(dependency, encoding="utf-8")
     if violation == "concrete-adapter":
         (application / "analysis.py").write_text(
             "from wb_tool.application import bridge\n", encoding="utf-8"
@@ -68,4 +96,4 @@ def test_import_linter_rejects_transitive_dependencies(tmp_path: Path, violation
         check=False,
     )
     assert result.returncode == (0 if violation == "none" else 1), result.stdout + result.stderr
-    assert ("BROKEN" if violation != "none" else "Contracts: 4 kept") in result.stdout
+    assert ("BROKEN" if violation != "none" else "Contracts: 7 kept") in result.stdout

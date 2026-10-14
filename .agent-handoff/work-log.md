@@ -31,3 +31,7 @@ wb-tool 0.2.0 新增 uint8/16 灰度及显式 RGB 单页 TIFF、极性与半开 
 ## 2026-10-14 / T-005 后台协议与真实进程
 
 上一回合 progress：e3932ee/45d0c5f 手工分析。本回合实现协议 v1、strict JSON/schema、host 会话门禁与数值限线程真实 worker，123 测试及隔离 wheel 启动通过。布尔 Literal/JSON tuple 模式反例已修复且保留。合作取消不是宿主强停/存储完成证据；后续继续宿主、工作区与 GUI，目标 active。
+
+## 2026-10-14 / T-006 工作区与恢复
+
+上一回合 progress：bd1af2e/74e6561 后台协议。本回合新增通用契约与工作区宿主存储；164 测试、7 合约、三独立 wheel 通过。原图快照、草稿 CAS、旧运行保持修订、发布/DB 故障、3 真实 os._exit、取消竞态、同大小损坏、Windows junction/硬链接及一致性备份均验证。平台无 WB 字段，Qt/UI/强停和独审未完成；目标 active。

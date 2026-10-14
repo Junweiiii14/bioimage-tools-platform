@@ -9,8 +9,8 @@
 | `.agents/skills/` | 固定提交的第三方工作技能 | 已建；`tooling/skills-lock.json` |
 | `tests/test_boundaries.py` | 边界检查的正反例 | 已建；pytest |
 | `apps/` | 一个应用包的 desktop / worker 两入口，显式装配 | 规划；P0 决定打包方式 |
-| `packages/tool_contracts/` | 请求、结果、资产、错误与窄端口，`tool_contracts.api` | 规划；契约/兼容测试 |
-| `packages/platform_runtime/` | 状态机、文件资产、SQLite 元数据、配置和日志 | 规划；故障注入/集成 |
+| `packages/tool_contracts/` | `tool_contracts.api` 的文件资产、修订、运行/退出与恢复契约 | 已建 v1；schema 漂移和隔离 wheel |
+| `packages/platform_runtime/` | `platform_runtime.api.Workspace` 输入快照、草稿 CAS、结果事务、恢复与备份 | 已建 v1；真实文件/SQLite、崩溃/取消/损坏负例、独立 wheel |
 | `packages/desktop_sdk/` | ToolView、Qt 生命周期、宿主 UI 端口 | 规划；pytest-qt |
 | `packages/imaging_core/` | 原始图像、坐标和纯技术运算 | 规划；位深/几何/性质 |
 | `packages/imaging_ui/` | 真实复用需求出现后的画布适配 | 规划，不预建 |

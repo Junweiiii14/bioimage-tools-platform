@@ -3,7 +3,7 @@ name = "bioimage-tools-platform"
 version = "0.0.0"
 description = "Bioimage desktop platform and WB quantification tools in development"
 requires-python = ">=3.12,<3.13"
-dependencies = ["wb-tool"]
+dependencies = ["wb-tool", "platform-runtime"]
 
 [dependency-groups]
 dev = [
@@ -33,10 +33,11 @@ package = false
 required-version = "==0.13.0"
 
 [tool.uv.workspace]
-members = ["tools/wb"]
+members = ["tools/wb", "packages/tool_contracts", "packages/platform_runtime"]
 
 [tool.uv.sources]
 wb-tool = { workspace = true }
+platform-runtime = { workspace = true }
 
 [tool.ruff]
 target-version = "py312"
@@ -47,7 +48,7 @@ extend-exclude = [".agents", ".local"]
 select = ["E", "F", "I", "UP", "B", "SIM"]
 
 [tool.pyright]
-include = ["dev.py", "p0_probe.py", "tooling", "tests", "tools/wb"]
+include = ["dev.py", "p0_probe.py", "tooling", "tests", "tools/wb", "packages"]
 exclude = [".agents", ".venv", ".local"]
 pythonVersion = "3.12"
 typeCheckingMode = "strict"

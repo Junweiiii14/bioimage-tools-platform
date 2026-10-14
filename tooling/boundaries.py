@@ -1,4 +1,7 @@
-"""Check direct imports at declared package boundaries. See docs/architecture.md."""
+"""Check declared API boundaries, including the real contracts/runtime/WB packages.
+
+See docs/architecture.md; Import Linter also checks transitive dependencies.
+"""
 
 from __future__ import annotations
 
