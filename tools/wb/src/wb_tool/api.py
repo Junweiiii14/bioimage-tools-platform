@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from PySide6.QtWidgets import QWidget
 
     from wb_tool.ui.background import WBBackground
+    from wb_tool.ui.figure_view import FigureProjectView
     from wb_tool.ui.view import WBView
 
 from wb_tool.adapters.tiff_input import ImageInputError, LoadedTiff, load_tiff
@@ -24,6 +25,14 @@ from wb_tool.application.analysis import (
 from wb_tool.application.crop import CropRequest
 from wb_tool.application.desktop_data import PreviewRaster, WBJob, WBReply
 from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
+from wb_tool.application.figure_project import (
+    FigureRender,
+    FigureRow,
+    FigureSourcePath,
+    FigureTemplate,
+    WBFigureProject,
+    plan_figure_layout,
+)
 from wb_tool.application.ocr_protocol import (
     OCRConversation,
     OCRRequest,
@@ -70,6 +79,15 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "FigureTemplate",
+    "FigureRow",
+    "WBFigureProject",
+    "FigureRender",
+    "FigureSourcePath",
+    "plan_figure_layout",
+    "create_figure_project_view",
+    "render_figure",
+    "export_figure_bundle",
     "CropRequest",
     "export_crop",
     "fixed_lane_grid",
@@ -138,6 +156,32 @@ __all__ = [
     "QuantificationError",
     "integrate_profile",
 ]
+
+
+def create_figure_project_view(parent: "QWidget | None" = None) -> "FigureProjectView":
+    from wb_tool.ui.figure_view import FigureProjectView
+
+    return FigureProjectView(parent)
+
+
+def render_figure(
+    project: WBFigureProject, sources: tuple[FigureSourcePath, ...], *, require_review: bool = True
+) -> FigureRender:
+    from wb_tool.adapters.figure_export import render_figure as render
+
+    return render(project, sources, require_review=require_review)
+
+
+def export_figure_bundle(
+    project: WBFigureProject,
+    sources: tuple[FigureSourcePath, ...],
+    destination: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> str:
+    from wb_tool.adapters.figure_export import export_figure_bundle as export
+
+    return export(project, sources, destination, cancelled=cancelled)
 
 
 def create_wb_view(parent: "QWidget | None" = None) -> "WBView":

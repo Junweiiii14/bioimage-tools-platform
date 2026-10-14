@@ -1,6 +1,8 @@
 """Bounded one-shot background requests for preview and document/result codecs."""
 
+from hashlib import file_digest
 from math import ceil
+from pathlib import Path
 from uuid import uuid4
 
 import numpy as np
@@ -13,6 +15,7 @@ from wb_tool.adapters.worksheet_export import export_worksheet
 from wb_tool.application.analysis import AnalysisResult
 from wb_tool.application.desktop_data import PreviewRaster, WBJob, WBReply
 from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
+from wb_tool.application.figure_project import FigureRender, WBFigureProject
 from wb_tool.domain.worksheet import OCRRecognition
 
 
@@ -26,12 +29,47 @@ class _Work(QObject):
                 PreviewRaster
                 | WBDocument
                 | WBWorksheetDocument
+                | WBFigureProject
+                | FigureRender
                 | AnalysisResult
                 | OCRRecognition
                 | bytes
                 | str
             )
-            if job.operation == "preview":
+            if job.operation == "font_digest":
+                path = Path(job.path)
+                if (
+                    path.suffix.lower() not in (".ttf", ".ttc", ".otf")
+                    or path.stat().st_size > 32 * 1024 * 1024
+                ):
+                    raise ValueError("请选择不超过 32 MiB 的字体文件")
+                with path.open("rb") as stream:
+                    value = file_digest(stream, "sha256").hexdigest()
+            elif job.operation == "figure_document":
+                value = WBFigureProject.from_bytes(job.data)
+            elif job.operation in ("figure_preview", "figure_export"):
+                from wb_tool.adapters.figure_export import export_figure_bundle, render_figure
+
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少拼图项目")
+                cancel = job.cancellation.is_set if job.cancellation is not None else lambda: False
+                if job.operation == "figure_preview":
+                    from PIL import Image
+
+                    value = render_figure(
+                        job.document, job.sources, require_review=False, cancelled=cancel
+                    )
+                    if max(value.width, value.height) > 2048:
+                        preview = Image.frombytes("RGB", (value.width, value.height), value.rgb)
+                        preview.thumbnail((2048, 2048), Image.Resampling.NEAREST)
+                        value = FigureRender(
+                            preview.width, preview.height, preview.tobytes(), value.manifest_json
+                        )
+                else:
+                    value = export_figure_bundle(
+                        job.document, job.sources, job.destination, cancelled=cancel
+                    )
+            elif job.operation == "preview":
                 image = load_tiff(job.path)
                 height, width = image.pixels.shape
                 step = max(1, ceil(max(height, width) / 2048))

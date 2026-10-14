@@ -19,3 +19,5 @@
 | 2026-10-14 | JSON 原字节 strict 解析 + 标签/重复键预检；worker 仅产出候选 | 保持 stdlib dataclass 唯一字段，避免 bool 标签与 JSON tuple 模式问题；终态由宿主提交 | docs/contracts/wb-worker-v1.md |
 
 | 2026-10-14 | 新平台包仅管理 opaque 文档/资产/修订/运行，结果先文件发布后 DB CAS | 实际输入/草稿/请求/结果复用；保留未知目录而不假成功或删除 | docs/contracts/workspace-v1.md |
+
+| 2026-10-14 | 多图行计划使用独立wb_figure_project v1，旧单图v1/v2与数值协议不变；显示拼图和原值裁剪同时归档 | 防止一个source定量协议被静默改成多源/8位合成；明确人工审核和来源、不同Fig宽度允许但同Fig不拉伸 | docs/contracts/wb-figure-project-v1.md；T-012的230全量/真实10图导入重开 |

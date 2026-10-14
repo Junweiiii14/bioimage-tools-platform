@@ -57,3 +57,6 @@ T-002 进行中：本轮基线 `dev.py check --all` 29 passed；新增协议/原
 
 ## 2026-10-14 / T-011诊断子阶段
 `dev.py check --all`退出0：218测试（62.88秒）、Ruff/Pyright、9合约、4wheel5场景。原代码4轮36桌面压力未复现旧中止；新诊断3独立子进程正常/异常/qFatal落盘通过。首个qFatal用例证实不能只依赖Python信号handler，修正为QtFatalMsg主动dump后通过；未把日志功能记成根因修复。详见work/evidence/T-011/validation.md。
+
+## 2026-10-14 / T-012
+`dev.py check --all`退出0：230测试（63.06s）、Ruff170文件、Pyright0、9合约、4wheel5场景。12新用例验证多图Qt闭环/模板复用、原像素/来源/复核/取消。另真实用户10张TIFF批量导入/重开与外部源SHA保持通过。详情work/evidence/T-012/validation.md。旧Qt原生中止未复现且仍未定位；独审/远程CI/完整产品包未运行。

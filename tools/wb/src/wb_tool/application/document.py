@@ -13,7 +13,7 @@ from wb_tool.application.worker_protocol import ResultFrame
 from wb_tool.domain.worksheet import OCRRecognition, Worksheet
 
 
-class _DocumentIO(BaseModel):
+class DocumentIO(BaseModel):
     model_config = ConfigDict(strict=True, frozen=True, extra="forbid", allow_inf_nan=False)
 
     @classmethod
@@ -32,7 +32,7 @@ class _DocumentIO(BaseModel):
         return cls.model_validate_json(data)
 
 
-class WBDocument(_DocumentIO):
+class WBDocument(DocumentIO):
     schema_version: int = Field(default=1, ge=1, le=1)
     source: AssetRef
     request: AnalysisRequest
@@ -48,7 +48,7 @@ class WBDocument(_DocumentIO):
         return self
 
 
-class WBWorksheetDocument(_DocumentIO):
+class WBWorksheetDocument(DocumentIO):
     schema_version: int = Field(default=2, ge=2, le=2)
     source: AssetRef
     revision: int = Field(ge=0)

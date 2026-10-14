@@ -148,7 +148,7 @@ import subprocess
 from pathlib import Path
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QTimer
-from bioimage_app.api import create_wb_window, DesktopDiagnostics
+from bioimage_app.api import create_wb_window, create_figure_project_window, DesktopDiagnostics
 import bioimage_app.api
 assert Path(bioimage_app.api.__file__).is_relative_to(Path(sys.prefix))
 app = QApplication([])
@@ -162,6 +162,13 @@ app.exec()
 diagnostics.close()
 assert 'session_end' in diagnostics.path.read_text(encoding='utf-8')
 assert not window.isVisible()
+project_window = create_figure_project_window()
+project_window.show()
+assert project_window.isVisible() and project_window.view.table.columnCount() == 11
+QTimer.singleShot(50, project_window.close)
+QTimer.singleShot(10000, app.quit)
+app.exec()
+assert project_window.resources_closed
 worker = subprocess.run([sys.executable, '-I', '-m', 'bioimage_app', '--worker', 'wb'],
     input=b'{}\\n', capture_output=True, timeout=15)
 assert worker.returncode == 2 and len(worker.stdout.splitlines()) == 2, worker
@@ -176,6 +183,20 @@ draw.text((30,20),'Fig 1A',font=font,fill=0)
 draw.text((30,150),'AKT',font=font,fill=0)
 tifffile.imwrite('installed-fig.tif',np.array(figure))
 source = load_tiff('installed-fig.tif')
+from tool_contracts.api import AssetRef
+from wb_tool.api import (FigureRow, FigureTemplate, FigureSourcePath, WBFigureProject,
+    LaneROI, export_figure_bundle)
+asset = AssetRef(asset_id='figure-source', relative_path='inputs/original.tif',
+    sha256=source.sha256, size_bytes=Path('installed-fig.tif').stat().st_size)
+row = FigureRow(row_id='row', source=asset, filename='original.tif', width=1200, height=500,
+    bit_depth=8, figure='Fig1A', protein='AKT', lane_count=3,
+    roi=LaneROI('row', 0, 100, 1200, 160), reviewed=True)
+project = WBFigureProject(project_id='installed-project', rows=(row,), figure_order=('Fig1A',),
+    template=FigureTemplate())
+source_path = FigureSourcePath(source.sha256, str(Path('installed-fig.tif').resolve()))
+export_figure_bundle(project, (source_path,),
+    str(Path('installed-figure.zip').resolve()))
+assert Path('installed-figure.zip').exists()
 recognized = recognize_figure('installed-fig.tif',source.sha256)
 groups = suggest_figures(recognized)
 assert len(groups) == 1 and groups[0].heading.text == 'Fig 1A'

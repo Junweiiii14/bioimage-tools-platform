@@ -49,3 +49,5 @@ faulthandler configuration is preserved; its generic native fault output stays a
 configured destination. close() restores the prior Qt/Python hooks before closing the
 owned descriptor. Logs are per-session and are not yet automatically rotated across runs.
 The intermittent desktop Aborted root cause remains unknown; diagnostics are not a fix.
+
+Version 0.4.0 adds create_figure_project_window / --figure-project and the multi-image project button in WBWindow. It assembles tool-owned review/template widgets, one asynchronous storage port and background rendering. New project drafts use tool_id wb-figure; old wb documents are unchanged. Batch TIFF imports deduplicate source SHA, edits revoke row review, save/close/reopen preserves asset identities, and template reuse saves the prior project before starting the next one. Export first persists the exact plan, then writes a new ZIP containing PNG/provenance/raw TIFF crops/originals. Preview may contain pending rows; export requires every row reviewed. Automatic candidates and project measurement/OCR integration are still pending.

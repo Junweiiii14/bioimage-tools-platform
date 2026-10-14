@@ -1,0 +1,521 @@
+"""Explicit assembly of WB project review, immutable asset storage and background rendering."""
+
+from collections.abc import Callable
+from pathlib import Path
+from threading import Event
+from uuid import uuid4
+
+from PySide6.QtCore import Signal
+from PySide6.QtGui import QCloseEvent
+from PySide6.QtWidgets import (
+    QComboBox,
+    QFileDialog,
+    QMainWindow,
+    QMessageBox,
+    QPushButton,
+    QToolBar,
+)
+from tool_contracts.api import AssetRef, DraftSnapshot
+from wb_tool.api import (
+    FigureRender,
+    FigureRow,
+    FigureSourcePath,
+    PreviewRaster,
+    WBFigureProject,
+    WBJob,
+    WBReply,
+    create_figure_project_view,
+    create_wb_background,
+)
+
+from bioimage_app.storage import AsyncStorage, StorageCommand, StorageReply
+
+
+class FigureProjectWindow(QMainWindow):
+    closed = Signal()
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.setWindowTitle("WB 自动化 · 多原图与 Fig 拼图项目")
+        self.resize(1300, 950)
+        self.view = create_figure_project_view()
+        self.setCentralWidget(self.view)
+        self._store = AsyncStorage(self)
+        self._background = create_wb_background()
+        self._storage_callbacks: dict[str, Callable[[StorageReply], None]] = {}
+        self._wb_callbacks: dict[str, Callable[[WBReply], None]] = {}
+        self._store.replied.connect(self._storage_reply)
+        self._background.replied.connect(self._wb_reply)
+        self._store.closed.connect(self._store_stopped)
+        self._background.closed.connect(self._background_stopped)
+        self._workspace = ""
+        self._paths: dict[str, str] = {}
+        self._saved_revision: int | None = None
+        self._saved_generation = 0
+        self._busy = False
+        self._closing = False
+        self._shutting = False
+        self._store_closed = False
+        self._background_closed = False
+        self._cancellation = Event()
+        bar = QToolBar("项目")
+        self.addToolBar(bar)
+        self.create_button = QPushButton("新建项目工作区")
+        self.open_button = QPushButton("打开项目工作区")
+        self.import_button = QPushButton("批量导入 TIFF")
+        self.save_button = QPushButton("保存项目")
+        self.new_button = QPushButton("复用模板新建项目")
+        self.cancel_button = QPushButton("取消当前任务")
+        self.documents = QComboBox()
+        self.documents.setMinimumWidth(240)
+        for button in (
+            self.create_button,
+            self.open_button,
+            self.import_button,
+            self.save_button,
+            self.new_button,
+            self.cancel_button,
+            self.documents,
+        ):
+            bar.addWidget(button)
+        self.create_button.clicked.connect(lambda: self._choose_workspace(True))
+        self.open_button.clicked.connect(lambda: self._choose_workspace(False))
+        self.import_button.clicked.connect(self._choose_import)
+        self.save_button.clicked.connect(lambda: self.save())
+        self.new_button.clicked.connect(self.new_project)
+        self.cancel_button.clicked.connect(self._cancellation.set)
+        self.documents.activated.connect(self._choose_document)
+        self.view.source_requested.connect(self.select_source)
+        self.view.preview_requested.connect(lambda: self.compose())
+        self.view.export_requested.connect(self._choose_export)
+        self.view.font_requested.connect(self._choose_font)
+        self._controls()
+
+    @property
+    def resources_closed(self) -> bool:
+        return self._store_closed and self._background_closed
+
+    def _controls(self) -> None:
+        idle = not self._busy and not self._closing
+        self.create_button.setEnabled(idle and not self._workspace)
+        self.open_button.setEnabled(idle and not self._workspace)
+        self.import_button.setEnabled(idle and bool(self._workspace))
+        self.save_button.setEnabled(idle and bool(self._workspace))
+        self.new_button.setEnabled(idle and bool(self._workspace))
+        self.documents.setEnabled(idle and bool(self._workspace))
+        self.cancel_button.setEnabled(self._busy and not self._closing)
+        self.view.setEnabled(idle and bool(self._workspace))
+
+    def _start(self) -> None:
+        self._busy = True
+        self._cancellation.clear()
+        self._controls()
+
+    def _done(self, message: str) -> None:
+        self._busy = False
+        self.view.status.setText(message)
+        self._controls()
+        if self._closing:
+            self._finish_close()
+
+    def _error(self, message: str) -> None:
+        self._closing = False
+        self._done("操作失败：" + message)
+
+    def _storage(self, command: StorageCommand, callback: Callable[[StorageReply], None]) -> None:
+        try:
+            self._storage_callbacks[self._store.submit(command)] = callback
+        except (ValueError, RuntimeError) as error:
+            self._error(str(error))
+
+    def _wb(self, job: WBJob, callback: Callable[[WBReply], None]) -> None:
+        try:
+            self._wb_callbacks[self._background.submit(job)] = callback
+        except (ValueError, RuntimeError) as error:
+            self._error(str(error))
+
+    def _storage_reply(self, reply: StorageReply) -> None:
+        callback = self._storage_callbacks.pop(reply.request_id, None)
+        if callback:
+            if reply.error_code:
+                self._error(reply.message)
+            else:
+                callback(reply)
+
+    def _wb_reply(self, reply: WBReply) -> None:
+        callback = self._wb_callbacks.pop(reply.request_id, None)
+        if callback:
+            if reply.error:
+                self._error(reply.error)
+            else:
+                callback(reply)
+
+    def _choose_workspace(self, create: bool) -> None:
+        path = QFileDialog.getExistingDirectory(
+            self, "选择新项目的空目录" if create else "打开项目工作区"
+        )
+        if path:
+            self.open_workspace(path, create=create)
+
+    def open_workspace(self, path: str, *, create: bool = False) -> None:
+        if self._workspace or self._busy:
+            return
+        self._start()
+
+        def opened(reply: StorageReply) -> None:
+            self._workspace = path
+            self._storage(StorageCommand("documents"), self._list_documents)
+
+        self._storage(StorageCommand("create" if create else "open", path=path), opened)
+
+    def _list_documents(self, reply: StorageReply) -> None:
+        self.documents.clear()
+        self.documents.addItem("选择已保存拼图项目", "")
+        if isinstance(reply.value, tuple):
+            for document in reply.value:
+                if isinstance(document, DraftSnapshot) and document.tool_id == "wb-figure":
+                    self.documents.addItem(document.document_id, document.document_id)
+        self._done("项目工作区已就绪；批量导入原图或选择已保存项目。")
+
+    def _choose_import(self) -> None:
+        paths, _ = QFileDialog.getOpenFileNames(
+            self, "选择同一项目的原始 TIFF", "", "TIFF (*.tif *.tiff)"
+        )
+        if paths:
+            self.import_images(tuple(paths))
+
+    def new_project(self) -> None:
+        if self._busy or not self._workspace:
+            return
+
+        def create() -> None:
+            template = self.view.project().template
+            project = WBFigureProject(project_id=uuid4().hex, template=template)
+            self.view.set_project(project)
+            self.view.generation += 1
+            self._saved_revision = None
+            self.view.status.setText("已复用模板新建项目；导入下一批原图。")
+
+        self.save(after=create)
+
+    def import_images(self, paths: tuple[str, ...]) -> None:
+        if self._busy or not self._workspace:
+            return
+        try:
+            self.view.project()
+        except ValueError as error:
+            self._error(str(error))
+            return
+        self._start()
+        pending = list(paths)
+        duplicates = 0
+
+        def next_image() -> None:
+            if not pending or self._cancellation.is_set():
+                self._done(f"导入结束；跳过 {duplicates} 个重复原图。请填写名称并复核裁剪。")
+                return
+            path = pending.pop(0)
+            self.view.status.setText(f"正在导入 {Path(path).name}；剩余 {len(pending)} 张")
+
+            def previewed(reply: WBReply) -> None:
+                nonlocal duplicates
+                if not isinstance(reply.value, PreviewRaster):
+                    self._error("图像预览无效")
+                    return
+                raster = reply.value
+                current = self.view.project()
+                if any(row.source and row.source.sha256 == raster.sha256 for row in current.rows):
+                    duplicates += 1
+                    next_image()
+                    return
+
+                def imported(reply: StorageReply) -> None:
+                    if not isinstance(reply.value, AssetRef):
+                        self._error("原图资产无效")
+                        return
+                    asset = reply.value
+
+                    def resolved(reply: StorageReply) -> None:
+                        if not isinstance(reply.value, str):
+                            self._error("原图路径无效")
+                            return
+                        self._paths[asset.sha256] = reply.value
+                        row = FigureRow(
+                            row_id=uuid4().hex,
+                            source=asset,
+                            filename=Path(path).name,
+                            width=raster.width,
+                            height=raster.height,
+                            bit_depth=16 if raster.bit_depth == 16 else 8,
+                            figure=current.figure_order[-1] if current.figure_order else "Fig1",
+                        )
+                        self.view.set_project(
+                            current.model_copy(
+                                update={
+                                    "rows": (*current.rows, row),
+                                    "figure_order": current.figure_order or ("Fig1",),
+                                }
+                            )
+                        )
+                        self.view.generation += 1
+                        next_image()
+
+                    self._storage(StorageCommand("asset", asset=asset), resolved)
+
+                self._storage(
+                    StorageCommand("import", path=path, source_sha256=raster.sha256), imported
+                )
+
+            self._wb(WBJob("preview", path=path), previewed)
+
+        next_image()
+
+    def select_source(self, row_id: str) -> None:
+        if self._busy or self._closing:
+            return
+        try:
+            row = next(r for r in self.view.project().rows if r.row_id == row_id)
+        except (ValueError, StopIteration) as error:
+            self._error(str(error))
+            return
+        asset = row.source
+        if asset is None:
+            self.view.canvas.set_image(PreviewRaster("", 0, 0, 0, 0, b"", 0, ()))
+            self.view.canvas.set_lanes(())
+            return
+        self._start()
+
+        def previewed(reply: WBReply) -> None:
+            if not isinstance(reply.value, PreviewRaster) or reply.value.sha256 != asset.sha256:
+                self._error("原图来源不一致")
+                return
+            self.view.set_source_preview(reply.value)
+            self._done(
+                f"{row.filename} · {row.width} × {row.height} · {row.bit_depth} 位；"
+                "框选时请排除 Marker。"
+            )
+
+        self._wb(WBJob("preview", path=self._paths[asset.sha256]), previewed)
+
+    def save(self, after: Callable[[], None] | None = None) -> None:
+        if self._busy or not self._workspace:
+            return
+        try:
+            project = self.view.project(
+                0 if self._saved_revision is None else self._saved_revision + 1
+            )
+        except ValueError as error:
+            self._error(str(error))
+            return
+        generation = self.view.generation
+        self._start()
+
+        def encoded(reply: WBReply) -> None:
+            if not isinstance(reply.value, bytes):
+                self._error("项目编码无效")
+                return
+
+            def saved(reply: StorageReply) -> None:
+                self._saved_revision = project.revision
+                self._saved_generation = generation
+                self.view.set_project(project)
+                if self.documents.findData(project.project_id) < 0:
+                    self.documents.addItem(project.project_id, project.project_id)
+                self._busy = False
+                self._controls()
+                self.view.status.setText("项目已保存，原图和模板可重新打开。")
+                if after:
+                    after()
+                elif self._closing:
+                    self._finish_close()
+
+            self._storage(
+                StorageCommand(
+                    "save",
+                    document_id=project.project_id,
+                    tool_id="wb-figure",
+                    revision=project.revision,
+                    previous_revision=self._saved_revision,
+                    data=reply.value,
+                ),
+                saved,
+            )
+
+        self._wb(WBJob("encode", document=project), encoded)
+
+    def _choose_document(self, index: int) -> None:
+        document_id = self.documents.itemData(index)
+        if isinstance(document_id, str) and document_id:
+            self.load_document(document_id)
+
+    def load_document(self, document_id: str) -> None:
+        if self._busy:
+            return
+        if (
+            self.view.generation != self._saved_generation
+            and QMessageBox.question(self, "未保存修改", "放弃当前未保存修改并切换项目？")
+            != QMessageBox.StandardButton.Yes
+        ):
+            return
+        self._start()
+
+        def loaded(reply: StorageReply) -> None:
+            def decoded(reply: WBReply) -> None:
+                if not isinstance(reply.value, WBFigureProject):
+                    self._error("项目文档无效")
+                    return
+                project = reply.value
+                assets = {r.source.sha256: r.source for r in project.rows if r.source}
+                if project.template.font:
+                    assets[project.template.font.sha256] = project.template.font
+                pending = list(assets.values())
+                resolved_paths: dict[str, str] = {}
+
+                def next_asset() -> None:
+                    if not pending:
+                        self._paths = resolved_paths
+                        self.view.set_project(project)
+                        self._saved_revision = project.revision
+                        self._saved_generation = self.view.generation
+                        self._done("项目已恢复，原图资产已校验。选择一行查看原图。")
+                        return
+                    asset = pending.pop(0)
+
+                    def resolved(reply: StorageReply) -> None:
+                        if not isinstance(reply.value, str):
+                            self._error("资产路径无效")
+                            return
+                        resolved_paths[asset.sha256] = reply.value
+                        next_asset()
+
+                    self._storage(StorageCommand("asset", asset=asset), resolved)
+
+                next_asset()
+
+            self._wb(WBJob("figure_document", data=reply.data), decoded)
+
+        self._storage(StorageCommand("load", document_id=document_id), loaded)
+
+    def _choose_export(self) -> None:
+        destination, _ = QFileDialog.getSaveFileName(
+            self, "导出新拼图归档（含原图、原值裁剪和记录）", "", "ZIP (*.zip)"
+        )
+        if destination:
+            self.compose(destination)
+
+    def compose(self, destination: str = "") -> None:
+        if self._busy or not self._workspace:
+            return
+
+        # Persist the exact plan first so exported revision points to a recoverable draft.
+        def run() -> None:
+            try:
+                project = self.view.project()
+            except ValueError as error:
+                self._error(str(error))
+                return
+            self._start()
+            sources = tuple(FigureSourcePath(sha, path) for sha, path in self._paths.items())
+
+            def completed(reply: WBReply) -> None:
+                if isinstance(reply.value, FigureRender):
+                    self.view.show_render(reply.value)
+                    self._done("预览已生成；未审核行允许预览，正式导出须逐行确认。")
+                elif isinstance(reply.value, str):
+                    self._done("拼图归档已保存：" + reply.value)
+                else:
+                    self._error("拼图结果无效")
+
+            self._wb(
+                WBJob(
+                    "figure_export" if destination else "figure_preview",
+                    document=project,
+                    sources=sources,
+                    destination=destination,
+                    cancellation=self._cancellation,
+                ),
+                completed,
+            )
+
+        self.save(after=run)
+
+    def _choose_font(self) -> None:
+        path, _ = QFileDialog.getOpenFileName(
+            self, "导入支持标签文字的字体", "", "Fonts (*.ttf *.otf *.ttc)"
+        )
+        if path:
+            self.import_font(path)
+
+    def import_font(self, path: str) -> None:
+        if self._busy:
+            return
+        try:
+            project = self.view.project()
+        except ValueError as error:
+            self._error(str(error))
+            return
+        self._start()
+
+        def fingerprinted(reply: WBReply) -> None:
+            if not isinstance(reply.value, str):
+                self._error("字体摘要无效")
+                return
+
+            def imported(reply: StorageReply) -> None:
+                if not isinstance(reply.value, AssetRef):
+                    self._error("字体资产无效")
+                    return
+                asset = reply.value
+
+                def resolved(reply: StorageReply) -> None:
+                    if not isinstance(reply.value, str):
+                        self._error("字体路径无效")
+                        return
+                    self._paths[asset.sha256] = reply.value
+                    self.view.set_project(
+                        project.model_copy(
+                            update={"template": project.template.model_copy(update={"font": asset})}
+                        )
+                    )
+                    self.view.generation += 1
+                    self._done("字体已导入，随项目保存。")
+
+                self._storage(StorageCommand("asset", asset=asset), resolved)
+
+            self._storage(StorageCommand("import", path=path, source_sha256=reply.value), imported)
+
+        self._wb(WBJob("font_digest", path=path), fingerprinted)
+
+    def closeEvent(self, event: QCloseEvent) -> None:
+        if self.resources_closed:
+            event.accept()
+            return
+        event.ignore()
+        self._closing = True
+        self._cancellation.set()
+        self._controls()
+        if not self._busy:
+            self._finish_close()
+
+    def _finish_close(self) -> None:
+        if self._shutting:
+            return
+        if self._workspace and self._saved_generation != self.view.generation:
+            self.save()
+            return
+        self._shutting = True
+        self._store.shutdown()
+        self._background.shutdown()
+
+    def _store_stopped(self) -> None:
+        self._store_closed = True
+        self._both_stopped()
+
+    def _background_stopped(self) -> None:
+        self._background_closed = True
+        self._both_stopped()
+
+    def _both_stopped(self) -> None:
+        if self.resources_closed:
+            self.closed.emit()
+            self.close()

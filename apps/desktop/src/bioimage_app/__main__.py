@@ -27,6 +27,7 @@ def main() -> int:
     from PySide6.QtWidgets import QApplication
 
     from bioimage_app.diagnostics import DesktopDiagnostics
+    from bioimage_app.figure_window import FigureProjectWindow
     from bioimage_app.wb_window import WBWindow
 
     app = QApplication(sys.argv)
@@ -43,7 +44,7 @@ def main() -> int:
         )
     except OSError:
         print("无法创建本地诊断日志；继续启动。", file=sys.stderr)
-    window = WBWindow()
+    window = FigureProjectWindow() if sys.argv[1:] == ["--figure-project"] else WBWindow()
     window.show()
     try:
         return app.exec()

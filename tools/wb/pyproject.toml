@@ -1,12 +1,13 @@
 [project]
 name = "wb-tool"
-version = "0.8.0"
+version = "0.9.0"
 description = "WB reference profile quantification domain"
 requires-python = ">=3.12,<3.13"
 dependencies = ["numpy==2.5.4", "tifffile==2026.9.20", "pydantic==2.14.1", "tool-contracts"]
 
 [project.optional-dependencies]
-desktop = ["PySide6==6.12.0"]
+desktop = ["PySide6==6.12.0", "pillow==12.3.0"]
+figures = ["pillow==12.3.0"]
 ocr = ["rapidocr==3.9.2", "onnxruntime==1.31.0", "opencv-python==5.0.0.93", "pillow==12.3.0"]
 
 [tool.uv.sources]

@@ -34,9 +34,12 @@ from wb_tool.api import (
     encode_worker_frame,
 )
 
+from bioimage_app.figure_window import FigureProjectWindow
 from bioimage_app.run_session import RunCompletion, RunSession
 from bioimage_app.storage import AsyncStorage, StorageCommand, StorageReply
 from bioimage_app.wb_registration import OCRProcessCodec, WBProcessCodec
+
+_figure_windows: list[FigureProjectWindow] = []
 
 
 class WBWindow(QMainWindow):
@@ -80,6 +83,8 @@ class WBWindow(QMainWindow):
         self.open_button = QPushButton("打开工作区")
         self.import_button = QPushButton("导入 TIFF")
         self.import_ocr_button = QPushButton("关联拼图 TIFF")
+        figure_button = QPushButton("多原图 / Fig 拼图项目")
+        figure_button.clicked.connect(self._open_figure_project)
         self.documents = QComboBox()
         self.documents.setMinimumWidth(230)
         for widget in (
@@ -87,6 +92,7 @@ class WBWindow(QMainWindow):
             self.open_button,
             self.import_button,
             self.import_ocr_button,
+            figure_button,
             self.documents,
         ):
             toolbar.addWidget(widget)
@@ -103,6 +109,12 @@ class WBWindow(QMainWindow):
         self.view.export_requested.connect(self._choose_export)
         self.view.crop_requested.connect(self._choose_crop)
         self._controls()
+
+    def _open_figure_project(self) -> None:
+        window = FigureProjectWindow()
+        _figure_windows.append(window)
+        window.closed.connect(lambda: _figure_windows.remove(window))
+        window.show()
 
     def _controls(self) -> None:
         idle = not self._busy and not self._closing
