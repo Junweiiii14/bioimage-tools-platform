@@ -1,6 +1,6 @@
 # WB 数值核心
 
-公开入口 `wb_tool.api`；包版本0.7.0，实现定量/手工Qt闭环、OCR复核和结果表。
+公开入口 `wb_tool.api`；包版本0.8.0，实现定量/手工Qt闭环、OCR复核和结果表。
 数值契约与参考来源见 `../../docs/contracts/wb-reference-v1.md`。
 
 - 输入：未平滑且已声明极性的非负有限剖面、闭区间 `BandBounds`、可选 `Baseline`。
@@ -35,3 +35,5 @@ export_worksheet输出新的XLSX，Windows采用无覆盖rename发布，POSIX采
 0.7.0已接入OCR worker、Qt复核表和v2文档；可以先识别后画ROI，或关联另一张拼图。
 跨图由用户指定lane/band，禁止按像素坐标猜配。布局建议@2支持短编号、主标签列与并排重复标签，原OCR不丢弃。
 v1草稿继续读取，协议/文档契约见wb-document-v2.md。自动裁剪、模板拼图、项目批次及完整产品验收仍待完成。
+
+0.8.0增加fixed_lane_grid、CropRequest/export_crop及桌面框选模式。固定N保留空位，左右Marker排除由用户给定；新TIFF裁剪保持原通道/位深/像素，内嵌来源和半开坐标记录。详见wb-crop-grid-v1.md。当前导出所选单框，整行可用单框模式标记；不是自动膜/Marker检测或模板合成。

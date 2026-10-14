@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
 from tool_contracts.api import AssetRef, DraftSnapshot, RunRecord
 from wb_tool.api import (
     AnalysisResult,
+    CropRequest,
     OCRRecognition,
     OCRRequest,
     OCRStartFrame,
@@ -100,6 +101,7 @@ class WBWindow(QMainWindow):
         self.view.cancel_requested.connect(self.cancel)
         self.view.ocr_requested.connect(self.recognize)
         self.view.export_requested.connect(self._choose_export)
+        self.view.crop_requested.connect(self._choose_crop)
         self._controls()
 
     def _controls(self) -> None:
@@ -117,6 +119,7 @@ class WBWindow(QMainWindow):
         self.view.export_button.setEnabled(
             self.view.quantitative_result is not None and idle and self._session is None
         )
+        self.view.crop_button.setEnabled(bool(self.view.lanes) and idle and self._session is None)
 
     def _set_busy(self, busy: bool) -> None:
         self._busy = busy
@@ -343,6 +346,43 @@ class WBWindow(QMainWindow):
         path, _ = QFileDialog.getSaveFileName(self, "导出新结果文件", "", "XLSX (*.xlsx)")
         if path:
             self.export_table(path)
+
+    def _choose_crop(self) -> None:
+        path, _ = QFileDialog.getSaveFileName(self, "导出新的原像素裁剪", "", "TIFF (*.tif *.tiff)")
+        if path:
+            self.export_crop(path)
+
+    def export_crop(self, path: str) -> None:
+        if self._busy or self._session is not None or self._asset is None:
+            return
+        asset = self._asset
+        try:
+            roi = self.view.selected_roi()
+        except ValueError as error:
+            self._error(str(error))
+            return
+
+        def saved() -> None:
+            assert self._saved_revision is not None
+            request = CropRequest(asset.sha256, self._saved_revision, roi)
+            self._set_busy(True)
+
+            def resolved(reply: StorageReply) -> None:
+                if not isinstance(reply.value, str):
+                    self._error("原图资产路径无效")
+                    return
+
+                def exported(reply: WBReply) -> None:
+                    self._set_busy(False)
+                    self.view.status.setText(
+                        "原像素裁剪已导出（含来源与坐标）：" + str(reply.value)
+                    )
+
+                self._wb(WBJob("crop", path=reply.value, crop=request, destination=path), exported)
+
+            self._storage(StorageCommand("asset", asset=asset), resolved)
+
+        self.save(after=saved)
 
     def export_table(self, path: str) -> None:
         if self._busy or self._session is not None:

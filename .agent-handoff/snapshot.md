@@ -1,13 +1,12 @@
 # Handoff Snapshot
 
-- 更新：2026-10-14。用户补充 WB 资料并明确继续，暂停已解除；上位目标 T-003 完整 WB 软件。当前 T-009：OCR/工作表完整闭环自验完成，独立审查尚未执行。
-- 分支 feat/T-009-fig-ocr-table，base feat/T-008-wb-desktop (34831e4)。本轮从184d018继续；最新提交以 git log 为准。main/PR/远程CI未操作。
-- wb-tool0.7.0 / bioimage-app0.2.0：原TIFF手工ROI/条带/基线定量、离线OCR专用进程、Qt名称/关联复核、自动写表/新文件XLSX、v1/v2草稿保存重开。允许先OCR后ROI，支持单独拼图资产与显式跨图绑定；一次草稿仍只有一个定量原图。
-- 文档v2保存OCR原文/坐标/引擎模型摘要、原图与拼图资产、已确认工作表和当前有效测量；v1保留只读兼容。更改ROI/极性清除当前值，更改名称取消确认；缺失/失败不转零。原图与历史运行不可覆盖。
-- 完整检查退出0：205测试（59秒）、Ruff/Pyright strict、9导入合约、4独立wheel/5安装场景；安装产物真实OCR worker通过。原生Qt实测先识别后ROI、跨图绑定、保存重开、XLSX数值、名称修正及ROI失效。证据见work/evidence/T-009/validation.md。
-- 新资料只读检查，私人提取/预览/原始OCR放.local/requirements-review（忽略目录）。真实组合图含短编号、倾斜样本名、并排同名蛋白、空位。布局@2给长图16组；另一图Fig1C高置信误读为Fig1G，必须复核，未建立准确率指标。
-- 下一步 T-010：用户已知泳道数的固定网格、Marker排除与原坐标条带裁剪复核；随后Fig/蛋白模板合成，再项目批次、归一化与产品打包。详见docs/research/2026-10-14-wb-materials-workflow.md。首版OCR/自动写表要求持续有效。
-- 待用户说明同曝光无后缀/_0/_1 TIFF与CLX含义及定量来源。界面可显式选源，不能根据位深/命名自动选；任务单趋势不作为算法优化目标。Excel数值单位未确认，不作为灰度真值。
-- T-003至T-009产品阶段均尚无绑定提交的独立审查；T-008一次pytest原生Aborted根因未独立重放，后续全量通过不能抹去风险。T-001真实人工标注未冻结，P0包态交互/DPI和干净Windows仍待办。
-- 启动：uv run --locked --no-sync python -m bioimage_app。静态--worker wb/wb_ocr；platform_runtime不含实验语义，各跨包仅用api。
-- 不恢复归档项目；不提交私人资料/模型/安装包。Goal API本轮先前返回null，没有创建替代目标。
+- 更新：2026-10-14。用户提供WB资料后明确继续，原暂停已解除。Goal当前active，目标完整WB软件；未设置token预算。不能在局部功能完成时标goal complete。
+- 当前work/tasks/T-010-wb-crop-grid.md，review待独审；分支feat/T-010-wb-crop-grid，base379ffa2（T-009完整OCR/表格桌面提交）。最新head查git log。没有推送/PR/main集成。
+- wb-tool0.8.0/bioimage-app0.3.0：已实现原TIFF定量/手工ROI/条带/基线、真实离线OCR、Qt名称/绑定复核与自动表/XLSX、单独拼图资产、OCR-first/v1-v2保存重开，以及固定泳道网格/人工左右Marker排除/后台原像素单框裁剪。
+- T-010最终自验：215测试（60.92秒）、9导入合约、4wheel/5安装场景，Ruff/Pyright全部通过。裁剪uint8/16/RGB/RGBA/MINISWHITE/planar/大端、原值/坐标/无覆盖/错误源，Qt拖框保存重开和安装产物API均通过。详细work/evidence/T-010/validation.md。
+- 一次T-010组合测试在新用例漏load_document超时之后、旧GUI用例中原生Aborted，栈顶WBBackground._reply。测试已修正、9桌面/215全量随后通过，但原生根因未明；T-008旧同类风险仍保留。下一步先专项捕获/定位Qt线程和对象回收，再扩展自动化，不宣称已修复。
+- 后续产品功能：自动膜/Marker候选、整行裁剪组织与Fig/蛋白模板合成、多原图项目批次、归一化、产品打包验收。当前一次草稿仅一个定量原图，跨图为一个原图对一个拼图；原像素导出只导出选中单框，整行可在单框模式框选。固定网格参数不存历史，保存明确坐标不按默认值重建。
+- 新资料只读检查；私人提取/预览/OCR位于.local/requirements-review。长组合图布局@2给16组；另一图Fig1C高置信误读为Fig1G，必须人工确认。用户首版必须OCR/Fig/自动写表要求保留；真实人工真值/准确率验收尚未建立。
+- 待用户回答无后缀/_0/_1 TIFF与CLX分别是什么导出、哪种用于定量。当前显式选源，不按位深或命名猜测；任务单趋势不用于调整检测/测量，Excel单位未明不当灰度真值。
+- 所有产品阶段绑定提交独审尚未执行。T-001人工标注、P0包态交互/DPI/干净Windows、物理FAT未验收。最终产品仍未完成。
+- 启动uv run --locked --no-sync python -m bioimage_app；各跨包只用api，平台不含实验语义。原图/历史结果不可覆盖，不恢复归档项目，不提交私人资料/模型/安装包。

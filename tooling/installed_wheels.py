@@ -70,6 +70,7 @@ from wb_tool.api import (
     AnalysisRequest, BandAnnotation, BandBounds, Baseline, LaneAnnotation, LaneROI,
     analyze_annotations, compute_lane_profiles, integrate_profile, load_tiff,
     StartFrame, WorkerConversation, encode_worker_frame, ResultFrame,
+    CropRequest, export_crop, fixed_lane_grid,
 )
 import numpy as np
 import tifffile
@@ -82,6 +83,9 @@ pixels = np.array([[245], [235], [245]], dtype=np.uint8)
 assert compute_lane_profiles(pixels, LaneROI('L', 0, 0, 1, 3), 'dark').quantitative == (10.,20.,10.)
 tifffile.imwrite('analytic.tif', pixels)
 image = load_tiff('analytic.tif')
+assert len(fixed_lane_grid(LaneROI('G', 0, 0, 12, 3), 3)) == 3
+export_crop('analytic.tif', CropRequest(image.sha256, 0, LaneROI('C', 0, 0, 1, 2)), 'crop.tif')
+assert np.array_equal(load_tiff('crop.tif').pixels, pixels[:2])
 lane = LaneAnnotation(LaneROI('L', 0, 0, 1, 3), (BandAnnotation('B', BandBounds(0, 2)),))
 request = AnalysisRequest(image.sha256, 7, 'dark', (lane,))
 result = analyze_annotations(image, request)
@@ -100,7 +104,7 @@ assert isinstance(received[-1], ResultFrame)
 assert received[-1].result.lanes[0].bands[0].signal == 10
 assert not any(name.startswith(('PySide6', 'sqlite3')) for name in sys.modules)
 assert not any(name.startswith(('rapidocr', 'onnxruntime', 'cv2')) for name in sys.modules)
-print('Isolated WB wheel: TIFF/manual analysis and real worker passed; no GUI/storage dependencies')
+print('Isolated WB wheel: TIFF/analysis, crop/grid and worker; no GUI/storage dependencies')
 """
 
 RUNTIME_SCRIPT = """

@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QPushButton,
+    QScrollArea,
     QSpinBox,
     QSplitter,
     QTableWidget,
@@ -29,6 +30,7 @@ from wb_tool.application.analysis import (
     LaneAnnotation,
 )
 from wb_tool.application.desktop_data import PreviewRaster
+from wb_tool.domain.grid import fixed_lane_grid
 from wb_tool.domain.lanes import LaneROI
 from wb_tool.domain.quantify import BandBounds, Baseline, ProfileMeasurement
 from wb_tool.domain.worksheet import OCRRecognition
@@ -108,6 +110,7 @@ class WBView(QWidget):
     cancel_requested = Signal()
     ocr_requested = Signal()
     export_requested = Signal()
+    crop_requested = Signal()
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -119,6 +122,18 @@ class WBView(QWidget):
         self._result: AnalysisResult | None = None
         self.canvas = ImageCanvas()
         self.canvas.roi_drawn.connect(self._drawn)
+        self.draw_mode = QComboBox()
+        self.draw_mode.addItems(["单个泳道 / 条带裁剪框", "固定数量泳道网格"])
+        self.lane_count = QSpinBox()
+        self.lane_count.setRange(1, 96)
+        self.lane_count.setValue(6)
+        self.exclude_left = QSpinBox()
+        self.exclude_right = QSpinBox()
+        for control in (self.exclude_left, self.exclude_right):
+            control.setRange(0, 1000000)
+            control.setSuffix(" px")
+        self.crop_button = QPushButton("导出所选框原像素 TIFF")
+        self.crop_button.clicked.connect(self.crop_requested)
         self.polarity = QComboBox()
         self.polarity.addItems(["暗条带", "亮条带"])
         self.polarity.currentIndexChanged.connect(self._edited)
@@ -163,6 +178,10 @@ class WBView(QWidget):
         self.recognition: OCRRecognition | None = None
         self.worksheet.changed.connect(self._metadata_edited)
         form = QFormLayout()
+        form.addRow("框选方式", self.draw_mode)
+        form.addRow("网格泳道数（含空位）", self.lane_count)
+        form.addRow("网格左侧排除 / Marker", self.exclude_left)
+        form.addRow("网格右侧排除", self.exclude_right)
         form.addRow("条带极性", self.polarity)
         form.addRow("泳道", self.lane_selector)
         for label, control in zip(
@@ -170,6 +189,7 @@ class WBView(QWidget):
         ):
             form.addRow(label, control)
         form.addRow(remove_lane)
+        form.addRow(self.crop_button)
         form.addRow("条带", self.band_selector)
         form.addRow(add_band)
         form.addRow(self.detected)
@@ -181,9 +201,13 @@ class WBView(QWidget):
         form.addRow("基线右值", self.baseline[1])
         sidebar = QWidget()
         sidebar.setLayout(form)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(sidebar)
+        scroll.setMinimumWidth(330)
         splitter = QSplitter()
         splitter.addWidget(self.canvas)
-        splitter.addWidget(sidebar)
+        splitter.addWidget(scroll)
         splitter.setStretchFactor(0, 1)
         self.plot = ProfilePlot()
         self.results = QTableWidget(0, 5)
@@ -349,11 +373,35 @@ class WBView(QWidget):
         self._select_lane()
 
     def _drawn(self, coordinates: tuple[int, int, int, int]) -> None:
-        lane = LaneAnnotation(LaneROI("L" + uuid4().hex[:6], *coordinates), ())
-        self.lanes.append(lane)
+        region = LaneROI("L" + uuid4().hex[:6], *coordinates)
+        try:
+            rois = (
+                fixed_lane_grid(
+                    region,
+                    self.lane_count.value(),
+                    exclude_left=self.exclude_left.value(),
+                    exclude_right=self.exclude_right.value(),
+                )
+                if self.draw_mode.currentIndex() == 1
+                else (region,)
+            )
+        except ValueError as error:
+            self.status.setText(str(error))
+            return
+        self.lanes.extend(LaneAnnotation(roi, ()) for roi in rois)
         self._refresh_lanes()
-        self.lane_selector.setCurrentIndex(len(self.lanes) - 1)
+        self.lane_selector.setCurrentIndex(len(self.lanes) - len(rois))
         self._edited()
+        self.status.setText(f"已添加 {len(rois)} 个区域；空泳道保留，请检查边界并标注条带。")
+
+    def selected_roi(self) -> LaneROI:
+        index = self.lane_selector.currentIndex()
+        if self.raster is None or index < 0:
+            raise ValueError("请先框选条带区域或选择泳道")
+        roi = LaneROI(self.lanes[index].roi.lane_id, *(c.value() for c in self.coordinates))
+        if roi.x1 > self.raster.width or roi.y1 > self.raster.height:
+            raise ValueError("裁剪框超出原图")
+        return roi
 
     def _select_lane(self) -> None:
         if self._loading:

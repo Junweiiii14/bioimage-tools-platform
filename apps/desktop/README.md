@@ -34,3 +34,7 @@ explicit cell bindings, table review/export and v1/v2 document reopening. Origin
 stay the measurement source. Automatic crop candidates, template composition, batch
 normalization and packaging remain pending. Test with `uv run --locked --no-sync pytest
 tests/test_async_storage.py tests/test_process_runner.py tests/test_run_session.py tests/test_wb_host.py`.
+
+Version 0.3.0 adds the fixed-count grid drawing mode and asynchronous original-pixel TIFF
+crop export. Margin exclusion is explicit; stored ROIs are not regenerated from defaults.
+The crop includes source/coordinate provenance in ImageDescription and never replaces inputs.

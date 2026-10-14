@@ -7,6 +7,8 @@
 
 ## Current Risks
 
+- T-010第一次裁剪+桌面组合在新测试超时后、旧test_desktop_draw_compute_save_reopen里再次原生Aborted，栈顶WBBackground._reply/replied.emit。漏load_document的测试已修正，随后-s九桌面/215全量通过，但原生原因未定位；下一阶段须专项诊断，不能标为修复。证据work/evidence/T-010/validation.md。
+
 - T-008最终pytest一次原生Aborted，首次GUI附近，未独立重放根因。后续191全量/Qt组合/20次开关gc通过；补三个线程非阻塞join确认后192完整门禁与Qt6用例通过。保留记录，独审/稳定性验收须复核，不以重跑通过抹去初次失败。
 
 - P0 本机验证已开始；只使用合成技术样本，不代表 WB 科学正确性。干净 Windows 依用户决定待办；未冻结完整产品栈。

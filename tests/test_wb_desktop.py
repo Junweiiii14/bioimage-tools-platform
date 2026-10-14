@@ -1,6 +1,7 @@
 """Real widget edits, original coordinate mapping and worker/storage/reopen behavior."""
 
 import gc
+import json
 import os
 from collections.abc import Callable, Iterator
 from pathlib import Path
@@ -43,6 +44,72 @@ def cell_text(table: QTableWidget, row: int, column: int) -> str:
     item = table.item(row, column)
     assert item is not None
     return item.text()
+
+
+def test_grid_draw_crop_and_reopen(
+    qtbot: QtBot, tmp_path: Path, make_window: Callable[[], "WBWindow"]
+) -> None:
+    source = tmp_path / "blank-lanes.tif"
+    pixels = np.full((30, 120), 9000, dtype=np.uint16)
+    pixels[10:14, 20:30] = 4000
+    pixels[10:14, 80:90] = 5000
+    tifffile.imwrite(source, pixels)
+    workspace = tmp_path / "grid-workspace"
+    window = make_window()
+    window.show()
+    window.open_workspace(str(workspace), create=True)
+    qtbot.waitUntil(window.import_button.isEnabled)
+    window.import_image(str(source))
+    qtbot.waitUntil(window.view.analyze_button.isEnabled)
+    view = window.view
+    view.draw_mode.setCurrentIndex(1)
+    view.lane_count.setValue(3)
+    view.exclude_left.setValue(12)
+    view.exclude_right.setValue(3)
+    rect = view.canvas.image_rect()
+    QTest.mousePress(
+        view.canvas,
+        Qt.MouseButton.LeftButton,
+        pos=QPoint(int(rect.left()) + 1, int(rect.top()) + 1),
+    )
+    QTest.mouseRelease(
+        view.canvas,
+        Qt.MouseButton.LeftButton,
+        pos=QPoint(int(rect.right()) - 1, int(rect.bottom()) - 1),
+    )
+    assert len(view.lanes) == 3  # middle sample is blank, still keeps its identity/position
+    rois = tuple(lane.roi for lane in view.lanes)
+    assert rois[0].x0 >= 12 and rois[-1].x1 <= 117
+    assert rois[0].x1 == rois[1].x0 and rois[1].x1 == rois[2].x0
+    assert view.crop_button.isEnabled()
+    destination = tmp_path / "raw-crop.tif"
+    window.export_crop(str(destination))
+    qtbot.waitUntil(lambda: destination.exists(), timeout=10000)
+    qtbot.waitUntil(view.save_button.isEnabled)
+    roi = rois[0]
+    with tifffile.TiffFile(destination) as image:
+        page = image.pages[0]
+        assert isinstance(page, tifffile.TiffPage)
+        np.testing.assert_array_equal(page.asarray(), pixels[roi.y0 : roi.y1, roi.x0 : roi.x1])
+        meta = json.loads(page.description)
+        assert meta["roi"]["lane_id"] == roi.lane_id
+    capture = os.environ.get("BIOIMAGE_GRID_CAPTURE")
+    if capture:
+        assert window.grab().save(capture)
+    document_id = window.documents.itemData(1)
+    assert isinstance(document_id, str)
+    window.close()
+    qtbot.waitUntil(lambda: window.resources_closed, timeout=10000)
+    reopened = make_window()
+    reopened.show()
+    reopened.open_workspace(str(workspace))
+    qtbot.waitUntil(reopened.import_button.isEnabled)
+    reopened.load_document(document_id)
+    qtbot.waitUntil(reopened.view.analyze_button.isEnabled, timeout=10000)
+    assert tuple(lane.roi for lane in reopened.view.lanes) == rois
+    # Parameters only apply to the next drawing; loaded ROIs never regenerate from defaults.
+    reopened.view.lane_count.setValue(12)
+    assert tuple(lane.roi for lane in reopened.view.lanes) == rois
 
 
 def test_ocr_before_roi_cross_source_and_explicit_binding(

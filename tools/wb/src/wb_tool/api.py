@@ -21,6 +21,7 @@ from wb_tool.application.analysis import (
     LaneAnnotation,
     analyze_annotations,
 )
+from wb_tool.application.crop import CropRequest
 from wb_tool.application.desktop_data import PreviewRaster, WBJob, WBReply
 from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
 from wb_tool.application.ocr_protocol import (
@@ -47,6 +48,7 @@ from wb_tool.application.worker_protocol import (
     worker_protocol_schema,
 )
 from wb_tool.application.worksheet import WorksheetCell, fill_worksheet, propose_worksheet
+from wb_tool.domain.grid import fixed_lane_grid
 from wb_tool.domain.lanes import LaneProfiles, LaneROI, Polarity, compute_lane_profiles
 from wb_tool.domain.quantify import (
     BandBounds,
@@ -68,6 +70,9 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "CropRequest",
+    "export_crop",
+    "fixed_lane_grid",
     "WBWorksheetDocument",
     "read_wb_document",
     "OCRRequest",
@@ -174,3 +179,9 @@ def export_worksheet(worksheet: Worksheet, result: AnalysisResult, destination: 
     from wb_tool.adapters.worksheet_export import export_worksheet as export
 
     return str(export(worksheet, result, destination))
+
+
+def export_crop(source: str, request: CropRequest, destination: str) -> str:
+    from wb_tool.adapters.crop_export import export_crop as export
+
+    return export(source, request, destination)

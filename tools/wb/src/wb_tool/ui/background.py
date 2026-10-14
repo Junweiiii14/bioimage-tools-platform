@@ -7,6 +7,7 @@ import numpy as np
 from pydantic import TypeAdapter
 from PySide6.QtCore import QObject, Qt, QThread, QTimer, Signal, Slot
 
+from wb_tool.adapters.crop_export import export_crop
 from wb_tool.adapters.tiff_input import load_tiff
 from wb_tool.adapters.worksheet_export import export_worksheet
 from wb_tool.application.analysis import AnalysisResult
@@ -61,6 +62,10 @@ class _Work(QObject):
                 if job.worksheet is None or job.result is None:
                     raise ValueError("缺少已复核工作表/测量")
                 value = str(export_worksheet(job.worksheet, job.result, job.path))
+            elif job.operation == "crop":
+                if job.crop is None:
+                    raise ValueError("缺少原图裁剪范围")
+                value = export_crop(job.path, job.crop, job.destination)
             else:
                 if job.document is None:
                     raise ValueError("缺少文档")

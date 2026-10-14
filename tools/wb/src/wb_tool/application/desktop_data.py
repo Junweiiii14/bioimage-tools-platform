@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 from wb_tool.application.analysis import AnalysisResult
+from wb_tool.application.crop import CropRequest
 from wb_tool.application.document import WBDocument, WBWorksheetDocument
 from wb_tool.domain.worksheet import OCRRecognition, Worksheet
 
@@ -23,13 +24,15 @@ class PreviewRaster:
 @dataclass(frozen=True)
 class WBJob:
     operation: Literal[
-        "preview", "document", "encode", "result", "ocr_result", "stored_result", "export"
+        "preview", "document", "encode", "result", "ocr_result", "stored_result", "export", "crop"
     ]
     path: str = ""
     data: bytes = b""
     document: WBDocument | WBWorksheetDocument | None = None
     worksheet: Worksheet | None = None
     result: AnalysisResult | None = None
+    crop: CropRequest | None = None
+    destination: str = ""
 
 
 @dataclass(frozen=True)
