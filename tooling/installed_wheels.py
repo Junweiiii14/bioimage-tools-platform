@@ -130,11 +130,39 @@ print('Isolated runtime/contracts wheels: immutable input, run commit/reopen; no
 """
 
 
+DESKTOP_SCRIPT = """
+import sys
+from pathlib import Path
+from PySide6.QtCore import QCoreApplication, QTimer
+from bioimage_app.api import AsyncStorage, StorageCommand
+from platform_runtime.api import Workspace
+import bioimage_app.api
+assert Path(bioimage_app.api.__file__).is_relative_to(Path(sys.prefix))
+app = QCoreApplication([])
+store = AsyncStorage()
+replies = []
+store.replied.connect(replies.append)
+store.closed.connect(app.quit)
+store.submit(StorageCommand('create', path=str(Path('desktop-workspace').resolve())))
+store.submit(StorageCommand('save', document_id='D', tool_id='probe', revision=0, data=b'{}'))
+store.submit(StorageCommand('load', document_id='D'))
+store.shutdown()
+QTimer.singleShot(15000, app.quit)
+app.exec()
+assert len(replies) == 4 and all(reply.error_code is None for reply in replies), replies
+assert replies[2].data == b'{}'
+with Workspace.open('desktop-workspace') as reopened:
+    assert reopened.load_draft('D').revision == 0
+assert not any(name.startswith(('wb_tool', 'numpy')) for name in sys.modules)
+print('Isolated desktop wheel: Qt storage FIFO/save/load/close; no experiment imports')
+"""
+
+
 def main() -> int:
     with tempfile.TemporaryDirectory(prefix="bioimage-wheel-") as temporary:
         folder = Path(temporary)
         wheel_dir = folder / "wheels"
-        packages = ("wb-tool", "tool-contracts", "platform-runtime")
+        packages = ("wb-tool", "tool-contracts", "platform-runtime", "bioimage-app")
         built: dict[str, Path] = {}
         for package in packages:
             code = subprocess.run(
@@ -155,6 +183,11 @@ def main() -> int:
                 RUNTIME_SCRIPT,
             ),
             ("wb-tool", [built["wb-tool"]], WB_SCRIPT),
+            (
+                "bioimage-app",
+                [built["tool-contracts"], built["platform-runtime"], built["bioimage-app"]],
+                DESKTOP_SCRIPT,
+            ),
         ):
             code = installed_check(folder, package, wheels, script)
             if code:

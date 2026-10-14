@@ -9,6 +9,10 @@ import ast
 from pathlib import Path
 
 MODULES: dict[str, tuple[str, frozenset[str]]] = {
+    "bioimage_app": (
+        "apps/desktop/src",
+        frozenset({"tool_contracts", "platform_runtime", "desktop_sdk", "wb_tool"}),
+    ),
     "tool_contracts": ("packages/tool_contracts/src", frozenset()),
     "platform_runtime": ("packages/platform_runtime/src", frozenset({"tool_contracts"})),
     "desktop_sdk": ("packages/desktop_sdk/src", frozenset({"tool_contracts"})),
@@ -90,7 +94,7 @@ def check_repository(root: Path) -> tuple[int, list[str]]:
     count = 0
     errors: list[str] = []
     registered = {(root / folder).resolve() for folder, _ in MODULES.values()}
-    for category in ("packages", "tools"):
+    for category in ("packages", "tools", "apps"):
         for folder in (root / category).glob("*/src"):
             if folder.resolve() not in registered:
                 errors.append(f"{folder.relative_to(root)}: register package boundary before use")
