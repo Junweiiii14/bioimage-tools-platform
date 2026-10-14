@@ -92,6 +92,10 @@ def analysis_is_current(project: WBFigureProject, plan: ProjectRowAnalysis) -> b
 def project_with_analyses(
     project: WBFigureProject, analyses: tuple[ProjectRowAnalysis, ...]
 ) -> WBAnalysisProject:
+    if isinstance(project, WBAnalysisProject):
+        fields = {name: getattr(project, name) for name in type(project).model_fields}
+        fields["analyses"] = analyses
+        return type(project).model_validate(fields)
     return WBAnalysisProject(
         project_id=project.project_id,
         name=project.name,
@@ -243,6 +247,9 @@ def validate_project_result(plan: ProjectRowAnalysis, result: AnalysisResult) ->
 
 
 ProjectCellStatus = Literal[
+    "unconfirmed",
+    "unbound",
+    "ocr_unavailable",
     "valid",
     "quality_review",
     "invalid",

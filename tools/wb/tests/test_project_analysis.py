@@ -19,24 +19,36 @@ from wb_tool.api import (
     FigureTemplate,
     LaneROI,
     LoadedProjectResult,
+    OCRRecognition,
+    ProjectOCRRow,
+    ProjectOCRState,
     ProjectRowAnalysis,
+    TextBounds,
+    TextToken,
     WBAnalysisProject,
     WBFigureProject,
+    WBProjectOCR,
     WBReviewProject,
     analysis_is_current,
     analyze_annotations,
+    bind_project_ocr_row,
     export_project_table,
+    fill_project_ocr_table,
     fill_project_table,
+    install_project_recognition,
     load_tiff,
     make_row_analysis,
     prepare_project_analyses,
     project_with_analyses,
+    project_with_ocr,
     read_figure_project,
+    read_project_ocr_result,
     read_project_result,
     record_project_run,
     set_row_analysis,
     update_row_analysis_request,
 )
+from wb_tool.domain.ocr_manifest import ENGINE_ID, MODEL_HASHES, PREPROCESS_ID
 
 
 def asset(data: bytes, name: str) -> AssetRef:
@@ -322,3 +334,106 @@ def test_plan_keeps_geometry_and_manual_baseline_edits_need_new_run(tmp_path: Pa
     )
     with pytest.raises(ValueError, match="确认"):
         make_row_analysis(unreviewed, "row0", "dark")
+
+
+def recognized_project(tmp_path: Path):
+    project, paths = configured(tmp_path)
+    project, results = complete(project, paths)
+    source = asset(b"composite", "ocr-source")
+    project = project_with_ocr(
+        project, ProjectOCRState(source=source, filename="labels.tif", width=1000, height=500)
+    )
+    recognition = OCRRecognition(
+        source.sha256,
+        1000,
+        500,
+        (
+            TextToken("h1", "Fig 1A", TextBounds(30, 20, 150, 50), 0.9),
+            TextToken("r1", "AKT", TextBounds(30, 100, 100, 130), 0.9),
+            TextToken("h2", "Fig 2B", TextBounds(530, 20, 650, 50), 0.9),
+            TextToken("r2", "AKT", TextBounds(530, 100, 600, 130), 0.9),
+        ),
+        ENGINE_ID,
+        MODEL_HASHES,
+        PREPROCESS_ID,
+    )
+    data = TypeAdapter(OCRRecognition).dump_json(recognition)
+    run = RunRecord(
+        document_id=project.project_id,
+        tool_id="wb-figure",
+        revision=project.revision,
+        run_id="ocr-run",
+        state="succeeded",
+        request=asset(project.model_dump_json().encode(), "ocr-request"),
+        pid=123,
+        result=asset(data, "ocr-result"),
+    )
+    loaded = read_project_ocr_result(project, run, data)
+    return install_project_recognition(project, loaded), results, loaded, data
+
+
+def test_ocr_project_names_need_explicit_current_source_bindings(tmp_path: Path) -> None:
+    project, results, loaded, _ = recognized_project(tmp_path)
+    assert len(project.ocr.rows) == 2
+    assert all(not r.confirmed and r.link is None for r in project.ocr.rows)
+    assert all(c.value is None for c in fill_project_ocr_table(project, results, loaded))
+    for label, target in zip(project.ocr.rows, project.rows, strict=False):
+        project = bind_project_ocr_row(project, label.row_id, target.row_id)
+    rows = tuple(r.model_copy(update={"confirmed": True}) for r in project.ocr.rows)
+    project = project_with_ocr(project, project.ocr.model_copy(update={"rows": rows}))
+    cells = fill_project_ocr_table(project, results, loaded)
+    assert [c.value for c in cells] == [4000, None, 0, 8000, 16000, 0]
+    assert cells[0].figure == "Fig 1A" and cells[3].figure == "Fig 2B"
+    assert cells[0].source_sha256 != cells[3].source_sha256
+    assert project.rows[0].figure == "Fig1"  # OCR edits do not rewrite source metadata.
+    restored = read_figure_project(project.model_dump_json().encode())
+    assert isinstance(restored, WBProjectOCR) and restored == project
+    assert all(
+        c.value is None and c.status == "ocr_unavailable"
+        for c in fill_project_ocr_table(project, results, None)
+    )
+    changed = project.model_copy(
+        update={
+            "rows": (
+                project.rows[0].model_copy(update={"roi": LaneROI("row0", 1, 5, 30, 15)}),
+                *project.rows[1:],
+            )
+        }
+    )
+    assert fill_project_ocr_table(changed, results, loaded)[0].status == "stale"
+    updated = update_row_analysis_request(
+        project, "row0", replace(project.analyses[0].request, polarity="light")
+    )
+    assert isinstance(updated, WBProjectOCR) and updated.ocr == project.ocr
+    assert fill_project_ocr_table(updated, results, loaded)[0].value is None
+    reidentified = install_project_recognition(project, loaded)
+    assert all(not r.confirmed and r.link is None for r in reidentified.ocr.rows)
+
+
+def test_ocr_project_rejects_bad_assets_identity_and_tokens(tmp_path: Path) -> None:
+    project, _, loaded, data = recognized_project(tmp_path)
+    with pytest.raises(ValueError):
+        read_project_ocr_result(project, loaded.run, data + b" ")
+    with pytest.raises(ValueError):
+        read_project_ocr_result(
+            project, loaded.run.model_copy(update={"document_id": "other"}), data
+        )
+    with pytest.raises(ValueError):
+        project_with_ocr(
+            project,
+            project.ocr.model_copy(
+                update={"recognition": replace(loaded.recognition, source_sha256="f" * 64)}
+            ),
+        )
+    with pytest.raises(ValueError):
+        ProjectOCRState(
+            source=project.ocr.source,
+            filename="labels.tif",
+            width=1000,
+            height=500,
+            rows=(ProjectOCRRow(row_id="manual", label_token_id="missing"),),
+        )
+    with pytest.raises(ValueError):
+        bind_project_ocr_row(project, project.ocr.rows[0].row_id, "missing")
+    with pytest.raises(ValueError):
+        WBAnalysisProject.from_bytes(project.model_dump_json().encode())

@@ -45,11 +45,13 @@ from wb_tool.application.project_analysis import (
     set_row_analysis,
     update_row_analysis_request,
 )
+from wb_tool.application.project_ocr import WBProjectOCR, bind_project_ocr_row, project_with_ocr
 from wb_tool.domain.grid import fixed_lane_grid
 from wb_tool.domain.lanes import LaneROI
 from wb_tool.ui.canvas import ImageCanvas
 from wb_tool.ui.crop_suggestions import CropSuggestionPanel
 from wb_tool.ui.project_analysis import ProjectAnalysisPanel
+from wb_tool.ui.project_ocr import ProjectOCRPanel
 
 
 class FigureProjectView(QWidget):
@@ -128,6 +130,10 @@ class FigureProjectView(QWidget):
         self.analysis.changed.connect(self._edited)
         self._results: tuple[LoadedProjectResult, ...] = ()
         tabs.addTab(self.analysis, "原图定量与项目结果表")
+        self.ocr = ProjectOCRPanel()
+        self.ocr.changed.connect(self._edited)
+        self.ocr.binding_requested.connect(self.bind_ocr)
+        tabs.addTab(self.ocr, "拼图 OCR 与结果关联")
         preview_page = QWidget()
         preview_layout = QVBoxLayout(preview_page)
         preview_layout.addWidget(
@@ -252,13 +258,18 @@ class FigureProjectView(QWidget):
             request = self.analysis.request()
             if request is not None and self.analysis.plan is not None:
                 project = update_row_analysis_request(project, self.analysis.plan.row_id, request)
+        ocr = self.ocr.state()
+        if ocr is not None:
+            project = project_with_ocr(project, ocr)
         return project
 
     def set_project(self, project: WBFigureProject) -> None:
         self._loading = True
         self._project = project
+        self.ocr.restore(project)
         self.analysis.show_plan(None)
         self.analysis.invalidate()
+        self.ocr.result_view.invalidate()
         self.table.clearSelection()
         self.table.setCurrentCell(-1, -1)
         self.canvas.set_image(PreviewRaster("", 0, 0, 0, 0, b"", 0, ()))
@@ -314,6 +325,7 @@ class FigureProjectView(QWidget):
             return
         self.generation += 1
         self.analysis.invalidate()
+        self.ocr.result_view.invalidate()
         self.preview_label.setPixmap(QPixmap())
         self.preview_label.setText("内容已修改，请重新生成预览")
         self.changed.emit()
@@ -394,6 +406,18 @@ class FigureProjectView(QWidget):
                 f"{row.figure} · {row.protein} · {row.filename}；先计算曲线或填写边界"
             )
             self._edited()
+        except ValueError as error:
+            self.status.setText(str(error))
+
+    def bind_ocr(self, row_id: str, target_id: str) -> None:
+        try:
+            project = self.project()
+            if not isinstance(project, WBProjectOCR):
+                raise ValueError("请先导入拼图并识别")
+            index = self.ocr.table.currentRow()
+            self.set_project(bind_project_ocr_row(project, row_id, target_id or None))
+            self.ocr.table.setCurrentCell(index, 0)
+            self.ocr.changed.emit()
         except ValueError as error:
             self.status.setText(str(error))
 

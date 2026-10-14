@@ -5,7 +5,7 @@ from pathlib import Path
 from threading import Event
 from uuid import uuid4
 
-from PySide6.QtCore import Signal
+from PySide6.QtCore import QTimer, Signal
 from PySide6.QtGui import QCloseEvent
 from PySide6.QtWidgets import (
     QComboBox,
@@ -21,21 +21,26 @@ from wb_tool.api import (
     FigureRender,
     FigureRow,
     FigureSourcePath,
+    LoadedProjectOCR,
     LoadedProjectResult,
     PreviewRaster,
+    ProjectOCRState,
     ProjectTableSnapshot,
     WBAnalysisProject,
     WBFigureProject,
     WBJob,
+    WBProjectOCR,
     WBReply,
     WBReviewProject,
     create_figure_project_view,
     create_wb_background,
     prepare_project_analyses,
+    project_with_ocr,
     record_crop_suggestion,
 )
 
 from bioimage_app.project_measurements import ProjectBatchCompletion, ProjectMeasurementSession
+from bioimage_app.project_ocr import ProjectOCRCompletion, ProjectOCRSession
 from bioimage_app.storage import AsyncStorage, StorageCommand, StorageReply
 
 
@@ -70,6 +75,9 @@ class FigureProjectWindow(QMainWindow):
         self._cancellation = Event()
         self._measurement_session: ProjectMeasurementSession | None = None
         self._project_results: tuple[LoadedProjectResult, ...] = ()
+        self._ocr_session: ProjectOCRSession | None = None
+        self._loaded_ocr: LoadedProjectOCR | None = None
+        self._ocr_refresh_pending = False
         bar = QToolBar("项目")
         self.addToolBar(bar)
         self.create_button = QPushButton("新建项目工作区")
@@ -105,12 +113,209 @@ class FigureProjectWindow(QMainWindow):
         self.view.analysis.run_requested.connect(self.analyze_project)
         self.view.analysis.refresh_requested.connect(self.refresh_project_table)
         self.view.analysis.export_requested.connect(self._choose_table_export)
+        self.view.ocr.import_requested.connect(self._choose_ocr_import)
+        self.view.ocr.run_requested.connect(self.recognize_project)
+        self.view.ocr.refresh_requested.connect(self.refresh_ocr_table)
+        self.view.ocr.export_requested.connect(lambda: self._choose_table_export(True))
+        self.view.changed.connect(self._queue_ocr_refresh)
         self._controls()
 
     def cancel(self) -> None:
         self._cancellation.set()
         if self._measurement_session:
             self._measurement_session.cancel()
+        if self._ocr_session:
+            self._ocr_session.cancel()
+
+    def _queue_ocr_refresh(self) -> None:
+        self._ocr_refresh_pending = True
+        QTimer.singleShot(150, self.refresh_ocr_table)
+
+    def refresh_ocr_table(self, message: str = "OCR关联结果已刷新") -> None:
+        if self._busy or not self._workspace or self._closing:
+            return
+        self._ocr_refresh_pending = False
+        try:
+            project = self.view.project()
+            if not isinstance(project, WBProjectOCR):
+                return
+            self.view.ocr.refresh_targets(project)
+        except ValueError as error:
+            self.view.status.setText(str(error))
+            return
+        generation = self.view.generation
+        self._start()
+
+        def filled(reply: WBReply) -> None:
+            if generation == self.view.generation and isinstance(reply.value, ProjectTableSnapshot):
+                self.view.ocr.result_view.show_cells(reply.value.cells)
+                self._done(message)
+            else:
+                self._done("项目已改变，未写入过期OCR关联表")
+
+        self._wb(
+            WBJob(
+                "project_ocr_table",
+                document=project,
+                project_results=self._project_results,
+                project_ocr_result=self._loaded_ocr,
+            ),
+            filled,
+        )
+
+    def _choose_ocr_import(self) -> None:
+        source, _ = QFileDialog.getOpenFileName(self, "导入独立拼图", "", "TIFF (*.tif *.tiff)")
+        if source:
+            self.import_ocr_image(source)
+
+    def import_ocr_image(self, source: str) -> None:
+        if self._busy or not self._workspace:
+            return
+        try:
+            project = self.view.project()
+        except ValueError as error:
+            self._error(str(error))
+            return
+        generation = self.view.generation
+        self._start()
+
+        def previewed(reply: WBReply) -> None:
+            if not isinstance(reply.value, PreviewRaster):
+                self._error("拼图预览失败")
+                return
+            raster = reply.value
+
+            def imported(response: StorageReply) -> None:
+                if not isinstance(response.value, AssetRef):
+                    self._error("拼图资产无效")
+                    return
+                asset = response.value
+
+                def resolved(result: StorageReply) -> None:
+                    if not isinstance(result.value, str):
+                        self._error("拼图资产路径无效")
+                        return
+                    if generation != self.view.generation:
+                        self._done("项目已修改，未替换拼图或覆盖编辑")
+                        return
+                    self._paths[asset.sha256] = result.value
+                    self._loaded_ocr = None
+                    self.view.set_project(
+                        project_with_ocr(
+                            project,
+                            ProjectOCRState(
+                                source=asset,
+                                filename=Path(source).name,
+                                width=raster.width,
+                                height=raster.height,
+                            ),
+                        )
+                    )
+                    self.view.generation += 1
+                    self.view.ocr.set_preview(raster)
+                    self._done("拼图已导入；识别Fig/行名后逐行关联原图。")
+
+                self._storage(StorageCommand("asset", asset=asset), resolved)
+
+            self._storage(
+                StorageCommand("import", path=source, source_sha256=raster.sha256), imported
+            )
+
+        self._wb(WBJob("preview", path=source), previewed)
+
+    def recognize_project(self) -> None:
+        if self._busy or not self._workspace:
+            return
+        try:
+            if not isinstance(self.view.project(), WBProjectOCR):
+                raise ValueError("请先导入独立拼图")
+        except ValueError as error:
+            self._error(str(error))
+            return
+
+        def saved() -> None:
+            if self._closing or self._cancellation.is_set():
+                self._done("识别已取消，之前关联保留")
+                return
+            project = self.view.project()
+            assert isinstance(project, WBProjectOCR)
+            self._start_ocr(project)
+
+        self.save(after=saved)
+
+    def _start_ocr(
+        self,
+        project: WBProjectOCR,
+        *,
+        restore: bool = False,
+        after: Callable[[], None] | None = None,
+    ) -> None:
+        generation = self.view.generation
+        self._start()
+        session = ProjectOCRSession(self._store, self._background, self)
+        self._ocr_session = session
+        self.view.status.setText("正在校验已保存OCR…" if restore else "正在后台识别Fig/蛋白名…")
+
+        def completed(completion: ProjectOCRCompletion) -> None:
+            self._ocr_session = None
+            session.deleteLater()
+            if generation != self.view.generation:
+                self._done("项目已修改，OCR结果仅保留在历史，未覆盖编辑。")
+                return
+            if restore:
+                self._loaded_ocr = completion.loaded
+                if completion.error:
+                    self.view.ocr.note.setText("OCR结果不可用：" + completion.error)
+
+                def previewed(reply: WBReply) -> None:
+                    if isinstance(reply.value, PreviewRaster):
+                        self.view.ocr.set_preview(reply.value)
+                    self._busy = False
+                    if after:
+                        after()
+                    else:
+                        self._done("OCR原文已校验" if completion.loaded else "OCR原文未载入")
+
+                self._wb(WBJob("preview", path=self._paths[project.ocr.source.sha256]), previewed)
+            elif completion.loaded is None:
+                self._busy = False
+                message = "识别未更新，之前关联保留：" + (completion.error or completion.state)
+                if self._closing:
+                    self._done(message)
+                else:
+                    self.refresh_ocr_table(message)
+            else:
+                loaded = completion.loaded
+
+                def installed(reply: WBReply) -> None:
+                    if generation != self.view.generation:
+                        self._done("项目已修改，OCR建议未覆盖编辑")
+                        return
+                    if not isinstance(reply.value, WBProjectOCR):
+                        self._error("OCR建议生成失败")
+                        return
+                    self._loaded_ocr = loaded
+                    self.view.set_project(reply.value)
+                    self.view.generation += 1
+                    self._busy = False
+
+                    def saved() -> None:
+                        if self._closing:
+                            self._done("OCR识别已保存")
+                        else:
+                            self.refresh_ocr_table("OCR完成；请校正名称、关联原图并确认。")
+
+                    self.save(after=saved)
+
+                self._wb(
+                    WBJob("project_ocr_install", document=project, project_ocr_result=loaded),
+                    installed,
+                )
+
+        session.finished.connect(completed)
+        session.start(project, self._workspace, restore=restore)
+        if self._closing:
+            session.cancel()
 
     def analyze_project(self, all_rows: bool = False) -> None:
         if self._busy or not self._workspace:
@@ -218,20 +423,24 @@ class FigureProjectWindow(QMainWindow):
                 return
             self.view.install_results(self._project_results)
             self.view.analysis.show_cells(reply.value.cells)
-            self._done(message)
+            if isinstance(project, WBProjectOCR) and not self._closing:
+                self._busy = False
+                self.refresh_ocr_table(message)
+            else:
+                self._done(message)
 
         self._wb(
             WBJob("project_table", document=project, project_results=self._project_results), filled
         )
 
-    def _choose_table_export(self) -> None:
+    def _choose_table_export(self, ocr: bool = False) -> None:
         destination, _ = QFileDialog.getSaveFileName(
             self, "导出新的项目结果表", "", "Excel (*.xlsx)"
         )
         if destination:
-            self.export_project_table(destination)
+            self.export_project_table(destination, ocr=ocr)
 
-    def export_project_table(self, destination: str) -> None:
+    def export_project_table(self, destination: str, *, ocr: bool = False) -> None:
         if self._busy or not self._workspace:
             return
 
@@ -240,9 +449,10 @@ class FigureProjectWindow(QMainWindow):
             self._start()
             self._wb(
                 WBJob(
-                    "project_export",
+                    "project_ocr_export" if ocr else "project_export",
                     document=project,
                     project_results=self._project_results,
+                    project_ocr_result=self._loaded_ocr,
                     destination=destination,
                 ),
                 lambda reply: self._done("项目结果表已导出：" + str(reply.value)),
@@ -276,6 +486,8 @@ class FigureProjectWindow(QMainWindow):
         self._controls()
         if self._closing:
             self._finish_close()
+        elif self._ocr_refresh_pending:
+            QTimer.singleShot(0, self.refresh_ocr_table)
 
     def _error(self, message: str) -> None:
         self._closing = False
@@ -455,6 +667,7 @@ class FigureProjectWindow(QMainWindow):
             project = WBFigureProject(project_id=uuid4().hex, template=template)
             self.view.set_project(project)
             self._project_results = ()
+            self._loaded_ocr = None
             self.view.generation += 1
             self._saved_revision = None
             self.view.status.setText("已复用模板新建项目；导入下一批原图。")
@@ -631,6 +844,8 @@ class FigureProjectWindow(QMainWindow):
                 assets = {r.source.sha256: r.source for r in project.rows if r.source}
                 if project.template.font:
                     assets[project.template.font.sha256] = project.template.font
+                if isinstance(project, WBProjectOCR):
+                    assets[project.ocr.source.sha256] = project.ocr.source
                 pending = list(assets.values())
                 resolved_paths: dict[str, str] = {}
 
@@ -641,10 +856,21 @@ class FigureProjectWindow(QMainWindow):
                         self._saved_revision = project.revision
                         self._saved_generation = self.view.generation
                         self._project_results = ()
+                        self._loaded_ocr = None
                         if isinstance(project, WBAnalysisProject):
-                            self._start_measurements(
-                                project, tuple(p.row_id for p in project.analyses), restore=True
-                            )
+                            analysis_project = project
+
+                            def measurements() -> None:
+                                self._start_measurements(
+                                    analysis_project,
+                                    tuple(p.row_id for p in analysis_project.analyses),
+                                    restore=True,
+                                )
+
+                            if isinstance(project, WBProjectOCR):
+                                self._start_ocr(project, restore=True, after=measurements)
+                            else:
+                                measurements()
                         else:
                             self._done("项目已恢复，原图资产已校验。选择一行查看原图。")
                         return

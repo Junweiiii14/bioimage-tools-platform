@@ -8,7 +8,6 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QPushButton,
-    QSpinBox,
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
@@ -22,6 +21,7 @@ from wb_tool.application.project_analysis import (
     ProjectTableCell,
 )
 from wb_tool.domain.quantify import BandBounds, Baseline
+from wb_tool.ui.project_results import ProjectResultsView
 from wb_tool.ui.view import ProfilePlot
 
 
@@ -38,7 +38,6 @@ class ProjectAnalysisPanel(QWidget):
         self.loaded: LoadedProjectResult | None = None
         self.dirty = False
         self._loading = False
-        self._cells: tuple[ProjectTableCell, ...] = ()
         layout = QVBoxLayout(self)
         self.message = QLabel("选择已审核的原图行，配置定量。首次可先计算曲线，再填写条带边界。")
         self.message.setWordWrap(True)
@@ -71,20 +70,9 @@ class ProjectAnalysisPanel(QWidget):
         layout.addWidget(self.lanes)
         self.plot = ProfilePlot()
         layout.addWidget(self.plot)
-        self.results = QTableWidget(0, 7)
-        self.results.setHorizontalHeaderLabels(
-            ["Fig", "蛋白", "泳道", "积分", "状态", "原因", "原图 / 运行"]
-        )
-        layout.addWidget(self.results)
-        paging = QHBoxLayout()
-        self.page = QSpinBox()
-        self.page.setRange(1, 1)
-        self.page_label = QLabel("0 个泳道结果")
-        paging.addWidget(QLabel("结果页（每页 200 个泳道）"))
-        paging.addWidget(self.page)
-        paging.addWidget(self.page_label)
-        layout.addLayout(paging)
-        self.page.valueChanged.connect(self._show_page)
+        self.result_view = ProjectResultsView()
+        self.results = self.result_view.table
+        layout.addWidget(self.result_view)
         self.lanes.cellChanged.connect(self._edited)
         self.polarity.currentIndexChanged.connect(self._edited)
         self.lanes.currentCellChanged.connect(self._plot)
@@ -166,40 +154,12 @@ class ProjectAnalysisPanel(QWidget):
         self._plot()
 
     def invalidate(self) -> None:
-        self._cells = ()
-        self.results.setRowCount(0)
-        self.page_label.setText("内容改变，请计算或刷新结果表")
+        self.result_view.invalidate()
         self.loaded = None
         self._plot()
 
     def show_cells(self, cells: tuple[ProjectTableCell, ...]) -> None:
-        self._cells = cells
-        self.page.setMaximum(max(1, (len(cells) + 199) // 200))
-        self.page_label.setText(f"共 {len(cells)} 个泳道结果")
-        self._show_page()
-
-    def _show_page(self, *_args: object) -> None:
-        start = (self.page.value() - 1) * 200
-        cells = self._cells[start : start + 200]
-        self.results.setRowCount(len(cells))
-        for i, cell in enumerate(cells):
-            for c, value in enumerate(
-                (
-                    cell.figure,
-                    cell.protein,
-                    str(cell.lane_index),
-                    "" if cell.value is None else format(cell.value, ".12g"),
-                    cell.status,
-                    cell.reason,
-                    f"{cell.source_sha256} / {cell.run_id}",
-                )
-            ):
-                item = QTableWidgetItem(value)
-                item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
-                item.setToolTip(
-                    f"row={cell.row_id}; lane={cell.lane_id}; revision={cell.request_revision}"
-                )
-                self.results.setItem(i, c, item)
+        self.result_view.show_cells(cells)
 
     def _plot(self, *_args: object) -> None:
         self.plot.values, self.plot.measurements = (), ()

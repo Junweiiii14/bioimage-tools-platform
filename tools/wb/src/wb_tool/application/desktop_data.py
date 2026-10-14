@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from threading import Event
 from typing import Literal
 
+from tool_contracts.api import RunRecord
+
 from wb_tool.application.analysis import AnalysisResult
 from wb_tool.application.crop import CropRequest
 from wb_tool.application.crop_suggestions import CropSuggestion
@@ -14,6 +16,7 @@ from wb_tool.application.project_analysis import (
     ProjectRowAnalysis,
     ProjectTableSnapshot,
 )
+from wb_tool.application.project_ocr import LoadedProjectOCR
 from wb_tool.domain.crop_detection import CropDetectionSettings
 from wb_tool.domain.worksheet import OCRRecognition, Worksheet
 
@@ -49,6 +52,10 @@ class WBJob:
         "project_result",
         "project_table",
         "project_export",
+        "project_ocr_result",
+        "project_ocr_install",
+        "project_ocr_table",
+        "project_ocr_export",
     ]
     path: str = ""
     data: bytes = b""
@@ -65,6 +72,8 @@ class WBJob:
     revision: int = 0
     analysis_plan: ProjectRowAnalysis | None = None
     project_results: tuple[LoadedProjectResult, ...] = ()
+    ocr_run: RunRecord | None = None
+    project_ocr_result: LoadedProjectOCR | None = None
 
 
 @dataclass(frozen=True)
@@ -79,6 +88,7 @@ class WBReply:
         | CropSuggestion
         | LoadedProjectResult
         | ProjectTableSnapshot
+        | LoadedProjectOCR
         | AnalysisResult
         | OCRRecognition
         | bytes

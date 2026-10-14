@@ -66,6 +66,19 @@ from wb_tool.application.project_analysis import (
     set_row_analysis,
     update_row_analysis_request,
 )
+from wb_tool.application.project_ocr import (
+    LoadedProjectOCR,
+    ProjectOCRLink,
+    ProjectOCRRow,
+    ProjectOCRState,
+    WBProjectOCR,
+    bind_project_ocr_row,
+    fill_project_ocr_table,
+    install_project_recognition,
+    ocr_link_is_current,
+    project_with_ocr,
+    read_project_ocr_result,
+)
 from wb_tool.application.worker_protocol import (
     AcceptedFrame,
     CancelFrame,
@@ -109,6 +122,18 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "export_project_ocr_table",
+    "LoadedProjectOCR",
+    "ProjectOCRLink",
+    "ProjectOCRRow",
+    "ProjectOCRState",
+    "WBProjectOCR",
+    "bind_project_ocr_row",
+    "fill_project_ocr_table",
+    "install_project_recognition",
+    "ocr_link_is_current",
+    "project_with_ocr",
+    "read_project_ocr_result",
     "export_project_table",
     "ProjectRowAnalysis",
     "WBAnalysisProject",
@@ -301,6 +326,17 @@ def export_project_table(
     from wb_tool.adapters.project_export import export_project_table as export
 
     return str(export(project, results, destination))
+
+
+def export_project_ocr_table(
+    project: WBProjectOCR,
+    results: tuple[LoadedProjectResult, ...],
+    loaded: LoadedProjectOCR | None,
+    destination: str,
+) -> str:
+    from wb_tool.adapters.project_ocr_export import export_project_ocr_table as export
+
+    return str(export(project, results, loaded, destination))
 
 
 def export_crop(source: str, request: CropRequest, destination: str) -> str:

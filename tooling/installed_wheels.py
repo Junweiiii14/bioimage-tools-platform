@@ -220,6 +220,33 @@ recognized = recognize_figure('installed-fig.tif',source.sha256)
 groups = suggest_figures(recognized)
 assert len(groups) == 1 and groups[0].heading.text == 'Fig 1A'
 assert groups[0].rows[0].text == 'AKT'
+from hashlib import sha256
+from pydantic import TypeAdapter
+from tool_contracts.api import RunRecord
+from wb_tool.api import (OCRRecognition, ProjectOCRState, WBProjectOCR, project_with_ocr,
+    read_project_ocr_result, install_project_recognition, bind_project_ocr_row,
+    fill_project_ocr_table, export_project_ocr_table)
+ocr_project = project_with_ocr(analysis_project,
+    ProjectOCRState(source=asset, filename='installed-fig.tif', width=1200, height=500))
+data = TypeAdapter(OCRRecognition).dump_json(recognized)
+result_asset = AssetRef(asset_id='ocr-result', relative_path='results/ocr.json',
+    sha256=sha256(data).hexdigest(), size_bytes=len(data))
+request_data = ocr_project.model_dump_json().encode()
+request_asset = AssetRef(asset_id='ocr-request', relative_path='requests/ocr.json',
+    sha256=sha256(request_data).hexdigest(), size_bytes=len(request_data))
+# Pure API fixture. Real run/commit orchestration is exercised by desktop integration tests.
+run = RunRecord(run_id='ocr-fixture', document_id=project.project_id, tool_id='wb-figure',
+    revision=0, state='succeeded', pid=123, request=request_asset, result=result_asset)
+loaded_ocr = read_project_ocr_result(ocr_project, run, data)
+ocr_project = install_project_recognition(ocr_project, loaded_ocr)
+ocr_project = bind_project_ocr_row(ocr_project, ocr_project.ocr.rows[0].row_id, 'row')
+assert isinstance(ocr_project, WBProjectOCR) and len(ocr_project.analyses) == 1
+assert read_figure_project(ocr_project.model_dump_json().encode()) == ocr_project
+assert all(c.status == 'unconfirmed' and c.value is None
+    for c in fill_project_ocr_table(ocr_project, (), loaded_ocr))
+export_project_ocr_table(ocr_project, (), loaded_ocr, 'installed-project-ocr.xlsx')
+assert Path('installed-project-ocr.xlsx').exists()
+print('Installed project v4: OCR evidence, explicit binding, roundtrip and literal XLSX passed')
 print('Installed WB desktop window: real widgets/entry assembly and async close passed')
 print('Installed optional OCR: verified bundled PP-OCRv6 CPU recognition passed')
 import subprocess

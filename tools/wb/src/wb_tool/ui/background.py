@@ -23,6 +23,13 @@ from wb_tool.application.project_analysis import (
     fill_project_table,
     read_project_result,
 )
+from wb_tool.application.project_ocr import (
+    LoadedProjectOCR,
+    WBProjectOCR,
+    fill_project_ocr_table,
+    install_project_recognition,
+    read_project_ocr_result,
+)
 from wb_tool.domain.worksheet import OCRRecognition
 
 
@@ -41,12 +48,46 @@ class _Work(QObject):
                 | CropSuggestion
                 | LoadedProjectResult
                 | ProjectTableSnapshot
+                | LoadedProjectOCR
                 | AnalysisResult
                 | OCRRecognition
                 | bytes
                 | str
             )
-            if job.operation == "project_result":
+            if job.operation in (
+                "project_ocr_result",
+                "project_ocr_install",
+                "project_ocr_table",
+                "project_ocr_export",
+            ):
+                if not isinstance(job.document, WBProjectOCR):
+                    raise ValueError("缺少项目OCR状态")
+                if job.operation == "project_ocr_result":
+                    if job.ocr_run is None:
+                        raise ValueError("缺少OCR运行记录")
+                    value = read_project_ocr_result(job.document, job.ocr_run, job.data)
+                elif job.operation == "project_ocr_install":
+                    if job.project_ocr_result is None:
+                        raise ValueError("缺少已校验OCR结果")
+                    value = install_project_recognition(job.document, job.project_ocr_result)
+                elif job.operation == "project_ocr_export":
+                    from wb_tool.adapters.project_ocr_export import export_project_ocr_table
+
+                    value = str(
+                        export_project_ocr_table(
+                            job.document,
+                            job.project_results,
+                            job.project_ocr_result,
+                            job.destination,
+                        )
+                    )
+                else:
+                    value = ProjectTableSnapshot(
+                        fill_project_ocr_table(
+                            job.document, job.project_results, job.project_ocr_result
+                        )
+                    )
+            elif job.operation == "project_result":
                 if job.analysis_plan is None:
                     raise ValueError("缺少结果所属定量计划")
                 value = read_project_result(job.analysis_plan, job.data)
