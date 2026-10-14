@@ -1,7 +1,7 @@
 # Handoff Snapshot
 
 - 更新：2026-10-14；目标持续开发至 WB 自动化软件完成；上位目标 T-003；当前实现任务唯一状态源 work/tasks/T-004-wb-analysis.md。
-- 分支 feat/T-004-wb-analysis（本地继承 feat/T-003-wb-product）；参考核心/TIFF 已提交 3655a3a、93a84bb；手工分析实现/自验完成，待独立审查和提交。继承 T-002 分支，PR #3 未合并，新任务未创建 PR。
+- 分支 feat/T-004-wb-analysis（本地继承 feat/T-003-wb-product）；参考核心/TIFF 已提交 3655a3a、93a84bb；手工分析已提交 e3932ee，待独立审查。继承 T-002 分支，PR #3 未合并，新任务未创建 PR。
 - 已建 wb_tool.api 0.3.0：手工分析用例、参考积分、闭区间、人工基线、uint8/16 单页 TIFF、RGB/不透明 RGBA、显式极性、稳定泳道半开 ROI 和原始均值剖面。读取数组不可开启写入。
 - 8 个来源 SHA/本地快照及原方案相关页核对完成；真实标注集未冻结。
 - 输入阶段 77 项最终完整检查通过。输入阶段 3 import-linter 合约；当前扩展到 4 合约，锁定依赖隔离 wheel 已通过。5 张本地真实 TIFF 只读输入烟测通过，私人摘要 .local/wb-real-input.json，不代表检测/科学正确性。
