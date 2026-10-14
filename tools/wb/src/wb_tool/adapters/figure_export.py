@@ -26,7 +26,7 @@ from wb_tool.application.figure_project import (
     plan_figure_layout,
 )
 from wb_tool.application.project_archive import ArchiveRunEvidence
-from wb_tool.application.project_ocr import WBProjectOCR
+from wb_tool.application.project_restore import WBRestoredProject, project_assets
 
 
 def _paths(sources: tuple[FigureSourcePath, ...]) -> dict[str, str]:
@@ -224,11 +224,12 @@ def export_figure_bundle(
                     )
                     writer.file(f"crops/{index + 1:04d}.tif", crop, "original_sample_crop")
                 # The bundle is independently traceable, including originals and custom font.
-                refs = [row.source for row in project.rows if row.source is not None]
-                if project.template.font is not None:
-                    refs.append(project.template.font)
-                if isinstance(project, WBProjectOCR) and project.ocr:
-                    refs.append(project.ocr.source)
+                refs = project_assets(project)
+                historical: set[str] = (
+                    {source.archive.sha256 for source in project.archive_sources}
+                    if isinstance(project, WBRestoredProject)
+                    else set()
+                )
                 assets = {ref.sha256: ref.size_bytes for ref in refs}
                 if any(assets[ref.sha256] != ref.size_bytes for ref in refs):
                     raise ValueError("同一来源SHA对应不一致的字节数")
@@ -238,7 +239,11 @@ def export_figure_bundle(
                     if digest not in paths:
                         raise ValueError("缺少项目原图/OCR/字体资产路径")
                     writer.file(
-                        f"assets/{digest}", paths[digest], "source_asset", digest, assets[digest]
+                        f"assets/{digest}",
+                        paths[digest],
+                        "historical_archive" if digest in historical else "source_asset",
+                        digest,
+                        assets[digest],
                     )
                 index = write_project_results(project, runs, writer)
                 writer.check_cancel()

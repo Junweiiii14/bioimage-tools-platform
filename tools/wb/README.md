@@ -53,3 +53,5 @@ v1草稿继续读取，协议/文档契约见wb-document-v2.md。自动裁剪、
 0.15.0增加read_metadata_file/preview_metadata/filename_metadata/apply_metadata：有界只读XLSX/UTF-8 CSV、表头/字段选择、严格row_id/SHA/文件名匹配、重复/未匹配提示、可修正预览、所选行/字段原子应用、共同参数及字面文件名分段。公式缓存不导入，空白不覆盖，几何/N/空位有效性沿用原契约；v1–v5字段不变，已有run/OCR/归一化保持。原图列表增加128边后台缩略图及SHA缓存；重开可按需加载。详见wb-project-metadata-v1.md。真实匹配、独审与完整产品验收仍待办。
 
 0.16.0为原图/OCR/归一化导出增加CSV，和XLSX共用表格数据；文字以可逆text:前缀编码，数值/真实0/空值分开。export_figure_bundle新增可选ArchiveRunEvidence，archive.json v2索引所有成员的SHA/大小/角色，ZIP统一包含原图、原值裁剪、拼图、CSV/XLSX、原始请求/结果及当前配置。重新校验运行资产，坏结果标明不可用、其他行继续；不把缓存或外来记录当本机成功。后台有界、取消/无覆盖发布，项目v1–v5与原算法不变。详见wb-project-archive-v2.md；ZIP导入和完整产品验收待办。
+
+0.17.0增加有界ZIP检查/stage_project_archive和schema6归档历史证据，保留原ZIP、原图、OCR关联、原始结果，严格重建表/像素检查。schema1–5兼容，来源表/界面区分归档历史与本机运行，外来RunRecord不登记本机收据。再次导出保留历史来源链，最多8代并受2GiB总预算限制。见wb-project-restore-v1.md；真实科学准确率/独审与最终产品验收仍待办。

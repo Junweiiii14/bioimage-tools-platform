@@ -20,9 +20,9 @@ class ProjectResultsView(QWidget):
         self._cells: tuple[ProjectTableCell, ...] = ()
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        self.table = QTableWidget(0, 7)
+        self.table = QTableWidget(0, 8)
         self.table.setHorizontalHeaderLabels(
-            ["Fig", "蛋白", "泳道", "积分", "状态", "原因", "原图 / 运行"]
+            ["Fig", "蛋白", "泳道", "积分", "状态", "原因", "原图 / 运行", "运行来源"]
         )
         layout.addWidget(self.table)
         paging = QHBoxLayout()
@@ -60,11 +60,13 @@ class ProjectResultsView(QWidget):
                     cell.status,
                     cell.reason,
                     f"{cell.source_sha256} / {cell.run_id}",
+                    cell.evidence_origin,
                 )
             ):
                 item = QTableWidgetItem(value)
                 item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 item.setToolTip(
                     f"row={cell.row_id}; lane={cell.lane_id}; revision={cell.request_revision}"
+                    + (f"\n来源归档 SHA256：{cell.archive_sha256}" if cell.archive_sha256 else "")
                 )
                 self.table.setItem(i, c, item)

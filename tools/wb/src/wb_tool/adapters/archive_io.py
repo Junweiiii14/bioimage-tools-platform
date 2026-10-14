@@ -38,7 +38,8 @@ class ArchiveWriter:
                 self.check_cancel()
                 size += len(chunk)
                 self.total += len(chunk)
-                if size > 512 * 1024 * 1024 or self.total > 2 * 1024**3:
+                limit = 2 * 1024**3 if role == "historical_archive" else 512 * 1024 * 1024
+                if size > limit or self.total > 2 * 1024**3:
                     raise ValueError("归档超过单文件512MiB或总计2GiB预算")
                 member.write(chunk)
                 digest.update(chunk)

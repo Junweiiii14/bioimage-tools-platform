@@ -281,6 +281,8 @@ class ProjectTableCell:
     value: float | None
     status: ProjectCellStatus
     reason: str
+    evidence_origin: str = ""
+    archive_sha256: str = ""
 
 
 @dataclass(frozen=True)
@@ -314,6 +316,8 @@ def _row_status(
 def fill_project_table(
     project: WBFigureProject, results: tuple[LoadedProjectResult, ...]
 ) -> tuple[ProjectTableCell, ...]:
+    from wb_tool.application.project_restore import run_origin
+
     if len({r.row_id for r in results}) != len(results):
         raise ValueError("同一行重复提供结果")
     plans = (
@@ -362,6 +366,7 @@ def fill_project_table(
                         signal,
                         status,
                         reason,
+                        *run_origin(project, plan.run.run_id if plan and plan.run else ""),
                     )
                 )
     return tuple(cells)

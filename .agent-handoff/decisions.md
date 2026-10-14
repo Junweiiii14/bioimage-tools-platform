@@ -36,3 +36,5 @@
 | 2026-10-14 | 批量元信息使用有界字面XLSX/CSV、严格完整键与可改预览，用户显式选行/字段后原子应用；项目schema不变 | 用户项目表含公式/订单编号和嵌图，不能推断科学映射；不解码嵌图、不用公式缓存；名称保留测量，N/空位依原契约失效 | wb-project-metadata-v1.md、2026-10-14-project-metadata.md、T-017/validation.md |
 
 | 2026-10-14 | 结果CSV使用可逆text:文字编码，数字/None独立；统一ZIP v2保存当前引用的原请求/结果和逐成员摘要，导出重读核验 | CSV无单元格类型，不依赖表格软件特殊转义；显示缓存不能绕过损坏；历史证据不等于本机PID/成功收据，ZIP恢复单列T-019 | c5f5787、wb-project-archive-v2.md、2026-10-14-wb-csv-archive.md、T-018/validation.md |
+
+| 2026-10-14 | schema6归档历史证据与本机run分开，原ZIP及复制请求结果持久化；新空工作区可显式导入单个原修订快照 | 不能伪造外来PID/退出/成功，不能丢历史后称恢复完成；普通CAS仍+1，后续真实计算沿原RunSession | wb-project-restore-v1.md、workspace-v1.md、2026-10-14-wb-archive-restore.md、T-019/validation.md |

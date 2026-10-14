@@ -224,6 +224,21 @@ with ZipFile('installed-figure.zip') as archive:
     assert index['schema_version'] == 2 and 'tables/source.csv' in archive.namelist()
     assert all(sha256(archive.read(member['path'])).hexdigest() == member['sha256']
                for member in index['members'])
+from wb_tool.api import (inspect_project_archive, stage_project_archive,
+    restore_staged_project, WBRestoredProject)
+assert inspect_project_archive('installed-figure.zip') == project
+staged = stage_project_archive('installed-figure.zip', 'installed-restore-staging')
+from platform_runtime.api import Workspace
+with Workspace.create('installed-restored') as store:
+    original = store.import_asset(staged.archive_path, staged.archive_sha256)
+    assets = tuple(store.import_asset(a.path, a.sha256) for a in staged.assets)
+    restored = restore_staged_project(staged, assets, original)
+    assert isinstance(restored, WBRestoredProject)
+    store.import_draft_snapshot(restored.project_id, 'wb-figure', restored.revision,
+                               restored.model_dump_json().encode())
+    assert store.list_runs() == ()
+with Workspace.open('installed-restored') as store:
+    assert store.load_draft(project.project_id).revision == project.revision
 from wb_tool.api import (CropDetectionSettings, WBReviewProject, suggest_crops,
     record_crop_suggestion, read_figure_project)
 suggestion = suggest_crops('installed-fig.tif', source.sha256, 'row', 0,

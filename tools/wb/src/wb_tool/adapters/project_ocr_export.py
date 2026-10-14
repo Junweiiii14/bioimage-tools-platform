@@ -7,6 +7,7 @@ from wb_tool.adapters.csv_export import csv_bytes
 from wb_tool.adapters.worksheet_export import Cell, publish_xlsx, two_sheet_xlsx_bytes
 from wb_tool.application.project_analysis import LoadedProjectResult
 from wb_tool.application.project_ocr import LoadedProjectOCR, WBProjectOCR, fill_project_ocr_table
+from wb_tool.application.project_restore import WBRestoredProject, run_origin
 
 
 def project_ocr_table_rows(
@@ -67,6 +68,11 @@ def project_ocr_table_rows(
                 c.reason,
             )
         )
+    if isinstance(project, WBRestoredProject):
+        audit[6] += ("定量运行来源", "定量来源归档SHA256", "OCR运行来源", "OCR来源归档SHA256")
+        origin = run_origin(project, project.ocr.run.run_id if project.ocr.run else "")
+        for index, cell in enumerate(cells, 7):
+            audit[index] += (cell.evidence_origin, cell.archive_sha256, *origin)
     return tuple(rows), tuple(audit)
 
 

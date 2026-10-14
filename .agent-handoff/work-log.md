@@ -87,3 +87,6 @@ wb-tool 0.2.0 新增 uint8/16 灰度及显式 RGB 单页 TIFF、极性与半开 
 
 ## 2026-10-14 / T-018 CSV与统一结果归档
 从ba8a678创建feat/T-018-project-result-archive，产品c5f5787接通源/OCR/归一化CSV与XLSX共用表、原值资产/裁剪/PNG/当前配置/原始请求结果的统一ZIP v2。保存后逐个核对工作区run和资产并后台重读，不用旧缓存冒充；成员SHA/大小/角色与坏run原因明确，取消/关闭/代际和无覆盖保持。364全量/9合约/隔离安装通过，作者自验不替代独审；T-019准备有界ZIP检查/恢复与历史证据保留。Goal active，未推送/发布，用户原资料未改。详情T-018/validation.md。
+
+## 2026-10-14 / T-019 ZIP恢复与历史证据
+从f79b7b3创建feat/T-019-project-archive-restore，实现schema6历史来源/原ZIP/复制请求结果、有界普通/ZIP64检查/表与像素重建、专用线程新工作区恢复/初始修订快照、重开核验/编辑失效/真实复算及再次恢复。398全量124.27秒、Ruff244、Pyright0、9合约、4wheel5场景通过；旧Qt/停滞风险未宣称解决。T-019 review待独审，T-020直接TIFF/PNG成图ready；整体Goal active。未推送/发布、用户资料未改；详情T-019/validation.md。

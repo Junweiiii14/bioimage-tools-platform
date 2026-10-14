@@ -1,14 +1,15 @@
 # Handoff Snapshot
 
-- 更新2026-10-14；用户授权持续开发至WB自动化软件完成，Goal active，无token预算。完整软件未完成，阶段测试不能标整体完成。
-- 活动分支feat/T-018-project-result-archive，产品c5f5787，base ba8a678；最后HEAD见git。任务状态唯一来源work/tasks：T-018 review待独审，T-019 ready。当前无运行中测试/工具进程。未推送、PR、main集成或发布。
-- 用户明确忽略CLX；TIFF设备原图/TIF裁剪，_0/_1语义未知，不猜定量源。归一化偏好问题未回答，不推断样本/参照。材料只作证据，未改用户资料。
-- wb-tool0.16.0 / app0.11.0：T-018源/OCR/归一化CSV与XLSX共用表构建器，CSV所有数据文本前置可逆text:，数字/真实0/None保持。CSV后缀入口/按钮已接桌面；无第三方版本或科学公式/schema变更。
-- 统一ZIP新增archive.json v2：原图/字体/OCR源、原值裁剪、PNG与旧manifest、精确project.json、各CSV/XLSX、原始已核验请求/结果、声明run记录、每成员SHA/大小/角色/缺项原因。索引自身无自引用SHA，但计入4096成员/2GiB预算；单成员512MiB，结果累计64MiB、每表20万格。低层API ArchiveRunEvidence是宿主证据，非本机执行收据。
-- 宿主ProjectArchiveSession精确保存后通过存储逐个核对完整run/资产路径；WB后台重读严格请求/结果，坏run单独unavailable，其他行保持。即使旧缓存曾显示有效值，损坏资产也不能导出旧数值。取消/关闭/代际变化撤销待发布输出；完成发布先于取消时保留文件。正式拼图仍需全部行审核。
-- 最终dev.py check --all退出0：364测试113.15秒、Ruff235文件、Pyright0、9合约、4wheel/5隔离场景。新增25核心/4Qt并扩展真实完整PNG OCR重开归档；35定向2.07秒、27Qt/项目41.93秒。首轮全门禁363通过115.73秒，随后补索引预算反例并重新完整验证。最终日志.local/requirements-review/T018-check-all.txt，证据work/evidence/T-018/validation.md。
-- 中间8核心失败因新测试夹具误用OCR绑定API与pairs字段，已修正测试，未改旧预期/容差/skip。类型/格式问题已修；本轮两次完整门禁通过。旧Qt Aborted及T-017约72项停滞的根因仍UNKNOWN，不能由本轮通过称已修复。启用PYTHONUNBUFFERED及faulthandler_timeout=20仅打印栈，无测试标准放宽。
-- T-017只读元信息/严格匹配/显式选行原子应用/共同参数/文件名字面分段/128边缩略图已保留；元信息导入来源审计不持久化。实际用户表50×49/190公式、47未绑定/0应用及2原图缩略图的旧只读证据见T-017；本轮未重新做真实实验准确率/外部Excel/DPI/FAT/大项目性能。
-- 下一步T-019-project-archive-restore.md：先读wb-project-archive-v2与实际导出/存储/项目契约，冻结有界ZIP检查、恢复到新工作区、历史证据和本机run区分方案，建立分支/context后实施。不得extractall/覆盖旧工作区/伪造PID/退出/成功，也不能静默丢弃旧结果。现ZIP不是完整数据库或全部编辑历史；跨工作区迁移需明确缺失历史来源的状态。
-- 其他首版缺项见work/wb-acceptance.md：直接TIFF成图、模板精修/横向分段、缩放句柄、旧工具实际衔接、真实标注/用户工作流、大项目性能、独审/远程CI/最终Windows包/DPI/干净机/物理FAT。当前版本/通过测试不等于软件完成。
-- 不恢复归档agent-workflow/lab-workbench，不自启子代理，不调用用户Esc停止的原生CUA。pytest-qt不是包态/人工准确率验收；原始图、已提交结果与数值预期保持。
+- 更新2026-10-14；用户授权持续开发至WB自动化软件完成，Goal active，无token预算。整体软件未完成，阶段测试不能标整体完成。
+- 活动分支feat/T-019-project-archive-restore，base f79b7b3；产品提交在收尾记录，最终HEAD见git。任务状态唯一来源work/tasks：T-019 review待独审，T-020 ready。当前无运行中测试/工具进程，未推送/PR/main集成/发布。
+- 用户明确忽略CLX；TIFF设备原图/TIF裁剪，_0/_1语义未知，不猜定量源。归一化偏好问题未回答，不推断样本/参照。材料只作证据，本轮未修改用户资料。
+- wb-tool0.17.0/app0.12.0/platform-runtime0.2.0：T-019有界ZIP普通/ZIP64检查、生成内部暂存路径、CRC/SHA/大小/成员集合/角色、原请求结果/OCR副本/CSV/OOXML重建及原通道裁剪/显示像素核对；不extractall、不执行成员。
+- 新schema6/WBRestoredProject保留原ZIP/archive_sources和历史imported_runs，本机AssetRef重映射，原RunRecord内部声明保持。v1–v5继续读；当前运行结果须重读核验并标为历史，本机数据库不登记外来run/PID/退出收据。真实重新计算沿RunSession，新run成为本机运行；旧历史保留，二次归档/恢复保留链。
+- 通用Workspace.import_draft_snapshot只允许无文档/run的新工作区，保留一个外来修订、不补造旧草稿；普通save_draft首修订0/+1 CAS不变，DB/文件格式仍v1。专用恢复线程创建自有临时工作区，关SQLite后Windows无覆盖目录rename，实际线程退出后通知GUI；关闭不打开晚到项目。POSIX标记发布未在实际目标环境验证。
+- 398全量124.27秒、Ruff244文件、Pyright0、9合约、4wheel/5隔离场景退出0；此前396全量128.27秒通过，补DOS目录/强加密标志反例后完整重验。首批13核心3.41秒、19核心/Qt7.61秒、70核心/Qt/存储17.92秒。首次全门禁仅Ruff行长失败已修，没有削弱旧测试/容差/skip；类型告警均实修。最终日志.local/requirements-review/T019-check-all.txt，证据work/evidence/T-019/validation.md。
+- 真实Qt/本机worker闭环：恢复后4000/空/0/8000/16000/0和OCR表保持；改基线旧值为空，真实复算2500，其他历史8000保持。首次恢复runs空，复算仅1条真实本机run；二次恢复2归档来源/4历史。8/16位/RGB/MINISWHITE、旧无索引、坏表/源/结果/CRC/路径、取消/关闭/无覆盖/发布失败/发布后关闭已测。截图T019-restored.png已看，源样例为受控合成，未新增真实科学准确率结论。
+- 预算：4096成员/2GiB解压总计、原ZIP容器额外8MiB、中央目录4MiB；普通成员512MiB，历史ZIP可大于512MiB但仍受总预算；JSON16MiB/PNG与单表64MiB/TIFF解码512MiB及3200万像素/历史8代。源及旧格式超过恢复预算明确失败；大项目性能/FAT/断电未验收。单条本地历史资产损坏不影响其他值，完整再次ZIP不伪装缺失资产。
+- 下一步T-020-direct-figure-image.md：直接TIFF/PNG成图，先冻结8位显示拼图/原16位定量来源的边界，读现有渲染/裁剪/OCR及官方TIFF资料，建立分支/context再实施；复用完整渲染与内嵌来源，精确保存后后台/取消/无覆盖，做直接TIFF到OCR往返。不要重新做T-019。
+- 其他首版缺项见work/wb-acceptance.md：精确实验室模板/横向分段/模板库、缩放句柄、旧工具实际衔接、真实标注/使用工作流、大项目性能、独审/远程CI/最终Windows包/DPI/干净机/FAT/签名许可证。首版OCR仍必需；归一化实验配对不替用户决定。
+- 旧Qt Aborted与T-017约72项停滞根因UNKNOWN。本轮两次全量通过，日志中段进度暂留后正常完成，无确认的新停滞；不能因此声称旧问题已修。PYTHONUNBUFFERED/faulthandler_timeout=20仅诊断。
+- 不恢复归档agent-workflow/lab-workbench，不自启子代理，不调用用户Esc停止的原生CUA；pytest-qt截图不是包态/人工准确率验收。私有材料、模型和探针只在忽略.local，未改用户资料。独审必须绑定最终产品提交，作者验证不替代独审。

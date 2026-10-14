@@ -26,6 +26,7 @@ from wb_tool.application.project_archive import ArchiveRunEvidence
 from wb_tool.application.project_metadata import MetadataBook
 from wb_tool.application.project_normalization import NormalizationSnapshot
 from wb_tool.application.project_ocr import LoadedProjectOCR
+from wb_tool.application.project_restore import RestoredProjectResults
 from wb_tool.domain.crop_detection import CropDetectionSettings
 from wb_tool.domain.worksheet import OCRRecognition, Worksheet
 
@@ -70,6 +71,7 @@ class WBJob:
         "project_ocr_export",
         "project_derived_tables",
         "project_normalization_export",
+        "project_evidence",
     ]
     path: str = ""
     data: bytes = b""
@@ -115,6 +117,7 @@ class WBReply:
         | ProjectTableSnapshot
         | LoadedProjectOCR
         | ProjectDerivedTables
+        | RestoredProjectResults
         | AnalysisResult
         | OCRRecognition
         | bytes

@@ -95,7 +95,18 @@ def verify_project_evidence(
                 and frozen.ocr
                 and isinstance(project, WBProjectOCR)
                 and project.ocr
-                and frozen.ocr.source == project.ocr.source
+                and (
+                    frozen.ocr.source.sha256,
+                    frozen.ocr.source.size_bytes,
+                    frozen.ocr.width,
+                    frozen.ocr.height,
+                )
+                == (
+                    project.ocr.source.sha256,
+                    project.ocr.source.size_bytes,
+                    project.ocr.width,
+                    project.ocr.height,
+                )
             ):
                 raise ValueError("冻结请求不对应OCR来源")
             if run.result is not None:

@@ -108,6 +108,14 @@ from wb_tool.application.project_ocr import (
     project_with_ocr,
     read_project_ocr_result,
 )
+from wb_tool.application.project_restore import (
+    RestoredProjectResults,
+    StagedProjectArchive,
+    WBRestoredProject,
+    imported_run,
+    project_assets,
+    restore_staged_project,
+)
 from wb_tool.application.worker_protocol import (
     AcceptedFrame,
     CancelFrame,
@@ -151,6 +159,14 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "RestoredProjectResults",
+    "StagedProjectArchive",
+    "WBRestoredProject",
+    "imported_run",
+    "project_assets",
+    "restore_staged_project",
+    "stage_project_archive",
+    "inspect_project_archive",
     "ArchiveRunEvidence",
     "project_runs",
     "MetadataBook",
@@ -424,3 +440,19 @@ def export_crop(source: str, request: CropRequest, destination: str) -> str:
     from wb_tool.adapters.crop_export import export_crop as export
 
     return export(source, request, destination)
+
+
+def stage_project_archive(
+    source: str, destination: str, *, cancelled: Callable[[], bool] = lambda: False
+) -> StagedProjectArchive:
+    from wb_tool.adapters.archive_restore import stage_project_archive as stage
+
+    return stage(source, destination, cancelled=cancelled)
+
+
+def inspect_project_archive(
+    source: str, *, cancelled: Callable[[], bool] = lambda: False
+) -> WBFigureProject:
+    from wb_tool.adapters.archive_restore import inspect_project_archive as inspect
+
+    return inspect(source, cancelled=cancelled)

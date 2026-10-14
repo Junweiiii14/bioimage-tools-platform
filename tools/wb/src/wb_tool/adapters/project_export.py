@@ -7,6 +7,7 @@ from wb_tool.adapters.csv_export import csv_bytes
 from wb_tool.adapters.worksheet_export import Cell, publish_xlsx, two_sheet_xlsx_bytes
 from wb_tool.application.figure_project import WBFigureProject
 from wb_tool.application.project_analysis import LoadedProjectResult, fill_project_table
+from wb_tool.application.project_restore import WBRestoredProject
 
 
 def project_table_rows(
@@ -65,6 +66,10 @@ def project_table_rows(
         )
         for c in cells
     )
+    if isinstance(project, WBRestoredProject):
+        audit[4] += ("运行来源", "来源归档SHA256")
+        for index, cell in enumerate(cells, 5):
+            audit[index] += (cell.evidence_origin, cell.archive_sha256)
     return tuple(rows), tuple(audit)
 
 

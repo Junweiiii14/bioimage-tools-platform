@@ -51,6 +51,7 @@ from wb_tool.application.project_normalization import (
     project_with_normalizations,
 )
 from wb_tool.application.project_ocr import WBProjectOCR, bind_project_ocr_row, project_with_ocr
+from wb_tool.application.project_restore import WBRestoredProject, with_archive_history
 from wb_tool.domain.grid import fixed_lane_grid
 from wb_tool.domain.lanes import LaneROI
 from wb_tool.ui.canvas import ImageCanvas
@@ -81,6 +82,9 @@ class FigureProjectView(QWidget):
         self.status = QLabel("批量导入原图，填写 Fig/蛋白，框选整行范围并复核。")
         self.status.setWordWrap(True)
         root.addWidget(self.status)
+        self.history_label = QLabel()
+        self.history_label.setWordWrap(True)
+        root.addWidget(self.history_label)
         actions = QHBoxLayout()
         self.filter = QComboBox()
         self.filter.addItems(
@@ -282,11 +286,27 @@ class FigureProjectView(QWidget):
         plans = self.normalization.plans()
         if plans or isinstance(self._project, WBNormalizedProject):
             project = project_with_normalizations(project, plans)
+        if isinstance(self._project, WBRestoredProject):
+            project = with_archive_history(
+                project, self._project.archive_sources, self._project.imported_runs
+            )
         return project
 
     def set_project(self, project: WBFigureProject) -> None:
         self._loading = True
         self._project = project
+        self.history_label.setText(
+            f"从归档恢复 · {len(project.archive_sources)} 个来源 · "
+            f"{len(project.imported_runs)} 条历史运行。"
+            "历史数值须通过资产核验；重新计算将建立本机运行。"
+            if isinstance(project, WBRestoredProject)
+            else ""
+        )
+        self.history_label.setToolTip(
+            "\n".join(s.archive.sha256 for s in project.archive_sources)
+            if isinstance(project, WBRestoredProject)
+            else ""
+        )
         self.metadata.clear_preview()
         present = {row.source.sha256 for row in project.rows if row.source}
         self._thumbnails = {key: icon for key, icon in self._thumbnails.items() if key in present}

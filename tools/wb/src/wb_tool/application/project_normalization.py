@@ -90,6 +90,10 @@ class WBNormalizedProject(WBProjectOCR):
 def project_with_normalizations(
     project: WBFigureProject, plans: tuple[NormalizationPlan, ...]
 ) -> WBNormalizedProject:
+    if isinstance(project, WBNormalizedProject):
+        fields = {name: getattr(project, name) for name in type(project).model_fields}
+        fields["normalizations"] = plans
+        return type(project).model_validate(fields)
     return WBNormalizedProject(
         project_id=project.project_id,
         name=project.name,

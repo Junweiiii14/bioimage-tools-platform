@@ -41,3 +41,5 @@ CSV 文字编码为 `wb_csv_text_prefix@1`：所有数据字符串（包括空�
 文件读取、压缩、表生成在后台；GUI 忙时冻结编辑。取消、关闭或 generation 改变通过 Event 取消，保存阶段的后到修订不启动导出。检查覆盖成员/1MiB写块/最终发布前；若发布先于取消完成，保留已完成文件。新文件同目录临时写入，fsync 后 Windows 无覆盖 rename / POSIX link，失败清理本次临时文件；不覆盖任何已有输出、源图或历史结果。
 
 每表200000单元格，表文件64MiB，CSV文本32MiB字符预算/每字段32767字符；XLSX原有UTF-16限制保留。冻结请求16MiB，单定量结果8MiB/OCR4MiB，累计加载结果64MiB；超出则明确不可用，不用旧缓存替代。ZIP最多4096成员、单成员512MiB、解压后总计2GiB；PNG与渲染仍沿用64MiB/3200万像素。预算是应用准入，不是OS内存硬限制；大型项目性能与物理FAT仍待实测。
+
+T-019兼容扩展：项目schema6带归档来源/外来历史证据，assets还包含原ZIP及复制的历史请求/结果，历史ZIP成员角色historical_archive、其余仍source_asset。原ZIP成员可以超过512MiB但不能超过总计2GiB预算。新恢复读取器见[恢复契约](wb-project-restore-v1.md)；旧schema1–5结果表布局保持，schema6增加来源列。归档v2/manifest v1不变，旧项目读取器拒绝未知schema6。

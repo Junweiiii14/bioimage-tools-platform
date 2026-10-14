@@ -30,15 +30,18 @@ from wb_tool.api import (
     ProjectDerivedTables,
     ProjectOCRState,
     ProjectTableSnapshot,
+    RestoredProjectResults,
     WBAnalysisProject,
     WBFigureProject,
     WBJob,
     WBProjectOCR,
     WBReply,
+    WBRestoredProject,
     WBReviewProject,
     create_figure_project_view,
     create_wb_background,
     prepare_project_analyses,
+    project_assets,
     project_with_ocr,
     record_crop_suggestion,
 )
@@ -46,6 +49,7 @@ from wb_tool.api import (
 from bioimage_app.project_archive import ProjectArchiveSession
 from bioimage_app.project_measurements import ProjectBatchCompletion, ProjectMeasurementSession
 from bioimage_app.project_ocr import ProjectOCRCompletion, ProjectOCRSession
+from bioimage_app.project_restore import ArchiveRestoreJob, ArchiveRestoreResult
 from bioimage_app.storage import AsyncStorage, StorageCommand, StorageReply
 
 
@@ -62,6 +66,7 @@ class FigureProjectWindow(QMainWindow):
         self._store = AsyncStorage(self)
         self._background = create_wb_background()
         self._storage_callbacks: dict[str, Callable[[StorageReply], None]] = {}
+        self._storage_accept_errors: set[str] = set()
         self._wb_callbacks: dict[str, Callable[[WBReply], None]] = {}
         self._wb_accept_errors: set[str] = set()
         self._store.replied.connect(self._storage_reply)
@@ -83,6 +88,7 @@ class FigureProjectWindow(QMainWindow):
         self._ocr_session: ProjectOCRSession | None = None
         self._loaded_ocr: LoadedProjectOCR | None = None
         self._archive_session: ProjectArchiveSession | None = None
+        self._restore_job: ArchiveRestoreJob | None = None
         self._export_generation: int | None = None
         self._ocr_refresh_pending = False
         self._ocr_refresh_timer = QTimer(self)
@@ -92,6 +98,7 @@ class FigureProjectWindow(QMainWindow):
         self.addToolBar(bar)
         self.create_button = QPushButton("新建项目工作区")
         self.open_button = QPushButton("打开项目工作区")
+        self.restore_button = QPushButton("从 ZIP 恢复")
         self.import_button = QPushButton("批量导入 TIFF")
         self.save_button = QPushButton("保存项目")
         self.new_button = QPushButton("复用模板新建项目")
@@ -101,6 +108,7 @@ class FigureProjectWindow(QMainWindow):
         for button in (
             self.create_button,
             self.open_button,
+            self.restore_button,
             self.import_button,
             self.save_button,
             self.new_button,
@@ -110,6 +118,7 @@ class FigureProjectWindow(QMainWindow):
             bar.addWidget(button)
         self.create_button.clicked.connect(lambda: self._choose_workspace(True))
         self.open_button.clicked.connect(lambda: self._choose_workspace(False))
+        self.restore_button.clicked.connect(self._choose_restore)
         self.import_button.clicked.connect(self._choose_import)
         self.save_button.clicked.connect(lambda: self.save())
         self.new_button.clicked.connect(self.new_project)
@@ -142,6 +151,54 @@ class FigureProjectWindow(QMainWindow):
             self._measurement_session.cancel()
         if self._ocr_session:
             self._ocr_session.cancel()
+
+    def _choose_restore(self) -> None:
+        source, _ = QFileDialog.getOpenFileName(self, "选择项目 ZIP 归档", "", "ZIP (*.zip)")
+        if not source:
+            return
+        destination, _ = QFileDialog.getSaveFileName(
+            self,
+            "输入新的工作区目录名",
+            str(Path(source).with_suffix("")),
+            "工作区目录 (*)",
+            options=QFileDialog.Option.DontConfirmOverwrite,
+        )
+        if destination:
+            self.restore_archive(source, destination)
+
+    def restore_archive(self, source: str, destination: str) -> None:
+        if self._busy or self._workspace or self._closing:
+            return
+        self._start()
+        self.view.status.setText("正在校验归档并恢复到新的工作区…")
+        job = ArchiveRestoreJob(source, destination, self._cancellation, self)
+        self._restore_job = job
+
+        def finished(result: ArchiveRestoreResult) -> None:
+            self._restore_job = None
+            job.deleteLater()
+            if self._closing:
+                self._done("恢复任务已结束" + ("；新工作区已完整保存。" if result.path else "。"))
+                return
+            if result.error:
+                self._error(result.error)
+                return
+
+            # Publication can win before cancellation. Open only after actual thread teardown.
+            def opened(reply: StorageReply) -> None:
+                self._workspace = result.path
+
+                def listed(reply: StorageReply) -> None:
+                    self._list_documents(reply)
+                    if not self._closing:
+                        self.load_document(result.project_id)
+
+                self._storage(StorageCommand("documents"), listed)
+
+            self._storage(StorageCommand("open", path=result.path), opened)
+
+        job.finished.connect(finished)
+        job.start()
 
     def _choose_metadata_import(self) -> None:
         path, _ = QFileDialog.getOpenFileName(
@@ -715,12 +772,13 @@ class FigureProjectWindow(QMainWindow):
 
     @property
     def resources_closed(self) -> bool:
-        return self._store_closed and self._background_closed
+        return self._store_closed and self._background_closed and self._restore_job is None
 
     def _controls(self) -> None:
         idle = not self._busy and not self._closing
         self.create_button.setEnabled(idle and not self._workspace)
         self.open_button.setEnabled(idle and not self._workspace)
+        self.restore_button.setEnabled(idle and not self._workspace)
         self.import_button.setEnabled(idle and bool(self._workspace))
         self.save_button.setEnabled(idle and bool(self._workspace))
         self.new_button.setEnabled(idle and bool(self._workspace))
@@ -749,9 +807,18 @@ class FigureProjectWindow(QMainWindow):
         self._closing = False
         self._done("操作失败：" + message)
 
-    def _storage(self, command: StorageCommand, callback: Callable[[StorageReply], None]) -> None:
+    def _storage(
+        self,
+        command: StorageCommand,
+        callback: Callable[[StorageReply], None],
+        *,
+        accept_errors: bool = False,
+    ) -> None:
         try:
-            self._storage_callbacks[self._store.submit(command)] = callback
+            request_id = self._store.submit(command)
+            self._storage_callbacks[request_id] = callback
+            if accept_errors:
+                self._storage_accept_errors.add(request_id)
         except (ValueError, RuntimeError) as error:
             self._error(str(error))
 
@@ -768,8 +835,10 @@ class FigureProjectWindow(QMainWindow):
 
     def _storage_reply(self, reply: StorageReply) -> None:
         callback = self._storage_callbacks.pop(reply.request_id, None)
+        accept_errors = reply.request_id in self._storage_accept_errors
+        self._storage_accept_errors.discard(reply.request_id)
         if callback:
-            if reply.error_code:
+            if reply.error_code and not accept_errors:
                 self._error(reply.message)
             else:
                 callback(reply)
@@ -1123,11 +1192,8 @@ class FigureProjectWindow(QMainWindow):
                     self._error("项目文档无效")
                     return
                 project = reply.value
-                assets = {r.source.sha256: r.source for r in project.rows if r.source}
-                if project.template.font:
-                    assets[project.template.font.sha256] = project.template.font
-                if isinstance(project, WBProjectOCR) and project.ocr is not None:
-                    assets[project.ocr.source.sha256] = project.ocr.source
+                assets = {asset.sha256: asset for asset in project_assets(project)}
+                primary = {asset.sha256 for asset in project_assets(project, history=False)}
                 pending = list(assets.values())
                 resolved_paths: dict[str, str] = {}
 
@@ -1139,7 +1205,9 @@ class FigureProjectWindow(QMainWindow):
                         self._saved_generation = self.view.generation
                         self._project_results = ()
                         self._loaded_ocr = None
-                        if isinstance(project, WBAnalysisProject):
+                        if isinstance(project, WBRestoredProject):
+                            self._restore_project_evidence(project)
+                        elif isinstance(project, WBAnalysisProject):
                             analysis_project = project
 
                             def measurements() -> None:
@@ -1159,19 +1227,61 @@ class FigureProjectWindow(QMainWindow):
                     asset = pending.pop(0)
 
                     def resolved(reply: StorageReply) -> None:
+                        if reply.error_code and asset.sha256 not in primary:
+                            next_asset()
+                            return
                         if not isinstance(reply.value, str):
                             self._error("资产路径无效")
                             return
                         resolved_paths[asset.sha256] = reply.value
                         next_asset()
 
-                    self._storage(StorageCommand("asset", asset=asset), resolved)
+                    self._storage(
+                        StorageCommand("asset", asset=asset),
+                        resolved,
+                        accept_errors=asset.sha256 not in primary,
+                    )
 
                 next_asset()
 
             self._wb(WBJob("figure_document", data=reply.data), decoded)
 
         self._storage(StorageCommand("load", document_id=document_id), loaded)
+
+    def _restore_project_evidence(self, project: WBRestoredProject) -> None:
+        def collected(evidence: tuple[ArchiveRunEvidence, ...]) -> None:
+            self._archive_session = None
+            if self._closing or self._cancellation.is_set():
+                self._done("历史证据加载已取消；新工作区已保存。")
+                return
+
+            def verified(reply: WBReply) -> None:
+                if self._closing or self._cancellation.is_set():
+                    self._done("历史证据加载已取消。")
+                elif reply.error or not isinstance(reply.value, RestoredProjectResults):
+                    self._error(reply.error or "历史证据读取失败")
+                else:
+                    self._project_results, self._loaded_ocr = reply.value.results, reply.value.ocr
+                    self._busy = False
+                    self.refresh_project_table(
+                        f"项目已恢复；{len(reply.value.errors)} 条运行证据不可用。"
+                        "历史来源见结果表。"
+                    )
+
+            self._wb(
+                WBJob(
+                    "project_evidence",
+                    document=project,
+                    archive_runs=evidence,
+                    cancellation=self._cancellation,
+                ),
+                verified,
+                accept_errors=True,
+            )
+
+        session = ProjectArchiveSession(self._store, project, self._cancellation, collected)
+        self._archive_session = session
+        session.start()
 
     def _choose_export(self) -> None:
         destination, _ = QFileDialog.getSaveFileName(

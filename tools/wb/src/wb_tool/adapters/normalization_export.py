@@ -11,6 +11,7 @@ from wb_tool.application.project_normalization import (
     fill_project_normalization,
 )
 from wb_tool.application.project_ocr import LoadedProjectOCR
+from wb_tool.application.project_restore import WBRestoredProject, run_origin
 
 
 def normalization_table_rows(
@@ -144,6 +145,26 @@ def normalization_table_rows(
                 plan.notes,
             )
         )
+    if isinstance(project, WBRestoredProject):
+        audit[5] += (
+            "目标运行来源",
+            "目标归档SHA256",
+            "参照运行来源",
+            "参照归档SHA256",
+            "OCR运行来源",
+            "OCR归档SHA256",
+        )
+        for index, cell in enumerate(cells, 6):
+            audit[index] += (
+                *run_origin(project, cell.target.run_id if cell.target else ""),
+                *run_origin(project, cell.reference.run_id if cell.reference else ""),
+                *run_origin(
+                    project,
+                    project.ocr.run.run_id
+                    if ocr_labels and project.ocr and project.ocr.run
+                    else "",
+                ),
+            )
     return tuple(rows), tuple(audit)
 
 

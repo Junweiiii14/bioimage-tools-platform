@@ -37,6 +37,7 @@ from wb_tool.application.project_ocr import (
     install_project_recognition,
     read_project_ocr_result,
 )
+from wb_tool.application.project_restore import RestoredProjectResults
 from wb_tool.domain.worksheet import OCRRecognition
 
 
@@ -73,12 +74,28 @@ class _Work(QObject):
                 | ProjectTableSnapshot
                 | LoadedProjectOCR
                 | ProjectDerivedTables
+                | RestoredProjectResults
                 | AnalysisResult
                 | OCRRecognition
                 | bytes
                 | str
             )
-            if job.operation == "metadata_read":
+            if job.operation == "project_evidence":
+                from wb_tool.adapters.project_evidence import verify_project_evidence
+
+                if not isinstance(job.document, WBFigureProject) or job.archive_runs is None:
+                    raise ValueError("缺少项目证据")
+                verified = verify_project_evidence(job.document, job.archive_runs, cancelled=cancel)
+                value = RestoredProjectResults(
+                    verified.results,
+                    verified.ocr,
+                    tuple(
+                        str(record["reason"])
+                        for record in verified.records
+                        if record["verification"] == "unavailable"
+                    ),
+                )
+            elif job.operation == "metadata_read":
                 from wb_tool.adapters.metadata_input import read_metadata_file
 
                 value = read_metadata_file(
