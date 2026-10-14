@@ -15,3 +15,5 @@
 | 2026-10-14 | TIFF 以元数据识别颜色轴，MINISWHITE 原值保留且要求显式极性 | 避免显示或静默反相改变定量意义 | docs/contracts/wb-reference-v1.md |
 
 | 2026-10-14 | dtype_limits_review@1 将上下限像素标为待复核而非证明饱和 | 原始积分可检查但不直接进入有效列；不将异常伪装为零 | docs/contracts/wb-manual-analysis-v1.md |
+
+| 2026-10-14 | JSON 原字节 strict 解析 + 标签/重复键预检；worker 仅产出候选 | 保持 stdlib dataclass 唯一字段，避免 bool 标签与 JSON tuple 模式问题；终态由宿主提交 | docs/contracts/wb-worker-v1.md |

@@ -27,3 +27,7 @@ wb-tool 0.2.0 新增 uint8/16 灰度及显式 RGB 单页 TIFF、极性与半开 
 ## 2026-10-14 / T-004 手工分析用例
 
 上一目标回合归类 progress：93a84bb 实现并验证 TIFF/剖面。本回合实现 WB application，明确来源/revision/缺失/排除/无效/真实零/待质量复核，并支持取消无完成结果。90 测试、4 合约及隔离 wheel TIFF→手工分析通过。独审、后台进程、存储与 GUI 未完成，目标保持 active。
+
+## 2026-10-14 / T-005 后台协议与真实进程
+
+上一回合 progress：e3932ee/45d0c5f 手工分析。本回合实现协议 v1、strict JSON/schema、host 会话门禁与数值限线程真实 worker，123 测试及隔离 wheel 启动通过。布尔 Literal/JSON tuple 模式反例已修复且保留。合作取消不是宿主强停/存储完成证据；后续继续宿主、工作区与 GUI，目标 active。

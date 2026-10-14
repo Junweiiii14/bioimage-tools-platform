@@ -12,6 +12,20 @@ from wb_tool.application.analysis import (
     LaneAnnotation,
     analyze_annotations,
 )
+from wb_tool.application.worker_protocol import (
+    AcceptedFrame,
+    CancelFrame,
+    CancelledFrame,
+    FailureFrame,
+    HelloFrame,
+    ProtocolErrorFrame,
+    ResultFrame,
+    StartFrame,
+    WorkerConversation,
+    encode_worker_frame,
+    parse_worker_frame,
+    worker_protocol_schema,
+)
 from wb_tool.domain.lanes import LaneProfiles, LaneROI, Polarity, compute_lane_profiles
 from wb_tool.domain.quantify import (
     BandBounds,
@@ -22,6 +36,18 @@ from wb_tool.domain.quantify import (
 )
 
 __all__ = [
+    "AcceptedFrame",
+    "CancelFrame",
+    "CancelledFrame",
+    "FailureFrame",
+    "HelloFrame",
+    "ProtocolErrorFrame",
+    "ResultFrame",
+    "StartFrame",
+    "WorkerConversation",
+    "encode_worker_frame",
+    "parse_worker_frame",
+    "worker_protocol_schema",
     "AnalysisCancelled",
     "AnalysisError",
     "AnalysisRequest",

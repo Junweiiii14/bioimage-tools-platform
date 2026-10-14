@@ -60,9 +60,11 @@ from pathlib import Path
 from wb_tool.api import (
     AnalysisRequest, BandAnnotation, BandBounds, Baseline, LaneAnnotation, LaneROI,
     analyze_annotations, compute_lane_profiles, integrate_profile, load_tiff,
+    StartFrame, WorkerConversation, encode_worker_frame, ResultFrame,
 )
 import numpy as np
 import tifffile
+import subprocess
 import wb_tool.api
 assert Path(wb_tool.api.__file__).is_relative_to(Path(sys.prefix))
 assert integrate_profile([10., 20., 10.], BandBounds(0, 2)).signal == 10.
@@ -75,8 +77,20 @@ lane = LaneAnnotation(LaneROI('L', 0, 0, 1, 3), (BandAnnotation('B', BandBounds(
 request = AnalysisRequest(image.sha256, 7, 'dark', (lane,))
 result = analyze_annotations(image, request)
 assert result.lanes[0].bands[0].signal == 10 and result.request.revision == 7
+start = StartFrame(protocol_version=1, kind='start', sequence=0, run_id='r',
+                  attempt_id='a', request_id='q', source_path=str(Path('analytic.tif').resolve()),
+                  request=request)
+worker = subprocess.run([sys.executable, '-I', '-m', 'wb_tool.worker'],
+                        input=encode_worker_frame(start), capture_output=True, timeout=30)
+assert worker.returncode == 0, worker.stderr
+frames = worker.stdout.splitlines()
+assert len(frames) == 3
+session = WorkerConversation(start)
+received = [session.accept(data) for data in frames]
+assert isinstance(received[-1], ResultFrame)
+assert received[-1].result.lanes[0].bands[0].signal == 10
 assert not any(name.startswith(('PySide6', 'sqlite3')) for name in sys.modules)
-print('Isolated WB wheel: TIFF/manual-analysis APIs passed; no GUI/storage dependencies')
+print('Isolated WB wheel: TIFF/manual analysis and real worker passed; no GUI/storage dependencies')
 """
         return subprocess.run([str(python), "-I", "-c", script], cwd=folder, check=False).returncode
 
