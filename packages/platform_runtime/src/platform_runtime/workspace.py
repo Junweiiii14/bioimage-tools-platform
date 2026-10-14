@@ -575,12 +575,22 @@ class Workspace:
             self._update_run(old, new)
         return new
 
-    def commit_result(self, run_id: str, receipt: ProcessExitReceipt, data: bytes) -> RunRecord:
+    def commit_result(
+        self,
+        run_id: str,
+        receipt: ProcessExitReceipt,
+        data: bytes,
+        *,
+        cancelled: Callable[[], bool] | None = None,
+    ) -> RunRecord:
         _document(data)
         old = self.get_run(run_id)
         self._exit(old, receipt)
         if old.state != "running" or receipt.exit_code != 0 or receipt.pid == 0:
             raise StateConflict("仅已确认成功退出的运行可以提交结果")
+        if cancelled is not None and cancelled():
+            self.request_cancel(run_id)
+            raise StateConflict("提交前已请求取消")
         self.asset_path(old.request)
         committing = old.model_copy(update={"state": "committing"})
         with self._db:
@@ -588,6 +598,9 @@ class Workspace:
         ref = self._blob("results", run_id, "result.json", data)
         self._checkpoint("before_database_commit")
         self._verify_file(ref)
+        if cancelled is not None and cancelled():
+            self.request_cancel(run_id)
+            raise StateConflict("发布后提交前已请求取消")
         completed = committing.model_copy(update={"state": "succeeded", "result": ref})
         with self._db:
             self._insert_asset(ref)

@@ -8,7 +8,7 @@
 | `p0_probe.py`, `tooling/p0/` | T-002 可丢弃技术探针：Qt、进程、合成图和 standalone；不作为产品 API | 本机验证中；`tooling/p0/README.md` |
 | `.agents/skills/` | 固定提交的第三方工作技能 | 已建；`tooling/skills-lock.json` |
 | `tests/test_boundaries.py` | 边界检查的正反例 | 已建；pytest |
-| `apps/desktop/` | `bioimage_app.api` 的 Qt 异步存储队列，显式宿主装配 | 已建 0.1.0；真实事件循环和隔离 wheel；进程/UI 入口待建 |
+| `apps/desktop/` | `bioimage_app.api` 的异步存储、QProcess/解码、RunSession 终态仲裁与明确 WB 协议注册 | 已建 0.1.0；真实事件循环/进程树/WB→存储和隔离 wheel；GUI 入口待建 |
 | `packages/tool_contracts/` | `tool_contracts.api` 的文件资产、修订、运行/退出与恢复契约 | 已建 v1；schema 漂移和隔离 wheel |
 | `packages/platform_runtime/` | `platform_runtime.api.Workspace` 输入快照、草稿 CAS、结果事务、恢复与备份 | 已建 v1；真实文件/SQLite、崩溃/取消/损坏负例、独立 wheel |
 | `packages/desktop_sdk/` | ToolView、Qt 生命周期、宿主 UI 端口 | 规划；pytest-qt |

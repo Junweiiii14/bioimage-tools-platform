@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from sqlite3 import Error as SQLiteError
+from threading import Event
 from typing import Literal
 from uuid import uuid4
 
@@ -66,6 +67,7 @@ class StorageCommand:
     receipt: ProcessExitReceipt | None = None
     reason: str = ""
     interrupted: bool = False
+    cancellation: Event | None = None
 
 
 @dataclass(frozen=True)
@@ -131,12 +133,20 @@ class _StorageWorker(QObject):
         if op == "start":
             return store.start_run(command.run_id, command.pid), b""
         if op == "cancel":
-            return store.request_cancel(command.run_id), b""
+            run = store.get_run(command.run_id)
+            return (run if run.state == "cancelling" else store.request_cancel(command.run_id)), b""
         if op in ("commit", "cancelled", "failed"):
             if command.receipt is None:
                 raise ValueError("Terminal operation requires an observed process exit")
             if op == "commit":
-                return store.commit_result(command.run_id, command.receipt, command.data), b""
+                return store.commit_result(
+                    command.run_id,
+                    command.receipt,
+                    command.data,
+                    cancelled=command.cancellation.is_set
+                    if command.cancellation is not None
+                    else None,
+                ), b""
             if op == "cancelled":
                 return store.finish_cancelled(command.run_id, command.receipt), b""
             return store.finish_failure(

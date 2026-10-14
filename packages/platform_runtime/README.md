@@ -8,6 +8,8 @@ import_asset 复制输入并校验声明摘要；save_draft 使用 CAS 修订并
 prepare_run 冻结指定草稿副本。start_run 只允许一个活动进程；结果提交需要匹配的成功退出回执。
 request_cancel 先保存 cancelling；finish_cancelled 在宿主确认退出后调用。
 commit_result 的阶段是 staging、文件 fsync/摘要、唯一目录发布、SQLite CAS 成功终态。
+宿主可传入 cancelled 检查回调；提交开始/最终校验之后检测到取消会保存 cancelling，
+拒绝 succeeded，并保留未登记的发布目录供恢复报告。最终提交检查决定先后；之后的取消不改写历史终态。
 文件发布与数据库不是同一事务；失败时不冒充 succeeded，重启将未完成运行标 interrupted。
 未发布 staging 移到 recovery；未登记的发布目录作为 orphan 报告，保留而不删除。
 backup 使用 SQLite 一致性备份 API 和不可变文件副本，拒绝现存目标与工作区内部目标；

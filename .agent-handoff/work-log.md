@@ -1,5 +1,9 @@
 # Current Work Log
 
+## 2026-10-14 / T-007 进程宿主
+
+上一回合progress：e61c3e3异步存储。本回合实现QProcess/后台解码、NDJSON与stderr预算、PID存储门禁、Windows JobObject/进程组、RunSession持久化取消与终态；补提交取消检查。真实WB输入快照→进程→存储→重开信号10，旧运行不覆盖新草稿；实际孙进程强停、残帧/超限/退出/提前取消与发布取消均验证。完整门禁185tests/9合约/4wheel通过；T-007进入review（独审未执行），下一步T-008桌面GUI，goal active。
+
 ## 2026-10-14 / T-007 异步存储子阶段
 
 上一回合 progress：ac01459/731cd70 工作区。本回合新增 bioimage_app 0.1.0，后台线程独占 Workspace；请求ID、明确命令、队列预算、错误后继续和异步关闭。真实Qt屏障/定时器确认主线程响应，真实进程退出→异步提交→重开通过。最终170测试/9导入合约/4wheel自验；任务仍 implementing，进程宿主/GUI与独审未完成，goal active。

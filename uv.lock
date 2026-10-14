@@ -30,12 +30,19 @@ dependencies = [
     { name = "tool-contracts" },
 ]
 
+[package.optional-dependencies]
+wb = [
+    { name = "wb-tool" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "platform-runtime", editable = "packages/platform_runtime" },
     { name = "pyside6", specifier = "==6.12.0" },
     { name = "tool-contracts", editable = "packages/tool_contracts" },
+    { name = "wb-tool", marker = "extra == 'wb'", editable = "tools/wb" },
 ]
+provides-extras = ["wb"]
 
 [[package]]
 name = "bioimage-tools-platform"

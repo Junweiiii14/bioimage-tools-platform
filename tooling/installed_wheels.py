@@ -134,27 +134,51 @@ DESKTOP_SCRIPT = """
 import sys
 from pathlib import Path
 from PySide6.QtCore import QCoreApplication, QTimer
-from bioimage_app.api import AsyncStorage, StorageCommand
+from bioimage_app.api import AsyncStorage, StorageCommand, ProcessEvent, RunSession
 from platform_runtime.api import Workspace
 import bioimage_app.api
 assert Path(bioimage_app.api.__file__).is_relative_to(Path(sys.prefix))
 app = QCoreApplication([])
 store = AsyncStorage()
 replies = []
+completions = []
+sessions = []
+class Codec:
+    def __init__(self): self.stage = 0
+    def accept(self, frame):
+        kinds = ('hello', 'accepted', 'result')
+        assert frame.decode() == kinds[self.stage]
+        event = ProcessEvent(kinds[self.stage], b'{}')
+        self.stage += 1
+        return event
+    def cancellation(self): return b'cancel\\n'
+def received(reply):
+    if reply.value is not None and getattr(reply.value, 'state', None) == 'prepared':
+        session = RunSession(store, reply.value, Codec())
+        sessions.append(session)
+        def completed(result):
+            completions.append(result)
+            store.shutdown()
+        session.completed.connect(completed)
+        code = ("import sys; print('hello',flush=True); sys.stdin.buffer.readline(); "
+                "print('accepted',flush=True); print('result',flush=True)")
+        session.start((sys.executable, '-I', '-c', code), str(Path.cwd()), b'start\\n')
 store.replied.connect(replies.append)
+store.replied.connect(received)
 store.closed.connect(app.quit)
 store.submit(StorageCommand('create', path=str(Path('desktop-workspace').resolve())))
 store.submit(StorageCommand('save', document_id='D', tool_id='probe', revision=0, data=b'{}'))
 store.submit(StorageCommand('load', document_id='D'))
-store.shutdown()
+store.submit(StorageCommand('prepare', document_id='D'))
 QTimer.singleShot(15000, app.quit)
 app.exec()
-assert len(replies) == 4 and all(reply.error_code is None for reply in replies), replies
+assert len(replies) == 7 and all(reply.error_code is None for reply in replies), replies
 assert replies[2].data == b'{}'
+assert len(completions) == 1 and completions[0].record.state == 'succeeded', completions
 with Workspace.open('desktop-workspace') as reopened:
     assert reopened.load_draft('D').revision == 0
 assert not any(name.startswith(('wb_tool', 'numpy')) for name in sys.modules)
-print('Isolated desktop wheel: Qt storage FIFO/save/load/close; no experiment imports')
+print('Isolated desktop wheel: Qt storage/process/terminal persistence; no experiment imports')
 """
 
 
