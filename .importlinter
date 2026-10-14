@@ -20,3 +20,10 @@ layers =
     wb_tool.api
     wb_tool.domain
 
+[importlinter:contract:input-quantification-independence]
+name = TIFF decoding and profile integration are independent
+type = independence
+modules =
+    wb_tool.adapters.tiff_input
+    wb_tool.domain.quantify
+

@@ -11,3 +11,5 @@
 | 2026-10-13 | 可丢弃技术探针与正式产品包分开 | 先证明 Qt/worker/standalone，不预建平台 SDK | tooling/p0/README.md |
 
 | 2026-10-14 | 用户授权持续开发 WB；先冻结参考后产品核心 | 最新指令替代仅限 P0；无第二消费者不预建公共包 | work/tasks/T-003-wb-product.md |
+
+| 2026-10-14 | TIFF 以元数据识别颜色轴，MINISWHITE 原值保留且要求显式极性 | 避免显示或静默反相改变定量意义 | docs/contracts/wb-reference-v1.md |

@@ -1013,8 +1013,18 @@ wheels = [
 
 [[package]]
 name = "wb-tool"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "tools/wb" }
+dependencies = [
+    { name = "numpy" },
+    { name = "tifffile" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "numpy", specifier = "==2.5.4" },
+    { name = "tifffile", specifier = "==2026.9.20" },
+]
 
 [[package]]
 name = "zstandard"

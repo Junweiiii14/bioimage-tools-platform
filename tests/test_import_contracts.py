@@ -10,11 +10,15 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 
 
-@pytest.mark.parametrize("violation", ["none", "storage", "reverse-layer"])
+@pytest.mark.parametrize("violation", ["none", "storage", "reverse-layer", "independence"])
 def test_import_linter_rejects_transitive_dependencies(tmp_path: Path, violation: str) -> None:
     package = tmp_path / "wb_tool"
     domain = package / "domain"
     domain.mkdir(parents=True)
+    adapters = package / "adapters"
+    adapters.mkdir()
+    (adapters / "__init__.py").write_text("", encoding="utf-8")
+    (adapters / "tiff_input.py").write_text("VALUE = 1\n", encoding="utf-8")
     (package / "__init__.py").write_text("", encoding="utf-8")
     (domain / "__init__.py").write_text("", encoding="utf-8")
     (package / "api.py").write_text("from wb_tool.domain import quantify\n", encoding="utf-8")
@@ -23,8 +27,16 @@ def test_import_linter_rejects_transitive_dependencies(tmp_path: Path, violation
         "none": "VALUE = 1\n",
         "storage": "import sqlite3\n",
         "reverse-layer": "from wb_tool import api\n",
+        "independence": "VALUE = 1\n",
     }[violation]
     (domain / "bridge.py").write_text(bridge, encoding="utf-8")
+    if violation == "independence":
+        (adapters / "tiff_input.py").write_text(
+            "from wb_tool.adapters import bridge\n", encoding="utf-8"
+        )
+        (adapters / "bridge.py").write_text(
+            "from wb_tool.domain import quantify\n", encoding="utf-8"
+        )
     env = {**os.environ, "PYTHONPATH": str(tmp_path)}
     result = subprocess.run(
         [
@@ -42,4 +54,4 @@ def test_import_linter_rejects_transitive_dependencies(tmp_path: Path, violation
         check=False,
     )
     assert result.returncode == (0 if violation == "none" else 1), result.stdout + result.stderr
-    assert ("BROKEN" if violation != "none" else "Contracts: 2 kept") in result.stdout
+    assert ("BROKEN" if violation != "none" else "Contracts: 3 kept") in result.stdout
