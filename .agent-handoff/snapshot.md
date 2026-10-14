@@ -1,7 +1,7 @@
 # Handoff Snapshot
 
 - 更新：2026-10-14；上位目标 T-003 持续开发 WB 软件；当前任务 work/tasks/T-006-workspace.md。
-- 分支 feat/T-006-workspace，继承 feat/T-005-wb-worker (74e6561)；本阶段待提交，所有产品阶段独审尚未执行。
+- 分支 feat/T-006-workspace，继承 feat/T-005-wb-worker (74e6561)；本阶段实现提交 ac01459，所有产品阶段独审尚未执行。
 - 新增 tool_contracts/platform_runtime 0.1.0：不可变输入资产、草稿 CAS/历史、运行冻结、退出回执、唯一结果目录+SQLite CAS、重启 interrupted/quarantine/orphan 报告与一致性备份。平台不含 WB 字段。
 - 最终完整检查164测试、7导入合约、schema漂移和三独立wheel通过。38工作区用例含3个真实宿主硬退出、同大小损坏、取消竞态、Windows junction/硬链接、真实WB worker→存储及备份恢复。证据 work/evidence/T-006/validation.md。
 - wb_tool.api 0.4.0 与静态单任务 worker已实现。UI/Qt宿主存储线程及进程树强停尚未完成；退出回执须由实际OS观察产生，不以模型替代观察。
