@@ -1,9 +1,11 @@
 """Actual Qt edits, worker processes, committed multi-source results and reopening."""
 
+import json
 import os
 from collections.abc import Callable, Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING
+from threading import Event
+from typing import TYPE_CHECKING, Any
 from xml.etree import ElementTree
 from zipfile import ZipFile
 
@@ -15,7 +17,7 @@ from PIL import Image, ImageDraw, ImageFont
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QTableWidget, QTableWidgetItem, QTabWidget
 from pytestqt.qtbot import QtBot
-from wb_tool.api import WBAnalysisProject, WBNormalizedProject, WBProjectOCR
+from wb_tool.api import WBAnalysisProject, WBNormalizedProject, WBProjectOCR, plan_figure_layout
 
 if TYPE_CHECKING:
     from bioimage_app.api import FigureProjectWindow
@@ -44,13 +46,21 @@ def windows(qtbot: QtBot) -> Iterator[Callable[[], "FigureProjectWindow"]]:
             qtbot.waitUntil(lambda window=window: window.resources_closed, timeout=20000)
 
 
-def setup(qtbot: QtBot, root: Path, window: "FigureProjectWindow") -> None:
+def setup(
+    qtbot: QtBot,
+    root: Path,
+    window: "FigureProjectWindow",
+    width_multiplier: int = 1,
+    crop_height: int = 10,
+) -> None:
     paths: list[str] = []
     profile = np.array([0, 0, 0, 1000, 2000, 1000, 0, 0, 0, 0], dtype=np.uint16)
     for i in range(2):
-        pixels = np.full((20, 30), 60000, dtype=np.uint16)
+        pixels = np.full((crop_height + 10, 30 * width_multiplier), 60000, dtype=np.uint16)
         for lane, scale in enumerate((1, 2, 0)):
-            pixels[5:15, lane * 10 : (lane + 1) * 10] -= (profile * (i + 1) * scale)[:, None]
+            pixels[5:15, lane * 10 * width_multiplier : (lane + 1) * 10 * width_multiplier] -= (
+                profile * (i + 1) * scale
+            )[:, None]
         path = root / f"original{i}.tiff"
         tifffile.imwrite(path, pixels)
         paths.append(str(path))
@@ -59,15 +69,15 @@ def setup(qtbot: QtBot, root: Path, window: "FigureProjectWindow") -> None:
     window.import_images(tuple(paths))
     qtbot.waitUntil(window.import_button.isEnabled, timeout=10000)
     view = window.view
-    view.numbers["crop_height"].setValue(10)
+    view.numbers["crop_height"].setValue(crop_height)
     for row in range(2):
         for col, text in {
             2: "AKT",
             3: "3",
             4: "0",
             5: "5",
-            6: "30",
-            7: "15",
+            6: str(30 * width_multiplier),
+            7: str(5 + crop_height),
             8: "2" if row == 0 else "",
         }.items():
             item(view.table, row, col).setText(text)
@@ -556,3 +566,167 @@ def test_project_normalization_ui_mapping_controls_export_reopen_and_stale(
         )
     )
     assert all(item(reopened.view.normalization.results, i, 8).text() == "" for i in range(3))
+
+
+def test_composed_png_ocr_full_size_preserves_measurements_and_normalization(
+    qtbot: QtBot, tmp_path: Path, windows: Callable[[], "FigureProjectWindow"]
+) -> None:
+    window = windows()
+    setup(qtbot, tmp_path, window, width_multiplier=80, crop_height=50)
+    window.analyze_project(True)
+    qtbot.waitUntil(window.import_button.isEnabled, timeout=20000)
+    configure_normalization(window)
+    qtbot.waitUntil(lambda: window.view.normalization.results.rowCount() == 3)
+    for key, value in (("font_size", 42), ("row_gap", 55), ("label_width", 180)):
+        window.view.numbers[key].setValue(value)
+    before = window.view.project()
+    assert isinstance(before, WBNormalizedProject)
+    layout = plan_figure_layout(before)
+    assert layout.width > 2048
+    qtbot.waitUntil(window.import_button.isEnabled)
+    window.recognize_composed_figure()
+    qtbot.waitUntil(window.import_button.isEnabled, timeout=30000)
+    project = window.view.project()
+    assert isinstance(project, WBNormalizedProject) and project.ocr and project.ocr.recognition, (
+        window.view.status.text()
+    )
+    assert project.normalizations == before.normalizations and project.analyses == before.analyses
+    assert (project.ocr.width, project.ocr.height) == (layout.width, layout.height)
+    assert project.ocr.recognition.preprocess_id.startswith("ocr_png_white_")
+    assert len(project.ocr.rows) == 2
+    assert all(not row.confirmed and row.link is None for row in project.ocr.rows)
+    source = tmp_path / "workspace" / project.ocr.source.relative_path
+    with Image.open(source) as png:
+        assert png.size == (layout.width, layout.height)
+        metadata = json.loads(png.info["wb_provenance"])
+        assert metadata["revision"] < project.revision
+        assert metadata["project_id"] == project.project_id
+        assert (
+            metadata["project"]["normalizations"]
+            == project.model_dump(mode="json")["normalizations"]
+        )
+        assert metadata["purpose"] == "display_only_not_quantitative"
+    panel = window.view.ocr
+    window.view.bind_ocr(project.ocr.rows[0].row_id, project.rows[0].row_id)
+    item(panel.table, 0, 2).setCheckState(Qt.CheckState.Checked)
+    qtbot.waitUntil(
+        lambda: panel.results.rowCount() >= 3 and item(panel.results, 0, 3).text() == "4000"
+    )
+    assert item(window.view.normalization.results, 0, 8).text() == "0.5"
+    capture = os.environ.get("BIOIMAGE_PNG_CAPTURE")
+    if capture:
+        tabs = window.view.findChild(QTabWidget)
+        assert tabs is not None
+        tabs.setCurrentWidget(panel)
+        assert window.grab().save(capture)
+    window.close()
+    qtbot.waitUntil(lambda: window.resources_closed, timeout=15000)
+    saved = window.view.project()
+    reopened = windows()
+    reopened.open_workspace(str(tmp_path / "workspace"))
+    qtbot.waitUntil(reopened.import_button.isEnabled)
+    reopened.load_document(project.project_id)
+    qtbot.waitUntil(reopened.import_button.isEnabled, timeout=20000)
+    assert reopened.view.project() == saved
+    assert item(reopened.view.ocr.results, 0, 3).text() == "4000"
+    assert item(reopened.view.normalization.results, 0, 8).text() == "0.5"
+
+
+@pytest.mark.parametrize("action", ["cancel", "close", "edit"])
+def test_generated_png_late_result_does_not_replace_existing_ocr(
+    qtbot: QtBot,
+    tmp_path: Path,
+    windows: Callable[[], "FigureProjectWindow"],
+    monkeypatch: pytest.MonkeyPatch,
+    action: str,
+) -> None:
+    window = windows()
+    setup(qtbot, tmp_path, window, crop_height=50)
+    source = tmp_path / "old.png"
+    Image.new("L", (20, 20), 123).save(source)
+    window.import_ocr_image(str(source))
+    qtbot.waitUntil(window.import_button.isEnabled)
+    old = window.view.project()
+    assert isinstance(old, WBProjectOCR) and old.ocr
+    entered, release = Event(), Event()
+    original = Image.Image.save
+
+    def controlled(image: Image.Image, fp: Any, format: str | None = None, **params: Any) -> None:
+        if format == "PNG":
+            entered.set()
+            assert release.wait(10)
+        original(image, fp, format, **params)
+
+    monkeypatch.setattr(Image.Image, "save", controlled)
+    window.recognize_composed_figure()
+    try:
+        qtbot.waitUntil(entered.is_set, timeout=10000)
+        if action == "edit":
+            window.view.name.setText("edited during PNG encoding")
+            window.view.name.textEdited.emit("edited during PNG encoding")
+        elif action == "close":
+            window.close()
+        else:
+            window.cancel()
+    finally:
+        release.set()
+    if action == "close":
+        qtbot.waitUntil(lambda: window.resources_closed, timeout=15000)
+    else:
+        qtbot.waitUntil(window.import_button.isEnabled, timeout=10000)
+    project = window.view.project()
+    assert isinstance(project, WBProjectOCR) and project.ocr == old.ocr
+    if action == "edit":
+        assert project.name == "edited during PNG encoding"
+    if action == "close":
+        reopened = windows()
+        reopened.open_workspace(str(tmp_path / "workspace"))
+        qtbot.waitUntil(reopened.import_button.isEnabled)
+        reopened.load_document(project.project_id)
+        qtbot.waitUntil(reopened.import_button.isEnabled, timeout=15000)
+        assert reopened.view.project() == project
+
+
+def test_edit_during_precompose_save_is_not_overwritten(
+    qtbot: QtBot, tmp_path: Path, windows: Callable[[], "FigureProjectWindow"]
+) -> None:
+    window = windows()
+    setup(qtbot, tmp_path, window)
+    window.recognize_composed_figure()
+    window.view.name.setText("newer edit during save")
+    window.view.name.textEdited.emit("newer edit during save")
+    qtbot.waitUntil(window.import_button.isEnabled, timeout=10000)
+    assert window.view.project().name == "newer edit during save"
+    assert not isinstance(window.view.project(), WBProjectOCR)
+    assert "旧修订已保存" in window.view.status.text()
+    project_id = window.view.project().project_id
+    window.close()
+    qtbot.waitUntil(lambda: window.resources_closed, timeout=15000)
+    reopened = windows()
+    reopened.open_workspace(str(tmp_path / "workspace"))
+    qtbot.waitUntil(reopened.import_button.isEnabled)
+    reopened.load_document(project_id)
+    qtbot.waitUntil(reopened.import_button.isEnabled, timeout=15000)
+    assert reopened.view.project().name == "newer edit during save"
+
+
+def test_composition_failure_is_not_hidden_by_pending_table_refresh(
+    qtbot: QtBot, tmp_path: Path, windows: Callable[[], "FigureProjectWindow"]
+) -> None:
+    window = windows()
+    setup(qtbot, tmp_path, window)
+    source = tmp_path / "existing.png"
+    Image.new("L", (20, 20), 123).save(source)
+    window.import_ocr_image(str(source))
+    qtbot.waitUntil(window.import_button.isEnabled)
+    old = window.view.project()
+    assert isinstance(old, WBProjectOCR)
+    window.view.numbers["font_size"].setValue(42)  # Intentionally too tall for the ten-pixel crop.
+    window.recognize_composed_figure()
+    qtbot.waitUntil(window.import_button.isEnabled, timeout=10000)
+    error = window.view.status.text()
+    assert "标签超出" in error
+    qtbot.wait(200)  # Cross the refresh deadline: an old timer must not clear the failure.
+    assert window.view.status.text() == error
+    current = window.view.project()
+    assert isinstance(current, WBProjectOCR) and current.ocr == old.ocr

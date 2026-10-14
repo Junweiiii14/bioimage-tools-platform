@@ -10,7 +10,12 @@ from wb_tool.application.analysis import AnalysisResult
 from wb_tool.application.crop import CropRequest
 from wb_tool.application.crop_suggestions import CropSuggestion
 from wb_tool.application.document import WBDocument, WBWorksheetDocument
-from wb_tool.application.figure_project import FigureRender, FigureSourcePath, WBFigureProject
+from wb_tool.application.figure_project import (
+    FigurePNG,
+    FigureRender,
+    FigureSourcePath,
+    WBFigureProject,
+)
 from wb_tool.application.project_analysis import (
     LoadedProjectResult,
     ProjectRowAnalysis,
@@ -39,6 +44,7 @@ class PreviewRaster:
 class WBJob:
     operation: Literal[
         "preview",
+        "ocr_preview",
         "document",
         "encode",
         "result",
@@ -48,6 +54,7 @@ class WBJob:
         "crop",
         "figure_document",
         "figure_preview",
+        "figure_ocr",
         "figure_export",
         "font_digest",
         "crop_suggest",
@@ -96,6 +103,7 @@ class WBReply:
         | WBWorksheetDocument
         | WBFigureProject
         | FigureRender
+        | FigurePNG
         | CropSuggestion
         | LoadedProjectResult
         | ProjectTableSnapshot

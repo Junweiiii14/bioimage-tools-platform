@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from hashlib import sha256
 from pathlib import Path
 from sqlite3 import Error as SQLiteError
+from tempfile import TemporaryDirectory
 from threading import Event
 from typing import Literal
 from uuid import uuid4
@@ -23,6 +25,7 @@ Operation = Literal[
     "create",
     "open",
     "import",
+    "import_bytes",
     "save",
     "load",
     "prepare",
@@ -116,6 +119,17 @@ class _StorageWorker(QObject):
             raise ValueError("No workspace is open")
         if op == "import":
             return store.import_asset(command.path, command.source_sha256), b""
+        if op == "import_bytes":
+            name = Path(command.path)
+            if name.name != command.path or not name.suffix or not name.suffix[1:].isalnum():
+                raise ValueError("Generated asset requires a simple filename with an extension")
+            if not command.data or sha256(command.data).hexdigest() != command.source_sha256:
+                raise ValueError("Generated asset bytes do not match the expected digest")
+            # Only the owned temporary directory is cleaned up; no caller path is used as a target.
+            with TemporaryDirectory(prefix="bioimage-asset-") as temporary:
+                source = Path(temporary).resolve() / ("asset" + name.suffix)
+                source.write_bytes(command.data)
+                return store.import_asset(source, command.source_sha256), b""
         if op == "save":
             if command.revision is None:
                 raise ValueError("Save requires a revision")
@@ -219,8 +233,9 @@ class AsyncStorage(QObject):
             raise ValueError("Use shutdown() to close the port")
         if len(self._pending) >= self._max_pending:
             raise RuntimeError("Storage queue is full")
-        if len(command.data) > 16 * 1024 * 1024:
-            raise ValueError("Document exceeds storage queue payload budget")
+        budget = 64 if command.operation == "import_bytes" else 16
+        if len(command.data) > budget * 1024 * 1024:
+            raise ValueError(f"Payload exceeds {budget} MiB storage queue budget")
         return self._enqueue(command)
 
     def _enqueue(self, command: StorageCommand) -> str:

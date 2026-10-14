@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from wb_tool.ui.figure_view import FigureProjectView
     from wb_tool.ui.view import WBView
 
+from wb_tool.adapters.ocr_input import OCRImage, load_ocr_image
 from wb_tool.adapters.tiff_input import ImageInputError, LoadedTiff, load_tiff
 from wb_tool.application.analysis import (
     AnalysisCancelled,
@@ -34,6 +35,7 @@ from wb_tool.application.crop_suggestions import (
 from wb_tool.application.desktop_data import PreviewRaster, ProjectDerivedTables, WBJob, WBReply
 from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
 from wb_tool.application.figure_project import (
+    FigurePNG,
     FigureRender,
     FigureRow,
     FigureSourcePath,
@@ -192,6 +194,9 @@ __all__ = [
     "FigureRow",
     "WBFigureProject",
     "FigureRender",
+    "FigurePNG",
+    "OCRImage",
+    "load_ocr_image",
     "FigureSourcePath",
     "plan_figure_layout",
     "create_figure_project_view",

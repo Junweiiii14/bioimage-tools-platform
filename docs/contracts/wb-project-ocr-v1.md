@@ -1,6 +1,6 @@
 # 项目拼图OCR与多源结果关联 v1
 
-对应wb_figure_project schema v4 / WBProjectOCR，继承v3的定量计划和v2候选。原v1/v2/v3继续读取。一个项目先支持一张独立TIFF拼图；原图定量来源保持每个FigureRow.source，拼图只用于文字识别和校正。
+对应wb_figure_project schema v4 / WBProjectOCR，继承v3的定量计划和v2候选。原v1/v2/v3继续读取。一个项目支持一张独立TIFF或PNG拼图；原图定量来源保持每个FigureRow.source，拼图只用于文字识别和校正。T-016的PNG解码、完整生成图及新预处理身份见wb-png-ocr-v1.md；不改变旧TIFF身份或v4/v5字段。
 
 OCR在已有离线worker运行，复用OCRRequest/ResultFrame、锁定引擎/模型/预处理与RunSession退出/提交机制。项目保存OCR源资产、原尺寸、原始recognition、已提交run引用和可编辑行。保存前后须核对完整RunRecord、结果资产大小/SHA、严格JSON、源SHA/尺寸/引擎版本。重开重新读取资产，不以文档里嵌入的识别副本代替已提交结果校验。
 

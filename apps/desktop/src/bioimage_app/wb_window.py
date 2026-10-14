@@ -82,7 +82,7 @@ class WBWindow(QMainWindow):
         self.create_button = QPushButton("新建工作区")
         self.open_button = QPushButton("打开工作区")
         self.import_button = QPushButton("导入 TIFF")
-        self.import_ocr_button = QPushButton("关联拼图 TIFF")
+        self.import_ocr_button = QPushButton("关联拼图 TIFF / PNG")
         figure_button = QPushButton("多原图 / Fig 拼图项目")
         figure_button.clicked.connect(self._open_figure_project)
         self.documents = QComboBox()
@@ -257,7 +257,7 @@ class WBWindow(QMainWindow):
 
     def _choose_ocr_image(self) -> None:
         path, _ = QFileDialog.getOpenFileName(
-            self, "关联用于识别名称的拼图", "", "TIFF (*.tif *.tiff)"
+            self, "关联用于识别名称的拼图", "", "拼图 (*.tif *.tiff *.png)"
         )
         if path:
             self.import_ocr_image(path)
@@ -286,7 +286,7 @@ class WBWindow(QMainWindow):
                 StorageCommand("import", path=path, source_sha256=raster.sha256), imported
             )
 
-        self._wb(WBJob("preview", path=path), previewed)
+        self._wb(WBJob("ocr_preview", path=path), previewed)
 
     def _edited(self) -> None:
         self.view.status.setText("有未保存修改；计算将先保存当前标注。")
@@ -645,7 +645,7 @@ class WBWindow(QMainWindow):
                 self.view.set_ocr_image(reply.value, reset=False)
                 self._set_busy(False)
 
-            self._wb(WBJob("preview", path=reply.value), previewed)
+            self._wb(WBJob("ocr_preview", path=reply.value), previewed)
 
         self._storage(StorageCommand("asset", asset=asset), resolved)
 

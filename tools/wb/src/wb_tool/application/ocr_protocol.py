@@ -19,7 +19,7 @@ from wb_tool.application.worker_protocol import (
     WireModel,
     unique_json_object,
 )
-from wb_tool.domain.ocr_manifest import ENGINE_ID, MODEL_HASHES, PREPROCESS_ID
+from wb_tool.domain.ocr_manifest import ENGINE_ID, MODEL_HASHES, PREPROCESS_IDS
 from wb_tool.domain.worksheet import OCRRecognition
 
 
@@ -49,7 +49,7 @@ class OCRResultFrame(IdentifiedFrame):
         if (
             self.result.engine_id != ENGINE_ID
             or self.result.model_hashes != MODEL_HASHES
-            or self.result.preprocess_id != PREPROCESS_ID
+            or self.result.preprocess_id not in PREPROCESS_IDS
         ):
             raise ValueError("OCR 引擎/模型/预处理版本未知")
         return self

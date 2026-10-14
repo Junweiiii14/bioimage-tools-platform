@@ -8,13 +8,13 @@
 | `p0_probe.py`, `tooling/p0/` | T-002 可丢弃技术探针：Qt、进程、合成图和 standalone；不作为产品 API | 本机验证中；`tooling/p0/README.md` |
 | `.agents/skills/` | 固定提交的第三方工作技能 | 已建；`tooling/skills-lock.json` |
 | `tests/test_boundaries.py` | 边界检查的正反例 | 已建；pytest |
-| `apps/desktop/` | 异步存储/进程、RunSession、WB窗口装配；`python -m bioimage_app`与静态wb/wb_ocr worker | 已建0.8.0；单图定量/OCR、多源拼图/候选/定量；测量/OCR会话及后台归一化连接已提交结果、显式关联、重开与取消 |
+| `apps/desktop/` | 异步存储/进程、RunSession、WB窗口装配；`python -m bioimage_app`与静态wb/wb_ocr worker | 已建0.9.0；单图定量/OCR、多源拼图/候选/定量；测量/OCR会话及后台归一化连接已提交结果、显式关联、重开与取消；PNG/当前完整成图进入OCR |
 | `packages/tool_contracts/` | `tool_contracts.api` 的文件资产、修订、运行/退出与恢复契约 | 已建 v1；schema 漂移和隔离 wheel |
 | `packages/platform_runtime/` | `platform_runtime.api.Workspace` 输入快照、草稿 CAS、结果事务、恢复与备份 | 已建 v1；真实文件/SQLite、崩溃/取消/损坏负例、独立 wheel |
 | `packages/desktop_sdk/` | ToolView、Qt 生命周期、宿主 UI 端口 | 规划；pytest-qt |
 | `packages/imaging_core/` | 原始图像、坐标和纯技术运算 | 规划；位深/几何/性质 |
 | `packages/imaging_ui/` | 真实复用需求出现后的画布适配 | 规划，不预建 |
-| `tools/wb/` | `wb_tool.api` 数值/单图文档v1/v2/严格协议、Qt画布/曲线/工作表、本地OCR与字面XLSX | 已建0.13.0；原值裁剪/模板归档、候选、项目v3定量、v4 OCR显式绑定/自动表及v5样本配对/参照比值/对照归一化 |
+| `tools/wb/` | `wb_tool.api` 数值/单图文档v1/v2/严格协议、Qt画布/曲线/工作表、本地OCR与字面XLSX | 已建0.14.0；原值裁剪/模板归档、候选、项目v3定量、v4 OCR显式绑定/自动表及v5样本配对/参照比值/对照归一化；PNG专用识别输入/来源保持 |
 | `tools/if_intensity/` | 第二工具验证平台边界 | 规划，WB 最小闭环后 |
 | `tools/if_count/`, `tools/ihc_area/` | 各自独立的实验语义 | 后续规划 |
 

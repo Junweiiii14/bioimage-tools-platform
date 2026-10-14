@@ -9,9 +9,9 @@ from typing import cast
 import numpy as np
 from numpy.typing import NDArray
 
-from wb_tool.adapters.tiff_input import load_tiff
+from wb_tool.adapters.ocr_input import load_ocr_image
 from wb_tool.application.analysis import AnalysisCancelled
-from wb_tool.domain.ocr_manifest import ENGINE_ID, MODEL_HASHES, PREPROCESS_ID
+from wb_tool.domain.ocr_manifest import ENGINE_ID, MODEL_HASHES
 from wb_tool.domain.worksheet import OCRRecognition, TextBounds, TextToken
 
 
@@ -46,11 +46,11 @@ def recognize_figure(
         raise ValueError("OCR 引擎版本不符；请修复安装")
     models = Path(rapidocr.__file__).parent / "models"
     hashes = verify_ocr_models(models)
-    image = load_tiff(source)
+    image = load_ocr_image(source)
     if image.sha256 != expected_sha256:
         raise ValueError("OCR 输入快照摘要不符")
     height, width = image.pixels.shape
-    display = (image.pixels // 257).astype(np.uint8) if image.bit_depth == 16 else image.pixels
+    display = image.pixels
     engine = RapidOCR(
         params={
             "Global.log_level": "error",
@@ -124,5 +124,5 @@ def recognize_figure(
         tuple(tokens),
         ENGINE_ID,
         hashes,
-        preprocess_id=PREPROCESS_ID,
+        preprocess_id=image.preprocess_id,
     )

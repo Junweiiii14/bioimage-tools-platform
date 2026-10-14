@@ -17,6 +17,7 @@ from wb_tool.adapters.crop_export import export_crop
 from wb_tool.adapters.tiff_input import load_tiff
 from wb_tool.application.crop import CropRequest
 from wb_tool.application.figure_project import (
+    FigurePNG,
     FigureRender,
     FigureSourcePath,
     WBFigureProject,
@@ -167,6 +168,19 @@ def render_figure(
     )
 
 
+def encode_figure_png(rendered: FigureRender, dpi: int) -> FigurePNG:
+    png = BytesIO()
+    info = PngImagePlugin.PngInfo()
+    info.add_text("wb_provenance", rendered.manifest_json)
+    Image.frombytes("RGB", (rendered.width, rendered.height), rendered.rgb).save(
+        png, format="PNG", pnginfo=info, dpi=(dpi, dpi)
+    )
+    data = png.getvalue()
+    if len(data) > 64 * 1024 * 1024:
+        raise ValueError("生成PNG超出64MiB资产预算，请拆分Fig")
+    return FigurePNG(rendered.width, rendered.height, sha256(data).hexdigest(), data)
+
+
 def export_figure_bundle(
     project: WBFigureProject,
     sources: tuple[FigureSourcePath, ...],
@@ -187,16 +201,8 @@ def export_figure_bundle(
     try:
         with TemporaryDirectory(prefix="wb-figure-") as temporary, stage.open("xb") as output:
             with ZipFile(output, "w", compression=ZIP_DEFLATED) as archive:
-                png = BytesIO()
-                info = PngImagePlugin.PngInfo()
-                info.add_text("wb_provenance", rendered.manifest_json)
-                Image.frombytes("RGB", (rendered.width, rendered.height), rendered.rgb).save(
-                    png,
-                    format="PNG",
-                    pnginfo=info,
-                    dpi=(project.template.dpi, project.template.dpi),
-                )
-                archive.writestr("figure.png", png.getvalue())
+                png = encode_figure_png(rendered, project.template.dpi)
+                archive.writestr("figure.png", png.data)
                 archive.writestr("manifest.json", rendered.manifest_json)
                 archive.writestr("project.json", project.model_dump_json())
                 for index, row in enumerate(project.rows):

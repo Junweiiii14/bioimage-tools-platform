@@ -30,6 +30,7 @@ class ProjectOCRPanel(QWidget):
     changed = Signal()
     import_requested = Signal()
     run_requested = Signal()
+    compose_requested = Signal()
     refresh_requested = Signal()
     export_requested = Signal()
     binding_requested = Signal(str, str)
@@ -42,7 +43,8 @@ class ProjectOCRPanel(QWidget):
         layout = QVBoxLayout(self)
         actions = QHBoxLayout()
         for text, callback in (
-            ("导入 / 更换拼图 TIFF", self.import_requested.emit),
+            ("导入拼图 TIFF / PNG", self.import_requested.emit),
+            ("生成并识别当前拼图", self.compose_requested.emit),
             ("识别 Fig/行名（重建关联）", self.run_requested.emit),
             ("刷新关联结果", self.refresh_requested.emit),
             ("导出关联表 XLSX", self.export_requested.emit),

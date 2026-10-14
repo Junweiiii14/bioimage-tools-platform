@@ -112,17 +112,21 @@ def test_grid_draw_crop_and_reopen(
     assert tuple(lane.roi for lane in reopened.view.lanes) == rois
 
 
+@pytest.mark.parametrize("extension", ["tif", "png"])
 def test_ocr_before_roi_cross_source_and_explicit_binding(
-    qtbot: QtBot, tmp_path: Path, make_window: Callable[[], "WBWindow"]
+    qtbot: QtBot, tmp_path: Path, make_window: Callable[[], "WBWindow"], extension: str
 ) -> None:
     source = tmp_path / "measurement.tif"
     tifffile.imwrite(source, np.repeat(np.array([[245], [235], [245]], dtype=np.uint8), 30, axis=1))
-    composite = tmp_path / "labels.tif"
+    composite = tmp_path / ("labels." + extension)
     image = Image.new("L", (500, 250), 245)
     draw = ImageDraw.Draw(image)
     for text, y in (("1G", 20), ("AKT", 120)):
         draw.text((30, y), text, font=ImageFont.load_default(size=42), fill=0)
-    tifffile.imwrite(composite, np.array(image))
+    if extension == "png":
+        image.save(composite)
+    else:
+        tifffile.imwrite(composite, np.array(image))
     workspace = tmp_path / "cross-source"
     window = make_window()
     window.show()

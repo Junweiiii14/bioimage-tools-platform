@@ -16,7 +16,7 @@ from wb_tool.application.analysis import AnalysisResult
 from wb_tool.application.crop_suggestions import CropSuggestion, read_figure_project
 from wb_tool.application.desktop_data import PreviewRaster, ProjectDerivedTables, WBJob, WBReply
 from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
-from wb_tool.application.figure_project import FigureRender, WBFigureProject
+from wb_tool.application.figure_project import FigurePNG, FigureRender, WBFigureProject
 from wb_tool.application.project_analysis import (
     LoadedProjectResult,
     ProjectTableSnapshot,
@@ -50,6 +50,7 @@ class _Work(QObject):
                 | WBWorksheetDocument
                 | WBFigureProject
                 | FigureRender
+                | FigurePNG
                 | CropSuggestion
                 | LoadedProjectResult
                 | ProjectTableSnapshot
@@ -161,13 +162,24 @@ class _Work(QObject):
                     value = file_digest(stream, "sha256").hexdigest()
             elif job.operation == "figure_document":
                 value = read_figure_project(job.data)
-            elif job.operation in ("figure_preview", "figure_export"):
-                from wb_tool.adapters.figure_export import export_figure_bundle, render_figure
+            elif job.operation in ("figure_preview", "figure_export", "figure_ocr"):
+                from wb_tool.adapters.figure_export import (
+                    encode_figure_png,
+                    export_figure_bundle,
+                    render_figure,
+                )
 
                 if not isinstance(job.document, WBFigureProject):
                     raise ValueError("缺少拼图项目")
                 cancel = job.cancellation.is_set if job.cancellation is not None else lambda: False
-                if job.operation == "figure_preview":
+                if job.operation == "figure_ocr":
+                    rendered = render_figure(job.document, job.sources, cancelled=cancel)
+                    if cancel():
+                        raise ValueError("生成拼图已取消")
+                    value = encode_figure_png(rendered, job.document.template.dpi)
+                    if cancel():
+                        raise ValueError("生成拼图已取消")
+                elif job.operation == "figure_preview":
                     from PIL import Image
 
                     value = render_figure(
@@ -183,6 +195,24 @@ class _Work(QObject):
                     value = export_figure_bundle(
                         job.document, job.sources, job.destination, cancelled=cancel
                     )
+            elif job.operation == "ocr_preview":
+                from wb_tool.adapters.ocr_input import load_ocr_image
+
+                ocr_image = load_ocr_image(job.path)
+                height, width = ocr_image.pixels.shape
+                step = max(1, ceil(max(height, width) / 2048))
+                sampled = ocr_image.pixels[::step, ::step]
+                ph, pw = sampled.shape
+                value = PreviewRaster(
+                    ocr_image.sha256,
+                    width,
+                    height,
+                    pw,
+                    ph,
+                    sampled.tobytes(),
+                    ocr_image.bit_depth,
+                    ocr_image.warnings,
+                )
             elif job.operation == "preview":
                 image = load_tiff(job.path)
                 height, width = image.pixels.shape

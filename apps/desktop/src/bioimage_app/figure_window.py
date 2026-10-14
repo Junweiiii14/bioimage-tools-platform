@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
 from tool_contracts.api import AssetRef, DraftSnapshot
 from wb_tool.api import (
     CropSuggestion,
+    FigurePNG,
     FigureRender,
     FigureRow,
     FigureSourcePath,
@@ -79,6 +80,9 @@ class FigureProjectWindow(QMainWindow):
         self._ocr_session: ProjectOCRSession | None = None
         self._loaded_ocr: LoadedProjectOCR | None = None
         self._ocr_refresh_pending = False
+        self._ocr_refresh_timer = QTimer(self)
+        self._ocr_refresh_timer.setSingleShot(True)
+        self._ocr_refresh_timer.timeout.connect(self.refresh_ocr_table)
         bar = QToolBar("项目")
         self.addToolBar(bar)
         self.create_button = QPushButton("新建项目工作区")
@@ -116,6 +120,7 @@ class FigureProjectWindow(QMainWindow):
         self.view.analysis.export_requested.connect(self._choose_table_export)
         self.view.ocr.import_requested.connect(self._choose_ocr_import)
         self.view.ocr.run_requested.connect(self.recognize_project)
+        self.view.ocr.compose_requested.connect(self.recognize_composed_figure)
         self.view.ocr.refresh_requested.connect(self.refresh_ocr_table)
         self.view.ocr.export_requested.connect(lambda: self._choose_table_export(True))
         self.view.normalization.refresh_requested.connect(self.refresh_ocr_table)
@@ -132,11 +137,12 @@ class FigureProjectWindow(QMainWindow):
 
     def _queue_ocr_refresh(self) -> None:
         self._ocr_refresh_pending = True
-        QTimer.singleShot(150, self.refresh_ocr_table)
+        self._ocr_refresh_timer.start(150)
 
     def refresh_ocr_table(self, message: str = "关联与归一化结果已刷新") -> None:
         if self._busy or not self._workspace or self._closing:
             return
+        self._ocr_refresh_timer.stop()
         self._ocr_refresh_pending = False
         try:
             project = self.view.project()
@@ -169,7 +175,9 @@ class FigureProjectWindow(QMainWindow):
         )
 
     def _choose_ocr_import(self) -> None:
-        source, _ = QFileDialog.getOpenFileName(self, "导入独立拼图", "", "TIFF (*.tif *.tiff)")
+        source, _ = QFileDialog.getOpenFileName(
+            self, "导入独立拼图", "", "拼图 (*.tif *.tiff *.png)"
+        )
         if source:
             self.import_ocr_image(source)
 
@@ -185,32 +193,76 @@ class FigureProjectWindow(QMainWindow):
         self._start()
 
         def previewed(reply: WBReply) -> None:
+            if self._abort_ocr_import(generation):
+                return
+            if reply.error:
+                self._error(reply.error)
+                return
             if not isinstance(reply.value, PreviewRaster):
                 self._error("拼图预览失败")
                 return
-            raster = reply.value
+            self._attach_ocr_source(
+                project,
+                generation,
+                Path(source).name,
+                StorageCommand("import", path=source, source_sha256=reply.value.sha256),
+            )
 
-            def imported(response: StorageReply) -> None:
-                if not isinstance(response.value, AssetRef):
-                    self._error("拼图资产无效")
+        self._wb(WBJob("ocr_preview", path=source), previewed, accept_errors=True)
+
+    def _abort_ocr_import(self, generation: int) -> bool:
+        if self._closing or self._cancellation.is_set():
+            self._done("拼图生成/导入已取消，之前关联保留")
+            return True
+        if generation != self.view.generation:
+            self._done("项目已修改，未替换拼图或覆盖编辑")
+            return True
+        return False
+
+    def _attach_ocr_source(
+        self,
+        project: WBFigureProject,
+        generation: int,
+        filename: str,
+        command: StorageCommand,
+        *,
+        recognize: bool = False,
+    ) -> None:
+        if self._abort_ocr_import(generation):
+            return
+
+        def imported(response: StorageReply) -> None:
+            if not isinstance(response.value, AssetRef):
+                self._error("拼图资产无效")
+                return
+            asset = response.value
+            if self._abort_ocr_import(generation):
+                return
+
+            def resolved(result: StorageReply) -> None:
+                if not isinstance(result.value, str):
+                    self._error("拼图资产路径无效")
                     return
-                asset = response.value
+                path = result.value
 
-                def resolved(result: StorageReply) -> None:
-                    if not isinstance(result.value, str):
-                        self._error("拼图资产路径无效")
+                def previewed(reply: WBReply) -> None:
+                    if self._abort_ocr_import(generation):
                         return
-                    if generation != self.view.generation:
-                        self._done("项目已修改，未替换拼图或覆盖编辑")
+                    if reply.error:
+                        self._error(reply.error)
                         return
-                    self._paths[asset.sha256] = result.value
+                    raster = reply.value
+                    if not isinstance(raster, PreviewRaster) or raster.sha256 != asset.sha256:
+                        self._error("拼图预览与已导入资产不一致")
+                        return
+                    self._paths[asset.sha256] = path
                     self._loaded_ocr = None
                     self.view.set_project(
                         project_with_ocr(
                             project,
                             ProjectOCRState(
                                 source=asset,
-                                filename=Path(source).name,
+                                filename=filename,
                                 width=raster.width,
                                 height=raster.height,
                             ),
@@ -218,15 +270,65 @@ class FigureProjectWindow(QMainWindow):
                     )
                     self.view.generation += 1
                     self.view.ocr.set_preview(raster)
-                    self._done("拼图已导入；识别Fig/行名后逐行关联原图。")
+                    if recognize:
+                        self._busy = False
+                        self.recognize_project()
+                    else:
+                        self._done("拼图已导入；识别Fig/行名后逐行关联原图。")
 
-                self._storage(StorageCommand("asset", asset=asset), resolved)
+                self._wb(WBJob("ocr_preview", path=path), previewed, accept_errors=True)
 
-            self._storage(
-                StorageCommand("import", path=source, source_sha256=raster.sha256), imported
+            self._storage(StorageCommand("asset", asset=asset), resolved)
+
+        self._storage(command, imported)
+
+    def recognize_composed_figure(self) -> None:
+        if self._busy or not self._workspace:
+            return
+
+        def saved() -> None:
+            if self._closing or self._cancellation.is_set():
+                self._done("生成拼图已取消，之前关联保留")
+                return
+            project = self.view.project()
+            generation = self.view.generation
+            self._start()
+            self.view.status.setText("正在生成完整拼图，随后识别Fig/行名…")
+
+            def generated(reply: WBReply) -> None:
+                if self._abort_ocr_import(generation):
+                    return
+                if reply.error:
+                    self._error(reply.error)
+                    return
+                if not isinstance(reply.value, FigurePNG):
+                    self._error("生成拼图无效")
+                    return
+                self._attach_ocr_source(
+                    project,
+                    generation,
+                    f"composed-r{project.revision}.png",
+                    StorageCommand(
+                        "import_bytes",
+                        path="figure.png",
+                        data=reply.value.data,
+                        source_sha256=reply.value.sha256,
+                    ),
+                    recognize=True,
+                )
+
+            self._wb(
+                WBJob(
+                    "figure_ocr",
+                    document=project,
+                    sources=tuple(FigureSourcePath(sha, path) for sha, path in self._paths.items()),
+                    cancellation=self._cancellation,
+                ),
+                generated,
+                accept_errors=True,
             )
 
-        self._wb(WBJob("preview", path=source), previewed)
+        self.save(after=saved)
 
     def recognize_project(self) -> None:
         if self._busy or not self._workspace:
@@ -286,7 +388,7 @@ class FigureProjectWindow(QMainWindow):
                     else:
                         self._done("OCR原文已校验" if completion.loaded else "OCR原文未载入")
 
-                self._wb(WBJob("preview", path=self._paths[ocr.source.sha256]), previewed)
+                self._wb(WBJob("ocr_preview", path=self._paths[ocr.source.sha256]), previewed)
             elif completion.loaded is None:
                 self._busy = False
                 message = "识别未更新，之前关联保留：" + (completion.error or completion.state)
@@ -509,9 +611,11 @@ class FigureProjectWindow(QMainWindow):
         if self._closing:
             self._finish_close()
         elif self._ocr_refresh_pending:
-            QTimer.singleShot(0, self.refresh_ocr_table)
+            self._ocr_refresh_timer.start(0)
 
     def _error(self, message: str) -> None:
+        self._ocr_refresh_timer.stop()
+        self._ocr_refresh_pending = False
         self._closing = False
         self._done("操作失败：" + message)
 
@@ -816,6 +920,9 @@ class FigureProjectWindow(QMainWindow):
             def saved(reply: StorageReply) -> None:
                 self._saved_revision = project.revision
                 self._saved_generation = generation
+                if generation != self.view.generation:
+                    self._done("旧修订已保存，当前编辑保留；请重新执行操作")
+                    return
                 self.view.set_project(project)
                 if self.documents.findData(project.project_id) < 0:
                     self.documents.addItem(project.project_id, project.project_id)

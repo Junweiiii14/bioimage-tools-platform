@@ -278,6 +278,20 @@ assert process.returncode == 0, process.stderr
 frames = process.stdout.splitlines()
 assert len(frames) == 3 and isinstance(parse_ocr_frame(frames[-1]), OCRResultFrame)
 print('Installed OCR worker: real protocol, bundled models and static route passed')
+from wb_tool.api import load_ocr_image
+figure.save('installed-labels.png')
+png_source = load_ocr_image('installed-labels.png')
+assert png_source.preprocess_id.startswith('ocr_png_white_')
+png_start = start.model_copy(update={'source_path': str(Path('installed-labels.png').resolve()),
+    'request': OCRRequest(source_sha256=png_source.sha256, revision=0)})
+png_process = subprocess.run([sys.executable, '-I', '-m', 'bioimage_app', '--worker', 'wb_ocr'],
+    input=encode_ocr_frame(png_start), capture_output=True, timeout=30)
+assert png_process.returncode == 0, png_process.stderr
+png_result = parse_ocr_frame(png_process.stdout.splitlines()[-1])
+assert isinstance(png_result, OCRResultFrame)
+assert png_result.result.preprocess_id == png_source.preprocess_id
+assert [t.text for t in png_result.result.tokens] == ['Fig 1A', 'AKT']
+print('Installed PNG OCR: separate loader and real worker preserve known text/coordinates')
 """
 
 

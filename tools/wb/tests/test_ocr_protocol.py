@@ -4,6 +4,7 @@ import json
 import subprocess
 import sys
 from dataclasses import replace
+from hashlib import sha256
 from pathlib import Path
 
 import numpy as np
@@ -25,21 +26,23 @@ from wb_tool.api import (
     WBDocument,
     WBWorksheetDocument,
     encode_ocr_frame,
-    load_tiff,
     ocr_protocol_schema,
     parse_ocr_frame,
     read_wb_document,
 )
 
 
-@pytest.fixture
-def ocr_start(tmp_path: Path) -> OCRStartFrame:
+@pytest.fixture(params=["tif", "png"])
+def ocr_start(tmp_path: Path, request: pytest.FixtureRequest) -> OCRStartFrame:
     image = Image.new("L", (500, 250), 245)
     draw = ImageDraw.Draw(image)
     for text, y in (("1G", 20), ("AKT", 120)):
         draw.text((30, y), text, font=ImageFont.load_default(size=42), fill=0)
-    path = tmp_path / "OCR.tif"
-    tifffile.imwrite(path, np.array(image))
+    path = tmp_path / ("OCR." + str(request.param))
+    if request.param == "png":
+        image.save(path)
+    else:
+        tifffile.imwrite(path, np.array(image))
     return OCRStartFrame(
         protocol_version=1,
         kind="start",
@@ -48,7 +51,7 @@ def ocr_start(tmp_path: Path) -> OCRStartFrame:
         attempt_id="attempt",
         request_id="request",
         source_path=str(path),
-        request=OCRRequest(source_sha256=load_tiff(path).sha256, revision=3),
+        request=OCRRequest(source_sha256=sha256(path.read_bytes()).hexdigest(), revision=3),
     )
 
 

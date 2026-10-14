@@ -164,6 +164,14 @@ class FigureRender:
 
 
 @dataclass(frozen=True)
+class FigurePNG:
+    width: int
+    height: int
+    sha256: str
+    data: bytes
+
+
+@dataclass(frozen=True)
 class FigureSourcePath:
     sha256: str
     path: str

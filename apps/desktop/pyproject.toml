@@ -1,6 +1,6 @@
 [project]
 name = "bioimage-app"
-version = "0.8.0"
+version = "0.9.0"
 description = "Explicit desktop host assembly"
 requires-python = ">=3.12,<3.13"
 dependencies = ["platform-runtime", "tool-contracts", "PySide6==6.12.0"]
