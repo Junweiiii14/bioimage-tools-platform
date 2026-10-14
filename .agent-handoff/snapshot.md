@@ -1,7 +1,7 @@
 # Handoff Snapshot
 
 - 更新2026-10-14；用户授权持续开发至WB自动化软件完成，Goal active，无token预算。整体软件未完成，不以阶段测试标整体完成。
-- 活动分支feat/T-020-direct-figure-image，base 3a38af6，产品待本轮提交；最终HEAD见git。任务状态唯一来源work/tasks：T-020 review待独审，T-021 ready。当前无运行中测试/工具进程，未推送/PR/main集成/发布。
+- 活动分支feat/T-020-direct-figure-image，base 3a38af6，产品1258d64；最终HEAD见git。任务状态唯一来源work/tasks：T-020 review待独审，T-021 ready。当前无运行中测试/工具进程，未推送/PR/main集成/发布。
 - 用户明确忽略CLX；TIFF设备原图/TIF裁剪，_0/_1语义未知，不猜定量源。归一化偏好尚未回复，不推断实验配对。用户材料仅作证据，本轮没有修改原资料/执行附带程序。
 - wb-tool0.18.0/app0.13.0/runtime0.2.0：新增export_figure_image与桌面直接TIFF/PNG按钮；沿现有完整render_figure，RGB8、16位整除257、原裁剪几何，无缩放/反相/自动增强；来源JSON和DPI一致。项目schema1–6、原值裁剪/积分/归一化不变。
 - TIFF单页未压缩contig/INCH、ImageDescription ASCII JSON、Software=bioimage-wb figure_display@1；PNG仍wb_provenance。量化load_tiff拒绝已知显示Software或operation/purpose，load_ocr_image专用TIFF分支允许并提示；旧TIFF预处理ID不变。未知第三方或剥掉来源标签不能自动判源。

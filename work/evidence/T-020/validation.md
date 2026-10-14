@@ -33,3 +33,5 @@ wb-tool0.18.0/app0.13.0；platform-runtime保持0.2.0，第三方依赖不变。
 私有探针脚本/JSON/图片留在.local/requirements-review，未提交用户原图。已查看T020-user-display-c64a3852/display.png与QWidget.grab的T020-direct-image.png：完整拼图、直接导出按钮、OCR关联/值4000/缺失/0可见。未调用原生CUA或执行用户提供的旧工具程序；没有真实OCR准确率结论。
 
 未完成：绑定最终提交的独审、远程CI/PR/main集成、实验室版式/横向分段/模板库（T-021）、缩放句柄、旧工具实际衔接、真实实验标注/效率评价、大项目性能、Windows最终包/干净机/DPI/物理FAT/签名许可证。旧Qt原生中止与T-017停滞根因仍UNKNOWN，本轮通过不能宣称已解决。
+
+产品提交：1258d64ad3d26d2c05fa0c1a5f590e7e637ed5f1；本地提交，未推送/独审/发布。提交钩子Ruff检查、格式与Repository policy均通过。
