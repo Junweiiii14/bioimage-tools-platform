@@ -1,6 +1,6 @@
 # WB 数值核心
 
-公开入口 `wb_tool.api`；包版本 0.4.0，实现参考积分、TIFF、泳道、手工分析和后台协议，尚无产品 GUI。
+公开入口 `wb_tool.api`；包版本 0.5.0，实现参考积分、TIFF、泳道、手工分析、后台协议与可选Qt复核页面。
 数值契约与参考来源见 `../../docs/contracts/wb-reference-v1.md`。
 
 - 输入：未平滑且已声明极性的非负有限剖面、闭区间 `BandBounds`、可选 `Baseline`。
@@ -21,3 +21,9 @@
 
 验证：仓库根 `uv run --locked --no-sync pytest tools/wb/tests -q`；
 完整门禁 `uv run --locked --no-sync python dev.py check --all`。
+
+`[desktop]` 可选依赖使用已有锁定Qt；普通API/worker导入不加载Qt。
+create_wb_view/create_wb_background 是延迟装配入口；PreviewRaster 是显示专用字节，
+不会传给定量用例。WBDocument v1 保存原输入资产/标注，契约见 wb-document-v1.md。
+桌面入口由apps显式装配：`uv run --locked --no-sync python -m bioimage_app`。
+当前手工界面可拖ROI/编辑闭区间与基线/查看原始曲线和结果状态；OCR/自动写表尚未完成。

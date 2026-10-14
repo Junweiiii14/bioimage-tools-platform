@@ -11,8 +11,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def installed_check(folder: Path, package: str, wheels: list[Path], script: str) -> int:
-    environment = folder / package
+def installed_check(
+    folder: Path,
+    package: str,
+    wheels: list[Path],
+    script: str,
+    extras: tuple[str, ...] = (),
+) -> int:
+    environment = folder / (package + "-".join(extras))
     code = subprocess.run(
         ["uv", "venv", "--python", sys.executable, str(environment)], cwd=ROOT, check=False
     ).returncode
@@ -28,6 +34,7 @@ def installed_check(folder: Path, package: str, wheels: list[Path], script: str)
             package,
             "--no-dev",
             "--no-install-workspace",
+            *(argument for extra in extras for argument in ("--extra", extra)),
         ],
         cwd=ROOT,
         env={
@@ -130,6 +137,30 @@ print('Isolated runtime/contracts wheels: immutable input, run commit/reopen; no
 """
 
 
+GUI_SCRIPT = """
+import sys
+import subprocess
+from pathlib import Path
+from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import QTimer
+from bioimage_app.api import create_wb_window
+import bioimage_app.api
+assert Path(bioimage_app.api.__file__).is_relative_to(Path(sys.prefix))
+app = QApplication([])
+window = create_wb_window()
+window.show()
+assert window.isVisible() and window.view.canvas is not None
+QTimer.singleShot(50, window.close)
+QTimer.singleShot(10000, app.quit)
+app.exec()
+assert not window.isVisible()
+worker = subprocess.run([sys.executable, '-I', '-m', 'bioimage_app', '--worker', 'wb'],
+    input=b'{}\\n', capture_output=True, timeout=15)
+assert worker.returncode == 2 and len(worker.stdout.splitlines()) == 2, worker
+print('Installed WB desktop window: real widgets/entry assembly and async close passed')
+"""
+
+
 DESKTOP_SCRIPT = """
 import sys
 from pathlib import Path
@@ -206,7 +237,7 @@ def main() -> int:
                 [built["tool-contracts"], built["platform-runtime"]],
                 RUNTIME_SCRIPT,
             ),
-            ("wb-tool", [built["wb-tool"]], WB_SCRIPT),
+            ("wb-tool", [built["tool-contracts"], built["wb-tool"]], WB_SCRIPT),
             (
                 "bioimage-app",
                 [built["tool-contracts"], built["platform-runtime"], built["bioimage-app"]],
@@ -216,7 +247,18 @@ def main() -> int:
             code = installed_check(folder, package, wheels, script)
             if code:
                 return code
-        return 0
+        return installed_check(
+            folder,
+            "bioimage-app",
+            [
+                built["tool-contracts"],
+                built["platform-runtime"],
+                built["wb-tool"],
+                built["bioimage-app"],
+            ],
+            GUI_SCRIPT,
+            ("wb",),
+        )
 
 
 if __name__ == "__main__":

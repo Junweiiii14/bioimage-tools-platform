@@ -24,5 +24,11 @@ Keep session/port alive until completed/closed. Stop the session before closing 
 
 The lazy `create_wb_codec` registration uses only wb_tool.api. Install `[wb]` for it.
 Generic API import/wheel tests do not load WB/NumPy. No experimental formulas live here.
-WB UI and executable entry are still pending. Test with `uv run --locked --no-sync pytest
+WBWindow explicitly assembles the optional WB page and background preview/document codec.
+Run `uv run --locked --no-sync python -m bioimage_app` after installing `[wb]`.
+The same static entry handles `--worker wb` without opening Qt; other modules are not
+loaded from document strings. Manual import/ROI/band/baseline/run/save/reopen now works.
+Close saves valid edits, cancels an active run, then drains and closes both threads.
+OCR/Fig mapping, automatic candidates/table writing, normalization, export and packaging
+remain pending. Test with `uv run --locked --no-sync pytest
 tests/test_async_storage.py tests/test_process_runner.py tests/test_run_session.py tests/test_wb_host.py`.

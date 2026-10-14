@@ -1,6 +1,6 @@
 # 生物图像工具平台
 
-当前阶段：**WB 产品开发；已实现 TIFF/参考积分、后台进程、工作区保存恢复、Qt 异步存储和进程生命周期；桌面复核界面待实现。**
+当前阶段：**WB 产品开发；手工桌面闭环已实现，可导入TIFF、编辑ROI/条带/基线、后台计算和保存重开。首版必需的拼图Fig/行名OCR、结果表自动写入及完整自动化仍在开发。**
 
 最初的 [V3.0 技术方案](生物图像工具平台与全AI长期迭代技术方案.pdf) 保持原样，首次提交可追溯。
 本仓库将承载 Windows 本地桌面平台及 WB、IF、IHC 工具，采用 Python/PySide6、独立计算进程、单仓库分包的候选路线。产品选型须经 P0 打包与目标机试验后冻结。
@@ -23,10 +23,11 @@ uv sync --locked --all-groups
 uv run --locked --no-sync python dev.py doctor
 uv run --locked --no-sync python dev.py check --all
 uv run --locked --no-sync python dev.py smoke-env
+uv run --locked --no-sync python -m bioimage_app
 uv run --locked --no-sync pre-commit install
 ```
 
-这些命令验证治理、P0、WB 数值/输入/真实 worker、工作区事务/恢复、Qt 存储队列、导入边界和四个独立 wheel；真实桌面、便携包和性能另外验收。P0 探针入口见 [验证手册](tooling/p0/README.md)，WB 见 [模块说明](tools/wb/README.md)，工作区见 [存储说明](packages/platform_runtime/README.md)。尚无正式产品 GUI，不提供 `package`、`contract`、`check --scope` 的空壳成功命令。
+检查验证数值/输入/真实worker、工作区事务、Qt存储与手工界面、导入边界和四个独立wheel（五种安装场景）。便携包和目标机性能另外验收。P0见[验证手册](tooling/p0/README.md)，WB见[模块说明](tools/wb/README.md)，工作区见[存储说明](packages/platform_runtime/README.md)。不提供 `package`、`contract`、`check --scope` 的空壳成功命令。
 
 ## 维护原则
 

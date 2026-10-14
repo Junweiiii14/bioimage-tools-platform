@@ -318,6 +318,9 @@ class ProcessRunner(QObject):
 
     @Slot()
     def _decoder_stopped(self) -> None:
+        if not self._thread.wait(0):
+            QTimer.singleShot(1, self._decoder_stopped)
+            return
         self._decoder_done = True
         self._complete()
 

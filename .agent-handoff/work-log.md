@@ -1,5 +1,9 @@
 # Current Work Log
 
+## 2026-10-14 / T-008 手工桌面闭环
+
+上一回合progress：32a2bae进程宿主。本回合WBDocument v1、纯显示DTO/后台预览与codec、Qt ROI/条带/基线/原始曲线及中文窗口/静态worker入口。实际拖选→signal10→保存/重开、关闭自动保存、新编辑拒绝旧参数、uint16原图不变、实际窗口取消关闭通过；190完整tests/9合约/4wheel5场景，追加取消后最终pytest见证据。合成抓图已查看，无数值/工作区格式改写。用户回复首版必须Fig/行名OCR与自动写表，下一阶段优先；独审/远程CI/包态验收未执行，goal active。
+
 ## 2026-10-14 / T-007 进程宿主
 
 上一回合progress：e61c3e3异步存储。本回合实现QProcess/后台解码、NDJSON与stderr预算、PID存储门禁、Windows JobObject/进程组、RunSession持久化取消与终态；补提交取消检查。真实WB输入快照→进程→存储→重开信号10，旧运行不覆盖新草稿；实际孙进程强停、残帧/超限/退出/提前取消与发布取消均验证。完整门禁185tests/9合约/4wheel通过；T-007进入review（独审未执行），下一步T-008桌面GUI，goal active。

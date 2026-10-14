@@ -10,7 +10,7 @@ from typing import Literal
 from uuid import uuid4
 
 from platform_runtime.api import Workspace, WorkspaceError
-from PySide6.QtCore import QObject, Qt, QThread, Signal, Slot
+from PySide6.QtCore import QObject, Qt, QThread, QTimer, Signal, Slot
 from tool_contracts.api import (
     AssetRef,
     DraftSnapshot,
@@ -32,6 +32,7 @@ Operation = Literal[
     "cancelled",
     "failed",
     "asset",
+    "read",
     "documents",
     "runs",
     "backup",
@@ -159,6 +160,10 @@ class _StorageWorker(QObject):
             if command.asset is None:
                 raise ValueError("Asset operation requires a reference")
             return str(store.asset_path(command.asset)), b""
+        if op == "read":
+            if command.asset is None:
+                raise ValueError("Read requires a registered asset reference")
+            return command.asset, store.read_asset(command.asset)
         if op == "documents":
             return store.list_documents(), b""
         if op == "runs":
@@ -192,7 +197,7 @@ class AsyncStorage(QObject):
         self._requested.connect(self._worker.execute, Qt.ConnectionType.QueuedConnection)
         self._worker.replied.connect(self._deliver, Qt.ConnectionType.QueuedConnection)
         self._thread.finished.connect(self._worker.deleteLater)
-        self._thread.finished.connect(self.closed)
+        self._thread.finished.connect(self._thread_stopped)
         self._thread.start()
 
     def _assert_owner(self) -> None:
@@ -234,3 +239,11 @@ class AsyncStorage(QObject):
         self.replied.emit(reply)
         if reply.request_id == self._closing_id:
             self._thread.quit()
+
+    @Slot()
+    def _thread_stopped(self) -> None:
+        # finished precedes TLS teardown. A zero-time join is a nonblocking probe.
+        if not self._thread.wait(0):
+            QTimer.singleShot(1, self._thread_stopped)
+            return
+        self.closed.emit()

@@ -3,7 +3,7 @@ name = "bioimage-tools-platform"
 version = "0.0.0"
 description = "Bioimage desktop platform and WB quantification tools in development"
 requires-python = ">=3.12,<3.13"
-dependencies = ["wb-tool", "platform-runtime", "bioimage-app"]
+dependencies = ["wb-tool", "platform-runtime", "bioimage-app[wb]"]
 
 [dependency-groups]
 dev = [
