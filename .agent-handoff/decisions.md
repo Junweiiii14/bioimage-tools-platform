@@ -28,3 +28,5 @@
 | 2026-10-14 | 项目v3保存小型标注与已提交run/result引用，重开逐行核验 | 避免大曲线嵌入16 MiB草稿、重复名称误配及一份坏结果阻断整批 | 79a675a、docs/research/2026-10-14-project-measurements.md |
 
 | 2026-10-14 | 项目v4保留已提交OCR证据，人工校正后按原图row_id/SHA/ROI/N显式绑定；取消重识别保留旧关联 | 重复蛋白名称不能证明来源，文档副本不能替代资产校验；OCR显示不进入原图定量 | 05e5d56、wb-project-ocr-v1.md、T-014/ocr-validation.md |
+
+| 2026-10-14 | 项目v5保存显式参照/逐槽样本与对照配置，可无OCR；lane_reference_ratio@1从核验run重建q=T/R、f=q/所选对照均值 | 未知实验偏好不能变成默认配对；全部所选对照必须有效，无epsilon/坏对照静默丢弃；原始积分保持 | 0cd390b、wb-project-normalization-v1.md、2026-10-14-project-normalization.md |

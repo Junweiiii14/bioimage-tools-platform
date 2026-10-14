@@ -75,3 +75,6 @@ wb-tool 0.2.0 新增 uint8/16 灰度及显式 RGB 单页 TIFF、极性与半开 
 
 ## 2026-10-14 / T-014 项目OCR关联
 上一目标回合progress完成多源定量，本回合产品05e5d56接通项目v4独立拼图OCR、原文位置/置信度、人工校正、明确原图绑定、自动填表/XLSX及重开校验。取消保留旧关联、关闭等待退出、过期导入/识别拒绝覆盖；原图审核变化同步绑定候选。268全量/9合约/隔离安装通过，真实组合TIFF15token/11未确认行保存重开和SHA保持通过。T-014 review待独审，T-015归一化ready；用户偏好询问尚无回复，不推断科学默认。Goal active，未推送/发布；详情work/evidence/T-014/ocr-validation.md。
+
+## 2026-10-14 / T-015 项目归一化
+从9dddcba创建feat/T-015-project-normalization，产品0cd390b实现v5显式目标/参照、逐槽样本/包含/对照、比值与相对单对照/均值、Qt编辑撤回确认/自动表/OCR标签/保存重开/XLSX。派生值从核验run重建，无epsilon或静默丢坏对照；v5可无OCR，旧v4约束保持。284全量/9合约/隔离安装通过，源码Qt截图已查看。T-015 review待独审，T-016生成PNG衔接ready；用户偏好仍未知，Goal active，未推送/发布。证据work/evidence/T-015/validation.md。
