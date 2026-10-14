@@ -23,3 +23,7 @@
 ## 2026-10-14 / T-003 TIFF 输入与泳道剖面
 
 wb-tool 0.2.0 新增 uint8/16 灰度及显式 RGB 单页 TIFF、极性与半开 ROI。5 张本地真实 TIFF 只读输入烟测通过；私人摘要在 .local。增加 TIFF/积分 independence 合约和第 4 个传递负例。隔离 wheel 先按锁文件装依赖后 no-deps 装产物；直接 offline pip 缺索引缓存的问题已修复。下一步后台任务/工作区/手工 GUI。
+
+## 2026-10-14 / T-004 手工分析用例
+
+上一目标回合归类 progress：93a84bb 实现并验证 TIFF/剖面。本回合实现 WB application，明确来源/revision/缺失/排除/无效/真实零/待质量复核，并支持取消无完成结果。90 测试、4 合约及隔离 wheel TIFF→手工分析通过。独审、后台进程、存储与 GUI 未完成，目标保持 active。

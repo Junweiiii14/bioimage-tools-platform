@@ -57,16 +57,26 @@ def main() -> int:
         script = """
 import sys
 from pathlib import Path
-from wb_tool.api import BandBounds, Baseline, LaneROI, compute_lane_profiles, integrate_profile
+from wb_tool.api import (
+    AnalysisRequest, BandAnnotation, BandBounds, Baseline, LaneAnnotation, LaneROI,
+    analyze_annotations, compute_lane_profiles, integrate_profile, load_tiff,
+)
 import numpy as np
+import tifffile
 import wb_tool.api
 assert Path(wb_tool.api.__file__).is_relative_to(Path(sys.prefix))
 assert integrate_profile([10., 20., 10.], BandBounds(0, 2)).signal == 10.
 assert integrate_profile([8., 8.], BandBounds(0, 1), Baseline(0, 0)).signal == 8.
 pixels = np.array([[245], [235], [245]], dtype=np.uint8)
 assert compute_lane_profiles(pixels, LaneROI('L', 0, 0, 1, 3), 'dark').quantitative == (10.,20.,10.)
+tifffile.imwrite('analytic.tif', pixels)
+image = load_tiff('analytic.tif')
+lane = LaneAnnotation(LaneROI('L', 0, 0, 1, 3), (BandAnnotation('B', BandBounds(0, 2)),))
+request = AnalysisRequest(image.sha256, 7, 'dark', (lane,))
+result = analyze_annotations(image, request)
+assert result.lanes[0].bands[0].signal == 10 and result.request.revision == 7
 assert not any(name.startswith(('PySide6', 'sqlite3')) for name in sys.modules)
-print('Isolated WB wheel: numerical/profile APIs passed; no GUI/storage dependencies')
+print('Isolated WB wheel: TIFF/manual-analysis APIs passed; no GUI/storage dependencies')
 """
         return subprocess.run([str(python), "-I", "-c", script], cwd=folder, check=False).returncode
 

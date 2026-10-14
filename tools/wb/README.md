@@ -1,6 +1,6 @@
 # WB 数值核心
 
-公开入口 `wb_tool.api`；包版本 0.2.0，当前实现 `profile_integral@1`、TIFF 输入及泳道剖面，尚无产品 GUI。
+公开入口 `wb_tool.api`；包版本 0.3.0，实现参考积分、TIFF 输入、泳道剖面和手工标注分析用例，尚无产品 GUI。
 数值契约与参考来源见 `../../docs/contracts/wb-reference-v1.md`。
 
 - 输入：未平滑且已声明极性的非负有限剖面、闭区间 `BandBounds`、可选 `Baseline`。
@@ -12,6 +12,9 @@
 - `compute_lane_profiles` 需要显式 dark/light 极性与稳定 lane_id，坐标为半开矩形。
   读取数组以 bytes 为后备，不能重新开启写入；均值以 float64 计算，不修改原像素。
 - NumPy 和 tifffile 依赖均固定为已有锁版本，不引入新的第三方包。
+- `analyze_annotations` 接受来源摘要、revision、泳道/条带不可变标注，返回明确定量状态；
+  取消或来源不符不返回成功结果，部分泳道失败保留原因；位深上下限像素触发复核，
+  待复核原始积分不能进入有效信号列。契约见 `../../docs/contracts/wb-manual-analysis-v1.md`。
 
 验证：仓库根 `uv run --locked --no-sync pytest tools/wb/tests -q`；
 完整门禁 `uv run --locked --no-sync python dev.py check --all`。

@@ -38,5 +38,5 @@ TIFF 输入、稳定 lane_id 半开 ROI 与原始均值剖面已实现（wb-tool
 依赖声明新增已有锁版本 numpy/tifffile，无版本升级；积分 algorithm_id 不变。
 隔离 wheel 改为干净环境依照 uv.lock 安装必要依赖，再 --no-deps 安装构建产物；
 直接 offline pip 解析由于缺索引元数据失败，已改用锁文件 sync，不回退到源码导入。
-下一步 worker/工作区/UI 手工闭环，再自动候选。可选 OCR 优先问题未回复，默认先候选，
+当前执行子任务 T-004 手工标注分析用例；下一步 worker/工作区/UI 手工闭环，再自动候选。可选 OCR 优先问题未回复，默认先候选，
 OCR 尚不以没有回复作永久排除或验收通过。

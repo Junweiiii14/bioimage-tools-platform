@@ -18,7 +18,18 @@ name = Public API may depend on domain, never the reverse
 type = layers
 layers =
     wb_tool.api
+    wb_tool.application
     wb_tool.domain
+
+[importlinter:contract:application-purity]
+name = Analysis depends on image ports, never file adapters or GUI
+type = forbidden
+source_modules = wb_tool.application
+forbidden_modules =
+    wb_tool.adapters
+    PySide6
+    sqlite3
+    subprocess
 
 [importlinter:contract:input-quantification-independence]
 name = TIFF decoding and profile integration are independent
