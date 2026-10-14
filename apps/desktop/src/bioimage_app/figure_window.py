@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
 )
 from tool_contracts.api import AssetRef, DraftSnapshot
 from wb_tool.api import (
+    CropSuggestion,
     FigureRender,
     FigureRow,
     FigureSourcePath,
@@ -24,8 +25,10 @@ from wb_tool.api import (
     WBFigureProject,
     WBJob,
     WBReply,
+    WBReviewProject,
     create_figure_project_view,
     create_wb_background,
+    record_crop_suggestion,
 )
 
 from bioimage_app.storage import AsyncStorage, StorageCommand, StorageReply
@@ -44,6 +47,7 @@ class FigureProjectWindow(QMainWindow):
         self._background = create_wb_background()
         self._storage_callbacks: dict[str, Callable[[StorageReply], None]] = {}
         self._wb_callbacks: dict[str, Callable[[WBReply], None]] = {}
+        self._wb_accept_errors: set[str] = set()
         self._store.replied.connect(self._storage_reply)
         self._background.replied.connect(self._wb_reply)
         self._store.closed.connect(self._store_stopped)
@@ -89,6 +93,7 @@ class FigureProjectWindow(QMainWindow):
         self.view.preview_requested.connect(lambda: self.compose())
         self.view.export_requested.connect(self._choose_export)
         self.view.font_requested.connect(self._choose_font)
+        self.view.detection_requested.connect(self.detect_crops)
         self._controls()
 
     @property
@@ -128,9 +133,14 @@ class FigureProjectWindow(QMainWindow):
         except (ValueError, RuntimeError) as error:
             self._error(str(error))
 
-    def _wb(self, job: WBJob, callback: Callable[[WBReply], None]) -> None:
+    def _wb(
+        self, job: WBJob, callback: Callable[[WBReply], None], *, accept_errors: bool = False
+    ) -> None:
         try:
-            self._wb_callbacks[self._background.submit(job)] = callback
+            request_id = self._background.submit(job)
+            self._wb_callbacks[request_id] = callback
+            if accept_errors:
+                self._wb_accept_errors.add(request_id)
         except (ValueError, RuntimeError) as error:
             self._error(str(error))
 
@@ -144,11 +154,109 @@ class FigureProjectWindow(QMainWindow):
 
     def _wb_reply(self, reply: WBReply) -> None:
         callback = self._wb_callbacks.pop(reply.request_id, None)
+        accept_errors = reply.request_id in self._wb_accept_errors
+        self._wb_accept_errors.discard(reply.request_id)
         if callback:
-            if reply.error:
+            if reply.error and not accept_errors:
                 self._error(reply.error)
             else:
                 callback(reply)
+
+    def detect_crops(self, all_rows: bool = False) -> None:
+        if self._busy or not self._workspace:
+            return
+        try:
+            project = self.view.project()
+            if all_rows and self.view.suggestions.manual.isChecked():
+                raise ValueError("手框膜范围只适用于当前行；批量检测请关闭该选项")
+            selected = self.view.selected_row()
+            rows = tuple(
+                r
+                for r in project.rows
+                if r.source and (all_rows or (selected and r.row_id == selected.row_id))
+            )
+            if not rows:
+                raise ValueError("请选择有原图的行")
+            pending = [
+                (r, self.view.suggestions.settings(r, project.template.crop_height)) for r in rows
+            ]
+        except ValueError as error:
+            self._error(str(error))
+            return
+        generation = self.view.generation
+        completed = failed = 0
+        self._start()
+
+        def finish() -> None:
+            if self.view.generation != generation:
+                self._done("候选结果已丢弃：检测期间项目发生了修改，请重新检测。")
+                return
+            if isinstance(project, WBReviewProject):
+                self.view.install_suggestions(project)
+            state = "已取消" if self._cancellation.is_set() else "已结束"
+            self._done(
+                f"候选检测{state}：完成 {completed} 行，失败 {failed} 行。"
+                "建议已保留，选择候选并应用后仍须审核。"
+            )
+
+        def next_row() -> None:
+            if not pending or self._cancellation.is_set() or self.view.generation != generation:
+                finish()
+                return
+            row, settings = pending.pop(0)
+            assert row.source is not None
+            sha = row.source.sha256
+            self.view.status.setText(
+                f"正在检测 {row.filename}；剩余 {len(pending)} 行。"
+                f"N={settings.lane_count}，高={settings.crop_height}"
+            )
+
+            def received(reply: WBReply) -> None:
+                nonlocal project, completed, failed
+                if self._cancellation.is_set():
+                    finish()
+                    return
+                if self.view.generation != generation:
+                    finish()
+                    return
+                if isinstance(reply.value, CropSuggestion):
+                    suggestion = reply.value
+                    if (
+                        suggestion.row_id != row.row_id
+                        or suggestion.source_sha256 != sha
+                        or suggestion.settings != settings
+                        or suggestion.source_revision != project.revision
+                    ):
+                        self._error("检测结果与请求身份不一致")
+                        return
+                    completed += 1
+                else:
+                    suggestion = CropSuggestion(
+                        row_id=row.row_id,
+                        source_sha256=sha,
+                        source_revision=project.revision,
+                        settings=settings,
+                        error=(reply.error or "检测后台未返回结果")[:2000],
+                    )
+                    failed += 1
+                project = record_crop_suggestion(project, suggestion)
+                next_row()
+
+            self._wb(
+                WBJob(
+                    "crop_suggest",
+                    path=self._paths.get(sha, ""),
+                    row_id=row.row_id,
+                    source_sha256=sha,
+                    revision=project.revision,
+                    detection_settings=settings,
+                    cancellation=self._cancellation,
+                ),
+                received,
+                accept_errors=True,
+            )
+
+        next_row()
 
     def _choose_workspace(self, create: bool) -> None:
         path = QFileDialog.getExistingDirectory(

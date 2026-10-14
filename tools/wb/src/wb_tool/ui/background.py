@@ -13,6 +13,7 @@ from wb_tool.adapters.crop_export import export_crop
 from wb_tool.adapters.tiff_input import load_tiff
 from wb_tool.adapters.worksheet_export import export_worksheet
 from wb_tool.application.analysis import AnalysisResult
+from wb_tool.application.crop_suggestions import CropSuggestion, read_figure_project
 from wb_tool.application.desktop_data import PreviewRaster, WBJob, WBReply
 from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
 from wb_tool.application.figure_project import FigureRender, WBFigureProject
@@ -31,12 +32,26 @@ class _Work(QObject):
                 | WBWorksheetDocument
                 | WBFigureProject
                 | FigureRender
+                | CropSuggestion
                 | AnalysisResult
                 | OCRRecognition
                 | bytes
                 | str
             )
-            if job.operation == "font_digest":
+            if job.operation == "crop_suggest":
+                from wb_tool.adapters.crop_suggestions import suggest_crops
+
+                if job.detection_settings is None:
+                    raise ValueError("缺少候选检测参数")
+                value = suggest_crops(
+                    job.path,
+                    job.source_sha256,
+                    job.row_id,
+                    job.revision,
+                    job.detection_settings,
+                    cancelled=job.cancellation.is_set if job.cancellation else lambda: False,
+                )
+            elif job.operation == "font_digest":
                 path = Path(job.path)
                 if (
                     path.suffix.lower() not in (".ttf", ".ttc", ".otf")
@@ -46,7 +61,7 @@ class _Work(QObject):
                 with path.open("rb") as stream:
                     value = file_digest(stream, "sha256").hexdigest()
             elif job.operation == "figure_document":
-                value = WBFigureProject.from_bytes(job.data)
+                value = read_figure_project(job.data)
             elif job.operation in ("figure_preview", "figure_export"):
                 from wb_tool.adapters.figure_export import export_figure_bundle, render_figure
 

@@ -1,6 +1,6 @@
 # WB 数值核心
 
-公开入口 `wb_tool.api`；包版本0.9.0，实现定量/手工Qt闭环、OCR复核和结果表。
+公开入口 `wb_tool.api`；包版本0.10.0，实现定量/手工Qt闭环、OCR复核和结果表。
 数值契约与参考来源见 `../../docs/contracts/wb-reference-v1.md`。
 
 - 输入：未平滑且已声明极性的非负有限剖面、闭区间 `BandBounds`、可选 `Baseline`。
@@ -38,4 +38,6 @@ v1草稿继续读取，协议/文档契约见wb-document-v2.md。自动裁剪、
 
 0.8.0增加fixed_lane_grid、CropRequest/export_crop及桌面框选模式。固定N保留空位，左右Marker排除由用户给定；新TIFF裁剪保持原通道/位深/像素，内嵌来源和半开坐标记录。详见wb-crop-grid-v1.md。当前导出所选单框，整行可用单框模式标记；不是自动膜/Marker检测或模板合成。
 
-0.9.0新增独立WBFigureProject v1和FigureRow/Template、plan_figure_layout、render_figure、export_figure_bundle。多原图批量去重、固定N整行审核、Fig/蛋白排序、模板保存/复用、后台预览及新ZIP导出（PNG/记录/原值TIFF/原图/字体）。使用[figures]可独立渲染，desktop也显式声明已锁Pillow12.3.0，普通API仍不加载Pillow/Qt。旧单图v1/v2不变。契约见wb-figure-project-v1.md；自动候选、项目级OCR/定量与归一化仍待接入。
+0.9.0新增独立WBFigureProject v1和FigureRow/Template、plan_figure_layout、render_figure、export_figure_bundle。多原图批量去重、固定N整行审核、Fig/蛋白排序、模板保存/复用、后台预览及新ZIP导出（PNG/记录/原值TIFF/原图/字体）。使用[figures]可独立渲染，desktop也显式声明已锁Pillow12.3.0，普通API仍不加载Pillow/Qt。旧单图v1/v2不变。契约见wb-figure-project-v1.md。
+
+0.10.0增加CropDetectionSettings/detect_crop_candidates/suggest_crops，以及CropSuggestion/WBReviewProject和read_figure_project。候选算法@1在私有数值副本定位膜、左Marker排除槽、固定N网格和条带行；弱/可能空/多候选/回退均需复核。项目首次记录建议升级为schema v2，原v1继续读取，旧单图文档不受影响。Qt后台逐图检测/取消、失败筛选、候选切换/应用/恢复和膜区域聚焦；仅应用建议才写ROI并撤销审核，手动空位元信息不被覆盖。建议与参数/源SHA/源修订/原图提示随草稿和ZIP保存；更改N或高度须重新检测。显示聚焦仍输出原图坐标，不改变像素。契约见wb-crop-suggestions-v1.md。项目级OCR/定量/归一化、完整人工标注准确率及产品验收仍待完成。

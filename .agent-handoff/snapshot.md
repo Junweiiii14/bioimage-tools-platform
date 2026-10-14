@@ -1,14 +1,15 @@
 # Handoff Snapshot
 
 - 更新：2026-10-14。用户提供WB资料后明确继续，暂停已解除。Goal active，目标完整WB自动化软件；无token预算。不能因某阶段自验完成而标goal complete。
-- 当前分支 feat/T-012-figure-project，base cfe0c56；T-012实施/作者自验完成，任务review待独审；最新commit查git log。T-013-crop-candidates.md ready。没有推送/PR/main集成。
-- wb-tool0.9.0/app0.4.0：现有单图定量/ROI/曲线/基线、真实离线OCR/Fig行名复核/显式跨图工作表/XLSX/v1-v2重开、固定N网格/原值单框TIFF均保留。新T-012独立多原图项目文档和窗口：批量导入SHA去重、Fig/蛋白/N/空位/备注/行ROI与审核、排序/模板保存复用、后台PNG拼图及ZIP原图/原值TIFF/来源记录、工作区重开。入口原WB按钮或 --figure-project。
-- 最新完整dev.py check --all退出0：230测试（63.06s）、Ruff170文件、Pyright0、9导入合约、4wheel5场景。新12用例覆盖真实Qt操作/关闭重开与模板复用、解析像素/无静默拉伸、重复标签/空位/缺图/审核、损坏/取消/无覆盖。详情work/evidence/T-012/validation.md。
-- 另用用户项目10张真实TIFF实际批量导入/保存重开，10个不同SHA与外部原文件摘要前后相同。没有擅自选择仪器导出模式、确认蛋白身份或真实ROI；真实样本准确率尚未验收。
-- T-012项目不是旧单图v2升级：独立wb_figure_project v1 / tool_id wb-figure。API延迟加载Pillow/Qt，锁文件只本地版本及对已锁Pillow的extra声明。旧v1/v2读取契约不变。当前一个行一个连续矩形，同Fig等宽/N、批次等高，PNG显示为BT.601/uint16整除257；原样本另存。项目级OCR/定量/归一化尚未接通，ZIP导入/直接TIFF成图/跨workspace模板库/横向分段仍缺。
-- 下一步T-013：按规则/研究协议冻结膜/左Marker/固定N网格/候选条带行的自动建议与反例，接入当前项目复核；保存算法参数/建议快照、可切换/调整/恢复、保留空位。用户源类型未明时继续显式选图，不能按后缀/位深猜源或按任务单趋势优化检测。
-- 首版完整验收矩阵work/wb-acceptance.md；持续补项目级OCR/自动表、灰度工具衔接/归一化、Excel/文件名元信息、批参数/缩略图、统一归档和产品打包。手工多图流程不是自动化目标完成。
-- T-008/T-010偶发Qt native Aborted根因UNKNOWN。T-011四轮36探针未复现；入口本地Qt/Python日志和qFatal线程栈落盘已自验，不能称为修复。T-012全量没有复现。下次错误先读日志，不反复无假设压力重跑。
-- 新资料/私人预览/OCR/真实项目探针/截图都留ignored .local/requirements-review，不提交私有材料。真实OCR曾Fig1C高置信误读Fig1G，短编号布局@2仍须人工复核。用户首版OCR/自动写表要求不降级。
-- 待用户说明无后缀/_0/_1 TIFF及CLX的导出身份和定量来源。所有产品阶段独审未执行；真实标注/最终Windows包态交互/DPI/干净机/物理FAT及远程CI验收缺项保留。
-- 下一轮先读根规则/此索引/风险/待办、T-013和目标API，再核对git并运行dev.py context。平台无WB字段、跨包只走api、原图/历史结果不可覆盖，不恢复已归档项目。
+- 当前分支feat/T-013-crop-candidates，base194794e。T-013实施/作者自验完成，任务review待独审；最新commit查git log。T-014-project-measurements.md ready。没有推送/PR/main集成。
+- wb-tool0.10.0/app0.5.0：在T-012多原图/模板项目上接入自动膜/左Marker假设/固定N/行候选@1、弱/可能空/多候选/等分回退提示；后台逐图检测、单源失败继续、取消/关闭保存已完成建议、generation防旧结果覆盖；候选切换/应用/恢复、坐标编辑、聚焦膜/全图、扩展筛选。只记录建议不写ROI，应用才写原坐标并撤销审核。定量不使用检测平滑数组或显示图。
+- WBReviewProject为独立wb_figure_project schema v2，保存每行当前CropSuggestion（源SHA/源修订/参数/算法/结果或失败/选择/源提示）。首次记录建议升级，旧项目v1继续读取；旧单图v1/v2不变。N/模板高度变化保留快照但禁止应用。建议随草稿/ZIP保存，历史由平台CAS保留。普通API仍不加载Qt/Pillow/OCR。
+- 最新完整dev.py check --all退出0：244测试（65.02s）、Ruff182文件、Pyright0、9导入合约、4wheel5场景；新增14用例，详情work/evidence/T-013/validation.md。第一次完整运行在新聚焦tuple类型推断处失败，明确类型后最终通过；没有削弱门禁或增加忽略。
+- 用户项目10个真实TIFF通过窗口批量导入/后台建议/聚焦显示/保存关闭重开，10个快照与外部源SHA保持。真实行全部未审核且未应用ROI。候选数2/1/0/0/3/1/0/0/2/1，仅使用N3/5、高30的探针配置，不是确认实验元信息或准确率。白背景膜不明/小裁剪/背景误检边界见docs/research/2026-10-14-crop-candidates.md。
+- 下一步T-014：读取规则与相关单图定量/OCR/项目契约，创建分支/context；连接已审核行→原图定量标注/曲线复核→逐源进程与已提交结果→项目自动表，再把拼图OCR的Fig/行名与项目源/行显式绑定。重复名称不是身份，裁剪ROI不是自动正确的band边界。平台无WB字段；源/ROI/极性/基线改变应使对应结果失效。
+- 现有单图定量/ROI/曲线/基线、真实离线OCR/Fig行名复核/显式跨图工作表/XLSX/v1-v2重开、固定N网格/原值TIFF均保留。T-012多图项目具备去重导入、Fig/蛋白排序、模板复用、后台PNG+原值TIFF+原图ZIP。当前项目结果表/归一化尚未接通，ZIP导入/直接TIFF成图/横向分段/批量元信息与缩略图未建。
+- 首版完整核对表work/wb-acceptance.md，所有缺项继续追踪。首版OCR/自动写表要求不能降级；检测或拼图自验不等于完整自动化完成。
+- T-008/T-010偶发Qt native Aborted根因UNKNOWN。T-011四轮36探针未复现，入口日志/qFatal线程栈已自验；T-013全量也未复现。下次先读日志，不能以本轮成功声称修复。
+- 私人资料/预览/OCR/探针/截图留ignored .local/requirements-review，绝不提交私有原图或模型。真实OCR有Fig1C→Fig1G高置信误读，需复核；真实标注准确率未冻结。
+- 待用户说明无后缀/_0/_1 TIFF及CLX导出身份与定量用途。没有答案时继续显式选图，禁止按后缀/位深猜用途或按任务单趋势优化信号。所有阶段独审、真实最终用户验收/包态/DPI/干净机/物理FAT及远程CI缺项保留。
+- 下一轮先读根规则/交接/风险/待办/T-014与目标模块，再核对git并context。不得恢复归档项目，不自动使用旧工作流分工，不自行启动子代理。Goal保持active。

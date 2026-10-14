@@ -6,8 +6,10 @@ from typing import Literal
 
 from wb_tool.application.analysis import AnalysisResult
 from wb_tool.application.crop import CropRequest
+from wb_tool.application.crop_suggestions import CropSuggestion
 from wb_tool.application.document import WBDocument, WBWorksheetDocument
 from wb_tool.application.figure_project import FigureRender, FigureSourcePath, WBFigureProject
+from wb_tool.domain.crop_detection import CropDetectionSettings
 from wb_tool.domain.worksheet import OCRRecognition, Worksheet
 
 
@@ -38,6 +40,7 @@ class WBJob:
         "figure_preview",
         "figure_export",
         "font_digest",
+        "crop_suggest",
     ]
     path: str = ""
     data: bytes = b""
@@ -48,6 +51,10 @@ class WBJob:
     destination: str = ""
     sources: tuple[FigureSourcePath, ...] = ()
     cancellation: Event | None = None
+    detection_settings: CropDetectionSettings | None = None
+    row_id: str = ""
+    source_sha256: str = ""
+    revision: int = 0
 
 
 @dataclass(frozen=True)
@@ -59,6 +66,7 @@ class WBReply:
         | WBWorksheetDocument
         | WBFigureProject
         | FigureRender
+        | CropSuggestion
         | AnalysisResult
         | OCRRecognition
         | bytes

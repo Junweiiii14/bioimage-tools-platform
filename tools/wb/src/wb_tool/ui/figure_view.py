@@ -1,5 +1,6 @@
 """Multi-image row review and template editing; host owns assets and asynchronous work."""
 
+from dataclasses import replace
 from uuid import uuid4
 
 from PySide6.QtCore import Qt, Signal
@@ -23,6 +24,11 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from wb_tool.application.crop_suggestions import (
+    WBReviewProject,
+    apply_crop_suggestion,
+    project_with_suggestions,
+)
 from wb_tool.application.desktop_data import PreviewRaster
 from wb_tool.application.figure_project import (
     FigureRender,
@@ -33,6 +39,7 @@ from wb_tool.application.figure_project import (
 from wb_tool.domain.grid import fixed_lane_grid
 from wb_tool.domain.lanes import LaneROI
 from wb_tool.ui.canvas import ImageCanvas
+from wb_tool.ui.crop_suggestions import CropSuggestionPanel
 
 
 class FigureProjectView(QWidget):
@@ -41,6 +48,7 @@ class FigureProjectView(QWidget):
     preview_requested = Signal()
     export_requested = Signal()
     font_requested = Signal()
+    detection_requested = Signal(bool)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -55,7 +63,18 @@ class FigureProjectView(QWidget):
         root.addWidget(self.status)
         actions = QHBoxLayout()
         self.filter = QComboBox()
-        self.filter.addItems(["全部行", "待审核", "已审核", "预标空泳道", "缺图"])
+        self.filter.addItems(
+            [
+                "全部行",
+                "待审核",
+                "已审核",
+                "预标空泳道",
+                "缺图",
+                "建议有弱/空槽",
+                "多候选",
+                "无候选/失败",
+            ]
+        )
         actions.addWidget(self.filter)
         for text, callback in (
             ("上移行", lambda: self.move_row(-1)),
@@ -83,7 +102,17 @@ class FigureProjectView(QWidget):
         split.addWidget(self.table)
         tabs = QTabWidget()
         self.canvas = ImageCanvas()
-        tabs.addTab(self.canvas, "原图与固定泳道")
+        self.suggestions = CropSuggestionPanel()
+        self.suggestions.run_requested.connect(self.detection_requested)
+        self.suggestions.apply_requested.connect(self.apply_candidate)
+        self.suggestions.candidate_changed.connect(self._overlay)
+        self.suggestions.focus_requested.connect(self.focus_membrane)
+        self.suggestions.reset_view_requested.connect(lambda: self.canvas.set_view_region(None))
+        source_page = QWidget()
+        source_layout = QVBoxLayout(source_page)
+        source_layout.addWidget(self.suggestions)
+        source_layout.addWidget(self.canvas, 1)
+        tabs.addTab(source_page, "原图与固定泳道")
         preview_page = QWidget()
         preview_layout = QVBoxLayout(preview_page)
         preview_layout.addWidget(
@@ -193,7 +222,7 @@ class FigureProjectView(QWidget):
             font=self._project.template.font,
         )
         order = tuple(s.strip() for s in self.figure_order.text().split(",") if s.strip())
-        return WBFigureProject(
+        project = WBFigureProject(
             project_id=self._project.project_id,
             name=self.name.text().strip(),
             revision=self._project.revision if revision is None else revision,
@@ -201,6 +230,9 @@ class FigureProjectView(QWidget):
             figure_order=order,
             template=FigureTemplate(**settings),
         )
+        if isinstance(self._project, WBReviewProject):
+            return project_with_suggestions(project, self._project.suggestions)
+        return project
 
     def set_project(self, project: WBFigureProject) -> None:
         self._loading = True
@@ -209,6 +241,8 @@ class FigureProjectView(QWidget):
         self.table.setCurrentCell(-1, -1)
         self.canvas.set_image(PreviewRaster("", 0, 0, 0, 0, b"", 0, ()))
         self.canvas.set_lanes(())
+        self.canvas.set_regions(())
+        self.suggestions.show_suggestion(None, None, project.template.crop_height)
         self.name.setText(project.name)
         self.figure_order.setText(", ".join(project.figure_order))
         self.template_name.setText(project.template.name)
@@ -260,6 +294,7 @@ class FigureProjectView(QWidget):
         self.preview_label.setPixmap(QPixmap())
         self.preview_label.setText("内容已修改，请重新生成预览")
         self.changed.emit()
+        self._overlay()
 
     def _cell_changed(self, row: int, column: int) -> None:
         if self._loading:
@@ -279,6 +314,7 @@ class FigureProjectView(QWidget):
 
     def _selected(self, row: int, _column: int, _previous_row: int, _previous_column: int) -> None:
         if not self._loading and 0 <= row < len(self._project.rows):
+            self._overlay()
             self.source_requested.emit(self._project.rows[row].row_id)
 
     def selected_row(self) -> FigureRow | None:
@@ -290,11 +326,76 @@ class FigureProjectView(QWidget):
         self._overlay()
 
     def _overlay(self) -> None:
+        if self._loading:
+            return
         try:
             row = self.selected_row()
-            self.canvas.set_lanes(
-                fixed_lane_grid(row.roi, row.lane_count) if row and row.roi else ()
+            suggestion = (
+                next((s for s in self._project.suggestions if row and s.row_id == row.row_id), None)
+                if isinstance(self._project, WBReviewProject)
+                else None
             )
+            self.suggestions.show_suggestion(row, suggestion, self.numbers["crop_height"].value())
+            regions: list[LaneROI] = []
+            if suggestion and suggestion.result:
+                result = suggestion.result
+                if result.membrane:
+                    regions.append(replace(result.membrane, lane_id="膜候选"))
+                if result.marker:
+                    regions.append(replace(result.marker, lane_id="左 Marker 待核对"))
+                index = self.suggestions.candidates.currentIndex()
+                if 0 <= index < len(result.candidates):
+                    regions.append(
+                        replace(result.candidates[index].roi, lane_id=f"候选 {index + 1}")
+                    )
+            self.canvas.set_regions(tuple(regions))
+            self.canvas.set_lanes(
+                tuple(
+                    replace(lane, lane_id=f"泳道 {i}")
+                    for i, lane in enumerate(fixed_lane_grid(row.roi, row.lane_count), 1)
+                )
+                if row and row.roi
+                else ()
+            )
+        except ValueError as error:
+            self.canvas.set_regions(())
+            self.canvas.set_lanes(())
+            self.status.setText(str(error))
+
+    def install_suggestions(self, project: WBReviewProject) -> None:
+        """Host has checked generation; table fields are unchanged by suggestion recording."""
+        self._project = project
+        self._edited()
+        self._filter_rows()
+
+    def focus_membrane(self) -> None:
+        try:
+            row = self.selected_row()
+            if row is None:
+                return
+            region = row.roi
+            if isinstance(self._project, WBReviewProject):
+                suggestion = next(
+                    (s for s in self._project.suggestions if s.row_id == row.row_id), None
+                )
+                if suggestion and suggestion.result and suggestion.result.membrane:
+                    region = suggestion.result.membrane
+            if region:
+                self.canvas.set_view_region(region)
+        except ValueError as error:
+            self.status.setText(str(error))
+
+    def apply_candidate(self, index: int) -> None:
+        try:
+            row = self.selected_row()
+            if row is None:
+                return
+            project = apply_crop_suggestion(self.project(), row.row_id, index)
+            self._project = project
+            updated = next(r for r in project.rows if r.row_id == row.row_id)
+            assert updated.roi is not None
+            self._drawn((updated.roi.x0, updated.roi.y0, updated.roi.x1, updated.roi.y1))
+            self.status.setText("已应用候选；请核对 Marker、各泳道位置及目标条带，再确认所选行。")
         except ValueError as error:
             self.status.setText(str(error))
 
@@ -312,7 +413,14 @@ class FigureProjectView(QWidget):
 
     def _filter_rows(self) -> None:
         mode = self.filter.currentIndex()
+        suggestions = (
+            {s.row_id: s for s in self._project.suggestions}
+            if isinstance(self._project, WBReviewProject)
+            else {}
+        )
         for i, row in enumerate(self._project.rows):
+            suggestion = suggestions.get(row.row_id)
+            result = suggestion.result if suggestion else None
             review = self.table.item(i, 9)
             checked = bool(review and review.checkState() == Qt.CheckState.Checked)
             hidden = (
@@ -320,6 +428,20 @@ class FigureProjectView(QWidget):
                 or (mode == 2 and not checked)
                 or (mode == 3 and not self._text(i, 8))
                 or (mode == 4 and row.source is not None)
+                or (
+                    mode == 5
+                    and not (
+                        result
+                        and any(c.weak_lanes or c.possible_empty_lanes for c in result.candidates)
+                    )
+                )
+                or (mode == 6 and not (result and len(result.candidates) > 1))
+                or (
+                    mode == 7
+                    and not (
+                        suggestion and (suggestion.error or (result and not result.candidates))
+                    )
+                )
             )
             self.table.setRowHidden(i, bool(hidden))
 
@@ -362,7 +484,15 @@ class FigureProjectView(QWidget):
             order = tuple(
                 name for name in project.figure_order if any(r.figure == name for r in rows)
             )
-            self.set_project(project.model_copy(update={"rows": rows, "figure_order": order}))
+            updated = project.model_copy(update={"rows": rows, "figure_order": order})
+            if isinstance(project, WBReviewProject):
+                updated = project_with_suggestions(
+                    updated,
+                    tuple(
+                        s for s in project.suggestions if any(r.row_id == s.row_id for r in rows)
+                    ),
+                )
+            self.set_project(updated)
             self._edited()
         except ValueError as error:
             self.status.setText(str(error))

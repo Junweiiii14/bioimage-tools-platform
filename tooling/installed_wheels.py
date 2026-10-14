@@ -197,6 +197,15 @@ source_path = FigureSourcePath(source.sha256, str(Path('installed-fig.tif').reso
 export_figure_bundle(project, (source_path,),
     str(Path('installed-figure.zip').resolve()))
 assert Path('installed-figure.zip').exists()
+from wb_tool.api import (CropDetectionSettings, WBReviewProject, suggest_crops,
+    record_crop_suggestion, read_figure_project)
+suggestion = suggest_crops('installed-fig.tif', source.sha256, 'row', 0,
+    CropDetectionSettings(3, 60, 'dark', left_marker=False,
+        membrane_hint=LaneROI('membrane', 0, 0, 1200, 500)))
+review_project = record_crop_suggestion(project, suggestion)
+assert isinstance(review_project, WBReviewProject)
+assert read_figure_project(review_project.model_dump_json().encode()) == review_project
+assert review_project.rows[0].roi == row.roi
 recognized = recognize_figure('installed-fig.tif',source.sha256)
 groups = suggest_figures(recognized)
 assert len(groups) == 1 and groups[0].heading.text == 'Fig 1A'
