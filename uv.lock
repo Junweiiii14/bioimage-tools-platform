@@ -22,7 +22,7 @@ wheels = [
 
 [[package]]
 name = "bioimage-app"
-version = "0.12.0"
+version = "0.13.0"
 source = { editable = "apps/desktop" }
 dependencies = [
     { name = "platform-runtime" },
@@ -1228,7 +1228,7 @@ wheels = [
 
 [[package]]
 name = "wb-tool"
-version = "0.17.0"
+version = "0.18.0"
 source = { editable = "tools/wb" }
 dependencies = [
     { name = "numpy" },

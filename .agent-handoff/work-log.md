@@ -90,3 +90,6 @@ wb-tool 0.2.0 新增 uint8/16 灰度及显式 RGB 单页 TIFF、极性与半开 
 
 ## 2026-10-14 / T-019 ZIP恢复与历史证据
 从f79b7b3创建feat/T-019-project-archive-restore，产品6a06369实现schema6历史来源/原ZIP/复制请求结果、有界普通/ZIP64检查/表与像素重建、专用线程新工作区恢复/初始修订快照、重开核验/编辑失效/真实复算及再次恢复。398全量124.27秒、Ruff244、Pyright0、9合约、4wheel5场景通过；旧Qt/停滞风险未宣称解决。T-019 review待独审，T-020直接TIFF/PNG成图ready；整体Goal active。未推送/发布、用户资料未改；详情T-019/validation.md。
+
+## 2026-10-14 / T-020 直接成图
+从3a38af6创建feat/T-020-direct-figure-image，实现完整RGB8 TIFF/PNG直接输出、来源/DPI与像素重读核验、原图/字体声明大小检查、已知显示TIFF拒绝定量而OCR允许。Qt精确保存后后台导出，取消/关闭/修改与已发布文件状态有回归；425全量143.71秒、Ruff251、Pyright0、9合约、4wheel/4个隔离环境通过。真实组合图格式探针原SHA/显示像素保持，OCR17token未确认/绑定，Qt与导出截图已看。T-020 review待独审，T-021实验室版式/横向分段ready；Goal active，未推送/发布。详情T-020/validation.md。

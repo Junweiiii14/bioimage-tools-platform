@@ -127,6 +127,7 @@ class FigureProjectWindow(QMainWindow):
         self.view.source_requested.connect(self.select_source)
         self.view.preview_requested.connect(lambda: self.compose())
         self.view.export_requested.connect(self._choose_export)
+        self.view.image_export_requested.connect(self._choose_image_export)
         self.view.font_requested.connect(self._choose_font)
         self.view.detection_requested.connect(self.detect_crops)
         self.view.metadata.import_requested.connect(self._choose_metadata_import)
@@ -1289,6 +1290,56 @@ class FigureProjectWindow(QMainWindow):
         )
         if destination:
             self.compose(destination)
+
+    def _choose_image_export(self) -> None:
+        destination, selected = QFileDialog.getSaveFileName(
+            self, "保存新的显示拼图", "", "TIFF (*.tif *.tiff);;PNG (*.png)"
+        )
+        if destination:
+            if not Path(destination).suffix:
+                destination += ".png" if selected.startswith("PNG") else ".tif"
+            self.export_figure_image(destination)
+
+    def export_figure_image(self, destination: str) -> None:
+        if self._busy or not self._workspace or self._closing:
+            return
+
+        def saved() -> None:
+            if self._closing or self._cancellation.is_set():
+                self._done("成图导出已取消，未发布输出")
+                return
+            try:
+                project = self.view.project()
+            except ValueError as error:
+                self._error(str(error))
+                return
+            self._start()
+            self._export_generation = self.view.generation
+
+            def completed(reply: WBReply) -> None:
+                if reply.error:
+                    if self._closing or self._cancellation.is_set():
+                        self._done("成图导出已取消，未发布输出")
+                    else:
+                        self._error(reply.error)
+                elif isinstance(reply.value, str):
+                    self._done("显示拼图已保存：" + reply.value)
+                else:
+                    self._error("成图导出返回无效结果")
+
+            self._wb(
+                WBJob(
+                    "figure_image_export",
+                    document=project,
+                    sources=tuple(FigureSourcePath(sha, path) for sha, path in self._paths.items()),
+                    destination=destination,
+                    cancellation=self._cancellation,
+                ),
+                completed,
+                accept_errors=True,
+            )
+
+        self.save(after=saved)
 
     def compose(self, destination: str = "") -> None:
         if self._busy or not self._workspace:

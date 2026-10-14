@@ -207,6 +207,14 @@ class _Work(QObject):
                     value = file_digest(stream, "sha256").hexdigest()
             elif job.operation == "figure_document":
                 value = read_figure_project(job.data)
+            elif job.operation == "figure_image_export":
+                from wb_tool.adapters.figure_image_export import export_figure_image
+
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少拼图项目")
+                value = export_figure_image(
+                    job.document, job.sources, job.destination, cancelled=cancel
+                )
             elif job.operation in ("figure_preview", "figure_export", "figure_ocr"):
                 from wb_tool.adapters.figure_export import (
                     encode_figure_png,

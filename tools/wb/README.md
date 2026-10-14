@@ -55,3 +55,5 @@ v1草稿继续读取，协议/文档契约见wb-document-v2.md。自动裁剪、
 0.16.0为原图/OCR/归一化导出增加CSV，和XLSX共用表格数据；文字以可逆text:前缀编码，数值/真实0/空值分开。export_figure_bundle新增可选ArchiveRunEvidence，archive.json v2索引所有成员的SHA/大小/角色，ZIP统一包含原图、原值裁剪、拼图、CSV/XLSX、原始请求/结果及当前配置。重新校验运行资产，坏结果标明不可用、其他行继续；不把缓存或外来记录当本机成功。后台有界、取消/无覆盖发布，项目v1–v5与原算法不变。详见wb-project-archive-v2.md；ZIP导入和完整产品验收待办。
 
 0.17.0增加有界ZIP检查/stage_project_archive和schema6归档历史证据，保留原ZIP、原图、OCR关联、原始结果，严格重建表/像素检查。schema1–5兼容，来源表/界面区分归档历史与本机运行，外来RunRecord不登记本机收据。再次导出保留历史来源链，最多8代并受2GiB总预算限制。见wb-project-restore-v1.md；真实科学准确率/独审与最终产品验收仍待办。
+
+0.18.0新增export_figure_image：直接保存完整RGB8显示TIFF/PNG，沿用原裁剪几何及既有16位整除257显示映射；嵌入相同来源JSON、DPI，原图/字体SHA与字节数核验，写入后重读核对像素和标签再无覆盖发布。已知本软件显示TIFF可走OCR，load_tiff定量入口明确拒绝；未知第三方图不按扩展名猜来源。PNG64MiB/TIFF128MiB、来源16MiB、3200万像素/32768边长预算；项目schema和数值公式保持，完整恢复仍用ZIP。见wb-direct-figure-image-v1.md。

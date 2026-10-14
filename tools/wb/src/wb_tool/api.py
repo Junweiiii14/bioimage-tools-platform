@@ -159,6 +159,7 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "export_figure_image",
     "RestoredProjectResults",
     "StagedProjectArchive",
     "WBRestoredProject",
@@ -440,6 +441,18 @@ def export_crop(source: str, request: CropRequest, destination: str) -> str:
     from wb_tool.adapters.crop_export import export_crop as export
 
     return export(source, request, destination)
+
+
+def export_figure_image(
+    project: WBFigureProject,
+    sources: tuple[FigureSourcePath, ...],
+    destination: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> str:
+    from wb_tool.adapters.figure_image_export import export_figure_image as export
+
+    return export(project, sources, destination, cancelled=cancelled)
 
 
 def stage_project_archive(

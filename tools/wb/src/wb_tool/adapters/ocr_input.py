@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 from numpy.typing import NDArray
 
-from wb_tool.adapters.tiff_input import load_tiff
+from wb_tool.adapters.tiff_input import load_ocr_tiff
 from wb_tool.domain.ocr_manifest import PNG_PREPROCESS_ID, PREPROCESS_ID
 
 
@@ -23,7 +23,7 @@ class OCRImage:
 def load_ocr_image(path: str | Path) -> OCRImage:
     source = Path(path).resolve()
     if source.suffix.lower() in (".tif", ".tiff"):
-        image = load_tiff(source)
+        image = load_ocr_tiff(source)
         display = (image.pixels // 257).astype(np.uint8) if image.bit_depth == 16 else image.pixels
         pixels = np.frombuffer(display.tobytes(), dtype=np.uint8).reshape(display.shape)
         return OCRImage(image.sha256, pixels, image.bit_depth, PREPROCESS_ID, image.warnings)

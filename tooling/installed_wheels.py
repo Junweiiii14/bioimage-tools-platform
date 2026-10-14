@@ -204,7 +204,7 @@ tifffile.imwrite('installed-fig.tif',np.array(figure))
 source = load_tiff('installed-fig.tif')
 from tool_contracts.api import AssetRef
 from wb_tool.api import (FigureRow, FigureTemplate, FigureSourcePath, WBFigureProject,
-    LaneROI, export_figure_bundle)
+    LaneROI, export_figure_bundle, export_figure_image, load_ocr_image, ImageInputError)
 asset = AssetRef(asset_id='figure-source', relative_path='inputs/original.tif',
     sha256=source.sha256, size_bytes=Path('installed-fig.tif').stat().st_size)
 row = FigureRow(row_id='row', source=asset, filename='original.tif', width=1200, height=500,
@@ -216,6 +216,23 @@ source_path = FigureSourcePath(source.sha256, str(Path('installed-fig.tif').reso
 export_figure_bundle(project, (source_path,),
     str(Path('installed-figure.zip').resolve()))
 assert Path('installed-figure.zip').exists()
+export_figure_image(project, (source_path,), 'installed-direct.tiff')
+export_figure_image(project, (source_path,), 'installed-direct.png')
+with Image.open('installed-direct.png') as png, tifffile.TiffFile('installed-direct.tiff') as tiff:
+    assert np.array_equal(np.array(png), tiff.asarray())
+    assert png.info['wb_provenance'] == tiff.pages[0].description
+    assert tiff.pages[0].software == 'bioimage-wb figure_display@1'
+    assert tiff.pages[0].tags['XResolution'].value == (300, 1)
+np.testing.assert_array_equal(load_ocr_image('installed-direct.png').pixels,
+                              load_ocr_image('installed-direct.tiff').pixels)
+try:
+    load_tiff('installed-direct.tiff')
+except ImageInputError as exc:
+    assert 'OCR' in str(exc)
+else:
+    raise AssertionError('Display TIFF was admitted as a quantitative source')
+assert load_tiff('installed-fig.tif').sha256 == source.sha256
+print('Installed direct TIFF/PNG: same full pixels/provenance/DPI; OCR only, original unchanged')
 from zipfile import ZipFile
 import json
 from hashlib import sha256

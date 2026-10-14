@@ -67,8 +67,8 @@ def render_figure(
             raise ValueError("字体文件超出 32 MiB 预算")
         data = font_path.read_bytes()
         font_hash = sha256(data).hexdigest()
-        if font_hash != template.font.sha256:
-            raise ValueError("模板字体摘要不一致")
+        if font_hash != template.font.sha256 or len(data) != template.font.size_bytes:
+            raise ValueError("模板字体摘要或字节数不一致")
         font = ImageFont.truetype(BytesIO(data), template.font_size)
     canvas = Image.new("RGB", (layout.width, layout.height), "white")
     draw = ImageDraw.Draw(canvas)
@@ -129,6 +129,7 @@ def render_figure(
                 original = load_tiff(paths[row.source.sha256])
                 if (
                     original.sha256 != row.source.sha256
+                    or original.source.stat().st_size != row.source.size_bytes
                     or original.pixels.shape != (row.height, row.width)
                     or original.bit_depth != row.bit_depth
                 ):

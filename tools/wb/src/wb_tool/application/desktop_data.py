@@ -60,6 +60,7 @@ class WBJob:
         "figure_preview",
         "figure_ocr",
         "figure_export",
+        "figure_image_export",
         "font_digest",
         "crop_suggest",
         "project_result",
