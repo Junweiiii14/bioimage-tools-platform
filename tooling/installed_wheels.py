@@ -99,6 +99,7 @@ received = [session.accept(data) for data in frames]
 assert isinstance(received[-1], ResultFrame)
 assert received[-1].result.lanes[0].bands[0].signal == 10
 assert not any(name.startswith(('PySide6', 'sqlite3')) for name in sys.modules)
+assert not any(name.startswith(('rapidocr', 'onnxruntime', 'cv2')) for name in sys.modules)
 print('Isolated WB wheel: TIFF/manual analysis and real worker passed; no GUI/storage dependencies')
 """
 
@@ -157,7 +158,23 @@ assert not window.isVisible()
 worker = subprocess.run([sys.executable, '-I', '-m', 'bioimage_app', '--worker', 'wb'],
     input=b'{}\\n', capture_output=True, timeout=15)
 assert worker.returncode == 2 and len(worker.stdout.splitlines()) == 2, worker
+import numpy as np
+import tifffile
+from PIL import Image, ImageDraw, ImageFont
+from wb_tool.api import recognize_figure, load_tiff, suggest_figures
+figure = Image.new('L',(1200,500),245)
+draw = ImageDraw.Draw(figure)
+font = ImageFont.load_default(size=42)
+draw.text((30,20),'Fig 1A',font=font,fill=0)
+draw.text((30,150),'AKT',font=font,fill=0)
+tifffile.imwrite('installed-fig.tif',np.array(figure))
+source = load_tiff('installed-fig.tif')
+recognized = recognize_figure('installed-fig.tif',source.sha256)
+groups = suggest_figures(recognized)
+assert len(groups) == 1 and groups[0].heading.text == 'Fig 1A'
+assert groups[0].rows[0].text == 'AKT'
 print('Installed WB desktop window: real widgets/entry assembly and async close passed')
+print('Installed optional OCR: verified bundled PP-OCRv6 CPU recognition passed')
 """
 
 

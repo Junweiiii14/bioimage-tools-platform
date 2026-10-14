@@ -37,3 +37,5 @@ T-002 进行中：本轮基线 `dev.py check --all` 29 passed；新增协议/原
 | 2026-10-14 | T-007 进程阶段 dev.py check --all | passed | 185tests/9合约/4wheel；真实Qt进程、Windows孙进程强停、WB存储重开/旧revision、取消发布；GUI/独审/远程CI未完成 |
 
 | 2026-10-14 | T-008 dev.py check --all / Qt交互追加验证 | passed | 190全量、9合约、4wheel5安装场景；真实手工GUI信号10保存重开/关闭保存/uint16/取消关闭；最终pytest见T008证据；OCR/独审/包态未完成 |
+
+| 2026-10-14 | T-009后端 dev.py check --all / 独立XLSX reader | passed | 199tests/9合约/4wheel5场景；真实PP-OCRv6禁网6标签/空间关联/3045和1995写表/无覆盖，bundled openpyxl3.1.5读Unicode与值；GUI/worker仍待接入 |

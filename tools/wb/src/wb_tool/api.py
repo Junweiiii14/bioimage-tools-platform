@@ -1,5 +1,6 @@
 """Versioned public WB API; importing this module has no runtime side effects."""
 
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -36,6 +37,7 @@ from wb_tool.application.worker_protocol import (
     parse_worker_frame,
     worker_protocol_schema,
 )
+from wb_tool.application.worksheet import WorksheetCell, fill_worksheet, propose_worksheet
 from wb_tool.domain.lanes import LaneProfiles, LaneROI, Polarity, compute_lane_profiles
 from wb_tool.domain.quantify import (
     BandBounds,
@@ -44,8 +46,33 @@ from wb_tool.domain.quantify import (
     QuantificationError,
     integrate_profile,
 )
+from wb_tool.domain.worksheet import (
+    FigureSuggestion,
+    MeasurementBinding,
+    OCRRecognition,
+    TextBounds,
+    TextToken,
+    Worksheet,
+    WorksheetColumn,
+    WorksheetRow,
+    suggest_figures,
+)
 
 __all__ = [
+    "FigureSuggestion",
+    "MeasurementBinding",
+    "OCRRecognition",
+    "TextBounds",
+    "TextToken",
+    "Worksheet",
+    "WorksheetColumn",
+    "WorksheetRow",
+    "WorksheetCell",
+    "fill_worksheet",
+    "suggest_figures",
+    "recognize_figure",
+    "propose_worksheet",
+    "export_worksheet",
     "WBDocument",
     "PreviewRaster",
     "WBJob",
@@ -105,3 +132,20 @@ def run_wb_worker() -> int:
     from wb_tool.worker import main
 
     return main()
+
+
+def recognize_figure(
+    source: str,
+    expected_sha256: str,
+    *,
+    cancelled: Callable[[], bool] | None = None,
+) -> OCRRecognition:
+    from wb_tool.adapters.ocr import recognize_figure as recognize
+
+    return recognize(source, expected_sha256, cancelled=cancelled)
+
+
+def export_worksheet(worksheet: Worksheet, result: AnalysisResult, destination: str) -> str:
+    from wb_tool.adapters.worksheet_export import export_worksheet as export
+
+    return str(export(worksheet, result, destination))

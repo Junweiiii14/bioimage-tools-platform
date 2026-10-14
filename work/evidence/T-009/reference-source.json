@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-14",
+  "source": "C:/Users/70236/ResearchVault/Codex-Workbench/wbquant-improvements",
+  "files": [
+    {
+      "file": "wb_quant/worksheet.py",
+      "sha256": "6cf2a63cf38ef158defd61013a679d65b3e85edc018fc5014bbb2a8cb094fdee",
+      "bytes": 18919
+    },
+    {
+      "file": "engine/ocr_jobs.py",
+      "sha256": "f730bb165ba94cdd23903ed7d99a1a3d55fd4a6f775c299a049be27725abfec9",
+      "bytes": 5191
+    },
+    {
+      "file": "engine/ocr_layout_repair.py",
+      "sha256": "ceb90fe100017a634ebfb4ecf2f1626bec600f40f3ef56a98ef809eaf42adb03",
+      "bytes": 2873
+    },
+    {
+      "file": "engine/table_export.py",
+      "sha256": "a79b1014508e855bfdbaef687ef222e4b6db3d41ff67eab5df7383c1a0a5d105",
+      "bytes": 6944
+    }
+  ]
+}
