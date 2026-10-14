@@ -24,6 +24,7 @@ from wb_tool.api import (
     LoadedProjectOCR,
     LoadedProjectResult,
     PreviewRaster,
+    ProjectDerivedTables,
     ProjectOCRState,
     ProjectTableSnapshot,
     WBAnalysisProject,
@@ -117,6 +118,8 @@ class FigureProjectWindow(QMainWindow):
         self.view.ocr.run_requested.connect(self.recognize_project)
         self.view.ocr.refresh_requested.connect(self.refresh_ocr_table)
         self.view.ocr.export_requested.connect(lambda: self._choose_table_export(True))
+        self.view.normalization.refresh_requested.connect(self.refresh_ocr_table)
+        self.view.normalization.export_requested.connect(self._choose_normalization_export)
         self.view.changed.connect(self._queue_ocr_refresh)
         self._controls()
 
@@ -131,12 +134,13 @@ class FigureProjectWindow(QMainWindow):
         self._ocr_refresh_pending = True
         QTimer.singleShot(150, self.refresh_ocr_table)
 
-    def refresh_ocr_table(self, message: str = "OCR关联结果已刷新") -> None:
+    def refresh_ocr_table(self, message: str = "关联与归一化结果已刷新") -> None:
         if self._busy or not self._workspace or self._closing:
             return
         self._ocr_refresh_pending = False
         try:
             project = self.view.project()
+            self.view.normalization.refresh_targets(project)
             if not isinstance(project, WBProjectOCR):
                 return
             self.view.ocr.refresh_targets(project)
@@ -147,15 +151,16 @@ class FigureProjectWindow(QMainWindow):
         self._start()
 
         def filled(reply: WBReply) -> None:
-            if generation == self.view.generation and isinstance(reply.value, ProjectTableSnapshot):
-                self.view.ocr.result_view.show_cells(reply.value.cells)
+            if generation == self.view.generation and isinstance(reply.value, ProjectDerivedTables):
+                self.view.ocr.result_view.show_cells(reply.value.ocr_cells)
+                self.view.normalization.result_view.show_snapshot(reply.value.normalization)
                 self._done(message)
             else:
                 self._done("项目已改变，未写入过期OCR关联表")
 
         self._wb(
             WBJob(
-                "project_ocr_table",
+                "project_derived_tables",
                 document=project,
                 project_results=self._project_results,
                 project_ocr_result=self._loaded_ocr,
@@ -227,7 +232,8 @@ class FigureProjectWindow(QMainWindow):
         if self._busy or not self._workspace:
             return
         try:
-            if not isinstance(self.view.project(), WBProjectOCR):
+            project = self.view.project()
+            if not isinstance(project, WBProjectOCR) or project.ocr is None:
                 raise ValueError("请先导入独立拼图")
         except ValueError as error:
             self._error(str(error))
@@ -250,6 +256,10 @@ class FigureProjectWindow(QMainWindow):
         restore: bool = False,
         after: Callable[[], None] | None = None,
     ) -> None:
+        ocr = project.ocr
+        if ocr is None:
+            self._error("请先导入独立拼图")
+            return
         generation = self.view.generation
         self._start()
         session = ProjectOCRSession(self._store, self._background, self)
@@ -276,7 +286,7 @@ class FigureProjectWindow(QMainWindow):
                     else:
                         self._done("OCR原文已校验" if completion.loaded else "OCR原文未载入")
 
-                self._wb(WBJob("preview", path=self._paths[project.ocr.source.sha256]), previewed)
+                self._wb(WBJob("preview", path=self._paths[ocr.source.sha256]), previewed)
             elif completion.loaded is None:
                 self._busy = False
                 message = "识别未更新，之前关联保留：" + (completion.error or completion.state)
@@ -440,7 +450,16 @@ class FigureProjectWindow(QMainWindow):
         if destination:
             self.export_project_table(destination, ocr=ocr)
 
-    def export_project_table(self, destination: str, *, ocr: bool = False) -> None:
+    def _choose_normalization_export(self) -> None:
+        destination, _ = QFileDialog.getSaveFileName(
+            self, "导出新的归一化结果", "", "Excel (*.xlsx)"
+        )
+        if destination:
+            self.export_project_table(destination, normalization=True)
+
+    def export_project_table(
+        self, destination: str, *, ocr: bool = False, normalization: bool = False
+    ) -> None:
         if self._busy or not self._workspace:
             return
 
@@ -449,10 +468,13 @@ class FigureProjectWindow(QMainWindow):
             self._start()
             self._wb(
                 WBJob(
-                    "project_ocr_export" if ocr else "project_export",
+                    "project_normalization_export"
+                    if normalization
+                    else ("project_ocr_export" if ocr else "project_export"),
                     document=project,
                     project_results=self._project_results,
                     project_ocr_result=self._loaded_ocr,
+                    ocr_labels=bool(self.view.normalization.result_view.labels.currentIndex()),
                     destination=destination,
                 ),
                 lambda reply: self._done("项目结果表已导出：" + str(reply.value)),
@@ -844,7 +866,7 @@ class FigureProjectWindow(QMainWindow):
                 assets = {r.source.sha256: r.source for r in project.rows if r.source}
                 if project.template.font:
                     assets[project.template.font.sha256] = project.template.font
-                if isinstance(project, WBProjectOCR):
+                if isinstance(project, WBProjectOCR) and project.ocr is not None:
                     assets[project.ocr.source.sha256] = project.ocr.source
                 pending = list(assets.values())
                 resolved_paths: dict[str, str] = {}
@@ -867,7 +889,7 @@ class FigureProjectWindow(QMainWindow):
                                     restore=True,
                                 )
 
-                            if isinstance(project, WBProjectOCR):
+                            if isinstance(project, WBProjectOCR) and project.ocr is not None:
                                 self._start_ocr(project, restore=True, after=measurements)
                             else:
                                 measurements()

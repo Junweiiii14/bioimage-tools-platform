@@ -53,6 +53,10 @@ class ProjectOCRSession(QObject):
             raise RuntimeError("OCR会话不能重复开始")
         self._started = True
         self._project, self._workspace, self._restore = project, workspace, restore
+        if project.ocr is None:
+            self._finish(ProjectOCRCompletion(error="请先导入独立拼图"))
+            return
+        self._ocr = project.ocr
         if restore:
             if project.ocr.run is None:
                 self._finish(ProjectOCRCompletion(state="empty"))
@@ -106,7 +110,7 @@ class ProjectOCRSession(QObject):
             if response.value != self._project or run.revision != self._project.revision:
                 raise ValueError("OCR冻结项目不一致")
             self._storage(
-                StorageCommand("asset", asset=self._project.ocr.source),
+                StorageCommand("asset", asset=self._ocr.source),
                 lambda source: self._launch(run, source),
             )
 
@@ -124,7 +128,7 @@ class ProjectOCRSession(QObject):
             request_id=uuid4().hex,
             source_path=reply.value,
             request=OCRRequest(
-                source_sha256=self._project.ocr.source.sha256, revision=self._project.revision
+                source_sha256=self._ocr.source.sha256, revision=self._project.revision
             ),
         )
         session = RunSession(self._store, run, OCRProcessCodec(start), self)
@@ -154,7 +158,7 @@ class ProjectOCRSession(QObject):
                 self._finish(ProjectOCRCompletion(error=str(error)))
 
     def _restored(self, reply: StorageReply) -> None:
-        if not isinstance(reply.value, RunRecord) or reply.value != self._project.ocr.run:
+        if not isinstance(reply.value, RunRecord) or reply.value != self._ocr.run:
             raise ValueError("OCR引用与工作区记录不一致")
         self._read_result(reply.value)
 
@@ -166,7 +170,7 @@ class ProjectOCRSession(QObject):
             def decoded(result: WBReply) -> None:
                 if not isinstance(result.value, LoadedProjectOCR):
                     raise ValueError("OCR结果未通过校验")
-                if self._restore and result.value.recognition != self._project.ocr.recognition:
+                if self._restore and result.value.recognition != self._ocr.recognition:
                     raise ValueError("OCR原文副本与已提交资产不一致")
                 self._finish(ProjectOCRCompletion(result.value, "succeeded"))
 

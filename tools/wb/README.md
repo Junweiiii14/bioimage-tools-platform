@@ -1,6 +1,6 @@
 # WB 数值核心
 
-公开入口 `wb_tool.api`；包版本0.12.0，实现定量/手工Qt闭环、OCR复核和结果表。
+公开入口 `wb_tool.api`；包版本0.13.0，实现定量/手工Qt闭环、OCR复核、结果表与显式样本归一化。
 数值契约与参考来源见 `../../docs/contracts/wb-reference-v1.md`。
 
 - 输入：未平滑且已声明极性的非负有限剖面、闭区间 `BandBounds`、可选 `Baseline`。
@@ -44,4 +44,6 @@ v1草稿继续读取，协议/文档契约见wb-document-v2.md。自动裁剪、
 
 0.11.0连接多原图定量：WBAnalysisProject/schema v3保存固定N标注和已提交RunRecord引用，继续读取v1/v2。边界初始为空；明确dark/light、闭区间边界、人工或端点基线，复用原积分与曲线。空位强制排除；源/几何/审核变化使计划过期，参数修改清除当前run，名称和排序不改变测量。后台结果校验/自动项目表/XLSX保留原图SHA、row/lane/band、请求修订与运行身份，缺失不填0。项目UI每页显示200泳道，结果资产加载预算64 MiB；未载入结果不给有效值。CLX按用户说明排除。契约见wb-project-analysis-v1.md。
 
-0.12.0新增WBProjectOCR/schema v4，继续读取v1/v2/v3：独立TIFF拼图OCR原文/token位置/置信度、可改Fig/蛋白、人工补行、明确关联原图row_id/SHA/ROI/N、确认后自动填表及XLSX。识别显示与原图定量独立；同名蛋白不猜配，空位和真实0保留。改名撤回确认，来源或几何变化使关联过期；重开须再次核对已提交OCR资产和运行，坏OCR不会伪造数值。成功重新识别重建未确认行；失败或取消保留旧关联。每项目当前一张TIFF拼图、最多512行；PNG/JPEG OCR、归一化、统一归档和产品验收仍待实施。契约见wb-project-ocr-v1.md。
+0.12.0新增WBProjectOCR/schema v4，继续读取v1/v2/v3：独立TIFF拼图OCR原文/token位置/置信度、可改Fig/蛋白、人工补行、明确关联原图row_id/SHA/ROI/N、确认后自动填表及XLSX。识别显示与原图定量独立；同名蛋白不猜配，空位和真实0保留。改名撤回确认，来源或几何变化使关联过期；重开须再次核对已提交OCR资产和运行，坏OCR不会伪造数值。成功重新识别重建未确认行；失败或取消保留旧关联。每项目当前一张TIFF拼图、最多512行；PNG/JPEG OCR、统一归档和产品验收仍待实施。契约见wb-project-ocr-v1.md。
+
+0.13.0新增WBNormalizedProject/schema v5，继续读取v1–v4，允许无OCR配置归一化。显式选择目标/内参或磷酸化/总蛋白、逐泳道样本映射、包含与对照；初始无样本名、参照泳道或确认。lane_reference_ratio@1分开保存原始积分展示、比值、对照均值和相对值，派生值从核验run重算，不写回原始结果。零/缺失/异常分母和无效对照给空值及原因，不加epsilon或跳过坏对照。Qt复核、OCR标签视图、重开与带来源XLSX共用同一计算；改映射撤回确认，源/ROI/N变化使关系过期。契约见wb-project-normalization-v1.md。用户实验偏好和真实对应未替用户选择；独审与完整产品验收待办。

@@ -14,8 +14,10 @@ from wb_tool.application.figure_project import FigureRender, FigureSourcePath, W
 from wb_tool.application.project_analysis import (
     LoadedProjectResult,
     ProjectRowAnalysis,
+    ProjectTableCell,
     ProjectTableSnapshot,
 )
+from wb_tool.application.project_normalization import NormalizationSnapshot
 from wb_tool.application.project_ocr import LoadedProjectOCR
 from wb_tool.domain.crop_detection import CropDetectionSettings
 from wb_tool.domain.worksheet import OCRRecognition, Worksheet
@@ -56,6 +58,8 @@ class WBJob:
         "project_ocr_install",
         "project_ocr_table",
         "project_ocr_export",
+        "project_derived_tables",
+        "project_normalization_export",
     ]
     path: str = ""
     data: bytes = b""
@@ -74,6 +78,13 @@ class WBJob:
     project_results: tuple[LoadedProjectResult, ...] = ()
     ocr_run: RunRecord | None = None
     project_ocr_result: LoadedProjectOCR | None = None
+    ocr_labels: bool = False
+
+
+@dataclass(frozen=True)
+class ProjectDerivedTables:
+    ocr_cells: tuple[ProjectTableCell, ...] = ()
+    normalization: NormalizationSnapshot = NormalizationSnapshot()
 
 
 @dataclass(frozen=True)
@@ -89,6 +100,7 @@ class WBReply:
         | LoadedProjectResult
         | ProjectTableSnapshot
         | LoadedProjectOCR
+        | ProjectDerivedTables
         | AnalysisResult
         | OCRRecognition
         | bytes

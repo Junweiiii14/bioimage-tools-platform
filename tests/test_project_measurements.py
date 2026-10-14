@@ -15,7 +15,7 @@ from PIL import Image, ImageDraw, ImageFont
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QTableWidget, QTableWidgetItem, QTabWidget
 from pytestqt.qtbot import QtBot
-from wb_tool.api import WBAnalysisProject, WBProjectOCR
+from wb_tool.api import WBAnalysisProject, WBNormalizedProject, WBProjectOCR
 
 if TYPE_CHECKING:
     from bioimage_app.api import FigureProjectWindow
@@ -281,6 +281,7 @@ def test_real_project_ocr_bind_fill_export_reopen_and_cancel(
     qtbot.waitUntil(window.import_button.isEnabled, timeout=30000)
     project = window.view.project()
     assert isinstance(project, WBProjectOCR), window.view.status.text()
+    assert project.ocr is not None
     assert project.ocr.run and project.ocr.run.state == "succeeded", window.view.status.text()
     assert project.ocr.recognition and len(project.ocr.rows) == 2
     assert [r.figure.replace(" ", "") for r in project.ocr.rows] == ["Fig1A", "Fig2B"]
@@ -313,6 +314,14 @@ def test_real_project_ocr_bind_fill_export_reopen_and_cancel(
     ]
     assert panel.canvas.image_rect().width() > 0
     assert "AKT" in panel.raw.toPlainText()
+    configure_normalization(window)
+    qtbot.waitUntil(lambda: window.view.normalization.results.rowCount() == 3)
+    window.view.normalization.result_view.labels.setCurrentIndex(1)
+    assert item(window.view.normalization.results, 0, 0).text() == "Fig 1A"
+    assert item(window.view.normalization.results, 0, 8).text() == "0.5"
+    normalized = window.view.project()
+    assert isinstance(normalized, WBNormalizedProject) and normalized.ocr is not None
+    assert normalized.ocr.run == project.ocr.run
     capture = os.environ.get("BIOIMAGE_PROJECT_OCR_CAPTURE")
     if capture:
         tabs = window.view.findChild(QTabWidget)
@@ -368,7 +377,11 @@ def test_real_project_ocr_bind_fill_export_reopen_and_cancel(
     reopened.load_document(project.project_id)
     qtbot.waitUntil(reopened.import_button.isEnabled, timeout=20000)
     restored = reopened.view.project()
-    assert isinstance(restored, WBProjectOCR) and restored.ocr == saved.ocr
+    assert (
+        isinstance(restored, WBProjectOCR)
+        and restored.ocr is not None
+        and restored.ocr == saved.ocr
+    )
     assert item(reopened.view.ocr.results, 0, 3).text() == "4000"
     assert item(reopened.view.ocr.results, 3, 3).text() == "8000"
     item(reopened.view.table, 0, 4).setText("1")
@@ -423,7 +436,8 @@ def test_project_ocr_inflight_close_or_edit_does_not_overwrite(
         window.close()
     qtbot.waitUntil(lambda: window.resources_closed, timeout=20000)
     project = window.view.project()
-    assert isinstance(project, WBProjectOCR) and project.ocr.run is None and not project.ocr.rows
+    assert isinstance(project, WBProjectOCR) and project.ocr is not None
+    assert project.ocr.run is None and not project.ocr.rows
 
 
 def test_late_ocr_import_preserves_new_edits(
@@ -441,3 +455,104 @@ def test_late_ocr_import_preserves_new_edits(
     assert window.view.project().name == "new edit during import"
     assert not isinstance(window.view.project(), WBProjectOCR)
     assert "未替换拼图" in window.view.status.text()
+
+
+def configure_normalization(window: "FigureProjectWindow") -> None:
+    project = window.view.project()
+    panel = window.view.normalization
+    panel.target.setCurrentIndex(panel.target.findData(project.rows[0].row_id))
+    panel.reference.setCurrentIndex(panel.reference.findData(project.rows[1].row_id))
+    panel.kind.setCurrentIndex(panel.kind.findData("housekeeping"))
+    panel.configure()
+    assert panel.pairs.rowCount() == 3, window.view.status.text()
+    for row, sample, reference in ((0, "control", "1"), (2, "=zero", "2")):
+        item(panel.pairs, row, 1).setText(sample)
+        item(panel.pairs, row, 2).setText(reference)
+    item(panel.pairs, 0, 4).setCheckState(Qt.CheckState.Checked)
+    panel.mode.setCurrentIndex(panel.mode.findData("single_control"))
+    panel.confirmed.setChecked(True)
+
+
+def test_project_normalization_ui_mapping_controls_export_reopen_and_stale(
+    qtbot: QtBot, tmp_path: Path, windows: Callable[[], "FigureProjectWindow"]
+) -> None:
+    window = windows()
+    setup(qtbot, tmp_path, window)
+    window.analyze_project(True)
+    qtbot.waitUntil(window.import_button.isEnabled, timeout=20000)
+    configure_normalization(window)
+    panel = window.view.normalization
+    qtbot.waitUntil(
+        lambda: panel.results.rowCount() == 3 and item(panel.results, 0, 8).text() == "0.5"
+    )
+    assert [item(panel.results, i, 10).text() for i in range(3)] == ["1", "", "0"]
+    project = window.view.project()
+    assert isinstance(project, WBNormalizedProject) and project.ocr is None
+    assert project.normalizations[0].confirmed
+    assert item(window.view.table, 0, 9).checkState() == Qt.CheckState.Checked
+    # Select two explicit controls: zero is a valid ratio, not a missing value.
+    item(panel.pairs, 2, 4).setCheckState(Qt.CheckState.Checked)
+    assert not panel.confirmed.isChecked()
+    panel.confirmed.setChecked(True)
+    qtbot.waitUntil(
+        lambda: panel.results.rowCount() == 3 and item(panel.results, 0, 10).text() == ""
+    )
+    assert "一个对照" in item(panel.results, 0, 12).text()
+    panel.mode.setCurrentIndex(panel.mode.findData("control_mean"))
+    panel.confirmed.setChecked(True)
+    qtbot.waitUntil(
+        lambda: panel.results.rowCount() == 3 and item(panel.results, 0, 10).text() == "2"
+    )
+    assert item(panel.results, 0, 9).text() == "0.25"
+    # A selected control with a zero denominator invalidates all relative values, not raw ratios.
+    item(panel.pairs, 2, 2).setText("3")
+    panel.confirmed.setChecked(True)
+    qtbot.waitUntil(
+        lambda: panel.results.rowCount() == 3 and "未跳过" in item(panel.results, 0, 12).text()
+    )
+    assert item(panel.results, 0, 8).text() == "0.5"
+    assert item(panel.results, 0, 10).text() == ""
+    item(panel.pairs, 2, 2).setText("2")
+    panel.confirmed.setChecked(True)
+    qtbot.waitUntil(
+        lambda: panel.results.rowCount() == 3 and item(panel.results, 0, 10).text() == "2"
+    )
+    capture = os.environ.get("BIOIMAGE_NORMALIZATION_CAPTURE")
+    if capture:
+        tabs = window.view.findChild(QTabWidget)
+        assert tabs is not None
+        tabs.setCurrentWidget(panel)
+        assert window.grab().save(capture)
+    output = tmp_path / "normalized.xlsx"
+    window.export_project_table(str(output), normalization=True)
+    qtbot.waitUntil(window.import_button.isEnabled, timeout=10000)
+    assert output.exists(), window.view.status.text()
+    with ZipFile(output) as archive:
+        raw = archive.read("xl/worksheets/sheet1.xml")
+        assert b"=zero" in raw and b"<f>" not in raw and b"0.25" in raw
+        audit = archive.read("xl/worksheets/sheet2.xml").decode()
+        assert all(plan.run and plan.run.run_id in audit for plan in project.analyses)
+    saved = window.view.project()
+    window.close()
+    qtbot.waitUntil(lambda: window.resources_closed, timeout=15000)
+    reopened = windows()
+    reopened.open_workspace(str(tmp_path / "workspace"))
+    qtbot.waitUntil(reopened.import_button.isEnabled)
+    reopened.load_document(saved.project_id)
+    qtbot.waitUntil(reopened.import_button.isEnabled, timeout=20000)
+    restored = reopened.view.project()
+    assert isinstance(restored, WBNormalizedProject) and restored == saved
+    assert [item(reopened.view.normalization.results, i, 10).text() for i in range(3)] == [
+        "2",
+        "",
+        "0",
+    ]
+    item(reopened.view.table, 1, 4).setText("1")
+    item(reopened.view.table, 1, 9).setCheckState(Qt.CheckState.Checked)
+    qtbot.waitUntil(
+        lambda: (
+            reopened.view.normalization.results.rowCount() == 3
+            and "过期" in item(reopened.view.normalization.results, 0, 11).text()
+        )
+    )
+    assert all(item(reopened.view.normalization.results, i, 8).text() == "" for i in range(3))

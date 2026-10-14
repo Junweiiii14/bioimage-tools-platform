@@ -90,17 +90,23 @@ class ProjectOCRState(DocumentIO):
 
 class WBProjectOCR(WBAnalysisProject):
     schema_version: int = Field(default=4, ge=4, le=4)
-    ocr: ProjectOCRState
+    ocr: ProjectOCRState | None = None
 
     @model_validator(mode="after")
     def owned(self) -> "WBProjectOCR":
-        run = self.ocr.run
+        if self.ocr is None and self.schema_version == 4:
+            raise ValueError("v4项目必须包含OCR状态")
+        run = self.ocr.run if self.ocr else None
         if run is not None and (run.document_id != self.project_id or run.revision > self.revision):
             raise ValueError("OCR运行不属于此项目/修订")
         return self
 
 
 def project_with_ocr(project: WBFigureProject, ocr: ProjectOCRState) -> WBProjectOCR:
+    if isinstance(project, WBProjectOCR):
+        fields = {name: getattr(project, name) for name in type(project).model_fields}
+        fields["ocr"] = ocr
+        return type(project).model_validate(fields)
     return WBProjectOCR(
         project_id=project.project_id,
         name=project.name,
@@ -114,10 +120,17 @@ def project_with_ocr(project: WBFigureProject, ocr: ProjectOCRState) -> WBProjec
     )
 
 
+def require_project_ocr(project: WBProjectOCR) -> ProjectOCRState:
+    if project.ocr is None:
+        raise ValueError("请先导入独立拼图")
+    return project.ocr
+
+
 def bind_project_ocr_row(
     project: WBProjectOCR, ocr_row_id: str, target_row_id: str | None
 ) -> WBProjectOCR:
-    if ocr_row_id not in {r.row_id for r in project.ocr.rows}:
+    ocr = require_project_ocr(project)
+    if ocr_row_id not in {r.row_id for r in ocr.rows}:
         raise ValueError("请选择已有OCR行")
     link = None
     if target_row_id is not None:
@@ -132,9 +145,9 @@ def bind_project_ocr_row(
         )
     rows = tuple(
         r.model_copy(update={"link": link, "confirmed": False}) if r.row_id == ocr_row_id else r
-        for r in project.ocr.rows
+        for r in ocr.rows
     )
-    return project_with_ocr(project, project.ocr.model_copy(update={"rows": rows}))
+    return project_with_ocr(project, ocr.model_copy(update={"rows": rows}))
 
 
 def ocr_link_is_current(project: WBFigureProject, link: ProjectOCRLink) -> bool:
@@ -169,6 +182,7 @@ class LoadedProjectOCR:
 
 
 def read_project_ocr_result(project: WBProjectOCR, run: RunRecord, data: bytes) -> LoadedProjectOCR:
+    ocr = require_project_ocr(project)
     if (
         run.state != "succeeded"
         or run.result is None
@@ -186,15 +200,16 @@ def read_project_ocr_result(project: WBProjectOCR, run: RunRecord, data: bytes) 
     check_document_json(data)
     result = TypeAdapter(OCRRecognition).validate_json(data, strict=True)
     validate_ocr_recognition(result, run.revision)
-    if result.source_sha256 != project.ocr.source.sha256 or (result.width, result.height) != (
-        project.ocr.width,
-        project.ocr.height,
+    if result.source_sha256 != ocr.source.sha256 or (result.width, result.height) != (
+        ocr.width,
+        ocr.height,
     ):
         raise ValueError("OCR结果不是当前拼图")
     return LoadedProjectOCR(run, result)
 
 
 def install_project_recognition(project: WBProjectOCR, loaded: LoadedProjectOCR) -> WBProjectOCR:
+    ocr = require_project_ocr(project)
     rows = tuple(
         ProjectOCRRow(
             row_id=token.token_id,
@@ -207,10 +222,10 @@ def install_project_recognition(project: WBProjectOCR, loaded: LoadedProjectOCR)
         for token in figure.rows
     )
     state = ProjectOCRState(
-        source=project.ocr.source,
-        filename=project.ocr.filename,
-        width=project.ocr.width,
-        height=project.ocr.height,
+        source=ocr.source,
+        filename=ocr.filename,
+        width=ocr.width,
+        height=ocr.height,
         run=loaded.run,
         recognition=loaded.recognition,
         rows=rows,
@@ -221,6 +236,8 @@ def install_project_recognition(project: WBProjectOCR, loaded: LoadedProjectOCR)
 def fill_project_ocr_table(
     project: WBProjectOCR, results: tuple[LoadedProjectResult, ...], loaded: LoadedProjectOCR | None
 ) -> tuple[ProjectTableCell, ...]:
+    if project.ocr is None:
+        return ()
     measurements = {(c.row_id, c.lane_index): c for c in fill_project_table(project, results)}
     evidence_valid = bool(
         loaded and loaded.run == project.ocr.run and loaded.recognition == project.ocr.recognition

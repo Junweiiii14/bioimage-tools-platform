@@ -19,27 +19,34 @@ from wb_tool.api import (
     FigureTemplate,
     LaneROI,
     LoadedProjectResult,
+    NormalizationPlan,
     OCRRecognition,
     ProjectOCRRow,
     ProjectOCRState,
     ProjectRowAnalysis,
+    SamplePair,
     TextBounds,
     TextToken,
     WBAnalysisProject,
     WBFigureProject,
+    WBNormalizedProject,
     WBProjectOCR,
     WBReviewProject,
     analysis_is_current,
     analyze_annotations,
     bind_project_ocr_row,
+    export_project_normalization,
     export_project_table,
+    fill_project_normalization,
     fill_project_ocr_table,
     fill_project_table,
     install_project_recognition,
     load_tiff,
+    make_normalization_plan,
     make_row_analysis,
     prepare_project_analyses,
     project_with_analyses,
+    project_with_normalizations,
     project_with_ocr,
     read_figure_project,
     read_project_ocr_result,
@@ -374,11 +381,13 @@ def recognized_project(tmp_path: Path):
 
 def test_ocr_project_names_need_explicit_current_source_bindings(tmp_path: Path) -> None:
     project, results, loaded, _ = recognized_project(tmp_path)
+    assert project.ocr is not None
     assert len(project.ocr.rows) == 2
     assert all(not r.confirmed and r.link is None for r in project.ocr.rows)
     assert all(c.value is None for c in fill_project_ocr_table(project, results, loaded))
     for label, target in zip(project.ocr.rows, project.rows, strict=False):
         project = bind_project_ocr_row(project, label.row_id, target.row_id)
+    assert project.ocr is not None
     rows = tuple(r.model_copy(update={"confirmed": True}) for r in project.ocr.rows)
     project = project_with_ocr(project, project.ocr.model_copy(update={"rows": rows}))
     cells = fill_project_ocr_table(project, results, loaded)
@@ -407,11 +416,13 @@ def test_ocr_project_names_need_explicit_current_source_bindings(tmp_path: Path)
     assert isinstance(updated, WBProjectOCR) and updated.ocr == project.ocr
     assert fill_project_ocr_table(updated, results, loaded)[0].value is None
     reidentified = install_project_recognition(project, loaded)
+    assert reidentified.ocr is not None
     assert all(not r.confirmed and r.link is None for r in reidentified.ocr.rows)
 
 
 def test_ocr_project_rejects_bad_assets_identity_and_tokens(tmp_path: Path) -> None:
     project, _, loaded, data = recognized_project(tmp_path)
+    assert project.ocr is not None
     with pytest.raises(ValueError):
         read_project_ocr_result(project, loaded.run, data + b" ")
     with pytest.raises(ValueError):
@@ -437,3 +448,164 @@ def test_ocr_project_rejects_bad_assets_identity_and_tokens(tmp_path: Path) -> N
         bind_project_ocr_row(project, project.ocr.rows[0].row_id, "missing")
     with pytest.raises(ValueError):
         WBAnalysisProject.from_bytes(project.model_dump_json().encode())
+
+
+def test_normalization_explicit_pairs_controls_roundtrip_and_export(tmp_path: Path) -> None:
+    project, paths = configured(tmp_path)
+    project, results = complete(project, paths)
+    plan = make_normalization_plan(project, "row0", "row1", "housekeeping")
+    assert all(p.reference_lane is None and not p.sample and not p.control for p in plan.pairs)
+    assert not plan.confirmed
+    plan = plan.model_copy(
+        update={
+            "pairs": (
+                SamplePair(target_lane=1, reference_lane=1, sample="control", control=True),
+                SamplePair(target_lane=2, included=False),
+                SamplePair(target_lane=3, reference_lane=2, sample="=zero"),
+            ),
+            "confirmed": True,
+            "control_mode": "single_control",
+        }
+    )
+    normalized = project_with_normalizations(project, (plan,))
+    assert normalized.ocr is None and normalized.schema_version == 5
+    cells = fill_project_normalization(normalized, results).cells
+    assert [c.ratio for c in cells] == [0.5, None, 0]
+    assert [c.relative for c in cells] == [1, None, 0]
+    assert all(c.control_mean == 0.5 for c in cells)
+    assert cells[0].target and cells[0].reference
+    assert cells[0].target.run_id != cells[0].reference.run_id
+    assert read_figure_project(normalized.model_dump_json().encode()) == normalized
+    assert normalized.analyses == project.analyses
+    with pytest.raises(ValueError):
+        WBProjectOCR.from_bytes(normalized.model_dump_json().encode())
+    with pytest.raises(ValueError):
+        WBProjectOCR(project_id="missing-ocr")
+    output = tmp_path / "normalized.xlsx"
+    export_project_normalization(normalized, results, None, str(output))
+    with ZipFile(output) as archive:
+        raw = archive.read("xl/worksheets/sheet1.xml")
+        assert b"=zero" in raw and b"<f>" not in raw
+        audit = archive.read("xl/worksheets/sheet2.xml").decode()
+        assert all(p.request.source_sha256 in audit for p in project.analyses)
+        assert "single_control" in audit and "housekeeping" in audit
+    old = output.read_bytes()
+    with pytest.raises(FileExistsError):
+        export_project_normalization(normalized, results, None, str(output))
+    assert output.read_bytes() == old
+
+
+def test_normalization_invalid_selected_control_cannot_be_silently_dropped(tmp_path: Path) -> None:
+    project, paths = configured(tmp_path)
+    project, results = complete(project, paths)
+    plan = make_normalization_plan(project, "row0", "row1", "phospho_total")
+    plan = plan.model_copy(
+        update={
+            "pairs": (
+                SamplePair(target_lane=1, reference_lane=1, sample="good", control=True),
+                SamplePair(target_lane=2, included=False),
+                SamplePair(target_lane=3, reference_lane=3, sample="bad", control=True),
+            ),
+            "confirmed": True,
+            "control_mode": "control_mean",
+        }
+    )
+    normalized = project_with_normalizations(project, (plan,))
+    cells = fill_project_normalization(normalized, results).cells
+    assert cells[0].ratio == 0.5 and cells[0].relative is None
+    assert cells[0].relative_status == "control_unavailable"
+    assert cells[2].ratio is None and cells[2].ratio_status == "invalid_ratio"
+    assert all(c.control_mean is None for c in cells)
+    # Cached valid results do not bypass later quantitative edits or changed geometry.
+    edited = update_row_analysis_request(
+        normalized, "row1", replace(normalized.analyses[1].request, polarity="light")
+    )
+    assert isinstance(edited, WBNormalizedProject) and edited.normalizations == (plan,)
+    assert fill_project_normalization(edited, results).cells[0].ratio_status == "invalid_reference"
+    changed = normalized.model_copy(
+        update={
+            "rows": (
+                normalized.rows[0].model_copy(update={"roi": LaneROI("row0", 1, 5, 30, 15)}),
+                *normalized.rows[1:],
+            )
+        }
+    )
+    assert fill_project_normalization(changed, results).cells[0].ratio_status == "stale"
+    unconfirmed = project_with_normalizations(
+        normalized, (plan.model_copy(update={"confirmed": False}),)
+    )
+    assert fill_project_normalization(unconfirmed, results).cells[0].ratio is None
+
+
+def test_normalization_pair_validation_and_incomplete_mapping(tmp_path: Path) -> None:
+    project, _ = configured(tmp_path)
+    with pytest.raises(ValueError):
+        make_normalization_plan(project, "row0", "row0", "housekeeping")
+    with pytest.raises(ValueError):
+        make_normalization_plan(project, "row0", "missing", "housekeeping")
+    plan = make_normalization_plan(project, "row0", "row1", "housekeeping")
+    for pairs in (
+        plan.pairs[:-1],
+        (
+            SamplePair(target_lane=1, reference_lane=1),
+            SamplePair(target_lane=2, reference_lane=1),
+            plan.pairs[2],
+        ),
+        (
+            SamplePair(target_lane=1, sample="same"),
+            plan.pairs[1],
+            SamplePair(target_lane=3, sample="same"),
+        ),
+        (SamplePair(target_lane=1, reference_lane=4), *plan.pairs[1:]),
+        (SamplePair(target_lane=1, included=False, control=True), *plan.pairs[1:]),
+    ):
+        fields = {name: getattr(plan, name) for name in NormalizationPlan.model_fields}
+        with pytest.raises(ValueError):
+            NormalizationPlan.model_validate({**fields, "pairs": pairs})
+    normalized = project_with_normalizations(
+        project, (plan.model_copy(update={"confirmed": True}),)
+    )
+    assert fill_project_normalization(normalized, ()).cells[0].ratio_status == "unmatched"
+    with pytest.raises(ValueError):
+        project_with_normalizations(project, (plan, plan))
+
+
+def test_normalization_preserves_ocr_and_requires_verified_labels(tmp_path: Path) -> None:
+    project, results, loaded, _ = recognized_project(tmp_path)
+    assert project.ocr is not None
+    ocr_id = project.ocr.rows[0].row_id
+    project = bind_project_ocr_row(project, ocr_id, "row0")
+    assert project.ocr is not None
+    project = project_with_ocr(
+        project,
+        project.ocr.model_copy(
+            update={
+                "rows": tuple(
+                    row.model_copy(update={"confirmed": True}) for row in project.ocr.rows
+                )
+            }
+        ),
+    )
+    plan = make_normalization_plan(project, "row0", "row1", "housekeeping")
+    plan = plan.model_copy(
+        update={
+            "confirmed": True,
+            "pairs": (
+                SamplePair(target_lane=1, sample="S1", reference_lane=1),
+                plan.pairs[1],
+                SamplePair(target_lane=3, sample="S3", reference_lane=2),
+            ),
+        }
+    )
+    normalized = project_with_normalizations(project, (plan,))
+    assert normalized.ocr == project.ocr
+    table = fill_project_normalization(normalized, results, loaded)
+    assert [c.ratio for c in table.ocr_cells] == [0.5, None, 0]
+    assert table.ocr_cells[0].figure == "Fig 1A" and table.cells[0].figure == "Fig1"
+    assert table.ocr_cells[0].ocr_row_id == ocr_id
+    assert all(c.ratio is None for c in fill_project_normalization(normalized, results).ocr_cells)
+    reidentified = install_project_recognition(normalized, loaded)
+    assert isinstance(reidentified, WBNormalizedProject) and reidentified.normalizations == (plan,)
+    assert all(
+        c.ratio is None for c in fill_project_normalization(reidentified, results, loaded).ocr_cells
+    )

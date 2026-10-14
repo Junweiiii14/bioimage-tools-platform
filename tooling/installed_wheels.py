@@ -247,6 +247,23 @@ assert all(c.status == 'unconfirmed' and c.value is None
 export_project_ocr_table(ocr_project, (), loaded_ocr, 'installed-project-ocr.xlsx')
 assert Path('installed-project-ocr.xlsx').exists()
 print('Installed project v4: OCR evidence, explicit binding, roundtrip and literal XLSX passed')
+from wb_tool.api import (WBNormalizedProject, make_normalization_plan,
+    project_with_normalizations, fill_project_normalization, export_project_normalization)
+reference = row.model_copy(update={'row_id': 'reference', 'protein': 'total AKT',
+    'roi': LaneROI('reference', 0, 250, 1200, 310)})
+paired_project = ocr_project.model_copy(update={'rows': (row, reference)})
+plan = make_normalization_plan(paired_project, 'row', 'reference', 'phospho_total')
+normalized = project_with_normalizations(paired_project, (plan,))
+assert isinstance(normalized, WBNormalizedProject) and normalized.ocr == ocr_project.ocr
+assert normalized.analyses == ocr_project.analyses
+assert read_figure_project(normalized.model_dump_json().encode()) == normalized
+assert all(c.ratio is None and c.ratio_status == 'pending_review'
+    for c in fill_project_normalization(normalized, (), loaded_ocr).cells)
+export_project_normalization(normalized, (), loaded_ocr, 'installed-normalization.xlsx')
+assert Path('installed-normalization.xlsx').exists()
+without_ocr = normalized.model_copy(update={'ocr': None})
+assert read_figure_project(without_ocr.model_dump_json().encode()) == without_ocr
+print('Installed project v5: explicit pairing, optional OCR, roundtrip and XLSX passed')
 print('Installed WB desktop window: real widgets/entry assembly and async close passed')
 print('Installed optional OCR: verified bundled PP-OCRv6 CPU recognition passed')
 import subprocess

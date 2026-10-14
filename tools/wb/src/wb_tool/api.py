@@ -31,7 +31,7 @@ from wb_tool.application.crop_suggestions import (
     read_figure_project,
     record_crop_suggestion,
 )
-from wb_tool.application.desktop_data import PreviewRaster, WBJob, WBReply
+from wb_tool.application.desktop_data import PreviewRaster, ProjectDerivedTables, WBJob, WBReply
 from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
 from wb_tool.application.figure_project import (
     FigureRender,
@@ -65,6 +65,20 @@ from wb_tool.application.project_analysis import (
     record_project_run,
     set_row_analysis,
     update_row_analysis_request,
+)
+from wb_tool.application.project_normalization import (
+    ControlMode,
+    NormalizationPlan,
+    NormalizationSnapshot,
+    NormalizationSource,
+    NormalizedCell,
+    ReferenceKind,
+    SamplePair,
+    WBNormalizedProject,
+    fill_project_normalization,
+    make_normalization_plan,
+    normalization_is_current,
+    project_with_normalizations,
 )
 from wb_tool.application.project_ocr import (
     LoadedProjectOCR,
@@ -122,6 +136,20 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "ProjectDerivedTables",
+    "ControlMode",
+    "NormalizationPlan",
+    "NormalizationSnapshot",
+    "NormalizationSource",
+    "NormalizedCell",
+    "ReferenceKind",
+    "SamplePair",
+    "WBNormalizedProject",
+    "fill_project_normalization",
+    "make_normalization_plan",
+    "normalization_is_current",
+    "project_with_normalizations",
+    "export_project_normalization",
     "export_project_ocr_table",
     "LoadedProjectOCR",
     "ProjectOCRLink",
@@ -337,6 +365,19 @@ def export_project_ocr_table(
     from wb_tool.adapters.project_ocr_export import export_project_ocr_table as export
 
     return str(export(project, results, loaded, destination))
+
+
+def export_project_normalization(
+    project: WBNormalizedProject,
+    results: tuple[LoadedProjectResult, ...],
+    loaded: LoadedProjectOCR | None,
+    destination: str,
+    *,
+    ocr_labels: bool = False,
+) -> str:
+    from wb_tool.adapters.normalization_export import export_project_normalization as export
+
+    return str(export(project, results, loaded, destination, ocr_labels=ocr_labels))
 
 
 def export_crop(source: str, request: CropRequest, destination: str) -> str:

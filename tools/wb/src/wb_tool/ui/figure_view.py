@@ -45,11 +45,17 @@ from wb_tool.application.project_analysis import (
     set_row_analysis,
     update_row_analysis_request,
 )
+from wb_tool.application.project_normalization import (
+    WBNormalizedProject,
+    make_normalization_plan,
+    project_with_normalizations,
+)
 from wb_tool.application.project_ocr import WBProjectOCR, bind_project_ocr_row, project_with_ocr
 from wb_tool.domain.grid import fixed_lane_grid
 from wb_tool.domain.lanes import LaneROI
 from wb_tool.ui.canvas import ImageCanvas
 from wb_tool.ui.crop_suggestions import CropSuggestionPanel
+from wb_tool.ui.normalization import NormalizationPanel
 from wb_tool.ui.project_analysis import ProjectAnalysisPanel
 from wb_tool.ui.project_ocr import ProjectOCRPanel
 
@@ -134,6 +140,11 @@ class FigureProjectView(QWidget):
         self.ocr.changed.connect(self._edited)
         self.ocr.binding_requested.connect(self.bind_ocr)
         tabs.addTab(self.ocr, "拼图 OCR 与结果关联")
+        self.normalization = NormalizationPanel()
+        self.normalization.changed.connect(self._edited)
+        self.normalization.configure_requested.connect(self.configure_normalization)
+        self.normalization.remove_requested.connect(self.remove_normalization)
+        tabs.addTab(self.normalization, "样本对应与归一化")
         preview_page = QWidget()
         preview_layout = QVBoxLayout(preview_page)
         preview_layout.addWidget(
@@ -261,12 +272,16 @@ class FigureProjectView(QWidget):
         ocr = self.ocr.state()
         if ocr is not None:
             project = project_with_ocr(project, ocr)
+        plans = self.normalization.plans()
+        if plans or isinstance(self._project, WBNormalizedProject):
+            project = project_with_normalizations(project, plans)
         return project
 
     def set_project(self, project: WBFigureProject) -> None:
         self._loading = True
         self._project = project
         self.ocr.restore(project)
+        self.normalization.restore(project)
         self.analysis.show_plan(None)
         self.analysis.invalidate()
         self.ocr.result_view.invalidate()
@@ -326,6 +341,7 @@ class FigureProjectView(QWidget):
         self.generation += 1
         self.analysis.invalidate()
         self.ocr.result_view.invalidate()
+        self.normalization.result_view.invalidate()
         self.preview_label.setPixmap(QPixmap())
         self.preview_label.setText("内容已修改，请重新生成预览")
         self.changed.emit()
@@ -418,6 +434,39 @@ class FigureProjectView(QWidget):
             self.set_project(bind_project_ocr_row(project, row_id, target_id or None))
             self.ocr.table.setCurrentCell(index, 0)
             self.ocr.changed.emit()
+        except ValueError as error:
+            self.status.setText(str(error))
+
+    def configure_normalization(self, target_id: str, reference_id: str, kind: str) -> None:
+        try:
+            if kind not in ("housekeeping", "phospho_total"):
+                raise ValueError("请选择参照类型")
+            project = self.project()
+            plan = make_normalization_plan(project, target_id, reference_id, kind)
+            plans = project.normalizations if isinstance(project, WBNormalizedProject) else ()
+            project = project_with_normalizations(
+                project, (*(p for p in plans if p.target.row_id != target_id), plan)
+            )
+            self.set_project(project)
+            self.normalization.selector.setCurrentIndex(
+                self.normalization.selector.findData(target_id)
+            )
+            self.normalization.selector.activated.emit(self.normalization.selector.currentIndex())
+            self._edited()
+        except ValueError as error:
+            self.status.setText(str(error))
+
+    def remove_normalization(self, target_id: str) -> None:
+        try:
+            project = self.project()
+            if isinstance(project, WBNormalizedProject):
+                self.set_project(
+                    project_with_normalizations(
+                        project,
+                        tuple(p for p in project.normalizations if p.target.row_id != target_id),
+                    )
+                )
+                self._edited()
         except ValueError as error:
             self.status.setText(str(error))
 

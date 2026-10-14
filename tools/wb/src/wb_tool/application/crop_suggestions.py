@@ -128,6 +128,10 @@ def read_figure_project(data: bytes) -> WBFigureProject:
     raw: object = json.loads(data)
     if isinstance(raw, dict):
         version = cast(dict[str, object], raw).get("schema_version")
+        if type(version) is int and version == 5:
+            from wb_tool.application.project_normalization import WBNormalizedProject
+
+            return WBNormalizedProject.from_bytes(data)
         if type(version) is int and version == 4:
             from wb_tool.application.project_ocr import WBProjectOCR
 

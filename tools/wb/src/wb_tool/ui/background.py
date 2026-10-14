@@ -14,7 +14,7 @@ from wb_tool.adapters.tiff_input import load_tiff
 from wb_tool.adapters.worksheet_export import export_worksheet
 from wb_tool.application.analysis import AnalysisResult
 from wb_tool.application.crop_suggestions import CropSuggestion, read_figure_project
-from wb_tool.application.desktop_data import PreviewRaster, WBJob, WBReply
+from wb_tool.application.desktop_data import PreviewRaster, ProjectDerivedTables, WBJob, WBReply
 from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
 from wb_tool.application.figure_project import FigureRender, WBFigureProject
 from wb_tool.application.project_analysis import (
@@ -22,6 +22,11 @@ from wb_tool.application.project_analysis import (
     ProjectTableSnapshot,
     fill_project_table,
     read_project_result,
+)
+from wb_tool.application.project_normalization import (
+    NormalizationSnapshot,
+    WBNormalizedProject,
+    fill_project_normalization,
 )
 from wb_tool.application.project_ocr import (
     LoadedProjectOCR,
@@ -49,12 +54,40 @@ class _Work(QObject):
                 | LoadedProjectResult
                 | ProjectTableSnapshot
                 | LoadedProjectOCR
+                | ProjectDerivedTables
                 | AnalysisResult
                 | OCRRecognition
                 | bytes
                 | str
             )
-            if job.operation in (
+            if job.operation == "project_derived_tables":
+                if not isinstance(job.document, WBProjectOCR):
+                    raise ValueError("缺少项目派生结果配置")
+                value = ProjectDerivedTables(
+                    fill_project_ocr_table(
+                        job.document, job.project_results, job.project_ocr_result
+                    ),
+                    fill_project_normalization(
+                        job.document, job.project_results, job.project_ocr_result
+                    )
+                    if isinstance(job.document, WBNormalizedProject)
+                    else NormalizationSnapshot(),
+                )
+            elif job.operation == "project_normalization_export":
+                from wb_tool.adapters.normalization_export import export_project_normalization
+
+                if not isinstance(job.document, WBNormalizedProject):
+                    raise ValueError("缺少归一化配置")
+                value = str(
+                    export_project_normalization(
+                        job.document,
+                        job.project_results,
+                        job.project_ocr_result,
+                        job.destination,
+                        ocr_labels=job.ocr_labels,
+                    )
+                )
+            elif job.operation in (
                 "project_ocr_result",
                 "project_ocr_install",
                 "project_ocr_table",

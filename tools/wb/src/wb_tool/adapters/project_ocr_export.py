@@ -13,6 +13,8 @@ def export_project_ocr_table(
     loaded: LoadedProjectOCR | None,
     destination: str | Path,
 ) -> Path:
+    if project.ocr is None:
+        raise ValueError("请先导入独立拼图")
     cells = fill_project_ocr_table(project, results, loaded)
     positions = {(c.row_id, c.lane_index): c.value for c in cells}
     count = max((r.link.lane_count if r.link else 1 for r in project.ocr.rows), default=1)
