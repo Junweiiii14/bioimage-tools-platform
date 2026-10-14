@@ -148,16 +148,19 @@ import subprocess
 from pathlib import Path
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QTimer
-from bioimage_app.api import create_wb_window
+from bioimage_app.api import create_wb_window, DesktopDiagnostics
 import bioimage_app.api
 assert Path(bioimage_app.api.__file__).is_relative_to(Path(sys.prefix))
 app = QApplication([])
+diagnostics = DesktopDiagnostics(Path('installed-diagnostics'))
 window = create_wb_window()
 window.show()
 assert window.isVisible() and window.view.canvas is not None
 QTimer.singleShot(50, window.close)
 QTimer.singleShot(10000, app.quit)
 app.exec()
+diagnostics.close()
+assert 'session_end' in diagnostics.path.read_text(encoding='utf-8')
 assert not window.isVisible()
 worker = subprocess.run([sys.executable, '-I', '-m', 'bioimage_app', '--worker', 'wb'],
     input=b'{}\\n', capture_output=True, timeout=15)

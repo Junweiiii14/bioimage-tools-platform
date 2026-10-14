@@ -38,3 +38,14 @@ tests/test_async_storage.py tests/test_process_runner.py tests/test_run_session.
 Version 0.3.0 adds the fixed-count grid drawing mode and asynchronous original-pixel TIFF
 crop export. Margin exclusion is explicit; stored ROIs are not regenerated from defaults.
 The crop includes source/coordinate provenance in ImageDescription and never replaces inputs.
+
+Version 0.3.1 starts local DesktopDiagnostics only in the desktop entry (never in worker
+routes). Each session gets a new log under logs in Qt's AppLocalDataLocation for
+BioImageTools. Qt messages and uncaught Python errors are flushed with UTC/native thread IDs;
+fatal Qt messages explicitly dump all Python thread stacks before Qt terminates. Normal
+messages have a 1 MiB budget, individual messages 8192 characters; fatal stacks may exceed
+it. No images or documents are serialized, and logs are not transmitted. Existing user
+faulthandler configuration is preserved; its generic native fault output stays at its
+configured destination. close() restores the prior Qt/Python hooks before closing the
+owned descriptor. Logs are per-session and are not yet automatically rotated across runs.
+The intermittent desktop Aborted root cause remains unknown; diagnostics are not a fix.

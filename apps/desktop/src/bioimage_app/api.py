@@ -7,11 +7,13 @@ if TYPE_CHECKING:
 
     from bioimage_app.wb_window import WBWindow as WBWindow
 
+from bioimage_app.diagnostics import DesktopDiagnostics
 from bioimage_app.process import ProcessCodec, ProcessEvent, ProcessOutcome, ProcessRunner
 from bioimage_app.run_session import RunCompletion, RunSession
 from bioimage_app.storage import AsyncStorage, StorageCommand, StorageReply
 
 __all__ = [
+    "DesktopDiagnostics",
     "AsyncStorage",
     "StorageCommand",
     "StorageReply",
