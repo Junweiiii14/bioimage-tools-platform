@@ -1,7 +1,7 @@
 # T-014 多源定量第一阶段验证
 
 - 日期：2026-10-14；Windows，Python3.12.14、uv0.13.0、Qt6.12.0；本仓库锁定NumPy/Pydantic/tifffile/OCR栈。产品base5bea9d3，验证产品commit `79a675aeba70a0dbd5428a439dd23b694dce1f49`。
-- 任务仍implementing；这里只覆盖多源定量、曲线、自动表与XLSX。项目OCR显式绑定、归一化、独立审查和最终产品验收未完成。
+- 第一阶段记录时任务implementing；这里只覆盖多源定量、曲线、自动表与XLSX。后续项目OCR验证见ocr-validation.md；当前任务状态以任务文件为准，归一化、独立审查和最终产品验收仍未完成。
 
 ## 命令与覆盖
 
