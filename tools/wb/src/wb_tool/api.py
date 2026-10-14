@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from PySide6.QtWidgets import QWidget
 
-    from wb_tool.ui.background import WBBackground
+    from wb_tool.ui.background import WBBackground as WBBackground
     from wb_tool.ui.figure_view import FigureProjectView
     from wb_tool.ui.view import WBView
 
@@ -49,6 +49,22 @@ from wb_tool.application.ocr_protocol import (
     encode_ocr_frame,
     ocr_protocol_schema,
     parse_ocr_frame,
+)
+from wb_tool.application.project_analysis import (
+    LoadedProjectResult,
+    ProjectRowAnalysis,
+    ProjectTableCell,
+    ProjectTableSnapshot,
+    WBAnalysisProject,
+    analysis_is_current,
+    fill_project_table,
+    make_row_analysis,
+    prepare_project_analyses,
+    project_with_analyses,
+    read_project_result,
+    record_project_run,
+    set_row_analysis,
+    update_row_analysis_request,
 )
 from wb_tool.application.worker_protocol import (
     AcceptedFrame,
@@ -93,6 +109,21 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "export_project_table",
+    "ProjectRowAnalysis",
+    "WBAnalysisProject",
+    "LoadedProjectResult",
+    "ProjectTableCell",
+    "ProjectTableSnapshot",
+    "analysis_is_current",
+    "project_with_analyses",
+    "make_row_analysis",
+    "set_row_analysis",
+    "update_row_analysis_request",
+    "prepare_project_analyses",
+    "record_project_run",
+    "read_project_result",
+    "fill_project_table",
     "CropSuggestion",
     "WBReviewProject",
     "apply_crop_suggestion",
@@ -262,6 +293,14 @@ def export_worksheet(worksheet: Worksheet, result: AnalysisResult, destination: 
     from wb_tool.adapters.worksheet_export import export_worksheet as export
 
     return str(export(worksheet, result, destination))
+
+
+def export_project_table(
+    project: WBFigureProject, results: tuple[LoadedProjectResult, ...], destination: str
+) -> str:
+    from wb_tool.adapters.project_export import export_project_table as export
+
+    return str(export(project, results, destination))
 
 
 def export_crop(source: str, request: CropRequest, destination: str) -> str:

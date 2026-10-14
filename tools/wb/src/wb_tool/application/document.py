@@ -13,22 +13,26 @@ from wb_tool.application.worker_protocol import ResultFrame
 from wb_tool.domain.worksheet import OCRRecognition, Worksheet
 
 
+def check_document_json(data: bytes) -> None:
+    def unique(pairs: list[tuple[str, object]]) -> dict[str, object]:
+        result: dict[str, object] = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError("WB 文档不能有重复 JSON 字段")
+            result[key] = value
+        return result
+
+    if len(data) > 16 * 1024 * 1024:
+        raise ValueError("WB 文档超出大小预算")
+    json.loads(data, object_pairs_hook=unique)
+
+
 class DocumentIO(BaseModel):
     model_config = ConfigDict(strict=True, frozen=True, extra="forbid", allow_inf_nan=False)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
-        def unique(pairs: list[tuple[str, object]]) -> dict[str, object]:
-            result: dict[str, object] = {}
-            for key, value in pairs:
-                if key in result:
-                    raise ValueError("WB 文档不能有重复 JSON 字段")
-                result[key] = value
-            return result
-
-        if len(data) > 16 * 1024 * 1024:
-            raise ValueError("WB 文档超出大小预算")
-        json.loads(data, object_pairs_hook=unique)
+        check_document_json(data)
         return cls.model_validate_json(data)
 
 

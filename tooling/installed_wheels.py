@@ -206,6 +206,16 @@ review_project = record_crop_suggestion(project, suggestion)
 assert isinstance(review_project, WBReviewProject)
 assert read_figure_project(review_project.model_dump_json().encode()) == review_project
 assert review_project.rows[0].roi == row.roi
+from wb_tool.api import (WBAnalysisProject, make_row_analysis, set_row_analysis,
+    fill_project_table, export_project_table)
+analysis_project = set_row_analysis(review_project,
+    make_row_analysis(review_project, 'row', 'dark'))
+assert isinstance(analysis_project, WBAnalysisProject)
+assert read_figure_project(analysis_project.model_dump_json().encode()) == analysis_project
+assert len(analysis_project.suggestions) == 1
+assert all(cell.value is None for cell in fill_project_table(analysis_project, ()))
+export_project_table(analysis_project, (), 'installed-project-results.xlsx')
+assert Path('installed-project-results.xlsx').exists()
 recognized = recognize_figure('installed-fig.tif',source.sha256)
 groups = suggest_figures(recognized)
 assert len(groups) == 1 and groups[0].heading.text == 'Fig 1A'

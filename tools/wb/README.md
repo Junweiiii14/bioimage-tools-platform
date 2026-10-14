@@ -1,6 +1,6 @@
 # WB 数值核心
 
-公开入口 `wb_tool.api`；包版本0.10.0，实现定量/手工Qt闭环、OCR复核和结果表。
+公开入口 `wb_tool.api`；包版本0.11.0，实现定量/手工Qt闭环、OCR复核和结果表。
 数值契约与参考来源见 `../../docs/contracts/wb-reference-v1.md`。
 
 - 输入：未平滑且已声明极性的非负有限剖面、闭区间 `BandBounds`、可选 `Baseline`。
@@ -41,3 +41,5 @@ v1草稿继续读取，协议/文档契约见wb-document-v2.md。自动裁剪、
 0.9.0新增独立WBFigureProject v1和FigureRow/Template、plan_figure_layout、render_figure、export_figure_bundle。多原图批量去重、固定N整行审核、Fig/蛋白排序、模板保存/复用、后台预览及新ZIP导出（PNG/记录/原值TIFF/原图/字体）。使用[figures]可独立渲染，desktop也显式声明已锁Pillow12.3.0，普通API仍不加载Pillow/Qt。旧单图v1/v2不变。契约见wb-figure-project-v1.md。
 
 0.10.0增加CropDetectionSettings/detect_crop_candidates/suggest_crops，以及CropSuggestion/WBReviewProject和read_figure_project。候选算法@1在私有数值副本定位膜、左Marker排除槽、固定N网格和条带行；弱/可能空/多候选/回退均需复核。项目首次记录建议升级为schema v2，原v1继续读取，旧单图文档不受影响。Qt后台逐图检测/取消、失败筛选、候选切换/应用/恢复和膜区域聚焦；仅应用建议才写ROI并撤销审核，手动空位元信息不被覆盖。建议与参数/源SHA/源修订/原图提示随草稿和ZIP保存；更改N或高度须重新检测。显示聚焦仍输出原图坐标，不改变像素。契约见wb-crop-suggestions-v1.md。项目级OCR/定量/归一化、完整人工标注准确率及产品验收仍待完成。
+
+0.11.0连接多原图定量：WBAnalysisProject/schema v3保存固定N标注和已提交RunRecord引用，继续读取v1/v2。边界初始为空；明确dark/light、闭区间边界、人工或端点基线，复用原积分与曲线。空位强制排除；源/几何/审核变化使计划过期，参数修改清除当前run，名称和排序不改变测量。后台结果校验/自动项目表/XLSX保留原图SHA、row/lane/band、请求修订与运行身份，缺失不填0。项目UI每页显示200泳道，结果资产加载预算64 MiB；未载入结果不给有效值。CLX按用户说明排除。项目OCR显式绑定、归一化、统一归档和产品验收继续实施；契约见wb-project-analysis-v1.md。

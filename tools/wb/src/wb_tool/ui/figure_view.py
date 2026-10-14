@@ -36,10 +36,20 @@ from wb_tool.application.figure_project import (
     FigureTemplate,
     WBFigureProject,
 )
+from wb_tool.application.project_analysis import (
+    LoadedProjectResult,
+    WBAnalysisProject,
+    analysis_is_current,
+    make_row_analysis,
+    project_with_analyses,
+    set_row_analysis,
+    update_row_analysis_request,
+)
 from wb_tool.domain.grid import fixed_lane_grid
 from wb_tool.domain.lanes import LaneROI
 from wb_tool.ui.canvas import ImageCanvas
 from wb_tool.ui.crop_suggestions import CropSuggestionPanel
+from wb_tool.ui.project_analysis import ProjectAnalysisPanel
 
 
 class FigureProjectView(QWidget):
@@ -113,6 +123,11 @@ class FigureProjectView(QWidget):
         source_layout.addWidget(self.suggestions)
         source_layout.addWidget(self.canvas, 1)
         tabs.addTab(source_page, "原图与固定泳道")
+        self.analysis = ProjectAnalysisPanel()
+        self.analysis.configure_requested.connect(self.configure_analysis)
+        self.analysis.changed.connect(self._edited)
+        self._results: tuple[LoadedProjectResult, ...] = ()
+        tabs.addTab(self.analysis, "原图定量与项目结果表")
         preview_page = QWidget()
         preview_layout = QVBoxLayout(preview_page)
         preview_layout.addWidget(
@@ -231,12 +246,19 @@ class FigureProjectView(QWidget):
             template=FigureTemplate(**settings),
         )
         if isinstance(self._project, WBReviewProject):
-            return project_with_suggestions(project, self._project.suggestions)
+            project = project_with_suggestions(project, self._project.suggestions)
+        if isinstance(self._project, WBAnalysisProject):
+            project = project_with_analyses(project, self._project.analyses)
+            request = self.analysis.request()
+            if request is not None and self.analysis.plan is not None:
+                project = update_row_analysis_request(project, self.analysis.plan.row_id, request)
         return project
 
     def set_project(self, project: WBFigureProject) -> None:
         self._loading = True
         self._project = project
+        self.analysis.show_plan(None)
+        self.analysis.invalidate()
         self.table.clearSelection()
         self.table.setCurrentCell(-1, -1)
         self.canvas.set_image(PreviewRaster("", 0, 0, 0, 0, b"", 0, ()))
@@ -291,6 +313,7 @@ class FigureProjectView(QWidget):
         if self._loading:
             return
         self.generation += 1
+        self.analysis.invalidate()
         self.preview_label.setPixmap(QPixmap())
         self.preview_label.setText("内容已修改，请重新生成预览")
         self.changed.emit()
@@ -299,7 +322,7 @@ class FigureProjectView(QWidget):
     def _cell_changed(self, row: int, column: int) -> None:
         if self._loading:
             return
-        if column != 9:
+        if column in (3, 4, 5, 6, 7, 8):
             check = self.table.item(row, 9)
             if check:
                 self._loading = True
@@ -314,8 +337,69 @@ class FigureProjectView(QWidget):
 
     def _selected(self, row: int, _column: int, _previous_row: int, _previous_column: int) -> None:
         if not self._loading and 0 <= row < len(self._project.rows):
+            try:
+                self._project = self.project()
+            except ValueError as error:
+                self.status.setText(str(error))
+                return
+            self.show_analysis(row)
             self._overlay()
             self.source_requested.emit(self._project.rows[row].row_id)
+
+    def show_analysis(self, index: int | None = None) -> None:
+        index = self.table.currentRow() if index is None else index
+        project = self.project()
+        # Commit editor values before show_plan clears its dirty flag.
+        self._project = project
+        plan = None
+        if isinstance(project, WBAnalysisProject) and 0 <= index < len(project.rows):
+            plan = next(
+                (
+                    p
+                    for p in project.analyses
+                    if p.row_id == project.rows[index].row_id and analysis_is_current(project, p)
+                ),
+                None,
+            )
+        loaded = next(
+            (
+                r
+                for r in self._results
+                if plan and plan.run and r.row_id == plan.row_id and r.run_id == plan.run.run_id
+            ),
+            None,
+        )
+        self.analysis.show_plan(plan, loaded)
+        if plan and 0 <= index < len(project.rows):
+            row = project.rows[index]
+            self.analysis.message.setText(
+                f"{row.figure} · {row.protein} · {row.filename}；修改边界/基线后重新计算"
+            )
+
+    def configure_analysis(self) -> None:
+        try:
+            project = self.project()
+            index = self.table.currentRow()
+            if not 0 <= index < len(project.rows):
+                raise ValueError("请选择已审核的行")
+            plan = make_row_analysis(
+                project,
+                project.rows[index].row_id,
+                "dark" if self.analysis.polarity.currentIndex() == 0 else "light",
+            )
+            self._project = set_row_analysis(project, plan)
+            self.analysis.show_plan(plan)
+            row = project.rows[index]
+            self.analysis.message.setText(
+                f"{row.figure} · {row.protein} · {row.filename}；先计算曲线或填写边界"
+            )
+            self._edited()
+        except ValueError as error:
+            self.status.setText(str(error))
+
+    def install_results(self, results: tuple[LoadedProjectResult, ...]) -> None:
+        self._results = results
+        self.show_analysis()
 
     def selected_row(self) -> FigureRow | None:
         index = self.table.currentRow()
@@ -485,6 +569,14 @@ class FigureProjectView(QWidget):
                 name for name in project.figure_order if any(r.figure == name for r in rows)
             )
             updated = project.model_copy(update={"rows": rows, "figure_order": order})
+            if isinstance(project, WBAnalysisProject):
+                updated = updated.model_copy(
+                    update={
+                        "analyses": tuple(
+                            p for p in project.analyses if any(r.row_id == p.row_id for r in rows)
+                        )
+                    }
+                )
             if isinstance(project, WBReviewProject):
                 updated = project_with_suggestions(
                     updated,

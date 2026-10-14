@@ -35,6 +35,7 @@ Operation = Literal[
     "read",
     "documents",
     "runs",
+    "run",
     "backup",
     "close",
 ]
@@ -168,6 +169,8 @@ class _StorageWorker(QObject):
             return store.list_documents(), b""
         if op == "runs":
             return store.list_runs(command.document_id or None), b""
+        if op == "run":
+            return store.get_run(command.run_id), b""
         if op == "backup":
             return str(store.backup(Path(command.path))), b""
         raise ValueError("Unsupported storage operation")

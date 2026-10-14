@@ -17,6 +17,12 @@ from wb_tool.application.crop_suggestions import CropSuggestion, read_figure_pro
 from wb_tool.application.desktop_data import PreviewRaster, WBJob, WBReply
 from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
 from wb_tool.application.figure_project import FigureRender, WBFigureProject
+from wb_tool.application.project_analysis import (
+    LoadedProjectResult,
+    ProjectTableSnapshot,
+    fill_project_table,
+    read_project_result,
+)
 from wb_tool.domain.worksheet import OCRRecognition
 
 
@@ -33,12 +39,31 @@ class _Work(QObject):
                 | WBFigureProject
                 | FigureRender
                 | CropSuggestion
+                | LoadedProjectResult
+                | ProjectTableSnapshot
                 | AnalysisResult
                 | OCRRecognition
                 | bytes
                 | str
             )
-            if job.operation == "crop_suggest":
+            if job.operation == "project_result":
+                if job.analysis_plan is None:
+                    raise ValueError("缺少结果所属定量计划")
+                value = read_project_result(job.analysis_plan, job.data)
+            elif job.operation in ("project_table", "project_export"):
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少项目文档")
+                if job.operation == "project_export":
+                    from wb_tool.adapters.project_export import export_project_table
+
+                    value = str(
+                        export_project_table(job.document, job.project_results, job.destination)
+                    )
+                else:
+                    value = ProjectTableSnapshot(
+                        fill_project_table(job.document, job.project_results)
+                    )
+            elif job.operation == "crop_suggest":
                 from wb_tool.adapters.crop_suggestions import suggest_crops
 
                 if job.detection_settings is None:

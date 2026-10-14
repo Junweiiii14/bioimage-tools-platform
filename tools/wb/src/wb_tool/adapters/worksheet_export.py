@@ -82,6 +82,13 @@ def worksheet_xlsx_bytes(worksheet: Worksheet, result: AnalysisResult) -> bytes:
         ("行 ID", "列 ID", "状态", "原因"),
     ]
     audit.extend((cell.row_id, cell.column_id, cell.status, cell.reason) for cell in cells)
+    return two_sheet_xlsx_bytes(tuple(rows), tuple(audit))
+
+
+def two_sheet_xlsx_bytes(
+    rows: tuple[tuple[Cell, ...], ...], audit: tuple[tuple[Cell, ...], ...]
+) -> bytes:
+    """Shared by single-source OCR tables and multi-source project tables."""
     types = Element("Types", xmlns="http://schemas.openxmlformats.org/package/2006/content-types")
     SubElement(
         types,
@@ -141,13 +148,17 @@ def worksheet_xlsx_bytes(worksheet: Worksheet, result: AnalysisResult) -> bytes:
             ("xl/_rels/workbook.xml.rels", sheet_relationships),
         ):
             archive.writestr(path, tostring(root, encoding="utf-8", xml_declaration=True))
-        archive.writestr("xl/worksheets/sheet1.xml", _sheet(tuple(rows)))
-        archive.writestr("xl/worksheets/sheet2.xml", _sheet(tuple(audit)))
+        archive.writestr("xl/worksheets/sheet1.xml", _sheet(rows))
+        archive.writestr("xl/worksheets/sheet2.xml", _sheet(audit))
     return stream.getvalue()
 
 
 def export_worksheet(worksheet: Worksheet, result: AnalysisResult, destination: str | Path) -> Path:
     data = worksheet_xlsx_bytes(worksheet, result)
+    return publish_xlsx(data, destination)
+
+
+def publish_xlsx(data: bytes, destination: str | Path) -> Path:
     target = Path(destination).absolute()
     if target.suffix.lower() != ".xlsx":
         raise ValueError("请选择新的 .xlsx 文件")

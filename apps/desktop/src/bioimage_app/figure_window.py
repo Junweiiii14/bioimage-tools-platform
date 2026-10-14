@@ -21,21 +21,27 @@ from wb_tool.api import (
     FigureRender,
     FigureRow,
     FigureSourcePath,
+    LoadedProjectResult,
     PreviewRaster,
+    ProjectTableSnapshot,
+    WBAnalysisProject,
     WBFigureProject,
     WBJob,
     WBReply,
     WBReviewProject,
     create_figure_project_view,
     create_wb_background,
+    prepare_project_analyses,
     record_crop_suggestion,
 )
 
+from bioimage_app.project_measurements import ProjectBatchCompletion, ProjectMeasurementSession
 from bioimage_app.storage import AsyncStorage, StorageCommand, StorageReply
 
 
 class FigureProjectWindow(QMainWindow):
     closed = Signal()
+    measurement_progress = Signal(str)
 
     def __init__(self) -> None:
         super().__init__()
@@ -62,6 +68,8 @@ class FigureProjectWindow(QMainWindow):
         self._store_closed = False
         self._background_closed = False
         self._cancellation = Event()
+        self._measurement_session: ProjectMeasurementSession | None = None
+        self._project_results: tuple[LoadedProjectResult, ...] = ()
         bar = QToolBar("项目")
         self.addToolBar(bar)
         self.create_button = QPushButton("新建项目工作区")
@@ -87,14 +95,160 @@ class FigureProjectWindow(QMainWindow):
         self.import_button.clicked.connect(self._choose_import)
         self.save_button.clicked.connect(lambda: self.save())
         self.new_button.clicked.connect(self.new_project)
-        self.cancel_button.clicked.connect(self._cancellation.set)
+        self.cancel_button.clicked.connect(self.cancel)
         self.documents.activated.connect(self._choose_document)
         self.view.source_requested.connect(self.select_source)
         self.view.preview_requested.connect(lambda: self.compose())
         self.view.export_requested.connect(self._choose_export)
         self.view.font_requested.connect(self._choose_font)
         self.view.detection_requested.connect(self.detect_crops)
+        self.view.analysis.run_requested.connect(self.analyze_project)
+        self.view.analysis.refresh_requested.connect(self.refresh_project_table)
+        self.view.analysis.export_requested.connect(self._choose_table_export)
         self._controls()
+
+    def cancel(self) -> None:
+        self._cancellation.set()
+        if self._measurement_session:
+            self._measurement_session.cancel()
+
+    def analyze_project(self, all_rows: bool = False) -> None:
+        if self._busy or not self._workspace:
+            return
+        try:
+            project = self.view.project()
+            if not isinstance(project, WBAnalysisProject):
+                raise ValueError("请先配置已审核行的定量")
+            selected = self.view.selected_row()
+            row_ids = tuple(
+                p.row_id
+                for p in project.analyses
+                if all_rows or (selected and p.row_id == selected.row_id)
+            )
+            prepared = prepare_project_analyses(
+                project, row_ids, 0 if self._saved_revision is None else self._saved_revision + 1
+            )
+            self.view.set_project(prepared)
+            self.view.generation += 1
+        except ValueError as error:
+            self._error(str(error))
+            return
+
+        def saved() -> None:
+            if self._closing or self._cancellation.is_set():
+                self._done("计算已取消；标注已保存。")
+                return
+            current = self.view.project()
+            assert isinstance(current, WBAnalysisProject)
+            self._start_measurements(current, row_ids)
+
+        self.save(after=saved)
+
+    def _start_measurements(
+        self, project: WBAnalysisProject, row_ids: tuple[str, ...], *, restore: bool = False
+    ) -> None:
+        generation = self.view.generation
+        self._start()
+        session = ProjectMeasurementSession(self._store, self._background, self)
+        self._measurement_session = session
+        session.progress.connect(self.view.status.setText)
+        session.progress.connect(self.measurement_progress)
+
+        def completed(completion: ProjectBatchCompletion) -> None:
+            self._measurement_session = None
+            session.deleteLater()
+            if self.view.generation != generation:
+                self._done("项目发生修改，运行已保留在历史，未覆盖当前标注。")
+                return
+            by_row = {r.row_id: r for r in (() if restore else self._project_results)}
+            by_row.update({r.row_id: r for r in completion.results})
+            retained: list[LoadedProjectResult] = []
+            retained_bytes = 0
+            overflow = False
+            for plan in completion.project.analyses:
+                cached = by_row.get(plan.row_id)
+                if cached and plan.run and plan.run.result and cached.run_id == plan.run.run_id:
+                    retained_bytes += plan.run.result.size_bytes
+                    if retained_bytes <= 64 * 1024 * 1024:
+                        retained.append(cached)
+                    else:
+                        overflow = True
+            self._project_results = tuple(retained)
+            message = (
+                "结果已校验"
+                if restore
+                else (
+                    "计算已取消；已完成行保留" if completion.cancelled else "计算结束，结果已提交"
+                )
+            )
+            if completion.errors:
+                message += "；" + "；".join(completion.errors[:3])
+            if overflow:
+                message += "；部分曲线超过 64 MiB 显示预算，结果仍保留在历史"
+            self._busy = False
+            if not restore:
+                self.view.set_project(completion.project)
+                self.view.generation += 1
+                self.save(after=lambda: self.refresh_project_table(message))
+            else:
+                self.refresh_project_table(message)
+
+        session.finished.connect(completed)
+        session.start(project, row_ids, self._workspace, restore=restore)
+        if self._closing:
+            session.cancel()
+
+    def refresh_project_table(self, message: str = "项目结果表已刷新") -> None:
+        if self._busy or not self._workspace:
+            return
+        try:
+            project = self.view.project()
+        except ValueError as error:
+            self._error(str(error))
+            return
+        generation = self.view.generation
+        self._start()
+
+        def filled(reply: WBReply) -> None:
+            if self.view.generation != generation:
+                self._done("项目已改变，请重新刷新结果表")
+                return
+            if not isinstance(reply.value, ProjectTableSnapshot):
+                self._error("项目结果表无效")
+                return
+            self.view.install_results(self._project_results)
+            self.view.analysis.show_cells(reply.value.cells)
+            self._done(message)
+
+        self._wb(
+            WBJob("project_table", document=project, project_results=self._project_results), filled
+        )
+
+    def _choose_table_export(self) -> None:
+        destination, _ = QFileDialog.getSaveFileName(
+            self, "导出新的项目结果表", "", "Excel (*.xlsx)"
+        )
+        if destination:
+            self.export_project_table(destination)
+
+    def export_project_table(self, destination: str) -> None:
+        if self._busy or not self._workspace:
+            return
+
+        def saved() -> None:
+            project = self.view.project()
+            self._start()
+            self._wb(
+                WBJob(
+                    "project_export",
+                    document=project,
+                    project_results=self._project_results,
+                    destination=destination,
+                ),
+                lambda reply: self._done("项目结果表已导出：" + str(reply.value)),
+            )
+
+        self.save(after=saved)
 
     @property
     def resources_closed(self) -> bool:
@@ -300,6 +454,7 @@ class FigureProjectWindow(QMainWindow):
             template = self.view.project().template
             project = WBFigureProject(project_id=uuid4().hex, template=template)
             self.view.set_project(project)
+            self._project_results = ()
             self.view.generation += 1
             self._saved_revision = None
             self.view.status.setText("已复用模板新建项目；导入下一批原图。")
@@ -485,7 +640,13 @@ class FigureProjectWindow(QMainWindow):
                         self.view.set_project(project)
                         self._saved_revision = project.revision
                         self._saved_generation = self.view.generation
-                        self._done("项目已恢复，原图资产已校验。选择一行查看原图。")
+                        self._project_results = ()
+                        if isinstance(project, WBAnalysisProject):
+                            self._start_measurements(
+                                project, tuple(p.row_id for p in project.analyses), restore=True
+                            )
+                        else:
+                            self._done("项目已恢复，原图资产已校验。选择一行查看原图。")
                         return
                     asset = pending.pop(0)
 
@@ -600,7 +761,7 @@ class FigureProjectWindow(QMainWindow):
             return
         event.ignore()
         self._closing = True
-        self._cancellation.set()
+        self.cancel()
         self._controls()
         if not self._busy:
             self._finish_close()

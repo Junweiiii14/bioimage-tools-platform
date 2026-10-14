@@ -9,6 +9,11 @@ from wb_tool.application.crop import CropRequest
 from wb_tool.application.crop_suggestions import CropSuggestion
 from wb_tool.application.document import WBDocument, WBWorksheetDocument
 from wb_tool.application.figure_project import FigureRender, FigureSourcePath, WBFigureProject
+from wb_tool.application.project_analysis import (
+    LoadedProjectResult,
+    ProjectRowAnalysis,
+    ProjectTableSnapshot,
+)
 from wb_tool.domain.crop_detection import CropDetectionSettings
 from wb_tool.domain.worksheet import OCRRecognition, Worksheet
 
@@ -41,6 +46,9 @@ class WBJob:
         "figure_export",
         "font_digest",
         "crop_suggest",
+        "project_result",
+        "project_table",
+        "project_export",
     ]
     path: str = ""
     data: bytes = b""
@@ -55,6 +63,8 @@ class WBJob:
     row_id: str = ""
     source_sha256: str = ""
     revision: int = 0
+    analysis_plan: ProjectRowAnalysis | None = None
+    project_results: tuple[LoadedProjectResult, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -67,6 +77,8 @@ class WBReply:
         | WBFigureProject
         | FigureRender
         | CropSuggestion
+        | LoadedProjectResult
+        | ProjectTableSnapshot
         | AnalysisResult
         | OCRRecognition
         | bytes

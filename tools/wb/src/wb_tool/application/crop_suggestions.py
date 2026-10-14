@@ -128,6 +128,10 @@ def read_figure_project(data: bytes) -> WBFigureProject:
     raw: object = json.loads(data)
     if isinstance(raw, dict):
         version = cast(dict[str, object], raw).get("schema_version")
+        if type(version) is int and version == 3:
+            from wb_tool.application.project_analysis import WBAnalysisProject
+
+            return WBAnalysisProject.from_bytes(data)
         if type(version) is int and version == 2:
             return WBReviewProject.from_bytes(data)
     return WBFigureProject.from_bytes(data)
@@ -136,6 +140,10 @@ def read_figure_project(data: bytes) -> WBFigureProject:
 def project_with_suggestions(
     project: WBFigureProject, suggestions: tuple[CropSuggestion, ...]
 ) -> WBReviewProject:
+    if isinstance(project, WBReviewProject):
+        fields = {name: getattr(project, name) for name in type(project).model_fields}
+        fields["suggestions"] = suggestions
+        return type(project).model_validate(fields)
     return WBReviewProject(
         project_id=project.project_id,
         name=project.name,
