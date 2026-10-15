@@ -6,8 +6,17 @@ from datetime import datetime
 from pathlib import Path
 from typing import cast
 
-from PySide6.QtCore import QSettings, Qt, QTimer
-from PySide6.QtGui import QCloseEvent, QFont
+from PySide6.QtCore import QBuffer, QByteArray, QIODevice, QMimeData, QSettings, QSize, Qt, QTimer
+from PySide6.QtGui import (
+    QCloseEvent,
+    QDragEnterEvent,
+    QDragLeaveEvent,
+    QDropEvent,
+    QFont,
+    QIcon,
+    QImageReader,
+    QPixmap,
+)
 from PySide6.QtWidgets import (
     QFileDialog,
     QFrame,
@@ -54,6 +63,7 @@ class PlatformWindow(QMainWindow):
         self.setFont(QFont("Microsoft YaHei UI", 10))
         self.settings = settings if settings is not None else QSettings("BioImageTools", "Platform")
         self.active_tool: FigureProjectWindow | None = None
+        self.setAcceptDrops(True)
         self._exit_requested = False
         self._recent_paths: list[str] = []
         self._build()
@@ -110,6 +120,7 @@ class PlatformWindow(QMainWindow):
         content.addSpacing(8)
         tool = QFrame()
         tool.setObjectName("toolSurface")
+        self.drop_surface = tool
         tool_layout = QVBoxLayout(tool)
         tool_layout.setContentsMargins(24, 24, 24, 24)
         tool_layout.setSpacing(14)
@@ -131,7 +142,7 @@ class PlatformWindow(QMainWindow):
         actions.addStretch()
         tool_layout.addLayout(actions)
         tool_layout.addWidget(
-            self._label("自动创建项目文件夹，原图无须移动。支持 TIFF 原图。", "muted")
+            self._label("也可将 TIFF 原图或文件夹拖到这里，自动创建项目并处理。", "muted")
         )
         content.addWidget(tool)
         recent_header = QHBoxLayout()
@@ -147,6 +158,7 @@ class PlatformWindow(QMainWindow):
         self.recent_list = QListWidget()
         self.recent_list.setObjectName("recentProjects")
         self.recent_list.setSpacing(5)
+        self.recent_list.setIconSize(QSize(72, 48))
         self.recent_list.itemSelectionChanged.connect(self._selection_changed)
         self.recent_list.itemDoubleClicked.connect(self.open_selected)
         content.addWidget(self.recent_list, 1)
@@ -190,6 +202,8 @@ class PlatformWindow(QMainWindow):
             QLabel#muted, QLabel#platformStatus { color: #61645f; }
             QFrame#toolSurface { background: #ffffff; border: 1px solid #d9dcd6;
                 border-radius: 8px; }
+            QFrame#toolSurface[dropActive="true"] {
+                background: #e8f0f1; border: 1px solid #256f82; }
             QPushButton { background: #ffffff; color: #242723; border: 1px solid #d9dcd6;
                 border-radius: 6px; padding: 10px 14px; min-height: 18px; }
             QPushButton:hover { background: #e8f0f1; border-color: #256f82; }
@@ -212,6 +226,77 @@ class PlatformWindow(QMainWindow):
             QListWidget#recentProjects::item:hover { border-color: #256f82; }
         """)
 
+    @staticmethod
+    def _drop_paths(mime: QMimeData) -> list[Path]:
+        urls = mime.urls()
+        if not urls or len(urls) > 512 or any(not url.isLocalFile() for url in urls):
+            return []
+        # Directory/type/decoding checks remain in the cancellable selection worker.
+        return [Path(url.toLocalFile()) for url in urls]
+
+    def _drop_feedback(self, active: bool) -> None:
+        self.drop_surface.setProperty("dropActive", active)
+        self.drop_surface.style().unpolish(self.drop_surface)
+        self.drop_surface.style().polish(self.drop_surface)
+        self.drop_surface.update()
+
+    def dragEnterEvent(self, event: QDragEnterEvent) -> None:
+        if self.active_tool is None and self._drop_paths(event.mimeData()):
+            self._drop_feedback(True)
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+
+    def dragLeaveEvent(self, event: QDragLeaveEvent) -> None:
+        self._drop_feedback(False)
+        event.accept()
+
+    def dropEvent(self, event: QDropEvent) -> None:
+        self._drop_feedback(False)
+        paths = self._drop_paths(event.mimeData())
+        if paths and self.active_tool is None:
+            event.acceptProposedAction()
+            self.start_from_images(paths)
+        else:
+            event.ignore()
+
+    def _recent_icon(self, path: str) -> QIcon:
+        data = self.settings.value(f"recent_thumbnail/{path}")
+        if not isinstance(data, QByteArray) or data.size() > 65536:
+            return QIcon()
+        buffer = QBuffer()
+        buffer.setData(data)
+        buffer.open(QIODevice.OpenModeFlag.ReadOnly)
+        reader = QImageReader(buffer, b"PNG")
+        size = reader.size()
+        if not size.isValid() or size.width() > 96 or size.height() > 64:
+            return QIcon()
+        return QIcon(QPixmap.fromImage(reader.read()))
+
+    def _remember_summary(self, window: FigureProjectWindow) -> None:
+        if not window.workspace_path:
+            return
+        path = str(Path(window.workspace_path).absolute())
+        try:
+            project = window.view.project()
+        except ValueError:
+            return
+        self.settings.setValue(f"recent_name/{path}", project.name)
+        self.settings.setValue(f"recent_summary/{path}", f"上次查看：{len(project.rows)} 张来源")
+        # Reuse an already-decoded source thumbnail; never decode original files on the GUI thread.
+        for index in range(window.view.source_list.count()):
+            item = window.view.source_list.item(index)
+            if item.icon().isNull():
+                continue
+            data = QByteArray()
+            buffer = QBuffer(data)
+            buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+            if item.icon().pixmap(96, 64).save(buffer, "PNG") and data.size() <= 65536:
+                self.settings.setValue(f"recent_thumbnail/{path}", data)
+            break
+        self.settings.sync()
+        self._refresh_recent()
+
     def recent_list_focus(self) -> None:
         self.recent_list.setFocus()
 
@@ -229,7 +314,14 @@ class PlatformWindow(QMainWindow):
             name = Path(path).name
             if name.casefold() == "workspace":
                 name = f"{Path(path).parent.name} · {name}"
+            cached_name = self.settings.value(f"recent_name/{path}", "")
+            if isinstance(cached_name, str) and cached_name:
+                name = cached_name[:160]
+            summary = self.settings.value(f"recent_summary/{path}", "")
+            if isinstance(summary, str) and summary:
+                detail += f" · {summary[:160]}"
             item = QListWidgetItem(f"{name}\nWB 项目 · {detail}")
+            item.setIcon(self._recent_icon(path))
             item.setData(Qt.ItemDataRole.UserRole, path)
             item.setToolTip(path)
             self.recent_list.addItem(item)
@@ -335,6 +427,7 @@ class PlatformWindow(QMainWindow):
                 window.load_document(document_id)
 
     def _tool_closed(self, window: FigureProjectWindow) -> None:
+        self._remember_summary(window)
         self.active_tool = None
         QTimer.singleShot(0, window.deleteLater)
         if self._exit_requested:

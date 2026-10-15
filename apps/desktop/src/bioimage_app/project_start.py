@@ -1,6 +1,7 @@
 """Prepare source selection off-thread without creating a project or changing inputs."""
 
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from threading import Event
 
@@ -40,6 +41,7 @@ class ProjectSelectionJob(QThread):
             destination = allocate_project_path(parent, source_name)
             if self.cancellation.is_set():
                 raise InterruptedError("已取消选择原图")
-            self.result = ProjectSelection(paths, destination, source_name[:120] or "WB 项目")
+            display_name = f"{source_name[:120] or 'WB 项目'} · {datetime.now():%Y-%m-%d}"
+            self.result = ProjectSelection(paths, destination, display_name)
         except (OSError, ValueError) as error:
             self.result = ProjectSelection(error=str(error))
