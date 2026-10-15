@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QPoint, Qt
 from PySide6.QtTest import QSignalSpy, QTest
 from pytestqt.qtbot import QtBot
-from wb_tool.api import LaneROI, PreviewRaster, create_figure_project_view
+from wb_tool.api import LaneROI, PreviewRaster, WBFigureProject, create_figure_project_view
 
 from tests.test_project_measurements import item, setup
 from tests.test_project_measurements import windows as windows
@@ -99,3 +99,62 @@ def test_graphical_crop_undo_redo_revoke_geometrical_confirmation(
     assert item(view.table, 1, 9).checkState() == Qt.CheckState.Unchecked
     view.redo_review()
     assert item(view.table, 1, 5).text() == "6"
+
+
+def test_autosave_and_recompute_preserve_selection_canvas_curve_history(
+    qtbot: QtBot, tmp_path: Path, windows: Callable[[], "FigureProjectWindow"]
+) -> None:
+    window = windows()
+    setup(qtbot, tmp_path, window)
+    window.analyze_project(True)
+    qtbot.waitUntil(window.import_button.isEnabled, timeout=20000)
+    view = window.view
+    view.table.setCurrentCell(1, 0)
+    qtbot.waitUntil(window.import_button.isEnabled)
+    view.show_section("analysis")
+    panel = view.analysis
+    panel.lane_selector.activated.emit(1)
+    plot = panel.plot
+    assert panel.plan is not None and panel.plan.run is not None
+    old_run = panel.plan.run.run_id
+    source = view.selected_row()
+    assert source is not None
+    raster_size = view.canvas.image_rect().size()
+    source_requests = QSignalSpy(view.source_requested)
+    window.activateWindow()
+    qtbot.waitUntil(window.isActiveWindow)
+    plot.setFocus()
+    qtbot.waitUntil(plot.hasFocus)
+    QTest.keyClick(plot, Qt.Key.Key_Right)
+    assert item(panel.lanes, 1, 2).text() == "3"
+    # Real 700 ms autosave -> persisted project -> worker -> recompute, not a
+    # direct show_plan simulation. The displayed source must never disappear.
+    qtbot.waitUntil(
+        lambda: (
+            bool(panel.plan and panel.plan.run and panel.plan.run.run_id != old_run)
+            and not window.operation_busy
+        ),
+        timeout=20000,
+    )
+    selected = view.selected_row()
+    assert selected is not None and selected.row_id == source.row_id
+    assert view.table.currentRow() == 1 and panel.lanes.currentRow() == 1
+    assert view.canvas.image_rect().size() == raster_size
+    assert source_requests.count() == 0
+    assert plot.values and panel.undo_button.isEnabled()
+    qtbot.waitUntil(plot.hasFocus)
+    panel.undo_button.click()
+    assert item(panel.lanes, 1, 2).text() == "2"
+    assert panel.loaded is None
+    assert item(panel.summary, 1, 1).text() == "—"
+    # Project switching belongs to the host, so exercise identity reset on an
+    # unattached view instead of placing a foreign document in an open workspace.
+    detached = create_figure_project_view()
+    qtbot.addWidget(detached)
+    detached.set_project(view.project())
+    detached.table.setCurrentCell(1, 0)
+    detached.canvas.set_image(PreviewRaster("d" * 64, 10, 10, 10, 10, b"\x90" * 100, 8, ()))
+    detached.set_project(WBFigureProject(project_id="another-project"))
+    assert detached.table.currentRow() == -1
+    assert detached.canvas.image_rect().isEmpty()
+    assert not detached.analysis.undo_button.isEnabled()

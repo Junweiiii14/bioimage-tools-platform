@@ -117,6 +117,12 @@ class ProjectAnalysisPanel(QWidget):
         self.curve_editor.setMaximumHeight(300)
         self._history: list[tuple[int, tuple[str, ...], tuple[str, ...]]] = []
         self._history_index = 0
+        self._history_store: dict[
+            str, tuple[str, list[tuple[int, tuple[str, ...], tuple[str, ...]]], int]
+        ] = {}
+        self._profile_cache: dict[tuple[str, int], tuple[float, ...]] = {}
+        self._profile_cache_identity = ""
+        self._selected_lanes: dict[str, int] = {}
         self._profile_values: tuple[float, ...] = ()
         self._profile_lane = -1
         self.review_controls = QWidget()
@@ -164,7 +170,70 @@ class ProjectAnalysisPanel(QWidget):
         cells = [cell for cell in self._cells if cell.row_id == row_id]
         return not cells or any(cell.status not in ("valid", "excluded") for cell in cells)
 
+    @staticmethod
+    def _history_identity(plan: ProjectRowAnalysis) -> str:
+        return repr(
+            (
+                plan.row_id,
+                plan.request.source_sha256,
+                plan.request.polarity,
+                tuple(lane.roi for lane in plan.request.lanes),
+                plan.empty_lanes,
+            )
+        )
+
+    def reset_history(self) -> None:
+        """A different project must not inherit another project's edit or profile evidence."""
+        self._history_store.clear()
+        self._selected_lanes.clear()
+        self._profile_cache.clear()
+        self._profile_cache_identity = ""
+        self._history.clear()
+        self._history_index = 0
+        self._profile_values = ()
+
+    def _restore_history(self, plan: ProjectRowAnalysis | None) -> None:
+        if self.plan is not None:
+            self._history_store[self.plan.row_id] = (
+                self._history_identity(self.plan),
+                self._history.copy(),
+                self._history_index,
+            )
+        self._history, self._history_index = [], 0
+        if plan is None:
+            return
+        saved = self._history_store.get(plan.row_id)
+        if saved is None or saved[0] != self._history_identity(plan):
+            self._history_store.pop(plan.row_id, None)
+            return
+        _, history, index = saved
+        # An external reset of annotations with identical geometry must not
+        # accidentally splice an incompatible command history into the new plan.
+        expected: dict[int, tuple[str, ...]] = {}
+        for lane, before, _after in history:
+            expected.setdefault(lane, before)
+        for lane, _before, after in history[:index]:
+            expected[lane] = after
+        for lane, fields in expected.items():
+            if lane >= len(plan.request.lanes):
+                return
+            band = plan.request.lanes[lane].bands[0]
+            actual = (
+                band.bounds.left if band.bounds else None,
+                band.bounds.right if band.bounds else None,
+                band.baseline.left_value if band.baseline else None,
+                band.baseline.right_value if band.baseline else None,
+            )
+            if tuple(float(value) if value else None for value in fields) != actual:
+                return
+        self._history, self._history_index = history.copy(), index
+
     def _polarity_edited(self) -> None:
+        if not self._loading:
+            self._history.clear()
+            self._history_index = 0
+            if self.plan:
+                self._history_store.pop(self.plan.row_id, None)
         self._profile_values = ()
         self._edited()
 
@@ -312,6 +381,8 @@ class ProjectAnalysisPanel(QWidget):
             return
         self._syncing = True
         row = self.lanes.currentRow()
+        if self.plan and row >= 0:
+            self._selected_lanes[self.plan.row_id] = row
         self.lane_selector.setCurrentIndex(row)
         for column, editor in self.lane_fields.items():
             item = self.lanes.item(row, column)
@@ -436,11 +507,10 @@ class ProjectAnalysisPanel(QWidget):
         self, plan: ProjectRowAnalysis | None, loaded: LoadedProjectResult | None = None
     ) -> None:
         self._loading = True
+        self._restore_history(plan)
         self.plan, self.loaded, self.dirty = plan, loaded, False
-        self._history.clear()
-        self._history_index = 0
-        self.undo_button.setEnabled(False)
-        self.redo_button.setEnabled(False)
+        self.undo_button.setEnabled(self._history_index > 0)
+        self.redo_button.setEnabled(self._history_index < len(self._history))
         self._profile_values = ()
         self.lanes.setRowCount(len(plan.request.lanes) if plan else 0)
         if plan:
@@ -488,7 +558,8 @@ class ProjectAnalysisPanel(QWidget):
                 ]
             )
         self._loading = False
-        self.lanes.setCurrentCell(0, 0)
+        selected = self._selected_lanes.get(plan.row_id, 0) if plan else 0
+        self.lanes.setCurrentCell(min(selected, self.lanes.rowCount() - 1), 0)
         self._sync_lane_editor()
         self._show_summary()
         self._plot()
@@ -511,6 +582,18 @@ class ProjectAnalysisPanel(QWidget):
         if self._profile_lane != i:
             self._profile_values = ()
         self._profile_lane = i
+        cache_key = (self._history_identity(self.plan), i) if self.plan else None
+        if self.plan and self.polarity.currentIndex() != (
+            0 if self.plan.request.polarity == "dark" else 1
+        ):
+            cache_key = None
+            self._profile_values = ()
+        if cache_key and cache_key[0] != self._profile_cache_identity:
+            # Bound retained evidence to the current source/geometry only.
+            self._profile_cache.clear()
+            self._profile_cache_identity = cache_key[0]
+        if cache_key and not self.loaded:
+            self._profile_values = self._profile_cache.get(cache_key, ())
         if (
             self.loaded
             and self.plan
@@ -520,6 +603,8 @@ class ProjectAnalysisPanel(QWidget):
             lane = self.loaded.result.lanes[i]
             if lane.profiles:
                 self._profile_values = lane.profiles.quantitative
+                if cache_key:
+                    self._profile_cache[cache_key] = self._profile_values
             self.plot.measurements = tuple(b.measurement for b in lane.bands if b.measurement)
         self.plot.values = self._profile_values
         if self.plan and 0 <= i < len(self.plan.request.lanes):

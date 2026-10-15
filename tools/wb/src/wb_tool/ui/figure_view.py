@@ -3,7 +3,7 @@
 from dataclasses import replace
 from uuid import uuid4
 
-from PySide6.QtCore import QSize, Qt, Signal
+from PySide6.QtCore import QEvent, QObject, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QIcon, QImage, QPixmap, QResizeEvent
 from PySide6.QtWidgets import (
     QAbstractItemView,
@@ -141,6 +141,9 @@ class FigureProjectView(QWidget):
         self._loading = False
         self._project = WBFigureProject(project_id=uuid4().hex)
         self._thumbnails: dict[str, QIcon] = {}
+        self._source_preview: PreviewRaster | None = None
+        self._last_review_focus: QWidget | None = None
+        self._pending_review_focus: QWidget | None = None
         self._crop_history: list[
             tuple[str, tuple[int, int, int, int], tuple[int, int, int, int]]
         ] = []
@@ -266,6 +269,9 @@ class FigureProjectView(QWidget):
 
         settings = QWidget()
         form = QFormLayout(settings)
+        form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapAllRows)
+        form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow)
+        settings.setMinimumWidth(0)
         self.figure_order = QLineEdit()
         form.addRow("Fig 顺序（逗号分隔）", self.figure_order)
         self.template_name = QLineEdit()
@@ -307,6 +313,11 @@ class FigureProjectView(QWidget):
         settings_scroll = QScrollArea()
         settings_scroll.setWidget(settings)
         settings_scroll.setWidgetResizable(True)
+        settings_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        settings_scroll.setMinimumWidth(0)
+        for label in settings.findChildren(QLabel):
+            label.setWordWrap(True)
+            label.setMinimumWidth(0)
 
         self.laboratory_layout = LaboratoryLayoutPanel()
         self.laboratory_layout.changed.connect(self._edited)
@@ -323,7 +334,38 @@ class FigureProjectView(QWidget):
         self.canvas.roi_drawn.connect(self._drawn)
         self.canvas.lane_selected.connect(self._select_graphical_lane)
         self.analysis.lane_changed.connect(self._highlight_lane)
+        for editor in (
+            self.canvas,
+            self.analysis.plot,
+            self.analysis.lane_selector,
+            self.name,
+            *self.source_fields.values(),
+            *self.analysis.lane_fields.values(),
+        ):
+            editor.installEventFilter(self)
         self.set_project(self._project)
+
+    def resizeEvent(self, event: QResizeEvent) -> None:
+        super().resizeEvent(event)
+        if hasattr(self, "analysis_source"):
+            self._refresh_source_workspace()
+
+    def eventFilter(self, watched: QObject, event: QEvent) -> bool:
+        if event.type() == QEvent.Type.FocusIn and isinstance(watched, QWidget):
+            self._last_review_focus = watched
+        return super().eventFilter(watched, event)
+
+    def changeEvent(self, event: QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QEvent.Type.EnabledChange and self.isEnabled():
+            # Child enabled states settle after the parent's changeEvent.
+            QTimer.singleShot(0, self._restore_review_focus)
+
+    def _restore_review_focus(self) -> None:
+        focused = self._pending_review_focus
+        if self.isEnabled() and focused is not None and focused.isVisible() and focused.isEnabled():
+            self._pending_review_focus = None
+            focused.setFocus()
 
     def _build_source_workspace(self) -> QWidget:
         workspace = QWidget()
@@ -347,7 +389,7 @@ class FigureProjectView(QWidget):
         self.source_list.setObjectName("sourceList")
         self.source_list.setAccessibleName("项目原图列表")
         self.source_list.setIconSize(QSize(48, 40))
-        self.source_list.setWordWrap(True)
+        self.source_list.setWordWrap(False)
         self.source_list.setMinimumHeight(150)
         self.source_list.currentRowChanged.connect(self._select_analysis_source)
         rail.addWidget(self.source_list, 1)
@@ -496,9 +538,13 @@ class FigureProjectView(QWidget):
                 if self._text(i, 10)
                 else "待识别"
             )
-            title = f"{row.filename or '缺图位'}\n{state}"
-            entry = QListWidgetItem(title)
-            entry.setToolTip(title)
+            filename = row.filename or "缺图位"
+            width = max(80, self.source_list.viewport().width() - 72)
+            display = self.source_list.fontMetrics().elidedText(
+                filename, Qt.TextElideMode.ElideMiddle, width
+            )
+            entry = QListWidgetItem(f"{display}\n{state}")
+            entry.setToolTip(f"{filename}\n{state}")
             if row.source and row.source.sha256 in self._thumbnails:
                 entry.setIcon(self._thumbnails[row.source.sha256])
             self.source_list.addItem(entry)
@@ -880,9 +926,30 @@ class FigureProjectView(QWidget):
 
     def set_project(self, project: WBFigureProject) -> None:
         self._loading = True
-        if project.project_id != self._project.project_id:
+        old_index = self.table.currentRow()
+        selected = (
+            self._project.rows[old_index] if 0 <= old_index < len(self._project.rows) else None
+        )
+        same_project = project.project_id == self._project.project_id
+        selected_index = next(
+            (
+                i
+                for i, row in enumerate(project.rows)
+                if same_project
+                and selected
+                and row.row_id == selected.row_id
+                and row.source == selected.source
+            ),
+            -1,
+        )
+        selected_lane = self.analysis.lanes.currentRow()
+        focused = self._last_review_focus
+        if not same_project:
             self._crop_history.clear()
             self._crop_history_index = 0
+            self.analysis.reset_history()
+            self._last_review_focus = None
+            self._pending_review_focus = None
         self._project = project
         self.history_label.setText(
             f"从归档恢复 · {len(project.archive_sources)} 个来源 · "
@@ -908,9 +975,11 @@ class FigureProjectView(QWidget):
         self.ocr.result_view.invalidate()
         self.table.clearSelection()
         self.table.setCurrentCell(-1, -1)
-        self.canvas.set_image(PreviewRaster("", 0, 0, 0, 0, b"", 0, ()))
-        self.canvas.set_lanes(())
-        self.canvas.set_regions(())
+        if selected_index < 0:
+            self._source_preview = None
+            self.canvas.set_image(PreviewRaster("", 0, 0, 0, 0, b"", 0, ()))
+            self.canvas.set_lanes(())
+            self.canvas.set_regions(())
         self.suggestions.show_suggestion(None, None, project.template.crop_height)
         self.name.setText(project.name)
         self.figure_order.setText(", ".join(project.figure_order))
@@ -960,9 +1029,23 @@ class FigureProjectView(QWidget):
             )
         self.name.setToolTip(self.history_label.text())
         self.history_label.hide()
+        if selected_index >= 0:
+            self.table.setCurrentCell(selected_index, 0)
         self._loading = False
+        if selected_index >= 0:
+            self.show_analysis(selected_index)
+            if self._source_preview is not None:
+                self.analysis.set_source_preview(self._source_preview)
+            if 0 <= selected_lane < self.analysis.lanes.rowCount():
+                self.analysis.lanes.setCurrentCell(selected_lane, 0)
+            self._overlay()
+            if focused is not None and focused.isVisible():
+                if self.isEnabled():
+                    focused.setFocus()
+                else:
+                    self._pending_review_focus = focused
         self._refresh_analysis_sources()
-        self._filter_rows()
+        self._filter_rows(select_visible=False)
         self._refresh_source_workspace()
 
     def rebuild_layout(self) -> None:
@@ -1079,6 +1162,7 @@ class FigureProjectView(QWidget):
                 self._refresh_analysis_sources()
                 return
             self._refresh_analysis_sources()
+            self._source_preview = None
             self.canvas.set_image(PreviewRaster("", 0, 0, 0, 0, b"", 0, ()))
             self.canvas.set_lanes(())
             self.canvas.set_regions(())
@@ -1199,6 +1283,7 @@ class FigureProjectView(QWidget):
         row = self._project.rows[index] if 0 <= index < len(self._project.rows) else None
         if row is None or row.source is None or row.source.sha256 != preview.sha256:
             return
+        self._source_preview = preview
         self.canvas.set_image(preview)
         self.analysis.set_source_preview(preview)
         if row.roi is not None:
@@ -1360,7 +1445,12 @@ class FigureProjectView(QWidget):
         finally:
             self._restoring_crop = False
 
-    def _filter_rows(self) -> None:
+    def refresh_attention(self) -> None:
+        """Refresh source statuses after the host installs verified result cells."""
+        self._refresh_source_workspace()
+        self._filter_rows(select_visible=False)
+
+    def _filter_rows(self, *_args: object, select_visible: bool = True) -> None:
         mode = self.filter.currentIndex()
         suggestions = (
             {s.row_id: s for s in self._project.suggestions}
@@ -1397,7 +1487,7 @@ class FigureProjectView(QWidget):
                 self.source_list.item(i).setHidden(bool(hidden))
 
         current = self.table.currentRow()
-        if current >= 0 and self.table.isRowHidden(current):
+        if select_visible and current >= 0 and self.table.isRowHidden(current):
             visible = next(
                 (i for i in range(self.table.rowCount()) if not self.table.isRowHidden(i)), -1
             )

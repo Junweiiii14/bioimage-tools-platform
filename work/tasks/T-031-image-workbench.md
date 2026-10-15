@@ -25,3 +25,11 @@ User approved T-028 proposal; scoped to WB workbench, direct manipulation and co
 - Existing show_section source/analysis opens source workspace, analysis expands curve; layout/template mode 1; OCR/normalization/export mode 2.
 - curve history scoped to currently loaded plan; source crop history stays within project. No scientific algorithm/schema/default changes.
 - Full legacy panels retained. Root owns autosave/recompute scheduling, project entry, theme/motion, documentation/handoff, and commit-bound independent review.
+
+## Independent review follow-up — 2026-10-16
+- Fixed history loss during the host's 700 ms autosave and subsequent recomputation. Per-row history is retained only for matching source/geometry/polarity and matching current annotations; project switches clear it. Raw profile cache is bounded to the current source/geometry, never restores an effective numerical result.
+- Same-project set_project now preserves selected source by row/source identity, original raster, current lane, and review focus. It does not emit source_requested during the host's busy callback. Different project/source clears selection and raster.
+- Added public refresh_attention() for the host after verified cells install; it updates filter/list without asynchronous reselection.
+- Source filenames use middle elision and full tooltip; template form uses vertical labels and wrapping instead of horizontal clipping. Root handles contextual panel titles/return actions.
+- Regression executes the real 700 ms autosave, waits for a new worker run, verifies nonzero selected lane, canvas, no source request, keyboard focus, surviving undo and invalid effective values after undo. Foreign-project reset tested on an unattached view; directly injecting a foreign document into an open host workspace is not a valid host switching sequence and initially caused teardown-save failure in the test, corrected without changing production host guards.
+- Final follow-up validation: 19 workbench/evidence/workflow tests passed in 14.23 s; Pyright 0 errors. Prior run exposed lane reset in show_plan and child-focus restore ordering; both fixed and covered. Root performs final commit-bound independent review and integrated visual capture.
