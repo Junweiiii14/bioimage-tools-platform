@@ -3,7 +3,16 @@
 from math import ceil, floor
 
 from PySide6.QtCore import QPointF, QRectF, Qt, Signal
-from PySide6.QtGui import QColor, QImage, QMouseEvent, QPainter, QPaintEvent, QPen, QWheelEvent
+from PySide6.QtGui import (
+    QColor,
+    QImage,
+    QKeyEvent,
+    QMouseEvent,
+    QPainter,
+    QPaintEvent,
+    QPen,
+    QWheelEvent,
+)
 from PySide6.QtWidgets import QWidget
 
 from wb_tool.application.desktop_data import PreviewRaster
@@ -12,6 +21,7 @@ from wb_tool.domain.lanes import LaneROI
 
 class ImageCanvas(QWidget):
     roi_drawn = Signal(object)
+    lane_selected = Signal(int)
 
     def __init__(
         self,
@@ -35,6 +45,8 @@ class ImageCanvas(QWidget):
         self._pan = QPointF()
         self._pan_anchor: QPointF | None = None
         self.setMouseTracking(True)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setAccessibleName("原图裁剪；方向键移动，Alt 加方向键调整右下边缘，Shift 加速")
 
     def set_image(self, raster: PreviewRaster) -> None:
         self._image = QImage(
@@ -136,7 +148,7 @@ class ImageCanvas(QWidget):
 
     def paintEvent(self, event: QPaintEvent) -> None:
         painter = QPainter(self)
-        painter.fillRect(self.rect(), QColor("#18212d"))
+        painter.fillRect(self.rect(), QColor("#252729"))
         rect = self.image_rect()
         if self._image.isNull():
             painter.setPen(QColor("#e1e7ef"))
@@ -268,9 +280,46 @@ class ImageCanvas(QWidget):
             and (crop.x0, crop.y0, crop.x1, crop.y1)
             == (self._crop.x0, self._crop.y0, self._crop.x1, self._crop.y1)
         )
+        if unchanged:
+            point = self._pixel(event.position())
+            for index, lane in enumerate(self._lanes):
+                if lane.x0 <= point.x() < lane.x1 and lane.y0 <= point.y() < lane.y1:
+                    self.lane_selected.emit(index)
+                    break
         if crop and not unchanged:
             self.roi_drawn.emit((crop.x0, crop.y0, crop.x1, crop.y1))
         self.update()
+
+    def keyPressEvent(self, event: QKeyEvent) -> None:
+        if event.key() == Qt.Key.Key_Escape:
+            self._anchor = None
+            self._drag_crop = None
+            self.update()
+            event.accept()
+            return
+        crop = self._crop
+        if crop and event.key() in (
+            Qt.Key.Key_Left,
+            Qt.Key.Key_Right,
+            Qt.Key.Key_Up,
+            Qt.Key.Key_Down,
+        ):
+            step = 5 if event.modifiers() & Qt.KeyboardModifier.ShiftModifier else 1
+            dx = step * (int(event.key() == Qt.Key.Key_Right) - int(event.key() == Qt.Key.Key_Left))
+            dy = step * (int(event.key() == Qt.Key.Key_Down) - int(event.key() == Qt.Key.Key_Up))
+            x0, y0, x1, y1 = crop.x0, crop.y0, crop.x1, crop.y1
+            if event.modifiers() & Qt.KeyboardModifier.AltModifier:
+                x1 = max(x0 + max(1, len(self._lanes)), min(self._size[0], x1 + dx))
+                y1 = max(y0 + 2, min(self._size[1], y1 + dy))
+            else:
+                dx = max(-x0, min(self._size[0] - x1, dx))
+                dy = max(-y0, min(self._size[1] - y1, dy))
+                x0, x1, y0, y1 = x0 + dx, x1 + dx, y0 + dy, y1 + dy
+            if (x0, y0, x1, y1) != (crop.x0, crop.y0, crop.x1, crop.y1):
+                self.roi_drawn.emit((x0, y0, x1, y1))
+            event.accept()
+            return
+        super().keyPressEvent(event)
 
     def wheelEvent(self, event: QWheelEvent) -> None:
         if self._image.isNull():

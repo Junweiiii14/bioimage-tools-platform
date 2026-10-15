@@ -57,6 +57,7 @@ def test_full_tiff_png_export_real_ocr_fill_and_reopen(
         return str(tmp_path / "full-png"), "PNG (*.png)"
 
     monkeypatch.setattr(QFileDialog, "getSaveFileName", picked)
+    window.view.export_disclosure.setChecked(True)
     QTest.mouseClick(window.view.image_export_button, Qt.MouseButton.LeftButton)
     qtbot.waitUntil(window.import_button.isEnabled, timeout=15000)
     png = tmp_path / "full-png.png"

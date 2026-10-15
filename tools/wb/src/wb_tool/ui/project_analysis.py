@@ -8,17 +8,13 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
     QFormLayout,
-    QGridLayout,
     QHBoxLayout,
     QHeaderView,
     QLabel,
     QLineEdit,
     QPushButton,
-    QScrollArea,
-    QSplitter,
     QTableWidget,
     QTableWidgetItem,
-    QTabWidget,
     QVBoxLayout,
     QWidget,
 )
@@ -34,8 +30,8 @@ from wb_tool.application.project_analysis import (
 from wb_tool.domain.lanes import LaneROI
 from wb_tool.domain.quantify import BandBounds, Baseline
 from wb_tool.ui.canvas import ImageCanvas
+from wb_tool.ui.editable_profile import EditableProfilePlot
 from wb_tool.ui.project_results import ProjectResultsView
-from wb_tool.ui.view import ProfilePlot
 
 
 class ProjectAnalysisPanel(QWidget):
@@ -61,144 +57,165 @@ class ProjectAnalysisPanel(QWidget):
         self.message = QLabel("选择已审核的原图行，配置定量；首次可先计算曲线。")
         self.message.setWordWrap(True)
         self.message.hide()
-        self.evidence_tabs = QTabWidget()
-        layout.addWidget(self.evidence_tabs, 1)
-        workbench = QWidget()
-        workbench.setObjectName("evidenceWorkbench")
-        columns = QHBoxLayout(workbench)
-        columns.setContentsMargins(0, 0, 0, 0)
-        columns.setSpacing(10)
         self.controls = QWidget()
         self.controls.setObjectName("evidenceControls")
         self.controls_layout = QVBoxLayout(self.controls)
-        self.controls_layout.setSpacing(5)
-        self.source_heading = QLabel("原图来源")
-        self.source_heading.setObjectName("evidenceHeading")
-        self.controls_layout.addWidget(self.source_heading)
-        self.source_info = QLabel("选择原图后查看来源与位深。")
-        self.source_info.setObjectName("evidenceSummary")
+        self.controls_layout.setContentsMargins(0, 0, 0, 0)
+        self.controls_layout.setSpacing(8)
+        self.source_heading = QLabel("泳道与测量")
+        self.source_info = QLabel()
         self.source_info.setWordWrap(True)
-        self.controls_layout.addWidget(self.source_info)
+        self.source_info.hide()
         self.lane_selector = QComboBox()
+        self.lane_selector.setAccessibleName("当前泳道")
+        self.controls_layout.addWidget(self.lane_selector)
         self.polarity = QComboBox()
         self.polarity.addItems(["暗条带", "亮条带"])
-        form = QFormLayout()
-        form.addRow("当前泳道", self.lane_selector)
+        self.advanced = QWidget()
+        form = QFormLayout(self.advanced)
+        form.setContentsMargins(0, 0, 0, 0)
         form.addRow("信号极性", self.polarity)
-        self.controls_layout.addLayout(form)
-        pairs = QGridLayout()
-        pairs.setHorizontalSpacing(8)
-        pairs.setVerticalSpacing(3)
         self.lane_fields: dict[int, QLineEdit] = {}
-        for column, label in ((2, "左边界 L"), (3, "右边界 R"), (4, "基线左值"), (5, "基线右值")):
+        for column, label in ((2, "左边界"), (3, "右边界"), (4, "基线左值"), (5, "基线右值")):
             edit = QLineEdit()
-            edit.setPlaceholderText("留空")
+            edit.setPlaceholderText("自动 / 未指定")
             edit.setAccessibleName(label)
             edit.textEdited.connect(partial(self._edit_lane_field, column))
             self.lane_fields[column] = edit
-            pair_row = 0 if column < 4 else 2
-            pair_column = column % 2
-            pairs.addWidget(QLabel(label), pair_row, pair_column)
-            pairs.addWidget(edit, pair_row + 1, pair_column)
-        self.controls_layout.addLayout(pairs)
+            form.addRow(label, edit)
         self.included = QCheckBox("包含当前泳道")
         self.included.toggled.connect(self._edit_included)
-        self.controls_layout.addWidget(self.included)
-        bounds_help = QLabel(
-            "边界：裁剪内 0 起算，含两端。\n边界双空＝未检测；基线双空＝端点。修改后需重算。"
-        )
-        bounds_help.setWordWrap(True)
-        self.controls_layout.addWidget(bounds_help)
-        configure = QPushButton("配置 / 重置所选行")
+        form.addRow(self.included)
+        configure = QPushButton("重新配置当前行")
         configure.clicked.connect(self.configure_requested)
-        self.controls_layout.addWidget(configure)
-        self.controls_layout.addStretch()
-        control_scroll = QScrollArea()
-        control_scroll.setWidgetResizable(True)
-        control_scroll.setFrameShape(QScrollArea.Shape.NoFrame)
-        control_scroll.setFixedWidth(220)
-        control_scroll.setWidget(self.controls)
-        columns.addWidget(control_scroll)
-        stage = QWidget()
-        stage.setObjectName("evidenceStage")
-        stage_layout = QVBoxLayout(stage)
-        stage_layout.setContentsMargins(0, 0, 0, 0)
-        stage_layout.addWidget(QLabel("原图与测量证据"))
-        self.source_canvas = ImageCanvas(empty_message="选择原图后显示来源证据；裁剪请返回第一步。")
-        self.source_canvas.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
-        self.source_canvas.setMinimumSize(280, 190)
-        self.plot = ProfilePlot()
-        evidence_split = QSplitter(Qt.Orientation.Vertical)
-        evidence_split.addWidget(self.source_canvas)
-        curve = QWidget()
-        curve_layout = QVBoxLayout(curve)
+        form.addRow(configure)
+        self.advanced_toggle = QCheckBox("高级测量参数")
+        self.advanced_toggle.toggled.connect(self.advanced.setVisible)
+        self.controls_layout.addWidget(self.advanced_toggle)
+        self.controls_layout.addWidget(self.advanced)
+        self.advanced.hide()
+        self.recalculate_button = QPushButton("重新测量当前图")
+        self.recalculate_button.clicked.connect(lambda: self.run_requested.emit(False))
+        self.controls_layout.addWidget(self.recalculate_button)
+        self.source_canvas = ImageCanvas(empty_message="选择原图查看来源")
+        self.source_canvas.hide()
+        self.plot = EditableProfilePlot()
+        self.plot.edit_committed.connect(self._curve_edited)
+        self.curve_editor = QWidget()
+        curve_layout = QVBoxLayout(self.curve_editor)
         curve_layout.setContentsMargins(0, 4, 0, 0)
-        curve_layout.addWidget(QLabel("当前泳道原始曲线 · 仅显示已核验结果"))
         curve_layout.addWidget(self.plot, 1)
-        evidence_split.addWidget(curve)
-        evidence_split.setSizes([340, 210])
-        evidence_split.setChildrenCollapsible(False)
-        stage_layout.addWidget(evidence_split, 1)
-        columns.addWidget(stage, 1)
-        review = QWidget()
-        review.setObjectName("evidenceReview")
-        review_layout = QVBoxLayout(review)
-        heading = QLabel("当前结果与复核")
-        heading.setObjectName("evidenceHeading")
-        review_layout.addWidget(heading)
-        self.summary = QTableWidget(0, 4)
-        self.summary.setHorizontalHeaderLabels(["泳道", "有效信号", "状态", "原始积分\n（待复核）"])
-        self.summary.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
-        for column, width in enumerate((32, 66, 76, 90)):
-            self.summary.setColumnWidth(column, width)
-        self.summary.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
-        self.summary.setWordWrap(True)
-        self.summary.setTextElideMode(Qt.TextElideMode.ElideNone)
-        self.summary.verticalHeader().hide()
-        self.summary.setMinimumHeight(130)
-        self.summary.setMaximumHeight(180)
-        review_layout.addWidget(self.summary)
-        self.review_note = QLabel(
-            "摘要显示 4 位有效数字；完整精度见项目结果表。原始积分待复核，不等于有效信号，"
-            "也不进入归一化。修改参数后需重新计算。"
-        )
+        curve_tools = QHBoxLayout()
+        curve_tools.addWidget(QLabel("拖动边界 / 基线 · Tab 换手柄 · 方向键微调"), 1)
+        self.undo_button = QPushButton("撤销曲线调整")
+        self.redo_button = QPushButton("重做")
+        self.undo_button.clicked.connect(lambda: self._history_step(-1))
+        self.redo_button.clicked.connect(lambda: self._history_step(1))
+        curve_tools.addWidget(self.undo_button)
+        curve_tools.addWidget(self.redo_button)
+        curve_layout.addLayout(curve_tools)
+        self.curve_editor.setMaximumHeight(300)
+        self._history: list[tuple[int, tuple[str, ...], tuple[str, ...]]] = []
+        self._history_index = 0
+        self._profile_values: tuple[float, ...] = ()
+        self._profile_lane = -1
+        self.review_controls = QWidget()
+        review_layout = QVBoxLayout(self.review_controls)
+        review_layout.setContentsMargins(0, 0, 0, 0)
+        self.review_note = QLabel("选择泳道查看测量状态与原因")
         self.review_note.setWordWrap(True)
+        self.review_note.setObjectName("reviewReason")
         review_layout.addWidget(self.review_note)
-        for text, callback in (
-            ("计算所选行", lambda: self.run_requested.emit(False)),
-            ("计算全部已配置行", lambda: self.run_requested.emit(True)),
-            ("刷新项目表", self.refresh_requested.emit),
-            ("导出结果 XLSX / CSV", self.export_requested.emit),
-        ):
-            button = QPushButton(text)
-            if text == "计算所选行":
-                button.setObjectName("primaryAction")
-            button.clicked.connect(callback)
-            review_layout.addWidget(button)
-        review_layout.addStretch()
-        review_scroll = QScrollArea()
-        review_scroll.setWidgetResizable(True)
-        review_scroll.setFrameShape(QScrollArea.Shape.NoFrame)
-        review_scroll.setFixedWidth(292)
-        review_scroll.setWidget(review)
-        columns.addWidget(review_scroll)
-        self.evidence_tabs.addTab(workbench, "证据工作台")
-        self.lanes = QTableWidget(0, 6)
+        self.summary = QTableWidget(0, 4)
+        self.summary.setHorizontalHeaderLabels(["泳道", "有效信号", "状态", "原始积分"])
+        self.summary.horizontalHeader().setSectionResizeMode(
+            QHeaderView.ResizeMode.ResizeToContents
+        )
+        self.summary.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
+        self.summary.verticalHeader().hide()
+        self.summary.setMaximumHeight(150)
+        self.summary.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self.summary.currentCellChanged.connect(self._summary_selected)
+        review_layout.addWidget(self.summary)
+        self.lanes = QTableWidget(0, 6, self)
         self.lanes.setHorizontalHeaderLabels(
             ["泳道", "包含", "边界左", "边界右", "基线左", "基线右"]
         )
-        self.lanes.horizontalHeader().setMinimumSectionSize(48)
-        self.lanes.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        self.evidence_tabs.addTab(self.lanes, "全部泳道参数")
+        self.lanes.hide()
         self.result_view = ProjectResultsView()
         self.results = self.result_view.table
-        self.evidence_tabs.addTab(self.result_view, "完整项目结果")
+        layout.addWidget(self.result_view, 1)
         self.lanes.cellChanged.connect(self._edited)
         self.lanes.cellChanged.connect(self._sync_lane_editor)
-        self.polarity.currentIndexChanged.connect(self._edited)
+        self.polarity.currentIndexChanged.connect(self._polarity_edited)
         self.lanes.currentCellChanged.connect(self._plot)
         self.lanes.currentCellChanged.connect(self._sync_lane_editor)
         self.lane_selector.activated.connect(self._select_lane)
+
+    def _summary_selected(self, row: int, *_args: int) -> None:
+        if not self._loading:
+            self._select_lane(row)
+
+    def _field_text(self, row: int, column: int) -> str:
+        item = self.lanes.item(row, column)
+        return item.text() if item else ""
+
+    def row_needs_attention(self, row_id: str) -> bool:
+        cells = [cell for cell in self._cells if cell.row_id == row_id]
+        return not cells or any(cell.status not in ("valid", "excluded") for cell in cells)
+
+    def _polarity_edited(self) -> None:
+        self._profile_values = ()
+        self._edited()
+
+    def _curve_edited(self, bounds: object, baseline: object) -> None:
+        if not isinstance(bounds, BandBounds) or (
+            baseline is not None and not isinstance(baseline, Baseline)
+        ):
+            return
+        row = self.lanes.currentRow()
+        if self.plan is None or row < 0:
+            return
+        old = tuple(self._field_text(row, c) for c in range(2, 6))
+        new = (
+            str(bounds.left),
+            str(bounds.right),
+            str(baseline.left_value) if baseline else "",
+            str(baseline.right_value) if baseline else "",
+        )
+        if old == new:
+            return
+        self._history[self._history_index :] = [(row, old, new)]
+        self._history_index += 1
+        self._apply_curve_fields(row, new)
+
+    def undo_curve(self) -> None:
+        self._history_step(-1)
+
+    def redo_curve(self) -> None:
+        self._history_step(1)
+
+    def _history_step(self, step: int) -> None:
+        target = self._history_index - 1 if step < 0 else self._history_index
+        if not 0 <= target < len(self._history):
+            return
+        row, old, new = self._history[target]
+        self._history_index += step
+        self.lanes.setCurrentCell(row, 0)
+        self._apply_curve_fields(row, old if step < 0 else new)
+
+    def _apply_curve_fields(self, row: int, values: tuple[str, ...]) -> None:
+        self._loading = True
+        for column, value in zip(range(2, 6), values, strict=True):
+            item = self.lanes.item(row, column)
+            if item is not None:
+                item.setText(value)
+        self._loading = False
+        self._edited()
+        self._sync_lane_editor()
+        self._plot()
+        self.undo_button.setEnabled(self._history_index > 0)
+        self.redo_button.setEnabled(self._history_index < len(self._history))
 
     def set_source_context(self, row: FigureRow | None) -> None:
         if (
@@ -276,6 +293,8 @@ class ProjectAnalysisPanel(QWidget):
         )
 
     def _select_lane(self, index: int) -> None:
+        if index != self.lanes.currentRow():
+            self._profile_values = ()
         self.lanes.setCurrentCell(index, 0)
 
     def _edit_lane_field(self, column: int, text: str) -> None:
@@ -303,9 +322,11 @@ class ProjectAnalysisPanel(QWidget):
         self.included.setEnabled(bool(included and included.flags() & Qt.ItemFlag.ItemIsEnabled))
         self._syncing = False
         self._source_overlay()
+        self._show_reason()
         self.lane_changed.emit()
 
     def _show_summary(self) -> None:
+        self.summary.blockSignals(True)
         row = self.source_row
         cells = {c.lane_index: c for c in self._cells if row and c.row_id == row.row_id}
         self.summary.setRowCount(row.lane_count if row else 0)
@@ -351,6 +372,35 @@ class ProjectAnalysisPanel(QWidget):
                 item.setToolTip(cell.reason if cell else "尚无当前参数的核验结果")
                 self.summary.setItem(i, column, item)
         self.summary.resizeRowsToContents()
+        self.summary.blockSignals(False)
+        self._show_reason()
+
+    def _show_reason(self) -> None:
+        row = self.source_row
+        cell = next(
+            (
+                c
+                for c in self._cells
+                if row and c.row_id == row.row_id and c.lane_index == self.lanes.currentRow() + 1
+            ),
+            None,
+        )
+        if cell:
+            reason = cell.reason or "当前参数的测量已核验。"
+            action = (
+                "查看原图与曲线。质量警告不能通过确认裁剪消除；原始积分不是有效信号。"
+                if cell.status == "quality_review"
+                else "修改后需重新测量，旧值不会继续作为当前结果。"
+                if cell.status not in ("valid", "excluded")
+                else ""
+            )
+            self.review_note.setText(reason + ("\n\n" + action if action else ""))
+        else:
+            self.review_note.setText(
+                "调整后等待重新测量。"
+                if self.dirty
+                else "尚无当前参数的核验结果。自动处理后在这里查看状态。"
+            )
 
     def _edited(self, *_args: object) -> None:
         if not self._loading and self.plan is not None:
@@ -387,6 +437,11 @@ class ProjectAnalysisPanel(QWidget):
     ) -> None:
         self._loading = True
         self.plan, self.loaded, self.dirty = plan, loaded, False
+        self._history.clear()
+        self._history_index = 0
+        self.undo_button.setEnabled(False)
+        self.redo_button.setEnabled(False)
+        self._profile_values = ()
         self.lanes.setRowCount(len(plan.request.lanes) if plan else 0)
         if plan:
             self.polarity.setCurrentIndex(0 if plan.request.polarity == "dark" else 1)
@@ -453,6 +508,9 @@ class ProjectAnalysisPanel(QWidget):
     def _plot(self, *_args: object) -> None:
         self.plot.values, self.plot.measurements = (), ()
         i = self.lanes.currentRow()
+        if self._profile_lane != i:
+            self._profile_values = ()
+        self._profile_lane = i
         if (
             self.loaded
             and self.plan
@@ -461,6 +519,19 @@ class ProjectAnalysisPanel(QWidget):
         ):
             lane = self.loaded.result.lanes[i]
             if lane.profiles:
-                self.plot.values = lane.profiles.quantitative
+                self._profile_values = lane.profiles.quantitative
             self.plot.measurements = tuple(b.measurement for b in lane.bands if b.measurement)
+        self.plot.values = self._profile_values
+        if self.plan and 0 <= i < len(self.plan.request.lanes):
+            try:
+                texts = [self._field_text(i, c).strip() for c in range(2, 6)]
+                bounds = BandBounds(int(texts[0]), int(texts[1])) if texts[0] and texts[1] else None
+                baseline = (
+                    Baseline(float(texts[2]), float(texts[3])) if texts[2] and texts[3] else None
+                )
+                self.plot.set_annotation(bounds, baseline)
+            except ValueError:
+                self.plot.set_annotation(None, None)
+        else:
+            self.plot.set_annotation(None, None)
         self.plot.update()

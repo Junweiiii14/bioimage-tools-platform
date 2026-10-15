@@ -128,15 +128,15 @@ def test_evidence_columns_fit_without_horizontal_page_scroll(
     for width, height in ((1440, 900), (1100, 780)):
         window.resize(width, height)
         qtbot.waitUntil(lambda: page.width() <= window.view.pages.width())
-        assert window.view.analysis.source_canvas.isVisible()
+        assert window.view.canvas.isVisible()
         assert window.view.analysis.plot.isVisible()
         assert window.view.analysis.summary.isVisible()
-        assert window.view.analysis.source_canvas.width() >= 280
+        assert window.view.canvas.width() >= 280
         assert window.width() == width and window.height() == height
         for evidence in (
-            window.view.analysis.source_canvas,
+            window.view.canvas,
             window.view.analysis.plot,
-            window.view.analysis.lane_fields[5],
+            window.view.analysis.advanced_toggle,
         ):
             bottom = evidence.mapTo(window, QPoint(0, evidence.height())).y()
             assert bottom < window.height()
