@@ -6,7 +6,7 @@ from threading import Event
 from uuid import uuid4
 
 from PySide6.QtCore import QSettings, QTimer, QUrl, Signal
-from PySide6.QtGui import QAction, QCloseEvent, QDesktopServices
+from PySide6.QtGui import QAction, QCloseEvent, QDesktopServices, QKeySequence
 from PySide6.QtWidgets import (
     QComboBox,
     QFileDialog,
@@ -66,7 +66,7 @@ from bioimage_app.project_ocr import ProjectOCRCompletion, ProjectOCRSession
 from bioimage_app.project_restore import ArchiveRestoreJob, ArchiveRestoreResult
 from bioimage_app.project_start import ProjectSelectionJob
 from bioimage_app.storage import AsyncStorage, StorageCommand, StorageReply
-from bioimage_app.workbench_motion import NavigationMotion
+from bioimage_app.workbench_motion import NavigationMotion, PanelReveal
 from bioimage_app.workbench_style import apply_workbench_theme
 
 
@@ -145,8 +145,8 @@ class FigureProjectWindow(QMainWindow):
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         bar.addWidget(spacer)
-        for button in (self.import_button, self.cancel_button):
-            bar.addWidget(button)
+        bar.addWidget(self.import_button)
+        self.cancel_action = bar.addWidget(self.cancel_button)
         # Keep the existing buttons as command/state owners for host contracts and tests.
         self.project_menu = QMenu("项目", self)
         self.project_actions: list[tuple[QAction, QPushButton]] = []
@@ -169,11 +169,25 @@ class FigureProjectWindow(QMainWindow):
         bar.addWidget(self.project_menu_button)
         self.documents.setMaximumWidth(280)
         self.documents.setAccessibleName("当前工作区内的项目")
-        self.export_button = QPushButton("导出结果")
-        self.export_button.setObjectName("primaryAction")
+        self.export_button = QPushButton("查看结果")
         bar.addWidget(self.export_button)
         self.motion_settings = QSettings("BioImageTools", "Motion")
         self.motion = NavigationMotion(self.view.steps, self.motion_settings)
+        self.panel_motion = [
+            PanelReveal(panel, self.motion)
+            for panel in (
+                self.view.source_metadata,
+                self.view.suggestions,
+                self.view.analysis.advanced,
+            )
+        ]
+        for text, shortcut, callback in (
+            ("撤销图上调整", QKeySequence.StandardKey.Undo, self.view.undo_review),
+            ("重做图上调整", QKeySequence.StandardKey.Redo, self.view.redo_review),
+        ):
+            action = self.project_menu.addAction(text)
+            action.setShortcut(QKeySequence(shortcut))
+            action.triggered.connect(callback)
         self.reduce_motion_action = self.project_menu.addAction("减少动效")
         self.reduce_motion_action.setCheckable(True)
         self.reduce_motion_action.setChecked(self.motion.reduced())
@@ -183,7 +197,7 @@ class FigureProjectWindow(QMainWindow):
         self.task_progress.setTextVisible(False)
         self.task_progress.setRange(0, 0)
         self.task_progress.setFixedWidth(72)
-        bar.addWidget(self.task_progress)
+        self.progress_action = bar.addWidget(self.task_progress)
         self.welcome = QWidget()
         self.welcome.setObjectName("welcomePage")
         welcome_layout = QVBoxLayout(self.welcome)
@@ -242,12 +256,17 @@ class FigureProjectWindow(QMainWindow):
         self.automatic = AutomaticWorkflow(self)
         self.output_button = QPushButton("打开结果文件夹")
         self.output_button.setEnabled(False)
-        bar.addWidget(self.output_button)
+        self.output_button.setParent(self)
+        self.output_button.hide()
+        self.output_action = self.project_menu.addAction("打开最近输出文件夹")
+        self.output_action.setEnabled(False)
+        self.output_action.triggered.connect(self.output_button.click)
         self.output_button.clicked.connect(
             lambda: QDesktopServices.openUrl(QUrl.fromLocalFile(self.automatic.last_output_path))
         )
+        self.view.output_folder_requested.connect(self.output_button.click)
         self.automatic.finished.connect(self._automatic_output_ready)
-        self.export_button.clicked.connect(self.automatic.choose_export)
+        self.export_button.clicked.connect(lambda: self.view.show_section("export"))
         self.view.automatic_requested.connect(self.automatic.analyze)
         self.view.automatic_export_requested.connect(self.automatic.choose_export)
         self.view.import_directory_requested.connect(self.automatic.choose_directory)
@@ -426,6 +445,7 @@ class FigureProjectWindow(QMainWindow):
         job.start()
 
     def cancel(self) -> None:
+        self._auto_save.stop()
         self._cancellation.set()
         self.automatic.cancel()
         if self._measurement_session:
@@ -435,7 +455,9 @@ class FigureProjectWindow(QMainWindow):
 
     def _automatic_output_ready(self, path: str) -> None:
         self.output_button.setEnabled(True)
+        self.output_action.setEnabled(True)
         self.output_button.setToolTip(path)
+        self.view.set_output_location(path)
 
     def _choose_restore(self) -> None:
         source, _ = QFileDialog.getOpenFileName(self, "选择项目 ZIP 归档", "", "ZIP (*.zip)")
@@ -992,6 +1014,7 @@ class FigureProjectWindow(QMainWindow):
                 return
             self.view.install_results(self._project_results)
             self.view.analysis.show_cells(reply.value.cells)
+            self.view.refresh_attention()
             if isinstance(project, WBProjectOCR) and not self._closing:
                 self._busy = False
                 self.refresh_ocr_table(message, after=after)
@@ -1142,8 +1165,8 @@ class FigureProjectWindow(QMainWindow):
         self.new_button.setEnabled(idle and bool(self._workspace))
         self.documents.setEnabled(idle and bool(self._workspace))
         self.cancel_button.setEnabled(self._busy and not self._closing)
-        self.cancel_button.setVisible(self._busy)
-        self.task_progress.setVisible(self._busy)
+        self.cancel_action.setVisible(self._busy)
+        self.progress_action.setVisible(self._busy)
         self.export_button.setEnabled(idle and bool(self._workspace))
         self.save_state.setText(
             "正在处理…"

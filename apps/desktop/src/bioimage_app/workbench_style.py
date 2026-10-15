@@ -27,6 +27,11 @@ def apply_workbench_theme(window: QWidget) -> None:
         QMainWindow { background: #f6f5f2; color: #202523; }
         QLabel, QCheckBox, QRadioButton { color: #202523; background: transparent; }
         QLabel:disabled, QCheckBox:disabled, QRadioButton:disabled { color: #6b726d; }
+        QCheckBox { spacing: 7px; }
+        QCheckBox::indicator { width: 14px; height: 14px; border: 1px solid #9aa69e;
+            border-radius: 3px; background: #ffffff; }
+        QCheckBox::indicator:checked { background: #256f82; border: 1px solid #256f82; }
+        QCheckBox::indicator:disabled { background: #eeefeb; border-color: #cdd3ca; }
         QToolBar { background: #ffffff; border: 0; border-bottom: 1px solid #e4e5e0;
             padding: 8px 14px; spacing: 8px; }
         QLabel#appBrand { font-size: 16px; font-weight: 600; padding-right: 8px; }

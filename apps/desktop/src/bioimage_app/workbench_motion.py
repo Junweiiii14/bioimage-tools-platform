@@ -1,7 +1,16 @@
 """Small, interruptible native motion for navigation; scientific imagery stays still."""
 
-from PySide6.QtCore import QEasingCurve, QEvent, QObject, QPropertyAnimation, QRect, QSettings, Qt
-from PySide6.QtWidgets import QApplication, QListWidget, QWidget
+from PySide6.QtCore import (
+    QEasingCurve,
+    QEvent,
+    QObject,
+    QPropertyAnimation,
+    QRect,
+    QSettings,
+    Qt,
+    QTimer,
+)
+from PySide6.QtWidgets import QApplication, QGraphicsOpacityEffect, QListWidget, QWidget
 
 
 class NavigationMotion(QObject):
@@ -45,7 +54,33 @@ class NavigationMotion(QObject):
 
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if event.type() in (QEvent.Type.Resize, QEvent.Type.Show):
-            self.move()
+            QTimer.singleShot(0, self.move)
         elif event.type() == QEvent.Type.Hide:
             self.animation.stop()
+        return super().eventFilter(watched, event)
+
+
+class PanelReveal(QObject):
+    """Brief feedback on newly opened controls only; no image or numeric interpolation."""
+
+    def __init__(self, panel: QWidget, navigation: NavigationMotion) -> None:
+        super().__init__(panel)
+        self.panel = panel
+        self.navigation = navigation
+        self.effect = QGraphicsOpacityEffect(panel)
+        self.effect.setOpacity(1)
+        panel.setGraphicsEffect(self.effect)
+        self.animation = QPropertyAnimation(self.effect, b"opacity", self)
+        self.animation.setDuration(140)
+        self.animation.setEasingCurve(QEasingCurve.Type.OutCubic)
+        panel.installEventFilter(self)
+
+    def eventFilter(self, watched: QObject, event: QEvent) -> bool:
+        if event.type() in (QEvent.Type.Show, QEvent.Type.Hide):
+            self.animation.stop()
+            self.effect.setOpacity(1)
+            if event.type() == QEvent.Type.Show and not self.navigation.reduced():
+                self.animation.setStartValue(0.7)
+                self.animation.setEndValue(1.0)
+                self.animation.start()
         return super().eventFilter(watched, event)
