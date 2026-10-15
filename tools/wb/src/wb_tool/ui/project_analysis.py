@@ -6,8 +6,10 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QComboBox,
     QGridLayout,
+    QHeaderView,
     QLabel,
     QPushButton,
+    QSplitter,
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
@@ -59,19 +61,30 @@ class ProjectAnalysisPanel(QWidget):
             button.clicked.connect(callback)
             actions.addWidget(button, (index + 1) // 3, (index + 1) % 3)
         layout.addLayout(actions)
-        layout.addWidget(
-            QLabel(
-                "边界为裁剪内的行号，含两端，0 起算。两端留空表示未检测；"
-                "基线两端都留空使用边界端点值。修改后需重新计算。"
-            )
+        bounds_help = QLabel(
+            "边界为裁剪内的行号，含两端，0 起算。两端留空表示未检测；"
+            "基线两端都留空使用边界端点值。修改后需重新计算。"
         )
+        bounds_help.setWordWrap(True)
+        layout.addWidget(bounds_help)
         self.lanes = QTableWidget(0, 6)
         self.lanes.setHorizontalHeaderLabels(
             ["泳道", "包含", "边界左", "边界右", "基线左", "基线右"]
         )
-        layout.addWidget(self.lanes)
+        header = self.lanes.horizontalHeader()
+        header.setMinimumSectionSize(48)
+        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.lanes.setMinimumWidth(324)
+        self.lanes.setMinimumHeight(130)
         self.plot = ProfilePlot()
-        layout.addWidget(self.plot)
+        evidence = QSplitter(Qt.Orientation.Horizontal)
+        evidence.addWidget(self.lanes)
+        evidence.addWidget(self.plot)
+        evidence.setChildrenCollapsible(False)
+        evidence.setSizes([440, 420])
+        evidence.setMinimumHeight(180)
+        evidence.setMaximumHeight(240)
+        layout.addWidget(evidence)
         self.result_view = ProjectResultsView()
         self.results = self.result_view.table
         layout.addWidget(self.result_view)

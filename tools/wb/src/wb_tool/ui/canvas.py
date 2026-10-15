@@ -110,7 +110,12 @@ class ImageCanvas(QWidget):
                 (lane.y1 - lane.y0) * rect.height() / height,
             )
             painter.drawRect(box)
-            painter.drawText(box.topLeft() + QPointF(2, label_y), lane.lane_id)
+            label_position = box.topLeft() + QPointF(4, label_y)
+            label_box = QRectF(painter.fontMetrics().boundingRect(lane.lane_id))
+            label_box.translate(label_position)
+            painter.fillRect(label_box.adjusted(-3, -1, 3, 2), QColor("#172126"))
+            painter.setPen(QColor("#ffffff"))
+            painter.drawText(label_position, lane.lane_id)
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.MouseButton.LeftButton and self.image_rect().contains(

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtTest import QSignalSpy
 from pytestqt.qtbot import QtBot
-from wb_tool.api import WBAnalysisProject
+from wb_tool.api import FigureRender, WBAnalysisProject
 
 from tests.test_project_measurements import item, setup
 from tests.test_project_measurements import windows as windows
@@ -137,3 +137,52 @@ def test_failed_workspace_open_is_visible_on_welcome(
     assert window.surface.currentWidget() is window.welcome
     assert "失败" in window.welcome_status.text()
     assert window.welcome_status.text() == window.view.status.text()
+
+
+def test_preview_fit_and_actual_size_are_display_only(
+    qtbot: QtBot, tmp_path: Path, windows: Callable[[], "FigureProjectWindow"]
+) -> None:
+    window = windows()
+    setup(qtbot, tmp_path, window)
+    view = window.view
+    before = view.project()
+    generation = view.generation
+    rendered = FigureRender(1800, 800, bytes((31, 127, 221)) * (1800 * 800), "{}")
+    view.show_section("preview")
+    view.show_render(rendered)
+    changes = QSignalSpy(view.changed)
+    full_image = view.preview_label.full_pixmap.toImage()
+    assert full_image.width() == 1800 and full_image.height() == 800
+    assert full_image.pixelColor(900, 400).getRgb() == (31, 127, 221, 255)
+    for width, height in ((1100, 780), (1280, 860)):
+        window.resize(width, height)
+        qtbot.waitUntil(lambda: view.preview_label.pixmap().width() <= view.preview_label.width())
+        assert view.preview_label.pixmap().height() <= view.preview_label.height()
+        assert view.preview_label.full_pixmap.toImage() == full_image
+    view.preview_scale.setCurrentIndex(1)
+    assert view.preview_label.pixmap().size() == full_image.size()
+    view.preview_scale.setCurrentIndex(0)
+    assert view.preview_label.full_pixmap.toImage() == full_image
+    assert view.project() == before and view.generation == generation
+    assert changes.count() == 0
+    assert rendered.rgb == bytes((31, 127, 221)) * (1800 * 800)
+
+
+def test_coordinate_and_detection_disclosure_do_not_change_parameters(
+    qtbot: QtBot, tmp_path: Path, windows: Callable[[], "FigureProjectWindow"]
+) -> None:
+    window = windows()
+    setup(qtbot, tmp_path, window)
+    view = window.view
+    before = view.project()
+    generation = view.generation
+    row = before.rows[0]
+    detection = view.suggestions.settings(row, before.template.crop_height)
+    assert all(view.table.isColumnHidden(i) for i in range(4, 8))
+    view.exact_coordinates.setChecked(True)
+    assert all(not view.table.isColumnHidden(i) for i in range(4, 8))
+    view.exact_coordinates.setChecked(False)
+    view.suggestions.advanced_toggle.setChecked(True)
+    view.suggestions.advanced_toggle.setChecked(False)
+    assert view.suggestions.settings(row, before.template.crop_height) == detection
+    assert view.project() == before and view.generation == generation

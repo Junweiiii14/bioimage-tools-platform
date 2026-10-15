@@ -147,8 +147,8 @@ class FigureProjectWindow(QMainWindow):
         self.welcome = QWidget()
         self.welcome.setObjectName("welcomePage")
         welcome_layout = QVBoxLayout(self.welcome)
-        welcome_layout.setContentsMargins(64, 48, 64, 48)
-        welcome_layout.addStretch()
+        welcome_layout.setContentsMargins(48, 32, 48, 32)
+        welcome_layout.setSpacing(12)
         title = QLabel("开始一个 WB 实验项目")
         title.setObjectName("welcomeTitle")
         welcome_layout.addWidget(title)
@@ -157,6 +157,16 @@ class FigureProjectWindow(QMainWindow):
         )
         description.setWordWrap(True)
         welcome_layout.addWidget(description)
+        workflow = QLabel(
+            "1   原图与裁剪     导入原图，明确泳道与裁剪区域\n\n"
+            "2   定量与复核     检查边界、基线和来源结果\n\n"
+            "3   拼图排版        调整分段、标签和完整拼图\n\n"
+            "4   导出               保存展示图、结果表或完整项目"
+        )
+        workflow.setObjectName("welcomeWorkflow")
+        workflow.setWordWrap(True)
+        welcome_layout.addWidget(workflow)
+        welcome_layout.addSpacing(12)
         self.welcome_buttons: list[tuple[QPushButton, QPushButton]] = []
         for label, owner in (
             ("新建项目工作区…", self.create_button),
@@ -242,9 +252,9 @@ class FigureProjectWindow(QMainWindow):
                 border: 1px solid #b7c6cf; padding: 4px; }
             QSplitter::handle { background: #d3dde2; }
             QTableCornerButton::section { background: #eaf0f3; border: 0; }
-            QToolBar { background: #eaf0f3; border: 0; padding: 10px; spacing: 8px; }
+            QToolBar { background: #eaf0f3; border: 0; padding: 7px; spacing: 8px; }
             QPushButton, QToolButton { color: #20323d; background: #ffffff;
-                border: 1px solid #b7c6cf; border-radius: 4px; padding: 6px 10px; }
+                border: 1px solid #b7c6cf; border-radius: 5px; padding: 5px 9px; }
             QPushButton:hover, QToolButton:hover { background: #e7f1f4; border-color: #126878; }
             QPushButton:focus, QToolButton:focus { border: 2px solid #126878; }
             QPushButton:disabled, QToolButton:disabled { color: #697a84; background: #edf1f3;
@@ -256,19 +266,28 @@ class FigureProjectWindow(QMainWindow):
                 padding: 4px; border: 1px solid #b7c6cf; border-radius: 3px; }
             QLineEdit:focus, QSpinBox:focus, QComboBox:focus { border-color: #126878; }
             QTabWidget::pane { border: 1px solid #c8d4dc; background: #ffffff; }
-            QTabBar::tab { color: #405660; background: #edf2f5; padding: 9px 14px; }
+            QTabBar::tab { color: #405660; background: #edf2f5; padding: 7px 12px; }
             QTabBar::tab:selected { color: #ffffff; background: #126878; }
             QTableWidget { background: #ffffff; color: #20323d; gridline-color: #dce4e9;
                 selection-background-color: #d3e9ed; selection-color: #173e49; }
             QHeaderView::section { background: #eaf0f3; color: #344c59;
                 border: 0; border-bottom: 1px solid #c8d4dc; padding: 6px; }
-            QListWidget#workflowSteps { background: #eaf0f3; border: 0; padding: 6px; }
-            QListWidget#workflowSteps::item { color: #344c59; padding: 16px 6px; }
-            QListWidget#workflowSteps::item:selected { background: #126878; color: #ffffff; }
-            QLabel#stepTitle { font-size: 22px; font-weight: 600; color: #20323d; }
-            QLabel#stepHelp { color: #405660; padding-bottom: 8px; }
+            QWidget#workflowSidebar { background: #172126; border-radius: 6px; }
+            QLabel#sidebarBrand { color: #f4f7f9; font-size: 28px; font-weight: 600; }
+            QLabel#sidebarSubtitle, QLabel#sidebarNote { color: #acbdc6; font-size: 11px; }
+            QListWidget#workflowSteps { background: #172126; border: 0; padding: 0; }
+            QListWidget#workflowSteps::item { color: #c9d5db; padding: 12px 7px; }
+            QListWidget#workflowSteps::item:selected {
+                background: #d2e9bd; color: #213322; border-radius: 4px; }
+            QLabel#stepTitle { font-size: 19px; font-weight: 600; color: #20323d; }
+            QLabel#stepHelp { color: #405660; padding-bottom: 3px; }
+            QLabel#projectCaption { color: #536771; font-size: 11px; }
+            QLineEdit#projectName { background: transparent; font-size: 14px; font-weight: 600;
+                border: 0; padding: 3px 6px; }
+            QLineEdit#projectName:focus { background: #ffffff; border: 1px solid #126878; }
+            QLabel#welcomeWorkflow { background: #e8eef1; padding: 22px; color: #344c59; }
             QLabel#exportHeading { font-size: 17px; font-weight: 600; }
-            QLabel#welcomeTitle { font-size: 28px; font-weight: 600; }
+            QLabel#welcomeTitle { font-size: 24px; font-weight: 600; }
             QMenu { color: #20323d; background: #ffffff; border: 1px solid #b7c6cf; }
             QMenu::item { padding: 8px 20px; }
             QMenu::item:selected { color: #ffffff; background: #126878; }

@@ -6,6 +6,7 @@ from PySide6.QtWidgets import (
     QComboBox,
     QFormLayout,
     QHBoxLayout,
+    QHeaderView,
     QLabel,
     QPushButton,
     QSpinBox,
@@ -65,11 +66,23 @@ class LaboratoryLayoutPanel(QWidget):
         content.addLayout(form)
         self.table = QTableWidget(0, 7)
         self.table.setHorizontalHeaderLabels(
-            ["原图行", "Fig", "显示行", "段序", "起始泳道", "结束泳道", "Fig列"]
+            ["原图行", "Fig", "显示行", "段序", "起始", "结束", "Fig列"]
         )
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
-        self.table.horizontalHeader().setStretchLastSection(True)
+        header = self.table.horizontalHeader()
+        header.setMinimumSectionSize(40)
+        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
+        self.table.setColumnWidth(0, 76)
+        self.table.setMinimumWidth(340)
+        for column, description in (
+            (4, "起始泳道（原图序号，含本泳道）"),
+            (5, "结束泳道（原图序号，含本泳道）"),
+        ):
+            heading = self.table.horizontalHeaderItem(column)
+            if heading is not None:
+                heading.setToolTip(description)
         content.addWidget(self.table, 1)
         column_hint = QLabel("向右横向滚动可编辑段序、起止泳道和 Fig 列；也可拖动中间分隔线加宽。")
         column_hint.setWordWrap(True)
@@ -183,9 +196,8 @@ class LaboratoryLayoutPanel(QWidget):
                     item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 if column == 0:
                     item.setData(Qt.ItemDataRole.UserRole, part.row_id)
-                    item.setToolTip(part.row_id)
+                    item.setToolTip(f"{text}\n来源行：{part.row_id}")
                 self.table.setItem(index, column, item)
-        self.table.setColumnWidth(0, 280)
 
     def split_selected(self) -> None:
         try:

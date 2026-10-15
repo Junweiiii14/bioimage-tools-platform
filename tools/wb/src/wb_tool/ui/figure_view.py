@@ -4,25 +4,27 @@ from dataclasses import replace
 from uuid import uuid4
 
 from PySide6.QtCore import QSize, Qt, Signal
-from PySide6.QtGui import QIcon, QImage, QPixmap
+from PySide6.QtGui import QIcon, QImage, QPixmap, QResizeEvent
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QCheckBox,
     QComboBox,
     QFormLayout,
-    QGridLayout,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QListWidget,
+    QMenu,
     QPushButton,
     QScrollArea,
+    QSizePolicy,
     QSpinBox,
     QSplitter,
     QStackedWidget,
     QTableWidget,
     QTableWidgetItem,
     QTabWidget,
+    QToolButton,
     QVBoxLayout,
     QWidget,
 )
@@ -70,6 +72,48 @@ from wb_tool.ui.project_metadata import ProjectMetadataPanel
 from wb_tool.ui.project_ocr import ProjectOCRPanel
 
 
+class FigurePreview(QLabel):
+    """Display-only fit/actual-size preview; retains complete unscaled render pixels."""
+
+    def __init__(self) -> None:
+        super().__init__("生成预览后，可在这里检查完整拼图")
+        self.full_pixmap = QPixmap()
+        self.fit = True
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
+
+    def set_render(self, pixmap: QPixmap) -> None:
+        self.full_pixmap = pixmap.copy()
+        self.set_fit(self.fit)
+
+    def clear_render(self) -> None:
+        self.full_pixmap = QPixmap()
+        self.setMinimumSize(0, 0)
+        self.setPixmap(QPixmap())
+        self.setText("内容已修改，请重新生成预览")
+
+    def set_fit(self, fit: bool) -> None:
+        self.fit = fit
+        self.setMinimumSize(QSize(0, 0) if fit else self.full_pixmap.size())
+        self._refresh()
+
+    def _refresh(self) -> None:
+        if not self.full_pixmap.isNull():
+            self.setPixmap(
+                self.full_pixmap.scaled(
+                    self.size(),
+                    Qt.AspectRatioMode.KeepAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation,
+                )
+                if self.fit
+                else self.full_pixmap
+            )
+
+    def resizeEvent(self, event: QResizeEvent) -> None:
+        super().resizeEvent(event)
+        self._refresh()
+
+
 class FigureProjectView(QWidget):
     changed = Signal()
     source_requested = Signal(str)
@@ -88,15 +132,23 @@ class FigureProjectView(QWidget):
         self._project = WBFigureProject(project_id=uuid4().hex)
         self._thumbnails: dict[str, QIcon] = {}
         root = QVBoxLayout(self)
+        root.setContentsMargins(12, 10, 12, 10)
+        root.setSpacing(5)
+        project_header = QHBoxLayout()
+        caption = QLabel("当前项目")
+        caption.setObjectName("projectCaption")
+        project_header.addWidget(caption)
         self.name = QLineEdit("WB 项目")
-        root.addWidget(self.name)
+        self.name.setObjectName("projectName")
+        project_header.addWidget(self.name, 1)
+        root.addLayout(project_header)
         self.status = QLabel("批量导入原图，填写 Fig/蛋白，框选整行范围并复核。")
         self.status.setWordWrap(True)
         root.addWidget(self.status)
         self.history_label = QLabel()
         self.history_label.setWordWrap(True)
         root.addWidget(self.history_label)
-        actions = QGridLayout()
+        actions = QHBoxLayout()
         self.filter = QComboBox()
         self.filter.addItems(
             [
@@ -110,32 +162,48 @@ class FigureProjectView(QWidget):
                 "无候选/失败",
             ]
         )
-        actions.addWidget(self.filter, 0, 0)
-        for index, (text, callback) in enumerate(
-            (
-                ("上移行", lambda: self.move_row(-1)),
-                ("下移行", lambda: self.move_row(1)),
-                ("添加缺图位", self.add_missing),
-                ("删除所选行", self.remove_row),
-                ("确认所选行", self.confirm_selected),
-            )
+        self.filter.setFixedWidth(132)
+        actions.addWidget(self.filter)
+        for text, callback in (
+            ("上移", lambda: self.move_row(-1)),
+            ("下移", lambda: self.move_row(1)),
         ):
             button = QPushButton(text)
             button.clicked.connect(callback)
-            actions.addWidget(button, (index + 1) // 3, (index + 1) % 3)
+            actions.addWidget(button)
+        more = QToolButton()
+        more.setText("更多操作")
+        menu = QMenu(more)
+        for text, callback in (("添加缺图位", self.add_missing), ("删除所选行", self.remove_row)):
+            menu.addAction(text).triggered.connect(callback)
+        more.setMenu(menu)
+        more.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+        actions.addWidget(more)
+        self.exact_coordinates = QCheckBox("精确坐标")
+        self.exact_coordinates.toggled.connect(self._show_coordinates)
+        actions.addWidget(self.exact_coordinates)
+        actions.addStretch()
+        confirm = QPushButton("确认所选行")
+        confirm.setObjectName("primaryAction")
+        confirm.clicked.connect(self.confirm_selected)
+        actions.addWidget(confirm)
         source_controls = QWidget()
-        QVBoxLayout(source_controls).addLayout(actions)
+        source_controls_layout = QVBoxLayout(source_controls)
+        source_controls_layout.setContentsMargins(6, 4, 6, 4)
+        source_controls_layout.addLayout(actions)
         self.table = QTableWidget(0, 11)
         self.table.setHorizontalHeaderLabels(
             ["原图", "Fig", "蛋白", "N", "x0", "y0", "x1", "y1", "空泳道(逗号)", "已审核", "备注"]
         )
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
-        self.table.setMinimumHeight(140)
+        self.table.setMinimumHeight(110)
+        self.table.setMaximumHeight(170)
         self.table.setIconSize(QSize(96, 64))
         for index in range(3, 8):
             self.table.setColumnWidth(index, 60)
-        self.table.setColumnWidth(0, 240)
+        self.table.setColumnWidth(0, 205)
+        self._show_coordinates(False)
         self.table.setColumnWidth(9, 65)
 
         self.canvas = ImageCanvas()
@@ -176,7 +244,7 @@ class FigureProjectView(QWidget):
                 "归档另含未改像素的 TIFF 裁剪和原图。"
             )
         )
-        self.preview_label = QLabel("修改后点击生成预览")
+        self.preview_label = FigurePreview()
         self.preview_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         preview_scroll = QScrollArea()
         preview_scroll.setWidget(self.preview_label)
@@ -242,6 +310,13 @@ class FigureProjectView(QWidget):
         self.canvas.roi_drawn.connect(self._drawn)
         self.set_project(self._project)
 
+    def _preview_scale_changed(self, index: int) -> None:
+        self.preview_label.set_fit(index == 0)
+
+    def _show_coordinates(self, visible: bool) -> None:
+        for column in range(4, 8):
+            self.table.setColumnHidden(column, not visible)
+
     def _build_workflow(
         self,
         root: QVBoxLayout,
@@ -251,15 +326,31 @@ class FigureProjectView(QWidget):
         preview_page: QWidget,
     ) -> None:
         body = QHBoxLayout()
-        body.setSpacing(20)
+        body.setSpacing(16)
         self.steps = QListWidget()
         self.steps.setObjectName("workflowSteps")
         self.steps.setAccessibleName("实验项目步骤")
         self.steps.addItems(["1  原图与裁剪", "2  定量与复核", "3  拼图排版", "4  导出"])
-        self.steps.setFixedWidth(168)
-        self.steps.setSpacing(4)
-        body.addWidget(self.steps)
+        self.steps.setSpacing(3)
+        self.sidebar = QWidget()
+        self.sidebar.setObjectName("workflowSidebar")
+        self.sidebar.setFixedWidth(168)
+        sidebar_layout = QVBoxLayout(self.sidebar)
+        sidebar_layout.setContentsMargins(12, 18, 12, 16)
+        brand = QLabel("WB")
+        brand.setObjectName("sidebarBrand")
+        sidebar_layout.addWidget(brand)
+        subtitle = QLabel("实验图像工作台")
+        subtitle.setObjectName("sidebarSubtitle")
+        sidebar_layout.addWidget(subtitle)
+        sidebar_layout.addSpacing(20)
+        sidebar_layout.addWidget(self.steps, 1)
+        side_note = QLabel("从原图到结果\n保留每一步的来源")
+        side_note.setObjectName("sidebarNote")
+        sidebar_layout.addWidget(side_note)
+        body.addWidget(self.sidebar)
         content = QVBoxLayout()
+        content.setSpacing(5)
         self.step_title = QLabel()
         self.step_title.setObjectName("stepTitle")
         self.step_help = QLabel()
@@ -279,7 +370,7 @@ class FigureProjectView(QWidget):
         source_split = QSplitter(Qt.Orientation.Vertical)
         source_split.addWidget(self.table)
         source_split.addWidget(source_page)
-        source_split.setSizes([200, 500])
+        source_split.setSizes([150, 500])
         source_split.setChildrenCollapsible(False)
         originals_layout.addWidget(source_split, 1)
         self.source_tabs = QTabWidget()
@@ -321,7 +412,14 @@ class FigureProjectView(QWidget):
         self.preview_button = QPushButton("生成 / 更新预览")
         self.preview_button.setObjectName("primaryAction")
         self.preview_button.clicked.connect(self.preview_requested)
-        preview_layout.insertWidget(0, self.preview_button)
+        preview_toolbar = QHBoxLayout()
+        preview_toolbar.addWidget(self.preview_button, 1)
+        self.preview_scale = QComboBox()
+        self.preview_scale.addItems(["适应窗口", "100%"])
+        self.preview_scale.setAccessibleName("预览显示比例")
+        self.preview_scale.currentIndexChanged.connect(self._preview_scale_changed)
+        preview_toolbar.addWidget(self.preview_scale)
+        preview_layout.insertLayout(0, preview_toolbar)
         arrangement.addWidget(preview_page)
         arrangement.setSizes([540, 500])
         arrangement.setChildrenCollapsible(False)
@@ -614,6 +712,7 @@ class FigureProjectView(QWidget):
             self.table.setRowHeight(
                 index, 68 if row.source and row.source.sha256 in self._thumbnails else 28
             )
+        self.history_label.setVisible(bool(self.history_label.text()))
         self._loading = False
         self._refresh_analysis_sources()
         self._filter_rows()
@@ -699,8 +798,7 @@ class FigureProjectView(QWidget):
         self.analysis.invalidate()
         self.ocr.result_view.invalidate()
         self.normalization.result_view.invalidate()
-        self.preview_label.setPixmap(QPixmap())
-        self.preview_label.setText("内容已修改，请重新生成预览")
+        self.preview_label.clear_render()
         self.changed.emit()
         self._overlay()
 
@@ -1041,5 +1139,4 @@ class FigureProjectView(QWidget):
             rendered.width * 3,
             QImage.Format.Format_RGB888,
         ).copy()
-        self.preview_label.setPixmap(QPixmap.fromImage(image))
-        self.preview_label.setMinimumSize(rendered.width, rendered.height)
+        self.preview_label.set_render(QPixmap.fromImage(image))

@@ -48,7 +48,11 @@ class CropSuggestionPanel(QWidget):
     def __init__(self) -> None:
         super().__init__()
         root = QVBoxLayout(self)
-        settings = QHBoxLayout()
+        root.setContentsMargins(6, 4, 6, 4)
+        root.setSpacing(4)
+        self.advanced_settings = QWidget()
+        settings = QHBoxLayout(self.advanced_settings)
+        settings.setContentsMargins(0, 0, 0, 0)
         self.polarity = QComboBox()
         self.polarity.addItems(["暗带 / 亮底", "亮带 / 暗底"])
         self.marker = QCheckBox("左侧有 Marker")
@@ -61,7 +65,7 @@ class CropSuggestionPanel(QWidget):
         self.threshold.setPrefix("SNR ≥ ")
         for widget in (self.polarity, self.marker, self.edges, self.manual, self.threshold):
             settings.addWidget(widget)
-        root.addLayout(settings)
+        self.advanced_settings.hide()
         actions = QGridLayout()
         self.run_one = QPushButton("检测当前行")
         self.run_all = QPushButton("检测全部原图")
@@ -96,7 +100,11 @@ class CropSuggestionPanel(QWidget):
             )
         ):
             actions.addWidget(widget, index // 4, index % 4)
+        self.advanced_toggle = QCheckBox("高级检测设置")
+        self.advanced_toggle.toggled.connect(self.advanced_settings.setVisible)
+        actions.addWidget(self.advanced_toggle, 1, 3)
         root.addLayout(actions)
+        root.addWidget(self.advanced_settings)
         self.details = QLabel()
         self.details.setWordWrap(True)
         root.addWidget(self.details)
