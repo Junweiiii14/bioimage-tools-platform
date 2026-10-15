@@ -127,3 +127,6 @@ policy退出0；技能文件/引用/脚本语法/方向列表与ImpeccableSHA/�
 ## T-028 / 审核提案（基线93792bc，产品16f3877）
 
 context --task T-028 --scope work --scope .agent-handoff --scope .impeccable/critique --record exit0；Impeccable context/detect exit0，detect为[]且PythonQt不代表视觉通过。Taste draw exit0，seed216553621；独立A/B审查完成，真实ZIP恢复/8页Qt截图脚本exit0。初次复制活动工作区遇到锁失败，改为不可变ZIP恢复，原资产未改。critique-storage write/trend exit0，只有本次快照，无趋势结论。产品测试未运行（无产品变更），键盘/读屏/高DPI等未验收。
+
+## 2026-10-16 T-029
+74a597b完整check --all退出0：560 passed/210.93s，Pyright0、9合约、隔离wheel/真实OCR烟测。48ecb72取消guard和11b1d96高DPI缓存增量专项回归通过，最终独审绑定11b1d96无未解决发现。完整命令边界及首轮失败保留work/evidence/T-029/validation.md；真实10图原哈希不变但质量警告仍需人工科学审核。

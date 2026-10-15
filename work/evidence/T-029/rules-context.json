@@ -9,6 +9,7 @@
     "PRODUCT.md",
     "apps/desktop",
     "docs",
+    "tests",
     "tools/wb",
     "work"
   ],

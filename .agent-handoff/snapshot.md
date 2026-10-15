@@ -1,12 +1,11 @@
 # Handoff Snapshot
 
-- 更新2026-10-15。总体T-003；当前T-028全面UI审核与改版提案，唯一状态 `work/tasks/T-028-ui-audit-proposal.md`，awaiting_user_review。用户明确所有产品改动待其审核，包括自动建项目目录；不要依据早期持续开发授权越过此门槛。T-024工程状态仍见原任务，不代表最终产品/科学验收。
-- 活动工作树 `C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform`，分支 `codex/t024-platform-automation`，产品 `16f38777d8bf8262b429e4004413937dd55b0195`。原仓库旧T-021 dirty保留；不要覆盖。当前预存未跟踪 `.impeccable/questions/` 保留。
-- 默认入口是真实工具平台，WB工具目录导入→自动泳道/裁剪/积分边界→真实测量进程→表/拼图/可恢复ZIP。源图左224/中央图/右272；Qt冷白青绿；图上移动缩放，不要求坐标。schema8机器证据不伪装人工审核，原像素计算，旧1–7读取不变。
-- 子任务平台T-025、画布T-026（修正重复ID）、核心T-027已集成。Impeccable用于Operate/native；Taste明确不适用app screen。独立代码审查五P2均修复且绑定16f3877通过；独立视觉两修复resolved/ship（限定所审修复）；设计documenter已核对。
-- 最终 `dev.py check --all` 退出0：532 passed/193.25s，Ruff317格式/Pyright0/9合约/隔离wheel与真实OCR烟测通过。详见work/evidence/T-024/validation.md。
-- 实际10张用户TIFF完整处理：5张检出21泳道、5张无可靠候选。全部21条有质量警告，原始积分已输出而有效信号留空。无人工真值准确率声明、不猜蛋白/组别/内参，不按文件后缀推断来源。
-- 最新交付 `.local/deliveries/WB-platform-20261015-212916`：workspace、真实5视图截图、启动脚本、使用说明；输出 `workspace/outputs/WB-20261015-212920-84db3a`。严格ZIP恢复验证10行/schema8/5机器证据/0人工review。原图/产物不提交Git。
-- 当前交付 `work/evidence/T-028/UI全面审核与改版方案.md`：自动管理目录、选图即处理、图像为中心三栏、异常队列、统一结果输出；OCR/写表等能力完整保留。独立A/B审核与8页真实Qt补拍完成，18/40是主观启发式评分，不是准确率。仅文档/临时证据变动，无产品改动。
-- 下一步先等用户审核T-028方案；获批再实施目录生命周期/主工作台/完整输出与独立验收。其他工具不自动扩展。旧坐标教学已停止。远程CI/PR合并/包态发布未做。
-- 历史Qt中止/停滞根因UNKNOWN，真实准确率与干净Windows仍待验收；不得以本轮通过删除风险。旧snapshot已存archive/t024-pre-integration-snapshot.md。
+- 更新2026-10-16。总体T-003；当前T-029已批准工作台实施，唯一状态work/tasks/T-029-approved-workbench.md。用户明确批准T-028方案及动效/审美，普通实现不再征询。
+- 活动工作树C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform，分支codex/t029-approved-workbench。原仓库旧dirty与预存.impeccable/questions保留。
+- 平台选图/文件夹/拖放→自动独立项目→自动识别/测量/输出。图像复核/拼图/结果三模式，中央图像、左右上下文；曲线/裁剪图上调整、自动保存重算、撤销和焦点保存。模板/OCR/归一化完整能力保留；schema与科学公式不变。
+- Taste product-performs+Impeccable原生Qt，暖白/青绿；180ms导航/140ms面板，可减少动效。DESIGN/PRODUCT/sidecar已由独立documenter3f690e4更新。
+- 真实10张TIFF最终交付.local/deliveries/WB-workbench-20261016-003258：5张检出21泳道、5张未定位、0人工审核、全部21条质量警告，原积分保留/有效信号空白；原图哈希不变，ZIP公开读回。51表项含30待定位占位，不能写成51泳道。
+- 入口启动工具平台.cmd/打开本次WB项目.cmd，使用说明及截图位于交付目录。依赖开发环境，不是独立安装包。之前002056保留视觉/DPI证据，进程实际DPR1.25/2.0；不外推干净Windows。
+- 独立视觉193c659修复清单ship限定静态，平台0e2c09c补审ship；最近项目实时就绪状态尚未做，使用真实历史名称/时间/来源数与关闭后缓存缩略图。
+- 工程559全门禁通过207.48s后，b6812e3修复重开→拼图清空结果表，50相关测试通过。74a597b全门禁560通过210.93s/退出0；48ecb72补取消guard，11b1d96修复高DPI缓存尺寸；专项回归/类型/最终绑定独审通过，无未解决确认问题。
+- T-029核心已交付，当前产品11b1d9679a5070e4ba24f4667f10fe362b6f146f。下一步依据用户反馈继续最近项目实时处理状态和科学准确率验证；不要自动扩展本轮范围。其他工具不自动扩展；远程CI/PR合并/独立安装包发布未做。历史Qt原生退出与真实检测准确率/人工真值、干净Windows仍待验收。
