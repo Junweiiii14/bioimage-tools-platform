@@ -119,3 +119,7 @@ policy退出0；技能文件/引用/脚本语法/方向列表与ImpeccableSHA/�
 - 2026-10-15 T-024自动核心子树：40定向测试通过1.31s，Pyright WB源/新测试0，Ruff通过；10真实TIFF仅本机只读探针，详见work/evidence/T-027/automatic-core-validation.md；独审/全仓由集成继续。
 
 - 2026-10-15 T-027后续：58定向2.34s通过（质量复核原始积分/Qt显示/CSV-XLSX/旧项目归档），Pyright0；不改变有效信号/归一化，schema1–7表布局不变。
+
+## T-024 / 16f3877
+
+`uv run --locked --no-sync python dev.py check --all` exit0；532/193.25s、Ruff/Pyright0/9合约/隔离安装通过。真实10图自动链与ZIP恢复通过；独立5复现exit0/5.24s，修复resolved。首次全量527/1旧schema8拒绝预期失败及显示格式预期更新均详记T-024 validation。

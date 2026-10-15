@@ -12,3 +12,5 @@ Test expectation updates: old table visible by default assertion replaced with v
 
 Parent integration: connect automatic_requested, automatic_export_requested, import_directory_requested; disable full view while busy. Preserve schema8 automatic_rows after project reconstruction when core helper lands, and display machine/human statuses separately. Full repository gates and independent commit-bound review delegated to parent.
 Final combined source/workflow/evidence/laboratory/figure/single-window run: 36 passed in 41.03s; exit 0. Final targeted Ruff, strict pyright and git diff --check exit 0. Full gates not run in subtask.
+
+协调收拢：已集成产品16f3877；T-024全门禁532通过，独立绑定审查通过。子任务本地交付完成，后续用户试用/PR集成由T-024统一跟踪。

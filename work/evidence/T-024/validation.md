@@ -27,3 +27,9 @@
 Impeccable用于原生Operate界面；Taste明确排除app screen，不强套营销网站。独立fresh视觉审查5张实际截图（1440/1100逻辑视口），初判fix：复核表截断、来源编号无法区分。一次修复与同样五视图回捕，reviewer给出两个resolved、remaining clear、disposition ship；该结论只覆盖两项视觉修复，不代表算法科学验收。documenter独立核对PRODUCT/DESIGN/token JSON，原生Qt平台枚举例外保留。
 
 最终全门禁与绑定提交独审结果由收尾记录补充。
+
+## 最终收尾
+
+产品16f38777d8bf8262b429e4004413937dd55b0195。最终 `uv run --locked --no-sync python dev.py check --all` 退出0，532 passed/193.25s；Ruff与317文件format、Pyright0、9合约、隔离runtime/contracts/WB/desktop及OCR安装烟测通过。日志.local/t024-check-all-final.log。独审绑定本提交，无未解决可操作发现（限定审查范围）；五实际复现脚本.local/reviews/t024-five-repros.py退出0/5.24s，ZIP严格恢复通过。未推送或更改main。
+
+独立交互复核同16f3877：`.local/qa/T-024-independent/replay.py` exit0/4.98s，拖ROI重算/发布后取消/发布后关闭/真实10图复制件重开四项通过。最新项目恢复5成功run、选中第2原图、摘要3行且画布非空。复核输出probe-results.json；该代理未自审其平台作者范围。
