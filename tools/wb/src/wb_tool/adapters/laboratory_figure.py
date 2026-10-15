@@ -11,7 +11,11 @@ from PIL import Image, ImageDraw, ImageFont
 
 from wb_tool.adapters.tiff_input import load_tiff
 from wb_tool.application.figure_project import FigureRender, FigureSourcePath
-from wb_tool.application.laboratory_layout import WBLayoutProject, plan_laboratory_layout
+from wb_tool.application.laboratory_layout import (
+    SegmentPlacement,
+    WBLayoutProject,
+    plan_laboratory_layout,
+)
 
 
 def render_laboratory_figure(
@@ -62,6 +66,7 @@ def render_laboratory_figure(
             raise ValueError("Fig标题超出留白，请调整字号或布局")
         draw.text((panel.x, panel.y), panel.figure, font=heading_font, fill="black", anchor="lt")
     records: list[dict[str, object]] = []
+    by_source: dict[str, list[tuple[SegmentPlacement, dict[str, object]]]] = {}
     for line in layout.lines:
         bounds = label_font.getbbox(line.label)
         if (
@@ -101,29 +106,18 @@ def render_laboratory_figure(
                 "status": "present" if row.source else "missing",
             }
             if row.source and roi:
-                original = load_tiff(paths[row.source.sha256])
-                if (
-                    original.sha256 != row.source.sha256
-                    or original.source.stat().st_size != row.source.size_bytes
-                    or original.pixels.shape != (row.height, row.width)
-                    or original.bit_depth != row.bit_depth
-                ):
-                    raise ValueError("拼图原图摘要/字节数/尺寸/位深不一致")
-                crop = original.pixels[roi.y0 : roi.y1, roi.x0 : roi.x1]
-                display = (crop // 257).astype(np.uint8) if row.bit_depth == 16 else crop
-                canvas.paste(Image.fromarray(display).convert("RGB"), (x0, y0))
-                record.update(
-                    roi={"x0": roi.x0, "y0": roi.y0, "x1": roi.x1, "y1": roi.y1},
-                    source_photometric=original.photometric,
-                    gray_conversion=original.conversion,
-                    source_warnings=original.warnings,
-                    display_pixel_sha256=sha256(display.tobytes()).hexdigest(),
-                )
+                by_source.setdefault(row.source.sha256, []).append((placed, record))
             else:
                 draw.rectangle((x0, y0, x1 - 1, y1 - 1), fill="#eeeeee")
                 draw.line((x0, y0, x1 - 1, y1 - 1), fill="#666666")
                 draw.line((x1 - 1, y0, x0, y1 - 1), fill="#666666")
             records.append(record)
+    # The plan has non-overlapping output boxes, so drawing by source changes no pixels.
+    # Keep records in display order, but retain only one decoded source at a time.
+    for digest, segments in by_source.items():
+        _paste_source(canvas, paths[digest], segments, cancelled)
+    if cancelled():
+        raise ValueError("拼图任务已取消，未发布输出")
     manifest = {
         "schema_version": 2,
         "operation": "figure_segmented_geometry@1",
@@ -140,3 +134,41 @@ def render_laboratory_figure(
     return FigureRender(
         layout.width, layout.height, canvas.tobytes(), json.dumps(manifest, ensure_ascii=True)
     )
+
+
+def _paste_source(
+    canvas: Image.Image,
+    path: str,
+    segments: list[tuple[SegmentPlacement, dict[str, object]]],
+    cancelled: Callable[[], bool],
+) -> None:
+    if cancelled():
+        raise ValueError("拼图任务已取消，未发布输出")
+    original = load_tiff(path)
+    for placed, record in segments:
+        if cancelled():
+            raise ValueError("拼图任务已取消，未发布输出")
+        row, roi = placed.row, placed.roi
+        if row.source is None or roi is None:
+            raise ValueError("拼图分段缺少原图或ROI")
+        if (
+            original.sha256 != row.source.sha256
+            or original.source.stat().st_size != row.source.size_bytes
+            or original.pixels.shape != (row.height, row.width)
+            or original.bit_depth != row.bit_depth
+        ):
+            raise ValueError("拼图原图摘要/字节数/尺寸/位深不一致")
+        crop = original.pixels[roi.y0 : roi.y1, roi.x0 : roi.x1]
+        display = (crop // 257).astype(np.uint8) if row.bit_depth == 16 else crop
+        canvas.paste(
+            Image.fromarray(display).convert("RGB"),
+            (placed.output_box[0], placed.output_box[1]),
+        )
+        record.update(
+            roi={"x0": roi.x0, "y0": roi.y0, "x1": roi.x1, "y1": roi.y1},
+            source_photometric=original.photometric,
+            gray_conversion=original.conversion,
+            source_warnings=original.warnings,
+            display_pixel_sha256=sha256(display.tobytes()).hexdigest(),
+        )
+    # original, crop and display go out of scope before the next source is decoded.
