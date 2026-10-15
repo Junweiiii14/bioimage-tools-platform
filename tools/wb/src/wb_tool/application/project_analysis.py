@@ -76,10 +76,12 @@ class WBAnalysisProject(WBReviewProject):
 
 
 def analysis_is_current(project: WBFigureProject, plan: ProjectRowAnalysis) -> bool:
+    from wb_tool.application.automatic import row_is_ready
+
     row = next((r for r in project.rows if r.row_id == plan.row_id), None)
     return bool(
         row
-        and row.reviewed
+        and row_is_ready(project, row)
         and row.source
         and row.source.sha256 == plan.request.source_sha256
         and row.roi == plan.crop
@@ -113,7 +115,9 @@ def make_row_analysis(
     project: WBFigureProject, row_id: str, polarity: Polarity
 ) -> ProjectRowAnalysis:
     row = next((r for r in project.rows if r.row_id == row_id), None)
-    if row is None or row.source is None or row.roi is None or not row.reviewed:
+    from wb_tool.application.automatic import row_is_ready
+
+    if row is None or row.source is None or row.roi is None or not row_is_ready(project, row):
         raise ValueError("请先确认有原图的行及裁剪范围")
     if (
         not 2 <= row.roi.y1 - row.roi.y0 <= 4096
@@ -122,7 +126,7 @@ def make_row_analysis(
         raise ValueError("裁剪高度与当前模板不一致，请重新复核")
     lanes = tuple(
         LaneAnnotation(roi, (BandAnnotation("target", None, included=i not in row.empty_lanes),))
-        for i, roi in enumerate(row.quantitative_lanes(), 1)
+        for i, roi in enumerate(fixed_lane_grid(row.roi, row.lane_count), 1)
     )
     return ProjectRowAnalysis(
         row_id=row_id,
@@ -302,8 +306,10 @@ def _row_status(
 ) -> tuple[ProjectCellStatus, str] | None:
     if row.source is None:
         return "missing_source", "缺少原图"
-    if not row.reviewed:
-        return "pending_review", "尚未确认裁剪行"
+    from wb_tool.application.automatic import row_is_ready
+
+    if not row_is_ready(project, row):
+        return "pending_review", "尚未确认裁剪行或自动建议已过期"
     if plan is None:
         return "unconfigured", "未配置条带边界与基线"
     if not analysis_is_current(project, plan):
@@ -354,6 +360,8 @@ def fill_project_table(
                         band.reason or ", ".join(band.quality_flags),
                         band.signal,
                     )
+                if not pending and not row.reviewed:
+                    reason = "自动建议计算，未经人工复核" + ("；" + reason if reason else "")
                 cells.append(
                     ProjectTableCell(
                         row.row_id,

@@ -359,3 +359,11 @@ def detect_crop_candidates(
     return CropDetection(
         settings, width, height, membrane, marker, region, tuple(candidates[:8]), tuple(flags)
     )
+
+
+# Shared detection primitives; public within the WB domain, not package API.
+check_detection_cancelled = _check
+detection_membrane = _membrane
+detection_noise = _noise
+detection_segments = _segments
+smooth_detection = _smooth
