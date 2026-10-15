@@ -21,3 +21,5 @@
 ## 2026-10-15 F-004
 
 check --all退出0（29测试、22.30秒、Ruff/格式/类型通过），smoke-env退出0；产品扫描0，不外推产品验收。完整证据work/evidence/F-004/validation.md。
+
+F-004远程补记：01f35ae四项CI全SUCCESS，PR OPEN/CLEAN；此次仅文档收尾。

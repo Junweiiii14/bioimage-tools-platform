@@ -1,6 +1,6 @@
 # F-004：修复 Dependabot PR #5 的规则回执
 
-- 状态：implementing
+- 状态：done（修复提交已推送且四项远程检查通过；未合并）
 - base commit：221a2dff610554092a881fc396010f032b31ae33
 - 初始 head：b826878279bbc5cd5b9c13cdb5e88408e46611be
 - 授权：用户2026-10-15要求修复PR #5并验证通过。
@@ -14,4 +14,8 @@
 
 ## 已完成本地验证
 
-check --all退出0：29测试/22.30秒；smoke-env退出0。见work/evidence/F-004/validation.md。待提交回执校验和远程四项CI，状态仍implementing。
+check --all退出0：29测试/22.30秒；smoke-env退出0。见work/evidence/F-004/validation.md。提交01f35ae27c86849a3db8e5975ab806c2ce9bc7a2的回执本地校验及远程四项CI均通过。
+
+## 远程结果
+
+01f35ae：rules-context 5秒、Ubuntu 14秒、Windows 46秒、desktop-environment 30秒全部SUCCESS；PR OPEN/CLEAN。收尾仅更新文档，最终head检查需再次核对。

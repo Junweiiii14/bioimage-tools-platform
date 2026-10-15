@@ -22,3 +22,11 @@
 | uv run --locked --no-sync python dev.py smoke-env | 0 | Qt6.12.0、QProcess、offscreen、中文路径uint16 TIFF通过；不覆盖DPI/产品包 |
 
 规则回执最终验证与远程CI绑定提交后在主开发目录F-003证据补记；推送前必须本地通过，远程四项未完成前不称完成。独立审查未执行；本任务无产品修改，不合并或发布。
+
+## 推送后的真实结果
+
+修复提交 `01f35ae27c86849a3db8e5975ab806c2ce9bc7a2` 已推送原Dependabot分支。本地 rules-context check 返回0。
+
+- [rules-context](https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/38696979789)：SUCCESS，5秒。
+- [quality](https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/38696979780)：Ubuntu SUCCESS/14秒、Windows SUCCESS/46秒、desktop-environment SUCCESS/30秒。
+- PR #5：OPEN / CLEAN；未合并。本收尾提交只更新任务与交接文档，最终head的检查另核对。
