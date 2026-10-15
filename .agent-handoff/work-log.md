@@ -1,9 +1,5 @@
 # Current Work Log
 
-## 2026-10-14 / T-009 OCR/表格后端
-
-上一回合progress：34831e4手工GUI。本回合只读核对旧OCR/worksheet/导出并记录SHA；选同RapidOCR3.9.2/PP-OCRv6，实际CPU识别六标签和两个Fig正确、三模型hash相同。新增模型加载前守卫/分块/坐标/取消、未确认空间建议、显式绑定写值及字面XLSX无覆盖发布；矩形145/95×21解析值3045/1995自动写入，缺失/排除/真零分开。199tests/9合约/4wheel5场景通过，独立读表Unicode/数值通过。T-009仍implementing，OCR worker/Qt表/持久化与整体目标继续，独审待办。
-
 ## 2026-10-14 / T-008 手工桌面闭环
 
 上一回合progress：32a2bae进程宿主。本回合WBDocument v1、纯显示DTO/后台预览与codec、Qt ROI/条带/基线/原始曲线及中文窗口/静态worker入口。实际拖选→signal10→保存/重开、关闭自动保存、新编辑拒绝旧参数、uint16原图不变、实际窗口取消关闭通过；190完整tests/9合约/4wheel5场景，追加取消后最终pytest见证据。合成抓图已查看，无数值/工作区格式改写。用户回复首版必须Fig/行名OCR与自动写表，下一阶段优先；独审/远程CI/包态验收未执行，goal active。
@@ -106,3 +102,7 @@ wb-tool 0.2.0 新增 uint8/16 灰度及显式 RGB 单页 TIFF、极性与半开 
 ## 2026-10-15 / T-023 全新UI候选
 
 用户要求完全重新设计，先给候选再实施。复用协调worktree，新分支codex/t023-ui-candidates从059d01b开始。用Impeccable Operate及Taste制作A证据工作台/B清晰实验流程/C图像专注静态稿；三张1440×900真实浏览器截图已看，图像全为合成示意。正式前端/科学规则未改，DESIGN与PRODUCT新系统尚未锁定。用户可从选择页0ea9eab8或聊天回复选择；实施必须等其选择。任务T-023/证据为唯一状态。
+
+## 2026-10-15 / T-023 A证据工作台
+
+用户选择A，正式Qt改为顶部横导航及来源参数/原图曲线/复核结果三栏。双向编辑、SHA切源与ROI失效回归补齐；原图坐标/科学值不变。产品0d9aad94，独审15项8.13s通过；视觉13图有效，两项修复resolved。独立合成演示及报告在.local/deliveries/WB-evidence-20261015。最终门禁详见T-023 validation。未推送/集成/发布。

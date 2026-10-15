@@ -1,45 +1,30 @@
 ---
-name: WB 自动化桌面工具
-description: 以原图证据和明确工作阶段组织的 Qt 实验工作台
+name: WB 证据工作台
+description: 原图、泳道曲线与核验结果同屏的原生 Qt 实验工作台
 colors:
-  primary: "#126878"
-  rail: "#172126"
-  rail-ink: "#c9d5db"
-  rail-muted: "#acbdc6"
-  current-step: "#d2e9bd"
-  current-step-ink: "#213322"
-  caption-ink: "#536771"
-  welcome-panel: "#e8eef1"
-  window: "#f4f7f9"
+  primary: "#087677"
+  selected-ink: "#096568"
+  window: "#f3f6f7"
   surface: "#ffffff"
-  alternate-base: "#eef3f5"
-  palette-button: "#f7fafb"
-  ink: "#20323d"
+  alternate-base: "#f0f5f5"
+  palette-button: "#fafcfc"
+  ink: "#24363b"
   secondary-ink: "#405660"
+  summary-ink: "#526970"
   header-ink: "#344c59"
+  caption-ink: "#536771"
   disabled-ink: "#697a84"
-  chrome: "#eaf0f3"
-  border: "#b7c6cf"
+  border: "#cbd8dd"
   divider: "#c8d4dc"
   splitter: "#d3dde2"
   grid: "#dce4e9"
-  hover: "#e7f1f4"
-  disabled-surface: "#edf1f3"
+  hover: "#eaf5f3"
+  step-selected: "#eff7f6"
+  table-selected: "#dff1ed"
   inactive-tab: "#edf2f5"
-  table-selection: "#d3e9ed"
-  table-selection-ink: "#173e49"
+  disabled-surface: "#edf1f3"
+  welcome-panel: "#e8eef1"
 typography:
-  brand:
-    fontFamily: "Microsoft YaHei UI"
-    fontSize: "28px"
-    fontWeight: 600
-  project-name:
-    fontFamily: "Microsoft YaHei UI"
-    fontSize: "14px"
-    fontWeight: 600
-  caption:
-    fontFamily: "Microsoft YaHei UI"
-    fontSize: "11px"
   welcome:
     fontFamily: "Microsoft YaHei UI"
     fontSize: "24px"
@@ -52,23 +37,34 @@ typography:
     fontFamily: "Microsoft YaHei UI"
     fontSize: "17px"
     fontWeight: 600
+  brand:
+    fontFamily: "Microsoft YaHei UI"
+    fontSize: "16px"
+    fontWeight: 600
+  evidence-heading:
+    fontFamily: "Microsoft YaHei UI"
+    fontSize: "14px"
+    fontWeight: 600
+  project-name:
+    fontFamily: "Microsoft YaHei UI"
+    fontSize: "14px"
+    fontWeight: 600
+  caption:
+    fontFamily: "Microsoft YaHei UI"
+    fontSize: "11px"
   body:
     fontFamily: "Microsoft YaHei UI"
     fontSize: "10pt"
 rounded:
   control: "5px"
-  rail: "6px"
-  navigation: "4px"
   field: "3px"
 spacing:
-  compact: "4px"
-  inset: "6px"
-  toolbar-gap: "8px"
-  toolbar-inset: "7px"
-  section-gap: "16px"
-  workspace-gap: "16px"
+  field-inset: "4px"
   content-gap: "5px"
-  navigation-gap: "3px"
+  header-inset: "6px"
+  parameter-gap: "8px"
+  column-gap: "10px"
+  export-gap: "16px"
 components:
   button:
     backgroundColor: "{colors.surface}"
@@ -91,122 +87,122 @@ components:
     rounded: "{rounded.field}"
     padding: "4px"
   navigation-item:
-    textColor: "{colors.rail-ink}"
-    padding: "12px 7px"
+    textColor: "{colors.summary-ink}"
+    padding: "10px 20px"
   navigation-selected:
-    backgroundColor: "{colors.current-step}"
-    textColor: "{colors.current-step-ink}"
-    rounded: "{rounded.navigation}"
+    backgroundColor: "{colors.step-selected}"
+    textColor: "{colors.selected-ink}"
   tab:
     backgroundColor: "{colors.inactive-tab}"
     textColor: "{colors.secondary-ink}"
     padding: "7px 12px"
   tab-selected:
-    backgroundColor: "{colors.primary}"
-    textColor: "{colors.surface}"
+    backgroundColor: "{colors.hover}"
+    textColor: "{colors.selected-ink}"
+  source-selected:
+    backgroundColor: "{colors.hover}"
+    textColor: "{colors.selected-ink}"
+    padding: "5px 7px"
 ---
 
-# Design System: WB 自动化桌面工具
+# Design System: WB 证据工作台
 
 ## Overview
 
-**Creative North Star: "实验工作台"**
+**Creative North Star: "证据工作台"**
 
-石墨导航、浅 lime 当前步骤、冷白证据区域和青蓝主要操作构成 Windows 原生 Qt 工作台。紧凑项目栏与层级明确的控件为原图、曲线和拼图让出空间；产品自身的真实证据成为视觉主体。
+白色横向导航与冷白工作区让图像、曲线和结果成为视觉主体。浅色参数区、深色图像画布和克制的青绿操作强调提供熟悉的实验软件布局；系统中文字体保持原生清晰度。
 
-此记录来自 T-022 第二轮 Taste / Impeccable 原生适配后的实际代码：桌面 `figure_window.py` 的 `_apply_theme`，WB 的 `figure_view.py`、`crop_suggestions.py`、`project_analysis.py`、`project_ocr.py`，以及 `canvas.py` 和 `view.py` 的绘制实现。它描述当前实现，不证明科学准确率、物理 DPI 或安装包验收。用户确认仅借鉴旧 WBQuant 的浅色参数区、深色图像舞台和紧凑工具栏布局；当前 Qt 工作流及科学语义保持独立。
+本记录以用户选择的候选 A 最终 Qt 实现为准，替换 T-022 石墨侧栏与 lime 规则。代码基线为 `0d9aad94c8bd7a93f34a24163af4fabe8d017d56`：`apps/desktop/src/bioimage_app/figure_window.py::_apply_theme` 提供壳 token，`tools/wb/src/wb_tool/ui/figure_view.py`、`project_analysis.py`、`view.py` 和 `canvas.py` 提供布局与绘制规则。核对了交付目录中的 `analysis-1440.png` 实际 Qt 截图；截图不证明科学准确率或物理 DPI 验收。
 
 **Key Characteristics:**
 
-- 原生控件与统一中文系统字体。
-- 石墨导航和浅 lime 当前步骤，配合紧凑项目栏。
-- 图像与曲线拥有独立的证据绘制色。
+- 白色顶部横向阶段导航。
+- 来源参数、中央证据、结果复核三栏同屏。
+- 原生控件、紧凑中文层级与青绿选择状态。
+- 图像显示与定量数据分离。
 
 ## Colors
 
-青蓝动作色与浅 lime 阶段定位分工；石墨导航衬托冷白证据工作面，表格选中保持较浅的底色以便阅读。
+主要操作与信号曲线使用青绿，浅色选中面保持文字可读，深色仅属于图像证据画布。
 
 ### Primary
 
-- `primary` 用于主要按钮、页签选中、菜单选中及控件焦点边框；选中文字使用 `surface`。
-- `hover` 用于普通按钮悬停。主要按钮保留其更具体的对象选择器底色，不额外规定独立悬停色。
-
-### Secondary
-
-- `current-step` / `current-step-ink` 只用于步骤列表当前项，区别于青蓝操作按钮和页签。
+- `primary` 用于主要按钮、控件焦点、导航及页签底部指示线，也与剖面信号线同值。
+- `selected-ink` 用于选中步骤、页签、来源和表格文字。步骤底使用 `step-selected`；来源与页签选中底使用 `hover`；表格选中底使用 `table-selected`。
 
 ### Neutral
 
-- `rail` 是石墨步骤栏背景，`rail-ink` / `rail-muted` 用于导航和辅助文字；品牌使用 `window` 浅色字。`caption-ink` 用于当前项目标签，`welcome-panel` 用于欢迎流程说明面。
-- `window` 是窗口背景；`surface` 是编辑区、表格、滚动区与菜单背景。`alternate-base` 和 `palette-button` 是 Qt palette 角色；按钮的 QSS 背景实际采用 `surface`。
-- `ink`、`secondary-ink`、`header-ink` 分别承担正文、辅助说明及表头/导航文字。
-- `chrome` 用于工具栏、表头；`border`、`divider`、`splitter`、`grid` 保留控件边界、页签边框、分隔柄和表格网格的区别。
-- 表格选中使用 `table-selection` / `table-selection-ink`。禁用按钮使用 `disabled-surface` / `disabled-ink`；部分原生控件仍由 Qt 处理禁用状态，不能推导为所有控件共有的完整禁用规范。
+- `window` 承载窗口与中央证据区，`surface` 承载工具栏、横导航、参数区、复核区、编辑器与表格。
+- `alternate-base` 用于表头和悬停列表项，也是 Qt AlternateBase；`palette-button` 是 palette 默认按钮角色，实际按钮 QSS 使用 `surface`。
+- `ink`、`secondary-ink`、`summary-ink`、`header-ink`、`caption-ink` 分别用于正文、步骤辅助说明、摘要/导航、表头、项目标签。
+- `border`、`divider`、`splitter`、`grid` 区分控件边框、页签分隔、分隔柄和表格线；禁用按钮采用 `disabled-surface` / `disabled-ink`。
 
-**The Evidence Canvas Rule.** 原图与剖面画布固定绘制色只属于证据视图，不进入通用壳主题，也不改变定量像素。
+**The Evidence Canvas Rule.** 画布的固定绘制色只编码证据视图，不改变原始像素、定量结果或输出数据。
 
-原图画布在 `canvas.py` 固定绘制深色背景、浅色空态文字、暖色区域框与绿色泳道框。`view.py` 的剖面图固定绘制浅色背景、蓝色曲线与红色边界/基线；这些是各自局部的可视化编码，具体值保留在源码，不能当作新的主要操作色。
+图像画布由 `canvas.py` 绘制深底、区域框和泳道框，不从窗口背景反推配色。剖面图由 `view.py` 绘制白底和青绿信号线；灰蓝基线、虚线边界及坐标文字的局部绘制参数记录在 sidecar。它们不是通用错误、成功或壳状态色。
 
 ## Typography
 
-字体由 `QFont("Microsoft YaHei UI", 10)` 继承；Qt 在字体缺失时选择系统替代，代码没有显式 fallback 栈。标题、品牌和项目名称使用 QSS 像素字号与半粗权重；正文保持 Qt 点字号。没有独立展示字体、等宽字体、固定行高或字距规范。
+基础字体为 `QFont("Microsoft YaHei UI", 10)`，由 Qt 继承；缺失字体时由系统替代，代码没有显式 fallback 栈。标题使用 QSS 像素字号，正文保持点字号；没有固定行高、字距或展示字体规范。
 
-- `brand`：导航栏 WB 标识。
-- `project-name`：紧凑顶部项目名输入。
-- `caption`：当前项目标签与导航辅助文字。
-- `welcome`：项目欢迎标题。
-- `title`：当前工作步骤标题。
-- `section`：导出用途分组标题与裁剪候选面板标题。
-- `body`：表格、按钮、字段、标签和说明。
+- `welcome`：欢迎标题；`title`：步骤标题。
+- `section`：导出用途组和裁剪候选标题；`brand`：工具栏产品名。
+- `evidence-heading`：来源、当前结果与复核标题；`project-name`：可编辑项目名。
+- `caption`：当前项目标签；`body`：常规控件和数据。
 
-输出拼图的字体导入和“输出像素”标签字号属于作品模板设置，不属于应用 UI 字体层级。
+剖面图绘制文字局部设为 9pt；拼图导入字体及输出像素字号属于作品模板，不是应用 UI 字体。定量页隐藏重复的步骤标题与说明，让页签和三栏标题承担定位。
 
 ## Layout
 
-当前窗口初始尺寸为 1440 × 960；项目列表最小宽度 240、最大宽度 340。工作区石墨侧栏固定宽度 168，与内容区相隔 `workspace-gap`；侧栏包含 WB 标识、说明和步骤列表。步骤项目间隔为 `navigation-gap`。根布局边距为左右 12、上下 10，内容布局间距为 `content-gap`。这些是 Qt 布局尺寸，不是 CSS 断点。
+窗口初始尺寸 1440 × 900。根布局左右边距 12、上下 10，内容间距 5。四阶段以 `QListWidget` 横向、不换行排列，单元格 220 × 44，列表固定高度 48；没有旧侧栏，也没有实现移动端折叠或自动换行断点。
 
-主体是四步骤 `QStackedWidget`，步骤内继续用页签组织相关操作。当前步骤用可调整内容的滚动区域承载；小窗口通过滚动保留可访问性，没有实现移动端折叠导航或响应式断点。原图表与下方图像工作区使用纵向 splitter；下方左侧是固定宽度 254 的浅色可滚参数面板，右侧是弹性主宽度的深色原图画布，通过水平布局并排，间距 8、边距 4。排版设置与预览、定量边界表与曲线使用横向 splitter，均不允许子项完全折叠。原图表高度限制为 110–170，精确坐标列默认隐藏；检测参数通过“高级检测设置”按需纵向展开。OCR / 结果表位于定量步骤，和定量曲线、样本对应页签并列；拼图步骤保留排版与预览。定量左右证据区高度限制为 180–240，结果表位于其下方。
+定量页内的证据工作台采用三栏：左侧参数滚动区固定宽 220，右侧复核滚动区固定宽 250，中央证据区弹性扩展，栏间距 10。中央原图与曲线使用不可折叠的纵向 splitter，初始分配 340 / 210；原图画布最小 280 × 190，剖面图最小高度 150。右侧当前摘要表高 130–180。来源列表高 82，当前泳道字段与完整参数表共享编辑状态。
 
-候选裁剪面板采用两列动作网格，候选选择和高级设置开关跨两列，面板边距 10、布局间距 8；应用候选使用主要按钮样式。定量和 OCR 动作采用三列网格。导出用途组间距采用 `section-gap`，导出按钮最大宽度 360。其余未显式设置的间距沿用 Qt 布局默认值，不将其虚构为统一倍数网格。
+OCR、归一化与定量为同级页签；证据工作台、全部泳道参数、完整项目结果为定量内部页签。完整结果没有被固定塞入工作台底部。
+
+原图阶段保留顶部来源表和下方左右工作区：浅色可滚裁剪参数宽 254，右侧深色画布扩展。精确坐标和高级检测参数按需展开。拼图阶段以水平 splitter 连接设置与预览，设置最小宽 450、预览最小宽 250，初始分配 460 / 400。导出用途组间距 16，按钮最大宽 360。小窗口依靠实际滚动容器与弹性中央区域，不宣称未实现的通用响应式规则。
 
 ## Elevation & Depth
 
-当前壳主题通过背景层次、细边框、表格网格与 splitter 表达分区；没有定义自绘阴影或装饰动画。系统菜单等原生表面可能受平台样式影响，因此这不构成对操作系统阴影的全局禁令。
+通过背景明暗、细边框、表格线和分隔柄组织工作区；没有定义自绘投影或装饰动画。操作系统原生菜单等表面可能有平台阴影，不能据此制定全局无阴影禁令。
 
 ## Shapes
 
-按钮与工具按钮使用 `control` 圆角，单行字段、整数输入和组合框使用 `field` 圆角。双精度输入框只显式设置边框和内边距，没有定义统一圆角。侧栏使用 `rail` 圆角，当前步骤使用 `navigation` 圆角。表格和页签容器保持原生几何，不包装成额外卡片。
+按钮与工具按钮使用 5px 圆角；单行输入、整数输入和组合框使用 3px 圆角。双精度输入仅显式规定边框和内边距。导航和页签使用底部指示线，三栏保持平直原生容器，不包装成额外卡片。
 
 ## Components
 
 ### Buttons
 
-普通按钮为浅底细边框，悬停改变背景与边框；键盘焦点使用主要色 2px 边框。主要按钮以对象名 `primaryAction` 标识，使用青蓝底白字。禁用按钮降低文字和背景对比；禁用主要按钮仍保留其对象规则的边框，未另设独立边框 token。
+普通按钮白底细边框，悬停变浅青背景与主要色边框，焦点边框为主要色 2px。`primaryAction` 是青绿底白字，用于导入、确认、计算、预览等明确动作。禁用样式降低文字/背景对比；主要按钮更具体的对象规则保留其边框，不虚构独立禁用边框 token。
 
 ### Inputs / Fields
 
-单行文本、整数输入和组合框使用白底细边框，焦点变为主要色边框。双精度输入是单独 QSS 规则；多行文本只显式规定前景和背景。不存在可复用的统一错误边框或动画规范。
+单行文本、整数输入和组合框使用白底细边框，焦点变为主要色。透明、无边框的顶部项目名在聚焦时恢复白底边框。双精度与多行输入有自己的 QSS 范围，不推广为完整统一错误状态规范。
 
 ### Navigation
 
-步骤栏是石墨背景内的原生列表，选中项浅 lime 底深色字；页签和菜单仍使用青蓝底白字。步骤数字是操作顺序，不是完成勾选。底部上一步/下一步与直接选步骤并存，切换保留来源上下文。
-
-顶部项目名是透明、无边框的编辑字段，聚焦时恢复白底主要色边框；它保持可编辑性，同时减少常态界面重量。
+当前阶段以浅青背景、深青文字和 3px 青绿底线表示；页签底线为 2px。阶段数字表示操作顺序，不表示完成进度。来源列表以浅青选中背景关联当前原图与测量证据。
 
 ### Tables and Evidence Views
 
-表头用冷灰底与底部分隔线，表格单元格白底、浅网格，选中用浅青底深字。证据画布独立绘制；OCR 的图像与原始文本以页签切换。空态给出真实下一步操作，不伪造已经计算或审核的状态。拼图预览提供“适应窗口”和“100%”：前者按显示区域缩放，后者保留实际像素尺寸；完整未缩放渲染仍被保留，这个显示选项不改变输出图或定量数据。
+表格白底、冷浅灰表头、浅网格；选中保持深字。右侧摘要同时显示信号与状态，未检测和排除不填为零。
+
+定量中央原图只读；裁剪编辑仍属于原图阶段。曲线只显示已核验结果，修改参数需重新计算。纵轴为定量极性下的原始灰度单位信号均值，横轴为裁剪内 0 起算行号；实际刻度来自数据范围。L/R 虚线附边界行号，基线连接所用端点值；没有拖曲线或拖基线交互。
+
+拼图预览提供适应窗口与 100%，保留完整未缩放渲染；缩放仅影响显示。空态提示下一步真实操作，不伪造成功。
 
 ## Do's and Don'ts
 
 ### Do:
 
-- **Do** 从实际 Qt palette 与 QSS 延续控件角色和状态。
-- **Do** 保留当前来源、未保存标注与步骤位置之间的连续性。
-- **Do** 将缺失、失败与真实零值分别呈现。
+- **Do** 从实际 Qt palette、QSS 和绘制实现延续角色。
+- **Do** 同步当前来源、泳道参数、图像、曲线与核验结果。
+- **Do** 显示真实坐标单位、边界含义、缺失与排除状态。
 
 ### Don't:
 
-- **Don't** 将画布绘制色或输出拼图字体提升为通用壳主题。
-- **Don't** 用导航选中态表示计算完成或科学审核通过。
-- **Don't** 宣称尚未实现的断点、动画、网页组件或统一错误状态。
+- **Don't** 恢复已被替换的石墨侧栏或 lime 导航规则。
+- **Don't** 将显示映射、预览缩放或导航选中当作定量与完成证据。
+- **Don't** 虚构网页组件、断点、旧版拖基线功能或统一错误样式。
