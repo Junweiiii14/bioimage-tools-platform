@@ -17,3 +17,9 @@
 | 2026-10-13 | F-002 rule loader / Ruff / Pyright / pytest | passed | 29 个测试；包含遗漏、过期、范围扩大、路径与中文编码反例 |
 | 2026-10-13 | Public visibility / ruleset 25008972 | passed | 用户授权公开；active，四项指定 Actions 检查，无 bypass；替代初次私有套餐阻碍 |
 | 2026-10-13 | 规则回执独立负例与正例 | passed | 03afb43：其余检查成功，仅回执失败仍 BLOCKED；5eb1e8b：四项全部通过 |
+
+## 2026-10-15 F-004
+
+check --all退出0（29测试、22.30秒、Ruff/格式/类型通过），smoke-env退出0；产品扫描0，不外推产品验收。完整证据work/evidence/F-004/validation.md。
+
+F-004远程补记：01f35ae四项CI全SUCCESS，PR OPEN/CLEAN；此次仅文档收尾。
