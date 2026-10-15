@@ -5,8 +5,8 @@ from pathlib import Path
 from threading import Event
 from uuid import uuid4
 
-from PySide6.QtCore import QTimer, QUrl, Signal
-from PySide6.QtGui import QAction, QCloseEvent, QColor, QDesktopServices, QFont, QPalette
+from PySide6.QtCore import QSettings, QTimer, QUrl, Signal
+from PySide6.QtGui import QAction, QCloseEvent, QDesktopServices
 from PySide6.QtWidgets import (
     QComboBox,
     QFileDialog,
@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QMenu,
     QMessageBox,
+    QProgressBar,
     QPushButton,
     QSizePolicy,
     QStackedWidget,
@@ -58,10 +59,14 @@ from wb_tool.api import (
 )
 
 from bioimage_app.project_archive import ProjectArchiveSession
+from bioimage_app.project_entry import default_project_parent
 from bioimage_app.project_measurements import ProjectBatchCompletion, ProjectMeasurementSession
 from bioimage_app.project_ocr import ProjectOCRCompletion, ProjectOCRSession
 from bioimage_app.project_restore import ArchiveRestoreJob, ArchiveRestoreResult
+from bioimage_app.project_start import ProjectSelectionJob
 from bioimage_app.storage import AsyncStorage, StorageCommand, StorageReply
+from bioimage_app.workbench_motion import NavigationMotion
+from bioimage_app.workbench_style import apply_workbench_theme
 
 
 class FigureProjectWindow(QMainWindow):
@@ -71,7 +76,7 @@ class FigureProjectWindow(QMainWindow):
 
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("WB 自动化 · 多原图与 Fig 拼图项目")
+        self.setWindowTitle("WB 自动化 · BioImage")
         self.resize(1440, 900)
         self.setObjectName("wbProjectWindow")
         self._apply_theme()
@@ -105,6 +110,12 @@ class FigureProjectWindow(QMainWindow):
         self._loaded_ocr: LoadedProjectOCR | None = None
         self._archive_session: ProjectArchiveSession | None = None
         self._restore_job: ArchiveRestoreJob | None = None
+        self._selection_job: ProjectSelectionJob | None = None
+        self._pending_project_paths: list[Path] = []
+        self._auto_save = QTimer(self)
+        self._auto_save.setSingleShot(True)
+        self._auto_save.setInterval(700)
+        self._auto_save.timeout.connect(self._save_idle_edits)
         self._export_generation: int | None = None
         self._ocr_refresh_pending = False
         self._ocr_refresh_timer = QTimer(self)
@@ -113,41 +124,65 @@ class FigureProjectWindow(QMainWindow):
         bar = QToolBar("项目")
         bar.setMovable(False)
         self.addToolBar(bar)
-        brand = QLabel("WB  实验图像工作台")
+        brand = QLabel("BioImage  /  WB")
         brand.setObjectName("appBrand")
         bar.addWidget(brand)
-        self.create_button = QPushButton("新建项目工作区")
-        self.open_button = QPushButton("打开项目工作区")
+        self.create_button = QPushButton("选择 WB 原图并开始")
+        self.open_button = QPushButton("打开已有项目")
         self.restore_button = QPushButton("从 ZIP 恢复")
-        self.import_button = QPushButton("批量导入 TIFF")
+        self.import_button = QPushButton("添加原图")
         self.save_button = QPushButton("保存项目")
         self.new_button = QPushButton("复用模板新建项目")
-        self.cancel_button = QPushButton("取消当前任务")
+        self.cancel_button = QPushButton("取消处理")
         self.documents = QComboBox()
         self.documents.setMinimumWidth(160)
-        bar.addWidget(self.documents)
+        self.documents.setParent(self)
+        self.documents.hide()
+        self.save_state = QLabel("尚未开始")
+        self.save_state.setObjectName("saveState")
+        bar.addWidget(self.save_state)
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         bar.addWidget(spacer)
-        for button in (self.import_button, self.save_button, self.cancel_button):
+        for button in (self.import_button, self.cancel_button):
             bar.addWidget(button)
         # Keep the existing buttons as command/state owners for host contracts and tests.
         self.project_menu = QMenu("项目", self)
         self.project_actions: list[tuple[QAction, QPushButton]] = []
-        for button in (self.create_button, self.open_button, self.restore_button, self.new_button):
+        for button in (
+            self.create_button,
+            self.open_button,
+            self.restore_button,
+            self.new_button,
+            self.save_button,
+        ):
             button.setParent(self)
             button.hide()
             action = self.project_menu.addAction(button.text())
             action.triggered.connect(button.click)
             self.project_actions.append((action, button))
         self.project_menu_button = QToolButton()
-        self.project_menu_button.setText("项目菜单")
+        self.project_menu_button.setText("项目")
         self.project_menu_button.setMenu(self.project_menu)
         self.project_menu_button.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
         bar.addWidget(self.project_menu_button)
         self.documents.setMaximumWidth(280)
         self.documents.setAccessibleName("当前工作区内的项目")
-        self.import_button.setObjectName("primaryAction")
+        self.export_button = QPushButton("导出结果")
+        self.export_button.setObjectName("primaryAction")
+        bar.addWidget(self.export_button)
+        self.motion_settings = QSettings("BioImageTools", "Motion")
+        self.motion = NavigationMotion(self.view.steps, self.motion_settings)
+        self.reduce_motion_action = self.project_menu.addAction("减少动效")
+        self.reduce_motion_action.setCheckable(True)
+        self.reduce_motion_action.setChecked(self.motion.reduced())
+        self.reduce_motion_action.toggled.connect(self._set_reduced_motion)
+        self.task_progress = QProgressBar()
+        self.task_progress.setObjectName("taskProgress")
+        self.task_progress.setTextVisible(False)
+        self.task_progress.setRange(0, 0)
+        self.task_progress.setFixedWidth(72)
+        bar.addWidget(self.task_progress)
         self.welcome = QWidget()
         self.welcome.setObjectName("welcomePage")
         welcome_layout = QVBoxLayout(self.welcome)
@@ -156,25 +191,18 @@ class FigureProjectWindow(QMainWindow):
         title = QLabel("开始一个 WB 实验项目")
         title.setObjectName("welcomeTitle")
         welcome_layout.addWidget(title)
-        description = QLabel(
-            "从原图裁剪、定量复核到拼图导出，按四个步骤完成。\n工作区会保存原图、项目配置和运行结果。"
-        )
+        description = QLabel("选择 WB 原图即可开始。项目文件夹由软件自动建立，原图保持不变。")
         description.setWordWrap(True)
         welcome_layout.addWidget(description)
-        workflow = QLabel(
-            "1   原图与裁剪     导入原图，明确泳道与裁剪区域\n\n"
-            "2   定量与复核     检查边界、基线和来源结果\n\n"
-            "3   拼图排版        调整分段、标签和完整拼图\n\n"
-            "4   导出               保存展示图、结果表或完整项目"
-        )
+        workflow = QLabel("选择原图   →   自动识别与测量   →   复核异常   →   导出结果")
         workflow.setObjectName("welcomeWorkflow")
         workflow.setWordWrap(True)
         welcome_layout.addWidget(workflow)
         welcome_layout.addSpacing(12)
         self.welcome_buttons: list[tuple[QPushButton, QPushButton]] = []
         for label, owner in (
-            ("新建项目工作区…", self.create_button),
-            ("打开已有工作区…", self.open_button),
+            ("选择 WB 原图并开始…", self.create_button),
+            ("打开已有项目…", self.open_button),
             ("从完整项目 ZIP 恢复…", self.restore_button),
         ):
             button = QPushButton(label)
@@ -182,9 +210,14 @@ class FigureProjectWindow(QMainWindow):
             button.clicked.connect(owner.click)
             welcome_layout.addWidget(button)
             self.welcome_buttons.append((button, owner))
-        self.welcome_status = QLabel("请选择一个工作区开始；已有工作区可继续上次进度。")
+        self.welcome_status = QLabel("选择原图开始新项目，或打开已有项目继续。")
         self.welcome_status.setWordWrap(True)
         welcome_layout.addWidget(self.welcome_status)
+        self.retry_location_button = QPushButton("更换项目保存位置并重试…")
+        self.retry_location_button.setMaximumWidth(300)
+        self.retry_location_button.clicked.connect(self._retry_project_location)
+        self.retry_location_button.hide()
+        welcome_layout.addWidget(self.retry_location_button)
         welcome_layout.addStretch()
         self.surface.addWidget(self.welcome)
         self.create_button.clicked.connect(lambda: self._choose_workspace(True))
@@ -213,6 +246,7 @@ class FigureProjectWindow(QMainWindow):
             lambda: QDesktopServices.openUrl(QUrl.fromLocalFile(self.automatic.last_output_path))
         )
         self.automatic.finished.connect(self._automatic_output_ready)
+        self.export_button.clicked.connect(self.automatic.choose_export)
         self.view.automatic_requested.connect(self.automatic.analyze)
         self.view.automatic_export_requested.connect(self.automatic.choose_export)
         self.view.import_directory_requested.connect(self.automatic.choose_directory)
@@ -229,98 +263,114 @@ class FigureProjectWindow(QMainWindow):
         self.view.normalization.refresh_requested.connect(self.refresh_ocr_table)
         self.view.normalization.export_requested.connect(self._choose_normalization_export)
         self.view.changed.connect(self._queue_ocr_refresh)
+        self.view.changed.connect(self._schedule_save)
         self.view.changed.connect(self._cancel_stale_export)
         for widget in self.findChildren(QWidget):
             widget.setPalette(self.palette())
-        self.view.status.setText("请选择一个工作区开始；已有工作区可继续上次进度。")
+        self.view.status.setText("选择原图开始新项目，或打开已有项目继续。")
         self._controls()
 
     def _apply_theme(self) -> None:
-        self.setFont(QFont("Microsoft YaHei UI", 10))
-        palette = QPalette(self.palette())
-        for role, color in (
-            (QPalette.ColorRole.Window, "#f3f6f7"),
-            (QPalette.ColorRole.WindowText, "#24363b"),
-            (QPalette.ColorRole.Base, "#ffffff"),
-            (QPalette.ColorRole.AlternateBase, "#f0f5f5"),
-            (QPalette.ColorRole.Text, "#24363b"),
-            (QPalette.ColorRole.Button, "#fafcfc"),
-            (QPalette.ColorRole.ButtonText, "#24363b"),
-            (QPalette.ColorRole.Highlight, "#087677"),
-            (QPalette.ColorRole.HighlightedText, "#ffffff"),
-            (QPalette.ColorRole.ToolTipBase, "#ffffff"),
-            (QPalette.ColorRole.ToolTipText, "#24363b"),
-        ):
-            for group in (
-                QPalette.ColorGroup.Active,
-                QPalette.ColorGroup.Inactive,
-                QPalette.ColorGroup.Disabled,
-            ):
-                palette.setColor(group, role, QColor(color))
-        self.setPalette(palette)
-        self.setStyleSheet("""
-            QMainWindow#wbProjectWindow { background: #f3f6f7; color: #24363b; }
-            QLabel, QCheckBox, QRadioButton { color: #24363b; background: transparent; }
-            QLabel:disabled, QCheckBox:disabled, QRadioButton:disabled { color: #697a84; }
-            QScrollArea, QScrollArea > QWidget, QScrollArea > QWidget > QWidget {
-                background: #ffffff; color: #24363b; }
-            QPlainTextEdit, QTextEdit { background: #ffffff; color: #24363b; }
-            QDoubleSpinBox { background: #ffffff; color: #24363b;
-                border: 1px solid #cbd8dd; padding: 4px; }
-            QSplitter::handle { background: #d3dde2; }
-            QTableCornerButton::section { background: #f0f5f5; border: 0; }
-            QToolBar { background: #ffffff; border: 0; padding: 10px 16px; spacing: 10px; }
-            QLabel#appBrand { font-size: 16px; font-weight: 600; padding-right: 12px; }
-            QPushButton, QToolButton { color: #24363b; background: #ffffff;
-                border: 1px solid #cbd8dd; border-radius: 5px; padding: 5px 9px; }
-            QPushButton:hover, QToolButton:hover { background: #eaf5f3; border-color: #087677; }
-            QPushButton:focus, QToolButton:focus { border: 2px solid #087677; }
-            QPushButton:disabled, QToolButton:disabled { color: #697a84; background: #edf1f3;
-                border-color: #d3dde2; }
-            QPushButton#primaryAction { color: #ffffff; background: #087677;
-                border-color: #087677; }
-            QPushButton#primaryAction:disabled { color: #697a84; background: #edf1f3; }
-            QLineEdit, QSpinBox, QComboBox { color: #24363b; background: #ffffff;
-                padding: 4px; border: 1px solid #cbd8dd; border-radius: 3px; }
-            QLineEdit:focus, QSpinBox:focus, QComboBox:focus { border-color: #087677; }
-            QTabWidget::pane { border: 1px solid #c8d4dc; background: #ffffff; }
-            QTabBar::tab { color: #405660; background: #edf2f5; padding: 7px 12px; }
-            QTabBar::tab:selected { color: #096568; background: #eaf5f3;
-                border-bottom: 2px solid #087677; }
-            QTableWidget { background: #ffffff; color: #24363b; gridline-color: #dce4e9;
-                selection-background-color: #dff1ed; selection-color: #096568; }
-            QHeaderView::section { background: #f0f5f5; color: #344c59;
-                border: 0; border-bottom: 1px solid #c8d4dc; padding: 6px; }
-            QWidget#workflowNavigation { background: #ffffff; }
-            QListWidget#workflowSteps { background: #ffffff; border: 0; padding: 0; }
-            QListWidget#workflowSteps::item { color: #526970; padding: 10px 20px;
-                border-bottom: 3px solid transparent; }
-            QListWidget#workflowSteps::item:selected { background: #eff7f6;
-                color: #096568; border-bottom: 3px solid #087677; }
-            QListWidget#workflowSteps::item:hover { background: #f0f5f5; }
-            QListWidget#evidenceSources { background: #ffffff; border: 0; }
-            QListWidget#evidenceSources::item { padding: 5px 7px; color: #24363b; }
-            QListWidget#evidenceSources::item:selected { background: #eaf5f3; color: #096568; }
-            QListWidget#evidenceSources::item:hover { background: #f0f5f5; }
-            QWidget#evidenceWorkbench, QWidget#evidenceStage { background: #f3f6f7; }
-            QWidget#evidenceControls, QWidget#evidenceReview { background: #ffffff; }
-            QLabel#evidenceHeading { font-size: 14px; font-weight: 600; }
-            QLabel#evidenceSummary { color: #526970; }
-            QLabel#stepTitle { font-size: 19px; font-weight: 600; color: #24363b; }
-            QLabel#stepHelp { color: #405660; padding-bottom: 3px; }
-            QLabel#projectCaption { color: #536771; font-size: 11px; }
-            QLineEdit#projectName { background: transparent; font-size: 14px; font-weight: 600;
-                border: 0; padding: 3px 6px; }
-            QLineEdit#projectName:focus { background: #ffffff; border: 1px solid #087677; }
-            QLabel#welcomeWorkflow { background: #e8eef1; padding: 22px; color: #344c59; }
-            QLabel#exportHeading { font-size: 17px; font-weight: 600; }
-            QLabel#welcomeTitle { font-size: 24px; font-weight: 600; }
-            QMenu { color: #24363b; background: #ffffff; border: 1px solid #cbd8dd; }
-            QMenu::item { padding: 8px 20px; }
-            QMenu::item:selected { color: #ffffff; background: #087677; }
-            QComboBox QAbstractItemView { color: #24363b; background: #ffffff;
-                selection-background-color: #087677; selection-color: #ffffff; }
-        """)
+        apply_workbench_theme(self)
+
+    def _set_reduced_motion(self, reduced: bool) -> None:
+        self.motion_settings.setValue("reduce_motion", reduced)
+        self.motion.move()
+
+    def _schedule_save(self) -> None:
+        if self._workspace and not self._closing:
+            self.save_state.setText("待保存…")
+            self._auto_save.start()
+
+    def _save_idle_edits(self) -> None:
+        if self._closing or not self._workspace:
+            return
+        if self._busy:
+            self._auto_save.start()
+            return
+        if self.view.generation != self._saved_generation:
+            self.save()
+
+    def _retry_project_location(self) -> None:
+        parent = QFileDialog.getExistingDirectory(self, "选择项目保存位置（软件自动创建子文件夹）")
+        if parent and self._pending_project_paths:
+            self.start_project_from_images(self._pending_project_paths, Path(parent))
+
+    def start_project_from_images(
+        self, paths: list[Path], project_parent: Path | None = None
+    ) -> None:
+        """Select originals first; decode before any workspace or recent entry is created."""
+        if not paths or self._busy or self._workspace or self._closing:
+            return
+        self._pending_project_paths = list(paths)
+        self.retry_location_button.hide()
+        self._start()
+        self.view.status.setText("正在查找 WB 原图…")
+        self.welcome_status.setText("正在查找 WB 原图…")
+        job = ProjectSelectionJob(
+            paths, project_parent or default_project_parent(), self._cancellation
+        )
+        self._selection_job = job
+
+        def scanned() -> None:
+            selection = job.result
+            self._selection_job = None
+            job.deleteLater()
+            if self._closing or self._cancellation.is_set():
+                self._done("已取消，未创建项目。")
+                return
+            if selection.error or selection.destination is None:
+                self.retry_location_button.show()
+                self._error(selection.error or "未能准备项目保存位置")
+                return
+            pending = list(selection.paths)
+            failures: list[str] = []
+
+            def validate_next() -> None:
+                if self._closing or self._cancellation.is_set():
+                    self._done("已取消，未创建项目。")
+                    return
+                if not pending:
+                    self._error("没有可读取的 WB 原图；未创建项目。" + "；".join(failures[:3]))
+                    return
+                source = pending.pop(0)
+                self.welcome_status.setText(f"正在核验原图：{source.name}")
+
+                def checked(reply: WBReply) -> None:
+                    if self._closing or self._cancellation.is_set():
+                        self._done("已取消，未创建项目。")
+                        return
+                    if not isinstance(reply.value, PreviewRaster):
+                        failures.append(f"{source.name}：{reply.error or '无法读取'}")
+                        validate_next()
+                        return
+
+                    def created(_reply: StorageReply) -> None:
+                        self._workspace = str(selection.destination)
+                        self.view.set_project(
+                            WBFigureProject(project_id=uuid4().hex, name=selection.name)
+                        )
+                        self.workspace_opened.emit(self._workspace)
+                        self._busy = False
+                        if self._closing or self._cancellation.is_set():
+                            self._done("创建后已取消；项目可稍后继续。")
+                            return
+                        self.import_images(tuple(str(p) for p in selection.paths), automatic=True)
+
+                    self._storage(
+                        StorageCommand("create", path=str(selection.destination)), created
+                    )
+
+                self._wb(
+                    WBJob("preview", path=str(source), preview_edge=128),
+                    checked,
+                    accept_errors=True,
+                )
+
+            validate_next()
+
+        job.finished.connect(scanned)
+        job.start()
 
     def cancel(self) -> None:
         self._cancellation.set()
@@ -1022,7 +1072,12 @@ class FigureProjectWindow(QMainWindow):
 
     @property
     def resources_closed(self) -> bool:
-        return self._store_closed and self._background_closed and self._restore_job is None
+        return (
+            self._store_closed
+            and self._background_closed
+            and self._restore_job is None
+            and self._selection_job is None
+        )
 
     def _controls(self) -> None:
         idle = not self._busy and not self._closing
@@ -1034,6 +1089,18 @@ class FigureProjectWindow(QMainWindow):
         self.new_button.setEnabled(idle and bool(self._workspace))
         self.documents.setEnabled(idle and bool(self._workspace))
         self.cancel_button.setEnabled(self._busy and not self._closing)
+        self.cancel_button.setVisible(self._busy)
+        self.task_progress.setVisible(self._busy)
+        self.export_button.setEnabled(idle and bool(self._workspace))
+        self.save_state.setText(
+            "正在处理…"
+            if self._busy
+            else "有未保存修改"
+            if self.view.generation != self._saved_generation
+            else "已保存"
+            if self._workspace
+            else "尚未开始"
+        )
         self.view.setEnabled(idle and bool(self._workspace))
         self.surface.setCurrentWidget(self.view if self._workspace else self.welcome)
         self.welcome_status.setText(
@@ -1062,8 +1129,10 @@ class FigureProjectWindow(QMainWindow):
     def _error(self, message: str) -> None:
         self._ocr_refresh_timer.stop()
         self._ocr_refresh_pending = False
-        self._closing = False
+        closing = self._closing
         self._done("操作失败：" + message)
+        if closing:
+            self._finish_close()
 
     def _storage(
         self,
@@ -1208,9 +1277,12 @@ class FigureProjectWindow(QMainWindow):
         next_row()
 
     def _choose_workspace(self, create: bool) -> None:
-        path = QFileDialog.getExistingDirectory(
-            self, "选择新项目的空目录" if create else "打开项目工作区"
-        )
+        if create:
+            paths, _ = QFileDialog.getOpenFileNames(self, "选择 WB 原图", "", "TIFF (*.tif *.tiff)")
+            if paths:
+                self.start_project_from_images([Path(path) for path in paths])
+            return
+        path = QFileDialog.getExistingDirectory(self, "打开已有项目")
         if path:
             self.open_workspace(path, create=create)
 
@@ -1338,7 +1410,7 @@ class FigureProjectWindow(QMainWindow):
                             row_id=uuid4().hex,
                             source=asset,
                             filename=Path(path).name,
-                            protein=f"Source {len(current.rows) + 1:03d}",
+                            protein="未指定",
                             width=raster.width,
                             height=raster.height,
                             bit_depth=16 if raster.bit_depth == 16 else 8,
@@ -1443,7 +1515,7 @@ class FigureProjectWindow(QMainWindow):
                     return
                 self.view.set_project(project)
                 if self.documents.findData(project.project_id) < 0:
-                    self.documents.addItem(project.project_id, project.project_id)
+                    self.documents.addItem(project.name, project.project_id)
                 self._busy = False
                 self._controls()
                 self.view.status.setText("项目已保存，原图和模板可重新打开。")
@@ -1872,6 +1944,7 @@ class FigureProjectWindow(QMainWindow):
             return
         event.ignore()
         self._closing = True
+        self._auto_save.stop()
         self.cancel()
         self._controls()
         if not self._busy:
