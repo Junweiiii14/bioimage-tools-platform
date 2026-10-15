@@ -1,0 +1,11 @@
+# T-030 平台入口与自动项目准备
+
+状态：implementing。用户已批准 T-028；按 T-029 分工实施。
+范围：platform_window.py、新 project_entry.py、相关测试。本分支不改宿主 figure_window、数值语义或设计文档。
+契约：平台选择原图，调用宿主 start_project_from_images(paths, project_parent=None)；扫描与目录创建在后台，原图只读，不覆盖已有项目。
+检查：待运行。
+
+实现：平台移除右侧常驻说明，选择 TIFF 文件/原图文件夹直接委托宿主；保留打开/返回/最近项目，最近打开时间只表示实际打开，不冒充分析完成。保存位置默认 Documents/BioImage/Projects，可改父目录。扫描排除自有 workspace/outputs、符号链接与 junction，去重、取消和 512 图/4096 目录预算；目录分配仅建父路径，最终创建交由 Workspace。
+验证：Windows/Python3.12.14，uv sync --locked --all-groups 退出0；pytest tests/test_project_entry.py tests/test_platform_host.py 9通过；ruff、scoped pyright退出0。截图 .local/t030/platform-1100.png、platform-1440.png（不提交）实际Qt，检查1100画面无截断，空态移至列表顶部。
+设计检测：Impeccable检测已运行，报告新色板/28px/8px不在旧DESIGN中的advisory；这些是T028已批准重设计，根任务负责更新统一设计文档，不能以旧色板否决新设计。无浏览器DOM，不能宣称无障碍全通过。动效和宿主start_project_from_images由T029集成；本分支不独立宣称端到端新建自动化验收通过。
+状态：implemented-awaiting-integration-review。未更改数值/schema/旧测试预期；独立审查由根任务绑定集成提交。

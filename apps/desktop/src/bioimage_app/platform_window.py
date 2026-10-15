@@ -2,6 +2,7 @@
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import cast
 
@@ -22,6 +23,7 @@ from PySide6.QtWidgets import (
 )
 
 from bioimage_app.figure_window import FigureProjectWindow
+from bioimage_app.project_entry import default_project_parent
 
 
 @dataclass(frozen=True)
@@ -81,7 +83,7 @@ class PlatformWindow(QMainWindow):
         root.addLayout(body, 1)
         left = QFrame()
         left.setObjectName("platformRail")
-        left.setFixedWidth(216)
+        left.setFixedWidth(190)
         nav = QVBoxLayout(left)
         nav.setContentsMargins(20, 30, 20, 24)
         nav.setSpacing(14)
@@ -93,20 +95,18 @@ class PlatformWindow(QMainWindow):
         nav.addSpacing(22)
         nav.addWidget(self._label("可用工具", "sectionTitle"))
         self.tool_button = QPushButton(TOOLS[0].title)
-        self.tool_button.clicked.connect(self.launch_tool)
+        self.tool_button.clicked.connect(self.choose_new)
         nav.addWidget(self.tool_button)
         nav.addStretch()
-        nav.addWidget(self._label("后续工具将在这里接入。\n当前可用：WB 自动化。", "muted"))
+        nav.addWidget(self._label("本地运行 · 原图保留", "muted"))
         body.addWidget(left)
 
         center = QWidget()
         content = QVBoxLayout(center)
         content.setContentsMargins(34, 30, 34, 28)
         content.setSpacing(16)
-        content.addWidget(self._label("从一个实验项目开始", "pageTitle"))
-        content.addWidget(
-            self._label("选择工具，导入原图，在同一项目中完成处理、复核与输出。", "muted")
-        )
+        content.addWidget(self._label("把原图交给工作台", "pageTitle"))
+        content.addWidget(self._label("自动识别与处理，集中复核，再输出实验结果。", "muted"))
         content.addSpacing(8)
         tool = QFrame()
         tool.setObjectName("toolSurface")
@@ -117,20 +117,28 @@ class PlatformWindow(QMainWindow):
         tool_layout.addWidget(self._label(TOOLS[0].summary, "muted"))
         actions = QHBoxLayout()
         actions.setSpacing(10)
-        self.new_button = QPushButton("新建 WB 项目")
+        self.new_button = QPushButton("选择 WB 原图并开始")
+        self.new_button.setAccessibleName("选择 WB 原图并自动创建项目")
+        self.new_button.setShortcut("Ctrl+N")
         self.new_button.setObjectName("primaryAction")
         self.new_button.clicked.connect(self.choose_new)
-        self.open_button = QPushButton("打开项目文件夹")
+        self.open_button = QPushButton("打开已有项目")
         self.open_button.clicked.connect(self.choose_open)
         actions.addWidget(self.new_button)
-        actions.addWidget(self.open_button)
+        self.folder_button = QPushButton("选择原图文件夹")
+        self.folder_button.clicked.connect(self.choose_source_folder)
+        actions.addWidget(self.folder_button)
         actions.addStretch()
         tool_layout.addLayout(actions)
+        tool_layout.addWidget(
+            self._label("自动创建项目文件夹，原图无须移动。支持 TIFF 原图。", "muted")
+        )
         content.addWidget(tool)
         recent_header = QHBoxLayout()
         recent_header.setContentsMargins(0, 14, 0, 0)
         recent_header.addWidget(self._label("最近项目", "sectionTitle"))
         recent_header.addStretch()
+        recent_header.addWidget(self.open_button)
         self.reopen_button = QPushButton("继续所选项目")
         self.reopen_button.setEnabled(False)
         self.reopen_button.clicked.connect(self.open_selected)
@@ -143,34 +151,20 @@ class PlatformWindow(QMainWindow):
         self.recent_list.itemDoubleClicked.connect(self.open_selected)
         content.addWidget(self.recent_list, 1)
         self.empty_label = self._label(
-            "还没有最近项目。新建项目后，在 WB 工作区导入原始 TIFF。", "muted"
+            "还没有项目。选择上方的 WB 原图，即可开始自动处理。", "muted"
         )
-        content.addWidget(self.empty_label)
+        content.insertWidget(content.indexOf(self.recent_list), self.empty_label)
         self.status = self._label("就绪", "platformStatus")
         content.addWidget(self.status)
         body.addWidget(center, 1)
 
-        right = QFrame()
-        right.setObjectName("platformDetails")
-        right.setFixedWidth(270)
-        details = QVBoxLayout(right)
-        details.setContentsMargins(24, 32, 24, 28)
-        details.setSpacing(18)
-        details.addWidget(self._label("项目流程", "sectionTitle"))
-        for title, description in (
-            ("导入原图", "原始文件作为分析来源。"),
-            ("处理与复核", "查看识别建议，在图上调整。"),
-            ("结果与输出", "保留数据、图像和项目记录。"),
-        ):
-            details.addWidget(self._label(title, "stepTitle"))
-            details.addWidget(self._label(description, "muted"))
-        details.addStretch()
-        details.addWidget(self._label("所选项目位置", "sectionTitle"))
-        self.project_path = self._label("选择最近项目可查看保存位置。", "muted")
+        self.project_path = self._label("项目会自动保存在文档 / BioImage / Projects", "muted")
         self.project_path.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        details.addWidget(self.project_path)
-        details.addWidget(self._label("新项目请使用空文件夹。原图可从其他文件夹导入。", "muted"))
-        body.addWidget(right)
+        content.addWidget(self.project_path)
+        self.location_button = QPushButton("更改新项目保存位置")
+        self.location_button.setObjectName("quietAction")
+        self.location_button.clicked.connect(self.choose_project_parent)
+        content.addWidget(self.location_button, 0, Qt.AlignmentFlag.AlignLeft)
 
     @staticmethod
     def _label(text: str, name: str) -> QLabel:
@@ -182,37 +176,40 @@ class PlatformWindow(QMainWindow):
 
     def _theme(self) -> None:
         self.setStyleSheet("""
-            QMainWindow, QWidget { background: #f3f6f7; color: #24363b; }
+            QMainWindow, QWidget { background: #f6f5f2; color: #242723; }
             QFrame#platformTop, QFrame#platformRail, QFrame#platformDetails {
                 background: #ffffff;
             }
-            QFrame#platformTop { border-bottom: 1px solid #dce4e9; }
+            QFrame#platformTop { border-bottom: 1px solid #e3e5df; }
             QLabel { background: transparent; }
-            QLabel#platformBrand { color: #087677; font-size: 23px; font-weight: 600; }
-            QLabel#pageTitle { font-size: 26px; font-weight: 600; }
+            QLabel#platformBrand { color: #256f82; font-size: 23px; font-weight: 600; }
+            QLabel#pageTitle { font-size: 28px; font-weight: 600; }
             QLabel#toolTitle { font-size: 22px; font-weight: 600; }
             QLabel#sectionTitle { font-size: 15px; font-weight: 600; }
             QLabel#stepTitle { font-size: 14px; font-weight: 600; }
-            QLabel#muted, QLabel#platformStatus { color: #526970; }
-            QFrame#toolSurface { background: #ffffff; border: 1px solid #cbd8dd;
-                border-radius: 12px; }
-            QPushButton { background: #ffffff; color: #24363b; border: 1px solid #cbd8dd;
+            QLabel#muted, QLabel#platformStatus { color: #61645f; }
+            QFrame#toolSurface { background: #ffffff; border: 1px solid #d9dcd6;
+                border-radius: 8px; }
+            QPushButton { background: #ffffff; color: #242723; border: 1px solid #d9dcd6;
                 border-radius: 6px; padding: 10px 14px; min-height: 18px; }
-            QPushButton:hover { background: #eaf5f3; border-color: #087677; }
-            QPushButton:focus { border: 2px solid #087677; }
-            QPushButton:pressed { background: #dff1ed; }
-            QPushButton:disabled { background: #edf1f3; color: #697a84; border-color: #dce4e9; }
-            QPushButton#primaryAction { background: #087677; color: #ffffff;
-                border-color: #087677; font-weight: 600; }
-            QPushButton#primaryAction:hover { background: #096568; }
-            QPushButton#selectedNav { background: #eaf5f3; color: #096568;
-                border-color: #eaf5f3; text-align: left; }
-            QListWidget#recentProjects { background: #f3f6f7; border: none; outline: 0; }
+            QPushButton:hover { background: #e8f0f1; border-color: #256f82; }
+            QPushButton:focus { border: 2px solid #256f82; }
+            QPushButton:pressed { background: #e1ecef; }
+            QPushButton:disabled { background: #edf1f3; color: #697a84; border-color: #e3e5df; }
+            QPushButton#primaryAction { background: #256f82; color: #ffffff;
+                border-color: #256f82; font-weight: 600; }
+            QPushButton#primaryAction:hover { background: #1d5868; }
+            QPushButton#selectedNav { background: #e8f0f1; color: #1d5868;
+                border-color: #e8f0f1; text-align: left; }
+            QListWidget#recentProjects { background: #f6f5f2; border: none;  }
+            QPushButton#quietAction { border: none; background: transparent; padding: 4px 0;
+                color: #256f82; }
+            QListWidget#recentProjects:focus { border: 1px solid #256f82; }
             QListWidget#recentProjects::item { background: #ffffff; padding: 15px 12px;
-                border: 1px solid #dce4e9; border-radius: 6px; }
-            QListWidget#recentProjects::item:selected { background: #dff1ed;
-                color: #24363b; border-color: #087677; }
-            QListWidget#recentProjects::item:hover { border-color: #087677; }
+                border: 1px solid #e3e5df; border-radius: 6px; }
+            QListWidget#recentProjects::item:selected { background: #e1ecef;
+                color: #242723; border-color: #256f82; }
+            QListWidget#recentProjects::item:hover { border-color: #256f82; }
         """)
 
     def recent_list_focus(self) -> None:
@@ -227,7 +224,12 @@ class PlatformWindow(QMainWindow):
     def _refresh_recent(self) -> None:
         self.recent_list.clear()
         for path in self._recent_paths:
-            item = QListWidgetItem(f"{Path(path).name}\nWB 项目")
+            opened = self.settings.value(f"recent_opened/{path}", "")
+            detail = f"最近打开 {opened}" if opened else "已保存的项目位置"
+            name = Path(path).name
+            if name.casefold() == "workspace":
+                name = f"{Path(path).parent.name} · {name}"
+            item = QListWidgetItem(f"{name}\nWB 项目 · {detail}")
             item.setData(Qt.ItemDataRole.UserRole, path)
             item.setToolTip(path)
             self.recent_list.addItem(item)
@@ -240,9 +242,37 @@ class PlatformWindow(QMainWindow):
         self.project_path.setText(path)
 
     def choose_new(self) -> None:
-        path = QFileDialog.getExistingDirectory(self, "为新 WB 项目选择空文件夹")
+        paths, _ = QFileDialog.getOpenFileNames(
+            self, "选择 WB 原始图像", "", "TIFF 原图 (*.tif *.tiff)"
+        )
+        if paths:
+            self.start_from_images([Path(path) for path in paths])
+
+    def choose_source_folder(self) -> None:
+        path = QFileDialog.getExistingDirectory(self, "选择 WB 原图文件夹")
         if path:
-            self.open_workspace(path, create=True)
+            self.start_from_images([Path(path)])
+
+    def choose_project_parent(self) -> None:
+        path = QFileDialog.getExistingDirectory(self, "选择项目保存位置（自动创建子文件夹）")
+        if path:
+            self.settings.setValue("project_parent", path)
+            self.project_path.setText(f"新项目保存位置：{path}（自动创建子文件夹）")
+
+    def start_from_images(self, paths: list[Path]) -> None:
+        if self.active_tool is not None:
+            self.active_tool.show()
+            self.active_tool.raise_()
+            return
+        parent_value = self.settings.value("project_parent", "")
+        parent = (
+            Path(parent_value)
+            if isinstance(parent_value, str) and parent_value
+            else default_project_parent()
+        )
+        self.launch_tool()
+        if self.active_tool is not None:
+            self.active_tool.start_project_from_images(paths, project_parent=parent)
 
     def choose_open(self) -> None:
         path = QFileDialog.getExistingDirectory(self, "打开已有项目文件夹")
@@ -289,6 +319,9 @@ class PlatformWindow(QMainWindow):
         normalized = str(Path(path).absolute())
         self._recent_paths = [normalized, *(p for p in self._recent_paths if p != normalized)][:8]
         self.settings.setValue("recent_workspaces", self._recent_paths)
+        self.settings.setValue(
+            f"recent_opened/{normalized}", datetime.now().strftime("%m月%d日 %H:%M")
+        )
         self.settings.sync()
         self._refresh_recent()
         if self.settings.status() != QSettings.Status.NoError:
