@@ -1599,8 +1599,12 @@ class FigureProjectWindow(QMainWindow):
                     self._finish_close()
                 elif after and self._cancellation.is_set():
                     self._done("项目已保存；后续操作已取消。")
-                elif after:
-                    after()
+                else:
+                    # set_project restores controls and intentionally invalidates
+                    # result presentation. Rebuild from verified runs before any
+                    # follow-up (including display-only compose), even when no
+                    # scientific parameters changed.
+                    self.refresh_project_table("项目已保存，结果表已核验。", after=after)
 
             self._storage(
                 StorageCommand(

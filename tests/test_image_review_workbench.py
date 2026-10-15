@@ -158,3 +158,47 @@ def test_autosave_and_recompute_preserve_selection_canvas_curve_history(
     assert detached.table.currentRow() == -1
     assert detached.canvas.image_rect().isEmpty()
     assert not detached.analysis.undo_button.isEnabled()
+
+
+def test_reopen_preview_export_and_metadata_autosave_keep_verified_results(
+    qtbot: QtBot, tmp_path: Path, windows: Callable[[], "FigureProjectWindow"]
+) -> None:
+    original = windows()
+    setup(qtbot, tmp_path, original, crop_height=40)
+    original.analyze_project(True)
+    qtbot.waitUntil(original.import_button.isEnabled, timeout=20000)
+    document_id = original.view.project().project_id
+    original.close()
+    qtbot.waitUntil(lambda: original.resources_closed, timeout=20000)
+    window = windows()
+    window.open_workspace(str(tmp_path / "workspace"))
+    qtbot.waitUntil(window.import_button.isEnabled)
+    window.load_document(document_id)
+    qtbot.waitUntil(window.import_button.isEnabled, timeout=20000)
+    view = window.view
+    expected = ["4000", "", "0", "8000", "16000", "0"]
+    assert [item(view.analysis.results, i, 3).text() for i in range(6)] == expected
+    view.show_section("template")
+    qtbot.waitUntil(
+        lambda: (
+            not window.operation_busy
+            and (not view.preview_label.full_pixmap.isNull() or "失败" in view.status.text())
+        ),
+        timeout=20000,
+    )
+    assert not view.preview_label.full_pixmap.isNull(), view.status.text()
+    view.show_section("export")
+    assert view.analysis.results.rowCount() == 6
+    assert [item(view.analysis.results, i, 3).text() for i in range(6)] == expected
+    # A label-only edit schedules a save but no new measurement. Both its new
+    # label and existing verified values must be automatically visible afterward.
+    item(view.table, 1, 2).setText("p-AKT")
+    qtbot.waitUntil(
+        lambda: (
+            not window.operation_busy
+            and view.analysis.results.rowCount() == 6
+            and item(view.analysis.results, 3, 1).text() == "p-AKT"
+        ),
+        timeout=20000,
+    )
+    assert [item(view.analysis.results, i, 3).text() for i in range(6)] == expected
