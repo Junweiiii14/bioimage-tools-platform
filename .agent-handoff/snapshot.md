@@ -1,6 +1,7 @@
 # Handoff Snapshot
 
 - 更新2026-10-15。当前总体任务T-003；T-021本轮三项完成并进入review，唯一状态见work/tasks/T-021-laboratory-figure-layout.md。
+- F-006已完成当前版本展示与7页中文Word/PDF使用报告；交付目录.local/deliveries/WB-preview-20261015-2，两个启动脚本、合成工作区/截图/示例模板。已启动Qt演示并核验2条真实后台成功记录；任务work/tasks/F-006-preview-user-guide.md。产品代码仍1e6cd5a。
 - 最新产品位于C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform，分支codex/t021-coordination。产品提交1e6cd5ab02968dc7493b2cecc5b3625564f23b8d；收尾文档HEAD以git为准。原主目录feat/T-021-laboratory-figure-layout仍保留原未提交产品内容，不双向覆盖。
 - 模板保存/导入与字体跨工作区、逐来源一次解码、旧schema1–6独立旧实现对照及schema7科学身份/ZIP兼容均完成。wb-tool0.19.0/app0.14.0，第三方锁版本未变。
 - dev.py check --all退出0：490测试174.80s、Ruff274、Pyright0、9合约、4wheel/4隔离环境。原生Qt合成截图已查看。独立final_review绑定bb5601a..1e6cd5a，55专项通过，无可操作发现。证据见work/evidence/T-021/validation.md与independent-review.md。

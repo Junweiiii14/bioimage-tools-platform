@@ -99,3 +99,7 @@ policy退出0；技能文件/引用/脚本语法/方向列表与ImpeccableSHA/�
 ## 2026-10-15 / T-021 worktree集成
 
 产品1e6cd5ab02968dc7493b2cecc5b3625564f23b8d：dev.py check --all退出0，490测试174.80s、Ruff274文件、Pyright0、9合约、4wheel/4隔离环境通过；模板后端18+桌面8专项与Qt截图检查通过。新独立审查绑定bb5601a..1e6cd5a，55专项退出0，无可操作问题。旧schema1–6对照旧实际产物像素/完整manifest一致，schema7真实合成积分/OCR明确绑定/归一化/ZIP恢复保持。模板导入新空项目，字体在目的工作区保存；逐源一次解码按顺序释放。无测试容差/skip/类型忽略削弱；锁仅本地包版本。详细证据work/evidence/T-021/validation.md与independent-review.md。旧Qt中止/停滞仍UNKNOWN，真实准确率、大项目/DPI/最终Windows与远程CI未验收。
+
+## 2026-10-15 / F-006 当前版本展示
+
+产品1e6cd5a未改。独立合成演示已启动；实际两条后台run均succeeded，已生成PNG/模板。documents捆绑Python生成Word，默认LO渲染退出1后改Word原生导出PDF退出0，Poppler渲染7页全部已目视检查。使用报告/本机启动脚本在.local/deliveries/WB-preview-20261015-2，详细F-006任务/validation。未重跑产品全门禁，不扩张为真实科学或包态验收。
