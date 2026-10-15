@@ -9,3 +9,5 @@
 验证：Windows/Python3.12.14，uv sync --locked --all-groups 退出0；pytest tests/test_project_entry.py tests/test_platform_host.py 9通过；ruff、scoped pyright退出0。截图 .local/t030/platform-1100.png、platform-1440.png（不提交）实际Qt，检查1100画面无截断，空态移至列表顶部。
 设计检测：Impeccable检测已运行，报告新色板/28px/8px不在旧DESIGN中的advisory；这些是T028已批准重设计，根任务负责更新统一设计文档，不能以旧色板否决新设计。无浏览器DOM，不能宣称无障碍全通过。动效和宿主start_project_from_images由T029集成；本分支不独立宣称端到端新建自动化验收通过。
 状态：implemented-awaiting-integration-review。未更改数值/schema/旧测试预期；独立审查由根任务绑定集成提交。
+
+T029宿主集成测试补充（host f8cb05d，本树cherry-pick 5d4e406）：tests/test_project_start.py新增4个用户行为测试。初次运行退出1：3通过、1失败。取消扫描、无效TIFF不建项目/历史、原图目录重叠保护通过；中文来源名称/未指定蛋白的有效原图自动输出失败，实际错误“这些标签需要导入支持相应文字的TTF/OTF/TTC字体”，已报告根任务修复，未削弱预期。scoped pyright与ruff通过。等待字体/显示标签修复后复验。
