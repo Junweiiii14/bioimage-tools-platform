@@ -1,5 +1,14 @@
 # Desktop host
 
+The default `python -m bioimage_app` entry opens the BioImage tool platform. Its static
+registry currently contains WB only. New/open/recent project actions launch the real WB
+project window and asynchronous storage; recent paths are recorded only after a successful
+workspace open. The tool's **返回工具平台** action saves valid edits, cancels/drains active
+work through its existing close lifecycle, then returns to the hub. Invalid or missing
+workspaces keep the error in the tool and are not added to recent history. `--figure-project`
+still opens WB directly; the legacy single-image window is available through `--wb-manual`.
+Project history stores at most eight local paths in Qt settings, never executable tool names.
+
 Version 0.14.0 adds schema7 laboratory segments and independent template file actions in
 the existing template settings page. Template I/O runs in the tool background thread;
 import saves the previous project, imports verified font bytes into the destination
