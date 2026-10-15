@@ -291,7 +291,17 @@ class PlatformWindow(QMainWindow):
             data = QByteArray()
             buffer = QBuffer(data)
             buffer.open(QIODevice.OpenModeFlag.WriteOnly)
-            if item.icon().pixmap(96, 64).save(buffer, "PNG") and data.size() <= 65536:
+            # QIcon requests logical pixels; high-DPI screens may return more physical pixels.
+            # Persist physical bounds so the same strict reader accepts the cache at any DPI.
+            thumbnail = item.icon().pixmap(96, 64)
+            thumbnail.setDevicePixelRatio(1.0)
+            thumbnail = thumbnail.scaled(
+                96,
+                64,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
+            if thumbnail.save(buffer, "PNG") and data.size() <= 65536:
                 self.settings.setValue(f"recent_thumbnail/{path}", data)
             break
         self.settings.sync()
