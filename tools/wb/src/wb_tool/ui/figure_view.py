@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QListView,
     QListWidget,
+    QListWidgetItem,
     QMenu,
     QPushButton,
     QScrollArea,
@@ -125,6 +126,9 @@ class FigureProjectView(QWidget):
     template_export_requested = Signal()
     template_import_requested = Signal()
     detection_requested = Signal(bool)
+    automatic_requested = Signal()
+    automatic_export_requested = Signal()
+    import_directory_requested = Signal()
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -143,7 +147,7 @@ class FigureProjectView(QWidget):
         self.name.setObjectName("projectName")
         project_header.addWidget(self.name, 1)
         root.addLayout(project_header)
-        self.status = QLabel("批量导入原图，填写 Fig/蛋白，框选整行范围并复核。")
+        self.status = QLabel("导入原图文件夹后自动识别；需要修正时，直接拖动图中的裁剪框。")
         self.status.setWordWrap(True)
 
         self.history_label = QLabel()
@@ -214,17 +218,7 @@ class FigureProjectView(QWidget):
         self.suggestions.candidate_changed.connect(self._overlay)
         self.suggestions.focus_requested.connect(self.focus_membrane)
         self.suggestions.reset_view_requested.connect(lambda: self.canvas.set_view_region(None))
-        source_page = QWidget()
-        source_layout = QHBoxLayout(source_page)
-        source_layout.setContentsMargins(4, 4, 4, 4)
-        source_layout.setSpacing(8)
-        self.source_controls_scroll = QScrollArea()
-        self.source_controls_scroll.setWidgetResizable(True)
-        self.source_controls_scroll.setFrameShape(QScrollArea.Shape.NoFrame)
-        self.source_controls_scroll.setFixedWidth(254)
-        self.source_controls_scroll.setWidget(self.suggestions)
-        source_layout.addWidget(self.source_controls_scroll)
-        source_layout.addWidget(self.canvas, 1)
+        source_page = self._build_source_workspace()
 
         self.metadata = ProjectMetadataPanel()
         self.metadata.preview_requested.connect(self._metadata_preview)
@@ -319,6 +313,170 @@ class FigureProjectView(QWidget):
         self.canvas.roi_drawn.connect(self._drawn)
         self.set_project(self._project)
 
+    def _build_source_workspace(self) -> QWidget:
+        workspace = QWidget()
+        layout = QHBoxLayout(workspace)
+        layout.setContentsMargins(0, 8, 0, 0)
+        layout.setSpacing(12)
+        left = QWidget()
+        left.setObjectName("sourceRail")
+        left.setFixedWidth(224)
+        rail = QVBoxLayout(left)
+        rail.setContentsMargins(12, 14, 12, 14)
+        rail.setSpacing(10)
+        self.source_count = QLabel("项目原图")
+        self.source_count.setObjectName("evidenceHeading")
+        rail.addWidget(self.source_count)
+        self.import_directory_button = QPushButton("导入原图文件夹…")
+        self.import_directory_button.clicked.connect(self.import_directory_requested)
+        rail.addWidget(self.import_directory_button)
+        self.source_list = QListWidget()
+        self.source_list.setObjectName("sourceList")
+        self.source_list.setAccessibleName("项目原图列表")
+        self.source_list.setIconSize(QSize(48, 40))
+        self.source_list.setWordWrap(True)
+        self.source_list.setMinimumHeight(150)
+        self.source_list.currentRowChanged.connect(self._select_analysis_source)
+        rail.addWidget(self.source_list, 1)
+        self.automatic_button = QPushButton("自动识别并分析")
+        self.automatic_button.setObjectName("primaryAction")
+        self.automatic_button.setMinimumHeight(38)
+        self.automatic_button.clicked.connect(self.automatic_requested)
+        rail.addWidget(self.automatic_button)
+        self.automatic_export_button = QPushButton("导出自动化结果…")
+        self.automatic_export_button.clicked.connect(self.automatic_export_requested)
+        rail.addWidget(self.automatic_export_button)
+        note = QLabel("自动处理原图、泳道与定量。\n有疑问的结果会保留复核提示。")
+        note.setWordWrap(True)
+        note.setObjectName("sourceHint")
+        rail.addWidget(note)
+        layout.addWidget(left)
+
+        center = QWidget()
+        evidence = QVBoxLayout(center)
+        evidence.setContentsMargins(0, 0, 0, 0)
+        evidence.setSpacing(8)
+        tools = QHBoxLayout()
+        self.source_image_title = QLabel("原图预览")
+        self.source_image_title.setObjectName("evidenceHeading")
+        self.source_image_title.setSizePolicy(
+            QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred
+        )
+        tools.addWidget(self.source_image_title, 1)
+        fit = QPushButton("适应窗口")
+        fit.clicked.connect(lambda: self.canvas.set_view_region(None))
+        tools.addWidget(fit)
+        evidence.addLayout(tools)
+        self.canvas.setMinimumSize(280, 240)
+        self.canvas.empty_message = "导入 TIFF 原图文件夹\n自动识别后，在这里检查和调整裁剪"
+        evidence.addWidget(self.canvas, 1)
+        hint = QLabel("框内拖动：移动裁剪  ·  边角拖动：调整大小  ·  滚轮：缩放  ·  中键：平移")
+        hint.setWordWrap(True)
+        hint.setObjectName("sourceHint")
+        evidence.addWidget(hint)
+        layout.addWidget(center, 1)
+
+        right = QWidget()
+        right.setObjectName("sourceReview")
+        review = QVBoxLayout(right)
+        review.setContentsMargins(12, 14, 12, 14)
+        review.setSpacing(12)
+        heading = QLabel("当前原图 · 复核")
+        heading.setObjectName("evidenceHeading")
+        review.addWidget(heading)
+        self.source_review_status = QLabel("导入原图后开始自动处理")
+        self.source_review_status.setWordWrap(True)
+        review.addWidget(self.source_review_status)
+        self.source_details = QLabel()
+        self.source_details.setWordWrap(True)
+        self.source_details.setObjectName("sourceHint")
+        review.addWidget(self.source_details)
+        form = QFormLayout()
+        form.setSpacing(8)
+        self.source_fields: dict[int, QLineEdit] = {}
+        for column, label in ((1, "Fig"), (2, "蛋白名称"), (3, "泳道数"), (8, "排除泳道")):
+            field = QLineEdit()
+            field.setMinimumWidth(0)
+            field.setAccessibleName(label)
+            field.editingFinished.connect(lambda c=column: self._source_field_edited(c))
+            self.source_fields[column] = field
+            form.addRow(label, field)
+        self.source_fields[8].setPlaceholderText("可选，例如 3, 6")
+        review.addLayout(form)
+        confirm = QPushButton("确认当前裁剪")
+        confirm.clicked.connect(self.confirm_selected)
+        review.addWidget(confirm)
+        self.suggestions_toggle = QCheckBox("检测候选与高级设置")
+        self.suggestions_toggle.toggled.connect(self.suggestions.setVisible)
+        review.addWidget(self.suggestions_toggle)
+        self.suggestions.hide()
+        review.addWidget(self.suggestions)
+        review.addStretch()
+        self.source_controls_scroll = QScrollArea()
+        self.source_controls_scroll.setWidgetResizable(True)
+        self.source_controls_scroll.setFrameShape(QScrollArea.Shape.NoFrame)
+        self.source_controls_scroll.setFixedWidth(272)
+        self.source_controls_scroll.setWidget(right)
+        layout.addWidget(self.source_controls_scroll)
+        workspace.setStyleSheet(
+            "QWidget#sourceRail, QWidget#sourceReview { background: #ffffff; }"
+            "QListWidget#sourceList { border: 0; background: #ffffff; outline: none; }"
+            "QListWidget#sourceList::item { padding: 9px 6px; border-radius: 5px; }"
+            "QListWidget#sourceList::item:selected { background: #e1f2ee; color: #096568; }"
+            "QListWidget#sourceList::item:hover { background: #eff7f6; }"
+            "QLabel#sourceHint { color: #536771; font-size: 11px; }"
+        )
+        return workspace
+
+    def _source_field_edited(self, column: int) -> None:
+        index = self.table.currentRow()
+        item = self.table.item(index, column) if index >= 0 else None
+        if item is not None:
+            item.setText(self.source_fields[column].text().strip())
+
+    def _refresh_source_workspace(self) -> None:
+        self.source_list.blockSignals(True)
+        self.source_list.clear()
+        self.source_count.setText(f"项目原图 · {len(self._project.rows)}")
+        index = self.table.currentRow()
+        for i, row in enumerate(self._project.rows):
+            review = self.table.item(i, 9)
+            reviewed = bool(review and review.checkState() == Qt.CheckState.Checked)
+            state = "已复核" if reviewed else "待复核" if self._text(i, 4) else "待识别"
+            title = f"{self._text(i, 2) or row.filename or '缺图位'}\n{state} · {row.filename}"
+            entry = QListWidgetItem(title)
+            entry.setToolTip(title)
+            if row.source and row.source.sha256 in self._thumbnails:
+                entry.setIcon(self._thumbnails[row.source.sha256])
+            self.source_list.addItem(entry)
+            entry.setHidden(self.table.isRowHidden(i))
+        self.source_list.setCurrentRow(index)
+        self.source_list.blockSignals(False)
+        row = self._project.rows[index] if 0 <= index < len(self._project.rows) else None
+        self.automatic_button.setEnabled(bool(self._project.rows))
+        self.automatic_export_button.setEnabled(bool(self._project.rows))
+        for column, field in self.source_fields.items():
+            field.setEnabled(row is not None)
+            if not field.hasFocus():
+                field.setText(self._text(index, column) if row else "")
+        self.source_image_title.setText(row.filename if row else "原图预览")
+        self.source_image_title.setToolTip(row.filename if row else "")
+        self.source_details.setText(
+            f"{row.width} × {row.height} 像素 · {row.bit_depth} 位原图"
+            if row and row.source
+            else ""
+        )
+        review = self.table.item(index, 9) if row else None
+        self.source_review_status.setText(
+            "人工复核已确认"
+            if review and review.checkState() == Qt.CheckState.Checked
+            else "裁剪已就绪 · 待复核，可直接拖动图中绿框"
+            if row and self._text(index, 4)
+            else "等待自动识别泳道和裁剪"
+            if row
+            else "从左侧导入原图文件夹"
+        )
+
     def _preview_scale_changed(self, index: int) -> None:
         self.preview_label.set_fit(index == 0)
 
@@ -366,16 +524,16 @@ class FigureProjectView(QWidget):
         originals = QWidget()
         originals_layout = QVBoxLayout(originals)
         originals_layout.setContentsMargins(0, 0, 0, 0)
-        originals_layout.addWidget(source_controls)
-        source_split = QSplitter(Qt.Orientation.Vertical)
-        source_split.addWidget(self.table)
-        source_split.addWidget(source_page)
-        source_split.setSizes([150, 500])
-        source_split.setChildrenCollapsible(False)
-        originals_layout.addWidget(source_split, 1)
+        originals_layout.addWidget(source_page, 1)
+        advanced = QWidget()
+        advanced_layout = QVBoxLayout(advanced)
+        advanced_layout.addWidget(source_controls)
+        self.table.setMaximumHeight(16777215)
+        advanced_layout.addWidget(self.table, 1)
         self.source_tabs = QTabWidget()
-        self.source_tabs.addTab(originals, "原图裁剪与审核")
+        self.source_tabs.addTab(originals, "原图工作区")
         self.source_tabs.addTab(self.metadata, "批量填写信息")
+        self.source_tabs.addTab(advanced, "高级数据表")
         self._add_step(self.source_tabs)
 
         quantification = QWidget()
@@ -503,7 +661,7 @@ class FigureProjectView(QWidget):
     def _step_changed(self, index: int) -> None:
         titles = ("原图与裁剪", "定量与复核", "拼图排版", "导出")
         hints = (
-            "导入 TIFF 原图，填写 Fig 与蛋白名称，核对泳道和裁剪范围，再确认所选行。",
+            "左侧选择原图，中间检查自动裁剪，右侧复核结果；拖动框体移动、拖动边角调整。",
             "可先通过 OCR 建表，再关联已审核原图并复核定量；也可直接定量后导出结果。",
             "需要展示拼图时，调整明确分段和标签样式并生成预览；定量结果可直接导出。",
             "按用途选择输出。保存项目保留当前工作进度，完整 ZIP 用于迁移和恢复。",
@@ -560,6 +718,7 @@ class FigureProjectView(QWidget):
         self.analysis_sources.setCurrentRow(self.table.currentRow())
         self.analysis_sources.blockSignals(False)
         self.analysis_source.blockSignals(False)
+        self._refresh_source_workspace()
 
     def _select_analysis_source(self, index: int) -> None:
         if 0 <= index < self.table.rowCount():
@@ -728,6 +887,7 @@ class FigureProjectView(QWidget):
         self._loading = False
         self._refresh_analysis_sources()
         self._filter_rows()
+        self._refresh_source_workspace()
 
     def rebuild_layout(self) -> None:
         try:
@@ -802,6 +962,7 @@ class FigureProjectView(QWidget):
                 item.setIcon(icon)
                 self.table.setRowHeight(i, 68)
         self._loading = False
+        self._refresh_source_workspace()
 
     def _edited(self) -> None:
         if self._loading:
@@ -997,6 +1158,8 @@ class FigureProjectView(QWidget):
                     regions.append(
                         replace(result.candidates[index].roi, lane_id=f"候选 {index + 1}")
                     )
+            self.canvas.set_crop(row.roi if row else None)
+            self._refresh_source_workspace()
             self.canvas.set_regions(tuple(regions))
             self.canvas.set_lanes(
                 tuple(
@@ -1052,12 +1215,23 @@ class FigureProjectView(QWidget):
         index = self.table.currentRow()
         if index < 0 or self._project.rows[index].source is None:
             return
+        previous_roi = self._project.rows[index].roi
         self._loading = True
         for column, value in enumerate(coords, start=4):
             item = self.table.item(index, column)
             if item:
                 item.setText(str(value))
         self._loading = False
+        if (
+            previous_roi is not None
+            and not self.laboratory_layout.active
+            and coords[3] - coords[1] != self._project.template.crop_height
+        ):
+            # A graphical resize is a per-row geometry change, never a global crop-height edit.
+            project = self.project()
+            project = with_figure_layout(project, initial_composition(project))
+            self._project = project
+            self.laboratory_layout.restore(project)
         self._cell_changed(index, 4)
 
     def _filter_rows(self) -> None:
@@ -1093,6 +1267,8 @@ class FigureProjectView(QWidget):
                 )
             )
             self.table.setRowHidden(i, bool(hidden))
+            if i < self.source_list.count():
+                self.source_list.item(i).setHidden(bool(hidden))
 
     def move_row(self, step: int) -> None:
         try:

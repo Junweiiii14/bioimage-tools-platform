@@ -4,6 +4,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from PySide6.QtCore import QPoint
 from PySide6.QtTest import QSignalSpy
 from PySide6.QtWidgets import QScrollArea
 from pytestqt.qtbot import QtBot
@@ -47,6 +48,9 @@ def test_navigation_keeps_draft_selection_and_dirty_annotation(
     assert not view.table.isVisible()
     assert view.analysis_source.currentIndex() == row
     view.show_section("source")
+    assert view.source_list.isVisible()
+    assert not view.table.isVisible()
+    view.source_tabs.setCurrentIndex(2)
     assert view.table.isVisible()
 
 
@@ -183,6 +187,7 @@ def test_coordinate_and_detection_disclosure_do_not_change_parameters(
     view.exact_coordinates.setChecked(True)
     assert all(not view.table.isColumnHidden(i) for i in range(4, 8))
     view.exact_coordinates.setChecked(False)
+    view.suggestions_toggle.setChecked(True)
     view.suggestions.advanced_toggle.setChecked(True)
     view.suggestions.advanced_toggle.setChecked(False)
     assert view.suggestions.settings(row, before.template.crop_height) == detection
@@ -243,9 +248,17 @@ def test_source_controls_stay_beside_larger_canvas_at_small_width(
     assert isinstance(page, QScrollArea)
     qtbot.waitUntil(lambda: page.horizontalScrollBar().maximum() == 0)
     qtbot.waitUntil(lambda: view.canvas.width() > view.source_controls_scroll.width())
-    assert view.source_controls_scroll.geometry().right() < view.canvas.geometry().left()
+    assert (
+        view.source_list.mapToGlobal(QPoint()).x() + view.source_list.width()
+        < view.canvas.mapToGlobal(QPoint()).x()
+    )
+    assert (
+        view.canvas.mapToGlobal(QPoint()).x() + view.canvas.width()
+        < view.source_controls_scroll.mapToGlobal(QPoint()).x()
+    )
     before = view.project()
     generation = view.generation
+    view.suggestions_toggle.setChecked(True)
     view.suggestions.advanced_toggle.setChecked(True)
     assert view.suggestions.advanced_settings.isVisible()
     assert view.project() == before and view.generation == generation
