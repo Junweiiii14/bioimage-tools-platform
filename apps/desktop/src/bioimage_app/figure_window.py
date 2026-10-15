@@ -1410,7 +1410,8 @@ class FigureProjectWindow(QMainWindow):
                             row_id=uuid4().hex,
                             source=asset,
                             filename=Path(path).name,
-                            protein="未指定",
+                            # Portable, explicitly unknown label, never a source/protein inference.
+                            protein="Unassigned",
                             width=raster.width,
                             height=raster.height,
                             bit_depth=16 if raster.bit_depth == 16 else 8,
