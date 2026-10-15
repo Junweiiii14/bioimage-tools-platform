@@ -1,8 +1,5 @@
 # Current Work Log
 
-## 2026-10-14 / T-009桌面接入后用户暂停
-新增OCR进程/共用顺序身份门禁、WBWorksheetDocument v2、Qt名称确认与显式绑定/自动表、后台导出和宿主RunSession接入。同图真实OCR至保存重开/导出单测通过；改动未提交，HEAD184d018。用户要求暂停后停止实施。跨源拼图、OCR-first、新协议反例、完整验证尚未完成；Goal API返回null，未重建目标。
-
 ## 2026-10-14 / T-009 OCR/表格后端
 
 上一回合progress：34831e4手工GUI。本回合只读核对旧OCR/worksheet/导出并记录SHA；选同RapidOCR3.9.2/PP-OCRv6，实际CPU识别六标签和两个Fig正确、三模型hash相同。新增模型加载前守卫/分块/坐标/取消、未确认空间建议、显式绑定写值及字面XLSX无覆盖发布；矩形145/95×21解析值3045/1995自动写入，缺失/排除/真零分开。199tests/9合约/4wheel5场景通过，独立读表Unicode/数值通过。T-009仍implementing，OCR worker/Qt表/持久化与整体目标继续，独审待办。
@@ -105,3 +102,7 @@ wb-tool 0.2.0 新增 uint8/16 灰度及显式 RGB 单页 TIFF、极性与半开 
 ## 2026-10-15 / T-022 前端与视觉参考
 
 用户确认四步工作流，随后要求同时使用新装两技能并提高精致度；最终明确旧WBQuant仅外观布局相似，不保留旧操作。使用Impeccable原生Operate和Taste实际方向抽取；源码Qt迭代至32a2d18。保留原主目录dirty，复用协调worktree/codex/t022-workflow-ui；作者与独立审查分开。f71083b全门禁498通过，最后布局32a2d18专项17和独审/截图ship；最终检查见T-022/validation。新合成演示与使用说明在.local/deliveries/WB-workflow-20261015，旧F006报告不覆盖。未推送/发布，不声称真实科学与最终包态验收。
+
+## 2026-10-15 / T-023 全新UI候选
+
+用户要求完全重新设计，先给候选再实施。复用协调worktree，新分支codex/t023-ui-candidates从059d01b开始。用Impeccable Operate及Taste制作A证据工作台/B清晰实验流程/C图像专注静态稿；三张1440×900真实浏览器截图已看，图像全为合成示意。正式前端/科学规则未改，DESIGN与PRODUCT新系统尚未锁定。用户可从选择页0ea9eab8或聊天回复选择；实施必须等其选择。任务T-023/证据为唯一状态。

@@ -107,3 +107,7 @@ policy退出0；技能文件/引用/脚本语法/方向列表与ImpeccableSHA/�
 ## 2026-10-15 / T-022
 
 最终产品32a2d18：dev.py check --all退出0，500测试173.83s、Ruff289、Pyright0、9合约、4wheel隔离环境通过。独立代码审查17专项9.02s无发现；原生1280×900/1100×780变化图视觉ship。演示窗口已打开，真实PID41120/启动stderr空，合成数据。旧WBQuant只作外观参考，不继承旧操作；科学/DPI/最终安装包与远程CI未验收。证据work/evidence/T-022/validation.md。
+
+## 2026-10-15 / T-023 静态设计候选
+
+三张本地HTML浏览器实拍1440×900，A/B首轮、C标签对比度修复后检查；6份JPEG来源嵌入scan0missing。产品未改，不重跑T-022全门禁或声称功能验收。详情work/evidence/T-023/validation.md。
