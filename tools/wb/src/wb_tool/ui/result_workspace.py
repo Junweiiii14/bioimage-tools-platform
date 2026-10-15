@@ -104,7 +104,7 @@ class ResultWorkspace(QWidget):
         self.formats.hide()
         self.formats_toggle.toggled.connect(self.formats.setVisible)
         right.addStretch()
-        right.addWidget(QLabel("最近输出"))
+        right.addWidget(QLabel("本次会话输出"))
         self.output_location = QLabel("尚未导出")
         self.output_location.setWordWrap(True)
         right.addWidget(self.output_location)
