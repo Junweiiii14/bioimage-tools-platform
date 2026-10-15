@@ -40,3 +40,11 @@
 | 2026-10-14 | schema6归档历史证据与本机run分开，原ZIP及复制请求结果持久化；新空工作区可显式导入单个原修订快照 | 不能伪造外来PID/退出/成功，不能丢历史后称恢复完成；普通CAS仍+1，后续真实计算沿原RunSession | wb-project-restore-v1.md、workspace-v1.md、2026-10-14-wb-archive-restore.md、T-019/validation.md |
 
 | 2026-10-14 | 直接TIFF/PNG复用完整RGB8显示和来源；已知显示TIFF量化拒绝、OCR专用读取；精确保存后后台校验/无覆盖发布 | 混合位深/文字合成不能伪称原值；原16位定量和完整ZIP恢复保持，未知第三方来源不猜测 | wb-direct-figure-image-v1.md、2026-10-14-wb-direct-image.md、T-020/validation.md |
+
+## 2026-10-15 维护顺序
+
+先执行maintenance-plan维护验收与独审收拢，再扩新工具；设计技能不改变Qt技术栈；REA源码学习优先、按缺口试点。
+
+## 2026-10-15 F-003采用决定
+
+Taste v2用于公开网页；科研Qt应用优先Impeccable Operate，不迁移框架。两技能固定来源，Impeccable引擎另锁SHA；cmd固定LF维持跨平台来源hash。REA保留按问题调用的隔离工具，静态Electron已验证，暂不增加全局MCP或产品依赖；真实社区学习收益按后续同题对照决定。

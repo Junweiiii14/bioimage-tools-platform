@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-13",
+  "date": "2026-10-15",
   "skills": [
     {
       "name": "gh-fix-ci",
@@ -45,6 +45,31 @@
       "tree_sha256": "a599dfbe97978723f802d963ab15b65ef0716ad6ab20455319ca5b7d45793ed0",
       "license": "CC-BY-SA-4.0",
       "modifications": "added upstream root LICENSE only"
+    },
+    {
+      "name": "taste-skill",
+      "repository": "Leonxlnx/taste-skill",
+      "commit": "f624f37a8c650b9cc550253104925efe4c8de246",
+      "source_path": "skills/taste-skill",
+      "tree_sha256": "c851a0fd1da8d746ca9b84db6713438508cfb2ec9d3e90436f0cc79e0be98c52",
+      "license": "MIT",
+      "modifications": "added upstream root LICENSE only"
+    },
+    {
+      "name": "impeccable",
+      "repository": "pbakaus/impeccable",
+      "commit": "abf5779cabc20147fd9c013fa4705088c200bf8a",
+      "source_path": ".agents/skills/impeccable",
+      "tree_sha256": "98337f5b6d447a18a356263f8418a3efd112f89b9e0c9318c15a8bfe4bd63d20",
+      "license": "Apache-2.0",
+      "modifications": "added upstream root LICENSE only",
+      "runtime": {
+        "version": "0.1.14",
+        "platform": "windows-x64",
+        "sha256": "38e09451694973ba664a24e67e1502a6913e6d0e533a0a5ae1e04c5963a804b1",
+        "release": "https://github.com/pbakaus/impeccable/releases/tag/engine-v0.1.14",
+        "location": "user cache: ~/.impeccable/bin/0.1.14/impeccable.exe (not committed)"
+      }
     }
   ],
   "hash_format": "UTF-8 relative POSIX path, NUL, file bytes, NUL; case-sensitive path sort; Git LF checkout"

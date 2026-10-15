@@ -1,0 +1,153 @@
+{
+  "node_version": "v26.7.0",
+  "package": {
+    "version": "6.5.0",
+    "resolved": "https://registry.npmjs.org/rea-agents/-/rea-agents-6.5.0.tgz",
+    "integrity": "sha512-C6BG7LyrAdR74mSjertM6PrxJkcNZ2bfQNOJornPo9erDEp2tyPRVYPnV5Yodr+1RqewCQla68WulXlVnveD+A==",
+    "license": "MIT",
+    "dependencies": {
+      "@babel/parser": "8.0.4",
+      "@babel/types": "8.0.4",
+      "@clack/prompts": "1.7.0",
+      "@electron/asar": "4.2.0",
+      "@jridgewell/trace-mapping": "0.3.31",
+      "@lydell/node-pty": "1.1.0",
+      "@modelcontextprotocol/client": "2.3.1",
+      "@modelcontextprotocol/server": "2.3.1",
+      "@xmldom/xmldom": "0.9.12",
+      "@xterm/addon-serialize": "0.14.0",
+      "@xterm/headless": "6.0.0",
+      "@zip.js/zip.js": "2.15.0",
+      "ajv": "8.20.0",
+      "ajv-formats": "3.0.1",
+      "canonicalize": "3.0.0",
+      "cborg": "6.1.3",
+      "cross-spawn": "7.0.6",
+      "diff": "9.0.0",
+      "evmole": "0.9.3",
+      "har-schema": "2.0.0",
+      "ignore": "7.0.6",
+      "incur": "0.6.1",
+      "isomorphic-git": "1.38.7",
+      "jsonc-parser": "3.3.1",
+      "lossless-json": "4.3.1",
+      "parse5": "8.0.1",
+      "pino": "10.4.0",
+      "playwright-core": "1.58.2",
+      "plist": "5.0.0",
+      "saxes": "6.0.0",
+      "semver": "7.8.5",
+      "smol-toml": "1.9.0",
+      "stream-chain": "4.2.6",
+      "stream-json": "3.7.0",
+      "tokenx": "1.3.0",
+      "write-file-atomic": "7.0.0",
+      "ws": "8.21.0",
+      "yaml": "2.9.0",
+      "zod": "4.4.3"
+    },
+    "bin": {
+      "rea": "scripts/rea.mjs",
+      "rea-agents": "scripts/rea.mjs"
+    },
+    "engines": {
+      "node": "^22.19.0 || ^24.11.0 || >=26.0.0"
+    },
+    "optionalDependencies": {
+      "frida": "17.23.2"
+    }
+  },
+  "source_review_commit": "ce89706145dd98fbaa8df8f062fdc80777136940",
+  "fixture_sha256": {
+    "index.html": "8e2922cb053cb3ea303175d684e65af69a816085acc5600a9b6dfe781639ebc5",
+    "main.js": "f776ad0a9bfcbe53a7c49075d83bf36338ce8927a673c7aa0bc039fc5e9ada26",
+    "package.json": "5e830791e49044ea7f17bf30b69ae519ea50eecfca1befec1758e055f5417c16",
+    "preload.js": "831f1b0f621f3a1328dd94753e76385c5c8dc684b7279801cdc540061782bca0",
+    "renderer.js": "19b975bfffddfec4b4c3ddbfa2067e30f232094c50aacecc7902be11a05290a4"
+  },
+  "analysis": {
+    "exit_code": 0,
+    "evidence_id": "ev_9d542f44a0803e612037257023b95e328214faf3c97213baee16e0a9e5a0c035",
+    "summary": {
+      "browser_windows": 1,
+      "explicit_web_preferences": 1,
+      "preload_entrypoints": 0,
+      "context_bridge_apis": 1,
+      "exposed_api_members": 1,
+      "ipc": {
+        "operations": 2,
+        "literal_channels": 1,
+        "dynamic_channel_operations": 0,
+        "renderer_transmissions": 1,
+        "renderer_listeners": 0,
+        "main_handlers": 1,
+        "paired_renderer_transmissions": 1,
+        "ambiguous_renderer_transmissions": 0,
+        "unpaired_literal_renderer_transmissions": 0
+      },
+      "sender_validation_observations": 0,
+      "utility_processes": 0,
+      "resolved_utility_entrypoints": 0,
+      "native_addon_bindings": 0,
+      "resolved_native_addon_bindings": 0
+    },
+    "statistics": {
+      "relevant_files": 5,
+      "nested_asar_containers": 0,
+      "text_bytes_read": 752,
+      "invalid_utf8_files": 0,
+      "parsed_javascript_files": 3,
+      "visited_ast_nodes": 115,
+      "findings": 15,
+      "modules": 0,
+      "parse_failures": 0
+    },
+    "coverage": {
+      "status": "partial",
+      "truncated": false,
+      "omitted_count": null,
+      "limits": []
+    },
+    "stdout_bytes": 234187,
+    "stdout_sha256": "22a29b7e494e05e1a38184fa9a4ebc7e07eba306e9a383274895820d3405cdb3"
+  },
+  "trace": {
+    "exit_code": 0,
+    "evidence_id": "ev_556f6babbd555f784d6dddffba23d577289425322ee9aa656f97b564e1466730",
+    "summary": {
+      "matched_seeds": 5,
+      "traced_nodes": 27,
+      "traced_edges": 34,
+      "terminal_paths": 0,
+      "native_handoffs": 0,
+      "observed_facts": 27,
+      "inferred_facts": 35,
+      "unknown_facts": 0,
+      "unavailable_facts": 0
+    },
+    "seed_match_count": 5,
+    "coverage": {
+      "status": "partial",
+      "source_graph_status": "partial",
+      "total_seed_matches": 5
+    },
+    "stdout_bytes": 98818,
+    "stdout_sha256": "29f0c97e16a6eb3e808da4172dc44455a15e91bc6740f32c33cbdea8e085b860"
+  },
+  "tamper_probe": {
+    "exit_code": 1,
+    "diagnostic": "{\"error\":\"Application workflow failed\",\"code\":\"invalid_request\",\"category\":\"invalid_input\",\"message\":\"Analysis input is invalid. Check the arguments and try again.\",\"retryable\":true,\"remediation\":{\"action\":\"Correct the listed arguments and retry.\"},\"details\":{\"operation\":\"trace_application_feature\",\"issues\":[{\"path\":[\"application\",\"evidence_id\"],\"reason\":\"invalid_value\",\"message\":\"Evidence semantic identifier does not match its record\"}]}}\n",
+    "stderr": ""
+  },
+  "limitations": [
+    "CommonJS and ESM binding relationships were recovered from inert syntax and resolved only within the inventoried artifact container.",
+    "Electron API identity follows proven lexical module aliases and structurally verified module-namespace interop. Other reassignments, dynamic selections, and visibly overwritten namespace members are unresolved; missing findings do not establish absence. Arbitrary call side effects and runtime registration are not evaluated.",
+    "Electron relationships are derived from inert syntax; runtime registration, reachability, defaults, and enforcement remain unproven.",
+    "Graph coverage is incomplete; unavailable facts remain explicit and must not be read as absence.",
+    "JavaScript and HTML were parsed as inert text; bundle bootstrap code was never executed.",
+    "Static imports, entrypoints, workers, endpoints, and storage relationships do not prove runtime execution.",
+    "Static paths and relationships may remain unresolved when expressions are dynamic or obfuscated.",
+    "Webpack/Rspack factories were recovered from AST literals; REA did not invoke push handlers or bundle bootstrap code."
+  ],
+  "scope": "Static synthetic Electron analysis only; no target execution, no native Ghidra/real community project benchmark, no MCP registration"
+}
