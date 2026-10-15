@@ -21,3 +21,5 @@
 成员采用 `pyproject.toml + src/<import_name>/ + tests/`。公开入口 `api.py` 无初始化副作用。创建新成员须同时更新 workspace members、本地图、`tooling/boundaries.py`、import-linter 合约及 CI 的已安装包测试。不能只添加目录就宣布边界完整。
 
 工具内部：`domain/` 纯数值与身份；`application/` 用例与端口；`adapters/` 文件/执行/导出；`ui/` view、presenter、view_state。模块 README 只记自己的 API、语义、输入输出、失败行为和命令。
+
+T-024 集成：默认桌面入口为真实工具平台，静态注册 WB；目录导入→自动泳道/裁剪/边界→后台测量→新结果目录与可恢复ZIP。WB schema8保留机器建议来源、失败及原始积分；源图三栏和图上调整。契约见 `contracts/wb-automatic-v1.md`，状态见 `../work/tasks/T-024-platform-automation.md`。现阶段未宣称完整科学验收或第二工具完成。

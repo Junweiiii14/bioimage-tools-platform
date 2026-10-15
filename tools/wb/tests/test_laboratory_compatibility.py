@@ -113,7 +113,7 @@ def test_legacy_schema_save_render_and_archive_match_old_renderer(
     assert Path(staged.archive_path).read_bytes() == archive.read_bytes()
 
 
-@pytest.mark.parametrize("version", [8, 99, True, "7"])
+@pytest.mark.parametrize("version", [9, 99, True, "7"])
 def test_unknown_or_coerced_project_version_is_rejected(tmp_path: Path, version: object) -> None:
     base, _ = sample(tmp_path)
     raw = base.model_dump(mode="json")

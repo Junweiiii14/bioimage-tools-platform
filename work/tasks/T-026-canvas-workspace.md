@@ -1,4 +1,4 @@
-# T-024 Canvas workspace subtask
+# T-026 Canvas workspace subtask
 
 Status: implemented; pending parent integration and independent review.
 
@@ -11,4 +11,4 @@ Validation (Windows/Python 3.12/locked shared environment, local source PYTHONPA
 Test expectation updates: old table visible by default assertion replaced with visible source list plus reachable advanced table; old left-only parameter position replaced with left-source/center-image/right-review geometry. No numerical expectation or tolerance weakened. New mouse-mapping checks allow 1 original pixel due integer device-point rounding; source clamp has exact equality.
 
 Parent integration: connect automatic_requested, automatic_export_requested, import_directory_requested; disable full view while busy. Preserve schema8 automatic_rows after project reconstruction when core helper lands, and display machine/human statuses separately. Full repository gates and independent commit-bound review delegated to parent.
-`nFinal combined source/workflow/evidence/laboratory/figure/single-window run: 36 passed in 41.03s; exit 0. Final targeted Ruff, strict pyright and git diff --check exit 0. Full gates not run in subtask.
+Final combined source/workflow/evidence/laboratory/figure/single-window run: 36 passed in 41.03s; exit 0. Final targeted Ruff, strict pyright and git diff --check exit 0. Full gates not run in subtask.

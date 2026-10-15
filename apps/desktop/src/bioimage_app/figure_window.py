@@ -5,8 +5,8 @@ from pathlib import Path
 from threading import Event
 from uuid import uuid4
 
-from PySide6.QtCore import QTimer, Signal
-from PySide6.QtGui import QAction, QCloseEvent, QColor, QFont, QPalette
+from PySide6.QtCore import QTimer, QUrl, Signal
+from PySide6.QtGui import QAction, QCloseEvent, QColor, QDesktopServices, QFont, QPalette
 from PySide6.QtWidgets import (
     QComboBox,
     QFileDialog,
@@ -66,6 +66,7 @@ from bioimage_app.storage import AsyncStorage, StorageCommand, StorageReply
 
 class FigureProjectWindow(QMainWindow):
     closed = Signal()
+    workspace_opened = Signal(str)
     measurement_progress = Signal(str)
 
     def __init__(self) -> None:
@@ -202,6 +203,19 @@ class FigureProjectWindow(QMainWindow):
         self.view.template_export_requested.connect(self._choose_template_export)
         self.view.template_import_requested.connect(self._choose_template_import)
         self.view.detection_requested.connect(self.detect_crops)
+        from bioimage_app.automatic_workflow import AutomaticWorkflow
+
+        self.automatic = AutomaticWorkflow(self)
+        self.output_button = QPushButton("打开结果文件夹")
+        self.output_button.setEnabled(False)
+        bar.addWidget(self.output_button)
+        self.output_button.clicked.connect(
+            lambda: QDesktopServices.openUrl(QUrl.fromLocalFile(self.automatic.last_output_path))
+        )
+        self.automatic.finished.connect(self._automatic_output_ready)
+        self.view.automatic_requested.connect(self.automatic.analyze)
+        self.view.automatic_export_requested.connect(self.automatic.choose_export)
+        self.view.import_directory_requested.connect(self.automatic.choose_directory)
         self.view.metadata.import_requested.connect(self._choose_metadata_import)
         self.view.metadata.thumbnails_requested.connect(self.load_thumbnails)
         self.view.analysis.run_requested.connect(self.analyze_project)
@@ -310,10 +324,15 @@ class FigureProjectWindow(QMainWindow):
 
     def cancel(self) -> None:
         self._cancellation.set()
+        self.automatic.cancel()
         if self._measurement_session:
             self._measurement_session.cancel()
         if self._ocr_session:
             self._ocr_session.cancel()
+
+    def _automatic_output_ready(self, path: str) -> None:
+        self.output_button.setEnabled(True)
+        self.output_button.setToolTip(path)
 
     def _choose_restore(self) -> None:
         source, _ = QFileDialog.getOpenFileName(self, "选择项目 ZIP 归档", "", "ZIP (*.zip)")
@@ -448,7 +467,9 @@ class FigureProjectWindow(QMainWindow):
         self._ocr_refresh_pending = True
         self._ocr_refresh_timer.start(150)
 
-    def refresh_ocr_table(self, message: str = "关联与归一化结果已刷新") -> None:
+    def refresh_ocr_table(
+        self, message: str = "关联与归一化结果已刷新", after: Callable[[], None] | None = None
+    ) -> None:
         if self._busy or not self._workspace or self._closing:
             return
         self._ocr_refresh_timer.stop()
@@ -470,6 +491,8 @@ class FigureProjectWindow(QMainWindow):
                 self.view.ocr.result_view.show_cells(reply.value.ocr_cells)
                 self.view.normalization.result_view.show_snapshot(reply.value.normalization)
                 self._done(message)
+                if after and not self._closing and not self._cancellation.is_set():
+                    after()
             else:
                 self._done("项目已改变，未写入过期OCR关联表")
 
@@ -738,7 +761,13 @@ class FigureProjectWindow(QMainWindow):
         if self._closing:
             session.cancel()
 
-    def analyze_project(self, all_rows: bool = False) -> None:
+    def analyze_project(
+        self,
+        all_rows: bool = False,
+        *,
+        row_ids: tuple[str, ...] | None = None,
+        after: Callable[[], None] | None = None,
+    ) -> None:
         if self._busy or not self._workspace:
             return
         try:
@@ -746,10 +775,14 @@ class FigureProjectWindow(QMainWindow):
             if not isinstance(project, WBAnalysisProject):
                 raise ValueError("请先配置已审核行的定量")
             selected = self.view.selected_row()
-            row_ids = tuple(
-                p.row_id
-                for p in project.analyses
-                if all_rows or (selected and p.row_id == selected.row_id)
+            row_ids = (
+                row_ids
+                if row_ids is not None
+                else tuple(
+                    p.row_id
+                    for p in project.analyses
+                    if all_rows or (selected and p.row_id == selected.row_id)
+                )
             )
             prepared = prepare_project_analyses(
                 project, row_ids, 0 if self._saved_revision is None else self._saved_revision + 1
@@ -766,12 +799,17 @@ class FigureProjectWindow(QMainWindow):
                 return
             current = self.view.project()
             assert isinstance(current, WBAnalysisProject)
-            self._start_measurements(current, row_ids)
+            self._start_measurements(current, row_ids, after=after)
 
         self.save(after=saved)
 
     def _start_measurements(
-        self, project: WBAnalysisProject, row_ids: tuple[str, ...], *, restore: bool = False
+        self,
+        project: WBAnalysisProject,
+        row_ids: tuple[str, ...],
+        *,
+        restore: bool = False,
+        after: Callable[[], None] | None = None,
     ) -> None:
         generation = self.view.generation
         self._start()
@@ -815,16 +853,23 @@ class FigureProjectWindow(QMainWindow):
             if not restore:
                 self.view.set_project(completion.project)
                 self.view.generation += 1
-                self.save(after=lambda: self.refresh_project_table(message))
+                self.save(
+                    after=lambda: self.refresh_project_table(
+                        message,
+                        after=after if not completion.cancelled else None,
+                    )
+                )
             else:
-                self.refresh_project_table(message)
+                self.refresh_project_table(message, after=after)
 
         session.finished.connect(completed)
         session.start(project, row_ids, self._workspace, restore=restore)
         if self._closing:
             session.cancel()
 
-    def refresh_project_table(self, message: str = "项目结果表已刷新") -> None:
+    def refresh_project_table(
+        self, message: str = "项目结果表已刷新", after: Callable[[], None] | None = None
+    ) -> None:
         if self._busy or not self._workspace:
             return
         try:
@@ -846,9 +891,11 @@ class FigureProjectWindow(QMainWindow):
             self.view.analysis.show_cells(reply.value.cells)
             if isinstance(project, WBProjectOCR) and not self._closing:
                 self._busy = False
-                self.refresh_ocr_table(message)
+                self.refresh_ocr_table(message, after=after)
             else:
                 self._done(message)
+                if after and not self._closing and not self._cancellation.is_set():
+                    after()
 
         self._wb(
             WBJob("project_table", document=project, project_results=self._project_results), filled
@@ -932,6 +979,46 @@ class FigureProjectWindow(QMainWindow):
             session.start()
         except (ValueError, RuntimeError) as error:
             self._error(str(error))
+
+    @property
+    def workspace_path(self) -> str:
+        return self._workspace
+
+    @property
+    def operation_busy(self) -> bool:
+        return self._busy
+
+    @property
+    def is_closing(self) -> bool:
+        return self._closing
+
+    @property
+    def cancellation(self) -> Event:
+        return self._cancellation
+
+    @property
+    def source_paths(self) -> dict[str, str]:
+        return dict(self._paths)
+
+    def end_phase(self) -> None:
+        self._busy = False
+
+    def begin_operation(self) -> None:
+        self._start()
+
+    def finish_operation(self, message: str) -> None:
+        self._done(message)
+
+    def fail_operation(self, message: str) -> None:
+        self._error(message)
+
+    def submit_tool_job(
+        self, job: WBJob, callback: Callable[[WBReply], None], *, accept_errors: bool = False
+    ) -> None:
+        self._wb(job, callback, accept_errors=accept_errors)
+
+    def submit_export_job(self, job: WBJob, callback: Callable[[WBReply], None]) -> None:
+        self._export_with_evidence(job, callback)
 
     @property
     def resources_closed(self) -> bool:
@@ -1146,13 +1233,14 @@ class FigureProjectWindow(QMainWindow):
                 if isinstance(document, DraftSnapshot) and document.tool_id == "wb-figure":
                     self.documents.addItem(document.document_id, document.document_id)
         self._done("项目工作区已就绪；批量导入原图或选择已保存项目。")
+        self.workspace_opened.emit(self._workspace)
 
     def _choose_import(self) -> None:
         paths, _ = QFileDialog.getOpenFileNames(
             self, "选择同一项目的原始 TIFF", "", "TIFF (*.tif *.tiff)"
         )
         if paths:
-            self.import_images(tuple(paths))
+            self.import_images(tuple(paths), automatic=True)
 
     def new_project(self) -> None:
         if self._busy or not self._workspace:
@@ -1175,7 +1263,7 @@ class FigureProjectWindow(QMainWindow):
 
         self.save(after=create)
 
-    def import_images(self, paths: tuple[str, ...]) -> None:
+    def import_images(self, paths: tuple[str, ...], *, automatic: bool = False) -> None:
         if self._busy or not self._workspace:
             return
         try:
@@ -1187,6 +1275,7 @@ class FigureProjectWindow(QMainWindow):
         pending = list(paths)
         duplicates = 0
         errors: list[str] = []
+        imported_ids: list[str] = []
         generation = self.view.generation
 
         def next_image() -> None:
@@ -1200,6 +1289,13 @@ class FigureProjectWindow(QMainWindow):
                     f"导入结束；跳过 {duplicates} 个重复原图，{len(errors)} 个失败。"
                     + ("; ".join(errors[:3]) if errors else "请填写名称并复核裁剪。")
                 )
+                if (
+                    automatic
+                    and (imported_ids or errors)
+                    and not self._cancellation.is_set()
+                    and not self._closing
+                ):
+                    self.automatic.analyze(row_ids=tuple(imported_ids), import_errors=tuple(errors))
                 return
             if len(self.view.project().rows) >= 512:
                 self._done(f"项目已达 512 行；剩余 {len(pending)} 张未导入，请另建项目。")
@@ -1242,22 +1338,32 @@ class FigureProjectWindow(QMainWindow):
                             row_id=uuid4().hex,
                             source=asset,
                             filename=Path(path).name,
+                            protein=f"Source {len(current.rows) + 1:03d}",
                             width=raster.width,
                             height=raster.height,
                             bit_depth=16 if raster.bit_depth == 16 else 8,
-                            figure=current.figure_order[-1] if current.figure_order else "Fig1",
+                            figure=(
+                                f"Fig{len(current.rows) + 1}"
+                                if automatic
+                                else current.figure_order[-1]
+                                if current.figure_order
+                                else "Fig1"
+                            ),
                         )
                         self.view.set_project(
                             current.model_copy(
                                 update={
                                     "rows": (*current.rows, row),
-                                    "figure_order": current.figure_order or ("Fig1",),
+                                    "figure_order": tuple(
+                                        dict.fromkeys((*current.figure_order, row.figure))
+                                    ),
                                 }
                             )
                         )
                         self.view.generation += 1
                         generation = self.view.generation
                         self.view.install_thumbnail(raster)
+                        imported_ids.append(row.row_id)
                         next_image()
 
                     self._storage(StorageCommand("asset", asset=asset), resolved)
@@ -1286,6 +1392,9 @@ class FigureProjectWindow(QMainWindow):
         self._start()
 
         def previewed(reply: WBReply) -> None:
+            if self._closing or self._cancellation.is_set():
+                self._done("原图预览已停止")
+                return
             if not isinstance(reply.value, PreviewRaster) or reply.value.sha256 != asset.sha256:
                 self._error("原图来源不一致")
                 return
@@ -1295,7 +1404,18 @@ class FigureProjectWindow(QMainWindow):
                 "框选时请排除 Marker。"
             )
 
-        self._wb(WBJob("preview", path=self._paths[asset.sha256]), previewed)
+        self._wb(WBJob("preview", path=self._paths[asset.sha256]), previewed, accept_errors=True)
+
+    def select_initial_source(self) -> None:
+        if self._closing or self._cancellation.is_set():
+            return
+        project = self.view.project()
+        if project.rows:
+            index = next((i for i, row in enumerate(project.rows) if row.roi), 0)
+            if self.view.table.currentRow() != index:
+                self.view.table.setCurrentCell(index, 0)
+            else:
+                self.select_source(project.rows[index].row_id)
 
     def save(self, after: Callable[[], None] | None = None) -> None:
         if self._busy or not self._workspace:
@@ -1327,10 +1447,12 @@ class FigureProjectWindow(QMainWindow):
                 self._busy = False
                 self._controls()
                 self.view.status.setText("项目已保存，原图和模板可重新打开。")
-                if after:
-                    after()
-                elif self._closing:
+                if self._closing:
                     self._finish_close()
+                elif after and self._cancellation.is_set():
+                    self._done("项目已保存；后续操作已取消。")
+                elif after:
+                    after()
 
             self._storage(
                 StorageCommand(
@@ -1391,6 +1513,7 @@ class FigureProjectWindow(QMainWindow):
                                     analysis_project,
                                     tuple(p.row_id for p in analysis_project.analyses),
                                     restore=True,
+                                    after=self.select_initial_source,
                                 )
 
                             if isinstance(project, WBProjectOCR) and project.ocr is not None:
@@ -1399,6 +1522,7 @@ class FigureProjectWindow(QMainWindow):
                                 measurements()
                         else:
                             self._done("项目已恢复，原图资产已校验。选择一行查看原图。")
+                            self.select_initial_source()
                         return
                     asset = pending.pop(0)
 
@@ -1441,7 +1565,8 @@ class FigureProjectWindow(QMainWindow):
                     self._busy = False
                     self.refresh_project_table(
                         f"项目已恢复；{len(reply.value.errors)} 条运行证据不可用。"
-                        "历史来源见结果表。"
+                        "历史来源见结果表。",
+                        after=self.select_initial_source,
                     )
 
             self._wb(

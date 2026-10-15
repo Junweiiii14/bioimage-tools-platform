@@ -90,11 +90,14 @@ def with_figure_layout(
     composition: FigureComposition,
     style: FigureLayoutStyle | None = None,
 ) -> WBLayoutProject:
+    from wb_tool.application.automatic import WBAutomaticProject
+
     fields = {name: getattr(project, name) for name in type(project).model_fields}
-    fields.update(schema_version=7, composition=composition)
+    automatic = isinstance(project, WBAutomaticProject)
+    fields.update(schema_version=8 if automatic else 7, composition=composition)
     if style is not None:
         fields["layout_style"] = style
-    return WBLayoutProject.model_validate(fields)
+    return (WBAutomaticProject if automatic else WBLayoutProject).model_validate(fields)
 
 
 @dataclass(frozen=True)
@@ -122,6 +125,8 @@ class LaboratoryLayout(FigureLayout):
 
 
 def _groups(project: WBLayoutProject, require_review: bool) -> dict[str, list[list[FigureSlice]]]:
+    from wb_tool.application.automatic import row_is_ready
+
     if not project.rows:
         raise ValueError("项目还没有原图行")
     rows = {row.row_id: row for row in project.rows}
@@ -131,7 +136,7 @@ def _groups(project: WBLayoutProject, require_review: bool) -> dict[str, list[li
         row = rows.get(segment.row_id)
         if row is None or row.figure != segment.figure:
             raise ValueError("版式原图行/Fig已改变，请重建或修正版式")
-        if require_review and not row.reviewed:
+        if require_review and not row_is_ready(project, row):
             raise ValueError(f"{row.figure} / {row.protein} 尚未审核")
         if row.source and (row.roi is None or not 2 <= project.crop_height_for(row) <= 4096):
             raise ValueError(f"{row.protein} 需要2..4096像素高的原图ROI")

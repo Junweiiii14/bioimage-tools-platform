@@ -82,7 +82,30 @@ class _Work(QObject):
                 | bytes
                 | str
             )
-            if job.operation == "project_evidence":
+            if job.operation == "discover_tiffs":
+                from wb_tool.adapters.automatic_export import discover_tiffs
+
+                value = discover_tiffs(job.path, cancelled=cancel)
+            elif job.operation == "automatic_row":
+                from wb_tool.adapters.automatic import automatic_project_row
+
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少自动分析项目")
+                value = automatic_project_row(job.path, job.document, job.row_id, cancelled=cancel)
+            elif job.operation == "automatic_export":
+                from wb_tool.adapters.automatic_export import export_automatic_results
+
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少自动结果项目")
+                value = export_automatic_results(
+                    job.document,
+                    job.sources,
+                    job.destination,
+                    runs=job.archive_runs or (),
+                    processing_errors=job.processing_errors,
+                    cancelled=cancel,
+                )
+            elif job.operation == "project_evidence":
                 from wb_tool.adapters.project_evidence import verify_project_evidence
 
                 if not isinstance(job.document, WBFigureProject) or job.archive_runs is None:

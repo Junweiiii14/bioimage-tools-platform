@@ -48,6 +48,9 @@ class PreviewRaster:
 class WBJob:
     operation: Literal[
         "preview",
+        "discover_tiffs",
+        "automatic_row",
+        "automatic_export",
         "metadata_read",
         "ocr_preview",
         "document",
@@ -97,6 +100,7 @@ class WBJob:
     ocr_labels: bool = False
     preview_edge: int = 2048
     archive_runs: tuple[ArchiveRunEvidence, ...] | None = None
+    processing_errors: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)

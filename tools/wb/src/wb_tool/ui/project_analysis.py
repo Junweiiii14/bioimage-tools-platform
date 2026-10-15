@@ -31,6 +31,7 @@ from wb_tool.application.project_analysis import (
     ProjectRowAnalysis,
     ProjectTableCell,
 )
+from wb_tool.domain.lanes import LaneROI
 from wb_tool.domain.quantify import BandBounds, Baseline
 from wb_tool.ui.canvas import ImageCanvas
 from wb_tool.ui.project_results import ProjectResultsView
@@ -147,13 +148,19 @@ class ProjectAnalysisPanel(QWidget):
         review_layout.addWidget(heading)
         self.summary = QTableWidget(0, 4)
         self.summary.setHorizontalHeaderLabels(["泳道", "有效信号", "状态", "原始积分\n（待复核）"])
-        self.summary.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.summary.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+        for column, width in enumerate((32, 66, 76, 90)):
+            self.summary.setColumnWidth(column, width)
+        self.summary.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
+        self.summary.setWordWrap(True)
+        self.summary.setTextElideMode(Qt.TextElideMode.ElideNone)
         self.summary.verticalHeader().hide()
         self.summary.setMinimumHeight(130)
         self.summary.setMaximumHeight(180)
         review_layout.addWidget(self.summary)
         self.review_note = QLabel(
-            "原始积分保留待复核测量，不等于有效信号，也不进入归一化。修改参数后需重新计算。"
+            "摘要显示 4 位有效数字；完整精度见项目结果表。原始积分待复核，不等于有效信号，"
+            "也不进入归一化。修改参数后需重新计算。"
         )
         self.review_note.setWordWrap(True)
         review_layout.addWidget(self.review_note)
@@ -172,7 +179,7 @@ class ProjectAnalysisPanel(QWidget):
         review_scroll = QScrollArea()
         review_scroll.setWidgetResizable(True)
         review_scroll.setFrameShape(QScrollArea.Shape.NoFrame)
-        review_scroll.setFixedWidth(250)
+        review_scroll.setFixedWidth(292)
         review_scroll.setWidget(review)
         columns.addWidget(review_scroll)
         self.evidence_tabs.addTab(workbench, "证据工作台")
@@ -230,6 +237,19 @@ class ProjectAnalysisPanel(QWidget):
         ):
             self.source_preview_sha256 = preview.sha256
             self.source_canvas.set_image(preview)
+            row = self.source_row
+            if row.roi is not None:
+                margin_x = max(20, row.roi.width // 8)
+                margin_y = max(30, row.roi.y1 - row.roi.y0)
+                self.source_canvas.set_view_region(
+                    LaneROI(
+                        row.row_id,
+                        max(0, row.roi.x0 - margin_x),
+                        max(0, row.roi.y0 - margin_y),
+                        min(row.width, row.roi.x1 + margin_x),
+                        min(row.height, row.roi.y1 + margin_y),
+                    )
+                )
             self._source_overlay()
 
     def _source_overlay(self) -> None:
@@ -319,9 +339,9 @@ class ProjectAnalysisPanel(QWidget):
             for column, value in enumerate(
                 (
                     str(i + 1),
-                    format(cell.value, ".12g") if cell and cell.value is not None else "—",
+                    format(cell.value, ".4g") if cell and cell.value is not None else "—",
                     labels.get(status, status),
-                    format(cell.raw_integral, ".12g")
+                    format(cell.raw_integral, ".4g")
                     if cell and cell.raw_integral is not None
                     else "—",
                 )
@@ -330,6 +350,7 @@ class ProjectAnalysisPanel(QWidget):
                 item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 item.setToolTip(cell.reason if cell else "尚无当前参数的核验结果")
                 self.summary.setItem(i, column, item)
+        self.summary.resizeRowsToContents()
 
     def _edited(self, *_args: object) -> None:
         if not self._loading and self.plan is not None:

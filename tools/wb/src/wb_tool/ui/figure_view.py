@@ -442,7 +442,15 @@ class FigureProjectView(QWidget):
         for i, row in enumerate(self._project.rows):
             review = self.table.item(i, 9)
             reviewed = bool(review and review.checkState() == Qt.CheckState.Checked)
-            state = "已复核" if reviewed else "待复核" if self._text(i, 4) else "待识别"
+            state = (
+                "已复核"
+                if reviewed
+                else "自动结果 · 待复核"
+                if self._text(i, 4)
+                else "未检出 · 需处理"
+                if self._text(i, 10)
+                else "待识别"
+            )
             title = f"{self._text(i, 2) or row.filename or '缺图位'}\n{state} · {row.filename}"
             entry = QListWidgetItem(title)
             entry.setToolTip(title)
@@ -476,6 +484,10 @@ class FigureProjectView(QWidget):
             if row
             else "从左侧导入原图文件夹"
         )
+        if row and self._text(index, 10):
+            self.source_review_status.setText(
+                self.source_review_status.text() + "\n\n" + self._text(index, 10)
+            )
 
     def _preview_scale_changed(self, index: int) -> None:
         self.preview_label.set_fit(index == 0)
@@ -804,6 +816,10 @@ class FigureProjectView(QWidget):
             project = with_archive_history(
                 project, self._project.archive_sources, self._project.imported_runs
             )
+        from wb_tool.application.automatic import WBAutomaticProject, with_automatic_rows
+
+        if isinstance(self._project, WBAutomaticProject):
+            project = with_automatic_rows(project, self._project.automatic_rows)
         return project
 
     def set_project(self, project: WBFigureProject) -> None:
@@ -1125,6 +1141,18 @@ class FigureProjectView(QWidget):
             return
         self.canvas.set_image(preview)
         self.analysis.set_source_preview(preview)
+        if row.roi is not None:
+            margin_x = max(20, row.roi.width // 8)
+            margin_y = max(30, row.roi.y1 - row.roi.y0)
+            self.canvas.set_view_region(
+                LaneROI(
+                    row.row_id,
+                    max(0, row.roi.x0 - margin_x),
+                    max(0, row.roi.y0 - margin_y),
+                    min(row.width, row.roi.x1 + margin_x),
+                    min(row.height, row.roi.y1 + margin_y),
+                )
+            )
         self._overlay()
 
     def _overlay(self) -> None:

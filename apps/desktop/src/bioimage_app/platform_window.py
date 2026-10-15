@@ -295,6 +295,11 @@ class PlatformWindow(QMainWindow):
             self.status.setText("项目已打开；最近项目列表未能保存，可通过项目文件夹重新打开。")
         else:
             self.status.setText(f"已打开：{Path(normalized).name}")
+        window = self.active_tool
+        if window is not None and window.documents.count() > 1:
+            document_id = window.documents.itemData(1)
+            if isinstance(document_id, str):
+                window.load_document(document_id)
 
     def _tool_closed(self, window: FigureProjectWindow) -> None:
         self.active_tool = None

@@ -310,3 +310,56 @@ def test_raw_integral_ui_separates_quality_review(qtbot: object) -> None:
     finally:
         table.close()
         panel.close()
+
+
+@pytest.mark.parametrize("prior_automatic", [False, True])
+def test_rerun_preserves_latest_same_source_light_polarity(
+    tmp_path: Path, prior_automatic: bool
+) -> None:
+    from wb_tool.api import (
+        make_row_analysis,
+        set_row_analysis,
+        update_row_analysis_request,
+    )
+
+    path = source(tmp_path, light=True)
+    project = project_for(path)
+    crop = LaneROI("r", 30, 50, 330, 110)
+    project = project.model_copy(
+        update={
+            "rows": (
+                project.rows[0].model_copy(update={"roi": crop, "lane_count": 5, "reviewed": True}),
+            )
+        }
+    )
+    if prior_automatic:
+        # Earlier automatic dark proposal exists; the user subsequently chose light.
+        automatic = automatic_project_row(path, project, "r")
+        assert automatic.automatic_rows[0].settings.polarity == "dark"
+        plan = automatic.analyses[0]
+        project = update_row_analysis_request(
+            automatic, "r", replace(plan.request, polarity="light")
+        )
+    else:
+        # Legacy manually configured projects have no automatic provenance at all.
+        project = set_row_analysis(project, make_row_analysis(project, "r", "light"))
+    rerun = automatic_project_row(path, project, "r")
+    assert rerun.rows[0].roi == crop
+    assert rerun.analyses[0].request.polarity == "light"
+    assert rerun.automatic_rows[0].settings.polarity == "light"
+    result = analyze_annotations(load_tiff(path), rerun.analyses[0].request)
+    for lane in result.lanes:
+        assert lane.bands[0].signal == pytest.approx(297500, abs=1e-8)
+
+
+def test_rerun_does_not_take_polarity_from_foreign_source_plan(tmp_path: Path) -> None:
+    path = source(tmp_path)
+    project = automatic_project_row(path, project_for(path), "r")
+    plan = project.analyses[0]
+    foreign = plan.model_copy(
+        update={"request": replace(plan.request, source_sha256="f" * 64, polarity="light")}
+    )
+    project = project.model_copy(update={"analyses": (foreign,)})
+    rerun = automatic_project_row(path, project, "r")
+    assert rerun.analyses[0].request.polarity == "dark"
+    assert rerun.analyses[0].request.source_sha256 == load_tiff(path).sha256

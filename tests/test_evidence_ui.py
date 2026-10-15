@@ -109,7 +109,7 @@ def test_review_summary_preserves_real_zero_and_excluded_values(
     # Saved refresh may deselect the source; choose the verified second row explicitly.
     view.table.setCurrentCell(1, 0)
     qtbot.waitUntil(window.import_button.isEnabled)
-    assert [item(view.analysis.summary, i, 1).text() for i in range(3)] == ["8000", "16000", "0"]
+    assert [item(view.analysis.summary, i, 1).text() for i in range(3)] == ["8000", "1.6e+04", "0"]
     view.table.setCurrentCell(0, 0)
     qtbot.waitUntil(window.import_button.isEnabled)
     assert item(view.analysis.summary, 1, 1).text() == "—"

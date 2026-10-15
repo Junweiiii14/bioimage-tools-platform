@@ -12,6 +12,7 @@ from wb_tool.application.automatic import (
     suggest_automatic_wb,
 )
 from wb_tool.application.figure_project import WBFigureProject
+from wb_tool.application.project_analysis import WBAnalysisProject
 from wb_tool.domain.automatic import AutoWBSettings
 
 
@@ -36,7 +37,27 @@ def automatic_project_row(
             if isinstance(project, WBAutomaticProject)
             else None
         )
-        polarity = previous.settings.polarity if previous else "dark"
+        current_plan = (
+            next(
+                (
+                    p
+                    for p in project.analyses
+                    if p.row_id == row_id and p.request.source_sha256 == image.sha256
+                ),
+                None,
+            )
+            if isinstance(project, WBAnalysisProject)
+            else None
+        )
+        # A saved same-source plan is the latest explicit polarity choice, even
+        # after geometry edits have made its measurement or automatic evidence stale.
+        polarity = (
+            current_plan.request.polarity
+            if current_plan is not None
+            else previous.settings.polarity
+            if previous is not None and previous.source_sha256 == image.sha256
+            else "dark"
+        )
         count = lane_count or row.lane_count
         settings = AutoWBSettings(
             lane_count=count, crop_height=row.roi.y1 - row.roi.y0, polarity=polarity

@@ -181,8 +181,9 @@ class LaboratoryLayoutPanel(QWidget):
         self.table.setRowCount(len(composition.slices))
         for index, part in enumerate(composition.slices):
             row = self._rows.get(part.row_id)
+            number = next((i for i, key in enumerate(self._rows, 1) if key == part.row_id), 0)
             values = [
-                f"{row.protein} · {row.filename}" if row else "来源行已删除",
+                f"{number:03d} · {row.protein}" if row else "来源行已删除",
                 part.figure,
                 str(part.line),
                 str(part.position),
@@ -196,7 +197,9 @@ class LaboratoryLayoutPanel(QWidget):
                     item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 if column == 0:
                     item.setData(Qt.ItemDataRole.UserRole, part.row_id)
-                    item.setToolTip(f"{text}\n来源行：{part.row_id}")
+                    item.setToolTip(
+                        f"{row.protein} · {row.filename}\n来源行：{part.row_id}" if row else text
+                    )
                 self.table.setItem(index, column, item)
 
     def split_selected(self) -> None:

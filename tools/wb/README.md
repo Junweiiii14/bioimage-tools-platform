@@ -61,3 +61,5 @@ v1草稿继续读取，协议/文档契约见wb-document-v2.md。自动裁剪、
 0.19.0新增WBLayoutProject/schema7：明确原泳道横向分段、原ROI逐行高度、独立Fig字号与列排布；v1–v6仍按旧渲染，不自动升级。渲染按源逐次解码一次并释放，保留显示顺序与逐段来源。export_figure_template/read_figure_template保存和读取.wbtemplate，只含通用排版样式和字体，导入新工作区后建立新字体资产及空项目，不带原实验绑定或测量。模板I/O必须后台调用；有界解析/字体SHA核验/无覆盖发布，详见wb-laboratory-layout-v1.md、wb-figure-template-v1.md。独审与真实科学/最终产品验收按任务记录，不能由功能存在推断通过。
 
 T-024新增 automatic_wb_proposals@1 与 WBAutomaticProject/schema8：原像素泳道/裁剪及积分边界建议、可保留图上调整的后台入口、机器来源证据与过期校验；人工审核标记保持false。旧schema1–7读取不变，积分profile_integral@1不变。策略、限制、验证见work/evidence/T-027/automatic-core-validation.md（仓库根）。
+
+T-024自动主流程已集成。schema8与自动输出契约见 `../../docs/contracts/wb-automatic-v1.md`；质量复核的原始积分与有效信号分列；失败来源保留，未知蛋白和归一化配对不猜测。
