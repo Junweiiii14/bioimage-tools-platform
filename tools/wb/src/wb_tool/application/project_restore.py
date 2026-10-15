@@ -72,6 +72,10 @@ class WBRestoredProject(WBNormalizedProject):
 def with_archive_history(
     project: WBFigureProject, sources: tuple[ArchiveSource, ...], runs: tuple[ImportedRun, ...]
 ) -> WBRestoredProject:
+    if isinstance(project, WBRestoredProject):
+        fields = {name: getattr(project, name) for name in type(project).model_fields}
+        fields.update(archive_sources=sources, imported_runs=runs)
+        return type(project).model_validate(fields)
     return WBRestoredProject(
         project_id=project.project_id,
         name=project.name,

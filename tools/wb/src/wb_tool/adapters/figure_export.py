@@ -43,6 +43,14 @@ def render_figure(
     require_review: bool = True,
     cancelled: Callable[[], bool] = lambda: False,
 ) -> FigureRender:
+    from wb_tool.application.laboratory_layout import WBLayoutProject
+
+    if isinstance(project, WBLayoutProject):
+        from wb_tool.adapters.laboratory_figure import render_laboratory_figure
+
+        return render_laboratory_figure(
+            project, sources, require_review=require_review, cancelled=cancelled
+        )
     layout = plan_figure_layout(project, require_review=require_review)
     paths = _paths(sources)
     template = project.template

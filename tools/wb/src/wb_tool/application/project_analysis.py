@@ -85,7 +85,8 @@ def analysis_is_current(project: WBFigureProject, plan: ProjectRowAnalysis) -> b
         and row.roi == plan.crop
         and row.lane_count == len(plan.request.lanes)
         and row.empty_lanes == plan.empty_lanes
-        and plan.crop.y1 - plan.crop.y0 == project.template.crop_height
+        and 2 <= plan.crop.y1 - plan.crop.y0 <= 4096
+        and plan.crop.y1 - plan.crop.y0 == project.crop_height_for(row)
     )
 
 
@@ -114,7 +115,10 @@ def make_row_analysis(
     row = next((r for r in project.rows if r.row_id == row_id), None)
     if row is None or row.source is None or row.roi is None or not row.reviewed:
         raise ValueError("请先确认有原图的行及裁剪范围")
-    if row.roi.y1 - row.roi.y0 != project.template.crop_height:
+    if (
+        not 2 <= row.roi.y1 - row.roi.y0 <= 4096
+        or row.roi.y1 - row.roi.y0 != project.crop_height_for(row)
+    ):
         raise ValueError("裁剪高度与当前模板不一致，请重新复核")
     lanes = tuple(
         LaneAnnotation(roi, (BandAnnotation("target", None, included=i not in row.empty_lanes),))

@@ -44,6 +44,17 @@ from wb_tool.application.figure_project import (
     WBFigureProject,
     plan_figure_layout,
 )
+from wb_tool.application.laboratory_layout import (
+    FigureColumn,
+    FigureComposition,
+    FigureLayoutStyle,
+    FigureSlice,
+    LaboratoryLayout,
+    WBLayoutProject,
+    initial_composition,
+    plan_laboratory_layout,
+    with_figure_layout,
+)
 from wb_tool.application.ocr_protocol import (
     OCRConversation,
     OCRRequest,
@@ -159,6 +170,15 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "FigureColumn",
+    "FigureComposition",
+    "FigureLayoutStyle",
+    "FigureSlice",
+    "LaboratoryLayout",
+    "WBLayoutProject",
+    "initial_composition",
+    "plan_laboratory_layout",
+    "with_figure_layout",
     "export_figure_image",
     "RestoredProjectResults",
     "StagedProjectArchive",

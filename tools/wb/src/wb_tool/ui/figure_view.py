@@ -36,6 +36,10 @@ from wb_tool.application.figure_project import (
     FigureTemplate,
     WBFigureProject,
 )
+from wb_tool.application.laboratory_layout import (
+    initial_composition,
+    with_figure_layout,
+)
 from wb_tool.application.project_analysis import (
     LoadedProjectResult,
     WBAnalysisProject,
@@ -56,6 +60,7 @@ from wb_tool.domain.grid import fixed_lane_grid
 from wb_tool.domain.lanes import LaneROI
 from wb_tool.ui.canvas import ImageCanvas
 from wb_tool.ui.crop_suggestions import CropSuggestionPanel
+from wb_tool.ui.laboratory_layout import LaboratoryLayoutPanel
 from wb_tool.ui.normalization import NormalizationPanel
 from wb_tool.ui.project_analysis import ProjectAnalysisPanel
 from wb_tool.ui.project_metadata import ProjectMetadataPanel
@@ -207,6 +212,10 @@ class FigureProjectView(QWidget):
         settings_scroll.setWidget(settings)
         settings_scroll.setWidgetResizable(True)
         tabs.addTab(settings_scroll, "模板与排序")
+        self.laboratory_layout = LaboratoryLayoutPanel()
+        self.laboratory_layout.changed.connect(self._edited)
+        self.laboratory_layout.rebuild_requested.connect(self.rebuild_layout)
+        tabs.addTab(self.laboratory_layout, "实验室版式与分段")
         split.addWidget(tabs)
         split.setStretchFactor(1, 2)
         root.addWidget(split, 1)
@@ -236,7 +245,9 @@ class FigureProjectView(QWidget):
         item = self.table.item(row, column)
         return item.text().strip() if item else ""
 
-    def project(self, revision: int | None = None) -> WBFigureProject:
+    def project(
+        self, revision: int | None = None, *, include_layout: bool = True
+    ) -> WBFigureProject:
         rows: list[FigureRow] = []
         for i, original in enumerate(self._project.rows):
             roi = None
@@ -291,6 +302,14 @@ class FigureProjectView(QWidget):
         plans = self.normalization.plans()
         if plans or isinstance(self._project, WBNormalizedProject):
             project = project_with_normalizations(project, plans)
+        if self.laboratory_layout.active:
+            project = with_figure_layout(
+                project,
+                self.laboratory_layout.composition()
+                if include_layout
+                else initial_composition(project),
+                self.laboratory_layout.layout_style(),
+            )
         if isinstance(self._project, WBRestoredProject):
             project = with_archive_history(
                 project, self._project.archive_sources, self._project.imported_runs
@@ -304,7 +323,7 @@ class FigureProjectView(QWidget):
             f"从归档恢复 · {len(project.archive_sources)} 个来源 · "
             f"{len(project.imported_runs)} 条历史运行。"
             "历史数值须通过资产核验；重新计算将建立本机运行。"
-            if isinstance(project, WBRestoredProject)
+            if isinstance(project, WBRestoredProject) and project.archive_sources
             else ""
         )
         self.history_label.setToolTip(
@@ -313,6 +332,7 @@ class FigureProjectView(QWidget):
             else ""
         )
         self.metadata.clear_preview()
+        self.laboratory_layout.restore(project)
         present = {row.source.sha256 for row in project.rows if row.source}
         self._thumbnails = {key: icon for key, icon in self._thumbnails.items() if key in present}
         self.ocr.restore(project)
@@ -374,6 +394,18 @@ class FigureProjectView(QWidget):
             )
         self._loading = False
         self._filter_rows()
+
+    def rebuild_layout(self) -> None:
+        try:
+            project = self.project(include_layout=False)
+            project = with_figure_layout(
+                project, initial_composition(project), self.laboratory_layout.layout_style()
+            )
+            self.set_project(project)
+            self._edited()
+            self.status.setText("已按原图行重建版式；每行独立，可明确设置横向段。")
+        except ValueError as error:
+            self.status.setText(str(error))
 
     def _metadata_preview(self, mode: str) -> None:
         try:
@@ -594,7 +626,10 @@ class FigureProjectView(QWidget):
                 if isinstance(self._project, WBReviewProject)
                 else None
             )
-            self.suggestions.show_suggestion(row, suggestion, self.numbers["crop_height"].value())
+            height = (
+                self.project().crop_height_for(row) if row else self.numbers["crop_height"].value()
+            )
+            self.suggestions.show_suggestion(row, suggestion, height)
             regions: list[LaneROI] = []
             if suggestion and suggestion.result:
                 result = suggestion.result

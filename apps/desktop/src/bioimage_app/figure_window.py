@@ -34,16 +34,19 @@ from wb_tool.api import (
     WBAnalysisProject,
     WBFigureProject,
     WBJob,
+    WBLayoutProject,
     WBProjectOCR,
     WBReply,
     WBRestoredProject,
     WBReviewProject,
     create_figure_project_view,
     create_wb_background,
+    initial_composition,
     prepare_project_analyses,
     project_assets,
     project_with_ocr,
     record_crop_suggestion,
+    with_figure_layout,
 )
 
 from bioimage_app.project_archive import ProjectArchiveSession
@@ -870,7 +873,7 @@ class FigureProjectWindow(QMainWindow):
             if not rows:
                 raise ValueError("请选择有原图的行")
             pending = [
-                (r, self.view.suggestions.settings(r, project.template.crop_height)) for r in rows
+                (r, self.view.suggestions.settings(r, project.crop_height_for(r))) for r in rows
             ]
         except ValueError as error:
             self._error(str(error))
@@ -989,8 +992,13 @@ class FigureProjectWindow(QMainWindow):
             return
 
         def create() -> None:
-            template = self.view.project().template
+            previous = self.view.project()
+            template = previous.template
             project = WBFigureProject(project_id=uuid4().hex, template=template)
+            if isinstance(previous, WBLayoutProject):
+                project = with_figure_layout(
+                    project, initial_composition(project), previous.layout_style
+                )
             self.view.set_project(project)
             self._project_results = ()
             self._loaded_ocr = None

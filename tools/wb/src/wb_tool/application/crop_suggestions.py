@@ -128,6 +128,10 @@ def read_figure_project(data: bytes) -> WBFigureProject:
     raw: object = json.loads(data)
     if isinstance(raw, dict):
         version = cast(dict[str, object], raw).get("schema_version")
+        if type(version) is int and version == 7:
+            from wb_tool.application.laboratory_layout import WBLayoutProject
+
+            return WBLayoutProject.from_bytes(data)
         if type(version) is int and version == 6:
             from wb_tool.application.project_restore import WBRestoredProject
 
@@ -185,7 +189,7 @@ def apply_crop_suggestion(project: WBFigureProject, row_id: str, index: int) -> 
         raise ValueError("请选择已有候选")
     if (
         row.lane_count != suggestion.settings.lane_count
-        or project.template.crop_height != suggestion.settings.crop_height
+        or project.crop_height_for(row) != suggestion.settings.crop_height
     ):
         raise ValueError("泳道数或裁剪高度已改变，请重新检测")
     roi = replace(suggestion.result.candidates[index].roi, lane_id=row.row_id)
