@@ -234,7 +234,7 @@ class ProjectOCRPanel(QWidget):
         self.note.setText(
             (self._state.filename + "：校正Fig/蛋白，关联原图行后勾选确认。")
             if self._state
-            else "请导入独立拼图。定量仍从项目原图读取。"
+            else "识别当前项目拼图，或导入外部拼图。定量仍从原图读取。"
         )
         self._loading = False
         self.result_view.invalidate()

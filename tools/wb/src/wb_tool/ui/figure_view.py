@@ -72,6 +72,7 @@ from wb_tool.ui.normalization import NormalizationPanel
 from wb_tool.ui.project_analysis import ProjectAnalysisPanel
 from wb_tool.ui.project_metadata import ProjectMetadataPanel
 from wb_tool.ui.project_ocr import ProjectOCRPanel
+from wb_tool.ui.result_workspace import ResultWorkspace
 
 
 class FigurePreview(QLabel):
@@ -133,6 +134,7 @@ class FigureProjectView(QWidget):
     detection_requested = Signal(bool)
     automatic_requested = Signal()
     automatic_export_requested = Signal()
+    output_folder_requested = Signal()
     import_directory_requested = Signal()
 
     def __init__(self, parent: QWidget | None = None) -> None:
@@ -632,6 +634,18 @@ class FigureProjectView(QWidget):
         self.step_title, self.step_help = QLabel(), QLabel()
         self.step_title.hide()
         self.step_help.hide()
+        self.context_header = QWidget()
+        context_layout = QHBoxLayout(self.context_header)
+        context_layout.setContentsMargins(0, 0, 0, 0)
+        self.context_back = QPushButton("返回图像复核")
+        self.context_back.clicked.connect(lambda: self.show_section(self._context_return))
+        self.context_title = QLabel()
+        self.context_title.setObjectName("sectionTitle")
+        context_layout.addWidget(self.context_back)
+        context_layout.addWidget(self.context_title, 1)
+        self._context_return = "source"
+        root.addWidget(self.context_header)
+        self.context_header.hide()
         self.pages = QStackedWidget()
         root.addWidget(self.pages, 1)
 
@@ -707,21 +721,27 @@ class FigureProjectView(QWidget):
         self.layout_tabs.addTab(arrangement, "排版与预览")
         self._add_step(self.layout_tabs)
 
-        # One primary package export, with individual formats behind disclosure.
+        # Keep analysis host APIs while its result content occupies a three-column workspace.
         result_layout = self.analysis.layout()
         assert isinstance(result_layout, QVBoxLayout)
-        output = QHBoxLayout()
-        package = QPushButton("导出结果包…")
-        package.setObjectName("primaryAction")
-        package.clicked.connect(self.automatic_export_requested)
-        output.addWidget(package)
-        disclosure = QCheckBox("单独导出")
-        output.addWidget(disclosure)
-        output.addStretch()
-        result_layout.insertLayout(0, output)
-        self.export_options = QWidget()
-        formats = QHBoxLayout(self.export_options)
-        formats.setContentsMargins(0, 0, 0, 0)
+        self.result_workspace = ResultWorkspace(self.analysis.result_view)
+        self._output_location = ""
+        self.result_workspace.export_requested.connect(self.automatic_export_requested)
+        self.result_workspace.open_output_requested.connect(self.output_folder_requested)
+        self.result_workspace.section_requested.connect(
+            lambda section="analysis": self.show_section(
+                "export" if section == "analysis" else section
+            )
+        )
+        result_layout.addWidget(self.result_workspace, 1)
+        self.export_options = self.result_workspace.formats
+        formats = self.export_options.layout()
+        assert isinstance(formats, QVBoxLayout)
+        while formats.count():
+            entry = formats.takeAt(0)
+            widget = entry.widget() if entry else None
+            if widget is not None:
+                widget.deleteLater()
         for attribute, label, signal in (
             ("image_export_button", "拼图 TIFF / PNG", self.image_export_requested),
             ("archive_export_button", "完整项目 ZIP", self.export_requested),
@@ -733,10 +753,9 @@ class FigureProjectView(QWidget):
             button.clicked.connect(signal)
             setattr(self, attribute, button)
             formats.addWidget(button)
-        result_layout.insertWidget(1, self.export_options)
-        self.export_options.hide()
-        disclosure.toggled.connect(self.export_options.setVisible)
-        self.export_disclosure = disclosure
+        self.export_disclosure = self.result_workspace.formats_toggle
+        self.analysis.result_view.cells_changed.connect(self._results_changed)
+        self.result_workspace.set_summary(self._project, ())
         self.analysis_tabs = QTabWidget()
         self.analysis_tabs.tabBar().hide()
         # Analysis methods/signals remain on the same instance, while its live
@@ -762,6 +781,7 @@ class FigureProjectView(QWidget):
     def _step_changed(self, index: int) -> None:
         if not 0 <= index < 3:
             return
+        self.context_header.hide()
         self.pages.setCurrentIndex(index)
         self.source_tabs.setCurrentIndex(0)
         self.analysis_tabs.setCurrentIndex(0)
@@ -798,6 +818,39 @@ class FigureProjectView(QWidget):
             self.analysis_tabs.setCurrentIndex(1 if section == "ocr" else 2)
         if section in ("layout", "template", "preview"):
             self.layout_settings_tabs.setCurrentIndex(int(section == "template"))
+        contexts = {
+            "metadata": ("批量填写实验信息", "source"),
+            "advanced": ("高级原图数据", "source"),
+            "ocr": ("OCR 识别与写表", "export"),
+            "normalization": ("样本对应与归一化", "export"),
+        }
+        if section in contexts:
+            title, self._context_return = contexts[section]
+            self.context_title.setText(title)
+            self.context_back.setText(
+                "返回图像复核" if self._context_return == "source" else "返回结果"
+            )
+            self.context_header.show()
+        elif section == "export":
+            self.result_workspace.navigation["analysis"].setChecked(True)
+            self.result_workspace.navigation["ocr"].setChecked(False)
+            self.result_workspace.navigation["normalization"].setChecked(False)
+        self._update_result_summary()
+
+    def set_output_location(self, path: str) -> None:
+        """Host supplies the latest successfully committed output directory."""
+        self._output_location = path
+        self._update_result_summary()
+
+    def _update_result_summary(self) -> None:
+        self.result_workspace.set_summary(
+            self._project, self.analysis.result_view.cells, self._output_location
+        )
+
+    def _results_changed(self, _cells: object) -> None:
+        self._update_result_summary()
+        if not self._loading:
+            self.refresh_attention()
 
     def _confirm_and_next(self) -> None:
         self.confirm_selected()
@@ -945,6 +998,7 @@ class FigureProjectView(QWidget):
         selected_lane = self.analysis.lanes.currentRow()
         focused = self._last_review_focus
         if not same_project:
+            self._output_location = ""
             self._crop_history.clear()
             self._crop_history_index = 0
             self.analysis.reset_history()
