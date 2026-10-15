@@ -214,8 +214,15 @@ class FigureProjectView(QWidget):
         self.suggestions.focus_requested.connect(self.focus_membrane)
         self.suggestions.reset_view_requested.connect(lambda: self.canvas.set_view_region(None))
         source_page = QWidget()
-        source_layout = QVBoxLayout(source_page)
-        source_layout.addWidget(self.suggestions)
+        source_layout = QHBoxLayout(source_page)
+        source_layout.setContentsMargins(4, 4, 4, 4)
+        source_layout.setSpacing(8)
+        self.source_controls_scroll = QScrollArea()
+        self.source_controls_scroll.setWidgetResizable(True)
+        self.source_controls_scroll.setFrameShape(QScrollArea.Shape.NoFrame)
+        self.source_controls_scroll.setFixedWidth(254)
+        self.source_controls_scroll.setWidget(self.suggestions)
+        source_layout.addWidget(self.source_controls_scroll)
         source_layout.addWidget(self.canvas, 1)
 
         self.metadata = ProjectMetadataPanel()
@@ -397,6 +404,7 @@ class FigureProjectView(QWidget):
         quantification_layout.addLayout(row_selection)
         self.analysis_tabs = QTabWidget()
         self.analysis_tabs.addTab(self.analysis, "定量与曲线复核")
+        self.analysis_tabs.addTab(self.ocr, "OCR / 结果表")
         self.analysis_tabs.addTab(self.normalization, "样本对应与归一化")
         quantification_layout.addWidget(self.analysis_tabs, 1)
         self._add_step(quantification)
@@ -426,7 +434,6 @@ class FigureProjectView(QWidget):
         arrangement.setSizes([460, 400])
         arrangement.setChildrenCollapsible(False)
         self.layout_tabs.addTab(arrangement, "排版与预览")
-        self.layout_tabs.addTab(self.ocr, "OCR 识别与原图关联")
         self._add_step(self.layout_tabs)
 
         exports = QWidget()
@@ -505,8 +512,8 @@ class FigureProjectView(QWidget):
         titles = ("原图与裁剪", "定量与复核", "拼图排版", "导出")
         hints = (
             "导入 TIFF 原图，填写 Fig 与蛋白名称，核对泳道和裁剪范围，再确认所选行。",
-            "选择已审核的原图行，配置定量并复核曲线；需要时再设置样本与内参对应。",
-            "调整明确分段和标签样式，生成预览。OCR 识别后仍需手动确认原图关联。",
+            "可先通过 OCR 建表，再关联已审核原图并复核定量；也可直接定量后导出结果。",
+            "需要展示拼图时，调整明确分段和标签样式并生成预览；定量结果可直接导出。",
             "按用途选择输出。保存项目保留当前工作进度，完整 ZIP 用于迁移和恢复。",
         )
         if not 0 <= index < len(titles):
@@ -529,16 +536,18 @@ class FigureProjectView(QWidget):
             "layout": 2,
             "template": 2,
             "preview": 2,
-            "ocr": 2,
+            "ocr": 1,
             "export": 3,
         }
         self.steps.setCurrentRow(sections[section])
         if section in ("source", "metadata"):
             self.source_tabs.setCurrentIndex(int(section == "metadata"))
-        if section in ("analysis", "normalization"):
-            self.analysis_tabs.setCurrentIndex(int(section == "normalization"))
-        if section in ("layout", "template", "preview", "ocr"):
-            self.layout_tabs.setCurrentIndex(int(section == "ocr"))
+        if section in ("analysis", "ocr", "normalization"):
+            self.analysis_tabs.setCurrentIndex(
+                {"analysis": 0, "ocr": 1, "normalization": 2}[section]
+            )
+        if section in ("layout", "template", "preview"):
+            self.layout_tabs.setCurrentIndex(0)
             if section in ("layout", "template"):
                 self.layout_settings_tabs.setCurrentIndex(int(section == "template"))
 

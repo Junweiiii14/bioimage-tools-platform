@@ -6,7 +6,6 @@ from PySide6.QtWidgets import (
     QComboBox,
     QDoubleSpinBox,
     QGridLayout,
-    QHBoxLayout,
     QLabel,
     QPushButton,
     QVBoxLayout,
@@ -48,10 +47,16 @@ class CropSuggestionPanel(QWidget):
     def __init__(self) -> None:
         super().__init__()
         root = QVBoxLayout(self)
-        root.setContentsMargins(6, 4, 6, 4)
-        root.setSpacing(4)
+        root.setContentsMargins(10, 10, 10, 10)
+        root.setSpacing(8)
+        title = QLabel("裁剪与候选")
+        title.setObjectName("exportHeading")
+        root.addWidget(title)
+        hint = QLabel("在右侧原图框选范围，或检测候选后逐行复核。")
+        hint.setWordWrap(True)
+        root.addWidget(hint)
         self.advanced_settings = QWidget()
-        settings = QHBoxLayout(self.advanced_settings)
+        settings = QVBoxLayout(self.advanced_settings)
         settings.setContentsMargins(0, 0, 0, 0)
         self.polarity = QComboBox()
         self.polarity.addItems(["暗带 / 亮底", "亮带 / 暗底"])
@@ -88,26 +93,23 @@ class CropSuggestionPanel(QWidget):
         )
         self.restore.clicked.connect(lambda: self.apply_requested.emit(0))
         self.candidates.currentIndexChanged.connect(self.candidate_changed)
-        for index, widget in enumerate(
-            (
-                self.run_one,
-                self.run_all,
-                self.candidates,
-                self.apply,
-                self.restore,
-                self.focus,
-                self.reset_view,
-            )
-        ):
-            actions.addWidget(widget, index // 4, index % 4)
+        actions.addWidget(self.run_one, 0, 0)
+        actions.addWidget(self.run_all, 0, 1)
+        actions.addWidget(self.candidates, 1, 0, 1, 2)
+        actions.addWidget(self.apply, 2, 0)
+        actions.addWidget(self.restore, 2, 1)
+        actions.addWidget(self.focus, 3, 0)
+        actions.addWidget(self.reset_view, 3, 1)
+        self.apply.setObjectName("primaryAction")
         self.advanced_toggle = QCheckBox("高级检测设置")
         self.advanced_toggle.toggled.connect(self.advanced_settings.setVisible)
-        actions.addWidget(self.advanced_toggle, 1, 3)
+        actions.addWidget(self.advanced_toggle, 4, 0, 1, 2)
         root.addLayout(actions)
         root.addWidget(self.advanced_settings)
         self.details = QLabel()
         self.details.setWordWrap(True)
         root.addWidget(self.details)
+        root.addStretch()
         self._shown: tuple[str, CropSuggestion | None] | None = None
         self.show_suggestion(None, None, 60)
 

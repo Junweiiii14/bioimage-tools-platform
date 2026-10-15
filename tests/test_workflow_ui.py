@@ -204,3 +204,48 @@ def test_layout_controls_fit_small_window_without_horizontal_page_scroll(
     qtbot.waitUntil(lambda: table.horizontalHeader().length() <= table.viewport().width())
     assert window.view.preview_scale.isVisible()
     assert all(table.columnWidth(column) >= 48 for column in range(7))
+
+
+def test_ocr_results_belong_to_quantification_without_requiring_composition(
+    qtbot: QtBot, tmp_path: Path, windows: Callable[[], "FigureProjectWindow"]
+) -> None:
+    window = windows()
+    setup(qtbot, tmp_path, window)
+    view = window.view
+    before = view.project()
+    generation = view.generation
+    assert not view.laboratory_layout.active
+    view.show_section("ocr")
+    assert view.steps.currentRow() == 1
+    assert view.analysis_tabs.currentWidget() is view.ocr
+    assert view.analysis_tabs.tabText(view.analysis_tabs.currentIndex()) == "OCR / 结果表"
+    assert view.layout_tabs.indexOf(view.ocr) == -1
+    view.show_section("source")
+    view.show_section("analysis")
+    assert view.analysis_tabs.currentWidget() is view.analysis
+    view.show_section("normalization")
+    assert view.analysis_tabs.currentWidget() is view.normalization
+    view.show_section("export")
+    assert view.table_export_button.isVisible()
+    assert view.project() == before and view.generation == generation
+    assert not view.laboratory_layout.active
+
+
+def test_source_controls_stay_beside_larger_canvas_at_small_width(
+    qtbot: QtBot, tmp_path: Path, windows: Callable[[], "FigureProjectWindow"]
+) -> None:
+    window = windows()
+    setup(qtbot, tmp_path, window)
+    window.view.show_section("source")
+    window.resize(1100, 780)
+    view = window.view
+    page = view.pages.currentWidget()
+    assert isinstance(page, QScrollArea)
+    qtbot.waitUntil(lambda: page.horizontalScrollBar().maximum() == 0)
+    qtbot.waitUntil(lambda: view.canvas.width() > view.source_controls_scroll.width())
+    assert view.source_controls_scroll.geometry().right() < view.canvas.geometry().left()
+    before = view.project()
+    generation = view.generation
+    view.suggestions.advanced_toggle.setChecked(True)
+    assert view.suggestions.advanced_settings.isVisible()
+    assert view.project() == before and view.generation == generation
