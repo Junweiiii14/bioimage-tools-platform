@@ -62,9 +62,11 @@ class ProjectMetadataPanel(QWidget):
         self._targets: list[QComboBox] = []
         self._target_model = QStandardItemModel(self)
         root = QVBoxLayout(self)
-        root.setSpacing(16)
+        root.setSpacing(12)
+        root.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.status = QLabel("选择填写方式。先预览并核对，再应用到选中的原图。")
         self.status.setWordWrap(True)
+        self.status.setMaximumHeight(52)
         root.addWidget(self.status)
         method = QHBoxLayout()
         method.addWidget(QLabel("填写方式"))
@@ -81,9 +83,11 @@ class ProjectMetadataPanel(QWidget):
         thumbnails.clicked.connect(self.thumbnails_requested)
         method.addWidget(thumbnails)
         root.addLayout(method)
+        method.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.input_stack = QStackedWidget()
         self.common_page = QWidget()
         common_form = QFormLayout(self.common_page)
+        common_form.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.common: dict[str, QLineEdit] = {}
         for field, label in zip(METADATA_FIELDS, METADATA_LABELS, strict=True):
             edit = QLineEdit()
@@ -105,6 +109,7 @@ class ProjectMetadataPanel(QWidget):
         self.input_stack.addWidget(self.common_page)
         filename_page = QWidget()
         filename_form = QFormLayout(filename_page)
+        filename_form.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.separator = QLineEdit("_")
         self.pattern = QLineEdit("Fig,蛋白,N")
         filename_form.addRow("文件名分隔符", self.separator)
@@ -113,6 +118,7 @@ class ProjectMetadataPanel(QWidget):
         self.input_stack.addWidget(filename_page)
         self.table_page = QWidget()
         table_form = QFormLayout(self.table_page)
+        table_form.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.import_button = QPushButton("选择 Excel / CSV")
         self.import_button.clicked.connect(self.import_requested)
         table_form.addRow(self.import_button)
@@ -141,10 +147,12 @@ class ProjectMetadataPanel(QWidget):
         self.input_scroll = QScrollArea()
         self.input_scroll.setWidgetResizable(True)
         self.input_scroll.setWidget(self.input_stack)
+        self.input_scroll.setMinimumWidth(560)
+        self.input_scroll.setMaximumWidth(1000)
         self.input_scroll.setMinimumHeight(200)
         self.input_scroll.setMaximumHeight(360)
         self.input_toggle.toggled.connect(self.input_scroll.setVisible)
-        root.addWidget(self.input_scroll)
+        root.addWidget(self.input_scroll, alignment=Qt.AlignmentFlag.AlignLeft)
         self.preview_button = QPushButton("预览所选原图的修改")
         self.preview_button.setObjectName("primaryAction")
         self.preview_button.clicked.connect(
@@ -184,6 +192,8 @@ class ProjectMetadataPanel(QWidget):
         review.addWidget(self.table, 1)
         root.addWidget(self.review, 1)
         self.review.hide()
+        self.empty_space = QWidget()
+        root.addWidget(self.empty_space, 1)
         self.method.currentIndexChanged.connect(self._method_changed)
         self.table.cellChanged.connect(self._corrected)
         self.sheet.currentIndexChanged.connect(self._map_columns)
@@ -210,6 +220,7 @@ class ProjectMetadataPanel(QWidget):
         self._targets.clear()
         self.table.setRowCount(0)
         self.review.hide()
+        self.empty_space.show()
         self.input_toggle.setChecked(True)
 
     def install_book(self, book: MetadataBook, filename: str) -> None:
@@ -287,6 +298,7 @@ class ProjectMetadataPanel(QWidget):
         self.clear_preview()
         self.preview = proposal
         self.review.show()
+        self.empty_space.hide()
         self.input_toggle.setChecked(False)
         self._loading = True
         self.table.setRowCount(len(proposal.entries))

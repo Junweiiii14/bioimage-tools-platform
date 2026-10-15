@@ -25,3 +25,17 @@ Scope: four WB UI panels and new contextual UI tests. Shared theme/motion, host 
 - Full integration, motion, real private WB resource processing, 125/200% DPI and independent review remain coordinator acceptance work. No claim that isolated panels are a completed product.
 
 Coordinator owns shared handoff update to avoid cross-worktree snapshot conflicts; this task is the handoff for this subtask.
+
+## Follow-up: integrated results workspace
+
+2026-10-16 coordinator assigns result_workspace.py and project_results.py: three-column result navigation/table/output summary, unified export action, localized display states and readable UI-only precision. Existing numerical data and export serialization remain unchanged. Status: implementing; dedicated validation pending.
+
+Results follow-up implemented:
+- ResultWorkspace(results QWidget) with navigation/summary/current-cell reason and one primary package export, optional per-format actions. No I/O or computation. Host connects signals and supplies project/cells/output path.
+- ProjectResultsView exposes cells/cells_changed and selection_changed; Chinese statuses, missing protein label, hidden optional technical columns; UI .8g precision with exact values in UserRole/tooltip, immutable cells unchanged.
+- Counts explicitly say result items including unlocated placeholders, with image rows lacking ROI counted separately. They do not claim all placeholders are detected lanes.
+- Metadata input layout top-aligned, bounded 560–1000 width, empty space absorbs surplus height, preview remains expansive.
+- Existing test_project_measurements status display assertions intentionally updated from English machine strings to Chinese UI labels (6 occurrences). Scientific expectations and tolerances unchanged; new test checks raw status and exact numeric data.
+- First combined run: 4 failures solely remaining English-label expectations, 18 passed; after updating display expectations: 22 passed / 39.51 s, exit 0. Final 6 contextual/result tests after count/spacing adjustments: 6 passed / 0.68 s, exit 0. Scoped Ruff/Pyright exit 0.
+- Standalone results/metadata 1440x800 renders checked with synthetic values; final theme and host signal wiring still coordinator-owned. Dedicated screenshot helper exit 0; preceding multi-panel old helper returned exit 1 at teardown after saving screenshots, no diagnostic, not a product validation pass.
+- Independent review and integrated screenshot validation remain pending coordinator.

@@ -3,6 +3,7 @@
   "task": "T-032",
   "base_commit": "221a2dff610554092a881fc396010f032b31ae33",
   "scopes": [
+    "tests",
     "tools/wb",
     "work"
   ],
