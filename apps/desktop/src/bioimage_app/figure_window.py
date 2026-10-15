@@ -23,6 +23,7 @@ from wb_tool.api import (
     FigureRender,
     FigureRow,
     FigureSourcePath,
+    LoadedFigureTemplate,
     LoadedProjectOCR,
     LoadedProjectResult,
     MetadataBook,
@@ -132,6 +133,8 @@ class FigureProjectWindow(QMainWindow):
         self.view.export_requested.connect(self._choose_export)
         self.view.image_export_requested.connect(self._choose_image_export)
         self.view.font_requested.connect(self._choose_font)
+        self.view.template_export_requested.connect(self._choose_template_export)
+        self.view.template_import_requested.connect(self._choose_template_import)
         self.view.detection_requested.connect(self.detect_crops)
         self.view.metadata.import_requested.connect(self._choose_metadata_import)
         self.view.metadata.thumbnails_requested.connect(self.load_thumbnails)
@@ -1385,6 +1388,147 @@ class FigureProjectWindow(QMainWindow):
             )
 
         self.save(after=run)
+
+    def _choose_template_export(self) -> None:
+        destination, _ = QFileDialog.getSaveFileName(
+            self,
+            "保存新的模板文件",
+            "",
+            "WB 模板 (*.wbtemplate)",
+            options=QFileDialog.Option.DontConfirmOverwrite,
+        )
+        if destination:
+            self.export_template(destination)
+
+    def export_template(self, destination: str) -> None:
+        if self._busy or not self._workspace or self._closing:
+            return
+        try:
+            project = self.view.project()
+        except ValueError as error:
+            self._error(str(error))
+            return
+        generation = self.view.generation
+        self._start()
+        self._export_generation = generation
+
+        def exported(reply: WBReply) -> None:
+            if isinstance(reply.value, str) and not reply.error:
+                self._done("模板文件已保存；只包含所选修订的排版设置和字体。")
+            elif self._closing or self._cancellation.is_set() or generation != self.view.generation:
+                self._done("模板导出已取消或项目已修改；当前编辑保留。")
+            else:
+                self._error(reply.error or "模板导出结果无效")
+
+        self._wb(
+            WBJob(
+                "template_export",
+                document=project,
+                destination=destination,
+                sources=tuple(FigureSourcePath(sha, path) for sha, path in self._paths.items()),
+                cancellation=self._cancellation,
+            ),
+            exported,
+            accept_errors=True,
+        )
+
+    def _choose_template_import(self) -> None:
+        path, _ = QFileDialog.getOpenFileName(
+            self, "导入模板并新建项目", "", "WB 模板 (*.wbtemplate)"
+        )
+        if path:
+            self.import_template(path)
+
+    def import_template(self, path: str) -> None:
+        if self._busy or not self._workspace or self._closing:
+            return
+        generation = self.view.generation
+        self._start()
+
+        def obsolete() -> bool:
+            if self._closing or self._cancellation.is_set() or generation != self.view.generation:
+                self._done("模板导入已取消或项目已修改；当前项目保持。")
+                return True
+            return False
+
+        def parsed(reply: WBReply) -> None:
+            if obsolete():
+                return
+            if reply.error or not isinstance(reply.value, LoadedFigureTemplate):
+                self._error(reply.error or "模板读取结果无效")
+                return
+            loaded = reply.value
+
+            def current_saved() -> None:
+                if obsolete():
+                    return
+                self._busy = True
+                self._controls()
+
+                def install(asset: AssetRef | None = None, asset_path: str = "") -> None:
+                    if obsolete():
+                        return
+                    template = loaded.spec.template.model_copy(update={"font": asset})
+                    fresh: WBFigureProject = WBFigureProject(
+                        project_id=uuid4().hex, template=template
+                    )
+                    if loaded.spec.layout_style is not None:
+                        fresh = with_figure_layout(
+                            fresh, initial_composition(fresh), loaded.spec.layout_style
+                        )
+                    self._paths = {asset.sha256: asset_path} if asset is not None else {}
+                    self.view.set_project(fresh)
+                    self.view.generation += 1
+                    self._saved_revision = None
+                    self._project_results = ()
+                    self._loaded_ocr = None
+                    self._done("模板已导入并新建空项目；原项目已保存，请导入本次实验的原图。")
+
+                descriptor = loaded.spec.font
+                if descriptor is None:
+                    install()
+                    return
+
+                def imported(storage_reply: StorageReply) -> None:
+                    if obsolete():
+                        return
+                    if storage_reply.error_code or not isinstance(storage_reply.value, AssetRef):
+                        self._error(storage_reply.message or "模板字体导入失败")
+                        return
+                    asset = storage_reply.value
+
+                    def resolved(storage_reply: StorageReply) -> None:
+                        if obsolete():
+                            return
+                        if storage_reply.error_code or not isinstance(storage_reply.value, str):
+                            self._error(storage_reply.message or "模板字体路径无效")
+                            return
+                        install(asset, storage_reply.value)
+
+                    self._storage(
+                        StorageCommand("asset", asset=asset), resolved, accept_errors=True
+                    )
+
+                self._storage(
+                    StorageCommand(
+                        "import_bytes",
+                        path=descriptor.filename,
+                        data=loaded.font_data,
+                        source_sha256=descriptor.sha256,
+                    ),
+                    imported,
+                    accept_errors=True,
+                )
+
+            # Save the previous experiment before replacing its draft with an empty project.
+            self._busy = False
+            self.save(after=current_saved)
+
+        self._wb(
+            WBJob("template_read", path=path, cancellation=self._cancellation),
+            parsed,
+            accept_errors=True,
+        )
 
     def _choose_font(self) -> None:
         path, _ = QFileDialog.getOpenFileName(

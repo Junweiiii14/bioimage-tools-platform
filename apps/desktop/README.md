@@ -1,5 +1,12 @@
 # Desktop host
 
+Version 0.14.0 adds schema7 laboratory segments and independent template file actions in
+the existing template settings page. Template I/O runs in the tool background thread;
+import saves the previous project, imports verified font bytes into the destination
+workspace, then opens an empty project. Cancellation, close and generation checks reject
+late replacements. Templates contain settings and fonts only; experiment row bindings,
+measurements, OCR and normalization do not cross into the new project.
+
 `bioimage_app.api` currently exposes AsyncStorage, StorageCommand and StorageReply.
 The QObject worker owns Workspace/SQLite on its own QThread. Commands are an explicit
 immutable FIFO, with request IDs, 64 pending-operation and 16 MiB document budgets.

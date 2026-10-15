@@ -44,6 +44,11 @@ from wb_tool.application.figure_project import (
     WBFigureProject,
     plan_figure_layout,
 )
+from wb_tool.application.figure_template import (
+    LoadedFigureTemplate,
+    PortableFigureTemplate,
+    TemplateFont,
+)
 from wb_tool.application.laboratory_layout import (
     FigureColumn,
     FigureComposition,
@@ -170,6 +175,11 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "LoadedFigureTemplate",
+    "PortableFigureTemplate",
+    "TemplateFont",
+    "export_figure_template",
+    "read_figure_template",
     "FigureColumn",
     "FigureComposition",
     "FigureLayoutStyle",
@@ -489,3 +499,23 @@ def inspect_project_archive(
     from wb_tool.adapters.archive_restore import inspect_project_archive as inspect
 
     return inspect(source, cancelled=cancelled)
+
+
+def export_figure_template(
+    project: WBFigureProject,
+    sources: tuple[FigureSourcePath, ...],
+    destination: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> str:
+    from wb_tool.adapters.figure_template_io import export_figure_template as export
+
+    return export(project, sources, destination, cancelled=cancelled)
+
+
+def read_figure_template(
+    source: str, *, cancelled: Callable[[], bool] = lambda: False
+) -> LoadedFigureTemplate:
+    from wb_tool.adapters.figure_template_io import read_figure_template as read
+
+    return read(source, cancelled=cancelled)

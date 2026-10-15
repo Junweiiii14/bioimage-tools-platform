@@ -18,6 +18,7 @@ from wb_tool.application.crop_suggestions import CropSuggestion, read_figure_pro
 from wb_tool.application.desktop_data import PreviewRaster, ProjectDerivedTables, WBJob, WBReply
 from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
 from wb_tool.application.figure_project import FigurePNG, FigureRender, WBFigureProject
+from wb_tool.application.figure_template import LoadedFigureTemplate
 from wb_tool.application.project_analysis import (
     LoadedProjectResult,
     ProjectTableSnapshot,
@@ -68,6 +69,7 @@ class _Work(QObject):
                 | WBFigureProject
                 | FigureRender
                 | FigurePNG
+                | LoadedFigureTemplate
                 | MetadataBook
                 | CropSuggestion
                 | LoadedProjectResult
@@ -196,6 +198,20 @@ class _Work(QObject):
                     job.detection_settings,
                     cancelled=job.cancellation.is_set if job.cancellation else lambda: False,
                 )
+            elif job.operation in ("template_read", "template_export"):
+                from wb_tool.adapters.figure_template_io import (
+                    export_figure_template,
+                    read_figure_template,
+                )
+
+                if job.operation == "template_read":
+                    value = read_figure_template(job.path, cancelled=cancel)
+                else:
+                    if not isinstance(job.document, WBFigureProject):
+                        raise ValueError("缺少模板所属项目")
+                    value = export_figure_template(
+                        job.document, job.sources, job.destination, cancelled=cancel
+                    )
             elif job.operation == "font_digest":
                 path = Path(job.path)
                 if (

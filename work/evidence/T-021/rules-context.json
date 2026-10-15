@@ -7,7 +7,9 @@
     "apps/desktop",
     "docs",
     "tests",
+    "tooling",
     "tools/wb",
+    "uv.lock",
     "work"
   ],
   "rules": {

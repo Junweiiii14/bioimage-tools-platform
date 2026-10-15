@@ -12,4 +12,4 @@ render_figure对v7调用figure_segmented_geometry@1，旧v1–v6继续figure_ori
 
 UI显示可编辑的显示行/段顺序/原泳道范围/Fig列，支持按明确泳道分段、重建单行版式与预览。未完成或过期计划可以保存草稿，渲染前严格检查全部覆盖、身份与几何；错误给出具体Fig/行。删除/新增原图行后不得静默隐藏数据。
 
-可复用模板仅包含FigureTemplate、FigureLayoutStyle及自定义字体，不带原图、row_id、Fig名称、OCR关联或测量结果。保存/导入新模板走后台、有界解析、摘要核验、无覆盖；从当前模板新建项目为空项目。后续实现须同时验证模板跨工作区字体引用与旧模板兼容。模板界面/持久化未完成前不得声称T-021完成。
+可复用模板仅包含FigureTemplate、FigureLayoutStyle及自定义字体，不带原图、row_id、Fig名称、OCR关联或测量结果。保存/导入新模板走后台、有界解析、摘要核验、无覆盖；从当前模板新建项目为空项目。独立.wbtemplate格式与旧版style=null兼容见wb-figure-template-v1.md。导入先保存当前项目，再将字体导入目的工作区并建立空项目；关闭/取消/代际变化拒绝晚到替换。
