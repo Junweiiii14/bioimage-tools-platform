@@ -5,7 +5,7 @@ from dataclasses import replace
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QComboBox,
-    QHBoxLayout,
+    QGridLayout,
     QLabel,
     QPushButton,
     QTableWidget,
@@ -42,20 +42,22 @@ class ProjectAnalysisPanel(QWidget):
         self.message = QLabel("选择已审核的原图行，配置定量。首次可先计算曲线，再填写条带边界。")
         self.message.setWordWrap(True)
         layout.addWidget(self.message)
-        actions = QHBoxLayout()
+        actions = QGridLayout()
         self.polarity = QComboBox()
         self.polarity.addItems(["暗条带", "亮条带"])
-        actions.addWidget(self.polarity)
-        for text, callback in (
-            ("配置 / 重置所选行", self.configure_requested.emit),
-            ("计算所选行", lambda: self.run_requested.emit(False)),
-            ("计算全部已配置行", lambda: self.run_requested.emit(True)),
-            ("刷新项目表", self.refresh_requested.emit),
-            ("导出结果 XLSX / CSV", self.export_requested.emit),
+        actions.addWidget(self.polarity, 0, 0)
+        for index, (text, callback) in enumerate(
+            (
+                ("配置 / 重置所选行", self.configure_requested.emit),
+                ("计算所选行", lambda: self.run_requested.emit(False)),
+                ("计算全部已配置行", lambda: self.run_requested.emit(True)),
+                ("刷新项目表", self.refresh_requested.emit),
+                ("导出结果 XLSX / CSV", self.export_requested.emit),
+            )
         ):
             button = QPushButton(text)
             button.clicked.connect(callback)
-            actions.addWidget(button)
+            actions.addWidget(button, (index + 1) // 3, (index + 1) % 3)
         layout.addLayout(actions)
         layout.addWidget(
             QLabel(

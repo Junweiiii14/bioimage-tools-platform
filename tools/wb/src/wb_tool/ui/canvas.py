@@ -13,8 +13,14 @@ from wb_tool.domain.lanes import LaneROI
 class ImageCanvas(QWidget):
     roi_drawn = Signal(object)
 
-    def __init__(self, parent: QWidget | None = None) -> None:
+    def __init__(
+        self,
+        parent: QWidget | None = None,
+        *,
+        empty_message: str = "导入 TIFF 后拖出泳道矩形",
+    ) -> None:
         super().__init__(parent)
+        self.empty_message = empty_message
         self.setMinimumSize(300, 240)
         self._image = QImage()
         self._size: tuple[int, int] = (0, 0)
@@ -86,7 +92,7 @@ class ImageCanvas(QWidget):
         rect = self.image_rect()
         if self._image.isNull():
             painter.setPen(QColor("#e1e7ef"))
-            painter.drawText(self.rect(), Qt.AlignmentFlag.AlignCenter, "导入 TIFF 后拖出泳道矩形")
+            painter.drawText(self.rect(), Qt.AlignmentFlag.AlignCenter, self.empty_message)
             return
         x, y, width, height = self._view_bounds()
         sx, sy = self._image.width() / self._size[0], self._image.height() / self._size[1]

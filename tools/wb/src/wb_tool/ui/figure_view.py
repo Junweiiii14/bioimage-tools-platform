@@ -10,13 +10,16 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
     QFormLayout,
+    QGridLayout,
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QListWidget,
     QPushButton,
     QScrollArea,
     QSpinBox,
     QSplitter,
+    QStackedWidget,
     QTableWidget,
     QTableWidgetItem,
     QTabWidget,
@@ -93,7 +96,7 @@ class FigureProjectView(QWidget):
         self.history_label = QLabel()
         self.history_label.setWordWrap(True)
         root.addWidget(self.history_label)
-        actions = QHBoxLayout()
+        actions = QGridLayout()
         self.filter = QComboBox()
         self.filter.addItems(
             [
@@ -107,33 +110,34 @@ class FigureProjectView(QWidget):
                 "无候选/失败",
             ]
         )
-        actions.addWidget(self.filter)
-        for text, callback in (
-            ("上移行", lambda: self.move_row(-1)),
-            ("下移行", lambda: self.move_row(1)),
-            ("添加缺图位", self.add_missing),
-            ("删除所选行", self.remove_row),
-            ("确认所选行", self.confirm_selected),
+        actions.addWidget(self.filter, 0, 0)
+        for index, (text, callback) in enumerate(
+            (
+                ("上移行", lambda: self.move_row(-1)),
+                ("下移行", lambda: self.move_row(1)),
+                ("添加缺图位", self.add_missing),
+                ("删除所选行", self.remove_row),
+                ("确认所选行", self.confirm_selected),
+            )
         ):
             button = QPushButton(text)
             button.clicked.connect(callback)
-            actions.addWidget(button)
-        root.addLayout(actions)
+            actions.addWidget(button, (index + 1) // 3, (index + 1) % 3)
+        source_controls = QWidget()
+        QVBoxLayout(source_controls).addLayout(actions)
         self.table = QTableWidget(0, 11)
         self.table.setHorizontalHeaderLabels(
             ["原图", "Fig", "蛋白", "N", "x0", "y0", "x1", "y1", "空泳道(逗号)", "已审核", "备注"]
         )
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
-        self.table.setMinimumHeight(180)
+        self.table.setMinimumHeight(140)
         self.table.setIconSize(QSize(96, 64))
         for index in range(3, 8):
             self.table.setColumnWidth(index, 60)
         self.table.setColumnWidth(0, 240)
         self.table.setColumnWidth(9, 65)
-        split = QSplitter(Qt.Orientation.Vertical)
-        split.addWidget(self.table)
-        tabs = QTabWidget()
+
         self.canvas = ImageCanvas()
         self.suggestions = CropSuggestionPanel()
         self.suggestions.run_requested.connect(self.detection_requested)
@@ -145,25 +149,25 @@ class FigureProjectView(QWidget):
         source_layout = QVBoxLayout(source_page)
         source_layout.addWidget(self.suggestions)
         source_layout.addWidget(self.canvas, 1)
-        tabs.addTab(source_page, "原图与固定泳道")
+
         self.metadata = ProjectMetadataPanel()
         self.metadata.preview_requested.connect(self._metadata_preview)
         self.metadata.apply_requested.connect(self._metadata_apply)
-        tabs.addTab(self.metadata, "批量元信息")
+
         self.analysis = ProjectAnalysisPanel()
         self.analysis.configure_requested.connect(self.configure_analysis)
         self.analysis.changed.connect(self._edited)
         self._results: tuple[LoadedProjectResult, ...] = ()
-        tabs.addTab(self.analysis, "原图定量与项目结果表")
+
         self.ocr = ProjectOCRPanel()
         self.ocr.changed.connect(self._edited)
         self.ocr.binding_requested.connect(self.bind_ocr)
-        tabs.addTab(self.ocr, "拼图 OCR 与结果关联")
+
         self.normalization = NormalizationPanel()
         self.normalization.changed.connect(self._edited)
         self.normalization.configure_requested.connect(self.configure_normalization)
         self.normalization.remove_requested.connect(self.remove_normalization)
-        tabs.addTab(self.normalization, "样本对应与归一化")
+
         preview_page = QWidget()
         preview_layout = QVBoxLayout(preview_page)
         preview_layout.addWidget(
@@ -178,7 +182,7 @@ class FigureProjectView(QWidget):
         preview_scroll.setWidget(self.preview_label)
         preview_scroll.setWidgetResizable(True)
         preview_layout.addWidget(preview_scroll)
-        tabs.addTab(preview_page, "拼图预览")
+
         settings = QWidget()
         form = QFormLayout(settings)
         self.figure_order = QLineEdit()
@@ -222,26 +226,12 @@ class FigureProjectView(QWidget):
         settings_scroll = QScrollArea()
         settings_scroll.setWidget(settings)
         settings_scroll.setWidgetResizable(True)
-        tabs.addTab(settings_scroll, "模板与排序")
+
         self.laboratory_layout = LaboratoryLayoutPanel()
         self.laboratory_layout.changed.connect(self._edited)
         self.laboratory_layout.rebuild_requested.connect(self.rebuild_layout)
-        tabs.addTab(self.laboratory_layout, "实验室版式与分段")
-        split.addWidget(tabs)
-        split.setStretchFactor(1, 2)
-        root.addWidget(split, 1)
-        bottom = QHBoxLayout()
-        preview = QPushButton("生成预览")
-        export = QPushButton("导出拼图归档 ZIP")
-        self.image_export_button = QPushButton("导出拼图 TIFF / PNG")
-        self.image_export_button.setToolTip("用于展示和排版；需要重新打开的完整项目请导出ZIP。")
-        preview.clicked.connect(self.preview_requested)
-        export.clicked.connect(self.export_requested)
-        self.image_export_button.clicked.connect(self.image_export_requested)
-        bottom.addWidget(preview)
-        bottom.addWidget(self.image_export_button)
-        bottom.addWidget(export)
-        root.addLayout(bottom)
+
+        self._build_workflow(root, source_controls, source_page, settings_scroll, preview_page)
         self.name.textEdited.connect(self._edited)
         self.template_name.textEdited.connect(self._edited)
         self.figure_order.textEdited.connect(self._edited)
@@ -251,6 +241,227 @@ class FigureProjectView(QWidget):
         self.table.currentCellChanged.connect(self._selected)
         self.canvas.roi_drawn.connect(self._drawn)
         self.set_project(self._project)
+
+    def _build_workflow(
+        self,
+        root: QVBoxLayout,
+        source_controls: QWidget,
+        source_page: QWidget,
+        settings: QWidget,
+        preview_page: QWidget,
+    ) -> None:
+        body = QHBoxLayout()
+        body.setSpacing(20)
+        self.steps = QListWidget()
+        self.steps.setObjectName("workflowSteps")
+        self.steps.setAccessibleName("实验项目步骤")
+        self.steps.addItems(["1  原图与裁剪", "2  定量与复核", "3  拼图排版", "4  导出"])
+        self.steps.setFixedWidth(168)
+        self.steps.setSpacing(4)
+        body.addWidget(self.steps)
+        content = QVBoxLayout()
+        self.step_title = QLabel()
+        self.step_title.setObjectName("stepTitle")
+        self.step_help = QLabel()
+        self.step_help.setWordWrap(True)
+        self.step_help.setObjectName("stepHelp")
+        content.addWidget(self.step_title)
+        content.addWidget(self.step_help)
+        self.pages = QStackedWidget()
+        content.addWidget(self.pages, 1)
+        body.addLayout(content, 1)
+        root.addLayout(body, 1)
+
+        originals = QWidget()
+        originals_layout = QVBoxLayout(originals)
+        originals_layout.setContentsMargins(0, 0, 0, 0)
+        originals_layout.addWidget(source_controls)
+        source_split = QSplitter(Qt.Orientation.Vertical)
+        source_split.addWidget(self.table)
+        source_split.addWidget(source_page)
+        source_split.setSizes([200, 500])
+        source_split.setChildrenCollapsible(False)
+        originals_layout.addWidget(source_split, 1)
+        self.source_tabs = QTabWidget()
+        self.source_tabs.addTab(originals, "原图裁剪与审核")
+        self.source_tabs.addTab(self.metadata, "批量填写信息")
+        self._add_step(self.source_tabs)
+
+        quantification = QWidget()
+        quantification_layout = QVBoxLayout(quantification)
+        quantification_layout.setContentsMargins(0, 0, 0, 0)
+        row_selection = QHBoxLayout()
+        row_selection.addWidget(QLabel("当前原图行"))
+        self.analysis_source = QComboBox()
+        self.analysis_source.setAccessibleName("选择需要定量的原图行")
+        self.analysis_source.setSizeAdjustPolicy(
+            QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
+        )
+        self.analysis_source.setMinimumContentsLength(24)
+        row_selection.addWidget(self.analysis_source, 1)
+        back_to_source = QPushButton("返回裁剪与审核")
+        back_to_source.clicked.connect(lambda: self.show_section("source"))
+        row_selection.addWidget(back_to_source)
+        quantification_layout.addLayout(row_selection)
+        self.analysis_tabs = QTabWidget()
+        self.analysis_tabs.addTab(self.analysis, "定量与曲线复核")
+        self.analysis_tabs.addTab(self.normalization, "样本对应与归一化")
+        quantification_layout.addWidget(self.analysis_tabs, 1)
+        self._add_step(quantification)
+        self.analysis_source.activated.connect(self._select_analysis_source)
+
+        self.layout_tabs = QTabWidget()
+        arrangement = QSplitter(Qt.Orientation.Horizontal)
+        self.layout_settings_tabs = QTabWidget()
+        self.layout_settings_tabs.addTab(self.laboratory_layout, "版式与分段")
+        self.layout_settings_tabs.addTab(settings, "样式与模板")
+        arrangement.addWidget(self.layout_settings_tabs)
+        preview_layout = preview_page.layout()
+        assert isinstance(preview_layout, QVBoxLayout)
+        self.preview_button = QPushButton("生成 / 更新预览")
+        self.preview_button.setObjectName("primaryAction")
+        self.preview_button.clicked.connect(self.preview_requested)
+        preview_layout.insertWidget(0, self.preview_button)
+        arrangement.addWidget(preview_page)
+        arrangement.setSizes([540, 500])
+        arrangement.setChildrenCollapsible(False)
+        self.layout_tabs.addTab(arrangement, "排版与预览")
+        self.layout_tabs.addTab(self.ocr, "OCR 识别与原图关联")
+        self._add_step(self.layout_tabs)
+
+        exports = QWidget()
+        export_layout = QVBoxLayout(exports)
+        export_layout.setSpacing(16)
+        self.image_export_button = QPushButton("导出拼图 TIFF / PNG…")
+        self.image_export_button.clicked.connect(self.image_export_requested)
+        self.archive_export_button = QPushButton("导出完整项目 ZIP…")
+        self.archive_export_button.clicked.connect(self.export_requested)
+        self.table_export_button = QPushButton("导出定量结果 XLSX / CSV…")
+        self.table_export_button.clicked.connect(self.analysis.export_requested)
+        self.ocr_export_button = QPushButton("导出 OCR 关联结果 XLSX / CSV…")
+        self.ocr_export_button.clicked.connect(self.ocr.export_requested)
+        self.normalization_export_button = QPushButton("导出归一化结果 XLSX / CSV…")
+        self.normalization_export_button.clicked.connect(self.normalization.export_requested)
+        for title, description, buttons in (
+            (
+                "完整项目",
+                "保留原图、原值裁剪、配置与可核验结果，用于迁移和恢复。",
+                [self.archive_export_button],
+            ),
+            (
+                "实验结果",
+                "导出已核验的结果表；缺失、失败与真实零值分别保留。",
+                [
+                    self.table_export_button,
+                    self.normalization_export_button,
+                    self.ocr_export_button,
+                ],
+            ),
+            (
+                "展示拼图",
+                "输出 RGB 8 位展示图。原始定量像素保存在完整项目中。",
+                [self.image_export_button],
+            ),
+        ):
+            heading = QLabel(title)
+            heading.setObjectName("exportHeading")
+            export_layout.addWidget(heading)
+            note = QLabel(description)
+            note.setWordWrap(True)
+            export_layout.addWidget(note)
+            for button in buttons:
+                button.setMaximumWidth(360)
+                export_layout.addWidget(button)
+        export_layout.addStretch()
+        exports_scroll = QScrollArea()
+        exports_scroll.setWidgetResizable(True)
+        exports_scroll.setWidget(exports)
+        self.pages.addWidget(exports_scroll)
+        navigation = QHBoxLayout()
+        self.previous_step = QPushButton("上一步")
+        self.next_step = QPushButton("下一步：定量与复核")
+        self.previous_step.clicked.connect(
+            lambda: self.steps.setCurrentRow(self.steps.currentRow() - 1)
+        )
+        self.next_step.clicked.connect(
+            lambda: self.steps.setCurrentRow(self.steps.currentRow() + 1)
+        )
+        navigation.addStretch()
+        navigation.addWidget(self.previous_step)
+        navigation.addWidget(self.next_step)
+        content.addLayout(navigation)
+        self.steps.currentRowChanged.connect(self._step_changed)
+        self.steps.setCurrentRow(0)
+
+    def _add_step(self, content: QWidget) -> None:
+        # Bound the shell minimum size; small displays scroll the current step only.
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QScrollArea.Shape.NoFrame)
+        scroll.setWidget(content)
+        self.pages.addWidget(scroll)
+
+    def _step_changed(self, index: int) -> None:
+        titles = ("原图与裁剪", "定量与复核", "拼图排版", "导出")
+        hints = (
+            "导入 TIFF 原图，填写 Fig 与蛋白名称，核对泳道和裁剪范围，再确认所选行。",
+            "选择已审核的原图行，配置定量并复核曲线；需要时再设置样本与内参对应。",
+            "调整明确分段和标签样式，生成预览。OCR 识别后仍需手动确认原图关联。",
+            "按用途选择输出。保存项目保留当前工作进度，完整 ZIP 用于迁移和恢复。",
+        )
+        if not 0 <= index < len(titles):
+            return
+        self.pages.setCurrentIndex(index)
+        self.step_title.setText(titles[index])
+        self.step_help.setText(hints[index])
+        self.previous_step.setEnabled(index > 0)
+        self.next_step.setEnabled(index < 3)
+        self.next_step.setText(f"下一步：{titles[index + 1]}" if index < 3 else "已到最后一步")
+        self._refresh_analysis_sources()
+
+    def show_section(self, section: str) -> None:
+        """Navigate without changing project data or committing scientific edits."""
+        sections = {
+            "source": 0,
+            "metadata": 0,
+            "analysis": 1,
+            "normalization": 1,
+            "layout": 2,
+            "template": 2,
+            "preview": 2,
+            "ocr": 2,
+            "export": 3,
+        }
+        self.steps.setCurrentRow(sections[section])
+        if section in ("source", "metadata"):
+            self.source_tabs.setCurrentIndex(int(section == "metadata"))
+        if section in ("analysis", "normalization"):
+            self.analysis_tabs.setCurrentIndex(int(section == "normalization"))
+        if section in ("layout", "template", "preview", "ocr"):
+            self.layout_tabs.setCurrentIndex(int(section == "ocr"))
+            if section in ("layout", "template"):
+                self.layout_settings_tabs.setCurrentIndex(int(section == "template"))
+
+    def _refresh_analysis_sources(self) -> None:
+        self.analysis_source.blockSignals(True)
+        self.analysis_source.clear()
+        for index, row in enumerate(self._project.rows):
+            self.analysis_source.addItem(
+                f"{self._text(index, 1)} · {self._text(index, 2)} · {row.filename}", index
+            )
+        self.analysis_source.setCurrentIndex(self.table.currentRow())
+        self.analysis_source.blockSignals(False)
+
+    def _select_analysis_source(self, index: int) -> None:
+        if 0 <= index < self.table.rowCount():
+            try:
+                self.project()
+            except ValueError as error:
+                self.status.setText(str(error))
+                self._refresh_analysis_sources()
+                return
+            # The original selection path commits valid dirty annotation edits first.
+            self.table.setCurrentCell(index, 0)
 
     def _text(self, row: int, column: int) -> str:
         item = self.table.item(row, column)
@@ -404,6 +615,7 @@ class FigureProjectView(QWidget):
                 index, 68 if row.source and row.source.sha256 in self._thumbnails else 28
             )
         self._loading = False
+        self._refresh_analysis_sources()
         self._filter_rows()
 
     def rebuild_layout(self) -> None:
@@ -514,7 +726,12 @@ class FigureProjectView(QWidget):
                 self._project = self.project()
             except ValueError as error:
                 self.status.setText(str(error))
+                self.table.blockSignals(True)
+                self.table.setCurrentCell(_previous_row, max(0, _previous_column))
+                self.table.blockSignals(False)
+                self._refresh_analysis_sources()
                 return
+            self._refresh_analysis_sources()
             self.show_analysis(row)
             self._overlay()
             self.source_requested.emit(self._project.rows[row].row_id)

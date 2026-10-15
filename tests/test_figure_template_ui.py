@@ -60,13 +60,7 @@ def test_template_cross_workspace_font_reopen_and_previous_project_saved(
     assert second.documents.findData(previous.project_id) >= 0
     capture = os.environ.get("BIOIMAGE_TEMPLATE_CAPTURE")
     if capture:
-        tabs = second.view.findChild(QTabWidget)
-        assert tabs is not None
-        tabs.setCurrentIndex(2)
-        # Locate by the action's containing scroll area, not by a fragile tab index.
-        for index in range(tabs.count()):
-            if tabs.tabText(index) == "模板与排序":
-                tabs.setCurrentIndex(index)
+        second.view.show_section("template")
         assert second.grab().save(capture)
     # Render from the destination asset after the original font file has gone away.
     font_path.unlink()

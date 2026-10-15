@@ -6,14 +6,20 @@ from threading import Event
 from uuid import uuid4
 
 from PySide6.QtCore import QTimer, Signal
-from PySide6.QtGui import QCloseEvent
+from PySide6.QtGui import QAction, QCloseEvent, QColor, QFont, QPalette
 from PySide6.QtWidgets import (
     QComboBox,
     QFileDialog,
+    QLabel,
     QMainWindow,
+    QMenu,
     QMessageBox,
     QPushButton,
+    QStackedWidget,
     QToolBar,
+    QToolButton,
+    QVBoxLayout,
+    QWidget,
 )
 from tool_contracts.api import AssetRef, DraftSnapshot
 from wb_tool.api import (
@@ -64,9 +70,13 @@ class FigureProjectWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("WB 自动化 · 多原图与 Fig 拼图项目")
-        self.resize(1300, 950)
+        self.resize(1440, 960)
+        self.setObjectName("wbProjectWindow")
+        self._apply_theme()
         self.view = create_figure_project_view()
-        self.setCentralWidget(self.view)
+        self.surface = QStackedWidget()
+        self.surface.addWidget(self.view)
+        self.setCentralWidget(self.surface)
         self._store = AsyncStorage(self)
         self._background = create_wb_background()
         self._storage_callbacks: dict[str, Callable[[StorageReply], None]] = {}
@@ -99,6 +109,7 @@ class FigureProjectWindow(QMainWindow):
         self._ocr_refresh_timer.setSingleShot(True)
         self._ocr_refresh_timer.timeout.connect(self.refresh_ocr_table)
         bar = QToolBar("项目")
+        bar.setMovable(False)
         self.addToolBar(bar)
         self.create_button = QPushButton("新建项目工作区")
         self.open_button = QPushButton("打开项目工作区")
@@ -110,16 +121,58 @@ class FigureProjectWindow(QMainWindow):
         self.documents = QComboBox()
         self.documents.setMinimumWidth(240)
         for button in (
-            self.create_button,
-            self.open_button,
-            self.restore_button,
             self.import_button,
             self.save_button,
-            self.new_button,
             self.cancel_button,
             self.documents,
         ):
             bar.addWidget(button)
+        # Keep the existing buttons as command/state owners for host contracts and tests.
+        self.project_menu = QMenu("项目", self)
+        self.project_actions: list[tuple[QAction, QPushButton]] = []
+        for button in (self.create_button, self.open_button, self.restore_button, self.new_button):
+            button.setParent(self)
+            button.hide()
+            action = self.project_menu.addAction(button.text())
+            action.triggered.connect(button.click)
+            self.project_actions.append((action, button))
+        self.project_menu_button = QToolButton()
+        self.project_menu_button.setText("项目")
+        self.project_menu_button.setMenu(self.project_menu)
+        self.project_menu_button.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+        bar.insertWidget(bar.actions()[0], self.project_menu_button)
+        self.documents.setMaximumWidth(340)
+        self.documents.setAccessibleName("当前工作区内的项目")
+        self.import_button.setObjectName("primaryAction")
+        self.welcome = QWidget()
+        self.welcome.setObjectName("welcomePage")
+        welcome_layout = QVBoxLayout(self.welcome)
+        welcome_layout.setContentsMargins(64, 48, 64, 48)
+        welcome_layout.addStretch()
+        title = QLabel("开始一个 WB 实验项目")
+        title.setObjectName("welcomeTitle")
+        welcome_layout.addWidget(title)
+        description = QLabel(
+            "从原图裁剪、定量复核到拼图导出，按四个步骤完成。\n工作区会保存原图、项目配置和运行结果。"
+        )
+        description.setWordWrap(True)
+        welcome_layout.addWidget(description)
+        self.welcome_buttons: list[tuple[QPushButton, QPushButton]] = []
+        for label, owner in (
+            ("新建项目工作区…", self.create_button),
+            ("打开已有工作区…", self.open_button),
+            ("从完整项目 ZIP 恢复…", self.restore_button),
+        ):
+            button = QPushButton(label)
+            button.setMaximumWidth(300)
+            button.clicked.connect(owner.click)
+            welcome_layout.addWidget(button)
+            self.welcome_buttons.append((button, owner))
+        self.welcome_status = QLabel("请选择一个工作区开始；已有工作区可继续上次进度。")
+        self.welcome_status.setWordWrap(True)
+        welcome_layout.addWidget(self.welcome_status)
+        welcome_layout.addStretch()
+        self.surface.addWidget(self.welcome)
         self.create_button.clicked.connect(lambda: self._choose_workspace(True))
         self.open_button.clicked.connect(lambda: self._choose_workspace(False))
         self.restore_button.clicked.connect(self._choose_restore)
@@ -150,7 +203,78 @@ class FigureProjectWindow(QMainWindow):
         self.view.normalization.export_requested.connect(self._choose_normalization_export)
         self.view.changed.connect(self._queue_ocr_refresh)
         self.view.changed.connect(self._cancel_stale_export)
+        for widget in self.findChildren(QWidget):
+            widget.setPalette(self.palette())
+        self.view.status.setText("请选择一个工作区开始；已有工作区可继续上次进度。")
         self._controls()
+
+    def _apply_theme(self) -> None:
+        self.setFont(QFont("Microsoft YaHei UI", 10))
+        palette = QPalette(self.palette())
+        for role, color in (
+            (QPalette.ColorRole.Window, "#f4f7f9"),
+            (QPalette.ColorRole.WindowText, "#20323d"),
+            (QPalette.ColorRole.Base, "#ffffff"),
+            (QPalette.ColorRole.AlternateBase, "#eef3f5"),
+            (QPalette.ColorRole.Text, "#20323d"),
+            (QPalette.ColorRole.Button, "#f7fafb"),
+            (QPalette.ColorRole.ButtonText, "#20323d"),
+            (QPalette.ColorRole.Highlight, "#126878"),
+            (QPalette.ColorRole.HighlightedText, "#ffffff"),
+            (QPalette.ColorRole.ToolTipBase, "#ffffff"),
+            (QPalette.ColorRole.ToolTipText, "#20323d"),
+        ):
+            for group in (
+                QPalette.ColorGroup.Active,
+                QPalette.ColorGroup.Inactive,
+                QPalette.ColorGroup.Disabled,
+            ):
+                palette.setColor(group, role, QColor(color))
+        self.setPalette(palette)
+        self.setStyleSheet("""
+            QMainWindow#wbProjectWindow { background: #f4f7f9; color: #20323d; }
+            QLabel, QCheckBox, QRadioButton { color: #20323d; background: transparent; }
+            QLabel:disabled, QCheckBox:disabled, QRadioButton:disabled { color: #697a84; }
+            QScrollArea, QScrollArea > QWidget, QScrollArea > QWidget > QWidget {
+                background: #ffffff; color: #20323d; }
+            QPlainTextEdit, QTextEdit { background: #ffffff; color: #20323d; }
+            QDoubleSpinBox { background: #ffffff; color: #20323d;
+                border: 1px solid #b7c6cf; padding: 4px; }
+            QSplitter::handle { background: #d3dde2; }
+            QTableCornerButton::section { background: #eaf0f3; border: 0; }
+            QToolBar { background: #eaf0f3; border: 0; padding: 10px; spacing: 8px; }
+            QPushButton, QToolButton { color: #20323d; background: #ffffff;
+                border: 1px solid #b7c6cf; border-radius: 4px; padding: 6px 10px; }
+            QPushButton:hover, QToolButton:hover { background: #e7f1f4; border-color: #126878; }
+            QPushButton:focus, QToolButton:focus { border: 2px solid #126878; }
+            QPushButton:disabled, QToolButton:disabled { color: #697a84; background: #edf1f3;
+                border-color: #d3dde2; }
+            QPushButton#primaryAction { color: #ffffff; background: #126878;
+                border-color: #126878; }
+            QPushButton#primaryAction:disabled { color: #697a84; background: #edf1f3; }
+            QLineEdit, QSpinBox, QComboBox { color: #20323d; background: #ffffff;
+                padding: 4px; border: 1px solid #b7c6cf; border-radius: 3px; }
+            QLineEdit:focus, QSpinBox:focus, QComboBox:focus { border-color: #126878; }
+            QTabWidget::pane { border: 1px solid #c8d4dc; background: #ffffff; }
+            QTabBar::tab { color: #405660; background: #edf2f5; padding: 9px 14px; }
+            QTabBar::tab:selected { color: #ffffff; background: #126878; }
+            QTableWidget { background: #ffffff; color: #20323d; gridline-color: #dce4e9;
+                selection-background-color: #d3e9ed; selection-color: #173e49; }
+            QHeaderView::section { background: #eaf0f3; color: #344c59;
+                border: 0; border-bottom: 1px solid #c8d4dc; padding: 6px; }
+            QListWidget#workflowSteps { background: #eaf0f3; border: 0; padding: 6px; }
+            QListWidget#workflowSteps::item { color: #344c59; padding: 16px 6px; }
+            QListWidget#workflowSteps::item:selected { background: #126878; color: #ffffff; }
+            QLabel#stepTitle { font-size: 22px; font-weight: 600; color: #20323d; }
+            QLabel#stepHelp { color: #405660; padding-bottom: 8px; }
+            QLabel#exportHeading { font-size: 17px; font-weight: 600; }
+            QLabel#welcomeTitle { font-size: 28px; font-weight: 600; }
+            QMenu { color: #20323d; background: #ffffff; border: 1px solid #b7c6cf; }
+            QMenu::item { padding: 8px 20px; }
+            QMenu::item:selected { color: #ffffff; background: #126878; }
+            QComboBox QAbstractItemView { color: #20323d; background: #ffffff;
+                selection-background-color: #126878; selection-color: #ffffff; }
+        """)
 
     def cancel(self) -> None:
         self._cancellation.set()
@@ -792,6 +916,14 @@ class FigureProjectWindow(QMainWindow):
         self.documents.setEnabled(idle and bool(self._workspace))
         self.cancel_button.setEnabled(self._busy and not self._closing)
         self.view.setEnabled(idle and bool(self._workspace))
+        self.surface.setCurrentWidget(self.view if self._workspace else self.welcome)
+        self.welcome_status.setText(
+            "正在处理工作区，请稍候。" if self._busy else self.view.status.text()
+        )
+        for action, button in self.project_actions:
+            action.setEnabled(button.isEnabled())
+        for welcome_button, button in self.welcome_buttons:
+            welcome_button.setEnabled(button.isEnabled())
 
     def _start(self) -> None:
         self._busy = True

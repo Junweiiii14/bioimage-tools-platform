@@ -5,6 +5,7 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
     QDoubleSpinBox,
+    QGridLayout,
     QHBoxLayout,
     QLabel,
     QPushButton,
@@ -61,13 +62,17 @@ class CropSuggestionPanel(QWidget):
         for widget in (self.polarity, self.marker, self.edges, self.manual, self.threshold):
             settings.addWidget(widget)
         root.addLayout(settings)
-        actions = QHBoxLayout()
+        actions = QGridLayout()
         self.run_one = QPushButton("检测当前行")
         self.run_all = QPushButton("检测全部原图")
         self.run_one.clicked.connect(lambda: self.run_requested.emit(False))
         self.run_all.clicked.connect(lambda: self.run_requested.emit(True))
         self.candidates = QComboBox()
-        self.candidates.setMinimumWidth(270)
+        self.candidates.setMinimumWidth(180)
+        self.candidates.setSizeAdjustPolicy(
+            QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
+        )
+        self.candidates.setMinimumContentsLength(12)
         self.apply = QPushButton("应用所选候选")
         self.restore = QPushButton("恢复首选候选")
         self.focus = QPushButton("聚焦膜区域")
@@ -79,16 +84,18 @@ class CropSuggestionPanel(QWidget):
         )
         self.restore.clicked.connect(lambda: self.apply_requested.emit(0))
         self.candidates.currentIndexChanged.connect(self.candidate_changed)
-        for widget in (
-            self.run_one,
-            self.run_all,
-            self.candidates,
-            self.apply,
-            self.restore,
-            self.focus,
-            self.reset_view,
+        for index, widget in enumerate(
+            (
+                self.run_one,
+                self.run_all,
+                self.candidates,
+                self.apply,
+                self.restore,
+                self.focus,
+                self.reset_view,
+            )
         ):
-            actions.addWidget(widget)
+            actions.addWidget(widget, index // 4, index % 4)
         root.addLayout(actions)
         self.details = QLabel()
         self.details.setWordWrap(True)

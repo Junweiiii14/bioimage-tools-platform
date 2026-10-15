@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 import tifffile
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QAbstractItemView, QTabWidget
+from PySide6.QtWidgets import QAbstractItemView
 from pytestqt.qtbot import QtBot
 from wb_tool.api import WBLayoutProject, analysis_is_current
 
@@ -74,9 +74,7 @@ def test_segmented_full_image_real_ocr_results_reopen_and_template_reuse(
     assert item(window.view.normalization.results, 0, 8).text() == "0.5"
     capture = os.environ.get("BIOIMAGE_LAYOUT_CAPTURE")
     if capture:
-        tabs = window.view.findChild(QTabWidget)
-        assert tabs
-        tabs.setCurrentWidget(panel)
+        window.view.show_section("layout")
         assert window.grab().save(capture)
     window.close()
     qtbot.waitUntil(lambda: window.resources_closed, timeout=20000)
