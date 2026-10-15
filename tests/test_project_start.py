@@ -58,7 +58,8 @@ def test_select_original_creates_independent_project_and_outputs(
     assert (output / "status.json").is_file()
     row = tool.view.project().rows[0]
     assert row.filename == source.name
-    assert row.protein == "未指定"
+    # Portable explicit unknown label; source identity must not masquerade as protein.
+    assert row.protein == "Unassigned"
 
 
 def test_invalid_tiff_creates_no_workspace_or_history(

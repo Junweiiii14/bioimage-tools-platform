@@ -11,3 +11,5 @@
 状态：implemented-awaiting-integration-review。未更改数值/schema/旧测试预期；独立审查由根任务绑定集成提交。
 
 T029宿主集成测试补充（host f8cb05d，本树cherry-pick 5d4e406）：tests/test_project_start.py新增4个用户行为测试。初次运行退出1：3通过、1失败。取消扫描、无效TIFF不建项目/历史、原图目录重叠保护通过；中文来源名称/未指定蛋白的有效原图自动输出失败，实际错误“这些标签需要导入支持相应文字的TTF/OTF/TTC字体”，已报告根任务修复，未削弱预期。scoped pyright与ruff通过。等待字体/显示标签修复后复验。
+
+字体阻塞复验：根修复348fb3e（本树efe7a46）将新导入行缺失蛋白标签表示为可移植的Unassigned，表示未知蛋白，不使用Source编号冒充身份，也不改变实验语义。测试对应明确断言该占位；保留中文原图目录和完整PNG/XLSX/status输出断言。pytest tests/test_project_start.py 4通过，退出0（2.88s）；pyright和ruff退出0。此前失败保留为发现与修复证据。
