@@ -5,6 +5,11 @@
   "scopes": [
     ".agent-handoff",
     ".impeccable",
+    "DESIGN.md",
+    "PRODUCT.md",
+    "apps/desktop",
+    "tests",
+    "tools/wb",
     "work"
   ],
   "rules": {

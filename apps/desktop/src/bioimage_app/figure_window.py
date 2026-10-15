@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
     QMenu,
     QMessageBox,
     QPushButton,
+    QSizePolicy,
     QStackedWidget,
     QToolBar,
     QToolButton,
@@ -70,7 +71,7 @@ class FigureProjectWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("WB 自动化 · 多原图与 Fig 拼图项目")
-        self.resize(1440, 960)
+        self.resize(1440, 900)
         self.setObjectName("wbProjectWindow")
         self._apply_theme()
         self.view = create_figure_project_view()
@@ -111,6 +112,9 @@ class FigureProjectWindow(QMainWindow):
         bar = QToolBar("项目")
         bar.setMovable(False)
         self.addToolBar(bar)
+        brand = QLabel("WB  实验图像工作台")
+        brand.setObjectName("appBrand")
+        bar.addWidget(brand)
         self.create_button = QPushButton("新建项目工作区")
         self.open_button = QPushButton("打开项目工作区")
         self.restore_button = QPushButton("从 ZIP 恢复")
@@ -119,13 +123,12 @@ class FigureProjectWindow(QMainWindow):
         self.new_button = QPushButton("复用模板新建项目")
         self.cancel_button = QPushButton("取消当前任务")
         self.documents = QComboBox()
-        self.documents.setMinimumWidth(240)
-        for button in (
-            self.import_button,
-            self.save_button,
-            self.cancel_button,
-            self.documents,
-        ):
+        self.documents.setMinimumWidth(160)
+        bar.addWidget(self.documents)
+        spacer = QWidget()
+        spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        bar.addWidget(spacer)
+        for button in (self.import_button, self.save_button, self.cancel_button):
             bar.addWidget(button)
         # Keep the existing buttons as command/state owners for host contracts and tests.
         self.project_menu = QMenu("项目", self)
@@ -137,11 +140,11 @@ class FigureProjectWindow(QMainWindow):
             action.triggered.connect(button.click)
             self.project_actions.append((action, button))
         self.project_menu_button = QToolButton()
-        self.project_menu_button.setText("项目")
+        self.project_menu_button.setText("项目菜单")
         self.project_menu_button.setMenu(self.project_menu)
         self.project_menu_button.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
-        bar.insertWidget(bar.actions()[0], self.project_menu_button)
-        self.documents.setMaximumWidth(340)
+        bar.addWidget(self.project_menu_button)
+        self.documents.setMaximumWidth(280)
         self.documents.setAccessibleName("当前工作区内的项目")
         self.import_button.setObjectName("primaryAction")
         self.welcome = QWidget()
@@ -222,17 +225,17 @@ class FigureProjectWindow(QMainWindow):
         self.setFont(QFont("Microsoft YaHei UI", 10))
         palette = QPalette(self.palette())
         for role, color in (
-            (QPalette.ColorRole.Window, "#f4f7f9"),
-            (QPalette.ColorRole.WindowText, "#20323d"),
+            (QPalette.ColorRole.Window, "#f3f6f7"),
+            (QPalette.ColorRole.WindowText, "#24363b"),
             (QPalette.ColorRole.Base, "#ffffff"),
-            (QPalette.ColorRole.AlternateBase, "#eef3f5"),
-            (QPalette.ColorRole.Text, "#20323d"),
-            (QPalette.ColorRole.Button, "#f7fafb"),
-            (QPalette.ColorRole.ButtonText, "#20323d"),
-            (QPalette.ColorRole.Highlight, "#126878"),
+            (QPalette.ColorRole.AlternateBase, "#f0f5f5"),
+            (QPalette.ColorRole.Text, "#24363b"),
+            (QPalette.ColorRole.Button, "#fafcfc"),
+            (QPalette.ColorRole.ButtonText, "#24363b"),
+            (QPalette.ColorRole.Highlight, "#087677"),
             (QPalette.ColorRole.HighlightedText, "#ffffff"),
             (QPalette.ColorRole.ToolTipBase, "#ffffff"),
-            (QPalette.ColorRole.ToolTipText, "#20323d"),
+            (QPalette.ColorRole.ToolTipText, "#24363b"),
         ):
             for group in (
                 QPalette.ColorGroup.Active,
@@ -242,57 +245,67 @@ class FigureProjectWindow(QMainWindow):
                 palette.setColor(group, role, QColor(color))
         self.setPalette(palette)
         self.setStyleSheet("""
-            QMainWindow#wbProjectWindow { background: #f4f7f9; color: #20323d; }
-            QLabel, QCheckBox, QRadioButton { color: #20323d; background: transparent; }
+            QMainWindow#wbProjectWindow { background: #f3f6f7; color: #24363b; }
+            QLabel, QCheckBox, QRadioButton { color: #24363b; background: transparent; }
             QLabel:disabled, QCheckBox:disabled, QRadioButton:disabled { color: #697a84; }
             QScrollArea, QScrollArea > QWidget, QScrollArea > QWidget > QWidget {
-                background: #ffffff; color: #20323d; }
-            QPlainTextEdit, QTextEdit { background: #ffffff; color: #20323d; }
-            QDoubleSpinBox { background: #ffffff; color: #20323d;
-                border: 1px solid #b7c6cf; padding: 4px; }
+                background: #ffffff; color: #24363b; }
+            QPlainTextEdit, QTextEdit { background: #ffffff; color: #24363b; }
+            QDoubleSpinBox { background: #ffffff; color: #24363b;
+                border: 1px solid #cbd8dd; padding: 4px; }
             QSplitter::handle { background: #d3dde2; }
-            QTableCornerButton::section { background: #eaf0f3; border: 0; }
-            QToolBar { background: #eaf0f3; border: 0; padding: 7px; spacing: 8px; }
-            QPushButton, QToolButton { color: #20323d; background: #ffffff;
-                border: 1px solid #b7c6cf; border-radius: 5px; padding: 5px 9px; }
-            QPushButton:hover, QToolButton:hover { background: #e7f1f4; border-color: #126878; }
-            QPushButton:focus, QToolButton:focus { border: 2px solid #126878; }
+            QTableCornerButton::section { background: #f0f5f5; border: 0; }
+            QToolBar { background: #ffffff; border: 0; padding: 10px 16px; spacing: 10px; }
+            QLabel#appBrand { font-size: 16px; font-weight: 600; padding-right: 12px; }
+            QPushButton, QToolButton { color: #24363b; background: #ffffff;
+                border: 1px solid #cbd8dd; border-radius: 5px; padding: 5px 9px; }
+            QPushButton:hover, QToolButton:hover { background: #eaf5f3; border-color: #087677; }
+            QPushButton:focus, QToolButton:focus { border: 2px solid #087677; }
             QPushButton:disabled, QToolButton:disabled { color: #697a84; background: #edf1f3;
                 border-color: #d3dde2; }
-            QPushButton#primaryAction { color: #ffffff; background: #126878;
-                border-color: #126878; }
+            QPushButton#primaryAction { color: #ffffff; background: #087677;
+                border-color: #087677; }
             QPushButton#primaryAction:disabled { color: #697a84; background: #edf1f3; }
-            QLineEdit, QSpinBox, QComboBox { color: #20323d; background: #ffffff;
-                padding: 4px; border: 1px solid #b7c6cf; border-radius: 3px; }
-            QLineEdit:focus, QSpinBox:focus, QComboBox:focus { border-color: #126878; }
+            QLineEdit, QSpinBox, QComboBox { color: #24363b; background: #ffffff;
+                padding: 4px; border: 1px solid #cbd8dd; border-radius: 3px; }
+            QLineEdit:focus, QSpinBox:focus, QComboBox:focus { border-color: #087677; }
             QTabWidget::pane { border: 1px solid #c8d4dc; background: #ffffff; }
             QTabBar::tab { color: #405660; background: #edf2f5; padding: 7px 12px; }
-            QTabBar::tab:selected { color: #ffffff; background: #126878; }
-            QTableWidget { background: #ffffff; color: #20323d; gridline-color: #dce4e9;
-                selection-background-color: #d3e9ed; selection-color: #173e49; }
-            QHeaderView::section { background: #eaf0f3; color: #344c59;
+            QTabBar::tab:selected { color: #096568; background: #eaf5f3;
+                border-bottom: 2px solid #087677; }
+            QTableWidget { background: #ffffff; color: #24363b; gridline-color: #dce4e9;
+                selection-background-color: #dff1ed; selection-color: #096568; }
+            QHeaderView::section { background: #f0f5f5; color: #344c59;
                 border: 0; border-bottom: 1px solid #c8d4dc; padding: 6px; }
-            QWidget#workflowSidebar { background: #172126; border-radius: 6px; }
-            QLabel#sidebarBrand { color: #f4f7f9; font-size: 28px; font-weight: 600; }
-            QLabel#sidebarSubtitle, QLabel#sidebarNote { color: #acbdc6; font-size: 11px; }
-            QListWidget#workflowSteps { background: #172126; border: 0; padding: 0; }
-            QListWidget#workflowSteps::item { color: #c9d5db; padding: 12px 7px; }
-            QListWidget#workflowSteps::item:selected {
-                background: #d2e9bd; color: #213322; border-radius: 4px; }
-            QLabel#stepTitle { font-size: 19px; font-weight: 600; color: #20323d; }
+            QWidget#workflowNavigation { background: #ffffff; }
+            QListWidget#workflowSteps { background: #ffffff; border: 0; padding: 0; }
+            QListWidget#workflowSteps::item { color: #526970; padding: 10px 20px;
+                border-bottom: 3px solid transparent; }
+            QListWidget#workflowSteps::item:selected { background: #eff7f6;
+                color: #096568; border-bottom: 3px solid #087677; }
+            QListWidget#workflowSteps::item:hover { background: #f0f5f5; }
+            QListWidget#evidenceSources { background: #ffffff; border: 0; }
+            QListWidget#evidenceSources::item { padding: 5px 7px; color: #24363b; }
+            QListWidget#evidenceSources::item:selected { background: #eaf5f3; color: #096568; }
+            QListWidget#evidenceSources::item:hover { background: #f0f5f5; }
+            QWidget#evidenceWorkbench, QWidget#evidenceStage { background: #f3f6f7; }
+            QWidget#evidenceControls, QWidget#evidenceReview { background: #ffffff; }
+            QLabel#evidenceHeading { font-size: 14px; font-weight: 600; }
+            QLabel#evidenceSummary { color: #526970; }
+            QLabel#stepTitle { font-size: 19px; font-weight: 600; color: #24363b; }
             QLabel#stepHelp { color: #405660; padding-bottom: 3px; }
             QLabel#projectCaption { color: #536771; font-size: 11px; }
             QLineEdit#projectName { background: transparent; font-size: 14px; font-weight: 600;
                 border: 0; padding: 3px 6px; }
-            QLineEdit#projectName:focus { background: #ffffff; border: 1px solid #126878; }
+            QLineEdit#projectName:focus { background: #ffffff; border: 1px solid #087677; }
             QLabel#welcomeWorkflow { background: #e8eef1; padding: 22px; color: #344c59; }
             QLabel#exportHeading { font-size: 17px; font-weight: 600; }
             QLabel#welcomeTitle { font-size: 24px; font-weight: 600; }
-            QMenu { color: #20323d; background: #ffffff; border: 1px solid #b7c6cf; }
+            QMenu { color: #24363b; background: #ffffff; border: 1px solid #cbd8dd; }
             QMenu::item { padding: 8px 20px; }
-            QMenu::item:selected { color: #ffffff; background: #126878; }
-            QComboBox QAbstractItemView { color: #20323d; background: #ffffff;
-                selection-background-color: #126878; selection-color: #ffffff; }
+            QMenu::item:selected { color: #ffffff; background: #087677; }
+            QComboBox QAbstractItemView { color: #24363b; background: #ffffff;
+                selection-background-color: #087677; selection-color: #ffffff; }
         """)
 
     def cancel(self) -> None:

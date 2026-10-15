@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QListView,
     QListWidget,
     QMenu,
     QPushButton,
@@ -144,7 +145,7 @@ class FigureProjectView(QWidget):
         root.addLayout(project_header)
         self.status = QLabel("批量导入原图，填写 Fig/蛋白，框选整行范围并复核。")
         self.status.setWordWrap(True)
-        root.addWidget(self.status)
+
         self.history_label = QLabel()
         self.history_label.setWordWrap(True)
         root.addWidget(self.history_label)
@@ -333,30 +334,22 @@ class FigureProjectView(QWidget):
         settings: QWidget,
         preview_page: QWidget,
     ) -> None:
-        body = QHBoxLayout()
-        body.setSpacing(16)
         self.steps = QListWidget()
         self.steps.setObjectName("workflowSteps")
         self.steps.setAccessibleName("实验项目步骤")
         self.steps.addItems(["1  原图与裁剪", "2  定量与复核", "3  拼图排版", "4  导出"])
-        self.steps.setSpacing(3)
+        self.steps.setFlow(QListView.Flow.LeftToRight)
+        self.steps.setWrapping(False)
+        self.steps.setGridSize(QSize(220, 44))
+        self.steps.setFixedHeight(48)
+        self.steps.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.steps.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.sidebar = QWidget()
-        self.sidebar.setObjectName("workflowSidebar")
-        self.sidebar.setFixedWidth(168)
-        sidebar_layout = QVBoxLayout(self.sidebar)
-        sidebar_layout.setContentsMargins(12, 18, 12, 16)
-        brand = QLabel("WB")
-        brand.setObjectName("sidebarBrand")
-        sidebar_layout.addWidget(brand)
-        subtitle = QLabel("实验图像工作台")
-        subtitle.setObjectName("sidebarSubtitle")
-        sidebar_layout.addWidget(subtitle)
-        sidebar_layout.addSpacing(20)
-        sidebar_layout.addWidget(self.steps, 1)
-        side_note = QLabel("从原图到结果\n保留每一步的来源")
-        side_note.setObjectName("sidebarNote")
-        sidebar_layout.addWidget(side_note)
-        body.addWidget(self.sidebar)
+        self.sidebar.setObjectName("workflowNavigation")
+        navigation_layout = QVBoxLayout(self.sidebar)
+        navigation_layout.setContentsMargins(0, 0, 0, 0)
+        navigation_layout.addWidget(self.steps)
+        root.addWidget(self.sidebar)
         content = QVBoxLayout()
         content.setSpacing(5)
         self.step_title = QLabel()
@@ -368,8 +361,7 @@ class FigureProjectView(QWidget):
         content.addWidget(self.step_help)
         self.pages = QStackedWidget()
         content.addWidget(self.pages, 1)
-        body.addLayout(content, 1)
-        root.addLayout(body, 1)
+        root.addLayout(content, 1)
 
         originals = QWidget()
         originals_layout = QVBoxLayout(originals)
@@ -389,25 +381,25 @@ class FigureProjectView(QWidget):
         quantification = QWidget()
         quantification_layout = QVBoxLayout(quantification)
         quantification_layout.setContentsMargins(0, 0, 0, 0)
-        row_selection = QHBoxLayout()
-        row_selection.addWidget(QLabel("当前原图行"))
-        self.analysis_source = QComboBox()
+        self.analysis_source = QComboBox(self.analysis.controls)
         self.analysis_source.setAccessibleName("选择需要定量的原图行")
-        self.analysis_source.setSizeAdjustPolicy(
-            QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
-        )
-        self.analysis_source.setMinimumContentsLength(24)
-        row_selection.addWidget(self.analysis_source, 1)
+        self.analysis_source.hide()
+        self.analysis_sources = QListWidget()
+        self.analysis_sources.setObjectName("evidenceSources")
+        self.analysis_sources.setAccessibleName("定量原图来源")
+        self.analysis_sources.setFixedHeight(82)
+        self.analysis.controls_layout.insertWidget(1, self.analysis_sources)
+        self.analysis_sources.currentRowChanged.connect(self._select_analysis_source)
         back_to_source = QPushButton("返回裁剪与审核")
         back_to_source.clicked.connect(lambda: self.show_section("source"))
-        row_selection.addWidget(back_to_source)
-        quantification_layout.addLayout(row_selection)
+        back_to_source.setParent(self.analysis.controls)
+        back_to_source.hide()
         self.analysis_tabs = QTabWidget()
         self.analysis_tabs.addTab(self.analysis, "定量与曲线复核")
         self.analysis_tabs.addTab(self.ocr, "OCR / 结果表")
         self.analysis_tabs.addTab(self.normalization, "样本对应与归一化")
         quantification_layout.addWidget(self.analysis_tabs, 1)
-        self._add_step(quantification)
+        self.pages.addWidget(quantification)
         self.analysis_source.activated.connect(self._select_analysis_source)
 
         self.layout_tabs = QTabWidget()
@@ -493,7 +485,7 @@ class FigureProjectView(QWidget):
         self.next_step.clicked.connect(
             lambda: self.steps.setCurrentRow(self.steps.currentRow() + 1)
         )
-        navigation.addStretch()
+        navigation.addWidget(self.status, 1)
         navigation.addWidget(self.previous_step)
         navigation.addWidget(self.next_step)
         content.addLayout(navigation)
@@ -521,6 +513,8 @@ class FigureProjectView(QWidget):
         self.pages.setCurrentIndex(index)
         self.step_title.setText(titles[index])
         self.step_help.setText(hints[index])
+        self.step_title.setVisible(index != 1)
+        self.step_help.setVisible(index != 1)
         self.previous_step.setEnabled(index > 0)
         self.next_step.setEnabled(index < 3)
         self.next_step.setText(f"下一步：{titles[index + 1]}" if index < 3 else "已到最后一步")
@@ -553,12 +547,18 @@ class FigureProjectView(QWidget):
 
     def _refresh_analysis_sources(self) -> None:
         self.analysis_source.blockSignals(True)
+        self.analysis_sources.blockSignals(True)
         self.analysis_source.clear()
+        self.analysis_sources.clear()
         for index, row in enumerate(self._project.rows):
-            self.analysis_source.addItem(
-                f"{self._text(index, 1)} · {self._text(index, 2)} · {row.filename}", index
-            )
+            title = f"{self._text(index, 2)} · {row.filename or '缺图'}"
+            self.analysis_source.addItem(title, index)
+            self.analysis_sources.addItem(title)
+            source_item = self.analysis_sources.item(index)
+            source_item.setToolTip(title)
         self.analysis_source.setCurrentIndex(self.table.currentRow())
+        self.analysis_sources.setCurrentRow(self.table.currentRow())
+        self.analysis_sources.blockSignals(False)
         self.analysis_source.blockSignals(False)
 
     def _select_analysis_source(self, index: int) -> None:
@@ -668,6 +668,7 @@ class FigureProjectView(QWidget):
         self._thumbnails = {key: icon for key, icon in self._thumbnails.items() if key in present}
         self.ocr.restore(project)
         self.normalization.restore(project)
+        self.analysis.set_source_context(None)
         self.analysis.show_plan(None)
         self.analysis.invalidate()
         self.ocr.result_view.invalidate()
@@ -841,6 +842,10 @@ class FigureProjectView(QWidget):
                 self._refresh_analysis_sources()
                 return
             self._refresh_analysis_sources()
+            self.canvas.set_image(PreviewRaster("", 0, 0, 0, 0, b"", 0, ()))
+            self.canvas.set_lanes(())
+            self.canvas.set_regions(())
+            self.analysis.clear_source_preview()
             self.show_analysis(row)
             self._overlay()
             self.source_requested.emit(self._project.rows[row].row_id)
@@ -867,6 +872,9 @@ class FigureProjectView(QWidget):
                 if plan and plan.run and r.row_id == plan.row_id and r.run_id == plan.run.run_id
             ),
             None,
+        )
+        self.analysis.set_source_context(
+            project.rows[index] if 0 <= index < len(project.rows) else None
         )
         self.analysis.show_plan(plan, loaded)
         if plan and 0 <= index < len(project.rows):
@@ -950,7 +958,12 @@ class FigureProjectView(QWidget):
         return self.project().rows[index] if 0 <= index < len(self._project.rows) else None
 
     def set_source_preview(self, preview: PreviewRaster) -> None:
+        index = self.table.currentRow()
+        row = self._project.rows[index] if 0 <= index < len(self._project.rows) else None
+        if row is None or row.source is None or row.source.sha256 != preview.sha256:
+            return
         self.canvas.set_image(preview)
+        self.analysis.set_source_preview(preview)
         self._overlay()
 
     def _overlay(self) -> None:
@@ -967,6 +980,11 @@ class FigureProjectView(QWidget):
                 self.project().crop_height_for(row) if row else self.numbers["crop_height"].value()
             )
             self.suggestions.show_suggestion(row, suggestion, height)
+            # Metadata/ROI edits can stale a plan without changing the selected row.
+            # Only inspect a valid draft; incomplete annotation text remains editable.
+            if self.analysis.plan and not analysis_is_current(self.project(), self.analysis.plan):
+                self.analysis.show_plan(None)
+            self.analysis.set_source_context(row)
             regions: list[LaneROI] = []
             if suggestion and suggestion.result:
                 result = suggestion.result

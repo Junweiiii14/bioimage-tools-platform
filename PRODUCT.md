@@ -16,7 +16,7 @@ Windows native desktop / Qt (PySide6). 本项目不是网页或移动端；不�
 
 ## Operating Context
 
-本机 Windows 桌面工作区；已有项目、后台计算、不可变原图和历史结果。T-022 重写现有前端，保留 T-021 后端与数据兼容。
+本机 Windows 桌面工作区；已有项目、后台计算、不可变原图和历史结果。T-023 按用户选定 A「证据工作台」重写前端，保留现有后端与数据兼容。
 
 ## Capabilities and Constraints
 
@@ -37,3 +37,5 @@ Windows native desktop / Qt (PySide6). 本项目不是网页或移动端；不�
 ## 最新视觉约束
 
 用户已澄清：不保留旧WBQuant操作，只需风格和布局大致相似。继续当前Qt、四步骤和科学逻辑；借鉴旧版浅色参数区、深色画布、紧凑工具栏、青绿强调。旧多峰/复制泳道/拖封底/下一组不属于本次需求。对照见work/evidence/T-022/wbquant-workflow-comparison.md。
+
+用户已选择全新候选 A：顶部横向阶段导航，定量三栏并置来源参数、图像曲线、结果复核。选择于2026-10-15聊天确认。

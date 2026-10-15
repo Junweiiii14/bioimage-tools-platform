@@ -1,28 +1,19 @@
-# WB 项目工作流
+# WB 证据工作台
 
-- Target: tools/wb/src/wb_tool/ui/figure_view.py; apps/desktop/src/bioimage_app/figure_window.py
-- Mode: Operate; native Windows Qt; code-led.
-- 用户确认：按步骤完成整个实验项目。普通布局与实现选择已授权自主处理。
-- 不采用图片拟真界面；Taste抽取用于视觉参考，确认的四步骤与真实Qt功能优先。
+- Target: tools/wb/src/wb_tool/ui/figure_view.py; tools/wb/src/wb_tool/ui/project_analysis.py; apps/desktop/src/bioimage_app/figure_window.py
+- Mode: Operate; Windows Qt; code-led. 用户2026-10-15明确选择候选 A。
+- Critique reference: .impeccable/mocks/decision/evidence.html 与 evidence.jpg；是静态设计参考，不是已实现功能证据。
 
 ## Direction contract
 
-THESIS: 将八个并列技术页整理成四个实验工作阶段，完整原图表只在原图阶段展示，其他阶段通过精简行选择器保留上下文。
+THESIS: 将原图、当前泳道曲线与核验结果放在同一视野，减少分析时往返页面。
 
-OWN-WORLD: 室内正常照明下操作实验数据，采用石墨导航、浅 lime 当前阶段、冷白工作区域、墨色文字、青蓝主要操作、原生控件与统一系统字体。图像本身保持自己的显示映射。Taste product-performs / seed278796543提供真实证据占主视野与紧凑层级方向，原生适配见work/evidence/T-022/taste-direction.md。
+OWN-WORLD: 正常照明下长时间复核实验图像，采用冷白外壳、浅灰工作区、深色图像画布和青绿操作强调。系统中文字体提供原生清晰度。Impeccable 实际方向抽签的 assigned 6；Taste quiet-instrument seed1443278531仅提供克制构图，营销网页规则不移植到桌面。
 
-STORY: 用户建立或打开项目、导入并审核原图、配置积分并复核结果、明确样本对应、设置分段与预览、按目的选择输出。空态指向下一项实际操作，不把未计算显示为完成。
+STORY: 项目身份与保存动作常驻顶部，四阶段横向导航；来源与参数在左，图像与曲线居中，当前结果与计算动作在右。OCR、归一化与完整表仍可直接到达。
 
-FIRST VIEWPORT: 左侧窄石墨导航提供四步骤与当前定位；顶部紧凑项目身份和常用操作；中间主要工作区占最大面积。原图步骤以紧凑来源列表和画布为核心，高级设置与精确坐标按需展开；定量边界表与曲线并排、结果表在下；拼图设置和完整适应窗口预览同屏，OCR关联放在定量辅助页，导出解释文件用途。
+FIRST VIEWPORT: 白色横向四阶段导航取代旧石墨侧栏。定量三栏以中央证据为最大区域，边栏紧凑但可读；原图、拼图和导出沿用同一系统。1440×900与1100×780验证，无横向截断关键操作。
 
-FORM: 用户确认的步骤导航结构；seed: none (user-pinned workflow)。标志性交互是切换阶段时保留同一原图行的选择与未保存标注；导航不增加修订、不虚构完成状态。无装饰动画，不妨碍科学复核。
+FORM: seed: reference unavailable in pinned Impeccable 4.5.2 CLI output; actual roll retained in work/evidence/T-023/seed.txt (no safe SEED REFERENCE line emitted; no reroll). 当前泳道编辑与完整参数表共享同一状态；换来源先验证编辑，再同步图像、曲线与结果。预览仅显示，未计算、排除、损坏与真实零值明确分开。旧WBQuant只参考熟悉的布局，不恢复其旧操作。
 
-FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
-
-## Validation scope
-
-真实Qt渲染；常用桌面尺寸与小窗口；所有既有保存/后台操作测试继续通过。截图只证明布局，不代替真实实验科学验收或物理DPI验收。
-
-## 用户锁定的旧版视觉参考
-
-2026-10-15澄清：仅风格和布局大致类似旧WBQuant，不保留旧操作。采用浅色参数/表格、深色图像画布、紧凑工具栏及青绿操作强调；四步可自由切换。Taste方向受此用户约束，不重抽随机方向。OCR/结果关联归定量辅助，原图检测参数与画布并排；不引入旧多峰/拖基线语义。
+FINISH: 实际Qt截图、相关交互测试、完整门禁、绑定提交的独立审查、视觉finish review，以及DESIGN.md与design.json更新。截图不替代科学准确率或物理DPI验收。
