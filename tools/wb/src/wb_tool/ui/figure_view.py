@@ -238,12 +238,13 @@ class FigureProjectView(QWidget):
 
         preview_page = QWidget()
         preview_layout = QVBoxLayout(preview_page)
-        preview_layout.addWidget(
-            QLabel(
-                "拼图显示：RGB 按 BT.601 转灰度；16 位整除 257。"
-                "归档另含未改像素的 TIFF 裁剪和原图。"
-            )
+        preview_note = QLabel(
+            "拼图显示：RGB 按 BT.601 转灰度；16 位整除 257。归档另含未改像素的 TIFF 裁剪和原图。"
         )
+        preview_note.setWordWrap(True)
+        preview_layout.addWidget(preview_note)
+        preview_page.setMinimumWidth(250)
+        preview_page.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.preview_label = FigurePreview()
         self.preview_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         preview_scroll = QScrollArea()
@@ -404,6 +405,7 @@ class FigureProjectView(QWidget):
         self.layout_tabs = QTabWidget()
         arrangement = QSplitter(Qt.Orientation.Horizontal)
         self.layout_settings_tabs = QTabWidget()
+        self.layout_settings_tabs.setMinimumWidth(450)
         self.layout_settings_tabs.addTab(self.laboratory_layout, "版式与分段")
         self.layout_settings_tabs.addTab(settings, "样式与模板")
         arrangement.addWidget(self.layout_settings_tabs)
@@ -421,7 +423,7 @@ class FigureProjectView(QWidget):
         preview_toolbar.addWidget(self.preview_scale)
         preview_layout.insertLayout(0, preview_toolbar)
         arrangement.addWidget(preview_page)
-        arrangement.setSizes([540, 500])
+        arrangement.setSizes([460, 400])
         arrangement.setChildrenCollapsible(False)
         self.layout_tabs.addTab(arrangement, "排版与预览")
         self.layout_tabs.addTab(self.ocr, "OCR 识别与原图关联")

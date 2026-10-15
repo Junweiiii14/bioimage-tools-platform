@@ -71,11 +71,11 @@ class LaboratoryLayoutPanel(QWidget):
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         header = self.table.horizontalHeader()
-        header.setMinimumSectionSize(40)
+        header.setMinimumSectionSize(48)
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
         self.table.setColumnWidth(0, 76)
-        self.table.setMinimumWidth(340)
+        self.table.setMinimumWidth(410)
         for column, description in (
             (4, "起始泳道（原图序号，含本泳道）"),
             (5, "结束泳道（原图序号，含本泳道）"),
@@ -84,7 +84,7 @@ class LaboratoryLayoutPanel(QWidget):
             if heading is not None:
                 heading.setToolTip(description)
         content.addWidget(self.table, 1)
-        column_hint = QLabel("向右横向滚动可编辑段序、起止泳道和 Fig 列；也可拖动中间分隔线加宽。")
+        column_hint = QLabel("在表内编辑显示行、段序和起止泳道；悬停原图行可查看完整文件名。")
         column_hint.setWordWrap(True)
         content.addWidget(column_hint)
         split = QHBoxLayout()

@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from PySide6.QtTest import QSignalSpy
+from PySide6.QtWidgets import QScrollArea
 from pytestqt.qtbot import QtBot
 from wb_tool.api import FigureRender, WBAnalysisProject
 
@@ -186,3 +187,20 @@ def test_coordinate_and_detection_disclosure_do_not_change_parameters(
     view.suggestions.advanced_toggle.setChecked(False)
     assert view.suggestions.settings(row, before.template.crop_height) == detection
     assert view.project() == before and view.generation == generation
+
+
+def test_layout_controls_fit_small_window_without_horizontal_page_scroll(
+    qtbot: QtBot, tmp_path: Path, windows: Callable[[], "FigureProjectWindow"]
+) -> None:
+    window = windows()
+    setup(qtbot, tmp_path, window)
+    window.view.rebuild_layout()
+    window.view.show_section("layout")
+    window.resize(1100, 780)
+    page = window.view.pages.currentWidget()
+    assert isinstance(page, QScrollArea)
+    table = window.view.laboratory_layout.table
+    qtbot.waitUntil(lambda: page.horizontalScrollBar().maximum() == 0)
+    qtbot.waitUntil(lambda: table.horizontalHeader().length() <= table.viewport().width())
+    assert window.view.preview_scale.isVisible()
+    assert all(table.columnWidth(column) >= 48 for column in range(7))
