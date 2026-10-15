@@ -76,7 +76,11 @@ class AutomaticWorkflow(QObject):
         )
 
     def analyze(
-        self, *, row_ids: tuple[str, ...] = (), import_errors: tuple[str, ...] = ()
+        self,
+        *,
+        row_ids: tuple[str, ...] = (),
+        import_errors: tuple[str, ...] = (),
+        publish_output: bool = True,
     ) -> None:
         window = self.window
         if window.operation_busy or window.is_closing or not window.workspace_path:
@@ -120,9 +124,12 @@ class AutomaticWorkflow(QObject):
                 window.end_phase()
                 if isinstance(project, WBAnalysisProject) and detected_ids:
                     window.view.status.setText("定位完成，正在按原始像素计算；自动结果待复核。")
-                    window.analyze_project(row_ids=tuple(detected_ids), after=self.publish_default)
+                    window.analyze_project(
+                        row_ids=tuple(detected_ids),
+                        after=self.publish_default if publish_output else window.compose,
+                    )
                 else:
-                    window.save(after=lambda: self.publish_default())
+                    window.save(after=self.publish_default if publish_output else window.compose)
                 return
             row_id = pending.pop(0)
             row = next(r for r in project.rows if r.row_id == row_id)

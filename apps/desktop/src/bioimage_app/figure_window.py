@@ -48,6 +48,7 @@ from wb_tool.api import (
     WBReply,
     WBRestoredProject,
     WBReviewProject,
+    analysis_is_current,
     create_figure_project_view,
     create_wb_background,
     initial_composition,
@@ -264,6 +265,7 @@ class FigureProjectWindow(QMainWindow):
         self.view.normalization.export_requested.connect(self._choose_normalization_export)
         self.view.changed.connect(self._queue_ocr_refresh)
         self.view.changed.connect(self._schedule_save)
+        self.view.steps.currentRowChanged.connect(self._mode_changed)
         self.view.changed.connect(self._cancel_stale_export)
         for widget in self.findChildren(QWidget):
             widget.setPalette(self.palette())
@@ -289,7 +291,58 @@ class FigureProjectWindow(QMainWindow):
             self._auto_save.start()
             return
         if self.view.generation != self._saved_generation:
-            self.save()
+            self.save(after=self._refresh_edited_results)
+
+    def _mode_changed(self, index: int) -> None:
+        if index == 1:
+            QTimer.singleShot(0, self._preview_if_needed)
+
+    def _preview_if_needed(self) -> None:
+        if self._busy or self._closing or not self._workspace:
+            return
+        if self.view.steps.currentRow() != 1 or not self.view.preview_label.full_pixmap.isNull():
+            return
+        try:
+            project = self.view.project()
+        except ValueError:
+            return
+        if any(row.roi for row in project.rows):
+            self.compose()
+
+    def _refresh_edited_results(self) -> None:
+        """Recompute edited geometry or explicit bounds, never overwrite explicit bounds."""
+        if self._busy or self._closing or self._cancellation.is_set():
+            return
+        project = self.view.project()
+        plans = (
+            {p.row_id: p for p in project.analyses}
+            if isinstance(project, WBAnalysisProject)
+            else {}
+        )
+        geometry = tuple(
+            row.row_id
+            for row in project.rows
+            if row.source
+            and row.roi
+            and (
+                row.row_id not in plans
+                or plans[row.row_id].crop != row.roi
+                or len(plans[row.row_id].request.lanes) != row.lane_count
+                or plans[row.row_id].empty_lanes != row.empty_lanes
+            )
+        )
+        if geometry:
+            self.automatic.analyze(row_ids=geometry, publish_output=False)
+            return
+        edited = tuple(
+            plan.row_id
+            for plan in plans.values()
+            if plan.run is None and analysis_is_current(project, plan)
+        )
+        if edited:
+            self.analyze_project(row_ids=edited, after=self.compose)
+        else:
+            self._preview_if_needed()
 
     def _retry_project_location(self) -> None:
         parent = QFileDialog.getExistingDirectory(self, "选择项目保存位置（软件自动创建子文件夹）")
@@ -1129,10 +1182,9 @@ class FigureProjectWindow(QMainWindow):
     def _error(self, message: str) -> None:
         self._ocr_refresh_timer.stop()
         self._ocr_refresh_pending = False
-        closing = self._closing
+        # A failed final save must leave the window open for recovery, never retry recursively.
+        self._closing = False
         self._done("操作失败：" + message)
-        if closing:
-            self._finish_close()
 
     def _storage(
         self,
