@@ -117,3 +117,5 @@ policy退出0；技能文件/引用/脚本语法/方向列表与ImpeccableSHA/�
 产品0d9aad94最终505/173.57s全门禁退出0，Ruff298/Pyright0/9合约/4wheel通过；独审15/8.13s；视觉两项修复resolved。一次完整测试约100项后停滞，专属pytest停止exit1；未改产品以faulthandler_timeout=30重跑通过，无超时栈，根因UNKNOWN保留。DESIGN/sidecar已更新，原生13截图元数据0missing；合成演示PID34964以进程为准。完整证据work/evidence/T-023/validation.md。
 
 - 2026-10-15 T-024自动核心子树：40定向测试通过1.31s，Pyright WB源/新测试0，Ruff通过；10真实TIFF仅本机只读探针，详见work/evidence/T-027/automatic-core-validation.md；独审/全仓由集成继续。
+
+- 2026-10-15 T-027后续：58定向2.34s通过（质量复核原始积分/Qt显示/CSV-XLSX/旧项目归档），Pyright0；不改变有效信号/归一化，schema1–7表布局不变。

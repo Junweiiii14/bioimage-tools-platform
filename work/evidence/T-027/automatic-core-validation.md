@@ -15,3 +15,5 @@ API：suggest_automatic_wb、suggest_analysis_for_crop、install_automatic_resul
 验证：2026-10-15 Windows / Python3.12.14，40 targeted tests passed in1.31s（自动11 + 既有裁剪/项目29）；Pyright WB源及新测试0；Ruff同范围通过。矩形解析期望297500证明原像素积分未被平滑替代。首次新测试调用不存在to_bytes导致1失败，改为已存在model_dump_json编码；Pyright测试bit_depth类型收窄为已知合成16位，未改生产契约、旧预期、容差或门禁。
 
 私有真实10TIFF本机只读探针：5个有清晰样本条带的图自动给出3/3/5/5/5泳道并生成边界；3个仅左Marker及2个未形成可靠列信号的图明确无样本候选。来源全部由实际像素处理，没有根据_0/_1选择。真实值尚未有人工真值；部分图含位深上下限，结果保留quality_review。私有图/接触表/脚本在.local，未提交。全仓检查由协调分支集成后执行；本分支不宣称完整产品通过。
+
+后续：ProjectTableCell.raw_integral 作为默认None的末尾字段，只有当前、已核验加载结果的band.measurement才填入。value/status/归一化保持不变。UI分开显示有效信号与原始积分（待复核）；schema8的审计CSV/XLSX附加原始积分列，主结果表不变；schema1–7保持原导出布局，防止旧ZIP严格重建校验失败。58定向测试2.34s通过，涵盖实际上下限像素、来源不匹配/几何过期清空、两处Qt显示及CSV/XLSX证据；Pyright0。

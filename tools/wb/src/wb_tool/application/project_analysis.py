@@ -291,6 +291,7 @@ class ProjectTableCell:
     reason: str
     evidence_origin: str = ""
     archive_sha256: str = ""
+    raw_integral: float | None = None
 
 
 @dataclass(frozen=True)
@@ -350,11 +351,13 @@ def fill_project_table(
             pending = _row_status(project, row, plan, value)
             for index in range(row.lane_count):
                 signal = None
+                raw_integral = None
                 if pending:
                     status, reason = pending
                 else:
                     assert value is not None
                     band = value.result.lanes[index].bands[0]
+                    raw_integral = band.measurement.signal if band.measurement else None
                     status, reason, signal = (
                         band.status,
                         band.reason or ", ".join(band.quality_flags),
@@ -379,6 +382,7 @@ def fill_project_table(
                         status,
                         reason,
                         *run_origin(project, plan.run.run_id if plan and plan.run else ""),
+                        raw_integral=raw_integral,
                     )
                 )
     return tuple(cells)

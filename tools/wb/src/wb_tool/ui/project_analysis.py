@@ -145,14 +145,16 @@ class ProjectAnalysisPanel(QWidget):
         heading = QLabel("当前结果与复核")
         heading.setObjectName("evidenceHeading")
         review_layout.addWidget(heading)
-        self.summary = QTableWidget(0, 3)
-        self.summary.setHorizontalHeaderLabels(["泳道", "信号", "状态"])
+        self.summary = QTableWidget(0, 4)
+        self.summary.setHorizontalHeaderLabels(["泳道", "有效信号", "状态", "原始积分\n（待复核）"])
         self.summary.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.summary.verticalHeader().hide()
         self.summary.setMinimumHeight(130)
         self.summary.setMaximumHeight(180)
         review_layout.addWidget(self.summary)
-        self.review_note = QLabel("未检测与排除不会填为零。修改参数后需重新计算。")
+        self.review_note = QLabel(
+            "原始积分保留待复核测量，不等于有效信号，也不进入归一化。修改参数后需重新计算。"
+        )
         self.review_note.setWordWrap(True)
         review_layout.addWidget(self.review_note)
         for text, callback in (
@@ -319,6 +321,9 @@ class ProjectAnalysisPanel(QWidget):
                     str(i + 1),
                     format(cell.value, ".12g") if cell and cell.value is not None else "—",
                     labels.get(status, status),
+                    format(cell.raw_integral, ".12g")
+                    if cell and cell.raw_integral is not None
+                    else "—",
                 )
             ):
                 item = QTableWidgetItem(value)
