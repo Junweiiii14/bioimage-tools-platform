@@ -447,6 +447,8 @@ class FigureProjectWindow(QMainWindow):
     def cancel(self) -> None:
         self._auto_save.stop()
         self._cancellation.set()
+        self._ocr_refresh_timer.stop()
+        self._ocr_refresh_pending = False
         self.automatic.cancel()
         if self._measurement_session:
             self._measurement_session.cancel()
@@ -612,6 +614,9 @@ class FigureProjectWindow(QMainWindow):
         self._start()
 
         def filled(reply: WBReply) -> None:
+            if self._closing or self._cancellation.is_set():
+                self._done("结果表刷新已取消；后续操作未执行。")
+                return
             if generation == self.view.generation and isinstance(reply.value, ProjectDerivedTables):
                 self.view.ocr.result_view.show_cells(reply.value.ocr_cells)
                 self.view.normalization.result_view.show_snapshot(reply.value.normalization)
@@ -1006,6 +1011,11 @@ class FigureProjectWindow(QMainWindow):
         self._start()
 
         def filled(reply: WBReply) -> None:
+            # A phase transition is part of the same operation: do not let the
+            # derived-table phase's _start() clear a cancellation before after().
+            if self._closing or self._cancellation.is_set():
+                self._done("结果表刷新已取消；后续操作未执行。")
+                return
             if self.view.generation != generation:
                 self._done("项目已改变，请重新刷新结果表")
                 return
