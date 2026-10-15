@@ -123,3 +123,7 @@ policy退出0；技能文件/引用/脚本语法/方向列表与ImpeccableSHA/�
 ## T-024 / 16f3877
 
 `uv run --locked --no-sync python dev.py check --all` exit0；532/193.25s、Ruff/Pyright0/9合约/隔离安装通过。真实10图自动链与ZIP恢复通过；独立5复现exit0/5.24s，修复resolved。首次全量527/1旧schema8拒绝预期失败及显示格式预期更新均详记T-024 validation。
+
+## T-028 / 审核提案（基线93792bc，产品16f3877）
+
+context --task T-028 --scope work --scope .agent-handoff --scope .impeccable/critique --record exit0；Impeccable context/detect exit0，detect为[]且PythonQt不代表视觉通过。Taste draw exit0，seed216553621；独立A/B审查完成，真实ZIP恢复/8页Qt截图脚本exit0。初次复制活动工作区遇到锁失败，改为不可变ZIP恢复，原资产未改。critique-storage write/trend exit0，只有本次快照，无趋势结论。产品测试未运行（无产品变更），键盘/读屏/高DPI等未验收。
