@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-15T17:10:16.656087+08:00",
+  "title": "Design System: WB 自动化桌面工具",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "青蓝操作色"
+      },
+      "window": {
+        "role": "neutral",
+        "displayName": "冷白窗口"
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "白色编辑面"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "墨色正文"
+      },
+      "rail": {
+        "role": "neutral",
+        "displayName": "石墨导航"
+      },
+      "current-step": {
+        "role": "secondary",
+        "displayName": "浅 lime 当前步骤"
+      }
+    },
+    "typographyMeta": {
+      "welcome": {
+        "displayName": "欢迎标题",
+        "purpose": "项目欢迎画面；使用 QSS 像素字号。"
+      },
+      "title": {
+        "displayName": "步骤标题",
+        "purpose": "当前工作步骤；使用 QSS 像素字号。"
+      },
+      "section": {
+        "displayName": "用途分组",
+        "purpose": "导出用途组与裁剪候选面板标题；使用 QSS 像素字号。"
+      },
+      "body": {
+        "displayName": "原生正文",
+        "purpose": "继承 Qt 点字号；字体缺失由系统替代。"
+      },
+      "brand": {
+        "displayName": "WB 标识",
+        "purpose": "侧栏产品标识；继承中文系统字体。"
+      },
+      "project-name": {
+        "displayName": "项目名称",
+        "purpose": "紧凑顶部可编辑名称。"
+      },
+      "caption": {
+        "displayName": "辅助标签",
+        "purpose": "当前项目标签与侧栏辅助文字。"
+      }
+    },
+    "shadows": [],
+    "motion": [],
+    "breakpoints": [],
+    "nativePlatform": {
+      "toolkit": "PySide6 / Qt Widgets",
+      "source": "apps/desktop/src/bioimage_app/figure_window.py::_apply_theme",
+      "focus": "Buttons use a 2px primary border; line edits, integer spin boxes and combo boxes change their border color to primary.",
+      "layout": "168px graphite sidebar and compact project header. Below the source table, a 254px light scrollable parameter panel sits beside the flexible dark image canvas. Candidate actions use a two-column grid and vertically expandable advanced settings. OCR/results belongs to the quantification tabs; layout retains arrangement/preview. QStackedWidget, QScrollArea and non-collapsible QSplitter children; no responsive breakpoint implementation.",
+      "canvasScope": "ImageCanvas and ProfilePlot paint fixed local colors independently of the shell palette. Image display mapping must not enter quantification.",
+      "previewPolicy": "Native Qt components are recorded in DESIGN.md. No fabricated HTML/CSS components or synthesized tonal ramps. Fit/100% preview is display-only and retains the full unscaled render."
+    }
+  },
+  "components": [],
+  "narrative": {
+    "northStar": "实验工作台",
+    "overview": "石墨导航、浅 lime 当前步骤、冷白证据区域和青蓝主要操作构成 Windows 原生 Qt 工作台。紧凑项目栏与层级明确的控件为原图、曲线和拼图让出空间；产品自身的真实证据成为视觉主体。\n\n此记录来自 T-022 第二轮 Taste / Impeccable 原生适配后的实际代码：桌面 `figure_window.py` 的 `_apply_theme`，WB 的 `figure_view.py`、`crop_suggestions.py`、`project_analysis.py`、`project_ocr.py`，以及 `canvas.py` 和 `view.py` 的绘制实现。它描述当前实现，不证明科学准确率、物理 DPI 或安装包验收。用户确认仅借鉴旧 WBQuant 的浅色参数区、深色图像舞台和紧凑工具栏布局；当前 Qt 工作流及科学语义保持独立。",
+    "keyCharacteristics": [
+      "原生控件与统一中文系统字体。",
+      "石墨导航和浅 lime 当前步骤，配合紧凑项目栏。",
+      "图像与曲线拥有独立的证据绘制色。"
+    ],
+    "rules": [
+      {
+        "name": "The Evidence Canvas Rule",
+        "body": "原图与剖面画布固定绘制色只属于证据视图，不进入通用壳主题，也不改变定量像素。",
+        "section": "colors"
+      }
+    ],
+    "dos": [
+      "Do 从实际 Qt palette 与 QSS 延续控件角色和状态。",
+      "Do 保留当前来源、未保存标注与步骤位置之间的连续性。",
+      "Do 将缺失、失败与真实零值分别呈现。"
+    ],
+    "donts": [
+      "Don't 将画布绘制色或输出拼图字体提升为通用壳主题。",
+      "Don't 用导航选中态表示计算完成或科学审核通过。",
+      "Don't 宣称尚未实现的断点、动画、网页组件或统一错误状态。"
+    ]
+  }
+}

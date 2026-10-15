@@ -103,3 +103,7 @@ policy退出0；技能文件/引用/脚本语法/方向列表与ImpeccableSHA/�
 ## 2026-10-15 / F-006 当前版本展示
 
 产品1e6cd5a未改。独立合成演示已启动；实际两条后台run均succeeded，已生成PNG/模板。documents捆绑Python生成Word，默认LO渲染退出1后改Word原生导出PDF退出0，Poppler渲染7页全部已目视检查。使用报告/本机启动脚本在.local/deliveries/WB-preview-20261015-2，详细F-006任务/validation。未重跑产品全门禁，不扩张为真实科学或包态验收。
+
+## 2026-10-15 / T-022
+
+最终产品32a2d18：dev.py check --all退出0，500测试173.83s、Ruff289、Pyright0、9合约、4wheel隔离环境通过。独立代码审查17专项9.02s无发现；原生1280×900/1100×780变化图视觉ship。演示窗口已打开，真实PID41120/启动stderr空，合成数据。旧WBQuant只作外观参考，不继承旧操作；科学/DPI/最终安装包与远程CI未验收。证据work/evidence/T-022/validation.md。
