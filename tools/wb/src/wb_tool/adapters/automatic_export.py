@@ -12,6 +12,7 @@ from wb_tool.adapters.figure_export import export_figure_bundle
 from wb_tool.adapters.figure_image_export import export_figure_image
 from wb_tool.adapters.project_evidence import verify_project_evidence
 from wb_tool.adapters.project_export import export_project_table
+from wb_tool.adapters.quant_export import export_wbquant_table
 from wb_tool.application.figure_project import FigureSourcePath, WBFigureProject
 from wb_tool.application.project_analysis import fill_project_table
 from wb_tool.application.project_archive import ArchiveRunEvidence
@@ -80,6 +81,15 @@ def export_automatic_results(
         export_project_table(
             project, evidence.results, str(stage / "measurements.csv"), cancelled=cancelled
         )
+        if any(
+            p.request.quant_policy == "wbquant_1_4_3@1" for p in getattr(project, "analyses", ())
+        ):
+            export_wbquant_table(
+                project, evidence.results, stage / "gray_analysis.xlsx", cancelled=cancelled
+            )
+            export_wbquant_table(
+                project, evidence.results, stage / "gray_analysis.csv", cancelled=cancelled
+            )
         ready = [r for r in project.rows if r.roi and row_is_ready(project, r)]
         if ready:
             export_figure_image(project, sources, str(stage / "figure.png"), cancelled=cancelled)

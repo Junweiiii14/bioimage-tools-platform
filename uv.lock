@@ -1233,6 +1233,7 @@ source = { editable = "tools/wb" }
 dependencies = [
     { name = "numpy" },
     { name = "pydantic" },
+    { name = "scipy" },
     { name = "tifffile" },
     { name = "tool-contracts" },
 ]
@@ -1263,6 +1264,7 @@ requires-dist = [
     { name = "pydantic", specifier = "==2.14.1" },
     { name = "pyside6", marker = "extra == 'desktop'", specifier = "==6.12.0" },
     { name = "rapidocr", marker = "extra == 'ocr'", specifier = "==3.9.2" },
+    { name = "scipy", specifier = "==1.18.1" },
     { name = "tifffile", specifier = "==2026.9.20" },
     { name = "tool-contracts", editable = "packages/tool_contracts" },
 ]

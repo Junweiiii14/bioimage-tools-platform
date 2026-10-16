@@ -13,7 +13,7 @@ from wb_tool.application.automatic import (
 )
 from wb_tool.application.figure_project import WBFigureProject
 from wb_tool.application.project_analysis import WBAnalysisProject
-from wb_tool.domain.automatic import AutoWBSettings, CropPolicy
+from wb_tool.domain.automatic import AutoWBSettings, CropPolicy, QuantPolicy
 
 
 def automatic_project_row(
@@ -23,6 +23,7 @@ def automatic_project_row(
     *,
     lane_count: int | None = None,
     crop_policy: CropPolicy = "legacy_fixed_height@1",
+    quant_policy: QuantPolicy = "legacy_bounds@1",
     cancelled: Callable[[], bool] = lambda: False,
 ) -> WBAutomaticProject:
     row = next((r for r in project.rows if r.row_id == row_id), None)
@@ -32,7 +33,10 @@ def automatic_project_row(
     if image.sha256 != row.source.sha256:
         raise ValueError("原图摘要已改变")
     settings = AutoWBSettings(
-        lane_count=lane_count, crop_height=project.template.crop_height, crop_policy=crop_policy
+        lane_count=lane_count,
+        crop_height=project.template.crop_height,
+        crop_policy=crop_policy,
+        quant_policy=quant_policy,
     )
     if row.roi is not None:
         previous = (
@@ -67,6 +71,7 @@ def automatic_project_row(
             crop_height=row.roi.y1 - row.roi.y0,
             polarity=polarity,
             crop_policy=previous.settings.crop_policy if previous else crop_policy,
+            quant_policy=quant_policy,
         )
         request = suggest_analysis_for_crop(
             image,
@@ -75,6 +80,7 @@ def automatic_project_row(
             revision=project.revision,
             polarity=polarity,
             empty_lanes=row.empty_lanes,
+            quant_policy=quant_policy,
             cancelled=cancelled,
         )
         return install_automatic_request(project, row_id, row.roi, request, settings)

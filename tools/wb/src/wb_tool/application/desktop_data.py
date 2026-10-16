@@ -28,7 +28,7 @@ from wb_tool.application.project_metadata import MetadataBook
 from wb_tool.application.project_normalization import NormalizationSnapshot
 from wb_tool.application.project_ocr import LoadedProjectOCR
 from wb_tool.application.project_restore import RestoredProjectResults
-from wb_tool.domain.automatic import CropPolicy
+from wb_tool.domain.automatic import CropPolicy, QuantPolicy
 from wb_tool.domain.crop_detection import CropDetectionSettings
 from wb_tool.domain.worksheet import OCRRecognition, Worksheet
 
@@ -73,6 +73,8 @@ class WBJob:
         "project_result",
         "project_table",
         "project_export",
+        "quant_export",
+        "quant_replan",
         "project_ocr_result",
         "project_ocr_install",
         "project_ocr_table",
@@ -93,6 +95,7 @@ class WBJob:
     detection_settings: CropDetectionSettings | None = None
     row_id: str = ""
     crop_policy: CropPolicy = "legacy_fixed_height@1"
+    quant_policy: QuantPolicy = "legacy_bounds@1"
     source_sha256: str = ""
     revision: int = 0
     analysis_plan: ProjectRowAnalysis | None = None

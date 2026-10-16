@@ -34,20 +34,37 @@ class ProjectRowAnalysis(DocumentIO):
         if self.crop.lane_id != self.row_id or not 1 <= len(lanes) <= 96:
             raise ValueError("项目定量行身份/泳道数无效")
         expected = fixed_lane_grid(self.crop, len(lanes))
-        if tuple(lane.roi for lane in lanes) != expected:
+        if (
+            self.request.geometry_policy == "fixed_grid@1"
+            and tuple(lane.roi for lane in lanes) != expected
+        ):
             raise ValueError("项目定量必须保留已配置的固定N网格与顺序")
+        if self.request.geometry_policy == "independent_lanes@1":
+            for index, lane in enumerate(lanes):
+                roi = lane.roi
+                if roi.lane_id != expected[index].lane_id or not (
+                    self.crop.x0 <= roi.x0 < roi.x1 <= self.crop.x1
+                    and self.crop.y0 <= roi.y0 < roi.y1 <= self.crop.y1
+                ):
+                    raise ValueError("独立泳道须保持身份并位于原图裁剪范围内")
+                if index and lanes[index - 1].roi.x1 > roi.x0:
+                    raise ValueError("定量泳道不能重叠或改变左右顺序")
         if len(set(self.empty_lanes)) != len(self.empty_lanes) or any(
             not 1 <= n <= len(lanes) for n in self.empty_lanes
         ):
             raise ValueError("空泳道编号无效")
         for index, lane in enumerate(lanes, 1):
-            if len(lane.bands) != 1 or lane.bands[0].band_id != "target":
+            if (
+                not lane.bands
+                or lane.bands[0].band_id != "target"
+                or (self.request.geometry_policy == "fixed_grid@1" and len(lane.bands) != 1)
+            ):
                 raise ValueError("项目每泳道须有一个稳定target条带")
-            band = lane.bands[0]
-            if index in self.empty_lanes and band.included:
-                raise ValueError("预标空泳道必须排除，不能伪造有效零值")
-            if band.bounds is not None and band.bounds.right >= self.crop.y1 - self.crop.y0:
-                raise ValueError("条带边界超出整行裁剪高度")
+            for band in lane.bands:
+                if index in self.empty_lanes and band.included:
+                    raise ValueError("预标空泳道必须排除，不能伪造有效零值")
+                if band.bounds is not None and band.bounds.right >= lane.roi.y1 - lane.roi.y0:
+                    raise ValueError("条带边界超出泳道高度")
         if self.run is not None:
             if self.run.state not in ("succeeded", "failed", "interrupted", "cancelled"):
                 raise ValueError("项目仅引用已提交终态，运行中的候选不能填表")
@@ -162,8 +179,13 @@ def update_row_analysis_request(
     if (
         request.source_sha256 != plan.request.source_sha256
         or request.revision != plan.request.revision
-        or tuple(lane.roi for lane in request.lanes)
-        != tuple(lane.roi for lane in plan.request.lanes)
+        or request.geometry_policy != plan.request.geometry_policy
+        or request.quant_policy != plan.request.quant_policy
+        or (
+            request.geometry_policy == "fixed_grid@1"
+            and tuple(lane.roi for lane in request.lanes)
+            != tuple(lane.roi for lane in plan.request.lanes)
+        )
     ):
         raise ValueError("参数编辑不能更换来源、固定网格或运行修订")
     updated = ProjectRowAnalysis(

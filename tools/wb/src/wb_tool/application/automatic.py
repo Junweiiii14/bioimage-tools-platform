@@ -17,7 +17,7 @@ from wb_tool.application.document import DocumentIO
 from wb_tool.application.figure_project import FigureRow, WBFigureProject
 from wb_tool.application.laboratory_layout import WBLayoutProject, initial_composition
 from wb_tool.application.project_analysis import ProjectRowAnalysis
-from wb_tool.domain.automatic import AutoWBSettings, detect_automatic_geometry
+from wb_tool.domain.automatic import AutoWBSettings, QuantPolicy, detect_automatic_geometry
 from wb_tool.domain.crop_detection import (
     CropDetection,
     check_detection_cancelled,
@@ -54,6 +54,7 @@ def suggest_analysis_for_crop(
     polarity: Polarity = "dark",
     empty_lanes: tuple[int, ...] = (),
     min_snr: float = 4.0,
+    quant_policy: QuantPolicy = "legacy_bounds@1",
     cancelled: Callable[[], bool] = lambda: False,
 ) -> AnalysisRequest:
     """Suggest closed bounds on detection copies; measurement uses untouched original pixels.
@@ -63,6 +64,30 @@ def suggest_analysis_for_crop(
     """
     AutoWBSettings(polarity=polarity, lane_count=lane_count, min_snr=min_snr)
     lanes: list[LaneAnnotation] = []
+    if quant_policy == "wbquant_1_4_3@1":
+        from wb_tool.domain.quant_supervision import propose_quant_lanes
+
+        proposals = propose_quant_lanes(image.pixels, fixed_lane_grid(crop, lane_count), polarity)
+        for index, proposal in enumerate(proposals, 1):
+            check_detection_cancelled(cancelled)
+            lanes.append(
+                LaneAnnotation(
+                    proposal.roi,
+                    tuple(
+                        BandAnnotation(
+                            "target" if number == 1 else f"target-{number}",
+                            band.bounds,
+                            band.baseline,
+                            index not in empty_lanes,
+                            band.notes,
+                        )
+                        for number, band in enumerate(proposal.bands, 1)
+                    ),
+                )
+            )
+        return AnalysisRequest(
+            image.sha256, revision, polarity, tuple(lanes), "independent_lanes@1", quant_policy
+        )
     for index, roi in enumerate(fixed_lane_grid(crop, lane_count), 1):
         check_detection_cancelled(cancelled)
         profile = np.asarray(compute_lane_profiles(image.pixels, roi, polarity).quantitative)
@@ -87,7 +112,14 @@ def suggest_analysis_for_crop(
                 roi, (BandAnnotation("target", bounds, included=index not in empty_lanes),)
             )
         )
-    return AnalysisRequest(image.sha256, revision, polarity, tuple(lanes))
+    return AnalysisRequest(
+        image.sha256,
+        revision,
+        polarity,
+        tuple(lanes),
+        "fixed_grid@1",
+        quant_policy,
+    )
 
 
 def suggest_automatic_wb(
@@ -115,6 +147,7 @@ def suggest_automatic_wb(
             revision=revision,
             polarity=settings.polarity,
             min_snr=settings.min_snr,
+            quant_policy=settings.quant_policy,
             cancelled=cancelled,
         )
         for c in detection.candidates

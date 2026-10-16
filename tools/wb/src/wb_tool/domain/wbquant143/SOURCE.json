@@ -1,0 +1,13 @@
+{
+  "version": "WBQuant 1.4.3 baseline 1.0.0",
+  "license": "MIT",
+  "modification": "core.py truncated after quantify_lane; unused imports removed. Other numerical logic unchanged.",
+  "sha256": {
+    "core": "0a62f6646715310f18ccdb91a700cb51a6edb088eb4b5452108d77203f643e97",
+    "config": "76b73024b0a0dc5a0a21adc6e0df03d00d81624013a8d61b8faf3d487583d0ae",
+    "models": "e5a37874376a4a57c68b56fc887eaf2664ea72be0b5f114ecbad3519775e03ca",
+    "errors": "3e22262aa5ed175ade9e019dabb1d135cff65913211e3017480b1a36d60bfb1a",
+    "border_peak_filter": "2155983e911c4a54393ad3f3d18359d1c7efa87a10c60bccfafd49b7ec250391",
+    "peak_candidates": "9c905c6c4a99a357cf190c62b9f6935be0520c237d68fc23d829bd56d32fc52c"
+  }
+}
