@@ -14,6 +14,7 @@ from wb_tool.api import (
     LaneROI,
     ProjectTableCell,
     WBAnalysisProject,
+    WBLayoutProject,
     row_is_ready,
 )
 
@@ -107,11 +108,49 @@ class WorkbenchBridge(QObject):
                 for item in manifest.get("rows", []):
                     box = item.get("output_box")
                     if box and item.get("source_sha256"):
+                        peers = [
+                            r["output_box"]
+                            for r in manifest.get("rows", [])
+                            if r.get("figure") == item.get("figure") and r.get("output_box")
+                        ]
+                        label = project.template.label_width
+                        border = project.template.border
+                        heading = (
+                            project.layout_style.heading_size
+                            if isinstance(project, WBLayoutProject)
+                            else project.template.font_size
+                        )
+                        gx = max(
+                            0,
+                            min(b[0] for b in peers)
+                            - border
+                            - (label if project.template.label_side == "left" else 0),
+                        )
+                        gy = max(
+                            0,
+                            min(b[1] for b in peers) - border - heading - project.template.row_gap,
+                        )
+                        gr = min(
+                            rendered.width,
+                            max(b[2] for b in peers)
+                            + border
+                            + (label if project.template.label_side == "right" else 0),
+                        )
+                        gb = min(
+                            rendered.height,
+                            max(b[3] for b in peers) + border + project.template.row_gap,
+                        )
                         regions.append(
                             {
                                 "rowId": item["row_id"],
                                 "sourceLaneRange": item.get("source_lane_range"),
                                 "sourceToOutput": item.get("source_to_output"),
+                                "groupBounds": {
+                                    "x": gx,
+                                    "y": gy,
+                                    "width": gr - gx,
+                                    "height": gb - gy,
+                                },
                                 "displayLine": item.get("display_line"),
                                 "sourceRoi": {
                                     "x": item["roi"]["x0"],
