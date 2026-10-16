@@ -1514,6 +1514,20 @@ class FigureProjectView(QWidget):
         index = next((i for i, row in enumerate(self._project.rows) if row.row_id == row_id), -1)
         if index < 0:
             return
+        # Later metadata edits (especially empty slots) may invalidate an older N.
+        # Validate the complete target row before changing cells, selection or history.
+        try:
+            current = self.project().rows[index]
+            restored = current.model_dump()
+            restored.update(
+                roi=LaneROI(row_id, *(before if step < 0 else after)),
+                lane_count=before_count if step < 0 else after_count,
+                reviewed=False,
+            )
+            FigureRow.model_validate(restored)
+        except ValueError as error:
+            self.status.setText(f"无法恢复裁剪：{error}")
+            return
         self.table.setCurrentCell(index, 0)
         if self.table.currentRow() != index:
             return
