@@ -24,7 +24,7 @@ const row=()=>state.rows.find(r=>r.id===state.selectedId)||state.rows[0];
 const send=(action,payload={})=>bridge&&bridge.request(action,JSON.stringify(payload));
 function toast(message){$('#toast').textContent=message;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3500);}
 function statusLabel(status){return ({quality_review:'质量待复核',needs_review:'待复核',unreviewed:'待复核',valid:'有效',ok:'有效',excluded:'已排除',result_unavailable:'结果不可用',missing:'未完成',pending:'待计算',stale:'已修改，待重算'})[status]||'待复核';}
-function setState(next){const oldId=state.selectedId;state={...state,...next};if(!state.selectedId&&state.rows.length)state.selectedId=state.rows.find(r=>r.roi)?.id||state.rows[0].id;if(oldId!==state.selectedId){focusCrop=true;zoom=1;}render();}
+function setState(next){const oldId=state.selectedId;state={...state,...next};if(selectedCell)selectedCell=state.cells.find(c=>c.rowId===selectedCell.rowId&&c.lane===selectedCell.lane)||null;if(!state.selectedId&&state.rows.length)state.selectedId=state.rows.find(r=>r.roi)?.id||state.rows[0].id;if(oldId!==state.selectedId){focusCrop=true;zoom=1;}render();}
 function render(){
   $('#project-name').textContent=state.projectName;$('#source-count').textContent=state.rows.length;$('#attention-count').textContent=state.rows.filter(needsAttention).length;
   $('#operation-status').textContent=state.status||'就绪';$('#status-dot').classList.toggle('busy',!!state.busy);$('#cancel-button').hidden=!state.busy;
@@ -44,7 +44,7 @@ function renderCanvas(){
  $('#image-title').textContent=mode==='results'?'测量结果':mode==='layout'?'当前拼图':r?.name||'选择一张原图';
  $('#image-subtitle').textContent=mode==='results'?`${state.rows.length} 张原图 · 有效信号与待复核积分独立呈现`:mode==='layout'?'原图裁剪的组合预览 · 显示变换不进入定量':r?`${r.width} × ${r.height} px  ·  ${r.bitDepth||'原始'} 位  ·  ${r.lanes} 个泳道`:'查看自动识别结果，在图上完成调整';
  $('#stage-label').textContent=mode==='layout'?'拼图预览':focusCrop?'原图 · 聚焦裁剪区域':'原始图像';
- $('#canvas-hint').textContent=mode==='results'?'选择结果查看完整原因':mode==='layout'?'当前已生成拼图 · 修改版式请打开模板工具':'拖动边框调整裁剪 · 滚轮缩放 · 方向键微调';
+ $('#canvas-hint').textContent=mode==='results'?'选择结果查看完整原因':mode==='layout'?'当前已生成拼图 · 修改版式请打开模板工具':r&&!r.roi?'在原图上拖出裁剪区域 · 无需填写坐标':'拖动边框调整裁剪 · 滚轮缩放 · 方向键微调';
  $('.image-actions').hidden=mode==='results';$('#overlay-toggle').hidden=mode!=='review';
  const src=mode==='layout'?state.montage:r?.preview;
  $('#empty-image').hidden=!!src;$('#image-transform').hidden=!src;
@@ -91,7 +91,7 @@ async function loadDemo(){
  if(demoOriginal){setState(structuredClone(demoOriginal));switchMode('review');return;}
  try{const res=await fetch('demo.json',{cache:'no-store'});if(!res.ok)throw new Error();const data=await res.json();demoOriginal=structuredClone(data);setState(data);switchMode('review');toast('已打开真实历史记录的交互预览；修改仅保留在网页草稿。');}catch{openDrawer('打开界面预览','<div class="drawer-copy"><p>此网页尚未加载本地预览资料。</p><p>请使用项目提供的预览启动器，或在桌面工作台中选择 WB 原图并开始。</p></div>');}
 }
-function commitCrop(next,before){const r=row();if(!r)return;if(bridge){send('crop',{id:r.id,sourceId:r.sourceId,roi:next});return;}undoStack.push({id:r.id,roi:before,reviewed:r.reviewed});redoStack=[];r.roi=next;r.reviewed=false;r.draft=true;r.results=(r.results||[]).map(c=>({...c,value:null,status:'stale',reason:'网页草稿已调整，未执行新测量。'}));state.cells=state.cells.map(c=>c.rowId===r.id?{...c,value:null,status:'stale',reason:'网页草稿已调整，未执行新测量。'}:c);state.status='网页草稿已调整；等待桌面重新计算';render();}
+function commitCrop(next,before){const r=row();if(!r)return;if(bridge){send('crop',{id:r.id,sourceId:r.sourceId,roi:next});return;}undoStack.push({id:r.id,roi:before,reviewed:r.reviewed});redoStack=[];r.roi=next;r.reviewed=false;r.draft=true;r.reason='网页草稿已调整，未执行新测量；下列积分来自历史记录。';r.results=(r.results||[]).map(c=>({...c,value:null,status:'stale',reason:'网页草稿已调整，未执行新测量。'}));state.cells=state.cells.map(c=>c.rowId===r.id?{...c,value:null,status:'stale',reason:'网页草稿已调整，未执行新测量。'}:c);state.status='网页草稿已调整；等待桌面重新计算';render();}
 function undoRedo(redo){if(bridge){send(redo?'redo':'undo');return;}const from=redo?redoStack:undoStack,to=redo?undoStack:redoStack;if(!from.length){toast(redo?'没有可重做的调整':'没有可撤销的调整');return;}const item=from.pop(),r=state.rows.find(r=>r.id===item.id);to.push({id:r.id,roi:structuredClone(r.roi),reviewed:r.reviewed});r.roi=item.roi;r.reviewed=item.reviewed;select(r.id);toast(redo?'已重做裁剪调整':'已撤销裁剪调整');}
 function showTools(){openDrawer('项目工具',`<p class="drawer-copy">围绕当前实验项目，按需进入完整编辑。</p>${[['metadata','file','批量实验信息','填写蛋白、样本信息与泳道设置'],['analysis','curve','积分曲线与边界','核对曲线，调整积分边界与基线'],['template','layout','模板与分段','管理版式、字体与实验室模板'],['ocr','scan','OCR 识别与写表','识别标签，明确关联到实验来源'],['normalization','table','样本对应与归一化','选择目标、参照与明确的样本关系']].map(([s,i,title,description])=>`<button class="tool-link" data-action="advanced" data-section="${s}">${icon(i)}<span><h3>${title}</h3><p>${description}</p></span></button>`).join('')}`);}
 function exportAction(){if(bridge){send('export');return;}openDrawer('导出与历史记录',`<div class="drawer-copy"><p>网页修改是交互草稿，不执行科学重算，也不生成新的实验结果。</p><h3>查看原始测量记录</h3><p>可下载预览项目原有的测量表。此文件不包含本次网页调整。</p><button class="button primary" data-action="download-record" ${demoOriginal?'':'disabled'}>${icon('download')}下载历史测量记录 CSV</button></div>`);}
@@ -115,7 +115,7 @@ function action(name,element){
  case 'advanced':advanced(element.dataset.section);break;
  case 'inspect':openDrawer($('#inspector-title').textContent,$('#inspector-content').innerHTML+$('#inspector-action').innerHTML);break;
  case 'close-drawer':closeDrawer();break;
- case 'confirm':if(state.busy)return;closeDrawer();if(bridge){send('confirm',{id:row()?.id});}else{const r=row();if(!r?.roi)return;r.reviewed=true;state.status='已记录网页裁剪确认；科学质量状态保持不变';const next=state.rows.find(s=>!s.reviewed&&s.id!==r.id);if(next)select(next.id);else render();toast('裁剪已确认；质量警告仍需独立复核');}break;
+ case 'confirm':if(state.busy)return;$$('#drawer [data-action="confirm"]').forEach(b=>b.disabled=true);closeDrawer();if(bridge){send('confirm',{id:row()?.id});}else{const r=row();if(!r?.roi)return;r.reviewed=true;state.status='已记录网页裁剪确认；科学质量状态保持不变';const next=state.rows.find(s=>!s.reviewed&&s.id!==r.id);if(next)select(next.id);else render();toast('裁剪已确认；质量警告仍需独立复核');}break;
  case 'reanalyze':if(bridge)send('reanalyze');else toast('网页不执行科学计算，请在桌面工作台重新识别。');break;
  case 'compose':if(bridge)send('compose');else toast('当前显示已生成的历史拼图，网页草稿未重新渲染。');break;
  case 'open_output':if(bridge)send('open_output');else exportAction();break;
@@ -136,5 +136,20 @@ $('#crop-overlay').addEventListener('pointermove',event=>{if(!drag)return;const 
 $('#crop-overlay').addEventListener('pointerup',()=>{if(!drag)return;const before=drag.roi,next={...row().roi};drag=null;if(JSON.stringify(before)!==JSON.stringify(next))commitCrop(next,before);});
 $('#crop-overlay').addEventListener('pointercancel',()=>{if(drag){row().roi=drag.roi;drag=null;fitImage();}});
 $('#crop-overlay').addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)||state.busy)return;event.preventDefault();const r=row();if(!r?.roi)return;const before={...r.roi},next={...r.roi},step=event.shiftKey?10:1;const handle=event.target.dataset.handle;if(handle){const dx=event.key==='ArrowLeft'?-step:event.key==='ArrowRight'?step:0,dy=event.key==='ArrowUp'?-step:event.key==='ArrowDown'?step:0;let right=next.x+next.width,bottom=next.y+next.height;if(handle.includes('w'))next.x=Math.max(0,Math.min(right-4,next.x+dx));if(handle.includes('e'))right=Math.max(next.x+4,Math.min(r.width,right+dx));if(handle.includes('n'))next.y=Math.max(0,Math.min(bottom-4,next.y+dy));if(handle.includes('s'))bottom=Math.max(next.y+4,Math.min(r.height,bottom+dy));next.width=right-next.x;next.height=bottom-next.y;commitCrop(next,before);return;}next.x=Math.max(0,Math.min(r.width-next.width,next.x+(event.key==='ArrowLeft'?-step:event.key==='ArrowRight'?step:0)));next.y=Math.max(0,Math.min(r.height-next.height,next.y+(event.key==='ArrowUp'?-step:event.key==='ArrowDown'?step:0)));commitCrop(next,before);});
+
+let drawing=null;
+$('#image-viewport').addEventListener('pointerdown',event=>{
+ const r=row();if(mode!=='review'||state.busy||r?.roi||!r?.preview)return;
+ const rect=$('#image-transform').getBoundingClientRect();const x=Math.round((event.clientX-rect.left)/rect.width*r.width),y=Math.round((event.clientY-rect.top)/rect.height*r.height);
+ if(x<0||y<0||x>=r.width||y>=r.height)return;event.preventDefault();event.currentTarget.setPointerCapture(event.pointerId);drawing={id:r.id,x,y,rect};
+});
+$('#image-viewport').addEventListener('pointermove',event=>{
+ if(!drawing)return;const r=row();if(r.id!==drawing.id){drawing=null;return;}
+ const x=Math.max(0,Math.min(r.width,Math.round((event.clientX-drawing.rect.left)/drawing.rect.width*r.width))),y=Math.max(0,Math.min(r.height,Math.round((event.clientY-drawing.rect.top)/drawing.rect.height*r.height)));
+ r.roi={x:Math.min(x,drawing.x),y:Math.min(y,drawing.y),width:Math.abs(x-drawing.x),height:Math.abs(y-drawing.y)};focusCrop=false;fitImage();
+});
+$('#image-viewport').addEventListener('pointerup',()=>{if(!drawing)return;drawing=null;const r=row();if(r.roi?.width>=4&&r.roi?.height>=4)commitCrop({...r.roi},null);else{r.roi=null;fitImage();}});
+$('#image-viewport').addEventListener('pointercancel',()=>{if(drawing){row().roi=null;drawing=null;fitImage();}});
+
 async function bootstrap(){icons();render();if(window.qt?.webChannelTransport){const script=document.createElement('script');script.src='qrc:///qtwebchannel/qwebchannel.js';script.onload=()=>new QWebChannel(qt.webChannelTransport,channel=>{bridge=channel.objects.workbench;bridge.stateChanged.connect(raw=>{try{const wasEmpty=!state.rows.length;setState(JSON.parse(raw));if(wasEmpty&&state.rows.length)switchMode('review');}catch{toast('项目状态无法读取，请重新打开项目。');}});$('#home-note').textContent='选择原图后自动创建独立项目，所有处理在本机执行。';send('refresh');});document.head.appendChild(script);}else{try{const response=await fetch('demo.json');if(response.ok){demoOriginal=await response.json();setState(structuredClone(demoOriginal));}}catch{} }if(new URLSearchParams(location.search).get('view')==='home'||!state.rows.length){$('#home-view').hidden=false;$('#work-view').hidden=true;}else switchMode('review');}
 bootstrap();

@@ -12,3 +12,5 @@
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;animation-iteration-count:1!important;transition-duration:1ms!important;scroll-behavior:auto!important}}body.reduce-motion *,body.reduce-motion *::before,body.reduce-motion *::after{animation-duration:1ms!important;animation-iteration-count:1!important;transition-duration:1ms!important}
 
 .compact-inspect{display:none}@media(max-width:900px){.compact-inspect{display:inline-flex}.mode-actions{display:flex;gap:10px}}
+
+.rail-button span{white-space:nowrap}.image-viewport{touch-action:none}
