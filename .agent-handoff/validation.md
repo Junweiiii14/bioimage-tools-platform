@@ -135,3 +135,7 @@ context --task T-028 --scope work --scope .agent-handoff --scope .impeccable/cri
 
 ## 2026-10-16 T-029
 74a597b完整check --all退出0：560 passed/210.93s，Pyright0、9合约、隔离wheel/真实OCR烟测。48ecb72取消guard和11b1d96高DPI缓存增量专项回归通过，最终独审绑定11b1d96无未解决发现。完整命令边界及首轮失败保留work/evidence/T-029/validation.md；真实10图原哈希不变但质量警告仍需人工科学审核。
+
+## 2026-10-17 T-037 / fb6e461
+
+完整check --all exit0：594 passed/396.92s、Ruff/Pyright/9合约/隔离wheel及安装桌面/OCR通过。前轮592pass1fail追加图缺分段已修且保留失败记录；初始领域pathlib边界也已修，未降低门禁。最终代码独审覆盖fb6e461，已知发现全部修复。视觉与实际Qt最终证据见work/evidence/T-037/validation.md。

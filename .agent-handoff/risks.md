@@ -1,6 +1,6 @@
 # Risks, Blockers, And Unknowns
 
-- T033仅主工作区同源，高级窗口仍原生；网页预览不重算。WebEngine多窗口GC崩溃在T034修复并回归，不外推所有环境。
+- T037灰度监督已同源，OCR/模板/归一化高级窗口仍原生；网页预览不重算。WebEngine多窗口GC崩溃在T034修复并回归，不外推所有环境。
 
 
 ## Current Blockers
