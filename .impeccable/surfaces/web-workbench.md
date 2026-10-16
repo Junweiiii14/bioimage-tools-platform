@@ -6,8 +6,8 @@ Mode: Operate; Web + QtWebEngine; code-led. 用户要求先网页、再完全同
 ## Direction contract
 THESIS: 从原图进入证据复核，当前来源、图像与质量原因始终可同时辨认；视觉精度服务图上操作。
 OWN-WORLD: 正常照明的实验室，矿物白工作面、深松绿色窄平台栏、翡翠色选中状态，琥珀仅用于质量警告；系统中文UI字体、紧凑标签与舒展图像。
-STORY: 平台选原图，自动处理，再在三栏里复核、排版、查看输出。网页预览明确只读记录/交互草稿，桌面连接真实后端，均不伪造有效信号。
-FIRST VIEWPORT: 72px平台栏；66px项目顶栏，51px模式导航；244px来源区、弹性中央图像、296px复核区。右侧唯一确认动作；底部轻量状态。390px转单列与抽屉，不压缩三栏。
+STORY: 平台选原图，自动处理完成后直接进入拼图，正常裁图无需逐张确认；点击拼图图像返回对应原图调整，再查看输出。网页预览明确只读记录/交互草稿，桌面连接真实后端，均不伪造有效信号。
+FIRST VIEWPORT: 72px平台栏；66px项目顶栏，51px模式导航；244px来源区、弹性中央图像、296px复核区。图像复核右侧主要动作为返回拼图；底部轻量状态。390px转单列与抽屉，不压缩三栏。
 FORM: 延续已选product-performs、固定三栏用户约束；本次不是新的概念投票。signature为来源缩略图选择与中央原图/边界/右侧证据同步，非图像控件使用短过渡，图像证据与像素数值不插值。
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
 
@@ -21,4 +21,4 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 当前本地静态证据：`.local/t033/desktop.png`、`home.png`、`mobile.png`。截图不证明真实 backend 流程、动画体验、科学准确率或完整移动端可用性；T-033 主任务记录与提交绑定独审决定完成状态。网页与桌面同源不代表高级能力已全部网页化。
 
 ## Final implementation details
-基于 `a68000e`：网页辅助文字 `#58675f`，原 8/9/10px 标签统一提高为 11px；图像 opacity/transform 过渡已移除。四角点方向键调整对应边界（默认 1 原像素，Shift 10），框体方向键平移；无 ROI 时在图上拖画，至少 4×4 原像素才提交。浏览器编辑仍为草稿，不产生新的科学结果。
+既有 T-033 视觉记录：网页辅助文字 `#58675f`，原 8/9/10px 标签统一提高为 11px；图像 opacity/transform 过渡已移除。T-035 基于 `96366e9` 核对交互：裁剪宽高比为 1.25 × 泳道数 n，四角点拖动与方向键等比调整（默认高度步进 1 原像素，Shift 10，宽度按比例取整），框体方向键平移；无 ROI 时在图上拖画比例范围，宽高至少各 4 原像素才提交。修改 n 保持裁剪高度，仅调宽；超出原图则提示先缩小框。原图不缩放改写，显示变换不进入定量。拼图命中区来自实际渲染图像边界及来源 ID，支持点击与键盘回原图。裁图状态 cropStatus 与定量质量独立；就绪不代表信号有效或人工审核。浏览器编辑仍为草稿，不产生新的科学结果，历史拼图不冒充草稿结果。T-035 验收以主任务证据为准，以上为代码核对记录。

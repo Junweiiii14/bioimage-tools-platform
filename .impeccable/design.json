@@ -139,7 +139,9 @@
       "validationLimit": "Static evidence only; backend, dynamic and commit-bound validation belong to T-033.",
       "sourceCommit": "a68000e118dc83b549ce6d8128b10225ae227b8d",
       "imageMotion": "Image opacity and transform transitions removed; evidence updates without interpolation.",
-      "cropInteraction": "Four corner handles resize with arrow keys (1 original pixel; Shift 10). Overlay arrows move ROI. Missing ROI supports drawing on the image; minimum 4x4 original pixels to commit. Browser edits remain drafts."
+      "workflowSourceCommit": "96366e9",
+      "cropWorkflow": "Automatic completion opens montage without per-image crop confirmation. Actual rendered image regions link to source rows. Return to montage is the review action. cropStatus and quantitation quality are independent; crop readiness is not scientific validity or human review.",
+      "cropInteraction": "T-035: crop ratio is 1.25 times lane count n. Corner drag and arrows preserve ratio (height step 1 original pixel; Shift 10; rounded width). Overlay arrows move ROI. Drawing requires at least 4x4 original pixels. Changing n preserves crop height and adjusts width; overflow is rejected. Source pixels remain unchanged. Browser edits remain drafts and do not update historical montage or quantitation."
     },
     "typographyMeta": {
       "web-body": {
@@ -154,7 +156,7 @@
     "keyCharacteristics": [
       "暖白、平面、系统中文字体，图像占据中央主要空间。",
       "图像复核、拼图、结果三种顶层模式；辅助能力通过项目工具和上下文入口到达。",
-      "机器建议、人工裁剪审核和质量警告分别表达。",
+      "裁图就绪、人工审核记录和定量质量警告分别表达。",
       "动效只帮助导航定位与控件显现，图像和定量数值保持稳定。"
     ],
     "rules": [
@@ -172,7 +174,7 @@
     "dos": [
       "Do 从实际 Qt palette、QSS 和绘制实现提取角色。",
       "Do 保持原图、来源、曲线、参数和当前结果一致。",
-      "Do 用明确文字区分裁剪审核、质量警告、过期和失败。",
+      "Do 用明确文字区分裁图就绪、人工审核、质量警告、过期和失败。",
       "Do 尊重应用减少动效和 Qt 暴露的系统效果偏好。"
     ],
     "donts": [
