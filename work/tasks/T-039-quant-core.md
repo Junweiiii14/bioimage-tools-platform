@@ -28,3 +28,12 @@ Validation: pending; independent review by parent after commit.
   docs/contracts/wb-quant-supervision-v1.md, not silently weakening product checks.
 - Independent review: parent/reference-audit identified invalid included peak removal and
   single-lane replan consensus; both corrected. Final product review owned by parent.
+
+## Follow-up requested by parent: Fig-first supervision
+
+- Public ordered_quant_rows shares display order with grouped export; split row appears once.
+- Automatic recrop preserves custom composition; a whole-row N change updates only that row;
+  incompatible multi-segment N change errors explicitly without resetting other layout.
+- New test checks custom Fig columns/order, exported first-row numeric identity, recrop stability,
+  single-row N adaptation, split-row rejection and fallback order. 36 related tests passed;
+  latest supervision module 10 passed, exit 0. Ruff passed. No desktop files changed.

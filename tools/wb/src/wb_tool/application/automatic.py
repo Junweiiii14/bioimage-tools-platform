@@ -15,7 +15,7 @@ from wb_tool.application.analysis import (
 )
 from wb_tool.application.document import DocumentIO
 from wb_tool.application.figure_project import FigureRow, WBFigureProject
-from wb_tool.application.laboratory_layout import WBLayoutProject, initial_composition
+from wb_tool.application.laboratory_layout import WBLayoutProject, preserve_automatic_composition
 from wb_tool.application.project_analysis import ProjectRowAnalysis
 from wb_tool.domain.automatic import AutoWBSettings, QuantPolicy, detect_automatic_geometry
 from wb_tool.domain.crop_detection import (
@@ -304,7 +304,28 @@ def install_automatic_request(
         analyses=tuple(p for p in plans if p.row_id != row_id) + (plan,),
     )
     upgraded = WBAutomaticProject.model_validate(fields)
-    return upgraded.model_copy(update={"composition": initial_composition(upgraded)})
+    composition = preserve_automatic_composition(upgraded, row_id)
+    if (
+        isinstance(project, WBLayoutProject)
+        and project.composition.slices
+        and composition != project.composition
+    ):
+        evidence = evidence.model_copy(
+            update={
+                "warnings": (
+                    *evidence.warnings,
+                    "layout_target_row_lane_count_updated_other_rows_preserved",
+                )
+            }
+        )
+        upgraded = upgraded.model_copy(
+            update={
+                "automatic_rows": tuple(
+                    evidence if item.row_id == row_id else item for item in upgraded.automatic_rows
+                )
+            }
+        )
+    return upgraded.model_copy(update={"composition": composition})
 
 
 def with_automatic_rows(

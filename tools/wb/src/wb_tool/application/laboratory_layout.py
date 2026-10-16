@@ -85,6 +85,56 @@ def initial_composition(project: WBFigureProject) -> FigureComposition:
     )
 
 
+def ordered_quant_rows(project: WBFigureProject) -> tuple[FigureRow, ...]:
+    """One measurement row per source row, in the current Fig/display order.
+
+    Segment wrapping never duplicates a biological row. Missing compositions retain
+    original row order; unmatched rows follow explicitly positioned rows of their Fig.
+    """
+    segments = project.composition.slices if isinstance(project, WBLayoutProject) else ()
+    positions: dict[str, tuple[int, int]] = {}
+    figures = {row.row_id: row.figure for row in project.rows}
+    for segment in segments:
+        if figures.get(segment.row_id) == segment.figure:
+            position = (segment.line, segment.position)
+            positions[segment.row_id] = min(positions.get(segment.row_id, position), position)
+    original = {row.row_id: index for index, row in enumerate(project.rows)}
+    return tuple(
+        row
+        for figure in project.figure_order
+        for row in sorted(
+            (row for row in project.rows if row.figure == figure),
+            key=lambda row: (*positions.get(row.row_id, (513, 97)), original[row.row_id]),
+        )
+    )
+
+
+def preserve_automatic_composition(project: WBLayoutProject, row_id: str) -> FigureComposition:
+    """Preserve layout; only a single whole-row segment may adapt to a changed N."""
+    if not project.composition.slices:
+        return initial_composition(project)
+    row = next(row for row in project.rows if row.row_id == row_id)
+    segments = [s for s in project.composition.slices if s.row_id == row_id]
+    composition = project.composition
+    if len(segments) == 1 and segments[0].first_lane == 1:
+        composition = composition.model_copy(
+            update={
+                "slices": tuple(
+                    s.model_copy(update={"last_lane": row.lane_count}) if s.row_id == row_id else s
+                    for s in composition.slices
+                )
+            }
+        )
+    candidate = project.model_copy(update={"composition": composition})
+    try:
+        _groups(candidate, require_review=False, allow_unlocated=True)
+    except ValueError as exc:
+        raise ValueError(
+            f"已有拼图分段与新泳道数不兼容，请先调整该行分段；未重置其它版式：{exc}"
+        ) from exc
+    return composition
+
+
 def with_figure_layout(
     project: WBFigureProject,
     composition: FigureComposition,
@@ -124,7 +174,9 @@ class LaboratoryLayout(FigureLayout):
     lines: tuple[LinePlacement, ...]
 
 
-def _groups(project: WBLayoutProject, require_review: bool) -> dict[str, list[list[FigureSlice]]]:
+def _groups(
+    project: WBLayoutProject, require_review: bool, *, allow_unlocated: bool = False
+) -> dict[str, list[list[FigureSlice]]]:
     from wb_tool.application.automatic import row_is_ready
 
     if not project.rows:
@@ -138,7 +190,11 @@ def _groups(project: WBLayoutProject, require_review: bool) -> dict[str, list[li
             raise ValueError("版式原图行/Fig已改变，请重建或修正版式")
         if require_review and not row_is_ready(project, row):
             raise ValueError(f"{row.figure} / {row.protein} 尚未审核")
-        if row.source and (row.roi is None or not 2 <= project.crop_height_for(row) <= 4096):
+        if (
+            row.source
+            and (row.roi is not None or not allow_unlocated)
+            and (row.roi is None or not 2 <= project.crop_height_for(row) <= 4096)
+        ):
             raise ValueError(f"{row.protein} 需要2..4096像素高的原图ROI")
         groups.setdefault(segment.figure, {}).setdefault(segment.line, []).append(segment)
     ordered: dict[str, list[list[FigureSlice]]] = {}

@@ -181,3 +181,63 @@ def test_multi_band_missing_slot_preserves_vertical_order(tmp_path: Path) -> Non
     rows = wbquant_table_rows(project, results)
     assert [row[3] for row in rows[1:4]] == [4000, None, 4000]
     assert results[0].result.lanes[0].bands[1].status == "not_detected"
+
+
+def test_display_order_and_automatic_layout_preservation(tmp_path: Path) -> None:
+    from wb_tool.api import (
+        FigureColumn,
+        FigureComposition,
+        FigureSlice,
+        ordered_quant_rows,
+        with_figure_layout,
+    )
+
+    project, paths = configured(tmp_path)
+    composition = FigureComposition(
+        slices=(
+            FigureSlice(
+                row_id="row0", figure="Fig1", line=2, position=1, first_lane=1, last_lane=3
+            ),
+            FigureSlice(
+                row_id="row1", figure="Fig1", line=1, position=1, first_lane=1, last_lane=3
+            ),
+            FigureSlice(
+                row_id="missing", figure="Fig2", line=1, position=1, first_lane=1, last_lane=2
+            ),
+        ),
+        columns=(FigureColumn(figure="Fig1", column=2), FigureColumn(figure="Fig2", column=1)),
+    )
+    laid_out = with_figure_layout(project, composition)
+    assert [row.row_id for row in ordered_quant_rows(laid_out)] == ["row1", "row0", "missing"]
+    completed, loaded = complete(laid_out, paths)
+    assert wbquant_table_rows(completed, loaded)[1][3] == 8000
+    refreshed = automatic_project_row(paths[0], laid_out, "row0", quant_policy="wbquant_1_4_3@1")
+    assert refreshed.composition == composition
+    # A whole-row segment adapts only its N and retains every other placement/column.
+    expanded = automatic_project_row(
+        paths[0], refreshed, "row0", lane_count=4, quant_policy="wbquant_1_4_3@1"
+    )
+    assert expanded.composition.slices[0].last_lane == 4
+    assert expanded.composition.slices[1:] == composition.slices[1:]
+    assert expanded.composition.columns == composition.columns
+    assert any(
+        "other_rows_preserved" in warning for warning in expanded.automatic_rows[-1].warnings
+    )
+    # Explicit multi-segment placement cannot be silently flattened after changing N.
+    split = composition.model_copy(
+        update={
+            "slices": (
+                composition.slices[0].model_copy(update={"last_lane": 1}),
+                composition.slices[0].model_copy(update={"line": 3, "first_lane": 2}),
+                *composition.slices[1:],
+            )
+        }
+    )
+    split_project = with_figure_layout(project, split)
+    assert [row.row_id for row in ordered_quant_rows(split_project)] == ["row1", "row0", "missing"]
+    with pytest.raises(ValueError, match="未重置"):
+        automatic_project_row(
+            paths[0], split_project, "row0", lane_count=4, quant_policy="wbquant_1_4_3@1"
+        )
+    assert split_project.composition == split
+    assert [row.row_id for row in ordered_quant_rows(project)] == ["row0", "row1", "missing"]

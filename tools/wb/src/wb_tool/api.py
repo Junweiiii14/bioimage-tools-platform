@@ -76,6 +76,7 @@ from wb_tool.application.laboratory_layout import (
     LaboratoryLayout,
     WBLayoutProject,
     initial_composition,
+    ordered_quant_rows,
     plan_laboratory_layout,
     with_figure_layout,
 )
@@ -239,6 +240,7 @@ __all__ = [
     "read_figure_template",
     "FigureColumn",
     "FigureComposition",
+    "ordered_quant_rows",
     "FigureLayoutStyle",
     "FigureSlice",
     "LaboratoryLayout",

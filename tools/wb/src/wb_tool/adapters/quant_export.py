@@ -10,6 +10,7 @@ from zipfile import ZIP_DEFLATED, ZipFile
 from wb_tool.adapters.project_export import project_table_rows
 from wb_tool.adapters.worksheet_export import NS, Cell, publish_table_bytes, two_sheet_xlsx_bytes
 from wb_tool.application.figure_project import WBFigureProject
+from wb_tool.application.laboratory_layout import ordered_quant_rows
 from wb_tool.application.project_analysis import (
     LoadedProjectResult,
     WBAnalysisProject,
@@ -57,7 +58,7 @@ def wbquant_table_rows(
         ("组序", "组名", "条带", *(f"泳道 {n}" for n in range(1, count + 1)))
     ]
     for group_index, figure in enumerate(project.figure_order, 1):
-        for row in (r for r in project.rows if r.figure == figure):
+        for row in (r for r in ordered_quant_rows(project) if r.figure == figure):
             result = available.get(row.row_id)
             signals: list[list[float | None]] = []
             if result:

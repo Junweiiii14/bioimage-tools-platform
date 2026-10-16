@@ -75,3 +75,17 @@ Both specified real RGB8 originals were also compared to the original package's
 `quantify_image` rejects the 1px unequal-width grid; cross-lane numerical behavior is
 covered separately by equal-width synthetic cases using its complete image entry.
 No broad detection accuracy or biological normalization claim follows from these cases.
+
+## Fig display-order follow-up
+
+`ordered_quant_rows(project)` is shared by grouped tables and host snapshots. It
+follows figure_order, then each source row's first composition (line, position),
+with original rows order as fallback. A wrapped/split source row appears once;
+actual displayed segments still require explicit manifest mappings in the UI.
+
+Automatic crop recalculation preserves a valid existing composition and column
+positions. A single full-row segment can update its last_lane when N changes,
+with `layout_target_row_lane_count_updated_other_rows_preserved` provenance. An
+invalid multi-segment configuration fails explicitly and leaves the passed immutable
+project untouched; no other row is reset. During import only this structural check
+permits not-yet-located rows. Normal rendering still requires valid original ROIs.
