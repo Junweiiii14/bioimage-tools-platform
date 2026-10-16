@@ -10,3 +10,5 @@
 - .local/t037含验证JSON、截图、工作区、打开灰度定量工作台.cmd；启动器读verification.json，只有最新成功harness才更新该文件。OCR/模板/归一化仍原生高级入口，干净Windows与PR/main未做。
 
 - T-041独立实施树codex/t040-standard-display：显式标准显示与可选旋转frame完成自验；唯一状态work/tasks/T-041-standard-display.md，等待协调任务独审/集成。原T037状态保持。
+
+- T041独审修复：frame限整行，部分泳道明确拒绝，31专项通过；协调任务复核新提交。

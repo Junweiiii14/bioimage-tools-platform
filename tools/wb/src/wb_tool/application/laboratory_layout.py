@@ -253,6 +253,8 @@ def _groups(
             raise ValueError(f"{row.protein} 需要2..4096像素高的原图ROI")
         frame = segment.display_frame
         if frame is not None:
+            if segment.first_lane != 1 or segment.last_lane != row.lane_count:
+                raise ValueError("旋转显示框仅允许完整原图行，不能用于分段泳道")
             if project.layout_style.display_policy != "standard_lane_ratio@1":
                 raise ValueError("旋转显示框仅支持standard_lane_ratio@1策略")
             roi = row.roi

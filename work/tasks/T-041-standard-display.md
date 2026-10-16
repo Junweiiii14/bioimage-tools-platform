@@ -16,3 +16,5 @@
 - 最终8测试文件88通过(exit0)：test_standard_display、test_standard_display_ui、test_laboratory_layout、test_laboratory_decode、test_laboratory_compatibility、test_figure_template_io、test_figure_image_export、test_figure_project。
 - Ruff目标文件检查exit0；Pyright strict目标7文件exit0（.local/pyright-standard.json仅配置本树src及借用环境，不降低规则）。第一次直接Pyright因本树空.venv导致依赖解析失败，临时config第一次绝对include被忽略没有检查产品，随后修相对include并实际通过；不将前两次视作有效通过。
 - 全仓check、真实用户8图及独审未运行，由协调任务负责；原科学算法/依赖/锁文件/门禁未改。
+
+独审P1修复：display_frame仅允许first_lane=1且last_lane=row.lane_count的完整原行；部分泳道段明确拒绝，防止整行frame重复采样却声称分段泳道。ROI四角限制未放宽。新增3泳道[1,1]/[2,3]重复整行frame负例；标准显示/Qt/既有native拆段与冻结manifest专项31通过exit0。Pyright首次新增测试list缺类型报3项，补FigureSlice类型后复查；不降低规则。

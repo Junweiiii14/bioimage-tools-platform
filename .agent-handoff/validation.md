@@ -141,3 +141,5 @@ context --task T-028 --scope work --scope .agent-handoff --scope .impeccable/cri
 完整check --all exit0：594 passed/396.92s、Ruff/Pyright/9合约/隔离wheel及安装桌面/OCR通过。前轮592pass1fail追加图缺分段已修且保留失败记录；初始领域pathlib边界也已修，未降低门禁。最终代码独审覆盖fb6e461，已知发现全部修复。视觉与实际Qt最终证据见work/evidence/T-037/validation.md。
 
 | 2026-10-17 | T-041 | Windows/Python3.12.14借t021环境、本树src | 8文件pytest88passed；Ruff/strict Pyright目标通过exit0 | 首轮失败与环境配置过程见任务；全仓/真实8图/独审未运行 |
+
+| 2026-10-17 | T-041独审修复 | 同前环境 | 标准显示/Qt/原生分段31passed exit0 | frame限制完整行；旧像素/manifest保留 |

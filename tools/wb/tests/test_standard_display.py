@@ -247,3 +247,37 @@ def test_rotated_frame_affine_and_bounds_leave_original_uint16_unchanged(tmp_pat
     ):
         with pytest.raises(ValueError):
             DisplayFrame.model_validate({**frame.model_dump(), **values})
+
+
+def test_rotated_frame_cannot_repeat_whole_row_under_segment_lane_claims(tmp_path: Path) -> None:
+    from wb_tool.api import DisplayFrame, FigureSlice
+
+    project, paths = mixed_resolution(tmp_path)
+    frame = DisplayFrame(center_x=18, center_y=15, width=36, height=20, angle_degrees=0)
+    slices: list[FigureSlice] = []
+    for segment in project.composition.slices:
+        if segment.figure == "Fig1":
+            slices.extend(
+                (
+                    segment.model_copy(
+                        update={
+                            "last_lane": 1,
+                            "display_frame": frame if segment.row_id == "r0" else None,
+                        }
+                    ),
+                    segment.model_copy(
+                        update={
+                            "first_lane": 2,
+                            "position": 2,
+                            "display_frame": frame if segment.row_id == "r0" else None,
+                        }
+                    ),
+                )
+            )
+        else:
+            slices.append(segment)
+    bad = project.model_copy(
+        update={"composition": project.composition.model_copy(update={"slices": tuple(slices)})}
+    )
+    with pytest.raises(ValueError, match="仅允许完整原图行"):
+        render_figure(bad, paths)

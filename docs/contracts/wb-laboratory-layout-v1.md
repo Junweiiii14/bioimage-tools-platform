@@ -27,3 +27,5 @@ FigureLayoutStyle 新增版本化 `display_policy`：缺字段继续为 `native_
 FigureSlice.display_frame可空，DisplayFrame保存center_x/center_y/width/height/angle_degrees；全部有限，宽高>0，角度±30度。坐标使用原图像素边界坐标，正角度在图像xy方向顺时针；width方向为(cosθ,sinθ)。四角必须在该行原ROI与原图内，仅1e-7浮点计算容差，不扩展采样边界。原ROI仍为原图矩形定量/裁剪坐标，不由显示框替换。
 
 仅standard_lane_ratio@1接受display_frame，native显式拒绝。旋转显示从原样本经既有8位显示映射，再以Pillow RGB8仿射双线性采样，声明pillow_rgb8_affine_bilinear@1；无frame仍LANCZOS。每实际标准显示段记录source_to_output 2×3矩阵（原图像素边界xy→完整画布xy）、display_frame（可空）及采样身份。矩阵支持显示点击回原图，不用于定量重采样。组合schema见wb-figure-composition-v1.schema.json；旧切片缺字段读作None。frame属于实验composition，不进入通用模板。Qt表单保存保留未编辑片段的frame和style策略/单位；改片段几何或分段清除对应frame，渲染仍验证有效性。
+
+独审修正：display_frame目前仅支持完整原图行（first_lane=1,last_lane=N），部分泳道分段明确拒绝。分段仍可使用无frame的标准或native显示；不能用整行frame重复显示却声明部分泳道。

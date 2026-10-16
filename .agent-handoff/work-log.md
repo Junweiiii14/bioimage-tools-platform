@@ -111,3 +111,5 @@ wb-tool 0.2.0 新增 uint8/16 灰度及显式 RGB 单页 TIFF、极性与半开 
 
 - 新显式standard_lane_ratio@1和DisplayFrame，仅显示RGB8重采样，manifest含原ROI/输出框/仿射矩阵，原生默认冻结hash保持。
 - 目标88测试、Ruff、strict Pyright通过；独审/全仓/真实8图未运行，交协调任务。详见work/tasks/T-041-standard-display.md。
+
+- T041独审P1：禁止部分泳道段携带完整行display_frame，新增重复三泳道负例；31专项通过，详见任务。
