@@ -13,3 +13,13 @@ actual WebChannel handshake, local navigation restrictions, advanced hide and sh
 Initial test source was incorrectly placed above the target project parent and correctly
 rejected by production overlap protection; fixture moved to separate originals directory.
 Full root integration/visual review remain parent T-033 responsibilities.
+
+Follow-up: advanced analysis route and snapshot bitDepth added. File/folder imports into an
+existing workspace append through public asynchronous APIs and automatically process new rows;
+tests preserve project ID/workspace and original bytes across both append forms. Initial
+combined multiple-WebEngine-window regression hit Windows native 0x80000003 during GC twice.
+Lifecycle correction now explicitly deletes the page after backend drain and keeps its
+profile application-owned until page destruction, then schedules profile deletion. Added
+forced-GC cleanup checks. Final targeted bridge+project-start suite: 8 passed in 8.29s exit0;
+scoped Ruff/Pyright passed. This reproduction/fix does not resolve historical unrelated Qt
+native failures or establish standalone Windows packaging stability.

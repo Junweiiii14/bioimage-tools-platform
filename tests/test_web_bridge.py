@@ -1,5 +1,6 @@
 """Real adapter lifecycle and rejection of stale graph edits."""
 
+import gc
 import json
 from collections.abc import Iterator
 from pathlib import Path
@@ -46,6 +47,7 @@ def test_web_adapter_real_import_output_and_original_coordinates(
     state = bridge.snapshot()
     assert state["outputPath"]
     assert state["selectedId"] == row.row_id
+    assert '"bitDepth": 16' in json.dumps(state)
     assert host.view.source_preview is not None
     assert "data:image/png;base64," in json.dumps(state)
     assert source.read_bytes() == before
@@ -115,8 +117,73 @@ def test_local_page_channel_and_drain(qtbot: QtBot, tmp_path: Path) -> None:
         )
         window.bridge.request("advanced", '{"section":"metadata"}')
         assert window.host.isVisible()
+        window.bridge.request("advanced", '{"section":"analysis"}')
+        assert window.host.view.curve_toggle.isChecked()
         window.host.close()
         assert not window.host.isVisible() and not window.host.resources_closed
     finally:
         window.close()
         qtbot.waitUntil(lambda: window.host.resources_closed, timeout=20000)
+        qtbot.wait(20)
+        gc.collect()
+
+
+def test_existing_web_project_appends_files_and_folder(
+    qtbot: QtBot, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from bioimage_app.web_window import WebWorkbenchWindow
+    from PySide6.QtCore import QSettings
+    from PySide6.QtWidgets import QFileDialog
+
+    assets = tmp_path / "web"
+    assets.mkdir()
+    (assets / "index.html").write_text("<html>WB</html>", encoding="utf-8")
+    originals = tmp_path / "originals"
+    originals.mkdir()
+    extra_folder = originals / "next"
+    extra_folder.mkdir()
+    sources = [originals / "first.tif", originals / "second.tif", extra_folder / "third.tif"]
+    for number, source in enumerate(sources):
+        image = np.full((180, 360), 50000 + number * 100, dtype=np.uint16)
+        for x in (60, 120, 180, 240, 300):
+            image[70:85, x - 17 : x + 17] = 15000
+        tifffile.imwrite(source, image)
+    originals_before = [source.read_bytes() for source in sources]
+    settings = QSettings(str(tmp_path / "settings.ini"), QSettings.Format.IniFormat)
+    settings.setValue("project_parent", str(tmp_path / "projects"))
+    window = WebWorkbenchWindow(asset_directory=assets, settings=settings)
+    try:
+        window.start_from_images([sources[0]])
+        qtbot.waitUntil(lambda: bool(window.host.automatic.last_output_path), timeout=45000)
+        qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=15000)
+        project_id = window.host.view.project().project_id
+        workspace = window.host.workspace_path
+        previous_output = window.host.automatic.last_output_path
+
+        def selected_files(*args: object) -> tuple[list[str], str]:
+            return [str(sources[1])], ""
+
+        monkeypatch.setattr(QFileDialog, "getOpenFileNames", selected_files)
+        window.choose("import")
+        qtbot.waitUntil(lambda: len(window.host.view.project().rows) == 2, timeout=15000)
+        qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=45000)
+        assert window.host.automatic.last_output_path != previous_output
+        previous_output = window.host.automatic.last_output_path
+
+        def selected_folder(*args: object) -> str:
+            return str(extra_folder)
+
+        monkeypatch.setattr(QFileDialog, "getExistingDirectory", selected_folder)
+        window.choose("import_folder")
+        qtbot.waitUntil(lambda: len(window.host.view.project().rows) == 3, timeout=15000)
+        qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=45000)
+        assert window.host.automatic.last_output_path != previous_output
+        assert window.host.workspace_path == workspace
+        assert window.host.view.project().project_id == project_id
+        assert len(list((tmp_path / "projects").glob("*/workspace.json"))) == 1
+        assert [source.read_bytes() for source in sources] == originals_before
+    finally:
+        window.close()
+        qtbot.waitUntil(lambda: window.host.resources_closed, timeout=20000)
+        qtbot.wait(20)
+        gc.collect()

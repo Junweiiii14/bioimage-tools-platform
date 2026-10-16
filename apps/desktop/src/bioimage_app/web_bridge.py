@@ -91,6 +91,7 @@ class WorkbenchBridge(QObject):
                     "fig": row.figure,
                     "protein": row.protein,
                     "width": row.width,
+                    "bitDepth": row.bit_depth,
                     "height": row.height,
                     "roi": {"x": roi.x0, "y": roi.y0, "width": roi.width, "height": roi.y1 - roi.y0}
                     if roi
@@ -194,7 +195,7 @@ class WorkbenchBridge(QObject):
                 self.host.output_button.click()
             elif action == "advanced":
                 section = data.get("section")
-                if section not in {"metadata", "ocr", "normalization", "template"}:
+                if section not in {"metadata", "ocr", "normalization", "template", "analysis"}:
                     raise ValueError("未知高级工具")
                 self.host.view.show_section(str(section))
                 self.host.show()

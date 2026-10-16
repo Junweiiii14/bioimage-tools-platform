@@ -13,7 +13,7 @@ from PySide6.QtWebEngineCore import (
     QWebEngineUrlRequestInterceptor,
 )
 from PySide6.QtWebEngineWidgets import QWebEngineView
-from PySide6.QtWidgets import QFileDialog, QMainWindow
+from PySide6.QtWidgets import QApplication, QFileDialog, QMainWindow
 
 from bioimage_app.figure_window import FigureProjectWindow
 from bioimage_app.web_bridge import WorkbenchBridge
@@ -34,8 +34,9 @@ class LocalAssetFilter(QWebEngineUrlRequestInterceptor):
 
 class LocalWorkbenchPage(QWebEnginePage):
     def __init__(self, index: Path, parent: QWebEngineView) -> None:
-        self.local_profile = QWebEngineProfile(parent)
+        self.local_profile = QWebEngineProfile(QApplication.instance())
         super().__init__(self.local_profile, parent)
+        self.destroyed.connect(self.local_profile.deleteLater)
         self.index = index.resolve()
 
     def acceptNavigationRequest(
@@ -96,11 +97,17 @@ class WebWorkbenchWindow(QMainWindow):
                 self, "选择 WB 原图", "", "TIFF 原图 (*.tif *.tiff)"
             )
             if paths:
-                self.start_from_images([Path(path) for path in paths])
+                if self.host.workspace_path:
+                    self.host.import_images(tuple(paths), automatic=True)
+                else:
+                    self.start_from_images([Path(path) for path in paths])
         elif action == "import_folder":
             path = QFileDialog.getExistingDirectory(self, "选择 WB 原图文件夹")
             if path:
-                self.start_from_images([Path(path)])
+                if self.host.workspace_path:
+                    self.host.automatic.import_directory(path)
+                else:
+                    self.start_from_images([Path(path)])
         elif action == "open_project":
             path = QFileDialog.getExistingDirectory(self, "打开已有 BioImage 项目")
             if path:
@@ -133,4 +140,6 @@ class WebWorkbenchWindow(QMainWindow):
 
     def _backend_closed(self) -> None:
         self.bridge.timer.stop()
+        self.web.stop()
+        self.web.page().deleteLater()
         self.close()
