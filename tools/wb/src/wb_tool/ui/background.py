@@ -91,7 +91,13 @@ class _Work(QObject):
 
                 if not isinstance(job.document, WBFigureProject):
                     raise ValueError("缺少自动分析项目")
-                value = automatic_project_row(job.path, job.document, job.row_id, cancelled=cancel)
+                value = automatic_project_row(
+                    job.path,
+                    job.document,
+                    job.row_id,
+                    crop_policy=job.crop_policy,
+                    cancelled=cancel,
+                )
             elif job.operation == "automatic_export":
                 from wb_tool.adapters.automatic_export import export_automatic_results
 

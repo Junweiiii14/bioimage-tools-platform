@@ -13,7 +13,7 @@ from wb_tool.application.automatic import (
 )
 from wb_tool.application.figure_project import WBFigureProject
 from wb_tool.application.project_analysis import WBAnalysisProject
-from wb_tool.domain.automatic import AutoWBSettings
+from wb_tool.domain.automatic import AutoWBSettings, CropPolicy
 
 
 def automatic_project_row(
@@ -22,6 +22,7 @@ def automatic_project_row(
     row_id: str,
     *,
     lane_count: int | None = None,
+    crop_policy: CropPolicy = "legacy_fixed_height@1",
     cancelled: Callable[[], bool] = lambda: False,
 ) -> WBAutomaticProject:
     row = next((r for r in project.rows if r.row_id == row_id), None)
@@ -30,7 +31,9 @@ def automatic_project_row(
     image = load_tiff(path)
     if image.sha256 != row.source.sha256:
         raise ValueError("原图摘要已改变")
-    settings = AutoWBSettings(lane_count=lane_count, crop_height=project.template.crop_height)
+    settings = AutoWBSettings(
+        lane_count=lane_count, crop_height=project.template.crop_height, crop_policy=crop_policy
+    )
     if row.roi is not None:
         previous = (
             next((e for e in project.automatic_rows if e.row_id == row_id), None)
@@ -60,7 +63,10 @@ def automatic_project_row(
         )
         count = lane_count or row.lane_count
         settings = AutoWBSettings(
-            lane_count=count, crop_height=row.roi.y1 - row.roi.y0, polarity=polarity
+            lane_count=count,
+            crop_height=row.roi.y1 - row.roi.y0,
+            polarity=polarity,
+            crop_policy=previous.settings.crop_policy if previous else crop_policy,
         )
         request = suggest_analysis_for_crop(
             image,

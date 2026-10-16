@@ -159,7 +159,12 @@ from wb_tool.application.worker_protocol import (
     worker_protocol_schema,
 )
 from wb_tool.application.worksheet import WorksheetCell, fill_worksheet, propose_worksheet
-from wb_tool.domain.automatic import AutoWBSettings, detect_automatic_geometry
+from wb_tool.domain.automatic import (
+    AutoWBSettings,
+    CropPolicy,
+    detect_automatic_geometry,
+    resize_crop_for_lane_count,
+)
 from wb_tool.domain.crop_detection import (
     CropCandidate,
     CropDetection,
@@ -191,6 +196,8 @@ __all__ = [
     "automatic_project_row",
     "with_automatic_rows",
     "AutoWBSettings",
+    "CropPolicy",
+    "resize_crop_for_lane_count",
     "AutomaticRowEvidence",
     "AutomaticWBResult",
     "WBAutomaticProject",

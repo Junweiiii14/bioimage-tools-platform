@@ -28,6 +28,7 @@ from wb_tool.application.project_metadata import MetadataBook
 from wb_tool.application.project_normalization import NormalizationSnapshot
 from wb_tool.application.project_ocr import LoadedProjectOCR
 from wb_tool.application.project_restore import RestoredProjectResults
+from wb_tool.domain.automatic import CropPolicy
 from wb_tool.domain.crop_detection import CropDetectionSettings
 from wb_tool.domain.worksheet import OCRRecognition, Worksheet
 
@@ -91,6 +92,7 @@ class WBJob:
     cancellation: Event | None = None
     detection_settings: CropDetectionSettings | None = None
     row_id: str = ""
+    crop_policy: CropPolicy = "legacy_fixed_height@1"
     source_sha256: str = ""
     revision: int = 0
     analysis_plan: ProjectRowAnalysis | None = None

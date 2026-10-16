@@ -2,6 +2,7 @@
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from math import ceil
 from typing import Literal
 
 import numpy as np
@@ -20,6 +21,28 @@ from wb_tool.domain.crop_detection import (
 from wb_tool.domain.grid import fixed_lane_grid
 from wb_tool.domain.lanes import LaneROI, Polarity
 
+CropPolicy = Literal["legacy_fixed_height@1", "lane_ratio@1"]
+
+
+def resize_crop_for_lane_count(
+    crop: LaneROI, lane_count: int, image_width: int, image_height: int
+) -> LaneROI:
+    """Keep original-pixel height and centre; reject clipping, round half pixels up."""
+    if type(lane_count) is not int or not 1 <= lane_count <= 96:
+        raise ValueError("泳道数须为1–96")
+    if any(type(v) is not int or v < 1 for v in (image_width, image_height)):
+        raise ValueError("原图尺寸须为正整数")
+    if crop.x1 > image_width or crop.y1 > image_height:
+        raise ValueError("裁剪框超出原图")
+    height = crop.y1 - crop.y0
+    width = (5 * lane_count * height + 2) // 4
+    if width < lane_count:
+        raise ValueError("裁剪框宽度不足")
+    x0 = (crop.x0 + crop.x1 - width + 1) // 2
+    if x0 < 0 or x0 + width > image_width:
+        raise ValueError("保持当前高度和中心无法容纳新的泳道数，请先移动或缩小裁剪框")
+    return LaneROI(crop.lane_id, x0, crop.y0, x0 + width, crop.y1)
+
 
 @dataclass(frozen=True)
 class AutoWBSettings:
@@ -28,8 +51,11 @@ class AutoWBSettings:
     crop_height: int = 60
     left_marker: Literal["auto", "exclude", "include"] = "auto"
     min_snr: float = 4.0
+    crop_policy: CropPolicy = "legacy_fixed_height@1"
 
     def __post_init__(self) -> None:
+        if self.crop_policy not in ("legacy_fixed_height@1", "lane_ratio@1"):
+            raise ValueError("裁剪比例策略无效")
         CropDetectionSettings(
             self.lane_count or 1, self.crop_height, self.polarity, min_snr=self.min_snr
         )
@@ -187,6 +213,22 @@ def detect_automatic_geometry(
         roi = LaneROI(
             "candidate", region.x0, membrane.y0 + y0, region.x1, membrane.y0 + y0 + crop_height
         )
+        if settings.crop_policy == "lane_ratio@1":
+            # Preserve detected horizontal coverage and the full active band height.
+            # This changes coordinates only; source pixels are never resampled.
+            ratio_height = max(2, ceil(region.width * 4 / (5 * count)), b - a + 4)
+            ratio_width = (5 * count * ratio_height + 2) // 4
+            if ratio_width > w or ratio_height > h:
+                flags.append("ratio_crop_exceeds_source")
+                continue
+            ratio_x0 = max(0, min((region.x0 + region.x1 - ratio_width + 1) // 2, w - ratio_width))
+            ratio_y0 = max(0, min(membrane.y0 + peak - ratio_height // 2, h - ratio_height))
+            if ratio_y0 > membrane.y0 + a or ratio_y0 + ratio_height < membrane.y0 + b:
+                flags.append("ratio_crop_cannot_cover_band")
+                continue
+            roi = LaneROI(
+                "candidate", ratio_x0, ratio_y0, ratio_x0 + ratio_width, ratio_y0 + ratio_height
+            )
         candidates.append(
             CropCandidate(
                 roi,
@@ -201,6 +243,8 @@ def detect_automatic_geometry(
     candidates.sort(
         key=lambda c: (-len(c.detected_lanes), -sum(min(v, 20) for v in c.lane_snr), c.peak_y)
     )
+    if settings.crop_policy == "lane_ratio@1":
+        flags.append("crop_policy:lane_ratio@1")
     flags.extend(
         (
             "automatic_lane_count" if settings.lane_count is None else "explicit_lane_count",
