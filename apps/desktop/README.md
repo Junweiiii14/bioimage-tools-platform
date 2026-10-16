@@ -87,3 +87,16 @@ Version 0.12.0 adds ZIP restore into a new workspace. A dedicated thread validat
 Version 0.13.0 adds a separate direct TIFF/PNG figure button. It saves the exact project revision before background rendering and publication; cancel, close or a later edit prevents pending output, including during the save callback. Already published images remain available. The tool validates complete pixels, provenance and DPI after writing. Display TIFFs enter the existing OCR workflow with explicit source-row binding, while quantitative import rejects known display outputs. Full portable projects still use ZIP; no platform or numerical schema changes.
 
 T-024 default launch now opens the tool platform with the real WB entry and recent workspaces. Directory import runs tool-owned lane/crop/bound suggestions, committed measurement processes and atomic result-directory export. Reopen verifies evidence and selects a source. Cancellation, errors and stale rows remain explicit. See `../../docs/contracts/wb-automatic-v1.md` and the T-024 task for validation and limitations.
+
+T-034 adds explicit `--web-workbench`: the package's local `web_ui/index.html` is rendered
+unchanged in a Qt WebEngine shell. Its WebChannel `workbench.request(action, JSON)` adapter
+routes native file selection and existing WB operations; `stateChanged(JSON)` carries
+read-only display rasters, original-pixel crop geometry and real result states. `refresh`
+requests an initial snapshot. Crop requires selected row ID plus source SHA; stale, busy,
+out-of-bounds and non-integer commands are rejected. Original pixels remain solely in the
+existing WB pipeline. Metadata, OCR, normalization and templates open the native advanced
+window explicitly; these are not claimed to be web-ported. Closing that window hides it;
+closing the shell cancels/drains/saves through the existing host lifecycle. The local page
+rejects foreign navigation and requests outside its asset root (except image data URLs and
+Qt's WebChannel resource). Each shell uses an off-the-record profile. Existing default
+platform/native routes remain available. This is a developer entry, not a packaged release.

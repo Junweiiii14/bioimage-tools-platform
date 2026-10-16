@@ -45,7 +45,11 @@ def main() -> int:
         )
     except OSError:
         print("无法创建本地诊断日志；继续启动。", file=sys.stderr)
-    if sys.argv[1:] == ["--figure-project"]:
+    if sys.argv[1:] == ["--web-workbench"]:
+        from bioimage_app.web_window import WebWorkbenchWindow
+
+        window = WebWorkbenchWindow()
+    elif sys.argv[1:] == ["--figure-project"]:
         window = FigureProjectWindow()
     elif sys.argv[1:] == ["--wb-manual"]:
         window = WBWindow()
