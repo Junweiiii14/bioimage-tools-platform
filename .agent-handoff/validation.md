@@ -1,5 +1,8 @@
 # Validation History
 
+- 2026-10-16 T033/a68000e：全门禁568 passed/224.97s退出0，最终9专项退出0，独审另5项退出0；wheel含web资源；真实10原图SHA不变。网页1440/390、角点/拖画/减少动效实际操作；详见任务与.local/t033。
+
+
 ## 2026-10-14 / T-009暂停前增量检查（未提交工作树）
 - worker+桌面联合：38 passed/1 failed；旧测试用v1专用读取器读v2失败，已改公开read_wb_document。
 - 修正后旧桌面6 passed；新增真实OCR桌面→自动写表→XLSX→保存重开→ROI失效单测1 passed。

@@ -1,11 +1,9 @@
 # Handoff Snapshot
 
-- 更新2026-10-16。总体T-003；当前T-029已批准工作台实施，唯一状态work/tasks/T-029-approved-workbench.md。用户明确批准T-028方案及动效/审美，普通实现不再征询。
-- 活动工作树C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform，分支codex/t029-approved-workbench。原仓库旧dirty与预存.impeccable/questions保留。
-- 平台选图/文件夹/拖放→自动独立项目→自动识别/测量/输出。图像复核/拼图/结果三模式，中央图像、左右上下文；曲线/裁剪图上调整、自动保存重算、撤销和焦点保存。模板/OCR/归一化完整能力保留；schema与科学公式不变。
-- Taste product-performs+Impeccable原生Qt，暖白/青绿；180ms导航/140ms面板，可减少动效。DESIGN/PRODUCT/sidecar已由独立documenter3f690e4更新。
-- 真实10张TIFF最终交付.local/deliveries/WB-workbench-20261016-003258：5张检出21泳道、5张未定位、0人工审核、全部21条质量警告，原积分保留/有效信号空白；原图哈希不变，ZIP公开读回。51表项含30待定位占位，不能写成51泳道。
-- 入口启动工具平台.cmd/打开本次WB项目.cmd，使用说明及截图位于交付目录。依赖开发环境，不是独立安装包。之前002056保留视觉/DPI证据，进程实际DPR1.25/2.0；不外推干净Windows。
-- 独立视觉193c659修复清单ship限定静态，平台0e2c09c补审ship；最近项目实时就绪状态尚未做，使用真实历史名称/时间/来源数与关闭后缓存缩略图。
-- 工程559全门禁通过207.48s后，b6812e3修复重开→拼图清空结果表，50相关测试通过。74a597b全门禁560通过210.93s/退出0；48ecb72补取消guard，11b1d96修复高DPI缓存尺寸；专项回归/类型/最终绑定独审通过，无未解决确认问题。
-- T-029核心已交付，当前产品11b1d9679a5070e4ba24f4667f10fe362b6f146f。下一步依据用户反馈继续最近项目实时处理状态和科学准确率验证；不要自动扩展本轮范围。其他工具不自动扩展；远程CI/PR合并/独立安装包发布未做。历史Qt原生退出与真实检测准确率/人工真值、干净Windows仍待验收。
+- 更新2026-10-16；当前T-033网页优先同源桌面，唯一状态work/tasks/T-033-web-first-ui.md。总体WB T003继续，非整套产品完成。
+- 活动树C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform；codex/t033-web-first-ui。产品a68000e，旧主目录dirty及.impeccable/questions保留。
+- web_ui三文件同源运行在浏览器/QtWebEngine；平台入口、左来源/中央图像/右复核、拼图/结果、非图像动效、减少动效。原始坐标拖画/角点键盘支持。
+- bridge真实导入自动建项目/追加/恢复/确认下一张/输出；--web-workbench显式入口，默认原生保留。高级曲线/OCR/模板/归一化仍原生窗口；已有workspace时另开窗口打开项目，不支持本窗口切换。
+- .local/t033含浏览器预览服务60303、desktop-final/home/workbench/mobile截图、启动新版桌面.cmd、使用说明、verification.json与真实输出。10张源图哈希不变；5图自动有裁剪/5图未定位/质量仍需复核，不能声称完全准确自动化。
+- 568全门禁退出0/224.97s，最终9专项退出0；独审a68000e原3代码问题已解决，视觉ship仅4修复项；独立documenter已更新产品/设计/sidecar。wheel包含web三资源；干净机/远程CI/PR/main合并未做。
+- 下一步优先用户体验反馈，再推进高级原生界面网页化与科学准确率真实标注；不要自动扩展其他工具。T029历史详见其任务，T002包态/干净机风险仍保留。

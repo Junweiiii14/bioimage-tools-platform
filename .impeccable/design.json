@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-15T16:26:41.692126+00:00",
+  "generatedAt": "2026-10-16T00:00:00+08:00",
   "title": "Design System: BioImage 工具平台与 WB 证据工作台",
   "extensions": {
     "colorMeta": {
@@ -15,10 +15,31 @@
       "surface": {
         "role": "neutral",
         "displayName": "白色控件面"
+      },
+      "web-muted": {
+        "role": "neutral",
+        "displayName": "网页辅助文字"
       }
     },
     "shadows": [],
-    "breakpoints": [],
+    "breakpoints": [
+      {
+        "name": "web-wide-min",
+        "value": "1600px"
+      },
+      {
+        "name": "web-compact-max",
+        "value": "1180px"
+      },
+      {
+        "name": "web-drawer-max",
+        "value": "900px"
+      },
+      {
+        "name": "web-mobile-max",
+        "value": "620px"
+      }
+    ],
     "motion": [
       {
         "name": "navigation",
@@ -29,6 +50,26 @@
         "name": "panel-reveal",
         "value": "140ms / QEasingCurve.OutCubic / opacity 0.7..1.0",
         "purpose": "Only designated control panels; no image, curve evidence or numeric fade."
+      },
+      {
+        "name": "web-navigation",
+        "value": "260ms cubic-bezier(.16,1,.3,1)",
+        "purpose": "Mode indicator only."
+      },
+      {
+        "name": "web-drawer-in",
+        "value": "260ms cubic-bezier(.16,1,.3,1)",
+        "purpose": "Control drawer entrance."
+      },
+      {
+        "name": "web-drawer-out",
+        "value": "150ms ease-in",
+        "purpose": "Control drawer exit."
+      },
+      {
+        "name": "web-button",
+        "value": "140ms; shadow 180ms",
+        "purpose": "Non-image control feedback."
       }
     ],
     "nativePlatform": {
@@ -40,7 +81,7 @@
         "apps/desktop/src/bioimage_app/platform_window.py",
         "tools/wb/src/wb_tool/ui/figure_view.py"
       ],
-      "exception": "Impeccable 4.5.2 has no Windows custom Qt platform enum. Native components below are evidence, not HTML previews. No invented web breakpoints or synthesized palette ramps.",
+      "exception": "Retained Qt Widgets advanced components have no matching Impeccable platform enum. These native snippets are evidence, not HTML previews.",
       "reduceMotion": "QSettings reduce_motion OR not QApplication.isEffectEnabled(Qt.UIEffect.UI_AnimateCombo); immediate stable end state.",
       "visualEvidence": ".local/deliveries/WB-workbench-20261016-002056/screenshots; static review only"
     },
@@ -79,12 +120,37 @@
       "labelBacking": "#172126",
       "labelsAndHandles": "#ffffff",
       "coordinatePolicy": "Original-pixel half-open ROI; display raster is never a numerical input."
+    },
+    "webPlatform": {
+      "toolkit": "HTML/CSS/JS shared by browser and PySide6 QtWebEngine",
+      "source": [
+        "apps/desktop/src/bioimage_app/web_ui/index.html",
+        "apps/desktop/src/bioimage_app/web_ui/styles.css",
+        "apps/desktop/src/bioimage_app/web_ui/app.js"
+      ],
+      "entry": "python -m bioimage_app --web-workbench; default remains native platform",
+      "runtimeBoundary": "Browser historical preview and interaction drafts do not recompute; desktop bridge connects real backend. Advanced curves/OCR/templates/normalization remain native.",
+      "reduceMotion": "prefers-reduced-motion or body.reduce-motion: animation and transition duration 1ms",
+      "visualEvidence": [
+        ".local/t033/desktop.png",
+        ".local/t033/home.png",
+        ".local/t033/mobile.png"
+      ],
+      "validationLimit": "Static evidence only; backend, dynamic and commit-bound validation belong to T-033.",
+      "sourceCommit": "a68000e118dc83b549ce6d8128b10225ae227b8d",
+      "imageMotion": "Image opacity and transform transitions removed; evidence updates without interpolation.",
+      "cropInteraction": "Four corner handles resize with arrow keys (1 original pixel; Shift 10). Overlay arrows move ROI. Missing ROI supports drawing on the image; minimum 4x4 original pixels to commit. Browser edits remain drafts."
+    },
+    "typographyMeta": {
+      "web-body": {
+        "purpose": "13px body; compact labels have an 11px minimum after the 8/9/10px replacements."
+      }
     }
   },
   "components": [],
   "narrative": {
     "northStar": "证据工作台",
-    "overview": "暖白工作区与白色控件面形成克制、平直的原生工作台。青绿强调当前选择与主要动作，深灰画布把注意力交给实验图像。沿用已批准 T-028 的 product-performs 方向：产品操作本身构成界面，专业数据和真实状态优先。\n\n本记录从 T-029 实现提交 `0e2c09c` 的 `workbench_style.py`、`workbench_motion.py`、`platform_window.py` 及 WB UI 提取。局部控件保留自己的原生样式，未将所有画布颜色强制统一为壳层强调色。截图证据位于 `.local/deliveries/WB-workbench-20261016-002056/screenshots`；静态视觉审查的 ship 结论仅限静态界面，不代表动效、科学准确率或干净 Windows 验收。\n\n这是 Windows 自定义 Qt Widgets 设计语言。Impeccable 4.5.2 没有对应 Platform 枚举，保留真实平台；sidecar 记录原生 QSS 与行为，不虚构 HTML/CSS 组件、网页断点或移动端适配。",
+    "overview": "图像中心的证据工作台。T-033 网页与 QtWebEngine 加载同一 assets，使用矿物白、深松绿和翡翠操作强调。既有 Qt Widgets 高级窗口保留原生设计记录。浏览器草稿不执行新的科学计算，桌面桥接真实 backend；能力与验收边界以 PRODUCT.md 和 T-033 为准。",
     "keyCharacteristics": [
       "暖白、平面、系统中文字体，图像占据中央主要空间。",
       "图像复核、拼图、结果三种顶层模式；辅助能力通过项目工具和上下文入口到达。",
@@ -113,7 +179,7 @@
       "Don't 恢复四阶段顶层导航或让高级表格成为默认操作。",
       "Don't 把图像、曲线证据或定量数值加入装饰动画。",
       "Don't 把截图、自动结果或裁剪确认当作科学验收证明。",
-      "Don't 虚构网页组件、移动端断点或全平台偏好检测。"
+      "Don't 把同源 assets 等同于高级能力全部网页化，或虚构全平台偏好检测。"
     ]
   }
 }

@@ -1,5 +1,8 @@
 # Risks, Blockers, And Unknowns
 
+- T033仅主工作区同源，高级窗口仍原生；网页预览不重算。WebEngine多窗口GC崩溃在T034修复并回归，不外推所有环境。
+
+
 ## Current Blockers
 
 - 无。用户已明确要求公开；仓库已公开，服务器 ruleset 已 active。此前私有套餐限制已解除。
