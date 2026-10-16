@@ -133,6 +133,7 @@ def quant_snapshot(host: FigureProjectWindow) -> dict[str, object]:
         bool(present) and len({r.lane_count for r in present}) == 1 and all(r.roi for r in present)
     )
     return {
+        "rowOrder": [row.row_id for _, row in ordered],
         "group": {
             "figure": selected.figure if selected else "",
             "rows": group_rows,
