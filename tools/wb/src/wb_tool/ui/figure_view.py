@@ -1332,6 +1332,11 @@ class FigureProjectView(QWidget):
         index = self.table.currentRow()
         return self.project().rows[index] if 0 <= index < len(self._project.rows) else None
 
+    @property
+    def source_preview(self) -> PreviewRaster | None:
+        """Display-only raster; never a quantitative input."""
+        return self._source_preview
+
     def set_source_preview(self, preview: PreviewRaster) -> None:
         index = self.table.currentRow()
         row = self._project.rows[index] if 0 <= index < len(self._project.rows) else None
