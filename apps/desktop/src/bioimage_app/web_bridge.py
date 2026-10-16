@@ -109,6 +109,16 @@ class WorkbenchBridge(QObject):
                         regions.append(
                             {
                                 "rowId": item["row_id"],
+                                "sourceLaneRange": item.get("source_lane_range"),
+                                "displayLine": item.get("display_line"),
+                                "sourceRoi": {
+                                    "x": item["roi"]["x0"],
+                                    "y": item["roi"]["y0"],
+                                    "width": item["roi"]["x1"] - item["roi"]["x0"],
+                                    "height": item["roi"]["y1"] - item["roi"]["y0"],
+                                }
+                                if item.get("roi")
+                                else None,
                                 "x": box[0],
                                 "y": box[1],
                                 "width": box[2] - box[0],
@@ -207,6 +217,24 @@ class WorkbenchBridge(QObject):
                     self.host.select_source(rows[index].row_id)
             elif action == "quant_edit":
                 self._edit_quant(data)
+            elif action == "quant_group":
+                selected = self.host.view.selected_row()
+                if selected is None or selected.figure != data.get("figure"):
+                    raise ValueError("当前 Fig 组已改变，请重新选择")
+                members = tuple(
+                    r
+                    for r in self.host.view.project().rows
+                    if r.figure == selected.figure and r.source
+                )
+                if (
+                    not members
+                    or len({r.lane_count for r in members}) != 1
+                    or any(not r.roi for r in members)
+                ):
+                    raise ValueError("组内各蛋白行须有裁剪且泳道数一致，才能按列对应定量")
+                self.host.analyze_project(
+                    row_ids=tuple(r.row_id for r in members), after=self.host.compose
+                )
             elif action == "quant_auto":
                 row = self.host.view.selected_row()
                 if row is None or row.row_id != data.get("id"):

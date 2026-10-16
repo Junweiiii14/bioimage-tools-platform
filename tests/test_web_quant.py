@@ -2,6 +2,7 @@
 
 import csv
 import json
+from dataclasses import replace
 from pathlib import Path
 from typing import Any, cast
 from zipfile import ZipFile
@@ -11,6 +12,7 @@ import tifffile
 from bioimage_app.figure_window import FigureProjectWindow
 from bioimage_app.web_bridge import WorkbenchBridge
 from pytestqt.qtbot import QtBot
+from wb_tool.api import WBAnalysisProject, make_row_analysis
 
 
 def test_quant_supervision_recomputes_and_exports(qtbot: QtBot, tmp_path: Path) -> None:
@@ -73,6 +75,55 @@ def test_quant_supervision_recomputes_and_exports(qtbot: QtBot, tmp_path: Path) 
         settled()
         assert state()["lanes"][0]["roi"] == roi
         assert state()["lanes"][0]["bands"][0]["signal"] is not None
+        # A Fig is the unit of quantitative supervision; duplicated row geometry
+        # is acceptable, but results must retain separate protein row identities.
+        project = host.view.project()
+        assert isinstance(project, WBAnalysisProject)
+        original = project.rows[0]
+        assert original.roi is not None
+        second = original.model_copy(
+            update={
+                "row_id": "second-protein",
+                "protein": "Control",
+                "reviewed": True,
+                "roi": replace(original.roi, lane_id="second-protein"),
+            }
+        )
+        draft = project.model_copy(update={"rows": (*project.rows, second)})
+        duplicate = make_row_analysis(draft, second.row_id, "dark")
+        source_request = project.analyses[0].request
+        duplicate = duplicate.model_copy(
+            update={
+                "request": replace(
+                    source_request,
+                    lanes=tuple(
+                        replace(lane, roi=replace(lane.roi, lane_id=f"{second.row_id}:{i:02d}"))
+                        for i, lane in enumerate(source_request.lanes, 1)
+                    ),
+                )
+            }
+        )
+        grouped = project.model_copy(
+            update={"rows": (*project.rows, second), "analyses": (*project.analyses, duplicate)}
+        )
+        host.view.set_project(grouped)
+        host.view.generation += 1
+        bridge.request("quant_group", json.dumps({"figure": original.figure}))
+        settled()
+        group = state()["group"]
+        assert group["compatible"] and len(group["rows"]) == 2
+        assert all(len(r["lanes"]) == 3 for r in group["rows"])
+        assert len(state()["table"]) == 2
+        assert all(v["signal"] is not None for r in state()["table"] for v in r["values"])
+        committed_group = host.view.project()
+        bridge.request("quant_group", json.dumps({"figure": "stale-figure"}))
+        assert host.view.project() == committed_group
+        incompatible = second.model_copy(update={"lane_count": 2})
+        host.view.set_project(committed_group.model_copy(update={"rows": (original, incompatible)}))
+        assert not state()["group"]["compatible"]
+        bridge.request("quant_group", json.dumps({"figure": original.figure}))
+        assert "泳道数一致" in str(bridge.snapshot()["status"])
+        host.view.set_project(committed_group)
         for ext in ("csv", "xlsx"):
             path = tmp_path / ("quant." + ext)
             host.export_project_table(str(path), quant=True)
