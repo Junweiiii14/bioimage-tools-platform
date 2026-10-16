@@ -57,7 +57,7 @@ def propose_quant_lanes(
     for roi, result in zip(rois, results, strict=True):
         effective = result.effective_roi or result.roi
         effective_roi = LaneROI(roi.lane_id, effective.x0, effective.y0, effective.x1, effective.y1)
-        candidates = [b for b in result.bands if b.included and b.signal is not None]
+        candidates = [b for b in result.bands if b.included]
         notes = list(result.warnings)
         if effective_roi != roi:
             notes.append(
@@ -80,8 +80,21 @@ def propose_quant_lanes(
         for candidate in sorted(candidates, key=lambda b: b.peak_y_relative):
             left = candidate.baseline_left_value
             right = candidate.baseline_right_value
-            if left is None or right is None:
-                raise ValueError("参考算法未返回完整封底")
+            if candidate.signal is None or left is None or right is None:
+                bands.append(
+                    QuantBandProposal(
+                        None,
+                        None,
+                        tuple(
+                            [
+                                *notes,
+                                *candidate.warnings,
+                                f"invalid_peak_at:{candidate.peak_y_absolute}; signal_unavailable",
+                            ]
+                        ),
+                    )
+                )
+                continue
             bands.append(
                 QuantBandProposal(
                     BandBounds(candidate.left, candidate.right),

@@ -91,7 +91,7 @@ def update_quant_lane(
                 bounds=bounds if bounds is not None else b.bounds,
                 baseline=baseline if bounds is not None or baseline is not None else b.baseline,
                 included=b.included if included is None else included,
-                detection_notes=("manually_adjusted",),
+                detection_notes=tuple(dict.fromkeys((*b.detection_notes, "manually_adjusted"))),
             )
             if b.band_id == band_id
             else b

@@ -62,10 +62,9 @@ def wbquant_table_rows(
             signals: list[list[float | None]] = []
             if result:
                 for lane in result.lanes:
-                    bands = sorted(
-                        (b for b in lane.bands if b.annotation.included),
-                        key=lambda b: b.annotation.bounds.left if b.annotation.bounds else -1,
-                    )
+                    # Detection persists original peak order, including invalid empty slots.
+                    # Sorting bounds would move an invalid (None) peak ahead of earlier peaks.
+                    bands = [b for b in lane.bands if b.annotation.included]
                     signals.append([b.measurement.signal if b.measurement else None for b in bands])
             height = max((len(v) for v in signals), default=1)
             for number in range(max(1, height)):
