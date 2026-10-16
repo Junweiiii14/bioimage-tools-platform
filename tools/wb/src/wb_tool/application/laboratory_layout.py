@@ -114,8 +114,38 @@ def preserve_automatic_composition(project: WBLayoutProject, row_id: str) -> Fig
     if not project.composition.slices:
         return initial_composition(project)
     row = next(row for row in project.rows if row.row_id == row_id)
-    segments = [s for s in project.composition.slices if s.row_id == row_id]
     composition = project.composition
+    # Appending sources preserves the old composition until their automatic jobs run.
+    # Add placeholders only for the current new row or still-unlocated pending rows.
+    # A previously located row missing from the layout remains a validation error.
+    slices = list(composition.slices)
+    positioned = {segment.row_id for segment in slices}
+    for pending in project.rows:
+        if pending.row_id in positioned or (pending.row_id != row_id and pending.roi is not None):
+            continue
+        line = (
+            max((segment.line for segment in slices if segment.figure == pending.figure), default=0)
+            + 1
+        )
+        slices.append(
+            FigureSlice(
+                row_id=pending.row_id,
+                figure=pending.figure,
+                line=line,
+                position=1,
+                first_lane=1,
+                last_lane=pending.lane_count,
+            )
+        )
+    columns = list(composition.columns)
+    known_figures = {column.figure for column in columns}
+    for index, figure in enumerate(project.figure_order):
+        if figure not in known_figures:
+            columns.append(FigureColumn(figure=figure, column=index % project.template.columns + 1))
+    composition = composition.model_copy(
+        update={"slices": tuple(slices), "columns": tuple(columns)}
+    )
+    segments = [segment for segment in composition.slices if segment.row_id == row_id]
     if len(segments) == 1 and segments[0].first_lane == 1:
         composition = composition.model_copy(
             update={

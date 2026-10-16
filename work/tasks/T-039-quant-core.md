@@ -45,3 +45,17 @@ wrapper. Changed the unused file-bearing object to a plain string image identity
 its fallback label access accordingly; numerical logic unchanged, SOURCE.json records
 this adaptation. No rule/config relaxation. 10 supervision tests passed; lint-imports
 --no-cache: 9 contracts kept, 0 broken, exit 0.
+
+## Append-source regression correction
+
+The desktop append operation retains old composition while adding source rows. The
+preservation helper previously rejected those new missing segments. It now appends
+full-row placeholders for the current new source and other unlocated pending rows,
+and only missing Fig column entries; existing placements remain unchanged. Located
+rows missing from layout still error, and complete _groups structural validation
+still runs; no layout gate weakened.
+
+New multi-pending-source regression test: 11 supervision tests passed, exit 0.
+The original failing desktop test_existing_web_project_appends_files_and_folder was
+run in coordinator with PYTHONPATH selecting this WB patch: 1 passed in 13.49s,
+exit 0; no coordinator files changed and no parallel Qt run.

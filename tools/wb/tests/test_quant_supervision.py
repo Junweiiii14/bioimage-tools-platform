@@ -241,3 +241,48 @@ def test_display_order_and_automatic_layout_preservation(tmp_path: Path) -> None
         )
     assert split_project.composition == split
     assert [row.row_id for row in ordered_quant_rows(project)] == ["row0", "row1", "missing"]
+
+
+def test_appended_pending_sources_receive_segments_without_resetting_layout(tmp_path: Path) -> None:
+    from wb_tool.api import FigureColumn, FigureRow, FigureSlice, with_figure_layout
+
+    path = source(tmp_path)
+    project = automatic_project_row(path, project_for(path), "r", quant_policy="wbquant_1_4_3@1")
+    original = project.composition.model_copy(
+        update={
+            "columns": (FigureColumn(figure="Fig1", column=3),),
+            "slices": (
+                FigureSlice(
+                    row_id="r", figure="Fig1", line=2, position=1, first_lane=1, last_lane=5
+                ),
+            ),
+        }
+    )
+    project = with_figure_layout(project, original)
+    row = project.rows[0]
+    second = FigureRow.model_validate(
+        {
+            **row.model_dump(),
+            "row_id": "second",
+            "figure": "Fig2",
+            "roi": None,
+            "lane_count": 6,
+            "reviewed": False,
+        }
+    )
+    third = second.model_copy(update={"row_id": "third", "figure": "Fig3"})
+    project = project.model_copy(
+        update={"rows": (*project.rows, second, third), "figure_order": ("Fig1", "Fig2", "Fig3")}
+    )
+    first_done = automatic_project_row(path, project, "second", quant_policy="wbquant_1_4_3@1")
+    assert first_done.composition.slices[0] == original.slices[0]
+    assert first_done.composition.columns[0] == original.columns[0]
+    assert [(s.row_id, s.last_lane) for s in first_done.composition.slices] == [
+        ("r", 5),
+        ("second", 5),
+        ("third", 6),
+    ]
+    finished = automatic_project_row(path, first_done, "third", quant_policy="wbquant_1_4_3@1")
+    assert finished.composition.slices[:2] == first_done.composition.slices[:2]
+    assert finished.composition.slices[-1].last_lane == 5
+    assert all(row.roi is not None for row in finished.rows)
