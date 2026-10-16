@@ -62,6 +62,7 @@ class WorkbenchBridge(QObject):
         self._montage: str | None = None
         self._error = ""
         self._completed_key = ""
+        self._quant_overview: tuple[str, str] | None = None
         self.host.automatic.finished.connect(self._automatic_completed)
         self.timer = QTimer(self)
         self.timer.setInterval(180)
@@ -183,6 +184,18 @@ class WorkbenchBridge(QObject):
             self.timer.stop()
             return
         try:
+            if self._quant_overview and not self.host.operation_busy and not self.host.is_closing:
+                project_id, row_id = self._quant_overview
+                self._quant_overview = None
+                current = self.host.view.project()
+                selected = self.host.view.selected_row()
+                if (
+                    current.project_id == project_id
+                    and selected
+                    and selected.row_id == row_id
+                    and self.host.view.rendered_preview is None
+                ):
+                    self.host.compose()
             state = json.dumps(self.snapshot(), ensure_ascii=False, allow_nan=False)
         except ValueError:
             return  # An incomplete native advanced edit is not a replacement project.
@@ -202,6 +215,7 @@ class WorkbenchBridge(QObject):
             if action in {"state", "refresh"}:
                 self._previous = ""
             elif action == "cancel":
+                self._quant_overview = None
                 self.host.cancel()
             elif self.host.operation_busy or self.host.is_closing:
                 raise ValueError("当前任务仍在处理中，请稍候或取消")
@@ -212,6 +226,10 @@ class WorkbenchBridge(QObject):
                 index = next((i for i, row in enumerate(rows) if row.row_id == data.get("id")), -1)
                 if index < 0:
                     raise ValueError("原图已改变，请重新选择")
+                if action == "quant_select" and data.get("overview") is True:
+                    self._quant_overview = (self.host.view.project().project_id, rows[index].row_id)
+                else:
+                    self._quant_overview = None
                 self.host.view.table.setCurrentCell(index, 0)
                 if not self.host.operation_busy:
                     self.host.select_source(rows[index].row_id)

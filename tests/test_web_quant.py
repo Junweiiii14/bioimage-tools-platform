@@ -12,7 +12,7 @@ import tifffile
 from bioimage_app.figure_window import FigureProjectWindow
 from bioimage_app.web_bridge import WorkbenchBridge
 from pytestqt.qtbot import QtBot
-from wb_tool.api import WBAnalysisProject, make_row_analysis
+from wb_tool.api import WBAnalysisProject, initial_composition, make_row_analysis
 
 
 def test_quant_supervision_recomputes_and_exports(qtbot: QtBot, tmp_path: Path) -> None:
@@ -106,6 +106,7 @@ def test_quant_supervision_recomputes_and_exports(qtbot: QtBot, tmp_path: Path) 
         grouped = project.model_copy(
             update={"rows": (*project.rows, second), "analyses": (*project.analyses, duplicate)}
         )
+        grouped = grouped.model_copy(update={"composition": initial_composition(grouped)})
         host.view.set_project(grouped)
         host.view.generation += 1
         bridge.request("quant_group", json.dumps({"figure": original.figure}))
@@ -134,6 +135,11 @@ def test_quant_supervision_recomputes_and_exports(qtbot: QtBot, tmp_path: Path) 
         assert rows[0][:3] == ["组序", "组名", "条带"]
         with ZipFile(tmp_path / "quant.xlsx") as book:
             assert "灰度分析" in book.read("xl/workbook.xml").decode("utf-8")
+        # An overview request queues its montage until source loading releases the host.
+        host.view.set_project(host.view.project())
+        bridge.request("quant_select", json.dumps({"id": original.row_id, "overview": True}))
+        qtbot.waitUntil(lambda: bool(bridge.snapshot()["montage"]), timeout=30000)
+        settled()
         assert source.read_bytes() == before
     finally:
         bridge.timer.stop()
