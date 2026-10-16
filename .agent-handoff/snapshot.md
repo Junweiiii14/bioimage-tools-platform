@@ -1,14 +1,11 @@
 # Handoff Snapshot
 
-- 更新2026-10-17；当前T-037灰度定量监督，唯一状态work/tasks/T-037-quant-supervision.md。总体WB T003未全部完成。
-- 活动树C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform；codex/t037-quant-supervision；产品9be19b1。旧主目录dirty与.impeccable/questions保留。
-- 用户最终流程：裁原图条带→按Fig拼标注图→Fig组灰度→结果；自动完成落点拼图。整组泳道框由manifest映射原ROI，每泳道按蛋白分段显示曲线，图框/文字/间隔不参与积分。
-- WBQuant1.4.3 MIT冻结纯数值核心、独立泳道、封底/边界编辑自动重算、原图灰度表已接同源桌面，不旧quant窗口，无逐张确认。质量警告与原始Signal并存。
-- 指定两原图3/5泳道分别独立Fig；同ROI8个Signal与旧包差分<1e-10。两源Qt实测exit0，合成2蛋白×3泳道Fig的6框/6值与分段曲线验证exit0，失败历史保留。
-- 全check第二轮592passed1failed（append新图缺composition段），fb6e461修复且独立失败用例exit0。最终check594passed及隔离wheel exit0，日志.local/t037/check-final.log。详细失败/验收见work/evidence/T-037/validation.md。
-- 当前T037本地验收完成：最终视觉ship、独审绑定9be19b1；追加重开队列修复专项通过。当前桌面已打开双源项目（opened.json），保留测试封底调整值。下一步用户体验反馈；不自动扩展OCR/模板或其它工具。
-- .local/t037含验证JSON、截图、工作区、打开灰度定量工作台.cmd；启动器读verification.json，只有最新成功harness才更新该文件。OCR/模板/归一化仍原生高级入口，干净Windows与PR/main未做。
-
-- T-041独立实施树codex/t040-standard-display：显式标准显示与可选旋转frame完成自验；唯一状态work/tasks/T-041-standard-display.md，等待协调任务独审/集成。原T037状态保持。
-
-- T041独审修复：frame限整行，部分泳道明确拒绝，31专项通过；协调任务复核新提交。
+- 更新2026-10-17；当前T-040真实多蛋白Fig验收，唯一状态work/tasks/T-040-real-fig-validation.md。总体T003/WB未科学验收完成。
+- 活动树C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform；codex/t040-real-fig-validation；产品f7a6651。旧主目录dirty及.impeccable/questions保留。
+- 用户授权只处理8张(1).tiff，4Fig各2蛋白(N8/4/8/4)，标准960×1200N TIFF按蛋白名放原目录，原像素定量，命名冲突不覆盖。验证目录只读评分。
+- 首轮纯自动冻结并独审：1/8=12.5%，7fail。N/Marker/倾斜截断问题尚未由本任务解决；不可用后续参考辅助纠正8/8冒充自动成功。
+- 参考辅助注册8/8视觉通过，NCC0.99786..0.99977；原图/参考hash不变。标准显示文件8/16位保持且禁止quant导入，native crop切片逐像素一致。
+- 实际桌面4Fig+48值+Excel/CSV+4高res标注图+ZIP已跑通。独审发现17/48旧自动bounds/baseline切穿主峰，另存明确整窗监督修正版，48与独立原像素整窗公式一致。33quality_review/15valid，全部actin有0平台，曝光线性未知，不做默认归一化。
+- T041显式standard_lane_ratio@1与DisplayFrame仅显示、source_to_output回源，native默认/冻结manifest保留。P1分段复用整行frame已限制仅整行可用；88专项及31后续通过，独审至f7a6651无未解发现。
+- .local/t040含首轮冻结、audit、诊断、delivery-report.json(最终workspace/output/supervised_output)、验证JSON及真实截图；用户可见输出在WB资料中新结果目录，原目录仅新增8标准裁图。脚本finish/supervise均exit0；Excel48单元格及ZIP8frame复读通过。
+- T040实际执行已交付，桌面PID32064可见8原图/4Fig；.local/t040/opened-desktop.png已目视核验。全check虽600passed但exit1，原因UNKNOWN，不宣称全门禁通过；独立wheel另记。下一步排查测试退出异常并修科学自动化。未来优先修原图膜/倾斜/周期泳道与自动bounds，不能继续以UI或合成数据替代科学验证。PR/main/干净Windows未做。

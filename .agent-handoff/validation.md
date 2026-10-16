@@ -143,3 +143,6 @@ context --task T-028 --scope work --scope .agent-handoff --scope .impeccable/cri
 | 2026-10-17 | T-041 | Windows/Python3.12.14借t021环境、本树src | 8文件pytest88passed；Ruff/strict Pyright目标通过exit0 | 首轮失败与环境配置过程见任务；全仓/真实8图/独审未运行 |
 
 | 2026-10-17 | T-041独审修复 | 同前环境 | 标准显示/Qt/原生分段31passed exit0 | frame限制完整行；旧像素/manifest保留 |
+
+## 2026-10-17 T040 real-data execution
+Product f7a6651 independently reviewed; actual8sources/4Fig/48values and supervised workbook audited. Scripts finish/supervise/open passed, visible8row project.600pytest passed summary, fullcheck exit1 unexplained beforewheel; not gate success. Separate installed-wheels exit0. First automatic crop1/8, corrected8/8 reference-assisted;33/48quality warnings. Details work/evidence/T-040/validation.md; no private originals committed.

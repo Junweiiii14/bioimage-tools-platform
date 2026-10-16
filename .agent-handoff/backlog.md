@@ -1,5 +1,9 @@
 # Task Backlog
 
+- [ ] T040科学自动化缺口优先：短膜检测、完整亮膜倾角、Marker/周期槽N、逐lane原像素定位，以及防止自动bounds/封底切穿主峰。先冻结独立真实holdout，再报告条件/样本量；本次参考辅助8/8不是自动准确率。
+- [ ] T040实际执行/标准显示已完成，完整门禁和桌面最终重开收尾中，详见任务。
+
+
 - [x] T037 Fig组灰度监督本地实现/验收完成，594全门禁与重开专项、双源/合成多蛋白、最终代码/视觉审查见任务。PR/main未集成。
 
 - [x] T035 比例裁图、自动入拼图、点击溯源与n快速调宽；指定两张源图原像素验证见任务。
@@ -64,3 +68,6 @@
 - [ ] 2026-10-15 用户纠偏后的优先事项：平台首页及真实 WB 入口→自动裁剪候选/图上调整→自动积分边界与异常复核→OCR/写表/拼图/导出完整闭环。分阶段验收见 work/evidence/F-007/progress-and-realignment.md；旧手填坐标演示已停止，不按旧演示待反馈继续。
 
 - [ ] T-024 review：16f3877工具平台+目录自动分析+图上调整+新结果目录/ZIP已真实10图跑通；532全门禁与绑定独审通过。后续用户试用、人工真值准确率、实验标签/样本配对、PR集成；不以本轮机器输出宣告完整科学产品完成。
+
+- [x] T-040 real-data execution:8 originals→4Fig→48 source-pixel values→supervised Excel/ZIP, saved desktop opened. First automatic1/8; corrected8/8 is reference-assisted.
+- [ ] T-040 gate investigation:600pytest passed summary but fullcheckexit1 beforewheel; UNKNOWN exit/shutdown cause.

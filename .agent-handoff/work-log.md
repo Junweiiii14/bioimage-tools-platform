@@ -5,10 +5,6 @@
 - 2026-10-16 T033：网页优先，同源WebEngine桥由T034分工集成；独立代码/视觉发现已修，独立文档同步。高级窗口网页化未完成，产品a68000e。
 
 
-## 2026-10-13
-
-完成原方案阅读、官方技术文档和 GitHub 技能调研，恢复 GitHub CLI 授权并建立私有仓库。建立规则、模块地图、ADR、任务/PR 模板、CI、依赖锁、边界检查、交接和 5 个技能。uv/项目 Python 及 67 个依赖可用，环境 smoke、质量门禁、14 个测试与漏洞查询通过。解决缓存路径和 uv Python DLL 启动器问题，GCC 15.2.0 编译运行通过；Windows/Linux 三项 CI 通过。已建立草稿 PR #1，没有合并或启动产品开发。未创建产品模块或算法。
-
 ## 2026-10-14 / T-003 首个 WB 产品核心
 
 用户授权扩展至 WB 软件完成。冻结参考 8 文件 SHA/本地快照与数值契约，独立实现标准库剖面积分包；新增真实 import-linter、传递依赖负例和隔离 wheel 门禁。完整检查 61 测试通过。真实图像标注与 GUI/自动化闭环未完成，独审未执行。下一步图像输入与 ROI。
@@ -113,3 +109,6 @@ wb-tool 0.2.0 新增 uint8/16 灰度及显式 RGB 单页 TIFF、极性与半开 
 - 目标88测试、Ruff、strict Pyright通过；独审/全仓/真实8图未运行，交协调任务。详见work/tasks/T-041-standard-display.md。
 
 - T041独审P1：禁止部分泳道段携带完整行display_frame，新增重复三泳道负例；31专项通过，详见任务。
+
+## 2026-10-17 T040
+Executed approved real dataset, published8no-overwrite named crops,4Fig images,48supervised observations/Excel/ZIP and reopened real desktop. Preserved first failed automatic predictions and old integrals. Integrated display-only standard frames and source overlays, independently reviewed throughf7a6651. Detector/baseline shortcomings and fullcheck abnormalexit remain explicit; see task/evidence.
