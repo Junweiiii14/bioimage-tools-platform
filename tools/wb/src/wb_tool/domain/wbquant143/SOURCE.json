@@ -1,7 +1,7 @@
 {
   "version": "WBQuant 1.4.3 baseline 1.0.0",
   "license": "MIT",
-  "modification": "core.py retained through quantify_image including cross-lane consensus; unused revision/edit imports removed; normalization rejected (separate existing API); lane_validation.py adapts geometry validation to individually sized lanes. All detection, border, weak-peak, boundary, baseline and consensus numerical logic unchanged.",
+  "modification": "core.py retained through quantify_image including cross-lane consensus; unused revision/edit imports removed; normalization rejected (separate existing API); lane_validation.py adapts geometry validation to individually sized lanes. All detection, border, weak-peak, boundary, baseline and consensus numerical logic unchanged. Pure-domain adaptation: LoadedImage.path is a plain string identity, not pathlib.Path; quantify_image uses that identity directly for its fallback label. No filesystem operations or numerical formulas changed.",
   "sha256": {
     "core": "0a62f6646715310f18ccdb91a700cb51a6edb088eb4b5452108d77203f643e97",
     "config": "76b73024b0a0dc5a0a21adc6e0df03d00d81624013a8d61b8faf3d487583d0ae",

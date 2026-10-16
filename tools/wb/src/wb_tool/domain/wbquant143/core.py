@@ -695,7 +695,7 @@ def quantify_image(
                 candidate["real_peak_score"] = float(min(1.0, float(candidate["real_peak_score"]) + 0.05 * consensus))
     result = ImageResult(
         image=image,
-        identifier=identifier or image.path.name,
+        identifier=identifier or image.path,
         lanes=results,
         config=config.as_dict(),
         reference_lane_id=reference_lane_id,

@@ -37,3 +37,11 @@ Validation: pending; independent review by parent after commit.
 - New test checks custom Fig columns/order, exported first-row numeric identity, recrop stability,
   single-row N adaptation, split-row rejection and fallback order. 36 related tests passed;
   latest supervision module 10 passed, exit 0. Ruff passed. No desktop files changed.
+
+## Pure-domain gate correction
+
+Import-linter found pathlib imports inherited in the reference LoadedImage model and
+wrapper. Changed the unused file-bearing object to a plain string image identity and
+its fallback label access accordingly; numerical logic unchanged, SOURCE.json records
+this adaptation. No rule/config relaxation. 10 supervision tests passed; lint-imports
+--no-cache: 9 contracts kept, 0 broken, exit 0.

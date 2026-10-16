@@ -1,7 +1,6 @@
 """Typed boundary around the frozen WBQuant 1.4.3 numerical reference."""
 
 from dataclasses import dataclass
-from pathlib import Path
 
 import numpy as np
 from numpy.typing import NDArray
@@ -40,7 +39,7 @@ def propose_quant_lanes(
     maximum = int(np.iinfo(pixels.dtype).max)
     raw = pixels if polarity == "dark" else maximum - pixels
     image = LoadedImage(
-        Path("original"),
+        "original",
         raw,
         raw.astype(np.float64),
         maximum,
