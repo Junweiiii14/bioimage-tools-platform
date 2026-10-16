@@ -7,7 +7,7 @@ from typing import cast
 
 from PySide6.QtCore import QBuffer, QIODevice, QObject, QTimer, Signal, Slot
 from PySide6.QtGui import QImage, QImageWriter
-from wb_tool.api import ProjectTableCell
+from wb_tool.api import ProjectTableCell, row_is_ready
 
 from bioimage_app.figure_window import FigureProjectWindow
 
@@ -52,10 +52,15 @@ class WorkbenchBridge(QObject):
         self._montage_key = 0
         self._montage: str | None = None
         self._error = ""
+        self._completed_key = ""
+        self.host.automatic.finished.connect(self._automatic_completed)
         self.timer = QTimer(self)
         self.timer.setInterval(180)
         self.timer.timeout.connect(self.publish)
         self.timer.start()
+
+    def _automatic_completed(self, output: str) -> None:
+        self._completed_key = output
 
     def snapshot(self) -> dict[str, object]:
         view = self.host.view
@@ -77,6 +82,30 @@ class WorkbenchBridge(QObject):
         if pixmap.cacheKey() != self._montage_key:
             self._montage_key = pixmap.cacheKey()
             self._montage = image_url(pixmap.toImage())
+        regions: list[dict[str, object]] = []
+        rendered = view.rendered_preview
+        montage_width = montage_height = 0
+        montage = None
+        if rendered and not pixmap.isNull():
+            manifest = json.loads(rendered.manifest_json)
+            if (
+                manifest.get("project_id") == project.project_id
+                and manifest.get("revision") == project.revision
+            ):
+                montage = self._montage
+                montage_width, montage_height = rendered.width, rendered.height
+                for item in manifest.get("rows", []):
+                    box = item.get("output_box")
+                    if box and item.get("source_sha256"):
+                        regions.append(
+                            {
+                                "rowId": item["row_id"],
+                                "x": box[0],
+                                "y": box[1],
+                                "width": box[2] - box[0],
+                                "height": box[3] - box[1],
+                            }
+                        )
         cells = [cell_state(c) for c in view.analysis.result_view.cells]
         rows: list[dict[str, object]] = []
         for row in project.rows:
@@ -98,6 +127,11 @@ class WorkbenchBridge(QObject):
                     else None,
                     "lanes": row.lane_count,
                     "reviewed": row.reviewed,
+                    "cropStatus": "ready"
+                    if row.roi and row_is_ready(project, row)
+                    else "pending"
+                    if row.roi
+                    else "failed",
                     "preview": self._images.get(row.source.sha256) if row.source else None,
                     "reason": "；".join(reasons) or ("尚未定位裁剪区域" if not roi else "等待复核"),
                     "status": "valid"
@@ -115,7 +149,11 @@ class WorkbenchBridge(QObject):
             "selectedId": selected.row_id if selected else "",
             "rows": rows,
             "cells": cells,
-            "montage": self._montage,
+            "montage": montage,
+            "montageRegions": regions,
+            "montageWidth": montage_width,
+            "montageHeight": montage_height,
+            "autoCompletedKey": self._completed_key,
             "outputPath": self.host.automatic.last_output_path,
         }
 
@@ -157,6 +195,19 @@ class WorkbenchBridge(QObject):
                 self.host.view.table.setCurrentCell(index, 0)
                 if not self.host.operation_busy:
                     self.host.select_source(rows[index].row_id)
+            elif action == "set_lanes":
+                row = self.host.view.selected_row()
+                if (
+                    row is None
+                    or data.get("id") != row.row_id
+                    or not row.source
+                    or data.get("sourceId") != row.source.sha256
+                ):
+                    raise ValueError("当前原图已改变，请重新调整")
+                count = data.get("n")
+                if type(count) is not int or not 1 <= count <= 96:
+                    raise ValueError("泳道数须为1–96的整数")
+                self.host.view.set_crop_lane_count(count)
             elif action in {"crop", "confirm"}:
                 row = self.host.view.selected_row()
                 if row is None or data.get("id") != row.row_id:

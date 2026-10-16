@@ -1820,7 +1820,11 @@ class FigureProjectWindow(QMainWindow):
             def completed(reply: WBReply) -> None:
                 if isinstance(reply.value, FigureRender):
                     self.view.show_render(reply.value)
-                    self._done("预览已生成；未审核行允许预览，正式导出须逐行确认。")
+                    self._done(
+                        "拼图已更新；可点击图片返回原图调整。"
+                        if self.automatic.crop_policy == "lane_ratio@1"
+                        else "预览已生成；未审核行允许预览，正式导出须逐行确认。"
+                    )
                 elif isinstance(reply.value, str):
                     self._done("项目归档已保存（结果缺项见归档内状态表）：" + reply.value)
                 else:

@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Literal, cast
 from uuid import uuid4
 
 from PySide6.QtCore import QObject, Signal
@@ -27,6 +27,7 @@ class AutomaticWorkflow(QObject):
         super().__init__(window)
         self.window = window
         self.last_output_path = ""
+        self.crop_policy: Literal["legacy_fixed_height@1", "lane_ratio@1"] = "legacy_fixed_height@1"
         self.failures: tuple[str, ...] = ()
         self.cancelled = False
 
@@ -165,6 +166,7 @@ class AutomaticWorkflow(QObject):
             window.submit_tool_job(
                 WBJob(
                     "automatic_row",
+                    crop_policy=self.crop_policy,
                     path=path,
                     document=project,
                     row_id=row_id,

@@ -246,3 +246,47 @@ def test_web_close_reopen_restores_saved_project(qtbot: QtBot, tmp_path: Path) -
         qtbot.waitUntil(lambda: reopened.host.resources_closed, timeout=20000)
         qtbot.wait(20)
         gc.collect()
+
+
+def test_ratio_crop_no_confirmation_montage_and_lane_resize(
+    qtbot: QtBot, tmp_path: Path, bridge: WorkbenchBridge
+) -> None:
+    host = bridge.host
+    host.automatic.crop_policy = "lane_ratio@1"
+    source = tmp_path / "originals" / "ratio-original.tif"
+    source.parent.mkdir()
+    image = np.full((180, 360), 50000, dtype=np.uint16)
+    for x in (100, 160, 220):
+        image[70:85, x - 17 : x + 17] = 15000
+    tifffile.imwrite(source, image)
+    before = source.read_bytes()
+    host.start_project_from_images([source], project_parent=tmp_path / "projects")
+    qtbot.waitUntil(
+        lambda: bool(host.automatic.last_output_path) or "操作失败" in host.view.status.text(),
+        timeout=45000,
+    )
+    assert host.automatic.last_output_path, host.view.status.text()
+    qtbot.waitUntil(lambda: not host.operation_busy, timeout=20000)
+    row = host.view.project().rows[0]
+    assert row.roi is not None and row.lane_count == 3
+    assert abs(row.roi.width - 1.25 * row.lane_count * (row.roi.y1 - row.roi.y0)) <= 0.5
+    assert not row.reviewed
+    snapshot = bridge.snapshot()
+    assert snapshot["autoCompletedKey"]
+    assert snapshot["montage"] and snapshot["montageRegions"]
+    assert snapshot["montageWidth"] and snapshot["montageHeight"]
+    bridge.request("select", json.dumps({"id": row.row_id}))
+    qtbot.waitUntil(lambda: not host.operation_busy, timeout=15000)
+    assert row.source is not None
+    bridge.request(
+        "set_lanes", json.dumps({"id": row.row_id, "sourceId": row.source.sha256, "n": 4})
+    )
+    changed = host.view.project().rows[0]
+    assert changed.roi is not None and changed.lane_count == 4
+    assert changed.roi.y1 - changed.roi.y0 == row.roi.y1 - row.roi.y0
+    assert abs(changed.roi.width - 1.25 * 4 * (row.roi.y1 - row.roi.y0)) <= 0.5
+    assert not changed.reviewed
+    bridge.request("undo", "{}")
+    restored = host.view.project().rows[0]
+    assert restored.roi == row.roi and restored.lane_count == 3
+    assert source.read_bytes() == before
