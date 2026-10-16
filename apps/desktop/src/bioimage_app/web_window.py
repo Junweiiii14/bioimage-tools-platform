@@ -67,6 +67,7 @@ class WebWorkbenchWindow(QMainWindow):
         self.settings = settings or QSettings("BioImageTools", "Platform")
         self.host = AdvancedHost()
         self.host.closed.connect(self._backend_closed)
+        self.host.workspace_opened.connect(self._workspace_ready)
         self.web = QWebEngineView(self)
         index = (asset_directory or Path(__file__).with_name("web_ui")) / "index.html"
         page = LocalWorkbenchPage(index, self.web)
@@ -109,9 +110,25 @@ class WebWorkbenchWindow(QMainWindow):
                 else:
                     self.start_from_images([Path(path)])
         elif action == "open_project":
+            if self.host.workspace_path:
+                raise ValueError("当前已有项目；请新开一个工作台窗口，再打开其他项目。")
             path = QFileDialog.getExistingDirectory(self, "打开已有 BioImage 项目")
             if path:
-                self.host.open_workspace(path)
+                self.open_project(path)
+
+    def open_project(self, path: str) -> None:
+        """Open persisted project data, rather than only its storage container."""
+        if self.host.workspace_path:
+            raise ValueError("当前已有项目；请新开一个工作台窗口，再打开其他项目。")
+        if self.host.operation_busy or self.host.is_closing:
+            raise ValueError("当前任务仍在处理中，请稍候或取消")
+        self.host.open_workspace(path)
+
+    def _workspace_ready(self, _path: str) -> None:
+        if self.host.documents.count() > 1:
+            document_id = self.host.documents.itemData(1)
+            if isinstance(document_id, str) and document_id:
+                self.host.load_document(document_id)
 
     def start_from_images(self, paths: list[Path]) -> None:
         parent = str(self.settings.value("project_parent", ""))

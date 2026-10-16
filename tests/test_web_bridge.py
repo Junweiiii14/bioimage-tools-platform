@@ -182,8 +182,67 @@ def test_existing_web_project_appends_files_and_folder(
         assert window.host.view.project().project_id == project_id
         assert len(list((tmp_path / "projects").glob("*/workspace.json"))) == 1
         assert [source.read_bytes() for source in sources] == originals_before
+        rows = window.host.view.project().rows
+        window.bridge.request("select", json.dumps({"id": rows[0].row_id}))
+        qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=15000)
+        for index in (0, 1):
+            window.bridge.request("confirm", json.dumps({"id": rows[index].row_id}))
+            qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=15000)
+            assert window.host.view.project().rows[index].reviewed
+            selected = window.host.view.selected_row()
+            assert selected is not None and selected.row_id == rows[index + 1].row_id
+
     finally:
         window.close()
         qtbot.waitUntil(lambda: window.host.resources_closed, timeout=20000)
+        qtbot.wait(20)
+        gc.collect()
+
+
+def test_web_close_reopen_restores_saved_project(qtbot: QtBot, tmp_path: Path) -> None:
+    from bioimage_app.web_window import WebWorkbenchWindow
+    from PySide6.QtCore import QSettings
+
+    assets = tmp_path / "web"
+    assets.mkdir()
+    (assets / "index.html").write_text("<html>WB</html>", encoding="utf-8")
+    originals = tmp_path / "originals"
+    originals.mkdir()
+    source = originals / "source.tif"
+    image = np.full((180, 360), 50000, dtype=np.uint16)
+    for x in (60, 120, 180, 240, 300):
+        image[70:85, x - 17 : x + 17] = 15000
+    tifffile.imwrite(source, image)
+    settings = QSettings(str(tmp_path / "settings.ini"), QSettings.Format.IniFormat)
+    settings.setValue("project_parent", str(tmp_path / "projects"))
+    first = WebWorkbenchWindow(asset_directory=assets, settings=settings)
+    try:
+        first.start_from_images([source])
+        qtbot.waitUntil(lambda: bool(first.host.automatic.last_output_path), timeout=45000)
+        qtbot.waitUntil(lambda: not first.host.operation_busy, timeout=15000)
+        workspace = first.host.workspace_path
+        original_project = first.host.view.project()
+    finally:
+        first.close()
+        qtbot.waitUntil(lambda: first.host.resources_closed, timeout=20000)
+        qtbot.wait(20)
+        gc.collect()
+    reopened = WebWorkbenchWindow(asset_directory=assets, settings=settings)
+    try:
+        reopened.open_project(workspace)
+        qtbot.waitUntil(lambda: bool(reopened.host.view.project().rows), timeout=20000)
+        qtbot.waitUntil(lambda: not reopened.host.operation_busy, timeout=20000)
+        restored = reopened.host.view.project()
+        assert restored.project_id == original_project.project_id
+        assert restored.rows == original_project.rows
+        assert reopened.host.view.analysis.result_view.cells
+        assert reopened.host.view.source_preview is not None
+        reopened.bridge.request("open_project", "{}")
+        assert "新开一个工作台窗口" in str(reopened.bridge.snapshot()["status"])
+        assert reopened.host.workspace_path == workspace
+        assert reopened.host.view.project().project_id == original_project.project_id
+    finally:
+        reopened.close()
+        qtbot.waitUntil(lambda: reopened.host.resources_closed, timeout=20000)
         qtbot.wait(20)
         gc.collect()

@@ -181,6 +181,14 @@ class WorkbenchBridge(QObject):
                     self.host.view.canvas.roi_drawn.emit((x, y, x + width, y + height))
                 else:
                     self.host.view.confirm_selected()
+                    rows = self.host.view.project().rows
+                    current = next(i for i, item in enumerate(rows) if item.row_id == row.row_id)
+                    following = list(range(current + 1, len(rows))) + list(range(current))
+                    next_index = next(
+                        (i for i in following if rows[i].source and not rows[i].reviewed), None
+                    )
+                    if next_index is not None:
+                        self.host.view.table.setCurrentCell(next_index, 0)
             elif action == "undo":
                 self.host.view.undo_review()
             elif action == "redo":

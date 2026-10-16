@@ -23,3 +23,11 @@ profile application-owned until page destruction, then schedules profile deletio
 forced-GC cleanup checks. Final targeted bridge+project-start suite: 8 passed in 8.29s exit0;
 scoped Ruff/Pyright passed. This reproduction/fix does not resolve historical unrelated Qt
 native failures or establish standalone Windows packaging stability.
+
+Independent-review corrections: workspace_opened now loads the saved WB document and its
+verified evidence, matching native platform behavior. Attempting open_project with an active
+workspace reports an explicit new-window instruction instead of silently ignoring it. Added
+real save/close/reopen regression verifying project ID, rows, results and selected raster.
+Confirm now advances to the next unreviewed source (wrapping), using existing asynchronous
+preview selection; two consecutive confirmations covered. Final web suite 5 passed in 7.40s,
+exit0; Ruff/Pyright passed. No frontend assets changed.
