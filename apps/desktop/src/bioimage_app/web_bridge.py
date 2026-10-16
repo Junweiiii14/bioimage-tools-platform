@@ -111,6 +111,7 @@ class WorkbenchBridge(QObject):
                             {
                                 "rowId": item["row_id"],
                                 "sourceLaneRange": item.get("source_lane_range"),
+                                "sourceToOutput": item.get("source_to_output"),
                                 "displayLine": item.get("display_line"),
                                 "sourceRoi": {
                                     "x": item["roi"]["x0"],
