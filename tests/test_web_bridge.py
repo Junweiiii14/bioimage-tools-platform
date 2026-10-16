@@ -117,8 +117,10 @@ def test_local_page_channel_and_drain(qtbot: QtBot, tmp_path: Path) -> None:
         )
         window.bridge.request("advanced", '{"section":"metadata"}')
         assert window.host.isVisible()
+        window.host.hide()
         window.bridge.request("advanced", '{"section":"analysis"}')
-        assert window.host.view.curve_toggle.isChecked()
+        assert not window.host.isVisible()
+        assert "灰度定量页" in str(window.bridge.snapshot()["status"])
         window.host.close()
         assert not window.host.isVisible() and not window.host.resources_closed
     finally:

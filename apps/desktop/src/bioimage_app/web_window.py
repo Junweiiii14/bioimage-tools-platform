@@ -67,6 +67,7 @@ class WebWorkbenchWindow(QMainWindow):
         self.settings = settings or QSettings("BioImageTools", "Platform")
         self.host = AdvancedHost()
         self.host.automatic.crop_policy = "lane_ratio@1"
+        self.host.automatic.quant_policy = "wbquant_1_4_3@1"
         self.host.closed.connect(self._backend_closed)
         self.host.workspace_opened.connect(self._workspace_ready)
         self.web = QWebEngineView(self)
@@ -103,6 +104,16 @@ class WebWorkbenchWindow(QMainWindow):
                     self.host.import_images(tuple(paths), automatic=True)
                 else:
                     self.start_from_images([Path(path) for path in paths])
+        elif action in {"quant_export_xlsx", "quant_export_csv"}:
+            extension = action.rsplit("_", 1)[-1]
+            path, _ = QFileDialog.getSaveFileName(
+                self,
+                "导出灰度分析",
+                "灰度分析." + extension,
+                "Excel (*.xlsx)" if extension == "xlsx" else "CSV (*.csv)",
+            )
+            if path:
+                self.host.export_project_table(path, quant=True)
         elif action == "import_folder":
             path = QFileDialog.getExistingDirectory(self, "选择 WB 原图文件夹")
             if path:

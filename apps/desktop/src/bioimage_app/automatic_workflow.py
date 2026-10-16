@@ -28,6 +28,7 @@ class AutomaticWorkflow(QObject):
         self.window = window
         self.last_output_path = ""
         self.crop_policy: Literal["legacy_fixed_height@1", "lane_ratio@1"] = "legacy_fixed_height@1"
+        self.quant_policy: Literal["legacy_bounds@1", "wbquant_1_4_3@1"] = "legacy_bounds@1"
         self.failures: tuple[str, ...] = ()
         self.cancelled = False
 
@@ -167,6 +168,7 @@ class AutomaticWorkflow(QObject):
                 WBJob(
                     "automatic_row",
                     crop_policy=self.crop_policy,
+                    quant_policy=self.quant_policy,
                     path=path,
                     document=project,
                     row_id=row_id,

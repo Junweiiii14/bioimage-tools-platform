@@ -22,6 +22,7 @@ from wb_tool.application.figure_template import LoadedFigureTemplate
 from wb_tool.application.project_analysis import (
     LoadedProjectResult,
     ProjectTableSnapshot,
+    WBAnalysisProject,
     fill_project_table,
     read_project_result,
 )
@@ -51,7 +52,12 @@ class _Work(QObject):
             cancel = job.cancellation.is_set if job.cancellation is not None else lambda: False
             if (
                 job.operation
-                in ("project_export", "project_ocr_export", "project_normalization_export")
+                in (
+                    "project_export",
+                    "project_ocr_export",
+                    "project_normalization_export",
+                    "quant_export",
+                )
                 and job.archive_runs is not None
             ):
                 from wb_tool.adapters.project_evidence import verify_project_evidence
@@ -96,6 +102,7 @@ class _Work(QObject):
                     job.document,
                     job.row_id,
                     crop_policy=job.crop_policy,
+                    quant_policy=job.quant_policy,
                     cancelled=cancel,
                 )
             elif job.operation == "automatic_export":
@@ -199,6 +206,22 @@ class _Work(QObject):
                 if job.analysis_plan is None:
                     raise ValueError("缺少结果所属定量计划")
                 value = read_project_result(job.analysis_plan, job.data)
+            elif job.operation == "quant_replan":
+                from wb_tool.adapters.quant_supervision import replan_quant_lanes
+
+                if not isinstance(job.document, WBAnalysisProject):
+                    raise ValueError("缺少定量项目")
+                value = replan_quant_lanes(job.path, job.document, job.row_id, cancelled=cancel)
+            elif job.operation == "quant_export":
+                from wb_tool.adapters.quant_export import export_wbquant_table
+
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少定量项目")
+                value = str(
+                    export_wbquant_table(
+                        job.document, job.project_results, job.destination, cancelled=cancel
+                    )
+                )
             elif job.operation in ("project_table", "project_export"):
                 if not isinstance(job.document, WBFigureProject):
                     raise ValueError("缺少项目文档")

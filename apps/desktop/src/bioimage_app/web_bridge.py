@@ -2,14 +2,23 @@
 
 import base64
 import json
+import math
 from collections.abc import Callable
 from typing import cast
 
 from PySide6.QtCore import QBuffer, QIODevice, QObject, QTimer, Signal, Slot
 from PySide6.QtGui import QImage, QImageWriter
-from wb_tool.api import ProjectTableCell, row_is_ready
+from wb_tool.api import (
+    BandBounds,
+    Baseline,
+    LaneROI,
+    ProjectTableCell,
+    WBAnalysisProject,
+    row_is_ready,
+)
 
 from bioimage_app.figure_window import FigureProjectWindow
+from bioimage_app.web_quant import quant_snapshot
 
 
 def image_url(image: QImage) -> str | None:
@@ -149,6 +158,7 @@ class WorkbenchBridge(QObject):
             "selectedId": selected.row_id if selected else "",
             "rows": rows,
             "cells": cells,
+            "quant": quant_snapshot(self.host),
             "montage": montage,
             "montageRegions": regions,
             "montageWidth": montage_width,
@@ -187,7 +197,7 @@ class WorkbenchBridge(QObject):
                 raise ValueError("当前任务仍在处理中，请稍候或取消")
             elif action in {"import", "import_folder", "open_project"}:
                 self.choose(action)
-            elif action == "select":
+            elif action in {"select", "quant_select"}:
                 rows = self.host.view.project().rows
                 index = next((i for i, row in enumerate(rows) if row.row_id == data.get("id")), -1)
                 if index < 0:
@@ -195,6 +205,18 @@ class WorkbenchBridge(QObject):
                 self.host.view.table.setCurrentCell(index, 0)
                 if not self.host.operation_busy:
                     self.host.select_source(rows[index].row_id)
+            elif action == "quant_edit":
+                self._edit_quant(data)
+            elif action == "quant_auto":
+                row = self.host.view.selected_row()
+                if row is None or row.row_id != data.get("id"):
+                    raise ValueError("当前原图已改变，请重新选择")
+                self.host.automatic.analyze(row_ids=(row.row_id,), publish_output=False)
+            elif action == "quant_export":
+                format_name = data.get("format")
+                if format_name not in {"xlsx", "csv"}:
+                    raise ValueError("请选择Excel或CSV格式")
+                self.choose("quant_export_" + str(format_name))
             elif action == "set_lanes":
                 row = self.host.view.selected_row()
                 if (
@@ -254,6 +276,8 @@ class WorkbenchBridge(QObject):
                 self.host.output_button.click()
             elif action == "advanced":
                 section = data.get("section")
+                if section == "analysis":
+                    raise ValueError("请使用工作台中的灰度定量页")
                 if section not in {"metadata", "ocr", "normalization", "template", "analysis"}:
                     raise ValueError("未知高级工具")
                 self.host.view.show_section(str(section))
@@ -265,3 +289,104 @@ class WorkbenchBridge(QObject):
         except (ValueError, TypeError) as error:
             self._error = str(error)
         self.publish()
+
+    def _edit_quant(self, data: dict[str, object]) -> None:
+        from wb_tool.api import update_quant_lane
+
+        project = self.host.view.project()
+        row = self.host.view.selected_row()
+        if (
+            not isinstance(project, WBAnalysisProject)
+            or row is None
+            or not row.source
+            or data.get("id") != row.row_id
+            or data.get("sourceId") != row.source.sha256
+            or type(data.get("revision")) is not int
+            or data.get("revision") != self.host.view.generation
+        ):
+            raise ValueError("原图或参数已改变，请等待刷新后重新调整")
+        plan = next((p for p in project.analyses if p.row_id == row.row_id), None)
+        lane = data.get("lane")
+        if plan is None or type(lane) is not int or not 1 <= lane <= len(plan.request.lanes):
+            raise ValueError("泳道已改变，请重新选择")
+        annotation = plan.request.lanes[lane - 1]
+        band_id = data.get("bandId") or "target"
+        if not isinstance(band_id, str) or not any(b.band_id == band_id for b in annotation.bands):
+            raise ValueError("当前目标条带不存在")
+        roi = None
+        bounds = None
+        baseline = None
+        if "roi" in data:
+            box = data["roi"]
+            if not isinstance(box, dict):
+                raise ValueError("泳道范围缺失")
+            fields = cast(dict[str, object], box)
+            coords = [fields.get(k) for k in ("x", "y", "width", "height")]
+            if any(type(v) is not int for v in coords):
+                raise ValueError("泳道须使用原图整数坐标")
+            x, y, width, height = cast(list[int], coords)
+            roi = LaneROI(annotation.roi.lane_id, x, y, x + width, y + height)
+        elif any(k in data for k in ("start", "end", "baselineStart", "baselineEnd")):
+            current_band = next(b for b in annotation.bands if b.band_id == band_id)
+            current_bounds, current_baseline = current_band.bounds, current_band.baseline
+            loaded = next(
+                (
+                    r
+                    for r in self.host.project_results
+                    if plan.run and r.run_id == plan.run.run_id and r.result.request == plan.request
+                ),
+                None,
+            )
+            if loaded:
+                measured_lane = next(
+                    (r for r in loaded.result.lanes if r.roi == annotation.roi), None
+                )
+                measured = (
+                    next(
+                        (
+                            b.measurement
+                            for b in measured_lane.bands
+                            if b.annotation.band_id == band_id
+                        ),
+                        None,
+                    )
+                    if measured_lane
+                    else None
+                )
+                if measured:
+                    current_bounds, current_baseline = measured.bounds, measured.baseline
+            start = data.get("start", current_bounds.left if current_bounds else None)
+            end = data.get("end", current_bounds.right if current_bounds else None)
+            if type(start) is not int or type(end) is not int:
+                raise ValueError("积分边界须为整数像素")
+            bounds = BandBounds(start, end)
+            raw = [
+                data.get(
+                    "baselineStart", current_baseline.left_value if current_baseline else None
+                ),
+                data.get("baselineEnd", current_baseline.right_value if current_baseline else None),
+            ]
+            if any(v is not None for v in raw):
+                if any(
+                    type(v) not in (int, float) or not math.isfinite(float(cast(float, v)))
+                    for v in raw
+                ):
+                    raise ValueError("封底端点须为有限数值")
+                baseline = Baseline(float(cast(float, raw[0])), float(cast(float, raw[1])))
+        else:
+            raise ValueError("缺少泳道范围或积分边界")
+        updated = update_quant_lane(
+            project,
+            row.row_id,
+            annotation.roi.lane_id,
+            roi=roi,
+            bounds=bounds,
+            baseline=baseline,
+            band_id=band_id,
+        )
+        self.host.view.set_project(updated)
+        self.host.view.generation += 1
+        if roi is not None:
+            self.host.replan_quant_lane(row.row_id)
+        else:
+            self.host.analyze_project(row_ids=(row.row_id,))
