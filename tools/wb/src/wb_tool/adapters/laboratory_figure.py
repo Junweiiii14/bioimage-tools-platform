@@ -1,9 +1,10 @@
-"""Render explicit segments without resampling or changing any quantitative source."""
+"""Render explicit display segments while preserving every quantitative source."""
 
 import json
 from collections.abc import Callable
 from hashlib import sha256
 from io import BytesIO
+from math import cos, radians, sin
 from pathlib import Path
 
 import numpy as np
@@ -30,6 +31,7 @@ def render_laboratory_figure(
     if any(paths[source.sha256] != source.path for source in sources):
         raise ValueError("同一来源摘要对应多个路径")
     template, style = project.template, project.layout_style
+    standard = style.display_policy == "standard_lane_ratio@1"
     required = {row.source.sha256 for row in project.rows if row.source}
     if template.font:
         required.add(template.font.sha256)
@@ -115,12 +117,19 @@ def render_laboratory_figure(
     # The plan has non-overlapping output boxes, so drawing by source changes no pixels.
     # Keep records in display order, but retain only one decoded source at a time.
     for digest, segments in by_source.items():
-        _paste_source(canvas, paths[digest], segments, cancelled)
+        _paste_source(canvas, paths[digest], segments, cancelled, resample=standard)
     if cancelled():
         raise ValueError("拼图任务已取消，未发布输出")
+    project_record = project.model_dump(mode="json")
+    if not standard:
+        # Retain the frozen native manifest representation for legacy projects.
+        project_record["layout_style"].pop("display_policy")
+        project_record["layout_style"].pop("lane_unit")
+        for segment in project_record["composition"]["slices"]:
+            segment.pop("display_frame")
     manifest = {
         "schema_version": 2,
-        "operation": "figure_segmented_geometry@1",
+        "operation": "figure_segmented_geometry@2" if standard else "figure_segmented_geometry@1",
         "project_id": project.project_id,
         "revision": project.revision,
         "purpose": "display_only_not_quantitative",
@@ -129,8 +138,17 @@ def render_laboratory_figure(
         "font_sha256": font_hash,
         "size": [layout.width, layout.height],
         "rows": records,
-        "project": project.model_dump(mode="json"),
+        "project": project_record,
     }
+    if standard:
+        manifest.update(
+            display_policy=style.display_policy,
+            lane_unit=style.lane_unit,
+            row_height=style.lane_unit * 4 // 5,
+            resampling="per_segment_explicit@1"
+            if any(s.display_frame for s in project.composition.slices)
+            else "pillow_rgb8_lanczos@1",
+        )
     return FigureRender(
         layout.width, layout.height, canvas.tobytes(), json.dumps(manifest, ensure_ascii=True)
     )
@@ -141,6 +159,8 @@ def _paste_source(
     path: str,
     segments: list[tuple[SegmentPlacement, dict[str, object]]],
     cancelled: Callable[[], bool],
+    *,
+    resample: bool,
 ) -> None:
     if cancelled():
         raise ValueError("拼图任务已取消，未发布输出")
@@ -160,10 +180,54 @@ def _paste_source(
             raise ValueError("拼图原图摘要/字节数/尺寸/位深不一致")
         crop = original.pixels[roi.y0 : roi.y1, roi.x0 : roi.x1]
         display = (crop // 257).astype(np.uint8) if row.bit_depth == 16 else crop
-        canvas.paste(
-            Image.fromarray(display).convert("RGB"),
-            (placed.output_box[0], placed.output_box[1]),
-        )
+        display_image = Image.fromarray(display).convert("RGB")
+        if resample:
+            x0, y0, x1, y1 = placed.output_box
+            frame = placed.segment.display_frame
+            angle = radians(frame.angle_degrees) if frame else 0.0
+            c, s = cos(angle), sin(angle)
+            cx = frame.center_x if frame else (roi.x0 + roi.x1) / 2
+            cy = frame.center_y if frame else (roi.y0 + roi.y1) / 2
+            fw = frame.width if frame else float(roi.width)
+            fh = frame.height if frame else float(roi.y1 - roi.y0)
+            sx, sy = (x1 - x0) / fw, (y1 - y0) / fh
+            matrix = [
+                [sx * c, sx * s, x0 + (x1 - x0) / 2 - sx * (c * cx + s * cy)],
+                [-sy * s, sy * c, y0 + (y1 - y0) / 2 + sy * (s * cx - c * cy)],
+            ]
+            sampling = "pillow_rgb8_lanczos@1"
+            if frame:
+                # Pillow affine coordinates refer to pixel edges; source and output
+                # pixel centers are therefore mapped consistently without rounding ROI.
+                sampling = "pillow_rgb8_affine_bilinear@1"
+                source_display = (
+                    (original.pixels // 257).astype(np.uint8)
+                    if row.bit_depth == 16
+                    else original.pixels
+                )
+                source_image = Image.fromarray(source_display).convert("RGB")
+                a, b = c / sx, -s / sy
+                d, e = s / sx, c / sy
+                display_image = source_image.transform(
+                    (x1 - x0, y1 - y0),
+                    Image.Transform.AFFINE,
+                    (a, b, cx - c * fw / 2 + s * fh / 2, d, e, cy - s * fw / 2 - c * fh / 2),
+                    resample=Image.Resampling.BILINEAR,
+                )
+            else:
+                display_image = display_image.resize((x1 - x0, y1 - y0), Image.Resampling.LANCZOS)
+            record.update(
+                source_to_output=matrix,
+                display_frame=frame.model_dump(mode="json") if frame else None,
+            )
+            record.update(
+                display_policy="standard_lane_ratio@1",
+                resampling=sampling,
+                original_roi_size=[roi.width, roi.y1 - roi.y0],
+                display_output_size=[x1 - x0, y1 - y0],
+                display_rgb_sha256=sha256(display_image.tobytes()).hexdigest(),
+            )
+        canvas.paste(display_image, (placed.output_box[0], placed.output_box[1]))
         record.update(
             roi={"x0": roi.x0, "y0": roi.y0, "x1": roi.x1, "y1": roi.y1},
             source_photometric=original.photometric,

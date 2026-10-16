@@ -25,3 +25,5 @@ symlink/junction。此检查不声称防御恶意进程在路径校验后替换�
 实现依据：[Python3.12 zipfile](https://docs.python.org/3.12/library/zipfile.html)、
 [Pillow ImageFont](https://pillow.readthedocs.io/en/stable/reference/ImageFont.html)。
 固定当前Pillow12.3.0，无新增依赖或数值算法变化。
+
+T-041：layout_style保存显式display_policy和lane_unit；缺字段为native_samples@1与120。standard_lane_ratio@1仅改变显示渲染，不含实验绑定或定量语义；参数约束及schema见wb-laboratory-layout-v1.md和wb-layout-style-v1.schema.json。

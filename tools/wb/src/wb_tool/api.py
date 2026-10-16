@@ -69,6 +69,7 @@ from wb_tool.application.figure_template import (
     TemplateFont,
 )
 from wb_tool.application.laboratory_layout import (
+    DisplayFrame,
     FigureColumn,
     FigureComposition,
     FigureLayoutStyle,
@@ -241,6 +242,7 @@ __all__ = [
     "FigureColumn",
     "FigureComposition",
     "ordered_quant_rows",
+    "DisplayFrame",
     "FigureLayoutStyle",
     "FigureSlice",
     "LaboratoryLayout",

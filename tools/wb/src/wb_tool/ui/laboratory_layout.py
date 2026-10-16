@@ -37,6 +37,8 @@ class LaboratoryLayoutPanel(QWidget):
         self.active = False
         self._loading = False
         self._rows: dict[str, FigureRow] = {}
+        self._style = FigureLayoutStyle()
+        self._original_slices: tuple[FigureSlice, ...] = ()
         root = QVBoxLayout(self)
         self.rebuild = QPushButton("根据原图更新排版")
         self.rebuild.clicked.connect(self.rebuild_requested)
@@ -181,11 +183,13 @@ class LaboratoryLayoutPanel(QWidget):
             self.changed.emit()
 
     def layout_style(self) -> FigureLayoutStyle:
-        return FigureLayoutStyle(
-            heading_size=self.heading.value(),
-            segment_gap=self.gap.value(),
-            flow="columns" if self.flow.currentIndex() == 0 else "rows",
-            label_alignment="right" if self.alignment.currentIndex() == 0 else "left",
+        return self._style.model_copy(
+            update={
+                "heading_size": self.heading.value(),
+                "segment_gap": self.gap.value(),
+                "flow": "columns" if self.flow.currentIndex() == 0 else "rows",
+                "label_alignment": "right" if self.alignment.currentIndex() == 0 else "left",
+            }
         )
 
     def composition(self) -> FigureComposition:
@@ -205,16 +209,33 @@ class LaboratoryLayoutPanel(QWidget):
             if values[1] in columns and columns[values[1]] != column:
                 raise ValueError("同一Fig的列号不一致")
             columns[values[1]] = column
-            parts.append(
-                FigureSlice(
-                    row_id=identity,
-                    figure=values[1],
-                    line=int(values[2]),
-                    position=int(values[3]),
-                    first_lane=int(values[4]),
-                    last_lane=int(values[5]),
-                )
+            part = FigureSlice(
+                row_id=identity,
+                figure=values[1],
+                line=int(values[2]),
+                position=int(values[3]),
+                first_lane=int(values[4]),
+                last_lane=int(values[5]),
             )
+            original = next(
+                (
+                    s
+                    for s in self._original_slices
+                    if (s.row_id, s.figure, s.line, s.position, s.first_lane, s.last_lane)
+                    == (
+                        part.row_id,
+                        part.figure,
+                        part.line,
+                        part.position,
+                        part.first_lane,
+                        part.last_lane,
+                    )
+                ),
+                None,
+            )
+            if original is not None:
+                part = part.model_copy(update={"display_frame": original.display_frame})
+            parts.append(part)
         return FigureComposition(
             slices=tuple(parts),
             columns=tuple(
@@ -233,6 +254,7 @@ class LaboratoryLayoutPanel(QWidget):
         composition = (
             project.composition if isinstance(project, WBLayoutProject) else FigureComposition()
         )
+        self._style = style
         self.heading.setValue(style.heading_size)
         self.gap.setValue(style.segment_gap)
         self.flow.setCurrentIndex(0 if style.flow == "columns" else 1)
@@ -248,6 +270,7 @@ class LaboratoryLayoutPanel(QWidget):
             self._select_segment(max(0, self.segment.currentIndex()))
 
     def _fill(self, composition: FigureComposition) -> None:
+        self._original_slices = composition.slices
         selected = self.segment.currentIndex()
         self.segment.clear()
         columns = {entry.figure: entry.column for entry in composition.columns}
@@ -305,9 +328,13 @@ class LaboratoryLayoutPanel(QWidget):
                     for part in parts
                 ]
                 parts[index : index + 1] = [
-                    original.model_copy(update={"last_lane": cut}),
+                    original.model_copy(update={"last_lane": cut, "display_frame": None}),
                     original.model_copy(
-                        update={"first_lane": cut + 1, "position": original.position + 1}
+                        update={
+                            "first_lane": cut + 1,
+                            "position": original.position + 1,
+                            "display_frame": None,
+                        }
                     ),
                 ]
             self._loading = True

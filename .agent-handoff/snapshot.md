@@ -8,3 +8,5 @@
 - 全check第二轮592passed1failed（append新图缺composition段），fb6e461修复且独立失败用例exit0。最终check594passed及隔离wheel exit0，日志.local/t037/check-final.log。详细失败/验收见work/evidence/T-037/validation.md。
 - 当前T037本地验收完成：最终视觉ship、独审绑定9be19b1；追加重开队列修复专项通过。当前桌面已打开双源项目（opened.json），保留测试封底调整值。下一步用户体验反馈；不自动扩展OCR/模板或其它工具。
 - .local/t037含验证JSON、截图、工作区、打开灰度定量工作台.cmd；启动器读verification.json，只有最新成功harness才更新该文件。OCR/模板/归一化仍原生高级入口，干净Windows与PR/main未做。
+
+- T-041独立实施树codex/t040-standard-display：显式标准显示与可选旋转frame完成自验；唯一状态work/tasks/T-041-standard-display.md，等待协调任务独审/集成。原T037状态保持。

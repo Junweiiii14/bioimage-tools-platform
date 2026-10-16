@@ -63,3 +63,5 @@ v1草稿继续读取，协议/文档契约见wb-document-v2.md。自动裁剪、
 T-024新增 automatic_wb_proposals@1 与 WBAutomaticProject/schema8：原像素泳道/裁剪及积分边界建议、可保留图上调整的后台入口、机器来源证据与过期校验；人工审核标记保持false。旧schema1–7读取不变，积分profile_integral@1不变。策略、限制、验证见work/evidence/T-027/automatic-core-validation.md（仓库根）。
 
 T-024自动主流程已集成。schema8与自动输出契约见 `../../docs/contracts/wb-automatic-v1.md`；质量复核的原始积分与有效信号分列；失败来源保留，未知蛋白和归一化配对不猜测。
+
+T-041：FigureLayoutStyle显式standard_lane_ratio@1可将同Fig不同原生ROI尺寸显示为每泳道lane_unit宽、4/5 lane_unit高的RGB8 LANCZOS行；原生默认、定量和原值裁剪保持。manifest操作@2明确回源与显示重采样，TIFF定量入口拒绝；预算仍3200万像素。详见wb-laboratory-layout-v1.md。
