@@ -14,3 +14,8 @@ Parent integration: connect automatic_requested, automatic_export_requested, imp
 Final combined source/workflow/evidence/laboratory/figure/single-window run: 36 passed in 41.03s; exit 0. Final targeted Ruff, strict pyright and git diff --check exit 0. Full gates not run in subtask.
 
 协调收拢：已集成产品16f3877；T-024全门禁532通过，独立绑定审查通过。子任务本地交付完成，后续用户试用/PR集成由T-024统一跟踪。
+
+
+## T-043 历史回执真实重载
+
+原回执提交16f38777d8bf8262b429e4004413937dd55b0195的规则指纹不匹配（Head rules changed or nested rules were omitted; reload context）。旧 Git 版本保留；本次按当前阶段规则重新加载，仍使用原记录基线与范围，不将旧记录记为通过。
