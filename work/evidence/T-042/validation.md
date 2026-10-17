@@ -13,3 +13,10 @@
 所有本地证据位于活动工作树.local/t042；私有原图、参考图和生成成果不进Git。旧工作区/旧结果未覆盖。未发布、未合并main、未做干净Windows验收。
 
 最终独立审查见independent-review.md，2980a0a兼容增量3项独立测试exit0。所有发现关闭，审查未代替完整门禁或科学泛化验收。
+
+
+补充失败与修复：第三轮完整626测试实际622passed/4failed，分别是3份JSON Schema漏同步及Hypothesis发现N8/7°宽斜膜被旧占比门槛拒绝；9eb5a1b同步Schema并加受限filled contour恢复。没有改低测试预期/skip/xfail。相关58测试exit0；另114组整数倾角[-9,9]×N3–8全部检出正确N；固定反例加入测试。最后8图frozen-final与独评分frozen-v4的detection对象逐项全等。最新全门禁628项进行中。
+
+最终9eb5a1b全门禁：policy/Ruff/format/Pyright/import检查通过；pytest628项运行至反复窗口关闭测试挂起，60秒faulthandler主线程停在pytestqt wait_signal.py:37 QTimer.timeout.connect、两个线程无Python帧。保留check-all-9eb5a1b.log后停止专属pytest33896，实际check退出1。独审只读诊断未找到可证明GC死锁或确定性生命周期缺陷；有关代码未在本任务修改。隔离tests/test_wb_desktop.py全部10passed/29.39s/exit0，仅为诊断，不能替代全门禁。
+
+独立wheel：uv run --locked --no-sync python -m tooling.installed_wheels，exit0；WB、runtime/contracts、desktop独立环境和真实OCR worker检查完成，日志.local/t042/wheels-9eb.log。此项补跑未改变check --all的失败状态。
