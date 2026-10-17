@@ -5,3 +5,6 @@
 - 一个正常关闭最小实验page/profile在app.exec返回时均已释放，退出0；不支持“必然残留profile”假设。Linux0d测试后SIGSEGV与本次Windows异常可能相关但未证明。
 - 先核验Windows原生观察工具和主来源，固定版本、独立差异审查；只捕受控测试树，保留原始异常与退出，不生成/上传内存转储、私有原图或凭据，不改系统全局调试器注册/安全策略。没有证据不猜测性清理或升级Qt。
 - 原15分钟、全部断言/skip、公式/schema/依赖锁不变。修复须真实反例、独审和完整门禁；原图/旧结果/原未提交文件与main保持。
+
+
+CI011 aabd39e本机正式check --all实际exit0：670passed/517.68秒，原pytest child0，Ruff/format/Pyright/import/policy及全部隔离wheel、桌面异步关闭、OCR真实worker完成。日志.local/t043/check-ci011-final.log，回执.local/t043/ci011-final-gate.json。绑定独审无阻断、五真实控制0、相关9项/2.56秒0；这是当前环境一次完整通过，原间歇原生退出根因仍UNKNOWN，远端当前后继另查，不宣告T043稳定性完成。

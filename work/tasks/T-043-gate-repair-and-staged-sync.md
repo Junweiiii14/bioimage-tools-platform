@@ -67,3 +67,6 @@ CI009产品57fd7ea正式check --all实际exit0：669passed/497.77秒，Observed 
 becb389远端run39025981922完整成功：Windows669/407.87秒、child0，Linux669/178.49秒，两平台全部隔离wheel/最终check成功，规则/桌面环境成功。产品57fd7ea；最终文档后继不改变产品。阶段治理及八个产品PR均草稿，开发/stage8普通原子快进同步，main221a2df保持；6干净历史树原位锁定，其余dirty/原图/旧结果不动。最新备份及34原改动SHA由独立只读审查核验，入口/远端HEAD/PR与日志正文一致。开发日志Issue6持续记录真实失败、修复和检查。
 
 未来集成仍逐阶段审查并按真实base重跑；历史bbf测试汇总后exit1仍UNKNOWN，更多真实样本/积分真值/最终交互/恢复演练/干净机发布验收未完成，保留在风险及维护计划。本文前述“待执行/未完成”均为当时记录，以本节与任务顶部当前状态为准。
+
+
+CI011 aabd39e本机正式check --all实际exit0：670passed/517.68秒，原pytest child0，Ruff/format/Pyright/import/policy及全部隔离wheel、桌面异步关闭、OCR真实worker完成。日志.local/t043/check-ci011-final.log，回执.local/t043/ci011-final-gate.json。绑定独审无阻断、五真实控制0、相关9项/2.56秒0；这是当前环境一次完整通过，原间歇原生退出根因仍UNKNOWN，远端当前后继另查，不宣告T043稳定性完成。
