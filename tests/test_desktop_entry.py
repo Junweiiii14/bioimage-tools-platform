@@ -4,9 +4,29 @@ import subprocess
 import sys
 
 import pytest
+import shiboken6
 from bioimage_app.desktop_entry import create_desktop_window, desktop_mode
 from bioimage_app.web_window import WebWorkbenchWindow
 from pytestqt.qtbot import QtBot
+
+
+def test_destroyed_workbench_releases_its_hidden_native_host(qtbot: QtBot) -> None:
+    window = WebWorkbenchWindow()
+    host = window.host
+    try:
+        assert host.isWindow()
+        window.close()
+        qtbot.waitUntil(lambda: host.resources_closed, timeout=15000)
+        window.deleteLater()
+        qtbot.waitUntil(lambda: not shiboken6.isValid(window))
+        assert not shiboken6.isValid(host)
+    finally:
+        if shiboken6.isValid(window):
+            window.close()
+            qtbot.waitUntil(lambda: host.resources_closed, timeout=15000)
+            window.deleteLater()
+        if shiboken6.isValid(host):
+            host.deleteLater()
 
 
 @pytest.mark.parametrize(
