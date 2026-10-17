@@ -150,6 +150,6 @@ class OwnedProcessTree:
         return False
 
     def close(self) -> None:
-        if self._job is not None:
+        if os.name == "nt" and self._job is not None:
             self._kernel.CloseHandle(self._job)
             self._job = None

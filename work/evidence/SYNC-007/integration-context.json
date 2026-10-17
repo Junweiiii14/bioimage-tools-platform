@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "task": "SYNC-007",
-  "base_commit": "d83e1bd2dbeaea2213a99c78c6168081afdb6ef0",
-  "source_head": "4988ca6638ce63578e5be66360c3cbbdd9dc5038",
+  "base_commit": "1e46c9caafab8e119262b5e56fb1a0cba071bdc7",
+  "source_head": "7ec7884ff0d5b1189bfc0667ee6c52a6cfeb99f5",
   "historical_receipts": {
     "work/evidence/T-035/rules-context.json": "96366e958be563a354095f0a9999d05e9d9acefb",
     "work/evidence/T-036/rules-context.json": "20f571cb0de676e93324ec28df34bcd5c6ded758",
