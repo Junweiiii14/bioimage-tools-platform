@@ -53,3 +53,6 @@
 ## CI006真实挂起与退出修复独审
 
 真实三线程原生栈经独立核对，支持本地79f9070故障为Qt析构/连接锁与GIL反转；存储emit等待为连带阻塞，不将其他超时一概归因。绑定79f9070..a811ccfd33834cfccdae1b38499dae7db70aa025独审无阻断：四处worker在自身线程迁移、owner wait(0)确认线程退出后删除、queued destroyed后才终态；FIFO/取消/重复shutdown未见回退。审查者独立退休/存储/进程18passed/4.17秒/实际exit0。完整门禁另跑，不由该独审代替。
+
+
+CI007绑定bbf3cc5..1021662：辅助函数平台guard无阻断，独审模块Linux/Windows Pyright各实际exit0；不代替Linux完整检查或篡改旧失败。产品无变化，未重复产品测试。

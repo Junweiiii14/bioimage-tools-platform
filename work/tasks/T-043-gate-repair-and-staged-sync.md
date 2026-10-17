@@ -49,3 +49,6 @@ a811ccfd将存储/WB后台/解码器/恢复四处worker排空后移回owner，�
 
 
 CI006产品a811ccfd正式完整check --all实际exit0：668passed/508.54秒；Ruff/format/Pyright/import/policy及全部隔离wheel、真实桌面异步关闭/OCR/worker均完成。日志.local/t043/check-ci006-final.log，退出回执.local/t043/ci006-final-gate.json。保留原测试/时限/依赖，之前79f9070失败不抹去。
+
+
+CI007：bbf3cc5远端Linux真实4项Pyright失败位于诊断辅助函数，pytest未跑；1021662仅补平台guard、绑定独审两平台类型0、作者相关8项0，未变产品或门禁。准备精确清单后继，等待bbf Windows结束再正常推送，保留原作业证据。最新远端状态始终看Issue6/PR14，main未变。

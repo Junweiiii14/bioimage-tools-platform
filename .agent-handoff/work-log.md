@@ -1,8 +1,5 @@
 # Current Work Log
 
-## 2026-10-14 / T-013 自动候选与项目复核
-在194794e上创建feat/T-013-crop-candidates。实现工程候选@1、项目schema v2快照与旧兼容、Qt后台逐图/失败继续/取消/过期保护、切换/应用/恢复/筛选和膜聚焦。原图与定量公式保持，真实10图探针暴露边缘误检后加入显式guard及回归；白背景/原导出身份不明保留。最终244全量/隔离安装通过，真实10图快照保存重开与源SHA保持；T-013 review待独审，T-014项目定量/OCR自动表ready。Goal active，未推送/发布。
-
 ## 2026-10-14 / T-014 多源定量第一阶段
 从5bea9d3创建feat/T-014-project-measurements，产品提交79a675a。接通项目v3标注/run引用、固定N原图曲线/边界/基线、逐源真实进程、已提交结果自动表/XLSX、取消关闭/保存重开与过期拒绝。损坏结果逐行核验，新增通用run查询；模型/公式/平台字段不扩展。用户CLX排除说明进入契约、风险和任务。T-014仍implementing，下一步项目OCR显式绑定；整体Goal active。完整验证与失败修复见work/evidence/T-014/validation.md；未独审/推送/发布。
 
@@ -115,3 +112,8 @@ ea6178e远端Windows再次15分钟取消，60秒栈停finally关闭的QTimer.tim
 ## 2026-10-17 CI006真实挂起退出修复
 
 79f9070本地全量真实挂起，Python/native及补采三线程证据支持Qt对象锁/GIL反转。仅保存后停止自有pytest，check实际exit1、wheel未跑。a811ccfd四后台退休→owner析构→queued终态；36定向0、独审18项0、Pyright0，668完整check/508.54秒及全部隔离wheel实际exit0。8原图正常工作台8run/保存重开/原SHA/参考未读/关闭exit0，输出另存workbench-ci006。全部旧失败/输出保持；main未变。
+
+
+## 2026-10-17 CI007诊断平台边界
+
+bbf3cc5安全原子推送开发/阶段8，外置bundle06ac64d9验证并再验34原文件保持。Linux真实Pyright4错在诊断_processes，1021662仅补平台拒绝、绑定独审两平台类型0，相关8项0；产品仍a811全量668/508.54秒及wheel0。新清单来源1021662，等待bbf Windows结束再推后继，main不变。

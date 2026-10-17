@@ -10,6 +10,8 @@
 
 ## Current Risks
 
+- bbf3cc5远端Linux诊断工具4项Pyright失败；CI0071021662最小平台guard两平台类型0/相关8项0并独审，新真实Linux完整CI待运行。Windows作业仍保留进行中，不用静态或本地通过代替远端。
+
 - 79f9070本地真实全量Qt锁/GIL反转有三线程原生证据；CI006修复四处worker退休和owner销毁，36项定向通过，a811ccfd完整668/508.54秒及全部wheel实际exit0、绑定独审18项0；远端新候选待复验。远端其他超时不一概归因；诊断前32线程可能被OpenBLAS占满，需按明确owned TID补采。
 
 - ea6178e远端Windows再次15分钟取消，60秒栈明确关闭阶段QTimer.timeout.connect阻塞，未证明GC或锁顺序；CI005只补原生证据，不宣称修复。Linux659完整通过；本机50关闭循环未复现。父工作区旧路由已独立备份后修正，旧dirty项目保留。
