@@ -1,18 +1,12 @@
 # Handoff Snapshot
 
-- 更新2026-10-17；任务唯一来源work/tasks/T-043-gate-repair-and-staged-sync.md，总体in_progress；科学/交互/发布验收未完。
-- 当前活动树C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform，codex/t043-gate-and-staged-sync；每次核对HEAD，不使用历史快照SHA启动。原ResearchVault主目录dirty，原有内容不变，不能用作当前产品。
-- 桌面“BioImage WB 工作台（当前开发）”固定活动树Start-BioImage.ps1；无参及历史--figure-project/--platform统一绿色WebWorkbenchWindow。旧窗口仅显式legacy，兼容测试离屏；高级编辑器仅显式工具动作打开。HTML/CSS未变；不重启用户现有工作台，不恢复用户停止的CUA。
-- 已确认旧界面三路径：真实默认/历史CLI旧窗口、失败关闭host.show、可见兼容测试；2e5021d修复并独审。CI003b4bc8ba又修确定隐藏宿主Qt所有权，审查者3项exit0；不是原挂起根因证明。
-- CI00579f9070诊断独审8项0，正式664全检真实挂起，Python/native三线程证据支持Qt对象锁/GIL反转；仅停止自有pytest，check实际exit1、wheel未跑。CI006a811ccfd四后台退休→owner析构→queued终态，独审18项0、作者36项0/Pyright0，668完整check/508.54秒及全部隔离wheel实际exit0；8原图功能链退出0。
-- ea6178e远端Windows15分钟再次取消，60秒栈test_web_bridge.py:128 finally关闭等待内QTimer.timeout.connect，20秒等待未运行完成，随后gc.collect尚未执行；2线程无Python帧不能归因GC。Linux659/184.75秒及wheel0。本机精确关闭50次26.81秒0未复现，转native证据，不同样压力无限重跑。
-- bbf3cc5已原子推开发/阶段8，main不变；远端Linux诊断辅助函数4条平台类型错，CI0071021662仅补guard并独审两平台0/相关8项0，最新清单已含CI007。Windows最终668passed/508.43秒后exit1、wheel未跑，无hang；CI008f5b1fe4/f2a61b3补原始子退出码及pytest后故障处理，追加独审、相关11项0，后继新CI待执行，不记全平台通过。
-- 父工作区AGENTS旧WB路由已仅替换为活动树/分支/固定启动器，完整原文件先外置备份，.local/t043/workspace-routing-fix.json记SHA；独审确认只改该段，原34未提交文件保持。原dirty根目录不变。
-- 最近完整产品b4bc8ba：check --all实际exit0，658passed/497.50s及全部隔离wheel/真实OCR。此前642/657两轮完整成功与失败记录均保留，见T043验证。
-- CI00468c3265补存储enqueue/execute/end/reply/deliver的DEBUG单调时间/请求/线程日志，不含载荷；独审2项实际exit0。最终659完整check实际exit0、509.86秒及全部隔离wheel/真实OCR通过，日志.local/t043/check-ci004-final.log；无时限/skip/锁/公式变更。
-- 远端阶段7 Windows首次初始化5秒超时，原SHA重跑成功；阶段8bcf Windows15分钟无节点取消，5de诊断后Windows首个create10秒超时，1failed/656passed；finally shutdown完成。根因UNKNOWN，无永久死锁证明；日志.local/t043/pr14-windows-diagnostic-failed.log。诊断通过也不能声称根因修复。
-- 同步分支为codex/t043-gate-and-staged-sync与codex/stage-08-source-repair，精确HEAD现场核对；CI003/004/006已完成本地完整门禁与绑定独审，SYNC008清单已更新至f2a61b3来源快照（产品仍a811ccfd）。治理PR7及产品阶段1–7当前CI成功，阶段8实时CI以PR14/Issue6为准；全草稿、main221a2df不变。
-- 阶段链PR7→3→8/9/10/11/12/13/14；.local/t043/stages-published-final.json结束时更新。前置合main后需真实重载base及CI，禁止一次合累计历史。旧T007/T026回执Git版本保留。
-- T042 source_geometry@2/background_support@1已接现有工作台；8原图独立推理，参考仅评分，旧1/8→新8/8（开发回归集）。48槽7有效/41复核，没有独立积分真值。8原图/12参考/旧预测保持；最新8图功能链.local/t043/workbench-ci006退出0，离屏截图空白不作视觉验收。
-- 原19树外置allrefs/二进制patch/未跟踪tar保留；34原有未提交文件SHA保持；6干净无.local树原位锁定，未删/移目录。私有原图/旧结果仍原路径，不能以Git bundle替代而删除。最新备份指针.local/t043/backup-final.json需在最终refs后更新。
-- GitHub开发日志Issue6/comment6231511951持续记录实际检查/阶段HEAD，保留全部失败与UNKNOWN。后续继续原生稳定性证据、阶段审查/实际base刷新及独立科学验收，不能扩展新工具。
+- 更新2026-10-17；任务唯一来源work/tasks/T-043-gate-repair-and-staged-sync.md，总体in_progress。最新CI009任务work/tasks/CI-009-atomic-workspace-initialization.md；科学/交互/发布验收未完。
+- 活动树C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform，codex/t043-gate-and-staged-sync；每次核对HEAD/dirty。当前产品57fd7ea，正式669 check/497.77秒+全部隔离wheel实际exit0，日志.local/t043/check-ci009-final.log。原ResearchVault根dirty保持，不能作为当前产品。
+- 日常入口为活动树Start-BioImage.ps1/桌面“BioImage WB 工作台（当前开发）”；默认和历史--figure-project/--platform统一绿色WebWorkbenchWindow，HTML/CSS未变。旧窗口显式legacy，测试强制离屏，关闭失败不回退旧host；父工作区旧WB路由已完整备份后仅改该段，独审核验。用户工作台46512保留，不强杀/重启，不恢复停止的CUA。
+- CI006a811ccfd修四处worker退休→owner线程析构→queued终态。79f9070真实三线程native及受控正负对照支持Qt对象锁/GIL反转；后续其他超时不一概归因。本机完整668/508.54秒+全部隔离wheel实际0，独审18项0。QtCore实际6.12.0；WebEngine独立6.140.0/Chromium140，不混用源码。WebEngine未完整析构边界仅假设，暂无确定缺陷。
+- 远端当前1bb1d9d：Linux668/183.03秒+全部wheel0，规则/桌面环境0；Windows1failed667passed/516.76秒、真实child exit1，metadata close测试setup等待5秒，create执行区间6.125秒后正常emit/deliver。CI007平台guard和CI008退出诊断已完成；bbf3cc5此前668passed后exit1仍UNKNOWN，无wheel，不追溯当同因。
+- CI00957fd7ea新库初始化BEGIN在executescript脚本内部，版本/5表/身份一次提交；同步/格式v1/旧库读/fsync/测试时限不变，失败目录保留。旧红1项真实半初始化，新45项0，独审45项8.31秒0；20本机创建旧median56.76ms→27.38ms，非托管CI保证。完整669/497.77秒+全部隔离wheel实际exit0，真实child0；远端新候选待复验。
+- 最新8原图工作台功能链.local/t043/workbench-ci009实际exit0：8run、保存重开/关闭成功、N8/8/4/4/8/8/4/4、8原像素ROI与48值/状态与CI006相同，原SHA保持、参考未读，仍7valid41review。离屏截图不作视觉验收。T042 source_geometry@2/background_support@1已正常UI接入，旧1/8→新8/8仅开发回归集，无独立积分/留出真值。
+- 治理#7→产品阶段#3→#8/9/10/11/12/13/14全草稿；开发与stage8远端精确1bb1d9d，main221a2df未变，无一次合累计历史。当前SYNC008清单来源57fd7ea，前置4582976e，含CI002–009历史回执；最终整理提交后须精确规则/独审，再正常FF/备份/atomic推两个分支，更新.local/t043/stages-published-final.json与Issue6。
+- 原19树外置refs/patch/untracked备份，34原有文件SHA保持；6干净无.local旧树仅锁定，未删/移。私有原图/旧结果原位，Git bundle不替代它们。最新.local/t043/backup-final.json只到1bb，57新成果结束后必须新unique bundle并再验34文件；原.impeccable/questions4文件不提交。
+- 用户要求完成后通俗简洁维护汇报；docs/maintenance-plan.md已更新机制/现状/小测试→完整检查→独审→阶段PR，不能宣称历史独审/科学/包态验收全完。GitHub开发日志Issue6/comment6231511951保持真实失败与当前状态，最终回读核对正文。

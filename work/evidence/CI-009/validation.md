@@ -9,3 +9,8 @@ Python3.12.14/Windows、原SQLite设置；executescript本身不启事务，旧u
 本机新目录每组20次create+close顺序描述性计时：旧median56.76ms/max68.08ms；新median27.38ms/max35.93ms；分别保留ci009-bench-before/after timing.json与全部新目录。不是托管runner基准或所有创建必小于5秒的保证；缓存/调度并非完全受控。
 
 依据：[Python3.12 executescript/transaction](https://docs.python.org/3.12/library/sqlite3.html#sqlite3.Cursor.executescript)、[SQLite事务](https://www.sqlite.org/lang_transaction.html)、[user_version](https://www.sqlite.org/pragma.html#pragma_user_version)。2026-10-17核验。绑定独审、完整门禁和8原图正常工作台复验另记，不沿用旧668结论。
+
+绑定1bb1d9d..57fd7ea独审无阻断，审查者独立45passed/8.31秒/实际exit0。作者清理测试连接closing后单项再次exit0。8原图正常工作台8run/保存重开/关闭exit0；8个原像素ROI/N和48数值/状态与CI006逐项相等，仍7valid/41review；原SHA保持、参考未读、结果新目录workbench-ci009。正式669完整check待结果，未提前记成功。
+
+
+CI009产品57fd7ea正式check --all实际exit0：669passed/497.77秒，Observed child exit0/u32=0；Ruff/format/Pyright/import/policy及全部隔离wheel、真实桌面异步关闭/OCR/worker均完成。日志.local/t043/check-ci009-final.log，回执.local/t043/ci009-final-gate.json。原5秒等待/15分钟/全部断言/依赖不变。此前Windows与旧退出失败仍保留。

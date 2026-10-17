@@ -1,8 +1,5 @@
 # Current Work Log
 
-## 2026-10-14 / T-014 项目OCR关联
-上一目标回合progress完成多源定量，本回合产品05e5d56接通项目v4独立拼图OCR、原文位置/置信度、人工校正、明确原图绑定、自动填表/XLSX及重开校验。取消保留旧关联、关闭等待退出、过期导入/识别拒绝覆盖；原图审核变化同步绑定候选。268全量/9合约/隔离安装通过，真实组合TIFF15token/11未确认行保存重开和SHA保持通过。T-014 review待独审，T-015归一化ready；用户偏好询问尚无回复，不推断科学默认。Goal active，未推送/发布；详情work/evidence/T-014/ocr-validation.md。
-
 ## 2026-10-14 / T-015 项目归一化
 从9dddcba创建feat/T-015-project-normalization，产品0cd390b实现v5显式目标/参照、逐槽样本/包含/对照、比值与相对单对照/均值、Qt编辑撤回确认/自动表/OCR标签/保存重开/XLSX。派生值从核验run重建，无epsilon或静默丢坏对照；v5可无OCR，旧v4约束保持。284全量/9合约/隔离安装通过，源码Qt截图已查看。T-015 review待独审，T-016生成PNG衔接ready；用户偏好仍未知，Goal active，未推送/发布。证据work/evidence/T-015/validation.md。
 
@@ -119,3 +116,8 @@ bbf3cc5安全原子推送开发/阶段8，外置bundle06ac64d9验证并再验34�
 ## 2026-10-17 CI008退出阶段诊断
 
 bbf3cc5 Windows668passed/508.43秒后外层exit1、wheel未跑，无timeout；保留失败和UNKNOWN。f5b1fe4记录真实子码，f2a61b3保留pytest后故障处理，均绑定独审；相关11项/4.14秒0，首次误写测试文件exit4保留。清单来源f2a61b3含CI007/008，待安全推新候选。产品仍a811本机完整668及wheel0，原图/旧结果/34文件保持，main不变。
+
+
+## 2026-10-17 CI009原子初始化与维护说明
+
+1bb远端Linux668/183.03秒+wheels0，Windows1failed667passed516.76秒/child1，create执行6.125秒后正常回执；非本轮native崩溃。57fd7ea显式单事务初始化，不改同步/schema/v1/旧库读或5秒等待。旧真实红例，作者45项11.05秒0/独审45项8.31秒0，本机20新目录median56.76→27.38ms但非CI保证；669完整check/497.77秒+全部隔离wheel实际exit0，child0；新远端待验。8原图正常工作台8run保存重开关闭0，8几何/48值状态保持。维护计划按用户要求补通俗维护流程，最终汇报待全检/阶段同步。

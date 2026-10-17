@@ -55,3 +55,9 @@ CI007：bbf3cc5远端Linux真实4项Pyright失败位于诊断辅助函数，pyte
 
 
 CI008：bbf3cc5 Windows最终668passed/508.43秒但外层exit1/wheel未跑，未定位退出根因，不当全量成功。f5b1fe4/f2a61b3补真实子码和pytest后faulthandler保留，绑定独审、11项0。当前新候选合CI007最小guard及CI008诊断，待正常推送重跑真实远端；main不变。
+
+
+用户追加：完成后用简单专业语言汇报维护设定、后续维护和快速修bug流程。已更新docs/maintenance-plan.md的现状/入口/分阶段保护/定向→完整检查→独审流程；最终报告须如实区分已建机制和未完成科学/发布/稳定性验收。CI00957fd7ea全量669进行中，8原图功能链已exit0且8几何/48槽输出保持。
+
+
+CI009产品57fd7ea正式check --all实际exit0：669passed/497.77秒，Observed child exit0/u32=0；Ruff/format/Pyright/import/policy及全部隔离wheel、真实桌面异步关闭/OCR/worker均完成。日志.local/t043/check-ci009-final.log，回执.local/t043/ci009-final-gate.json。原5秒等待/15分钟/全部断言/依赖不变。此前Windows与旧退出失败仍保留。
