@@ -67,6 +67,8 @@ class Symbol(c.Structure):
 
 
 def _processes(kernel: c.CDLL) -> dict[int, tuple[int, str]]:
+    if sys.platform != "win32":
+        raise ValueError("Native process enumeration requires Windows")
     kernel.CreateToolhelp32Snapshot.argtypes = [w.DWORD, w.DWORD]
     kernel.CreateToolhelp32Snapshot.restype = w.HANDLE
     kernel.CloseHandle.argtypes = [w.HANDLE]
