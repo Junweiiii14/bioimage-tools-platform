@@ -11,3 +11,5 @@ Linux CI先以真实0、17和SIGSEGV子程序校验观察器：退出码对应�
 作者Windows相关8passed/2.49秒实际0，Ruff/format0、模块Windows及Linux目标Pyright0。首命令误填不存在tests/test_dev.py导致无测试exit1，另格式首检1处失败已修，均保留日志。Linux原生复验/独审另记，不提前宣称修复。
 
 2026-10-17核验官方：[GDB模式及return-child-result](https://sourceware.org/gdb/current/onlinedocs/gdb.html/Mode-Options.html)、[信号pass/stop](https://sourceware.org/gdb/current/onlinedocs/gdb.html/Signals.html)、[自动加载](https://sourceware.org/gdb/current/onlinedocs/gdb.html/Auto_002dloading.html)。
+
+绑定0d269db..6bef18a只读静态独审无阻断，明确Linux真实控制尚待执行；建议保留系统ASLR，单行后继b7e1caa增加disable-randomization off，追加独审确认无阻断。首次fault后继续传信号，若程序自行恢复，后续fault可能没有第二份栈；仍按真实子结果失败/成功，不吞异常。新阶段清单来源b7e1caa，保留CI010及全部旧历史回执；下一步备份/普通同步后受控原生完整观察，不提前宣称产品修复。

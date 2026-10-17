@@ -2,7 +2,7 @@
   "schema": 1,
   "task": "SYNC-008",
   "base_commit": "4582976e4623e6ce25e433be59d08290bff3e3a9",
-  "source_head": "57fd7ea84225e7b8049a8dc49dc5099e42cf6a43",
+  "source_head": "b7e1caaa5abd7b22c03344fadaf0a0f22c8f95a0",
   "historical_receipts": {
     "work/evidence/CI-002/rules-context.json": "4943c03b8c90df15d1d402e352fa6c044699f612",
     "work/evidence/CI-003/rules-context.json": "b4bc8baed0ceaaa6b365f667da5846e77af87b17",
@@ -12,6 +12,7 @@
     "work/evidence/CI-007/rules-context.json": "1021662ef5b46cec136ccc54e87b6024ff92d098",
     "work/evidence/CI-008/rules-context.json": "f5b1fe4f913fdd9a91557f4bff616426ced396f6",
     "work/evidence/CI-009/rules-context.json": "57fd7ea84225e7b8049a8dc49dc5099e42cf6a43",
+    "work/evidence/CI-010/rules-context.json": "6bef18ae63bfde2fdbf9a74cd530d7e7444353ab",
     "work/evidence/T-042/rules-context.json": "cba80df27f7e911ee0bd094cd269b998c174c935",
     "work/evidence/T-043/rules-context.json": "df68bb1aa45523f29711e747066c50137fa431d0"
   }
