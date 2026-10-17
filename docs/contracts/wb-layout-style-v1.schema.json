@@ -1,0 +1,63 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": 1,
+      "maximum": 1,
+      "minimum": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "display_policy": {
+      "default": "native_samples@1",
+      "enum": [
+        "native_samples@1",
+        "standard_lane_ratio@1"
+      ],
+      "title": "Display Policy",
+      "type": "string"
+    },
+    "lane_unit": {
+      "default": 120,
+      "maximum": 1200,
+      "minimum": 5,
+      "multipleOf": 5,
+      "title": "Lane Unit",
+      "type": "integer"
+    },
+    "heading_size": {
+      "default": 26,
+      "maximum": 128,
+      "minimum": 8,
+      "title": "Heading Size",
+      "type": "integer"
+    },
+    "segment_gap": {
+      "default": 8,
+      "maximum": 500,
+      "minimum": 2,
+      "title": "Segment Gap",
+      "type": "integer"
+    },
+    "label_alignment": {
+      "default": "right",
+      "enum": [
+        "left",
+        "right"
+      ],
+      "title": "Label Alignment",
+      "type": "string"
+    },
+    "flow": {
+      "default": "columns",
+      "enum": [
+        "rows",
+        "columns"
+      ],
+      "title": "Flow",
+      "type": "string"
+    }
+  },
+  "title": "FigureLayoutStyle",
+  "type": "object"
+}

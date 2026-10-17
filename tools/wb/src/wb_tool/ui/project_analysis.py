@@ -495,7 +495,10 @@ class ProjectAnalysisPanel(QWidget):
             item = self.lanes.item(i, 1)
             included = bool(item and item.checkState() == Qt.CheckState.Checked)
             lanes.append(
-                replace(lane, bands=(BandAnnotation("target", bounds, baseline, included),))
+                replace(
+                    lane,
+                    bands=(BandAnnotation("target", bounds, baseline, included), *lane.bands[1:]),
+                )
             )
         return replace(
             self.plan.request,

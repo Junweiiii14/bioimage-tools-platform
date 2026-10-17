@@ -1,0 +1,26 @@
+# T-040 Real multi-protein Fig validation
+
+- Status: completed real-data execution and validation; automatic detector/scientific acceptance NOT complete. Baseline c531238 (product9be19b1), active coordinator worktree retained.
+- User approved: only source TIFF stems ending (1);8 files in10670059,4 Fig groups1D/1F/4F/4H.
+- Target protein above beta-actin; output crop named protein.tif in each original folder, never overwrite.
+- Preserve native-pixel crop for quantitative measurement. Additionally create standard presentation TIFF960 high,1200*N wide, dtype retained; presentation resampling not used for measurement.
+- Reference folder10670059_验证 read-only. Freeze first automatic predictions before reference scoring/correction. Report correct/8 by row identity,N,complete intended bands,no adjacent row or Marker; corrections separate.
+- Run actual desktop automatic crop→Fig label composition→group quantitative→XLSX; verify output/readback/source hashes and show real operating window.
+- Scope WB application/adapters, desktop assembly if needed, validation tests/docs/work/handoff; no unrelated redesign or dependency upgrades.
+
+## Observed results / scope
+
+- First untouched automatic predictions frozen before reference-assisted geometry. Independent crop score1/8=12.5%,7fail,0unknown; no claim of general automatic success.
+- Reference-assisted registration then8/8 visual crop criteria pass, NCC0.99786..0.99977. This is correction evidence, not detector test accuracy.
+- Eight standardized960×1200N TIFFs written under original subfolders by protein name, dtype8/16 retained; embedded display-only provenance, quantitative loader rejects them. Original and reference SHA unchanged. Raw native samples separately exported exactly.
+- Real desktop4Fig groups,2proteins/group,N8/4/8/4,48 raw values,PNG overview,4 high-res labeled TIFFs,CSV/XLSX and recoverable ZIP generated.
+- Audit detected17/48 automatic-bound integrals below50% of full-window comparison because endpoints lay on slope/peak. Initial outputs preserved. Explicit supervised full isolated target windows now match48 independent source-pixel calculations. Numerical WBQuant formula unchanged; not an automatic-bound accuracy claim.
+-33/48 source rectangles have lower-rail0; all24actin have substantial zero platforms. Retain clipping/linearity quality warnings, no default normalization or true abundance claim.
+- New display-only standard policy/affine frames implemented T041, original quantification separate. Independent P1 split-frame duplicate-lane issue fixed by complete-row-only frame validation; sourceToOutput overlay and template-aware group bounds integrated.
+- Public repository stores no private images/results. Local .local/t040 has all logs, frozen predictions, registration/profile audits and delivery pointers. Saved real project reopened visibly with 8 rows (PID32064), screenshot .local/t040/opened-desktop.png. Full check returned1 despite600 passed summary; not accepted as gate success. Isolated installed-wheels passed exit0 separately.
+
+## Follow-up causal reasoning (2026-10-17)
+Read-only source/evidence review confirms short-membrane rejection couples to2*crop_height; tilted projection trim and fixed shared-y grid lose endpoints; original-only rotation/threshold sweep does not reliably recover N. Marker/weak-slot identification remains a hypothesis requiring ablation. Persisted48old values reproduce exactly;17low full-window comparisons are endpoint/baseline errors, not Excel corruption; exact upstream peak branch not yet traced.33lower-rail rectangles cannot prove acquisition saturation versus prior processing. Proposed sequence: instrument source-only detector stages; separate membrane threshold from output size; orientation+row detection; periodic lane slots and marker evidence; independent source-coordinate lane windows; trace peak candidate/bounds/background stages; compare background-anchor alternatives without silently replacing WBQuant formula. Freeze validation references for scoring only; prohibit coordinate/filename priors. Fullcheck exit1 requires child exitcode/teardown capture; Qt hypothesis unproven. No numerical/product changes in this reasoning turn.
+
+## Deep technical report (2026-10-17)
+Completed source audit by three parallel readers and cross-review; report work/evidence/T-040/deep-technical-limitations.md plus docs/research/2026-10-17-t040-deep-failure-analysis.md. New source-only probes .local/t040/diagnosis/deep-causal-replay.py and audit/deep-boundary-replay.py both exit0; no product/data/project changes. This supersedes earlier unknown exact-boundary attribution: nearest raw local minima plus inward-only refinement reproduce17/17 severe low values;11vendored ok,6review; application3valid/14quality_review, not boundary-confidence-gated. Two8→7N errors are confirmed Marker false positives from slope. Three membrane rejects are107/119/118<120. Exposed UI/script gap, actual先量后拼workflow, CSV2decimal rounding, DPIcm mismatch, temporary highres embedded params failing normal model validation. >2048manifest mismatch is static/not triggered here. Report independent readers corrections incorporated; full600not rerun for documentation-only analysis. Scientific repair remains pending.

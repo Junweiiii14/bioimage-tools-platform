@@ -43,6 +43,7 @@ class BandAnnotation:
     bounds: BandBounds | None
     baseline: Baseline | None = None
     included: bool = True
+    detection_notes: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.band_id.strip() or type(self.included) is not bool:
@@ -69,8 +70,15 @@ class AnalysisRequest:
     revision: int
     polarity: Polarity
     lanes: tuple[LaneAnnotation, ...]
+    geometry_policy: Literal["fixed_grid@1", "independent_lanes@1"] = "fixed_grid@1"
+    quant_policy: Literal["legacy_bounds@1", "wbquant_1_4_3@1"] = "legacy_bounds@1"
 
     def __post_init__(self) -> None:
+        if self.geometry_policy not in (
+            "fixed_grid@1",
+            "independent_lanes@1",
+        ) or self.quant_policy not in ("legacy_bounds@1", "wbquant_1_4_3@1"):
+            raise AnalysisError("未知定量策略")
         if len(self.source_sha256) != 64 or any(c not in hexdigits for c in self.source_sha256):
             raise AnalysisError("输入来源摘要须为 SHA256")
         if type(self.revision) is not int or self.revision < 0:

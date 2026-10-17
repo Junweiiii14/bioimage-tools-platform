@@ -48,6 +48,15 @@
     "AnalysisRequest": {
       "additionalProperties": false,
       "properties": {
+        "geometry_policy": {
+          "default": "fixed_grid@1",
+          "enum": [
+            "fixed_grid@1",
+            "independent_lanes@1"
+          ],
+          "title": "Geometry Policy",
+          "type": "string"
+        },
         "lanes": {
           "items": {
             "$ref": "#/$defs/LaneAnnotation"
@@ -61,6 +70,15 @@
             "light"
           ],
           "title": "Polarity",
+          "type": "string"
+        },
+        "quant_policy": {
+          "default": "legacy_bounds@1",
+          "enum": [
+            "legacy_bounds@1",
+            "wbquant_1_4_3@1"
+          ],
+          "title": "Quant Policy",
           "type": "string"
         },
         "revision": {
@@ -220,6 +238,14 @@
               "type": "null"
             }
           ]
+        },
+        "detection_notes": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Detection Notes",
+          "type": "array"
         },
         "included": {
           "default": true,

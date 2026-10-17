@@ -25,6 +25,24 @@
           },
           "title": "Lanes",
           "type": "array"
+        },
+        "geometry_policy": {
+          "default": "fixed_grid@1",
+          "enum": [
+            "fixed_grid@1",
+            "independent_lanes@1"
+          ],
+          "title": "Geometry Policy",
+          "type": "string"
+        },
+        "quant_policy": {
+          "default": "legacy_bounds@1",
+          "enum": [
+            "legacy_bounds@1",
+            "wbquant_1_4_3@1"
+          ],
+          "title": "Quant Policy",
+          "type": "string"
         }
       },
       "required": [
@@ -109,6 +127,14 @@
           "default": true,
           "title": "Included",
           "type": "boolean"
+        },
+        "detection_notes": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Detection Notes",
+          "type": "array"
         }
       },
       "required": [

@@ -9,3 +9,5 @@ export_figure_image(project,sources,destination,cancelled=...)接受新.png/.tif
 写入前验证原图/字体摘要、声明字节数/尺寸/位深，使用生成的同目录临时文件；后台完成渲染/写入后关闭、fsync，再次核对实际像素/模式/DPI/来源文本，然后检查取消并无覆盖发布（Windows rename/POSIX link）。既有目标、坏源、未审核、超限、取消或写入/校验失败均不发布新文件，清理自有临时输出。发布先于取消时保留完成文件，不覆盖源图。
 
 桌面单独“导出拼图 TIFF / PNG”，完整项目ZIP入口保持。精确保存修订后在WB后台工作，忙时禁止编辑；后到编辑/关闭/取消撤销待发布输出。来源文档仅作证据，不执行或自动替换当前项目。导出TIFF可从既有拼图OCR入口导入，再走真实worker、人工校正和明确关联；不自动确认蛋白对应。
+
+T-041增加显式实验室标准显示策略，采用figure_segmented_geometry@2及standard_lane_ratio@1；RGB8显示映射之后可按泳道宽/行高使用Pillow LANCZOS重采样，manifest明确原ROI与输出框、尺寸及输出RGB摘要。旧原生策略保持无缩放；标准显示TIFF仍被load_tiff拒绝，原值裁剪/定量不变。参数和预算见wb-laboratory-layout-v1.md。
