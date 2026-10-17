@@ -154,7 +154,10 @@ class Workspace:
                 for name in ("assets", "drafts", "runs", "results", ".staging", "recovery"):
                     self._path(name).mkdir()
                 self._db = sqlite3.connect(self._path("metadata.sqlite"))
+                # executescript does not start a transaction: keep the schema, version,
+                # and identity in one durable commit, rather than committing each DDL.
                 self._db.executescript("""
+                    BEGIN IMMEDIATE;
                     PRAGMA user_version=1;
                     CREATE TABLE metadata (workspace_id TEXT PRIMARY KEY);
                     CREATE TABLE assets (asset_id TEXT PRIMARY KEY,
