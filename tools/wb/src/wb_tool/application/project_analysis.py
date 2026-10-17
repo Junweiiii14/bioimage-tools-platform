@@ -76,16 +76,19 @@ class WBAnalysisProject(WBReviewProject):
 
 
 def analysis_is_current(project: WBFigureProject, plan: ProjectRowAnalysis) -> bool:
+    from wb_tool.application.automatic import row_is_ready
+
     row = next((r for r in project.rows if r.row_id == plan.row_id), None)
     return bool(
         row
-        and row.reviewed
+        and row_is_ready(project, row)
         and row.source
         and row.source.sha256 == plan.request.source_sha256
         and row.roi == plan.crop
         and row.lane_count == len(plan.request.lanes)
         and row.empty_lanes == plan.empty_lanes
-        and plan.crop.y1 - plan.crop.y0 == project.template.crop_height
+        and 2 <= plan.crop.y1 - plan.crop.y0 <= 4096
+        and plan.crop.y1 - plan.crop.y0 == project.crop_height_for(row)
     )
 
 
@@ -112,13 +115,18 @@ def make_row_analysis(
     project: WBFigureProject, row_id: str, polarity: Polarity
 ) -> ProjectRowAnalysis:
     row = next((r for r in project.rows if r.row_id == row_id), None)
-    if row is None or row.source is None or row.roi is None or not row.reviewed:
+    from wb_tool.application.automatic import row_is_ready
+
+    if row is None or row.source is None or row.roi is None or not row_is_ready(project, row):
         raise ValueError("请先确认有原图的行及裁剪范围")
-    if row.roi.y1 - row.roi.y0 != project.template.crop_height:
+    if (
+        not 2 <= row.roi.y1 - row.roi.y0 <= 4096
+        or row.roi.y1 - row.roi.y0 != project.crop_height_for(row)
+    ):
         raise ValueError("裁剪高度与当前模板不一致，请重新复核")
     lanes = tuple(
         LaneAnnotation(roi, (BandAnnotation("target", None, included=i not in row.empty_lanes),))
-        for i, roi in enumerate(row.quantitative_lanes(), 1)
+        for i, roi in enumerate(fixed_lane_grid(row.roi, row.lane_count), 1)
     )
     return ProjectRowAnalysis(
         row_id=row_id,
@@ -283,6 +291,7 @@ class ProjectTableCell:
     reason: str
     evidence_origin: str = ""
     archive_sha256: str = ""
+    raw_integral: float | None = None
 
 
 @dataclass(frozen=True)
@@ -298,8 +307,10 @@ def _row_status(
 ) -> tuple[ProjectCellStatus, str] | None:
     if row.source is None:
         return "missing_source", "缺少原图"
-    if not row.reviewed:
-        return "pending_review", "尚未确认裁剪行"
+    from wb_tool.application.automatic import row_is_ready
+
+    if not row_is_ready(project, row):
+        return "pending_review", "尚未确认裁剪行或自动建议已过期"
     if plan is None:
         return "unconfigured", "未配置条带边界与基线"
     if not analysis_is_current(project, plan):
@@ -340,16 +351,20 @@ def fill_project_table(
             pending = _row_status(project, row, plan, value)
             for index in range(row.lane_count):
                 signal = None
+                raw_integral = None
                 if pending:
                     status, reason = pending
                 else:
                     assert value is not None
                     band = value.result.lanes[index].bands[0]
+                    raw_integral = band.measurement.signal if band.measurement else None
                     status, reason, signal = (
                         band.status,
                         band.reason or ", ".join(band.quality_flags),
                         band.signal,
                     )
+                if not pending and not row.reviewed:
+                    reason = "自动建议计算，未经人工复核" + ("；" + reason if reason else "")
                 cells.append(
                     ProjectTableCell(
                         row.row_id,
@@ -367,6 +382,7 @@ def fill_project_table(
                         status,
                         reason,
                         *run_origin(project, plan.run.run_id if plan and plan.run else ""),
+                        raw_integral=raw_integral,
                     )
                 )
     return tuple(cells)

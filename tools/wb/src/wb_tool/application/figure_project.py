@@ -85,6 +85,9 @@ class WBFigureProject(DocumentIO):
     figure_order: tuple[str, ...] = ()
     template: FigureTemplate = Field(default_factory=FigureTemplate)
 
+    def crop_height_for(self, row: FigureRow) -> int:
+        return self.template.crop_height
+
     @model_validator(mode="after")
     def identities(self) -> "WBFigureProject":
         if len({row.row_id for row in self.rows}) != len(self.rows):
@@ -114,6 +117,10 @@ class FigureLayout:
 
 def plan_figure_layout(project: WBFigureProject, *, require_review: bool = True) -> FigureLayout:
     """Use original crop sizes, never stretch rows to make different lanes look aligned."""
+    from wb_tool.application.laboratory_layout import WBLayoutProject, plan_laboratory_layout
+
+    if isinstance(project, WBLayoutProject):
+        return plan_laboratory_layout(project, require_review=require_review)
     if not project.rows:
         raise ValueError("项目还没有行")
     template = project.template

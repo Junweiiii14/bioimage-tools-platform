@@ -43,6 +43,68 @@ def render_figure(
     require_review: bool = True,
     cancelled: Callable[[], bool] = lambda: False,
 ) -> FigureRender:
+    from wb_tool.application.automatic import WBAutomaticProject, row_is_ready
+    from wb_tool.application.laboratory_layout import WBLayoutProject
+
+    if isinstance(project, WBAutomaticProject) and any(
+        r.roi is None or (require_review and not row_is_ready(project, r)) for r in project.rows
+    ):
+        # An explicit display projection only; the saved/archived project retains every input.
+        rows = tuple(
+            r
+            for r in project.rows
+            if r.roi is not None and (not require_review or row_is_ready(project, r))
+        )
+        if not rows:
+            raise ValueError("没有可生成拼图的条带；请查看每张原图的检测状态")
+        if require_review and any(not row_is_ready(project, r) for r in rows):
+            raise ValueError("裁剪或定量建议已修改，请重新自动分析或确认后导出")
+        ids = {r.row_id for r in rows}
+        figures = tuple(f for f in project.figure_order if any(r.figure == f for r in rows))
+        columns = tuple(c for c in project.composition.columns if c.figure in figures)
+        compact_columns = {
+            number: i for i, number in enumerate(sorted({c.column for c in columns}), 1)
+        }
+        composition = project.composition.model_copy(
+            update={
+                "slices": tuple(s for s in project.composition.slices if s.row_id in ids),
+                "columns": tuple(
+                    c.model_copy(update={"column": compact_columns[c.column]}) for c in columns
+                ),
+            }
+        )
+        projection = project.model_copy(
+            update={"rows": rows, "figure_order": figures, "composition": composition}
+        )
+        rendered = render_figure(
+            projection, sources, require_review=require_review, cancelled=cancelled
+        )
+        manifest = json.loads(rendered.manifest_json)
+        original_indices = {row.row_id: i for i, row in enumerate(project.rows, 1)}
+        for record in manifest["rows"]:
+            if record.get("crop_file"):
+                record["crop_file"] = f"crops/{original_indices[str(record['row_id'])]:04d}.tif"
+        manifest["project"] = project.model_dump(mode="json")
+        manifest["unrendered_rows"] = [
+            {
+                "row_id": r.row_id,
+                "source_sha256": r.source.sha256 if r.source else None,
+                "status": "no_crop" if r.roi is None else "stale_or_unreviewed",
+                "reason": r.notes,
+            }
+            for r in project.rows
+            if r.row_id not in ids
+        ]
+        return FigureRender(
+            rendered.width, rendered.height, rendered.rgb, json.dumps(manifest, ensure_ascii=True)
+        )
+
+    if isinstance(project, WBLayoutProject):
+        from wb_tool.adapters.laboratory_figure import render_laboratory_figure
+
+        return render_laboratory_figure(
+            project, sources, require_review=require_review, cancelled=cancelled
+        )
     layout = plan_figure_layout(project, require_review=require_review)
     paths = _paths(sources)
     template = project.template

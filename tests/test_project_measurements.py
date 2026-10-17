@@ -15,7 +15,7 @@ import tifffile
 from bioimage_app.api import create_figure_project_window
 from PIL import Image, ImageDraw, ImageFont
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QTableWidget, QTableWidgetItem, QTabWidget
+from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 from pytestqt.qtbot import QtBot
 from wb_tool.api import WBAnalysisProject, WBNormalizedProject, WBProjectOCR, plan_figure_layout
 
@@ -111,9 +111,7 @@ def test_multi_source_compute_reopen_edit_and_recompute(
     assert len(window.view.analysis.plot.values) == 10
     capture = os.environ.get("BIOIMAGE_MEASUREMENT_CAPTURE")
     if capture:
-        tabs = window.view.findChild(QTabWidget)
-        assert tabs is not None
-        tabs.setCurrentWidget(window.view.analysis)
+        window.view.show_section("analysis")
         assert window.grab().save(capture)
     # Metadata has no numerical effect; it must not revoke geometrical review.
     item(window.view.table, 0, 2).setText("p-AKT")
@@ -334,9 +332,7 @@ def test_real_project_ocr_bind_fill_export_reopen_and_cancel(
     assert normalized.ocr.run == project.ocr.run
     capture = os.environ.get("BIOIMAGE_PROJECT_OCR_CAPTURE")
     if capture:
-        tabs = window.view.findChild(QTabWidget)
-        assert tabs is not None
-        tabs.setCurrentWidget(panel)
+        window.view.show_section("ocr")
         panel.table.setCurrentCell(0, 0)
         assert window.grab().save(capture)
     item(panel.table, 0, 1).setText("=AKT")
@@ -529,9 +525,7 @@ def test_project_normalization_ui_mapping_controls_export_reopen_and_stale(
     )
     capture = os.environ.get("BIOIMAGE_NORMALIZATION_CAPTURE")
     if capture:
-        tabs = window.view.findChild(QTabWidget)
-        assert tabs is not None
-        tabs.setCurrentWidget(panel)
+        window.view.show_section("normalization")
         assert window.grab().save(capture)
     output = tmp_path / "normalized.xlsx"
     window.export_project_table(str(output), normalization=True)
@@ -615,9 +609,7 @@ def test_composed_png_ocr_full_size_preserves_measurements_and_normalization(
     assert item(window.view.normalization.results, 0, 8).text() == "0.5"
     capture = os.environ.get("BIOIMAGE_PNG_CAPTURE")
     if capture:
-        tabs = window.view.findChild(QTabWidget)
-        assert tabs is not None
-        tabs.setCurrentWidget(panel)
+        window.view.show_section("ocr")
         assert window.grab().save(capture)
     window.close()
     qtbot.waitUntil(lambda: window.resources_closed, timeout=15000)

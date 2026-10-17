@@ -18,6 +18,7 @@ from wb_tool.application.crop_suggestions import CropSuggestion, read_figure_pro
 from wb_tool.application.desktop_data import PreviewRaster, ProjectDerivedTables, WBJob, WBReply
 from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
 from wb_tool.application.figure_project import FigurePNG, FigureRender, WBFigureProject
+from wb_tool.application.figure_template import LoadedFigureTemplate
 from wb_tool.application.project_analysis import (
     LoadedProjectResult,
     ProjectTableSnapshot,
@@ -68,6 +69,7 @@ class _Work(QObject):
                 | WBFigureProject
                 | FigureRender
                 | FigurePNG
+                | LoadedFigureTemplate
                 | MetadataBook
                 | CropSuggestion
                 | LoadedProjectResult
@@ -80,7 +82,30 @@ class _Work(QObject):
                 | bytes
                 | str
             )
-            if job.operation == "project_evidence":
+            if job.operation == "discover_tiffs":
+                from wb_tool.adapters.automatic_export import discover_tiffs
+
+                value = discover_tiffs(job.path, cancelled=cancel)
+            elif job.operation == "automatic_row":
+                from wb_tool.adapters.automatic import automatic_project_row
+
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少自动分析项目")
+                value = automatic_project_row(job.path, job.document, job.row_id, cancelled=cancel)
+            elif job.operation == "automatic_export":
+                from wb_tool.adapters.automatic_export import export_automatic_results
+
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少自动结果项目")
+                value = export_automatic_results(
+                    job.document,
+                    job.sources,
+                    job.destination,
+                    runs=job.archive_runs or (),
+                    processing_errors=job.processing_errors,
+                    cancelled=cancel,
+                )
+            elif job.operation == "project_evidence":
                 from wb_tool.adapters.project_evidence import verify_project_evidence
 
                 if not isinstance(job.document, WBFigureProject) or job.archive_runs is None:
@@ -196,6 +221,20 @@ class _Work(QObject):
                     job.detection_settings,
                     cancelled=job.cancellation.is_set if job.cancellation else lambda: False,
                 )
+            elif job.operation in ("template_read", "template_export"):
+                from wb_tool.adapters.figure_template_io import (
+                    export_figure_template,
+                    read_figure_template,
+                )
+
+                if job.operation == "template_read":
+                    value = read_figure_template(job.path, cancelled=cancel)
+                else:
+                    if not isinstance(job.document, WBFigureProject):
+                        raise ValueError("缺少模板所属项目")
+                    value = export_figure_template(
+                        job.document, job.sources, job.destination, cancelled=cancel
+                    )
             elif job.operation == "font_digest":
                 path = Path(job.path)
                 if (

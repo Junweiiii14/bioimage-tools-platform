@@ -1,0 +1,247 @@
+{
+  "scope": "direction",
+  "title": "WB 前端重新设计 · 三种候选",
+  "question": "先看布局、信息密度与风格，再选 A / B / C；所有界面均为示例设计稿。",
+  "options": [
+    {
+      "id": "evidence",
+      "label": "A · 证据工作台",
+      "kind": "assigned",
+      "thesis": "原图、曲线和结果同屏，减少来回切换。",
+      "palette": [
+        "#F3F5F6",
+        "#18252D",
+        "#137C75"
+      ],
+      "materials": [
+        "原生桌面控件",
+        "示例图像与曲线"
+      ],
+      "viewport": "顶部四阶段；左来源与参数，中间图像和曲线，右侧当前结果。",
+      "risk": "信息密度较高，适合经常使用的操作者。",
+      "html": ".impeccable\\mocks\\decision\\evidence.html",
+      "htmlFrame": "1440x900",
+      "comp": ".impeccable\\mocks\\decision\\evidence.jpg",
+      "raised": [
+        {
+          "from": "大字色块",
+          "raise": "当前动作与非活动区域明确分级。"
+        },
+        {
+          "from": "词典边注",
+          "raise": "说明跟随当前对象，避免全局长段提示。"
+        },
+        {
+          "from": "星图",
+          "raise": "选中泳道在图像、曲线和结果中保持对应。"
+        },
+        {
+          "from": "图谱目录",
+          "raise": "原图始终保留可识别名称。"
+        },
+        {
+          "from": "网格字形",
+          "raise": "控件按一致尺寸与间距对齐。"
+        }
+      ]
+    },
+    {
+      "id": "guided",
+      "label": "B · 清晰实验流程",
+      "kind": "pick",
+      "thesis": "每次突出当前任务，保留清楚的前后步骤。",
+      "palette": [
+        "#FFFFFF",
+        "#EAF0F8",
+        "#315FAD"
+      ],
+      "materials": [
+        "原生桌面控件",
+        "示例图像与曲线"
+      ],
+      "viewport": "左侧阶段导航；中间大工作面，右侧精简参数；结果按需展开。",
+      "risk": "同屏显示的信息较少，复核全部结果需要展开。",
+      "html": ".impeccable\\mocks\\decision\\guided.html",
+      "htmlFrame": "1440x900",
+      "comp": ".impeccable\\mocks\\decision\\guided.jpg"
+    },
+    {
+      "id": "focus",
+      "label": "C · 图像专注模式",
+      "kind": "challenger",
+      "thesis": "深色工作区放大图像，参数和结果退到两侧与底部。",
+      "palette": [
+        "#111A20",
+        "#20303B",
+        "#64D2B0"
+      ],
+      "materials": [
+        "原生桌面控件",
+        "示例图像与曲线"
+      ],
+      "viewport": "紧凑顶部阶段；左侧原图列表，大幅图像，底部曲线与结果。",
+      "risk": "明亮环境下阅读表格可能不如浅色方案舒适。",
+      "html": ".impeccable\\mocks\\decision\\focus.html",
+      "htmlFrame": "1440x900",
+      "comp": ".impeccable\\mocks\\decision\\focus.jpg",
+      "catalogId": "operate-b-exposure-record-zone-sheets",
+      "verdict": "competitive",
+      "case": "影像复核的认同感强；大项目表格清晰度不及浅色方案。"
+    },
+    {
+      "id": "digital-design-canon-metro-typographic-tiles",
+      "label": "大字色块",
+      "kind": "challenger",
+      "catalogId": "digital-design-canon-metro-typographic-tiles",
+      "verdict": "declined",
+      "thesis": "巨型文字挤占实验工作面。",
+      "palette": [
+        "#F3F5F6",
+        "#18252D",
+        "#137C75"
+      ],
+      "materials": [
+        "规则比较"
+      ],
+      "viewport": "仅作为设计评估，不是候选界面。",
+      "risk": "巨型文字挤占实验工作面。",
+      "case": "巨型文字挤占实验工作面。",
+      "kept": "当前动作与非活动区域明确分级。"
+    },
+    {
+      "id": "rw-lexicon-shoulder-and-plate",
+      "label": "词典边注",
+      "kind": "challenger",
+      "catalogId": "rw-lexicon-shoulder-and-plate",
+      "verdict": "declined",
+      "thesis": "书籍结构不适合反复编辑。",
+      "palette": [
+        "#F3F5F6",
+        "#18252D",
+        "#137C75"
+      ],
+      "materials": [
+        "规则比较"
+      ],
+      "viewport": "仅作为设计评估，不是候选界面。",
+      "risk": "书籍结构不适合反复编辑。",
+      "case": "书籍结构不适合反复编辑。",
+      "kept": "说明跟随当前对象，避免全局长段提示。"
+    },
+    {
+      "id": "notation-diagram-systems-star-atlas",
+      "label": "星图",
+      "kind": "challenger",
+      "catalogId": "notation-diagram-systems-star-atlas",
+      "verdict": "declined",
+      "thesis": "装饰坐标和数据坐标可能混淆。",
+      "palette": [
+        "#F3F5F6",
+        "#18252D",
+        "#137C75"
+      ],
+      "materials": [
+        "规则比较"
+      ],
+      "viewport": "仅作为设计评估，不是候选界面。",
+      "risk": "装饰坐标和数据坐标可能混淆。",
+      "case": "装饰坐标和数据坐标可能混淆。",
+      "kept": "选中泳道在图像、曲线和结果中保持对应。"
+    },
+    {
+      "id": "brand-identity-canon-saville-catalog-sleeve",
+      "label": "图谱目录",
+      "kind": "challenger",
+      "catalogId": "brand-identity-canon-saville-catalog-sleeve",
+      "verdict": "declined",
+      "thesis": "以编码替代标签会增加学习成本。",
+      "palette": [
+        "#F3F5F6",
+        "#18252D",
+        "#137C75"
+      ],
+      "materials": [
+        "规则比较"
+      ],
+      "viewport": "仅作为设计评估，不是候选界面。",
+      "risk": "以编码替代标签会增加学习成本。",
+      "case": "以编码替代标签会增加学习成本。",
+      "kept": "原图始终保留可识别名称。"
+    },
+    {
+      "id": "crouwel-grid-specimen",
+      "label": "网格字形",
+      "kind": "challenger",
+      "catalogId": "crouwel-grid-specimen",
+      "verdict": "declined",
+      "thesis": "展示字形影响密集中文标签可读性。",
+      "palette": [
+        "#F3F5F6",
+        "#18252D",
+        "#137C75"
+      ],
+      "materials": [
+        "规则比较"
+      ],
+      "viewport": "仅作为设计评估，不是候选界面。",
+      "risk": "展示字形影响密集中文标签可读性。",
+      "case": "展示字形影响密集中文标签可读性。",
+      "kept": "控件按一致尺寸与间距对齐。"
+    }
+  ],
+  "reroll": {
+    "registers": [
+      "safer",
+      "bolder"
+    ]
+  },
+  "buildPath": {
+    "value": "code",
+    "toggle": true
+  },
+  "canon": true,
+  "canonCard": {
+    "label": "沿用熟悉的 WBQuant 布局",
+    "thesis": "保留传统参数、画布、结果三栏，仅重做视觉细节。",
+    "palette": [
+      "#FFFFFF",
+      "#17231E",
+      "#139E7F"
+    ],
+    "materials": [
+      "传统桌面工作区"
+    ],
+    "viewport": "左参数、中间图像、右结果。",
+    "risk": "与旧版更相似，整体布局变化较小。",
+    "comp": ".impeccable\\mocks\\decision\\canon.png",
+    "wireframe": {
+      "cols": 12,
+      "rows": 8,
+      "regions": [
+        {
+          "label": "参数",
+          "x": 0,
+          "y": 0,
+          "w": 3,
+          "h": 8
+        },
+        {
+          "label": "原图",
+          "x": 3,
+          "y": 0,
+          "w": 6,
+          "h": 8,
+          "accent": true
+        },
+        {
+          "label": "结果",
+          "x": 9,
+          "y": 0,
+          "w": 3,
+          "h": 8
+        }
+      ]
+    }
+  },
+  "steer": true
+}

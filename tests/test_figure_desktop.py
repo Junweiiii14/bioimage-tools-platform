@@ -14,7 +14,7 @@ import tifffile
 from bioimage_app.api import create_figure_project_window
 from PySide6.QtCore import QPoint, Qt
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QTableWidget, QTableWidgetItem, QTabWidget
+from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 from pytestqt.qtbot import QtBot
 from wb_tool.api import CropDetectionSettings, CropSuggestion, WBFigureProject, WBReviewProject
 
@@ -112,9 +112,7 @@ def test_project_batch_review_export_reopen(
     if capture:
         window.compose()
         qtbot.waitUntil(window.import_button.isEnabled)
-        tabs = view.findChild(QTabWidget)
-        assert tabs is not None
-        tabs.setCurrentIndex(1)
+        view.show_section("preview")
         assert window.grab().save(capture)
     saved = view.project()
     window.close()

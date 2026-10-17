@@ -17,7 +17,8 @@ def _display_only(page: tifffile.TiffPage) -> bool:
     if page.software == DISPLAY_TIFF_SOFTWARE:
         return True
     description = page.description
-    if len(description) > 16 * 1024 * 1024 or "figure_original_geometry@1" not in description:
+    operations = ("figure_original_geometry@1", "figure_segmented_geometry@1")
+    if len(description) > 16 * 1024 * 1024 or not any(op in description for op in operations):
         return False
     try:
         value: object = json.loads(description)
@@ -27,7 +28,7 @@ def _display_only(page: tifffile.TiffPage) -> bool:
         return False
     record = cast(dict[str, object], value)
     return (
-        record.get("operation") == "figure_original_geometry@1"
+        record.get("operation") in operations
         and record.get("purpose") == "display_only_not_quantitative"
     )
 

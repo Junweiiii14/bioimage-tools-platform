@@ -70,6 +70,12 @@ def project_table_rows(
         audit[4] += ("运行来源", "来源归档SHA256")
         for index, cell in enumerate(cells, 5):
             audit[index] += (cell.evidence_origin, cell.archive_sha256)
+    # Historical archive tables are byte-verified when restored. Keep schema1–7
+    # layouts unchanged; schema8 introduces the explicit raw measurement column.
+    if project.schema_version >= 8:
+        audit[4] += ("原始积分（待复核）",)
+        for index, cell in enumerate(cells, 5):
+            audit[index] += (cell.raw_integral,)
     return tuple(rows), tuple(audit)
 
 
