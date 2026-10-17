@@ -27,7 +27,9 @@ class AutomaticWorkflow(QObject):
         super().__init__(window)
         self.window = window
         self.last_output_path = ""
-        self.crop_policy: Literal["legacy_fixed_height@1", "lane_ratio@1"] = "legacy_fixed_height@1"
+        self.crop_policy: Literal["legacy_fixed_height@1", "lane_ratio@1", "source_geometry@2"] = (
+            "legacy_fixed_height@1"
+        )
         self.quant_policy: Literal["legacy_bounds@1", "wbquant_1_4_3@1"] = "legacy_bounds@1"
         self.failures: tuple[str, ...] = ()
         self.cancelled = False

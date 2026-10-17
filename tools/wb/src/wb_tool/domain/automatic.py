@@ -23,7 +23,7 @@ from wb_tool.domain.lanes import LaneROI, Polarity
 
 QuantPolicy = Literal["legacy_bounds@1", "wbquant_1_4_3@1"]
 
-CropPolicy = Literal["legacy_fixed_height@1", "lane_ratio@1"]
+CropPolicy = Literal["legacy_fixed_height@1", "lane_ratio@1", "source_geometry@2"]
 
 
 def resize_crop_for_lane_count(
@@ -59,7 +59,7 @@ class AutoWBSettings:
     def __post_init__(self) -> None:
         if self.quant_policy not in ("legacy_bounds@1", "wbquant_1_4_3@1"):
             raise ValueError("未知定量策略")
-        if self.crop_policy not in ("legacy_fixed_height@1", "lane_ratio@1"):
+        if self.crop_policy not in ("legacy_fixed_height@1", "lane_ratio@1", "source_geometry@2"):
             raise ValueError("裁剪比例策略无效")
         CropDetectionSettings(
             self.lane_count or 1, self.crop_height, self.polarity, min_snr=self.min_snr
@@ -89,6 +89,10 @@ def detect_automatic_geometry(
     if h < 3 or w < 3 or h * w > 16_000_000:
         raise ValueError("自动检测尺寸超出预算")
     check_detection_cancelled(cancelled)
+    if settings.crop_policy == "source_geometry@2":
+        from wb_tool.domain.source_geometry import detect_source_geometry
+
+        return detect_source_geometry(pixels, settings, cancelled)
     crop_height = min(settings.crop_height, h)
     initial = CropDetectionSettings(
         settings.lane_count or 1,

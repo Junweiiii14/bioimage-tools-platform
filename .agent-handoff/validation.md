@@ -1,5 +1,7 @@
 # Validation History
 
+- 2026-10-17 T042/base b32acff：context/doctor/smoke-env/policy/gh只读认证/8源图SHA检查均exit0。配置证据work/evidence/T-042/configuration.md；私有清单.local/t042。未跑产品测试/全门禁/重新识别/独审；doctor过时product_status不作产品结论。
+
 - 2026-10-16 T035/25ac71d：两指定原图端到端与原值像素核对退出0；独审18专项退出0；首次全量581 passed但退出1、根因UNKNOWN，最终复查见work/evidence/T-035/validation.md，不把测试摘要等同进程成功。
 
 - 2026-10-16 T033/a68000e：全门禁568 passed/224.97s退出0，最终9专项退出0，独审另5项退出0；wheel含web资源；真实10原图SHA不变。网页1440/390、角点/拖画/减少动效实际操作；详见任务与.local/t033。
