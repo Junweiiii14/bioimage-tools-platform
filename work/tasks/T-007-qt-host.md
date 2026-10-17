@@ -24,3 +24,8 @@ WB ROI/曲线/复核产品界面随后接入此宿主，不用虚假按钮宣称
 进程子阶段已实现：Qt 后台解码、4MiB帧/8MiB总流/64KiB stderr、真实PID存储门禁、Job Object/进程组强停与退出确认；RunSession 连接取消/提交终态。
 实际WB原图快照→进程→存储→重开，旧运行不覆盖新草稿；异常/残帧/超限/强停孙进程/取消发布反例通过。
 最终完整门禁185测试、9导入合约、4独立wheel通过。GUI界面进入下一任务；独审未执行，尚未集成main。
+
+
+## T-043 历史回执真实重载
+
+原回执提交32a2baea0e3ac4cae3be2da33152e666624bc0dc的规则指纹不匹配（Head rules changed or nested rules were omitted; reload context）。旧 Git 版本保留；本次按当前阶段规则重新加载，仍使用原记录基线与范围，不将旧记录记为通过。
