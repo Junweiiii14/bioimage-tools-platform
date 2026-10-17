@@ -10,11 +10,11 @@
 
 ## Current Risks
 
-- 最新1bb Windows为create执行区间6.125秒/默认5秒setup超时（1failed667passed，child1），Linux668/183.03秒+wheels0。CI009仅合并新库初始化事务，45定向/45独审0、本机完整669/497.77秒+全部隔离wheel0、新远端待验；不保证托管I/O任意时限。旧bbf668passed后exit1仍UNKNOWN。
+- 最新1bb Windows为create执行区间6.125秒/默认5秒setup超时（1failed667passed，child1），Linux668/183.03秒+wheels0。CI009仅合并新库初始化事务，45定向/45独审0、本机完整669/497.77秒+全部隔离wheel0；becb389远端Windows669/407.87秒、Linux669/178.49秒及全部wheel/规则/桌面环境成功；不保证托管I/O任意时限。旧bbf668passed后exit1仍UNKNOWN。
 
-- bbf3cc5远端Linux诊断工具4项Pyright失败；CI0071021662最小平台guard两平台类型0/相关8项0并独审，新真实Linux完整CI待运行。Windows最终668passed/508.43秒后外层exit1、wheel未跑，无挂起/真实子码。CI008仅增加子码/pytest后故障处理观察，未认定Qt崩溃或完整修复；新候选远端待验。
+- bbf3cc5远端Linux诊断工具4项Pyright失败；CI0071021662最小平台guard两平台类型0/相关8项0并独审，后续becb389真实Linux669/178.49秒及全部wheel成功。Windows最终668passed/508.43秒后外层exit1、wheel未跑，无挂起/真实子码。CI008仅增加子码/pytest后故障处理观察，未认定Qt崩溃或完整修复；后续becb389双平台完整CI已成功，不能抹去该次未定位退出。
 
-- 79f9070本地真实全量Qt锁/GIL反转有三线程原生证据；CI006修复四处worker退休和owner销毁，36项定向通过，a811ccfd完整668/508.54秒及全部wheel实际exit0、绑定独审18项0；远端新候选待复验。远端其他超时不一概归因；诊断前32线程可能被OpenBLAS占满，需按明确owned TID补采。
+- 79f9070本地真实全量Qt锁/GIL反转有三线程原生证据；CI006修复四处worker退休和owner销毁，36项定向通过，a811ccfd完整668/508.54秒及全部wheel实际exit0、绑定独审18项0；后续becb389双平台完整CI已成功。远端其他超时不一概归因；诊断前32线程可能被OpenBLAS占满，需按明确owned TID补采。
 
 - ea6178e远端Windows再次15分钟取消，60秒栈明确关闭阶段QTimer.timeout.connect阻塞，未证明GC或锁顺序；CI005只补原生证据，不宣称修复。Linux659完整通过；本机50关闭循环未复现。父工作区旧路由已独立备份后修正，旧dirty项目保留。
 

@@ -14,3 +14,5 @@ Python3.12.14/Windows、原SQLite设置；executescript本身不启事务，旧u
 
 
 CI009产品57fd7ea正式check --all实际exit0：669passed/497.77秒，Observed child exit0/u32=0；Ruff/format/Pyright/import/policy及全部隔离wheel、真实桌面异步关闭/OCR/worker均完成。日志.local/t043/check-ci009-final.log，回执.local/t043/ci009-final-gate.json。原5秒等待/15分钟/全部断言/依赖不变。此前Windows与旧退出失败仍保留。
+
+becb389真实远端run39025981922完成：Windows job117376933537为669passed/407.87秒、Observed child exit0/u32=0，全部隔离wheel及dev最终成功；Linux job117376933489为669passed/178.49秒，全部隔离wheel及dev最终成功；规则job117376933411、桌面环境job117376933376均成功。下载完成作业日志分别为.local/t043/ci009-windows-success.log、ci009-linux-success.log，PR完整状态ci009-pr14-completed.json。通过不抹去历史失败，也不替代未完成科学/发布验收。

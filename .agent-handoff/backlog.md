@@ -75,3 +75,6 @@
 
 - [x] T-040 real-data execution:8 originals→4Fig→48 source-pixel values→supervised Excel/ZIP, saved desktop opened. First automatic1/8; corrected8/8 is reference-assisted.
 - [ ] T-040 gate investigation:600pytest passed summary but fullcheckexit1 beforewheel; UNKNOWN exit/shutdown cause.
+
+- [x] T043本轮：固定入口、证实的关闭挂起/新库事务修复、669完整本地和Windows/Linux远端检查、阶段草稿同步与原改动保护完成。
+- [ ] 后续按真实base逐阶段审查集成；历史UNKNOWN退出、独立留出科学/积分真值、恢复演练、干净Windows候选包/交互验收继续保留，不因本轮全绿取消。
