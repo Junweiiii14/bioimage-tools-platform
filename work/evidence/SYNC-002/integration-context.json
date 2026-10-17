@@ -2,8 +2,9 @@
   "schema": 1,
   "task": "SYNC-002",
   "base_commit": "34a5cc1920ea38494177f2dbedce84d0503407bf",
-  "source_head": "cb2a02c305f47f32db0c3af46eb76b6c471c67c5",
+  "source_head": "2b9f6435d178e0fd16eadaedf885ddf4d84a45a6",
   "historical_receipts": {
+    "work/evidence/CI-001/rules-context.json": "2b9f6435d178e0fd16eadaedf885ddf4d84a45a6",
     "work/evidence/T-003/rules-context.json": "93a84bbce627453736b9a4cfafb6e88d71015ea3",
     "work/evidence/T-004/rules-context.json": "e3932eed476b99313dfda6c9aae5444cbc8f74ef",
     "work/evidence/T-005/rules-context.json": "bd1af2ec0c3c44ec5260ad83476ba78581edf4a3",
