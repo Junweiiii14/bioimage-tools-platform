@@ -46,3 +46,9 @@
 更新先读变更、许可证、脚本和外部访问范围；用新的提交安装到临时目录比较，再更新本地技能和 skills-lock，同 PR 运行 policy。不得在每次启动自动覆盖。撤销通过 Git 回退这次项目技能改动；全局已装能力保持不变。
 
 完整性检查可发现与记录不一致的文件修改，不证明上游没有缺陷或供应链风险。真正适用性要通过后续具体任务的输出质量评估。
+
+## 2026-10-15 新增前端技能
+
+Taste v2（.agents/skills/taste-skill，调用名design-taste-frontend）及Impeccable（.agents/skills/impeccable）已安装，来源完整commit、目录hash和许可见tooling/skills-lock.json。Taste面向公开网页；当前科研Qt界面优先参考Impeccable Operate。引擎0.1.14已校验Windows x64 SHA256并验证默认启动器；新技能在下轮本仓库会话可发现。
+
+安装方法、烟测、运行时访问边界与REA实测见[2026-10-15研究](2026-10-15-maintenance-skills-rea.md)。没有启用技能hooks、子代理或REA全局MCP。外部技能不改变本仓库技术栈/权限/科学规则。

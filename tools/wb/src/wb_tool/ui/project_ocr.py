@@ -47,7 +47,7 @@ class ProjectOCRPanel(QWidget):
             ("生成并识别当前拼图", self.compose_requested.emit),
             ("识别 Fig/行名（重建关联）", self.run_requested.emit),
             ("刷新关联结果", self.refresh_requested.emit),
-            ("导出关联表 XLSX", self.export_requested.emit),
+            ("导出关联表 XLSX / CSV", self.export_requested.emit),
         ):
             button = QPushButton(text)
             button.clicked.connect(callback)

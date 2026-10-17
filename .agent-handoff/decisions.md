@@ -32,3 +32,19 @@
 | 2026-10-14 | 项目v5保存显式参照/逐槽样本与对照配置，可无OCR；lane_reference_ratio@1从核验run重建q=T/R、f=q/所选对照均值 | 未知实验偏好不能变成默认配对；全部所选对照必须有效，无epsilon/坏对照静默丢弃；原始积分保持 | 0cd390b、wb-project-normalization-v1.md、2026-10-14-project-normalization.md |
 
 | 2026-10-14 | PNG走独立OCR显示解码/白底透明/已知预处理ID；完整生成图先保存来源修订，再导入不可变资产进入OCR | 保持旧TIFF与原图定量语义，不以缩略图或未确认标签推断实验关联；通用存储线程import_bytes无实验字段 | 1d5ae2a、wb-png-ocr-v1.md、T-016/validation.md |
+
+| 2026-10-14 | 批量元信息使用有界字面XLSX/CSV、严格完整键与可改预览，用户显式选行/字段后原子应用；项目schema不变 | 用户项目表含公式/订单编号和嵌图，不能推断科学映射；不解码嵌图、不用公式缓存；名称保留测量，N/空位依原契约失效 | wb-project-metadata-v1.md、2026-10-14-project-metadata.md、T-017/validation.md |
+
+| 2026-10-14 | 结果CSV使用可逆text:文字编码，数字/None独立；统一ZIP v2保存当前引用的原请求/结果和逐成员摘要，导出重读核验 | CSV无单元格类型，不依赖表格软件特殊转义；显示缓存不能绕过损坏；历史证据不等于本机PID/成功收据，ZIP恢复单列T-019 | c5f5787、wb-project-archive-v2.md、2026-10-14-wb-csv-archive.md、T-018/validation.md |
+
+| 2026-10-14 | schema6归档历史证据与本机run分开，原ZIP及复制请求结果持久化；新空工作区可显式导入单个原修订快照 | 不能伪造外来PID/退出/成功，不能丢历史后称恢复完成；普通CAS仍+1，后续真实计算沿原RunSession | wb-project-restore-v1.md、workspace-v1.md、2026-10-14-wb-archive-restore.md、T-019/validation.md |
+
+| 2026-10-14 | 直接TIFF/PNG复用完整RGB8显示和来源；已知显示TIFF量化拒绝、OCR专用读取；精确保存后后台校验/无覆盖发布 | 混合位深/文字合成不能伪称原值；原16位定量和完整ZIP恢复保持，未知第三方来源不猜测 | wb-direct-figure-image-v1.md、2026-10-14-wb-direct-image.md、T-020/validation.md |
+
+## 2026-10-15 维护顺序
+
+先执行maintenance-plan维护验收与独审收拢，再扩新工具；设计技能不改变Qt技术栈；REA源码学习优先、按缺口试点。
+
+## 2026-10-15 F-003采用决定
+
+Taste v2用于公开网页；科研Qt应用优先Impeccable Operate，不迁移框架。两技能固定来源，Impeccable引擎另锁SHA；cmd固定LF维持跨平台来源hash。REA保留按问题调用的隔离工具，静态Electron已验证，暂不增加全局MCP或产品依赖；真实社区学习收益按后续同题对照决定。

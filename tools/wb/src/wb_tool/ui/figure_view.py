@@ -3,8 +3,8 @@
 from dataclasses import replace
 from uuid import uuid4
 
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QImage, QPixmap
+from PySide6.QtCore import QSize, Qt, Signal
+from PySide6.QtGui import QIcon, QImage, QPixmap
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QCheckBox,
@@ -51,12 +51,14 @@ from wb_tool.application.project_normalization import (
     project_with_normalizations,
 )
 from wb_tool.application.project_ocr import WBProjectOCR, bind_project_ocr_row, project_with_ocr
+from wb_tool.application.project_restore import WBRestoredProject, with_archive_history
 from wb_tool.domain.grid import fixed_lane_grid
 from wb_tool.domain.lanes import LaneROI
 from wb_tool.ui.canvas import ImageCanvas
 from wb_tool.ui.crop_suggestions import CropSuggestionPanel
 from wb_tool.ui.normalization import NormalizationPanel
 from wb_tool.ui.project_analysis import ProjectAnalysisPanel
+from wb_tool.ui.project_metadata import ProjectMetadataPanel
 from wb_tool.ui.project_ocr import ProjectOCRPanel
 
 
@@ -65,6 +67,7 @@ class FigureProjectView(QWidget):
     source_requested = Signal(str)
     preview_requested = Signal()
     export_requested = Signal()
+    image_export_requested = Signal()
     font_requested = Signal()
     detection_requested = Signal(bool)
 
@@ -73,12 +76,16 @@ class FigureProjectView(QWidget):
         self.generation = 0
         self._loading = False
         self._project = WBFigureProject(project_id=uuid4().hex)
+        self._thumbnails: dict[str, QIcon] = {}
         root = QVBoxLayout(self)
         self.name = QLineEdit("WB 项目")
         root.addWidget(self.name)
         self.status = QLabel("批量导入原图，填写 Fig/蛋白，框选整行范围并复核。")
         self.status.setWordWrap(True)
         root.addWidget(self.status)
+        self.history_label = QLabel()
+        self.history_label.setWordWrap(True)
+        root.addWidget(self.history_label)
         actions = QHBoxLayout()
         self.filter = QComboBox()
         self.filter.addItems(
@@ -112,6 +119,7 @@ class FigureProjectView(QWidget):
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.table.setMinimumHeight(180)
+        self.table.setIconSize(QSize(96, 64))
         for index in range(3, 8):
             self.table.setColumnWidth(index, 60)
         self.table.setColumnWidth(0, 240)
@@ -131,6 +139,10 @@ class FigureProjectView(QWidget):
         source_layout.addWidget(self.suggestions)
         source_layout.addWidget(self.canvas, 1)
         tabs.addTab(source_page, "原图与固定泳道")
+        self.metadata = ProjectMetadataPanel()
+        self.metadata.preview_requested.connect(self._metadata_preview)
+        self.metadata.apply_requested.connect(self._metadata_apply)
+        tabs.addTab(self.metadata, "批量元信息")
         self.analysis = ProjectAnalysisPanel()
         self.analysis.configure_requested.connect(self.configure_analysis)
         self.analysis.changed.connect(self._edited)
@@ -201,9 +213,13 @@ class FigureProjectView(QWidget):
         bottom = QHBoxLayout()
         preview = QPushButton("生成预览")
         export = QPushButton("导出拼图归档 ZIP")
+        self.image_export_button = QPushButton("导出拼图 TIFF / PNG")
+        self.image_export_button.setToolTip("用于展示和排版；需要重新打开的完整项目请导出ZIP。")
         preview.clicked.connect(self.preview_requested)
         export.clicked.connect(self.export_requested)
+        self.image_export_button.clicked.connect(self.image_export_requested)
         bottom.addWidget(preview)
+        bottom.addWidget(self.image_export_button)
         bottom.addWidget(export)
         root.addLayout(bottom)
         self.name.textEdited.connect(self._edited)
@@ -275,11 +291,30 @@ class FigureProjectView(QWidget):
         plans = self.normalization.plans()
         if plans or isinstance(self._project, WBNormalizedProject):
             project = project_with_normalizations(project, plans)
+        if isinstance(self._project, WBRestoredProject):
+            project = with_archive_history(
+                project, self._project.archive_sources, self._project.imported_runs
+            )
         return project
 
     def set_project(self, project: WBFigureProject) -> None:
         self._loading = True
         self._project = project
+        self.history_label.setText(
+            f"从归档恢复 · {len(project.archive_sources)} 个来源 · "
+            f"{len(project.imported_runs)} 条历史运行。"
+            "历史数值须通过资产核验；重新计算将建立本机运行。"
+            if isinstance(project, WBRestoredProject)
+            else ""
+        )
+        self.history_label.setToolTip(
+            "\n".join(s.archive.sha256 for s in project.archive_sources)
+            if isinstance(project, WBRestoredProject)
+            else ""
+        )
+        self.metadata.clear_preview()
+        present = {row.source.sha256 for row in project.rows if row.source}
+        self._thumbnails = {key: icon for key, icon in self._thumbnails.items() if key in present}
         self.ocr.restore(project)
         self.normalization.restore(project)
         self.analysis.show_plan(None)
@@ -318,6 +353,8 @@ class FigureProjectView(QWidget):
             for column, value in enumerate(values):
                 item = QTableWidgetItem(value)
                 if column == 0:
+                    if row.source and row.source.sha256 in self._thumbnails:
+                        item.setIcon(self._thumbnails[row.source.sha256])
                     item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
                     item.setToolTip(
                         f"{row.width} × {row.height} · {row.bit_depth} 位\n"
@@ -332,8 +369,73 @@ class FigureProjectView(QWidget):
                         Qt.CheckState.Checked if row.reviewed else Qt.CheckState.Unchecked
                     )
                 self.table.setItem(index, column, item)
+            self.table.setRowHeight(
+                index, 68 if row.source and row.source.sha256 in self._thumbnails else 28
+            )
         self._loading = False
         self._filter_rows()
+
+    def _metadata_preview(self, mode: str) -> None:
+        try:
+            project = self.project()
+            selected = tuple(
+                project.rows[index.row()].row_id
+                for index in self.table.selectionModel().selectedRows()
+                if not self.table.isRowHidden(index.row())
+            )
+            self.metadata.build_preview(mode, project, selected)
+        except ValueError as error:
+            self.metadata.status.setText(str(error))
+
+    def _metadata_apply(self) -> None:
+        try:
+            updated = self.metadata.apply(self.project())
+            self.set_project(updated)
+            self._edited()
+            self.metadata.status.setText("元信息已应用；N / 空泳道变化的行须重新审核和定量。")
+        except ValueError as error:
+            self.metadata.status.setText(str(error))
+
+    def has_thumbnail(self, sha256: str) -> bool:
+        return sha256 in self._thumbnails
+
+    def install_thumbnail(self, raster: PreviewRaster) -> None:
+        if (
+            not 1 <= raster.preview_width <= 128
+            or not 1 <= raster.preview_height <= 128
+            or len(raster.pixels) != raster.preview_width * raster.preview_height
+        ):
+            raise ValueError("缩略图超出 128 像素预算或数据不完整")
+        matches = [
+            i
+            for i, row in enumerate(self._project.rows)
+            if row.source
+            and row.source.sha256 == raster.sha256
+            and row.width == raster.width
+            and row.height == raster.height
+            and row.bit_depth == raster.bit_depth
+        ]
+        if not matches:
+            return
+        icon = QIcon(
+            QPixmap.fromImage(
+                QImage(
+                    raster.pixels,
+                    raster.preview_width,
+                    raster.preview_height,
+                    raster.preview_width,
+                    QImage.Format.Format_Grayscale8,
+                ).copy()
+            )
+        )
+        self._thumbnails[raster.sha256] = icon
+        self._loading = True
+        for i in matches:
+            item = self.table.item(i, 0)
+            if item is not None:
+                item.setIcon(icon)
+                self.table.setRowHeight(i, 68)
+        self._loading = False
 
     def _edited(self) -> None:
         if self._loading:

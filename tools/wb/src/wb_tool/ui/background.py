@@ -1,5 +1,6 @@
 """Bounded one-shot background requests for preview and document/result codecs."""
 
+from dataclasses import replace
 from hashlib import file_digest
 from math import ceil
 from pathlib import Path
@@ -23,6 +24,7 @@ from wb_tool.application.project_analysis import (
     fill_project_table,
     read_project_result,
 )
+from wb_tool.application.project_metadata import MetadataBook
 from wb_tool.application.project_normalization import (
     NormalizationSnapshot,
     WBNormalizedProject,
@@ -35,6 +37,7 @@ from wb_tool.application.project_ocr import (
     install_project_recognition,
     read_project_ocr_result,
 )
+from wb_tool.application.project_restore import RestoredProjectResults
 from wb_tool.domain.worksheet import OCRRecognition
 
 
@@ -44,6 +47,20 @@ class _Work(QObject):
     @Slot(str, object)
     def execute(self, request_id: str, job: WBJob) -> None:
         try:
+            cancel = job.cancellation.is_set if job.cancellation is not None else lambda: False
+            if (
+                job.operation
+                in ("project_export", "project_ocr_export", "project_normalization_export")
+                and job.archive_runs is not None
+            ):
+                from wb_tool.adapters.project_evidence import verify_project_evidence
+
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少项目文档")
+                evidence = verify_project_evidence(job.document, job.archive_runs, cancelled=cancel)
+                job = replace(
+                    job, project_results=evidence.results, project_ocr_result=evidence.ocr
+                )
             value: (
                 PreviewRaster
                 | WBDocument
@@ -51,17 +68,41 @@ class _Work(QObject):
                 | WBFigureProject
                 | FigureRender
                 | FigurePNG
+                | MetadataBook
                 | CropSuggestion
                 | LoadedProjectResult
                 | ProjectTableSnapshot
                 | LoadedProjectOCR
                 | ProjectDerivedTables
+                | RestoredProjectResults
                 | AnalysisResult
                 | OCRRecognition
                 | bytes
                 | str
             )
-            if job.operation == "project_derived_tables":
+            if job.operation == "project_evidence":
+                from wb_tool.adapters.project_evidence import verify_project_evidence
+
+                if not isinstance(job.document, WBFigureProject) or job.archive_runs is None:
+                    raise ValueError("缺少项目证据")
+                verified = verify_project_evidence(job.document, job.archive_runs, cancelled=cancel)
+                value = RestoredProjectResults(
+                    verified.results,
+                    verified.ocr,
+                    tuple(
+                        str(record["reason"])
+                        for record in verified.records
+                        if record["verification"] == "unavailable"
+                    ),
+                )
+            elif job.operation == "metadata_read":
+                from wb_tool.adapters.metadata_input import read_metadata_file
+
+                value = read_metadata_file(
+                    job.path,
+                    cancelled=job.cancellation.is_set if job.cancellation else lambda: False,
+                )
+            elif job.operation == "project_derived_tables":
                 if not isinstance(job.document, WBProjectOCR):
                     raise ValueError("缺少项目派生结果配置")
                 value = ProjectDerivedTables(
@@ -86,6 +127,7 @@ class _Work(QObject):
                         job.project_ocr_result,
                         job.destination,
                         ocr_labels=job.ocr_labels,
+                        cancelled=cancel,
                     )
                 )
             elif job.operation in (
@@ -113,6 +155,7 @@ class _Work(QObject):
                             job.project_results,
                             job.project_ocr_result,
                             job.destination,
+                            cancelled=cancel,
                         )
                     )
                 else:
@@ -132,7 +175,9 @@ class _Work(QObject):
                     from wb_tool.adapters.project_export import export_project_table
 
                     value = str(
-                        export_project_table(job.document, job.project_results, job.destination)
+                        export_project_table(
+                            job.document, job.project_results, job.destination, cancelled=cancel
+                        )
                     )
                 else:
                     value = ProjectTableSnapshot(
@@ -162,6 +207,14 @@ class _Work(QObject):
                     value = file_digest(stream, "sha256").hexdigest()
             elif job.operation == "figure_document":
                 value = read_figure_project(job.data)
+            elif job.operation == "figure_image_export":
+                from wb_tool.adapters.figure_image_export import export_figure_image
+
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少拼图项目")
+                value = export_figure_image(
+                    job.document, job.sources, job.destination, cancelled=cancel
+                )
             elif job.operation in ("figure_preview", "figure_export", "figure_ocr"):
                 from wb_tool.adapters.figure_export import (
                     encode_figure_png,
@@ -193,7 +246,11 @@ class _Work(QObject):
                         )
                 else:
                     value = export_figure_bundle(
-                        job.document, job.sources, job.destination, cancelled=cancel
+                        job.document,
+                        job.sources,
+                        job.destination,
+                        cancelled=cancel,
+                        runs=job.archive_runs or (),
                     )
             elif job.operation == "ocr_preview":
                 from wb_tool.adapters.ocr_input import load_ocr_image
@@ -214,9 +271,11 @@ class _Work(QObject):
                     ocr_image.warnings,
                 )
             elif job.operation == "preview":
+                if not 1 <= job.preview_edge <= 2048:
+                    raise ValueError("预览边长必须位于 1..2048")
                 image = load_tiff(job.path)
                 height, width = image.pixels.shape
-                step = max(1, ceil(max(height, width) / 2048))
+                step = max(1, ceil(max(height, width) / job.preview_edge))
                 sampled = image.pixels[::step, ::step]
                 display = (sampled // 257).astype(np.uint8) if image.bit_depth == 16 else sampled
                 ph, pw = display.shape

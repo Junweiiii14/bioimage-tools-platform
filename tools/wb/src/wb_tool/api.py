@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from wb_tool.ui.figure_view import FigureProjectView
     from wb_tool.ui.view import WBView
 
+from wb_tool.adapters.metadata_input import read_metadata_file
 from wb_tool.adapters.ocr_input import OCRImage, load_ocr_image
 from wb_tool.adapters.tiff_input import ImageInputError, LoadedTiff, load_tiff
 from wb_tool.application.analysis import (
@@ -68,6 +69,18 @@ from wb_tool.application.project_analysis import (
     set_row_analysis,
     update_row_analysis_request,
 )
+from wb_tool.application.project_archive import ArchiveRunEvidence, project_runs
+from wb_tool.application.project_metadata import (
+    MetadataBook,
+    MetadataCell,
+    MetadataEntry,
+    MetadataKey,
+    MetadataPreview,
+    MetadataSheet,
+    apply_metadata,
+    filename_metadata,
+    preview_metadata,
+)
 from wb_tool.application.project_normalization import (
     ControlMode,
     NormalizationPlan,
@@ -94,6 +107,14 @@ from wb_tool.application.project_ocr import (
     ocr_link_is_current,
     project_with_ocr,
     read_project_ocr_result,
+)
+from wb_tool.application.project_restore import (
+    RestoredProjectResults,
+    StagedProjectArchive,
+    WBRestoredProject,
+    imported_run,
+    project_assets,
+    restore_staged_project,
 )
 from wb_tool.application.worker_protocol import (
     AcceptedFrame,
@@ -138,6 +159,27 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "export_figure_image",
+    "RestoredProjectResults",
+    "StagedProjectArchive",
+    "WBRestoredProject",
+    "imported_run",
+    "project_assets",
+    "restore_staged_project",
+    "stage_project_archive",
+    "inspect_project_archive",
+    "ArchiveRunEvidence",
+    "project_runs",
+    "MetadataBook",
+    "MetadataCell",
+    "MetadataEntry",
+    "MetadataKey",
+    "MetadataPreview",
+    "MetadataSheet",
+    "apply_metadata",
+    "filename_metadata",
+    "preview_metadata",
+    "read_metadata_file",
     "ProjectDerivedTables",
     "ControlMode",
     "NormalizationPlan",
@@ -306,10 +348,11 @@ def export_figure_bundle(
     destination: str,
     *,
     cancelled: Callable[[], bool] = lambda: False,
+    runs: tuple[ArchiveRunEvidence, ...] = (),
 ) -> str:
     from wb_tool.adapters.figure_export import export_figure_bundle as export
 
-    return export(project, sources, destination, cancelled=cancelled)
+    return export(project, sources, destination, cancelled=cancelled, runs=runs)
 
 
 def create_wb_view(parent: "QWidget | None" = None) -> "WBView":
@@ -354,11 +397,15 @@ def export_worksheet(worksheet: Worksheet, result: AnalysisResult, destination: 
 
 
 def export_project_table(
-    project: WBFigureProject, results: tuple[LoadedProjectResult, ...], destination: str
+    project: WBFigureProject,
+    results: tuple[LoadedProjectResult, ...],
+    destination: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
 ) -> str:
     from wb_tool.adapters.project_export import export_project_table as export
 
-    return str(export(project, results, destination))
+    return str(export(project, results, destination, cancelled=cancelled))
 
 
 def export_project_ocr_table(
@@ -366,10 +413,12 @@ def export_project_ocr_table(
     results: tuple[LoadedProjectResult, ...],
     loaded: LoadedProjectOCR | None,
     destination: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
 ) -> str:
     from wb_tool.adapters.project_ocr_export import export_project_ocr_table as export
 
-    return str(export(project, results, loaded, destination))
+    return str(export(project, results, loaded, destination, cancelled=cancelled))
 
 
 def export_project_normalization(
@@ -379,13 +428,44 @@ def export_project_normalization(
     destination: str,
     *,
     ocr_labels: bool = False,
+    cancelled: Callable[[], bool] = lambda: False,
 ) -> str:
     from wb_tool.adapters.normalization_export import export_project_normalization as export
 
-    return str(export(project, results, loaded, destination, ocr_labels=ocr_labels))
+    return str(
+        export(project, results, loaded, destination, ocr_labels=ocr_labels, cancelled=cancelled)
+    )
 
 
 def export_crop(source: str, request: CropRequest, destination: str) -> str:
     from wb_tool.adapters.crop_export import export_crop as export
 
     return export(source, request, destination)
+
+
+def export_figure_image(
+    project: WBFigureProject,
+    sources: tuple[FigureSourcePath, ...],
+    destination: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> str:
+    from wb_tool.adapters.figure_image_export import export_figure_image as export
+
+    return export(project, sources, destination, cancelled=cancelled)
+
+
+def stage_project_archive(
+    source: str, destination: str, *, cancelled: Callable[[], bool] = lambda: False
+) -> StagedProjectArchive:
+    from wb_tool.adapters.archive_restore import stage_project_archive as stage
+
+    return stage(source, destination, cancelled=cancelled)
+
+
+def inspect_project_archive(
+    source: str, *, cancelled: Callable[[], bool] = lambda: False
+) -> WBFigureProject:
+    from wb_tool.adapters.archive_restore import inspect_project_archive as inspect
+
+    return inspect(source, cancelled=cancelled)

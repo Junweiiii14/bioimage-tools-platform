@@ -22,8 +22,11 @@ from wb_tool.application.project_analysis import (
     ProjectTableCell,
     ProjectTableSnapshot,
 )
+from wb_tool.application.project_archive import ArchiveRunEvidence
+from wb_tool.application.project_metadata import MetadataBook
 from wb_tool.application.project_normalization import NormalizationSnapshot
 from wb_tool.application.project_ocr import LoadedProjectOCR
+from wb_tool.application.project_restore import RestoredProjectResults
 from wb_tool.domain.crop_detection import CropDetectionSettings
 from wb_tool.domain.worksheet import OCRRecognition, Worksheet
 
@@ -44,6 +47,7 @@ class PreviewRaster:
 class WBJob:
     operation: Literal[
         "preview",
+        "metadata_read",
         "ocr_preview",
         "document",
         "encode",
@@ -56,6 +60,7 @@ class WBJob:
         "figure_preview",
         "figure_ocr",
         "figure_export",
+        "figure_image_export",
         "font_digest",
         "crop_suggest",
         "project_result",
@@ -67,6 +72,7 @@ class WBJob:
         "project_ocr_export",
         "project_derived_tables",
         "project_normalization_export",
+        "project_evidence",
     ]
     path: str = ""
     data: bytes = b""
@@ -86,6 +92,8 @@ class WBJob:
     ocr_run: RunRecord | None = None
     project_ocr_result: LoadedProjectOCR | None = None
     ocr_labels: bool = False
+    preview_edge: int = 2048
+    archive_runs: tuple[ArchiveRunEvidence, ...] | None = None
 
 
 @dataclass(frozen=True)
@@ -104,11 +112,13 @@ class WBReply:
         | WBFigureProject
         | FigureRender
         | FigurePNG
+        | MetadataBook
         | CropSuggestion
         | LoadedProjectResult
         | ProjectTableSnapshot
         | LoadedProjectOCR
         | ProjectDerivedTables
+        | RestoredProjectResults
         | AnalysisResult
         | OCRRecognition
         | bytes

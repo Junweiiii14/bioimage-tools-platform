@@ -1,0 +1,1 @@
+window.study.preview(3);

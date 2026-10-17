@@ -1,5 +1,6 @@
 """Read quantitative TIFF pixels without changing the source or its bit depth."""
 
+import json
 from dataclasses import dataclass
 from hashlib import file_digest
 from pathlib import Path
@@ -8,6 +9,27 @@ from typing import cast
 import numpy as np
 import tifffile
 from numpy.typing import NDArray
+
+DISPLAY_TIFF_SOFTWARE = "bioimage-wb figure_display@1"
+
+
+def _display_only(page: tifffile.TiffPage) -> bool:
+    if page.software == DISPLAY_TIFF_SOFTWARE:
+        return True
+    description = page.description
+    if len(description) > 16 * 1024 * 1024 or "figure_original_geometry@1" not in description:
+        return False
+    try:
+        value: object = json.loads(description)
+    except (ValueError, RecursionError):
+        return False
+    if not isinstance(value, dict):
+        return False
+    record = cast(dict[str, object], value)
+    return (
+        record.get("operation") == "figure_original_geometry@1"
+        and record.get("purpose") == "display_only_not_quantitative"
+    )
 
 
 class ImageInputError(ValueError):
@@ -35,6 +57,15 @@ def load_tiff(path: str | Path) -> LoadedTiff:
     MINISWHITE intensities remain numerically unchanged. The caller must select
     polarity using metadata; no silent inversion or default polarity is applied.
     """
+    return _read_tiff(path, allow_display=False)
+
+
+def load_ocr_tiff(path: str | Path) -> LoadedTiff:
+    """OCR may read known display composites without offering quantitative admission."""
+    return _read_tiff(path, allow_display=True)
+
+
+def _read_tiff(path: str | Path, *, allow_display: bool) -> LoadedTiff:
     source = Path(path).resolve()
     if source.suffix.lower() not in (".tif", ".tiff"):
         raise ImageInputError("仅支持 TIFF 定量输入")
@@ -48,6 +79,9 @@ def load_tiff(path: str | Path) -> LoadedTiff:
                 page = image.pages[0]
                 if not isinstance(page, tifffile.TiffPage):
                     raise ImageInputError("无法确认 TIFF 页的完整元数据")
+                display_only = _display_only(page)
+                if display_only and not allow_display:
+                    raise ImageInputError("这是显示拼图；可用于拼图OCR，定量请使用未改强度的原图")
                 orientation = page.tags.get("Orientation")
                 if orientation is not None and orientation.value != 1:
                     raise ImageInputError("当前仅支持左上原点 TIFF，请先确认方向")
@@ -67,6 +101,8 @@ def load_tiff(path: str | Path) -> LoadedTiff:
         raise ImageInputError("仅支持 uint8 和 uint16 TIFF")
     original_shape = tuple(int(value) for value in raw.shape)
     warnings: list[str] = []
+    if display_only:
+        warnings.append("本软件生成的显示拼图，仅用于OCR/排版；定量须回到原图")
     conversion: str | None = None
     if photometric == "RGB":
         if planar == 2:

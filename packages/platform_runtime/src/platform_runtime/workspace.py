@@ -134,6 +134,8 @@ class Workspace:
     ) -> None:
         root = root.absolute()
         _plain(root)
+        if (root / ".restore-incomplete").exists():
+            raise IntegrityError("工作区恢复发布尚未完成，请选择完整工作区")
         self.root = root.resolve()
         self._closed = False
         self._fault_hook = fault_hook
@@ -367,6 +369,41 @@ class Workspace:
         *,
         expected_previous_revision: int | None,
     ) -> DraftSnapshot:
+        return self._save_draft(
+            document_id,
+            tool_id,
+            revision,
+            data,
+            expected_previous_revision=expected_previous_revision,
+        )
+
+    def import_draft_snapshot(
+        self, document_id: str, tool_id: str, revision: int, data: bytes
+    ) -> DraftSnapshot:
+        """Seed one imported revision into a new workspace, without importing any runs."""
+        if self._db.execute("SELECT 1 FROM documents LIMIT 1").fetchone() is not None:
+            raise StateConflict("快照导入只允许尚无文档的新工作区")
+        if self._db.execute("SELECT 1 FROM runs LIMIT 1").fetchone() is not None:
+            raise StateConflict("快照导入不能包含本机运行")
+        return self._save_draft(
+            document_id,
+            tool_id,
+            revision,
+            data,
+            expected_previous_revision=None,
+            imported=True,
+        )
+
+    def _save_draft(
+        self,
+        document_id: str,
+        tool_id: str,
+        revision: int,
+        data: bytes,
+        *,
+        expected_previous_revision: int | None,
+        imported: bool = False,
+    ) -> DraftSnapshot:
         DocumentRevision(document_id=document_id, tool_id=tool_id, revision=revision)
         if expected_previous_revision is not None and type(expected_previous_revision) is not int:
             raise StateConflict("期望修订必须为整数，不能是布尔值")
@@ -375,7 +412,7 @@ class Workspace:
             "SELECT tool_id,current_revision FROM documents WHERE document_id=?", (document_id,)
         ).fetchone()
         if row is None:
-            if expected_previous_revision is not None or revision != 0:
+            if expected_previous_revision is not None or (revision != 0 and not imported):
                 raise StateConflict("新草稿须从修订 0 开始")
         elif row[0] != tool_id or row[1] != expected_previous_revision or revision != row[1] + 1:
             raise StateConflict("草稿修订已改变，不能覆盖旧草稿")
