@@ -1,0 +1,25 @@
+{
+  "pid": 40464,
+  "command": [
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\deliverables\\P0独立验收\\BioimageP0-293c6c0\\app\\BioimageP0.exe",
+    "--fixtures",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\deliverables\\P0独立验收\\BioimageP0-293c6c0\\fixtures",
+    "--evidence",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-tools-platform\\.local\\p0\\desktop-package-150"
+  ],
+  "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\deliverables\\P0独立验收\\BioimageP0-293c6c0",
+  "environment": {
+    "APPDATA": "C:\\Users\\70236\\AppData\\Roaming",
+    "COMSPEC": "C:\\WINDOWS\\system32\\cmd.exe",
+    "LOCALAPPDATA": "C:\\Users\\70236\\AppData\\Local",
+    "PATHEXT": ".COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL",
+    "SYSTEMROOT": "C:\\WINDOWS",
+    "TEMP": "C:\\Users\\70236\\AppData\\Local\\Temp",
+    "TMP": "C:\\Users\\70236\\AppData\\Local\\Temp",
+    "USERPROFILE": "C:\\Users\\70236",
+    "WINDIR": "C:\\WINDOWS",
+    "PATH": "C:\\WINDOWS\\System32;C:\\WINDOWS"
+  },
+  "exe_sha256": "d5c7d3c82c40a724fdb580421775c70524ee39616bb1be5e2c1244222d085398",
+  "scope": "local host with minimal child environment; Python remains installed on host"
+}

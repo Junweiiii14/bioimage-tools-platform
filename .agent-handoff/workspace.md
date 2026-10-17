@@ -9,13 +9,13 @@
 
 ## Main Entry Points
 
-产品入口不存在。开发入口为 dev.py；使用本项目 .venv 或 uv，避免系统 Python 商店别名。
+正式产品入口不存在。P0 探针入口为 p0_probe.py，复现见 tooling/p0/README.md；开发入口为 dev.py。使用本项目 .venv 或 uv，避免系统 Python 商店别名。
 
 规则入口 `dev.py context --task <ID> --scope <目录> --record`，生成当前规则版本回执；`.github/workflows/rules-context.yml` 在 PR 校验。完整安装后本地命令加 `uv run --locked --no-sync` 保持桌面/构建依赖。
 
 ## Test Entry Points
 
-`uv run --locked python dev.py check --all`；额外桌面环境烟测见开发手册。
+`uv run --locked --no-sync python dev.py check --all`；额外桌面环境烟测与真实窗口验收分开记录。
 
 ## Docs And Specs
 

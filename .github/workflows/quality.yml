@@ -18,6 +18,8 @@ jobs:
         os: [windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
+    env:
+      QT_QPA_PLATFORM: offscreen
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -26,8 +28,13 @@ jobs:
         with:
           version: '0.13.0'
           enable-cache: true
-      - run: uv sync --locked
-      - run: uv run --locked python dev.py check --all
+      - name: Install Qt shared libraries (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libegl1 libopengl0 libxkbcommon0
+      - run: uv sync --locked --group desktop
+      - run: uv run --locked --no-sync python dev.py check --all
   desktop-environment:
     runs-on: windows-latest
     timeout-minutes: 20

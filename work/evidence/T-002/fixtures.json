@@ -1,0 +1,213 @@
+{
+  "generator": "p0-v1: (17*x+31*y+101*i)%65536",
+  "files": [
+    {
+      "file": "灰度2048.tif",
+      "shape": [
+        2048,
+        2048
+      ],
+      "dtype": "uint16",
+      "sha256": "1b30972fc9108c3246f40ae8c775c6dd09748b8d04f1a084faed1e55ffa0cad3"
+    },
+    {
+      "file": "灰度4096.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "3c1f3593f0bce2949e3fd85ac1d77c8c0075dee88b3106416833dc429bae0836"
+    },
+    {
+      "file": "彩色4096.tif",
+      "shape": [
+        4096,
+        4096,
+        3
+      ],
+      "dtype": "uint8",
+      "sha256": "4944b4317a7a79946e287841e595cbb8501df80b707520ddd402eb1539380bed"
+    },
+    {
+      "file": "批次00.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "3c1f3593f0bce2949e3fd85ac1d77c8c0075dee88b3106416833dc429bae0836"
+    },
+    {
+      "file": "批次01.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "1d35806b7e538522543d927bba2d907d97116abf2f554dce38a22ff06fd1a00a"
+    },
+    {
+      "file": "批次02.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "5da469c83a6ed19ee59132854ea0074e1e048b5d04dca094104bb69474b6618e"
+    },
+    {
+      "file": "批次03.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "0e3b9a0a2194d71aa50219d41b0aae093322971e62c35aef09ae5a9bff34d95d"
+    },
+    {
+      "file": "批次04.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "147f514dc0274a64194161ac2420d60f8a3b03d324cbb8a65d1dbed6b1b51a99"
+    },
+    {
+      "file": "批次05.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "39597930ce76c1750dd133fc927d289097128a7d41139de069f0eabaecf08fb4"
+    },
+    {
+      "file": "批次06.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "513ec5eac44020552b76b9f78a45179855b2710cc57357d2e0cb347db0fb60d9"
+    },
+    {
+      "file": "批次07.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "d73f33f1d7e69905bb343cdc367aacd1448653840a2497e6b97cd49f8273e1e8"
+    },
+    {
+      "file": "批次08.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "6800e689aa55f1d0125b70d64e5c2d5f0eb2422398c982abe6b5dcf7cbc2755b"
+    },
+    {
+      "file": "批次09.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "2bd47c3fa073ed22bd8b4ec41e4868b1d359f2b7eb55ac9e6f47f4f33c32ea56"
+    },
+    {
+      "file": "批次10.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "02932de9768a4d3b41480539ebd786a90989e01b0adf860640f214b6c2c78cb2"
+    },
+    {
+      "file": "批次11.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "5b35f47df38cb409bc6ff472ba177add8690150052a88e98f5bb2160564f8577"
+    },
+    {
+      "file": "批次12.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "10bd192a5de55e54c979a46d619300e1aae29eac150b7a8fb1945dd811f42637"
+    },
+    {
+      "file": "批次13.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "fb0e511d29e6fc15030d43857a77381762d88f501c635b37f6de0b86da8f9166"
+    },
+    {
+      "file": "批次14.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "1cae2e38d1a953bb836663af8325f9162517e29952912a694d1d915378298286"
+    },
+    {
+      "file": "批次15.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "b50ee5f54a310c4564d7ca8d1b6285dad65b964613be0f5e60a44e9c0fa0cad3"
+    },
+    {
+      "file": "批次16.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "6ad879bb8aed8d55ab5c8f604d2ae6bd7bf0cc310e7f794d28eab40b18ad1e35"
+    },
+    {
+      "file": "批次17.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "bf6571fc0ab7321bf3c14ebe8a0edf3ec3202b87c8bf3f11e275c5873bcd7fb4"
+    },
+    {
+      "file": "批次18.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "7fb966451add7e1f5b0016f0f336ff74ebfae829f4369408d0777f8e271d7deb"
+    },
+    {
+      "file": "批次19.tif",
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "uint16",
+      "sha256": "8fd1f0651d1813bb6f5dac96490201ab8c47fe2a3ef2cd09f3fdae420a1059ed"
+    }
+  ]
+}

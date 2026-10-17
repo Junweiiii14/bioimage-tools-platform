@@ -5,6 +5,7 @@
 | 位置 | 职责与入口 | 状态 / 验证 |
 |---|---|---|
 | `dev.py`, `tooling/` | 开发检查与来源核验，不含业务算法 | 已建；`dev.py check --all` |
+| `p0_probe.py`, `tooling/p0/` | T-002 可丢弃技术探针：Qt、进程、合成图和 standalone；不作为产品 API | 本机验证中；`tooling/p0/README.md` |
 | `.agents/skills/` | 固定提交的第三方工作技能 | 已建；`tooling/skills-lock.json` |
 | `tests/test_boundaries.py` | 边界检查的正反例 | 已建；pytest |
 | `apps/` | 一个应用包的 desktop / worker 两入口，显式装配 | 规划；P0 决定打包方式 |

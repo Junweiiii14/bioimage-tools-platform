@@ -1,22 +1,12 @@
 # Handoff Snapshot
 
-## Current State
-
-- Last updated: 2026-10-13
-- Last agent: Codex
-- Workspace root: bioimage-tools-platform
-- Current objective: F-002，公开仓库并安装无需逐次提醒的规则校验，不开始业务开发。
-- Current status: 配置与正反例验收完成；29 个本地测试及四项远程检查通过。交付 PR #2，最终集成状态以 GitHub PR 为准；任务见 work/tasks/F-002-rule-enforcement.md。
-- Immediate next actions:
-  - PR #2 已获用户集成授权；若尚未合并，核对最新 head 必需检查后完成集成。已合并则等待明确的新任务，不启动产品路线图。
-- Active files:
-  - work/tasks/F-002-rule-enforcement.md
-  - docs/runbooks/rule-enforcement.md
-  - tooling/rule_context.py
-- Blockers: 无；用户已明确授权公开，原套餐限制解除。
-- Open questions:
-  - 产品 P0、科学样本和干净机打包尚未授权启动，不是当前安装任务的未决需求。
-
-## Recovery Summary
-
-GitHub 已依用户要求公开；PR #1 已合并，main 包含原始 PDF 与治理规则。main-quality ruleset 25008972 active，要求 PR、四项指定 Actions 检查、禁止强推/删除、无 bypass actor。F-002 已验证缺回执时其余检查通过仍 BLOCKED，补回执后全部通过；证据见 work/evidence/F-002/validation.md。尚未授权产品实现；不要把原方案任务模板当作开始产品工作的命令。
+- 更新：2026-10-14；Codex；bioimage-tools-platform。
+- 当前任务唯一状态源：`work/tasks/T-002-p0-validation.md`。
+- 授权：P0 本机验证与便携包；干净 Windows 无 Python 验收后续。不扩展 T-001/WB 或归档项目。
+- 分支 `feat/T-002-p0-validation`；PR #3 草稿，未合并。基线 main `221a2df`。
+- 已完成：35 测试、Ruff、Pyright strict；源码原生窗口实操；standalone 构建；ZIP 330 文件解压哈希；包态固定样本、取消/强停/崩溃恢复基准。构建源提交 `293c6c0632e2`，应用 183.5MiB；完整 ZIP（含固定大图集）794MiB。
+- 未完成：用户物理 Esc 停止 Computer Use。本轮没有继续桌面工具；包态原生加载/ROI/按钮、GUI 大图峰值与交互 p95、125/200% 进程缩放未测。干净机和跨显示器亦待后续，独立审查未进行。不能宣称完整本机 P0 通过或栈冻结。
+- 下一步：用户继续时恢复 T-002，仅补上述未完成验收。重新读取 Computer Use 文档，重新选择窗口，不复用 handle；不要重做已通过的源码或完整编译，除非相关代码变化。
+- 包：`../deliverables/BioimageP0-Windows-x64-293c6c0.zip`；已解压到 `../deliverables/P0独立验收/BioimageP0-293c6c0`。GUI PID 40464 启动后留给用户控制，后续须核对进程现状。
+- 证据：`work/evidence/T-002/validation.md`（含 ZIP SHA、包态基准、限制）；脚本：`tooling/p0/README.md`。最小环境启动已完成、实际 DLL 来源已记录，但不等于干净机。
+- 构建日志/XML 在 `.local/p0/build-293c6c0632e2`。首轮宽泛构建主动中止在 `.local/p0/build-d81350859588`；缓存未删除。二进制与原图不进 Git。

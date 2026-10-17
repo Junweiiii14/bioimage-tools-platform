@@ -70,7 +70,7 @@ def main() -> int:
         code = run_module(*command)
         if code:
             return code
-    print("Repository foundation checks passed; product and packaged application remain untested")
+    print("Governance and automated probe checks passed; desktop/package evidence is separate")
     return 0
 
 
