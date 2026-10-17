@@ -24,6 +24,10 @@ The QObject worker owns Workspace/SQLite on its own QThread. Commands are an exp
 immutable FIFO, with request IDs, 64 pending-operation and 16 MiB document budgets.
 Callbacks run on the owning GUI thread. Errors retain identity and do not stop the queue.
 Keep the port alive until its asynchronous `closed` signal; shutdown drains accepted work.
+The `bioimage_app.storage` DEBUG logger records only request identity, operation, phase,
+monotonic time and native thread identity; it excludes paths, payloads and error text.
+Pytest captures this logger for failed-test diagnosis. Logging does not change time limits
+or establish the cause of an intermittent timeout; production DEBUG is disabled by default.
 The caller must stop active processes before shutdown. Switching workspaces requires a
 new port after closing the previous one. No database/Workspace objects are returned.
 
