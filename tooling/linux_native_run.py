@@ -51,10 +51,15 @@ def run_with_native_debugger(command: list[str], *, cwd: Path, env: dict[str, st
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    literal = 'literal space ; $(printf WRONG) `printf WRONG` "quotes" \\end'
     controls = {
-        "zero": "raise SystemExit(0)",
-        "seventeen": "raise SystemExit(17)",
-        "fault": "import os,signal; os.kill(os.getpid(),signal.SIGSEGV)",
+        "zero": ["raise SystemExit(0)"],
+        "seventeen": ["raise SystemExit(17)"],
+        "fault": ["import os,signal; os.kill(os.getpid(),signal.SIGSEGV)"],
+        "arguments": [
+            f"import sys; raise SystemExit(0 if sys.argv[1] == {literal!r} else 19)",
+            literal,
+        ],
     }
     action = parser.add_mutually_exclusive_group(required=True)
     action.add_argument("--probe", action="store_true")
@@ -62,9 +67,9 @@ def main() -> int:
     args = parser.parse_args()
     if args.control:
         return run_with_native_debugger(
-            [sys.executable, "-I", "-c", controls[args.control]], cwd=ROOT, env=dict(os.environ)
+            [sys.executable, "-I", "-c", *controls[args.control]], cwd=ROOT, env=dict(os.environ)
         )
-    for name, expected in (("zero", 0), ("seventeen", 17), ("fault", None)):
+    for name, expected in (("zero", 0), ("seventeen", 17), ("arguments", 0), ("fault", None)):
         result = subprocess.run(
             [sys.executable, "-m", "tooling.linux_native_run", "--control", name],
             cwd=ROOT,
@@ -82,7 +87,9 @@ def main() -> int:
             for marker in ("NATIVE_FAULT signal=SIGSEGV", "Program terminated with signal SIGSEGV")
         ):
             return 1
-    print("Native debugger controls: exit0, exit17, SIGSEGV failure verified", flush=True)
+    print(
+        "Native debugger controls: exit0, exit17, literal arguments, SIGSEGV verified", flush=True
+    )
     return 0
 
 
