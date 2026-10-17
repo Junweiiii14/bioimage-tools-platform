@@ -1,14 +1,14 @@
 # Handoff Snapshot
 
-- 更新2026-10-17；唯一任务状态 work/tasks/T-042-source-only-repair.md；总体T-003科学验收仍未完成。
-- 活动树 C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform，codex/t042-source-only-repair，产品HEAD9eb5a1b；旧主目录dirty和.impeccable/questions不动。
-- 已实现source_geometry@2（短膜/倾角/多证据Marker/N/独立原ROI），background_support@1（背景不足/内部双峰复核）；网页工作台启用新策略，web_ui HTML/CSS无改动。误开旧Qt测试窗口已关闭，验证入口改WebWorkbenchWindow。
-- 8原图源输入识别、冻结后参考评分：旧1/8→新8/8，独审一致；回归集非留出。原图/12参考/旧成果SHA保持。frozen-final与独审frozen-v4 detection对象全等。部分裁图有残余曲率。
-- 正常网页workbench-web-v3：8成功run、正常导出、保存重开相等、原图不变exit0；另重开DOM结果页48cells/48按钮/busyfalse通过。见.local/t042/workbench-results.png/json。
-- 产品独审9eb5a1b增量完成，无未关闭确定缺陷；真实积分48槽7valid/41quality_review，其中21背景支持不足、33位深极值（交集），没有独立积分真值。
-- 最终完整check --all：628项在tests/test_wb_desktop.py:480反复关闭窗测试挂起，faulthandler主线程停QTimer.timeout.connect，专属pytest33896已停止，check实际exit1。根因UNKNOWN，生命周期代码本任务未改；只读诊断不能证明GC死锁。隔离该模块10passed/29.39s/exit0；其余618测试分进程343.79s/exit0，合计628在两个进程通过，不等于完整check门禁。
-- 独立wheel和smoke/policy exit0，类型0错误；58相关测试及114角度×N探针通过。626项前轮622passed/4failed已经9eb修复Schema漂移和N8/7°反例。
-- 下一步调查原生挂起可复现顺序或原生线程栈，再完成全门禁；不得靠skip/改阈值或只看passed数量判成功。
-- 未发布/PR/main/干净Windows。原生CUA不重启。源路径仅.local/t042/sources-only.json；参考仅scoring。所有失败轮次与私有成果保持。
-
-- 用户要求的GitHub开发日志已发布并回读核对Issue #6：https://github.com/Junweiiii14/bioimage-tools-platform/issues/6；正文副本work/evidence/T-042/github-development-log.md。记录前开发HEAD d71c8ec领先远端main127提交（T042为8）；48本地分支/19worktree，原主目录dirty均保留，产品分支未推送。
+- 更新2026-10-17；任务唯一来源work/tasks/T-043-gate-repair-and-staged-sync.md；T-003科学与发布验收仍未完成。
+- 当前活动树C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform，codex/t043-gate-and-staged-sync。原ResearchVault主目录是dirty历史检出，保留全部原改动，不能用于当前产品启动。
+- 正常入口：桌面“BioImage WB 工作台（当前开发）”→活动树Start-BioImage.ps1→绿色WebWorkbenchWindow。无参及历史--figure-project/--platform统一当前工作台；旧Qt窗仅显式legacy诊断。不要用历史树或兼容测试窗演示当前产品。原生CUA按用户停止决定不重启。
+- T043产品2e5021d修复默认入口、失败弹旧宿主及测试可见旧窗；网页HTML/CSS未改。14新增测试/绑定独审通过；完整check真实exit0，642项/361.62s及隔离wheel完成。
+- 原生交互式间歇挂起仍UNKNOWN。原628全check停止exit1、后续分跑、未改生命周期时628完整exit0及压力诊断均保留；不能据离屏成功宣称已定位原生锁根因。
+- 治理前置0b786cb/草稿PR7：显式历史清单，当前scope/base/rules仍完整检查。独立44项完整check/165.88s/exit0，独审6拒绝路径exit0；首次缺venv失败保留，原锁环境安装后通过。远端4项CI成功。
+- 八产品阶段整理完成且独审通过；产品快照一致，8份清单均exit0。T007/T026真实重载且保留旧blob。阶段表.local/t043/stages-built-v2.json；远端阶段PR与最新状态见T043任务/管理记录。
+- 合并治理后的最终开发树完整check真实exit0：657passed/427.30s，全部隔离wheel完成；日志.local/t043/check-final-integrated.log。后续仅文档/回执整理，产品代码未变。
+- main仍221a2df，禁止一次合入累计历史；开发分支已推送f9ef161。现有PR3保持草稿，机器人PR4/5不动。没有合main或发布动作。
+- 仓库外bundle及19树补丁/未跟踪tar已验证；34个原有未提交文件哈希保持；6个干净无.local历史树原位锁定分类，未删/移目录。dirty和结果树保持原位。私有路径仅.local，管理记录work/evidence/T-043/repository-management.md。
+- T042 source_geometry@2/background_support@1接现有工作台；8原图推理、参考只评分，旧1/8→新8/8，非留出。8原图/12参考/旧成果SHA保持。48槽7valid/41quality_review，没有积分真值。网页导出/保存重开/48DOM结果exit0；详见T042证据，不重复注入本地结果。
+- 开发日志Issue6已发布并回读；待补入口/门禁/阶段PR结果。下一步：完整门禁→最终文档/清单→阶段草稿PR/CI→二次refs备份和交接容量检查。

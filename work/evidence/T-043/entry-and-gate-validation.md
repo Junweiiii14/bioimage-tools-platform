@@ -26,3 +26,6 @@
 最终产品提交2e5021d：只读独审无确定阻断问题，独立新增14项exit0。正式uv run --locked --no-sync python dev.py check --all实际exit0：642passed/361.62s，Ruff/format/Pyright/import及隔离wheel全部完成。日志.local/t043/check-entry-fix.log。未把离屏配置修复称为已证明某个原生锁死根因；原生Windows显示/交互和旧间歇挂起仍独立保留。
 
 桌面新建“BioImage WB 工作台（当前开发）”快捷方式，固定当前检出目录的Start-BioImage.ps1；原有快捷方式/旧结果启动文件未覆盖。入口+网页+平台21项exit0，最终入口/环境/同步异步关闭拒绝14项exit0。
+
+
+治理合入开发树e0be945后再次正式完整check，实际exit0：657passed/427.30s，全部独立wheel及真实OCR验证完成。日志.local/t043/check-final-integrated.log；只读原生快照显示正常Git子进程管道ReadFile等待，没有复现挂起。8原图/12参考SHA再验相等，34个原有未提交文件SHA相等。

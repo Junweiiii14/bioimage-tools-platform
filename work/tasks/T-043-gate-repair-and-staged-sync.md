@@ -17,3 +17,6 @@
 已查明两个入口问题：默认命令经PlatformWindow的注册表进入旧FigureProjectWindow，历史--figure-project也直接打开旧窗口；工作台关闭失败还自动host.show。另，本地pytest未默认offscreen，会显示遗留兼容测试窗口。修复正常入口统一现有绿色工作台、兼容入口显式标记、关闭失败留在工作台、测试默认离屏；保留兼容测试与worker，不修改网页样式和原图/旧结果。
 
 完整门禁通过后已建立仓库外all-refs.bundle并verify、19个工作树的index/unstaged binary patch与未跟踪文件tar/摘要；私有忽略结果仍在原路径保留，未将其当Git备份。备份位置仅记.local/t043/backup-location.json。下一步创建依赖阶段草稿PR并分类归档。
+
+
+合并独立治理实现0b786cb后的开发树e0be945完整check也实际退出0：657passed/427.30s，Ruff/format/Pyright/import/policy及全部隔离wheel完成。后续仅文档、规则回执和阶段历史整理，产品代码不变。34个原有未提交文件SHA保持，8原图/12参考SHA再验一致；6干净历史树原位锁定，所有文件保留。八阶段整理独审完成，治理PR7四项CI通过，阶段草稿PR同步中。原生交互式间歇挂起仍UNKNOWN。
