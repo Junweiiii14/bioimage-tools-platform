@@ -1,8 +1,5 @@
 # Current Work Log
 
-## 2026-10-14 / T-010 网格与原像素裁剪
-在用户补充资料基础上，增加固定数量网格/人工Marker左右排除/单框原像素TIFF导出。网格保留空泳道，原像素不受预览影响，来源/坐标嵌入派生TIFF；主文档保存明确ROI，未扩展schema。wb-tool0.8.0/bioimage-app0.3.0；215全量/9合约/4wheel5场景通过。一次原生中止仍未定位，详见T-010证据。用户原/goal在暂停后明确继续，Goal已重新建立为active，无token预算；不能因当前阶段通过标完整产品完成。
-
 ## 2026-10-14 / T-011 诊断与首版验收追踪
 四轮36桌面用例含GC阈值与线程生命周期探针未复现旧中止。增加桌面入口本地日志、Qt fatal显式线程栈、保留原处理器与已有faulthandler配置；真实子进程Qt致命错误证明退出前证据落盘，完整218通过。根因仍UNKNOWN，不改线程和Qt版本。整理用户方案第7–11节首版验收矩阵，T-012多原图项目/模板ready；Goal保持active。
 
@@ -109,3 +106,8 @@ Three independent readers traced crop/quant/pipeline and cross-reviewed17-sectio
 ## 2026-10-17 T043 最终阶段与平台分支
 
 CI001之后最终产品树fa9c5f2正式完整check实际exit0：657passed/451.28s，全部隔离wheel含真实OCR完成。日志.local/t043/check-final-ci001.log；文档后继与此产品内容相同。 Linux真实CI暴露Windows句柄guard，2b9f643修复并独审；阶段2–8仅此产品差异。P0补基线转换说明，8阶段精确清单再次独审全部exit0。全部草稿PR7、3、8–14，main不变；远端CI看PR/Issue6实时。原有34未提交文件、8原图/12参考及旧预测SHA保持，6历史树原位锁定。原生间歇挂起仍UNKNOWN，完整科学/发布验收待后续。
+
+
+## 2026-10-17 T043 入口指针、宿主与回执诊断
+
+核对固定活动树快捷方式并纠正AGENT_HANDOFF旧目录指针；原dirty历史树保持。CI003b4bc8ba修确定隐藏host所有权，独审3项、658完整check/497.50秒及全部wheel真实exit0；8原图功能链exit0，参考未读，离屏截图空白不作视觉通过。阶段7首次超时后原SHA重跑成功，阶段8bcf15分钟取消和5de首次create10秒失败保留，根因UNKNOWN。CI00468c3265加无载荷请求阶段DEBUG日志，独审2项exit0，最终659完整check实际exit0/509.86秒及全部隔离wheel通过。main不变、PR全草稿。

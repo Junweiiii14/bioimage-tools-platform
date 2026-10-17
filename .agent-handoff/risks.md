@@ -10,7 +10,9 @@
 
 ## Current Risks
 
-- T043正常启动已统一绿色WebWorkbenchWindow，测试默认离屏，完整642门禁通过；旧原生交互式间歇挂起仍UNKNOWN。当前活动树见workspace/snapshot；原ResearchVault目录是保留dirty成果的历史树，从该目录运行旧入口仍会得到旧代码，必须使用固定当前检出的启动器。
+- 远端阶段8仍有未定位回执超时：bcf Windows15分钟取消、5de Windows首个create10秒超时（1failed/656passed），finally关闭完成；阶段7原SHA重跑成功不抹初败。CI003仅修确定宿主所有权，CI004仅补无载荷阶段日志，不能据后续通过认定根因修复。
+
+- T043正常启动已统一绿色WebWorkbenchWindow，测试默认离屏，最近CI003完整658门禁通过；旧原生交互式间歇挂起仍UNKNOWN。当前活动树见workspace/snapshot；原ResearchVault目录是保留dirty成果的历史树，从该目录运行旧入口仍会得到旧代码，必须使用固定当前检出的启动器。
 - T043阶段PR仅整理与安全同步，历史阶段仍须独立CI/审查；前置合main后精确base变化会使回执过期，必须重载并重跑，不能直接串行点击合并。6树仅原位锁定，不代表释放磁盘；忽略旧结果未打入Git备份，不能删除其持有树。
 
 - T042原图独立新裁图8/8，旧T040首轮1/8；不是T040参考辅助配准8/8。只证明本开发回归集，未做不同仪器/多膜/弯曲独立留出。

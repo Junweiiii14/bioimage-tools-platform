@@ -12,4 +12,5 @@
 
 
 绑定提交5decc73..b4bc8ba只读独审无阻断；审查者独立执行实际销毁及同步/异步拒绝关闭3项，退出0。作者随后用8原图经正常工作台宿主导入、自动处理、保存和重开验证，8个run成功、原图SHA不变、参考未读取、重开内容相等，退出0；输出.local/t043/workbench-ci003/validation.json。此次离屏WebEngine截图为空白，伴随GPU context lost信息，不能作视觉验收；只记录功能链验证，不以截图宣告UI已验收。旧输出保持原位。
-`n完整产品b4bc8ba随后正式check --all实际退出0：658passed/497.50秒，静态、边界及全部隔离wheel/真实OCR均完成，日志.local/t043/check-ci003-final.log。之后CI004新增诊断另跑最终门禁，不把本轮旧结果充作其验证。
+
+完整产品b4bc8ba随后正式check --all实际退出0：658passed/497.50秒，静态、边界及全部隔离wheel/真实OCR均完成，日志.local/t043/check-ci003-final.log。之后CI004新增诊断另跑最终门禁，不把本轮旧结果充作其验证。

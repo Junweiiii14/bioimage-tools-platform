@@ -1,16 +1,14 @@
 # Handoff Snapshot
 
-- 更新2026-10-17；任务唯一来源work/tasks/T-043-gate-repair-and-staged-sync.md；T-003科学与发布验收仍未完成。
-- 当前活动树C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform，codex/t043-gate-and-staged-sync。原ResearchVault主目录是dirty历史检出，保留全部原改动，不能用于当前产品启动。
-- 正常入口：桌面“BioImage WB 工作台（当前开发）”→活动树Start-BioImage.ps1→绿色WebWorkbenchWindow。无参及历史--figure-project/--platform统一当前工作台；旧兼容入口需显式legacy；现有高级编辑器仅在选择对应工具时打开。不要用历史树或兼容测试窗演示当前产品。原生CUA按用户停止决定不重启。
-- T043产品2e5021d修复默认入口、失败弹旧宿主及测试可见旧窗；网页HTML/CSS未改。14新增测试/绑定独审通过；完整check真实exit0，642项/361.62s及隔离wheel完成。
-- 原生交互式间歇挂起仍UNKNOWN。原628全check停止exit1、后续分跑、未改生命周期时628完整exit0及压力诊断均保留；不能据离屏成功宣称已定位原生锁根因。
-- 治理前置0b786cb/草稿PR7：显式历史清单，当前scope/base/rules仍完整检查。独立44项完整check/165.88s/exit0，独审6拒绝路径exit0；首次缺venv失败保留，原锁环境安装后通过。远端4项CI成功。
-- 八产品阶段整理完成且独审通过；原快照保留，CI001另有已审单行guard；8份清单均exit0。T007/T026真实重载且保留旧blob。阶段表.local/t043/stages-published-final.json；远端阶段PR与最新状态见T043任务/管理记录。
-- 合并治理后的最终开发树完整check真实exit0：657passed/427.30s，全部隔离wheel完成；日志.local/t043/check-final-integrated.log。之后CI001增加已独审单行Windows guard；再次完整门禁见下述最新记录。
-- main仍221a2df，禁止一次合入累计历史；开发分支与阶段8同步；精确HEAD需现场git核对，不使用旧快照SHA启动。现有PR3保持草稿，机器人PR4/5不动。没有合main或发布动作。
-- 仓库外原始及阶段refs bundle均已验证，最新索引.local/t043/backup-final.json；原有19树补丁/未跟踪tar保留；34个原有未提交文件哈希保持；6个干净无.local历史树原位锁定分类，未删/移目录。dirty和结果树保持原位。私有路径仅.local，管理记录work/evidence/T-043/repository-management.md。
-- T042 source_geometry@2/background_support@1接现有工作台；8原图推理、参考只评分，旧1/8→新8/8，非留出。8原图/12参考/旧成果SHA保持。48槽7valid/41quality_review，没有积分真值。网页导出/保存重开/48DOM结果exit0；详见T042证据，不重复注入本地结果。
-- 开发日志Issue6及T043补充已发布并回读（issuecomment-6231511951），当前工作台已正常打开，启动日志.local/t043/current-launch-*.log。当前阶段链：治理PR7→P0 PR3→PR8/9/10/11/12/13/14，均草稿；远端CI以PR实时及Issue6日志为准。下一步按阶段审查/刷新base/CI集成；原生挂起/独立科学与发布验收另计，不重复旧入口。
-
-- 最新CI001：CI001之后最终产品树fa9c5f2正式完整check实际exit0：657passed/451.28s，全部隔离wheel含真实OCR完成。日志.local/t043/check-final-ci001.log；文档后继与此产品内容相同。 单行Windows guard独审2b9f643及8阶段整理复核通过；精确链见T043管理记录，后继只补文档。原生根因仍UNKNOWN。
+- 更新2026-10-17；任务唯一来源work/tasks/T-043-gate-repair-and-staged-sync.md，总体in_progress；科学/交互/发布验收未完。
+- 当前活动树C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform，codex/t043-gate-and-staged-sync；每次核对HEAD，不使用历史快照SHA启动。原ResearchVault主目录dirty，原有内容不变，不能用作当前产品。
+- 桌面“BioImage WB 工作台（当前开发）”固定活动树Start-BioImage.ps1；无参及历史--figure-project/--platform统一绿色WebWorkbenchWindow。旧窗口仅显式legacy，兼容测试离屏；高级编辑器仅显式工具动作打开。HTML/CSS未变；不重启用户现有工作台，不恢复用户停止的CUA。
+- 已确认旧界面三路径：真实默认/历史CLI旧窗口、失败关闭host.show、可见兼容测试；2e5021d修复并独审。CI003b4bc8ba又修确定隐藏宿主Qt所有权，审查者3项exit0；不是原挂起根因证明。
+- 最近完整产品b4bc8ba：check --all实际exit0，658passed/497.50s及全部隔离wheel/真实OCR。此前642/657两轮完整成功与失败记录均保留，见T043验证。
+- CI00468c3265补存储enqueue/execute/end/reply/deliver的DEBUG单调时间/请求/线程日志，不含载荷；独审2项实际exit0。最终659完整check实际exit0、509.86秒及全部隔离wheel/真实OCR通过，日志.local/t043/check-ci004-final.log；无时限/skip/锁/公式变更。
+- 远端阶段7 Windows首次初始化5秒超时，原SHA重跑成功；阶段8bcf Windows15分钟无节点取消，5de诊断后Windows首个create10秒超时，1failed/656passed；finally shutdown完成。根因UNKNOWN，无永久死锁证明；日志.local/t043/pr14-windows-diagnostic-failed.log。诊断通过也不能声称根因修复。
+- 同步分支为codex/t043-gate-and-staged-sync与codex/stage-08-source-repair，精确HEAD现场核对；CI003/004已完成本地完整门禁与绑定独审，SYNC008清单以68c3265为来源快照。治理PR7及产品阶段1–7当前CI成功，阶段8实时CI以PR14/Issue6为准；全草稿、main221a2df不变。
+- 阶段链PR7→3→8/9/10/11/12/13/14；.local/t043/stages-published-final.json结束时更新。前置合main后需真实重载base及CI，禁止一次合累计历史。旧T007/T026回执Git版本保留。
+- T042 source_geometry@2/background_support@1已接现有工作台；8原图独立推理，参考仅评分，旧1/8→新8/8（开发回归集）。48槽7有效/41复核，没有独立积分真值。8原图/12参考/旧预测保持；最新8图功能链.local/t043/workbench-ci003退出0，离屏截图空白不作视觉验收。
+- 原19树外置allrefs/二进制patch/未跟踪tar保留；34原有未提交文件SHA保持；6干净无.local树原位锁定，未删/移目录。私有原图/旧结果仍原路径，不能以Git bundle替代而删除。最新备份指针.local/t043/backup-final.json需在最终refs后更新。
+- GitHub开发日志Issue6/comment6231511951持续记录实际检查/阶段HEAD，保留全部失败与UNKNOWN。后续继续原生稳定性证据、阶段审查/实际base刷新及独立科学验收，不能扩展新工具。

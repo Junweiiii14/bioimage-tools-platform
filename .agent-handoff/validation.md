@@ -160,3 +160,8 @@ HEADcc626d7/productf7a6651. deep-causal-replay.py and deep-boundary-replay.py ea
 
 
 - 2026-10-17 CI001：CI001之后最终产品树fa9c5f2正式完整check实际exit0：657passed/451.28s，全部隔离wheel含真实OCR完成。日志.local/t043/check-final-ci001.log；文档后继与此产品内容相同。 旧阶段自身环境8进程测试/10.89s退出0，guard模块双平台类型0；Windows全项目Linux目标因Qt平台存根8错不作为Linux CI，实际Linux以远端为准。
+
+- 2026-10-17 CI003b4bc8ba：完整check --all实际exit0，658passed/497.50秒及全部隔离wheel/真实OCR；独审3项exit0。8原图工作台宿主导入/处理/保存重开exit0，SHA不变、参考未读，离屏截图空白不作视觉验收。CI00468c3265独审2项exit0，完整659正在执行，结果另记。
+
+
+CI004产品68c3265正式完整check --all实际exit0：659passed/509.86秒，静态/架构/政策检查和全部隔离wheel、真实OCR/worker均通过；日志.local/t043/check-ci004-final.log，退出码记录.local/t043/ci004-final-gate.json。没有修改时限、预期、skip或依赖；通过不证明偶发超时根因。

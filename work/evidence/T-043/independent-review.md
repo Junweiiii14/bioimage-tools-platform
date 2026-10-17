@@ -36,3 +36,11 @@
 | 8 原图几何、积分边界与入口统一 | [#14](https://github.com/Junweiiii14/bioimage-tools-platform/pull/14) | 0637250e33044c42a769ac8195a53b8916ff730e |
 
 后继仅文档/回执；不将作者最终完整门禁说成独审者执行。
+
+
+## CI002–004增量审查
+
+- bcf405a..4943c03：仅增加Windows/Linux CI无缓冲、逐节点输出及60秒栈采集；独审未发现放宽15分钟门禁、断言、skip或退出码处理。
+- 5decc73..b4bc8ba：隐藏宿主Qt所有权修复无阻断，审查者独立3项实际exit0（C++销毁、同步/异步拒绝关闭）。作者随后658完整check及8原图功能链exit0；离屏截图空白不作视觉验收。
+- b4bc8ba..68c32654d8858331429f5f2a081dfe816ab155bd：阶段诊断无阻断，审查者独立2项实际exit0。日志可能影响调度，不作根因修复证明。
+- 阶段7首次Windows初始化5秒超时后原SHA重跑成功；阶段8bcf Windows15分钟取消、5de Windows首次create10秒超时（1failed/656passed）均保留。只读调查没有确定丢回复缺陷，根因UNKNOWN。

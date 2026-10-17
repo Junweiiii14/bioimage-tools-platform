@@ -26,3 +26,13 @@
 
 CI001之后最终产品树fa9c5f2正式完整check实际exit0：657passed/451.28s，全部隔离wheel含真实OCR完成。日志.local/t043/check-final-ci001.log；文档后继与此产品内容相同。
 治理前置PR7与8阶段PR3、8–14均已创建草稿。CI001处理Linux类型分支，同步前再次完成全门禁与独审；按精确基线链更新后原子推送，非强推，main不变。当前远端CI结论以各PR实时记录及Issue6开发日志为准，不将历史阶段单独产品审查视为完成。原生Windows交互式间歇挂起根因仍UNKNOWN、后续科学/发布验收未完成；因此总体T043/T003不作完成宣告。
+
+
+## 入口复发与远端超时追踪
+
+已再次核对专用快捷方式固定活动树；当前AGENT_HANDOFF索引也纠正旧目录指针，原dirty历史树未变。CI003确定隐藏host未随owner销毁，最小Qt所有权修复b4bc8ba/独审3项通过；完整check实际exit0，658passed/497.50s及全部wheel/真实OCR。8原图正常宿主路径新目录验证exit0，原图SHA/保存重开相等/参考未读；离屏截图空白不当作视觉通过。
+
+阶段7原SHA Windows重跑已成功，但初次失败保留。阶段8bcf15分钟取消；CI002诊断5de Windows1failed/656passed/426.36s，首次AsyncStorage create10秒超时且finally关闭完成。不能宣告已定位永久锁；CI00468c3265按请求阶段补无载荷DEBUG日志，独审2项通过，最终全门禁另跑。保持原15分钟/10秒/断言/skip/依赖。
+
+
+CI004产品68c3265正式完整check --all实际exit0：659passed/509.86秒，静态/架构/政策检查和全部隔离wheel、真实OCR/worker均通过；日志.local/t043/check-ci004-final.log，退出码记录.local/t043/ci004-final-gate.json。没有修改时限、预期、skip或依赖；通过不证明偶发超时根因。
