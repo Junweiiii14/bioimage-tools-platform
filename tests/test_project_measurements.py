@@ -192,7 +192,7 @@ def test_close_cancels_batch_preserves_completed_run(
     qtbot.waitUntil(reopened.import_button.isEnabled, timeout=15000)
     table = reopened.view.analysis.results
     assert item(table, 0, 3).text() == "4000"
-    assert item(table, 3, 3).text() == "" and item(table, 3, 4).text() == "cancelled"
+    assert item(table, 3, 3).text() == "" and item(table, 3, 4).text() == "已取消"
 
 
 @pytest.mark.parametrize("fault", ["damaged", "foreign_run"])
@@ -229,13 +229,13 @@ def test_result_damage_isolated_and_stale_geometry_does_not_fill(
     qtbot.waitUntil(reopened.import_button.isEnabled, timeout=15000)
     table = reopened.view.analysis.results
     assert item(table, 0, 3).text() == ""
-    assert item(table, 0, 4).text() == "result_unavailable"
+    assert item(table, 0, 4).text() == "结果不可用"
     assert item(table, 3, 3).text() == "8000"
     item(reopened.view.table, 1, 4).setText("1")
     item(reopened.view.table, 1, 9).setCheckState(Qt.CheckState.Checked)
     reopened.refresh_project_table()
     qtbot.waitUntil(reopened.import_button.isEnabled)
-    assert item(table, 3, 3).text() == "" and item(table, 3, 4).text() == "stale"
+    assert item(table, 3, 3).text() == "" and item(table, 3, 4).text() == "已过期"
     # Removing a row removes its plan without dropping other plans or schema v3.
     reopened.view.table.selectRow(1)
     qtbot.waitUntil(reopened.import_button.isEnabled)
@@ -338,7 +338,7 @@ def test_real_project_ocr_bind_fill_export_reopen_and_cancel(
     item(panel.table, 0, 1).setText("=AKT")
     assert item(panel.table, 0, 2).checkState() == Qt.CheckState.Unchecked
     qtbot.waitUntil(
-        lambda: panel.results.rowCount() == 6 and item(panel.results, 0, 4).text() == "unconfirmed",
+        lambda: panel.results.rowCount() == 6 and item(panel.results, 0, 4).text() == "标签待确认",
         timeout=10000,
     )
     item(panel.table, 0, 2).setCheckState(Qt.CheckState.Checked)
@@ -395,7 +395,7 @@ def test_real_project_ocr_bind_fill_export_reopen_and_cancel(
     qtbot.waitUntil(
         lambda: (
             reopened.view.ocr.results.rowCount() == 6
-            and item(reopened.view.ocr.results, 0, 4).text() == "stale"
+            and item(reopened.view.ocr.results, 0, 4).text() == "已过期"
         ),
         timeout=10000,
     )
@@ -410,7 +410,7 @@ def test_real_project_ocr_bind_fill_export_reopen_and_cancel(
     qtbot.waitUntil(damaged.import_button.isEnabled)
     damaged.load_document(project.project_id)
     qtbot.waitUntil(damaged.import_button.isEnabled, timeout=20000)
-    assert item(damaged.view.ocr.results, 3, 4).text() == "ocr_unavailable"
+    assert item(damaged.view.ocr.results, 3, 4).text() == "OCR 证据不可用"
     assert item(damaged.view.ocr.results, 3, 3).text() == ""
     assert item(damaged.view.analysis.results, 3, 3).text() == "8000"
 

@@ -1,11 +1,9 @@
 # Handoff Snapshot
 
-- 更新2026-10-15。总体T-003；当前T-024工具平台与WB自动化主流程，唯一状态 `work/tasks/T-024-platform-automation.md`。已完成本地闭环/真实输出/独审，待用户实际试用及PR集成，不代表最终科学验收。
-- 活动工作树 `C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform`，分支 `codex/t024-platform-automation`，产品 `16f38777d8bf8262b429e4004413937dd55b0195`。原仓库旧T-021 dirty保留；不要覆盖。当前预存未跟踪 `.impeccable/questions/` 保留。
-- 默认入口是真实工具平台，WB工具目录导入→自动泳道/裁剪/积分边界→真实测量进程→表/拼图/可恢复ZIP。源图左224/中央图/右272；Qt冷白青绿；图上移动缩放，不要求坐标。schema8机器证据不伪装人工审核，原像素计算，旧1–7读取不变。
-- 子任务平台T-025、画布T-026（修正重复ID）、核心T-027已集成。Impeccable用于Operate/native；Taste明确不适用app screen。独立代码审查五P2均修复且绑定16f3877通过；独立视觉两修复resolved/ship（限定所审修复）；设计documenter已核对。
-- 最终 `dev.py check --all` 退出0：532 passed/193.25s，Ruff317格式/Pyright0/9合约/隔离wheel与真实OCR烟测通过。详见work/evidence/T-024/validation.md。
-- 实际10张用户TIFF完整处理：5张检出21泳道、5张无可靠候选。全部21条有质量警告，原始积分已输出而有效信号留空。无人工真值准确率声明、不猜蛋白/组别/内参，不按文件后缀推断来源。
-- 最新交付 `.local/deliveries/WB-platform-20261015-212916`：workspace、真实5视图截图、启动脚本、使用说明；输出 `workspace/outputs/WB-20261015-212920-84db3a`。严格ZIP恢复验证10行/schema8/5机器证据/0人工review。原图/产物不提交Git。
-- 下一步依据用户实际试用处理检测失败/质量复核、明确实验标签和样本配对，再验收完整科学工作流。其他工具不自动扩展。旧坐标教学已停止。远程CI/PR合并/包态发布未做。
-- 历史Qt中止/停滞根因UNKNOWN，真实准确率与干净Windows仍待验收；不得以本轮通过删除风险。旧snapshot已存archive/t024-pre-integration-snapshot.md。
+- 更新2026-10-16；当前T-033网页优先同源桌面，唯一状态work/tasks/T-033-web-first-ui.md。总体WB T003继续，非整套产品完成。
+- 活动树C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform；codex/t033-web-first-ui。产品a68000e，旧主目录dirty及.impeccable/questions保留。
+- web_ui三文件同源运行在浏览器/QtWebEngine；平台入口、左来源/中央图像/右复核、拼图/结果、非图像动效、减少动效。原始坐标拖画/角点键盘支持。
+- bridge真实导入自动建项目/追加/恢复/确认下一张/输出；--web-workbench显式入口，默认原生保留。高级曲线/OCR/模板/归一化仍原生窗口；已有workspace时另开窗口打开项目，不支持本窗口切换。
+- .local/t033含浏览器预览服务60303、desktop-final/home/workbench/mobile截图、启动新版桌面.cmd、使用说明、verification.json与真实输出。10张源图哈希不变；5图自动有裁剪/5图未定位/质量仍需复核，不能声称完全准确自动化。
+- 568全门禁退出0/224.97s，最终9专项退出0；独审a68000e原3代码问题已解决，视觉ship仅4修复项；独立documenter已更新产品/设计/sidecar。wheel包含web三资源；干净机/远程CI/PR/main合并未做。
+- 下一步优先用户体验反馈，再推进高级原生界面网页化与科学准确率真实标注；不要自动扩展其他工具。T029历史详见其任务，T002包态/干净机风险仍保留。

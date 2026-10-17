@@ -6,7 +6,6 @@ from uuid import uuid4
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QComboBox,
-    QGridLayout,
     QHBoxLayout,
     QLabel,
     QPlainTextEdit,
@@ -42,63 +41,126 @@ class ProjectOCRPanel(QWidget):
         self._loading = False
         self._rows: tuple[ProjectOCRRow, ...] = ()
         layout = QVBoxLayout(self)
-        actions = QGridLayout()
-        for index, (text, callback) in enumerate(
-            (
-                ("导入拼图 TIFF / PNG", self.import_requested.emit),
-                ("生成并识别当前拼图", self.compose_requested.emit),
-                ("识别 Fig/行名（重建关联）", self.run_requested.emit),
-                ("刷新关联结果", self.refresh_requested.emit),
-                ("导出关联表 XLSX / CSV", self.export_requested.emit),
-            )
-        ):
-            button = QPushButton(text)
-            button.clicked.connect(callback)
-            actions.addWidget(button, index // 3, index % 3)
+        layout.setSpacing(12)
+        actions = QHBoxLayout()
+        self.import_button = QPushButton("导入外部拼图")
+        self.import_button.clicked.connect(self.import_requested)
+        self.compose_button = QPushButton("识别当前项目拼图")
+        self.compose_button.setObjectName("primaryAction")
+        self.compose_button.clicked.connect(self.compose_requested)
+        self.run_button = QPushButton("重新识别文字")
+        self.run_button.clicked.connect(self.run_requested)
+        for button in (self.compose_button, self.import_button, self.run_button):
+            actions.addWidget(button)
+        actions.addStretch()
+        self.results_toggle = QPushButton("关联结果")
+        self.results_toggle.setCheckable(True)
+        actions.addWidget(self.results_toggle)
         layout.addLayout(actions)
-        self.note = QLabel("导入独立拼图，识别后校正名称并明确关联到已审核的原图行。")
+        self.note = QLabel("识别当前拼图，或导入外部拼图。识别后核对文字并关联原图。")
         self.note.setWordWrap(True)
         layout.addWidget(self.note)
-        body = QSplitter(Qt.Orientation.Horizontal)
-        labels = QWidget()
-        label_layout = QVBoxLayout(labels)
-        self.table = QTableWidget(0, 4)
-        self.table.setHorizontalHeaderLabels(
-            ["Fig（可改）", "蛋白（可改）", "已确认", "关联原图行"]
-        )
-        label_layout.addWidget(self.table)
-        controls = QHBoxLayout()
-        for title, callback in (("补充行", self.add_row), ("删除所选OCR行", self.remove_row)):
-            button = QPushButton(title)
-            button.clicked.connect(callback)
-            controls.addWidget(button)
-        label_layout.addLayout(controls)
-        self.target = QComboBox()
-        label_layout.addWidget(self.target)
-        binding = QHBoxLayout()
-        bind = QPushButton("关联所选原图行")
-        bind.clicked.connect(lambda: self.bind(False))
-        unbind = QPushButton("解除关联")
-        unbind.clicked.connect(lambda: self.bind(True))
-        binding.addWidget(bind)
-        binding.addWidget(unbind)
-        label_layout.addLayout(binding)
-        body.addWidget(labels)
+        self.body = QSplitter(Qt.Orientation.Horizontal)
         evidence = QTabWidget()
-        self.canvas = ImageCanvas(empty_message="导入 TIFF / PNG 拼图，\n或生成并识别当前拼图")
-        evidence.addTab(self.canvas, "拼图 / 所选原文位置")
+        self.canvas = ImageCanvas(
+            empty_message="识别当前项目拼图，或导入外部拼图。\n识别结果会显示在这里，原图定量不会被改变。"
+        )
+        evidence.addTab(self.canvas, "拼图")
         self.raw = QPlainTextEdit()
         self.raw.setReadOnly(True)
-        evidence.addTab(self.raw, "原始识别文字与置信度")
-        body.addWidget(evidence)
-        body.setStretchFactor(0, 1)
-        body.setStretchFactor(1, 1)
-        layout.addWidget(body, 2)
+        evidence.addTab(self.raw, "识别依据")
+        self.body.addWidget(evidence)
+        self.labels_panel = QWidget()
+        label_layout = QVBoxLayout(self.labels_panel)
+        label_layout.setContentsMargins(12, 0, 0, 0)
+        label_layout.addWidget(QLabel("核对标签与来源"))
+        self.table = QTableWidget(0, 4)
+        self.table.setHorizontalHeaderLabels(["Fig", "蛋白", "确认", "关联原图"])
+        self.table.setColumnWidth(0, 70)
+        self.table.setColumnWidth(1, 90)
+        self.table.setColumnWidth(2, 45)
+        label_layout.addWidget(self.table, 1)
+        controls = QHBoxLayout()
+        self.add_button = QPushButton("补充标签")
+        self.add_button.clicked.connect(self.add_row)
+        self.remove_button = QPushButton("删除所选")
+        self.remove_button.clicked.connect(self.remove_row)
+        controls.addWidget(self.add_button)
+        controls.addWidget(self.remove_button)
+        label_layout.addLayout(controls)
+        self.binding_note = QLabel("选择标签，再指定对应的已审核原图。")
+        self.binding_note.setWordWrap(True)
+        label_layout.addWidget(self.binding_note)
+        self.target = QComboBox()
+        self.target.setMinimumWidth(0)
+        self.target.setSizeAdjustPolicy(
+            QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
+        )
+        self.target.setMinimumContentsLength(18)
+        label_layout.addWidget(self.target)
+        binding = QHBoxLayout()
+        self.bind_button = QPushButton("关联此原图")
+        self.bind_button.clicked.connect(lambda: self.bind(False))
+        self.unbind_button = QPushButton("解除关联")
+        self.unbind_button.clicked.connect(lambda: self.bind(True))
+        binding.addWidget(self.bind_button)
+        binding.addWidget(self.unbind_button)
+        label_layout.addLayout(binding)
+        self.body.addWidget(self.labels_panel)
+        self.body.setStretchFactor(0, 3)
+        self.body.setStretchFactor(1, 1)
+        self.body.setSizes([780, 320])
+        layout.addWidget(self.body, 1)
+        self.output_panel = QWidget()
+        output = QVBoxLayout(self.output_panel)
+        output.setContentsMargins(0, 0, 0, 0)
+        result_actions = QHBoxLayout()
+        self.refresh_button = QPushButton("计算关联结果")
+        self.refresh_button.clicked.connect(self.refresh_requested)
+        self.export_button = QPushButton("导出关联表 XLSX / CSV")
+        self.export_button.clicked.connect(self.export_requested)
+        result_actions.addWidget(self.refresh_button)
+        result_actions.addStretch()
+        result_actions.addWidget(self.export_button)
+        output.addLayout(result_actions)
         self.result_view = ProjectResultsView()
         self.results = self.result_view.table
-        layout.addWidget(self.result_view, 1)
+        output.addWidget(self.result_view, 1)
+        layout.addWidget(self.output_panel, 1)
+        self.results_toggle.toggled.connect(self._show_results)
         self.table.cellChanged.connect(self._edited)
         self.table.currentCellChanged.connect(self._selected)
+        self.target.currentIndexChanged.connect(self._update_actions)
+        self._show_results(False)
+        self._update_actions()
+
+    def _show_results(self, shown: bool) -> None:
+        self.output_panel.setVisible(shown)
+        self.body.setVisible(not shown)
+        self.results_toggle.setText("返回拼图校正" if shown else "关联结果")
+
+    def _update_actions(self, *_args: object) -> None:
+        has_source = self._state is not None
+        selected = 0 <= self.table.currentRow() < len(self._rows)
+        self.run_button.setVisible(has_source)
+        self.labels_panel.setVisible(has_source)
+        self.results_toggle.setVisible(bool(self._rows))
+        self.add_button.setEnabled(has_source)
+        self.remove_button.setEnabled(selected)
+        self.bind_button.setEnabled(selected and bool(self.target.currentData()))
+        self.unbind_button.setEnabled(
+            selected and self._rows[self.table.currentRow()].link is not None
+        )
+        self.refresh_button.setEnabled(bool(self._rows))
+        self.export_button.setEnabled(bool(self._rows))
+        self.binding_note.setText(
+            "尚无已审核的原图。请先在图像复核中确认裁剪，再回来关联。"
+            if self.target.count() <= 1
+            else "选择对应原图并关联，核对文字后勾选确认。"
+        )
+        if not self._rows:
+            self.results_toggle.setChecked(False)
+            self._show_results(False)
 
     def state(self) -> ProjectOCRState | None:
         if self._state is None:
@@ -172,7 +234,7 @@ class ProjectOCRPanel(QWidget):
         self.note.setText(
             (self._state.filename + "：校正Fig/蛋白，关联原图行后勾选确认。")
             if self._state
-            else "请导入独立拼图。定量仍从项目原图读取。"
+            else "识别当前项目拼图，或导入外部拼图。定量仍从原图读取。"
         )
         self._loading = False
         self.result_view.invalidate()
@@ -198,6 +260,7 @@ class ProjectOCRPanel(QWidget):
                     names.get(row.link.target_row_id, "原图行已删除") if row.link else "未关联"
                 )
         self._loading = loading
+        self._update_actions()
 
     def _edited(self, row: int, column: int) -> None:
         if self._loading:
@@ -236,6 +299,7 @@ class ProjectOCRPanel(QWidget):
                         LaneROI(token.text[:60], floor(b.x0), floor(b.y0), ceil(b.x1), ceil(b.y1))
                     )
         self.canvas.set_regions(tuple(regions))
+        self._update_actions()
 
     def set_preview(self, preview: PreviewRaster) -> None:
         if self._state and preview.sha256 == self._state.source.sha256:
@@ -269,6 +333,7 @@ class ProjectOCRPanel(QWidget):
             self.table.setCurrentCell(i, 0)
             self.result_view.invalidate()
             self.changed.emit()
+            self._update_actions()
 
     def remove_row(self) -> None:
         i = self.table.currentRow()
@@ -279,3 +344,4 @@ class ProjectOCRPanel(QWidget):
             self._loading = False
             self.result_view.invalidate()
             self.changed.emit()
+            self._update_actions()

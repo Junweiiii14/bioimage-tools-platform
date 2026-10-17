@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "task": "SYNC-006",
+  "base_commit": "8be1c56d2399f728ead09415ab8c9800b32cdc99",
+  "source_head": "3dbd0c3eab06db929fdec952d88ef4f1491e18fa",
+  "historical_receipts": {
+    "work/evidence/T-028/rules-context.json": "a802b0f7e7ea08f9426190b49aed9baeae4165b7",
+    "work/evidence/T-029/rules-context.json": "7d97a6ebccc0da00c5aa049664c9dd35e5514cfa",
+    "work/evidence/T-030/rules-context.json": "2846c8dc5cc475297d1161d8ded311264e7ff66b",
+    "work/evidence/T-031/rules-context.json": "b6812e3af41665b9aeb39335fd8fa51856bcb930",
+    "work/evidence/T-032/rules-context.json": "151e56dd787542bae52c9a9f95d17c9f94ed59fa",
+    "work/evidence/T-033/rules-context.json": "97d5600b8ca8d8cdfc7482e7328b19ba534755bb",
+    "work/evidence/T-034/rules-context.json": "6ddec2d7f46bb5d48b4d0e0d8935d31dbabf4bf4"
+  }
+}

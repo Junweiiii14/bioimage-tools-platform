@@ -1,194 +1,185 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-15T13:30:52.118470+00:00",
+  "generatedAt": "2026-10-16T00:00:00+08:00",
   "title": "Design System: BioImage 工具平台与 WB 证据工作台",
   "extensions": {
     "colorMeta": {
       "primary": {
         "role": "primary",
-        "displayName": "青绿操作与信号"
+        "displayName": "克制青绿操作"
+      },
+      "window": {
+        "role": "neutral",
+        "displayName": "暖白工作区"
       },
       "surface": {
         "role": "neutral",
         "displayName": "白色控件面"
       },
-      "window": {
+      "web-muted": {
         "role": "neutral",
-        "displayName": "冷白工作区"
-      },
-      "source-selected": {
-        "role": "neutral",
-        "displayName": "原图列表选中面"
-      }
-    },
-    "typographyMeta": {
-      "body": {
-        "displayName": "原生中文正文",
-        "purpose": "Qt 10pt，标题独立使用 QSS px。"
-      },
-      "platform-page": {
-        "displayName": "平台页面标题",
-        "purpose": "Qt QSS 26px/600; platform entry only."
-      },
-      "platform-brand": {
-        "displayName": "平台品牌",
-        "purpose": "Qt QSS 23px/600; teal BioImage wordmark."
-      },
-      "platform-tool": {
-        "displayName": "平台工具标题",
-        "purpose": "Qt QSS 22px/600; current WB tool entry."
-      },
-      "platform-section": {
-        "displayName": "平台分区标题",
-        "purpose": "Qt QSS 15px/600; navigation, recent projects and flow details."
+        "displayName": "网页辅助文字"
       }
     },
     "shadows": [],
-    "motion": [],
-    "breakpoints": [],
-    "nativePlatform": {
-      "toolkit": "PySide6 / Qt Widgets",
-      "source": [
-        "apps/desktop/src/bioimage_app/platform_window.py::_theme",
-        "apps/desktop/src/bioimage_app/figure_window.py::_apply_theme",
-        "tools/wb/src/wb_tool/ui/figure_view.py::_build_source_workspace",
-        "tools/wb/src/wb_tool/ui/canvas.py"
-      ],
-      "navigation": "Horizontal list, 220×44 cells, 48 height; selected bottom border 3px primary; selected tabs bottom border 2px primary.",
-      "layout": "WB analysis: 220px controls / flexible evidence / 292px review, 10px gaps. Source: 224px source rail / flexible canvas / 272px review, 12px gaps. Platform: 216px navigation / flexible tools and recent projects / 270px project details.",
-      "focus": "Buttons: 2px primary border. Line edits, integer spin boxes and combo boxes: primary border color.",
-      "previewPolicy": "Native Qt only; no fabricated HTML/CSS preview components or synthesized tonal ramps. Fit/100% is display-only.",
-      "sourceCommits": {
-        "platform": "f32ebbb",
-        "sourceWorkspace": "e2d78e676b46e448bb2f503435ffa09d0b8f4d6d",
-        "previousWbStages": "0d9aad94c8bd7a93f34a24163af4fabe8d017d56",
-        "automaticCore": "8f9b050"
+    "breakpoints": [
+      {
+        "name": "web-wide-min",
+        "value": "1600px"
       },
-      "platformEnumException": "Windows custom Qt Widgets is not represented by Impeccable 4.5.2 web/ios/android/adaptive enums. Keep truthful PRODUCT.md; inspect native QSS/layout manually. Web fallback does not authorize changing technology or fabricated web component previews.",
-      "verification": "Source workspace actual Qt synthetic fixture screenshots inspected at logical 1440x900 and 1100x780; source regression suite 36 passed. Final integrated platform/real-resource workflow screenshots and output validation belong to main T-024 task; not implied by design metadata.",
-      "workingTreeAmendments": [
-        "T-024 coordinator: analysis review 292px; 4 significant-digit compact values; wrapped non-elided status; original-integral review column.",
-        "T-024 coordinator: laboratory source labels use three-digit project-order prefix with stable row_id and filename in tooltip."
-      ]
-    },
-    "evidenceDrawing": {
-      "source": "tools/wb/src/wb_tool/ui/view.py::ProfilePlot.paintEvent",
-      "scope": "Local scientific plot drawing, not general shell tokens.",
-      "baseline": "#7d919a",
-      "bounds": "#79aaa4",
-      "boundsText": "#246a65",
-      "axes": "#dce4e7",
-      "plotText": "#344256",
-      "fontSize": "9pt",
-      "signalWidth": 2,
-      "baselineWidth": 2,
-      "boundsWidth": 1,
-      "boundsStyle": "DashLine",
-      "axisMeaning": "Y: signal mean in original grayscale units under quantification polarity; X: crop row index starting at 0. Actual data ticks and L/R labels; verified results only."
+      {
+        "name": "web-compact-max",
+        "value": "1180px"
+      },
+      {
+        "name": "web-drawer-max",
+        "value": "900px"
+      },
+      {
+        "name": "web-mobile-max",
+        "value": "620px"
+      }
+    ],
+    "motion": [
+      {
+        "name": "navigation",
+        "value": "180ms / QEasingCurve.OutCubic",
+        "purpose": "Interruptible native indicator geometry."
+      },
+      {
+        "name": "panel-reveal",
+        "value": "140ms / QEasingCurve.OutCubic / opacity 0.7..1.0",
+        "purpose": "Only designated control panels; no image, curve evidence or numeric fade."
+      },
+      {
+        "name": "web-navigation",
+        "value": "260ms cubic-bezier(.16,1,.3,1)",
+        "purpose": "Mode indicator only."
+      },
+      {
+        "name": "web-drawer-in",
+        "value": "260ms cubic-bezier(.16,1,.3,1)",
+        "purpose": "Control drawer entrance."
+      },
+      {
+        "name": "web-drawer-out",
+        "value": "150ms ease-in",
+        "purpose": "Control drawer exit."
+      },
+      {
+        "name": "web-button",
+        "value": "140ms; shadow 180ms",
+        "purpose": "Non-image control feedback."
+      }
+    ],
+    "nativePlatform": {
+      "toolkit": "Windows / PySide6 Qt Widgets",
+      "sourceCommit": "0e2c09c08ae54d2b173bda167d2e44a99935ce74",
+      "source": [
+        "apps/desktop/src/bioimage_app/workbench_style.py",
+        "apps/desktop/src/bioimage_app/workbench_motion.py",
+        "apps/desktop/src/bioimage_app/platform_window.py",
+        "tools/wb/src/wb_tool/ui/figure_view.py"
+      ],
+      "exception": "Retained Qt Widgets advanced components have no matching Impeccable platform enum. These native snippets are evidence, not HTML previews.",
+      "reduceMotion": "QSettings reduce_motion OR not QApplication.isEffectEnabled(Qt.UIEffect.UI_AnimateCombo); immediate stable end state.",
+      "visualEvidence": ".local/deliveries/WB-workbench-20261016-002056/screenshots; static review only"
     },
     "nativeComponents": [
       {
-        "name": "Platform buttons",
-        "source": "platform_window.py::_theme",
-        "nativeType": "QPushButton",
-        "qss": "QPushButton { background: #ffffff; color: #24363b; border: 1px solid #cbd8dd; border-radius: 6px; padding: 10px 14px; min-height: 18px; } QPushButton:hover { background: #eaf5f3; border-color: #087677; } QPushButton:focus { border: 2px solid #087677; } QPushButton:pressed { background: #dff1ed; } QPushButton:disabled { background: #edf1f3; color: #697a84; border-color: #dce4e9; }"
+        "name": "Button",
+        "nativeType": "QPushButton, QToolButton",
+        "qss": "QPushButton, QToolButton { color: #202523; background: #ffffff;\n            border: 1px solid #d9dcd5; border-radius: 6px; padding: 6px 10px; }"
       },
       {
-        "name": "Platform primary action",
-        "source": "platform_window.py::_theme",
+        "name": "Primary button",
         "nativeType": "QPushButton#primaryAction",
-        "qss": "QPushButton#primaryAction { background: #087677; color: #ffffff; border-color: #087677; font-weight: 600; } QPushButton#primaryAction:hover { background: #096568; }"
+        "qss": "QPushButton#primaryAction { background: #256f82; color: #ffffff; border-color: #256f82; }"
       },
       {
-        "name": "Tool entry surface",
-        "source": "platform_window.py::_theme",
-        "nativeType": "QFrame#toolSurface",
-        "qss": "QFrame#toolSurface { background: #ffffff; border: 1px solid #cbd8dd; border-radius: 12px; }",
-        "layout": "24px margins; 14px content spacing."
+        "name": "Field",
+        "nativeType": "QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox, QTextEdit, QPlainTextEdit",
+        "qss": "QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox, QTextEdit, QPlainTextEdit {\n            color: #202523; background: #ffffff; border: 1px solid #d9dcd5;\n            border-radius: 4px; padding: 5px; selection-background-color: #256f82; }"
       },
       {
-        "name": "Source list",
-        "source": "figure_view.py::_build_source_workspace",
-        "nativeType": "QListWidget#sourceList",
-        "qss": "QListWidget#sourceList { border: 0; background: #ffffff; outline: none; } QListWidget#sourceList::item { padding: 9px 6px; border-radius: 5px; } QListWidget#sourceList::item:selected { background: #e1f2ee; color: #096568; } QListWidget#sourceList::item:hover { background: #eff7f6; }"
+        "name": "Navigation",
+        "nativeType": "QListWidget#workflowSteps::item:selected",
+        "qss": "QListWidget#workflowSteps::item:selected { color: #205e6e; background: #edf3f3; }"
       },
       {
-        "name": "Source metadata fields",
-        "source": "figure_view.py::_build_source_workspace",
-        "nativeType": "QFormLayout with QLineEdit",
-        "layout": "Fig / protein / lane count / excluded lanes. 8px spacing; shared advanced table state; original coordinate fields stay in advanced tab."
-      },
-      {
-        "name": "Crop canvas",
-        "source": "canvas.py::ImageCanvas",
-        "nativeType": "QWidget/QPainter",
-        "behavior": "Left drag inside crop moves; edge or corner drag resizes; release emits original-pixel half-open ROI; unchanged click does not emit; wheel zoom 1..12, middle drag pans, double click resets zoom. Lane overlays update during drag."
-      },
-      {
-        "name": "Analysis review summary",
-        "source": "project_analysis.py::__init__, _show_summary",
-        "nativeType": "QScrollArea / QTableWidget",
-        "refersTo": "analysis-review-panel",
-        "layout": "292px review rail; table 130..180px high; columns lane/effective signal/status/raw integral pending review. Fixed first columns 32/66/76px, final column stretches.",
-        "format": "Compact numerical cells use .4g only; complete project result table/export retain existing precision. WordWrap=True, ElideNone, resizeRowsToContents. Raw integral is separate from effective signal and excluded from normalization until quality policy permits."
-      },
-      {
-        "name": "Laboratory source identity",
-        "source": "laboratory_layout.py::_fill",
-        "nativeType": "QTableWidgetItem",
-        "format": "{current project source index:03d} · {protein}; tooltip contains full filename and stable row_id. Same source across multiple segments keeps one prefix; numbering is display identity within current ordering, not a replacement for row_id."
+        "name": "Table",
+        "nativeType": "QTableWidget",
+        "qss": "QTableWidget { background: #ffffff; color: #202523; gridline-color: #eaebe6;\n            selection-background-color: #e3eef0; selection-color: #174f60; border: 0; }"
       }
     ],
     "sourceCanvasDrawing": {
       "source": "tools/wb/src/wb_tool/ui/canvas.py",
-      "canvas": "#18212d",
+      "canvas": "#252729",
       "candidate": "#ffbb52",
       "cropAndLanes": "#36d9b0",
       "labelBacking": "#172126",
       "labelsAndHandles": "#ffffff",
-      "edgeWidth": 2,
-      "cornerHandleSize": 8,
-      "hitTolerance": 7,
-      "coordinatePolicy": "Original-pixel half-open rectangle, including zoom and focused regions. Display raster is never a numerical input."
+      "coordinatePolicy": "Original-pixel half-open ROI; display raster is never a numerical input."
     },
-    "automaticState": {
-      "schemaVersion": 8,
-      "algorithm": "automatic_wb_proposals@1",
-      "machineHumanReviewed": false,
-      "currentEvidence": "row_is_ready matches source SHA, crop, lane count, excluded lanes and normalized-revision request; human row.reviewed is separate.",
-      "scope": "Core evidence contract plus integrated host workflow; final real-resource output validation belongs to main T-024 task.",
-      "sourcePresentation": "Source rail distinguishes human-confirmed / crop ready pending review / awaiting recognition and appends source notes. Expired and failed result semantics remain in analysis/results/report; existence of a crop alone is not proof of current machine provenance."
+    "webPlatform": {
+      "toolkit": "HTML/CSS/JS shared by browser and PySide6 QtWebEngine",
+      "source": [
+        "apps/desktop/src/bioimage_app/web_ui/index.html",
+        "apps/desktop/src/bioimage_app/web_ui/styles.css",
+        "apps/desktop/src/bioimage_app/web_ui/app.js"
+      ],
+      "entry": "python -m bioimage_app --web-workbench; default remains native platform",
+      "runtimeBoundary": "Browser historical preview and interaction drafts do not recompute; desktop bridge connects real backend. Advanced curves/OCR/templates/normalization remain native.",
+      "reduceMotion": "prefers-reduced-motion or body.reduce-motion: animation and transition duration 1ms",
+      "visualEvidence": [
+        ".local/t033/desktop.png",
+        ".local/t033/home.png",
+        ".local/t033/mobile.png"
+      ],
+      "validationLimit": "Static evidence only; backend, dynamic and commit-bound validation belong to T-033.",
+      "sourceCommit": "a68000e118dc83b549ce6d8128b10225ae227b8d",
+      "imageMotion": "Image opacity and transform transitions removed; evidence updates without interpolation.",
+      "cropInteraction": "Four corner handles resize with arrow keys (1 original pixel; Shift 10). Overlay arrows move ROI. Missing ROI supports drawing on the image; minimum 4x4 original pixels to commit. Browser edits remain drafts."
+    },
+    "typographyMeta": {
+      "web-body": {
+        "purpose": "13px body; compact labels have an 11px minimum after the 8/9/10px replacements."
+      }
     }
   },
   "components": [],
   "narrative": {
     "northStar": "证据工作台",
-    "overview": "冷白平台入口与白色工作区承载项目、工具和结果，深色画布承载原始图像。青绿用于主要动作和当前选择，系统中文字体保证长时间操作的清晰度。沿用用户选择的 A「证据工作台」，将相同的视觉语言扩展到可见工具平台和原图三栏工作区。\n\n本次增量来源为平台 `f32ebbb` 的 `platform_window.py`、原图工作区与画布 `e2d78e6`，并核对 T-024 协调工作树的最终改动：定量复核栏扩为 292px、摘要格式与状态换行、拼图来源序号。其余定量、OCR、拼图和导出视觉规则沿用 T-023 `0d9aad94`。原图页 1440×900 与 1100×780 的实际 Qt 合成截图已检查；平台最终集成截图和真实资源完整运行由主任务补充，不能从这些设计记录推断科学准确率。\n\n这是 Windows 自定义 Qt Widgets 设计语言。Impeccable 当前没有相应 Platform 枚举，按原生界面手工提取尺寸、QSS 和绘制行为；不把桌面控件伪报成网页组件或移动端组件。",
+    "overview": "图像中心的证据工作台。T-033 网页与 QtWebEngine 加载同一 assets，使用矿物白、深松绿和翡翠操作强调。既有 Qt Widgets 高级窗口保留原生设计记录。浏览器草稿不执行新的科学计算，桌面桥接真实 backend；能力与验收边界以 PRODUCT.md 和 T-033 为准。",
     "keyCharacteristics": [
-      "可见工具平台：工具入口、项目动作和最近项目。",
-      "WB 顶部横向阶段导航，来源与操作在左、图像居中、结果复核在右。",
-      "自动化为主要操作；精确坐标与批量元数据保留在高级入口。",
-      "机器建议、人工复核和过期状态有各自含义，颜色不代替状态文字。",
-      "图像显示与定量数据分离。"
+      "暖白、平面、系统中文字体，图像占据中央主要空间。",
+      "图像复核、拼图、结果三种顶层模式；辅助能力通过项目工具和上下文入口到达。",
+      "机器建议、人工裁剪审核和质量警告分别表达。",
+      "动效只帮助导航定位与控件显现，图像和定量数值保持稳定。"
     ],
     "rules": [
       {
         "name": "The Evidence Canvas Rule",
-        "body": "画布的固定绘制色只编码证据视图，不改变原始像素、定量结果或输出数据。",
+        "body": "画布配色和显示变换不进入原始像素或定量结果。",
         "section": "colors"
+      },
+      {
+        "name": "The Stable Evidence Rule",
+        "body": "图像像素、曲线证据和定量数值不做淡入或数值插值。",
+        "section": "components"
       }
     ],
     "dos": [
-      "Do 从实际 Qt palette、QSS 和绘制实现延续角色。",
-      "Do 同步当前来源、泳道参数、图像、曲线与核验结果。",
-      "Do 将自动识别和图上修正作为默认操作，精确坐标作为高级补充。",
-      "Do 保留机器建议、人工复核、过期和失败的独立文字状态。",
-      "Do 显示真实坐标单位、边界含义、缺失与排除状态。"
+      "Do 从实际 Qt palette、QSS 和绘制实现提取角色。",
+      "Do 保持原图、来源、曲线、参数和当前结果一致。",
+      "Do 用明确文字区分裁剪审核、质量警告、过期和失败。",
+      "Do 尊重应用减少动效和 Qt 暴露的系统效果偏好。"
     ],
     "donts": [
-      "Don't 恢复已被替换的石墨侧栏或 lime 导航规则。",
-      "Don't 将显示映射、预览缩放或导航选中当作定量与完成证据。",
-      "Don't 虚构网页组件、断点、旧版拖基线功能或统一错误样式。"
+      "Don't 恢复四阶段顶层导航或让高级表格成为默认操作。",
+      "Don't 把图像、曲线证据或定量数值加入装饰动画。",
+      "Don't 把截图、自动结果或裁剪确认当作科学验收证明。",
+      "Don't 把同源 assets 等同于高级能力全部网页化，或虚构全平台偏好检测。"
     ]
   }
 }

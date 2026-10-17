@@ -298,7 +298,11 @@ def test_raw_integral_ui_separates_quality_review(qtbot: object) -> None:
     try:
         table.show_cells((cell,))
         assert item_text(table.table, 3) == ""
-        assert item_text(table.table, 4) == "quality_review"
+        assert item_text(table.table, 4) == "质量待复核"
+        from PySide6.QtCore import Qt
+
+        status = table.table.item(0, 4)
+        assert status is not None and status.data(Qt.ItemDataRole.UserRole) == "quality_review"
         assert item_text(table.table, 8) == "125.5"
         panel.source_row = FigureRow(row_id="r", protein="AKT", lane_count=1)
         panel.show_cells((cell,))

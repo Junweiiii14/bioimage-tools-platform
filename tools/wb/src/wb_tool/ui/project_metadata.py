@@ -8,12 +8,13 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
     QFormLayout,
-    QGridLayout,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QPushButton,
+    QScrollArea,
     QSpinBox,
+    QStackedWidget,
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
@@ -61,26 +62,71 @@ class ProjectMetadataPanel(QWidget):
         self._targets: list[QComboBox] = []
         self._target_model = QStandardItemModel(self)
         root = QVBoxLayout(self)
-        self.status = QLabel("选择原图行，可批量填值或按文件名分段提取；Excel/CSV 先映射列再预览。")
+        root.setSpacing(12)
+        root.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.status = QLabel("选择填写方式。先预览并核对，再应用到选中的原图。")
         self.status.setWordWrap(True)
+        self.status.setMaximumHeight(52)
         root.addWidget(self.status)
-        bar = QHBoxLayout()
-        for title, signal in (
-            ("导入 Excel / CSV 元信息", self.import_requested),
-            ("加载原图缩略图", self.thumbnails_requested),
+        method = QHBoxLayout()
+        method.addWidget(QLabel("填写方式"))
+        self.method = QComboBox()
+        for title, mode in (
+            ("共同值", "common"),
+            ("从文件名提取", "filename"),
+            ("Excel / CSV 表格", "table"),
         ):
-            button = QPushButton(title)
-            button.clicked.connect(signal)
-            bar.addWidget(button)
+            self.method.addItem(title, mode)
+        method.addWidget(self.method)
+        method.addStretch()
+        thumbnails = QPushButton("查看原图缩略图")
+        thumbnails.clicked.connect(self.thumbnails_requested)
+        method.addWidget(thumbnails)
+        root.addLayout(method)
+        method.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.input_stack = QStackedWidget()
+        self.common_page = QWidget()
+        common_form = QFormLayout(self.common_page)
+        common_form.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.common: dict[str, QLineEdit] = {}
+        for field, label in zip(METADATA_FIELDS, METADATA_LABELS, strict=True):
+            edit = QLineEdit()
+            edit.setPlaceholderText("留空保持原值")
+            self.common[field] = edit
+            if field in ("empty_lanes", "notes"):
+                row = QHBoxLayout()
+                row.addWidget(edit)
+                clear = QPushButton("清空此字段")
+                clear.clicked.connect(
+                    lambda _checked=False, e=edit, value="无" if field == "empty_lanes" else "[]": (
+                        e.setText(value)
+                    )
+                )
+                row.addWidget(clear)
+                common_form.addRow(label, row)
+            else:
+                common_form.addRow(label, edit)
+        self.input_stack.addWidget(self.common_page)
+        filename_page = QWidget()
+        filename_form = QFormLayout(filename_page)
+        filename_form.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.separator = QLineEdit("_")
+        self.pattern = QLineEdit("Fig,蛋白,N")
+        filename_form.addRow("文件名分隔符", self.separator)
+        filename_form.addRow("各段字段", self.pattern)
+        filename_form.addRow(QLabel("字段以逗号分隔；无需读取的段写 -。例如：Fig,蛋白,N"))
+        self.input_stack.addWidget(filename_page)
+        self.table_page = QWidget()
+        table_form = QFormLayout(self.table_page)
+        table_form.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.import_button = QPushButton("选择 Excel / CSV")
+        self.import_button.clicked.connect(self.import_requested)
+        table_form.addRow(self.import_button)
         self.sheet = QComboBox()
         self.header = QSpinBox()
         self.header.setRange(1, 1025)
-        bar.addWidget(self.sheet)
-        bar.addWidget(QLabel("表头行"))
-        bar.addWidget(self.header)
-        root.addLayout(bar)
-        form = QFormLayout()
-        keys = QHBoxLayout()
+        table_form.addRow("工作表", self.sheet)
+        table_form.addRow("表头行", self.header)
         self.key_kind = QComboBox()
         for title, value in (
             ("完整文件名（大小写一致）", "filename"),
@@ -89,56 +135,52 @@ class ProjectMetadataPanel(QWidget):
         ):
             self.key_kind.addItem(title, value)
         self.columns: dict[str, QComboBox] = {key: QComboBox() for key in ("key", *METADATA_FIELDS)}
-        keys.addWidget(self.key_kind)
-        keys.addWidget(self.columns["key"])
-        form.addRow("匹配键 / 表格列", keys)
-        root.addLayout(form)
-        grid = QGridLayout()
+        table_form.addRow("匹配依据", self.key_kind)
+        table_form.addRow("匹配列", self.columns["key"])
+        for field, label in zip(METADATA_FIELDS, METADATA_LABELS, strict=True):
+            table_form.addRow(label, self.columns[field])
+        self.input_stack.addWidget(self.table_page)
+        self.input_toggle = QPushButton("填写内容与映射")
+        self.input_toggle.setCheckable(True)
+        self.input_toggle.setChecked(True)
+        root.addWidget(self.input_toggle, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.input_scroll = QScrollArea()
+        self.input_scroll.setWidgetResizable(True)
+        self.input_scroll.setWidget(self.input_stack)
+        self.input_scroll.setMinimumWidth(560)
+        self.input_scroll.setMaximumWidth(1000)
+        self.input_scroll.setMinimumHeight(200)
+        self.input_scroll.setMaximumHeight(360)
+        self.input_toggle.toggled.connect(self.input_scroll.setVisible)
+        root.addWidget(self.input_scroll, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.preview_button = QPushButton("预览所选原图的修改")
+        self.preview_button.setObjectName("primaryAction")
+        self.preview_button.clicked.connect(
+            lambda: self.preview_requested.emit(self.method.currentData())
+        )
+        root.addWidget(self.preview_button, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.review = QWidget()
+        review = QVBoxLayout(self.review)
+        review.setContentsMargins(0, 0, 0, 0)
+        review.addWidget(QLabel("核对预览 · 勾选要写入的字段和原图"))
+        fields = QHBoxLayout()
         self.enabled: dict[str, QCheckBox] = {}
-        self.common: dict[str, QLineEdit] = {}
-        for index, (field, label) in enumerate(zip(METADATA_FIELDS, METADATA_LABELS, strict=True)):
+        for field, label in zip(METADATA_FIELDS, METADATA_LABELS, strict=True):
             check = QCheckBox(label)
             self.enabled[field] = check
-            self.common[field] = QLineEdit()
-            self.common[field].setPlaceholderText("共同值")
-            grid.addWidget(check, 0, index)
-            grid.addWidget(self.columns[field], 1, index)
-            grid.addWidget(self.common[field], 2, index)
-        root.addLayout(grid)
-        bar = QHBoxLayout()
-        self.separator = QLineEdit("_")
-        self.separator.setMaximumWidth(60)
-        self.pattern = QLineEdit("Fig,蛋白,N")
-        bar.addWidget(QLabel("文件名分隔符"))
-        bar.addWidget(self.separator)
-        bar.addWidget(QLabel("各段字段（逗号分隔；忽略写 -）"))
-        bar.addWidget(self.pattern, 1)
-        root.addLayout(bar)
-        bar = QHBoxLayout()
-        for title, mode in (
-            ("预览表格匹配", "table"),
-            ("从所选行文件名提取", "filename"),
-            ("共同值预览到所选行", "common"),
-        ):
-            button = QPushButton(title)
-            button.clicked.connect(lambda _checked=False, m=mode: self.preview_requested.emit(m))
-            bar.addWidget(button)
-        apply = QPushButton("应用勾选的行与字段")
-        apply.clicked.connect(self.apply_requested)
-        bar.addWidget(apply)
-        root.addLayout(bar)
-        note = QLabel(
-            "先勾选字段与预览行。空白保持原值；空泳道填“无”清空，备注填 [] 清空。"
-            "顺序仅重排所选行占用的位置。实验项目是整个项目的名称。"
-        )
-        note.setWordWrap(True)
-        root.addWidget(note)
+            fields.addWidget(check)
+        review.addLayout(fields)
         selection = QHBoxLayout()
-        for title, checked in (("勾选所有预览行", True), ("取消勾选", False)):
+        for title, checked in (("全选预览行", True), ("取消全选", False)):
             button = QPushButton(title)
             button.clicked.connect(lambda _checked=False, value=checked: self.select_entries(value))
             selection.addWidget(button)
-        root.addLayout(selection)
+        selection.addStretch()
+        self.apply_button = QPushButton("应用已勾选的修改")
+        self.apply_button.setObjectName("primaryAction")
+        self.apply_button.clicked.connect(self.apply_requested)
+        selection.addWidget(self.apply_button)
+        review.addLayout(selection)
         self.table = QTableWidget(0, 11)
         self.table.setHorizontalHeaderLabels(
             ["应用", "输入键 / 行", "目标原图行", *METADATA_LABELS, "匹配提示"]
@@ -147,7 +189,12 @@ class ProjectMetadataPanel(QWidget):
         self.table.setColumnWidth(1, 160)
         self.table.setColumnWidth(2, 240)
         self.table.setColumnWidth(10, 250)
-        root.addWidget(self.table, 1)
+        review.addWidget(self.table, 1)
+        root.addWidget(self.review, 1)
+        self.review.hide()
+        self.empty_space = QWidget()
+        root.addWidget(self.empty_space, 1)
+        self.method.currentIndexChanged.connect(self._method_changed)
         self.table.cellChanged.connect(self._corrected)
         self.sheet.currentIndexChanged.connect(self._map_columns)
         self.header.valueChanged.connect(self._map_columns)
@@ -156,6 +203,12 @@ class ProjectMetadataPanel(QWidget):
             combo.currentIndexChanged.connect(self._settings_changed)
         for edit in (*self.common.values(), self.separator, self.pattern):
             edit.textChanged.connect(self._settings_changed)
+
+    def _method_changed(self, index: int) -> None:
+        self.input_stack.setCurrentIndex(index)
+        self.input_toggle.setChecked(True)
+        self.clear_preview()
+        self.status.setText("先配置填写内容，再预览。空白保持原值，只有勾选的行与字段会写入。")
 
     def _settings_changed(self) -> None:
         if self.preview is not None:
@@ -166,8 +219,12 @@ class ProjectMetadataPanel(QWidget):
         self.preview = None
         self._targets.clear()
         self.table.setRowCount(0)
+        self.review.hide()
+        self.empty_space.show()
+        self.input_toggle.setChecked(True)
 
     def install_book(self, book: MetadataBook, filename: str) -> None:
+        self.method.setCurrentIndex(2)
         self.book = book
         self.clear_preview()
         self.sheet.clear()
@@ -240,6 +297,9 @@ class ProjectMetadataPanel(QWidget):
     def show_preview(self, proposal: MetadataPreview, project: WBFigureProject) -> None:
         self.clear_preview()
         self.preview = proposal
+        self.review.show()
+        self.empty_space.hide()
+        self.input_toggle.setChecked(False)
         self._loading = True
         self.table.setRowCount(len(proposal.entries))
         self._target_model.clear()

@@ -6,11 +6,13 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
+    QFormLayout,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QPushButton,
     QSpinBox,
+    QStackedWidget,
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
@@ -144,10 +146,25 @@ class NormalizationPanel(QWidget):
         self._active: NormalizationPlan | None = None
         self._loading = False
         layout = QVBoxLayout(self)
-        self.note = QLabel("选择已审核的目标和参照行，重建关系后逐泳道填写同一样本的对应关系。")
+        layout.setSpacing(16)
+        self.note = QLabel("先选择已审核的目标与参照，再核对每个样本的对应关系。")
         self.note.setWordWrap(True)
         layout.addWidget(self.note)
-        setup = QHBoxLayout()
+        stages = QHBoxLayout()
+        self.stage_buttons: list[QPushButton] = []
+        for index, title in enumerate(("选择目标与参照", "核对样本对应", "归一化结果")):
+            button = QPushButton(title)
+            button.setCheckable(True)
+            button.clicked.connect(lambda _checked=False, i=index: self._show_stage(i))
+            self.stage_buttons.append(button)
+            stages.addWidget(button)
+        stages.addStretch()
+        layout.addLayout(stages)
+        self.stages = QStackedWidget()
+        layout.addWidget(self.stages, 1)
+        sources = QWidget()
+        source_layout = QVBoxLayout(sources)
+        setup = QFormLayout()
         self.target = QComboBox()
         self.reference = QComboBox()
         self.kind = QComboBox()
@@ -157,18 +174,42 @@ class NormalizationPanel(QWidget):
             ("磷酸化 / 总蛋白", "phospho_total"),
         ):
             self.kind.addItem(title, value)
-        for label, widget in (("目标", self.target), ("参照", self.reference)):
-            setup.addWidget(QLabel(label))
-            setup.addWidget(widget, 1)
-        setup.addWidget(self.kind)
-        create = QPushButton("创建 / 重建关系")
-        create.clicked.connect(self.configure)
-        setup.addWidget(create)
-        layout.addLayout(setup)
+        for label, widget in (
+            ("目标", self.target),
+            ("参照", self.reference),
+            ("参照类型", self.kind),
+        ):
+            widget.setMinimumContentsLength(24)
+            widget.setSizeAdjustPolicy(
+                QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
+            )
+            setup.addRow(label, widget)
+        source_layout.addLayout(setup)
+        self.requirements = QLabel("尚无可选原图。先在图像复核中确认目标与参照的裁剪。")
+        self.requirements.setWordWrap(True)
+        source_layout.addWidget(self.requirements)
+        self.create_button = QPushButton("建立关系，核对样本对应")
+        self.create_button.setObjectName("primaryAction")
+        self.create_button.clicked.connect(self.configure)
+        source_layout.addWidget(self.create_button)
+        source_layout.addStretch()
+        self.stages.addWidget(sources)
+        mapping = QWidget()
+        mapping_layout = QVBoxLayout(mapping)
         settings = QHBoxLayout()
         self.selector = QComboBox()
-        settings.addWidget(QLabel("编辑关系"))
+        settings.addWidget(QLabel("当前关系"))
         settings.addWidget(self.selector, 1)
+        remove = QPushButton("删除此关系")
+        remove.clicked.connect(
+            lambda: self.remove_requested.emit(self._active.target.row_id) if self._active else None
+        )
+        settings.addWidget(remove)
+        mapping_layout.addLayout(settings)
+        self.relationship_kind = QComboBox()
+        self.relationship_kind.addItem("目标蛋白 / 内参", "housekeeping")
+        self.relationship_kind.addItem("磷酸化 / 总蛋白", "phospho_total")
+        mapping_layout.addWidget(self.relationship_kind)
         self.mode = QComboBox()
         for title, value in (
             ("仅计算蛋白比值", "ratio_only"),
@@ -176,48 +217,67 @@ class NormalizationPanel(QWidget):
             ("相对所选对照的算术均值", "control_mean"),
         ):
             self.mode.addItem(title, value)
-        settings.addWidget(self.mode)
-        self.confirmed = QCheckBox("已确认样本对应与参照")
-        settings.addWidget(self.confirmed)
-        remove = QPushButton("删除此关系")
-        remove.clicked.connect(
-            lambda: self.remove_requested.emit(self._active.target.row_id) if self._active else None
-        )
-        settings.addWidget(remove)
-        layout.addLayout(settings)
+        mapping_layout.addWidget(self.mode)
         self.pairs = QTableWidget(0, 5)
         self.pairs.setHorizontalHeaderLabels(
             ["目标泳道", "样本 / 重复编号", "对应参照泳道（留空未配）", "包含", "对照"]
         )
         self.pairs.setColumnWidth(1, 190)
         self.pairs.setColumnWidth(2, 210)
-        layout.addWidget(self.pairs)
+        mapping_layout.addWidget(self.pairs, 1)
         notes = QHBoxLayout()
         notes.addWidget(QLabel("实验对应说明"))
         self.notes = QLineEdit()
         notes.addWidget(self.notes)
-        layout.addLayout(notes)
-        layout.addWidget(
-            QLabel("仅对已核验的原图积分计算；选择对照后再确认。改变对应关系会撤回确认。")
+        mapping_layout.addLayout(notes)
+        self.confirmed = QCheckBox("已确认样本对应与参照")
+        mapping_layout.addWidget(self.confirmed)
+        hint = QLabel(
+            "只有已核验的原图积分可参与计算。修改对应关系会撤回确认；不会自动猜测参照或分母。"
         )
+        hint.setWordWrap(True)
+        mapping_layout.addWidget(hint)
+        self.calculate_button = QPushButton("计算并查看结果")
+        self.calculate_button.setObjectName("primaryAction")
+        self.calculate_button.clicked.connect(self._calculate)
+        mapping_layout.addWidget(self.calculate_button)
+        self.stages.addWidget(mapping)
+        result_page = QWidget()
+        result_layout = QVBoxLayout(result_page)
         actions = QHBoxLayout()
-        for title, callback in (
-            ("刷新归一化结果", self.refresh_requested.emit),
-            ("导出当前标签视图 XLSX / CSV", self.export_requested.emit),
-        ):
-            button = QPushButton(title)
-            button.clicked.connect(callback)
-            actions.addWidget(button)
-        layout.addLayout(actions)
+        refresh = QPushButton("重新计算")
+        refresh.clicked.connect(self.refresh_requested)
+        actions.addWidget(refresh)
+        actions.addStretch()
+        export = QPushButton("导出当前标签视图 XLSX / CSV")
+        export.clicked.connect(self.export_requested)
+        actions.addWidget(export)
+        result_layout.addLayout(actions)
         self.result_view = NormalizationResults()
         self.results = self.result_view.table
-        layout.addWidget(self.result_view, 1)
+        result_layout.addWidget(self.result_view, 1)
+        self.stages.addWidget(result_page)
+        self._show_stage(0)
+        self.stage_buttons[1].setEnabled(False)
+        self.stage_buttons[2].setEnabled(False)
         self.selector.activated.connect(self._switch)
         self.pairs.cellChanged.connect(self._edited)
-        self.kind.currentIndexChanged.connect(self._edited)
+        self.relationship_kind.currentIndexChanged.connect(self._edited)
         self.mode.currentIndexChanged.connect(self._edited)
         self.notes.textEdited.connect(self._edited)
         self.confirmed.toggled.connect(lambda: self._edited(confirmation=True))
+
+    def _show_stage(self, index: int) -> None:
+        self.stages.setCurrentIndex(index)
+        for i, button in enumerate(self.stage_buttons):
+            button.setChecked(i == index)
+
+    def _calculate(self) -> None:
+        if self._active is None:
+            self.note.setText("请先建立目标与参照关系。")
+            return
+        self._show_stage(2)
+        self.refresh_requested.emit()
 
     def configure(self) -> None:
         target, reference, kind = (
@@ -252,7 +312,7 @@ class NormalizationPanel(QWidget):
                     control=control.checkState() == Qt.CheckState.Checked,
                 )
             )
-        kind, mode = self.kind.currentData(), self.mode.currentData()
+        kind, mode = self.relationship_kind.currentData(), self.mode.currentData()
         if kind not in ("housekeeping", "phospho_total"):
             raise ValueError("请选择参照类型")
         plan = NormalizationPlan(
@@ -286,6 +346,12 @@ class NormalizationPanel(QWidget):
         self._loading = False
         self._load(self.selector.currentData())
         self.result_view.invalidate()
+        for button in self.stage_buttons[1:]:
+            button.setEnabled(bool(self._plans))
+        if not self._plans:
+            self._show_stage(0)
+        elif self.stages.currentIndex() == 0:
+            self._show_stage(1)
 
     def refresh_targets(self, project: WBFigureProject) -> None:
         for widget in (self.target, self.reference):
@@ -296,6 +362,16 @@ class NormalizationPanel(QWidget):
                 if row.source and row.roi and row.reviewed:
                     widget.addItem(f"{row.figure} · {row.protein} · {row.filename}", row.row_id)
             widget.setCurrentIndex(max(0, widget.findData(selected)))
+
+        count = self.target.count() - 1
+        self.requirements.setText(
+            "尚无已审核的原图。请先在图像复核中确认目标与参照的裁剪，再回来选择。"
+            if count == 0
+            else "目前只有一个已审核原图行。目标与参照必须不同，请先审核另一原图。"
+            if count == 1
+            else f"可选择 {count} 个已审核原图行。明确指定目标、参照和类型，下一步核对样本。"
+        )
+        self.create_button.setEnabled(count >= 2)
 
     def _switch(self, _index: int) -> None:
         if self._loading:
@@ -321,6 +397,7 @@ class NormalizationPanel(QWidget):
             self.target.setCurrentIndex(max(0, self.target.findData(plan.target.row_id)))
             self.reference.setCurrentIndex(max(0, self.reference.findData(plan.reference.row_id)))
             self.kind.setCurrentIndex(self.kind.findData(plan.kind))
+            self.relationship_kind.setCurrentIndex(self.relationship_kind.findData(plan.kind))
             self.mode.setCurrentIndex(self.mode.findData(plan.control_mode))
             for i, pair in enumerate(plan.pairs):
                 for j, value in enumerate(
