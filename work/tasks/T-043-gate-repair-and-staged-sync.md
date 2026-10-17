@@ -40,4 +40,12 @@ CI004产品68c3265正式完整check --all实际exit0：659passed/509.86秒，静
 
 ## CI005真实Windows栈
 
-ea6178e远端Windows15分钟取消，60秒栈锁定test_web_bridge.py:128 finally关闭期间QTimer.timeout.connect；不是随后显式gc.collect位置，2无Python帧线程不能诊断GC。Linux659/184.75秒及wheel0，本机50次关闭26.81秒0。79f9070新增受控owned-tree native栈观察，独审独立8项0，完整664门禁正在执行；保留全部旧失败与UNKNOWN。另修父工作区旧WB路由，原文件外置备份，仅该项目段变化并经只读核验；原34未提交内容不变。
+ea6178e远端Windows15分钟取消，60秒栈锁定test_web_bridge.py:128 finally关闭期间QTimer.timeout.connect；不是随后显式gc.collect位置，2无Python帧线程不能诊断GC。Linux659/184.75秒及wheel0，本机50次关闭26.81秒0。79f9070新增受控owned-tree native栈观察，独审独立8项0，完整664门禁随后真实挂起并保存三线程证据，停止专属pytest后check实际exit1；CI006继续修复，保留旧失败。另修父工作区旧WB路由，原文件外置备份，仅该项目段变化并经只读核验；原34未提交内容不变。
+
+
+## CI006对象退出修复
+
+a811ccfd将存储/WB后台/解码器/恢复四处worker排空后移回owner，确认原线程结束、queued析构完成后才终态。真实本地原生栈支持Qt对象锁/GIL反转，其他超时不一概归因。独审独立18项/4.17秒/exit0，作者组合36项0；668完整check随后实际exit0，见文末结果。8原图再次经现有工作台正常host→真实worker→新输出→保存重开，8run成功、N8/8/4/4/8/8/4/4、原图SHA保持、参考未读、最终关闭退出0；不是注入识别结果或视觉验收。日志.local/t043/workbench-ci006.log。
+
+
+CI006产品a811ccfd正式完整check --all实际exit0：668passed/508.54秒；Ruff/format/Pyright/import/policy及全部隔离wheel、真实桌面异步关闭/OCR/worker均完成。日志.local/t043/check-ci006-final.log，退出回执.local/t043/ci006-final-gate.json。保留原测试/时限/依赖，之前79f9070失败不抹去。

@@ -25,6 +25,8 @@
 `[desktop]` 可选依赖使用已有锁定Qt；普通API/worker导入不加载Qt。
 create_wb_view/create_wb_background 是延迟装配入口；PreviewRaster 是显示专用字节，
 不会传给定量用例。WBDocument v1 保存原输入资产/标注，契约见 wb-document-v1.md。
+后台关闭排空已接受请求后，由worker在自身线程移回owner，再停止原QThread；
+owner非阻塞确认线程退出和实际QObject销毁后才发送closed，避免跨线程析构的Qt锁/GIL反转。
 桌面入口由apps显式装配：`uv run --locked --no-sync python -m bioimage_app`。
 当前界面可拖ROI/编辑闭区间与基线/查看原始曲线、OCR原文和自动结果表。
 

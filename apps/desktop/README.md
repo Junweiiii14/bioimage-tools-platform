@@ -24,6 +24,11 @@ The QObject worker owns Workspace/SQLite on its own QThread. Commands are an exp
 immutable FIFO, with request IDs, 64 pending-operation and 16 MiB document budgets.
 Callbacks run on the owning GUI thread. Errors retain identity and do not stop the queue.
 Keep the port alive until its asynchronous `closed` signal; shutdown drains accepted work.
+Drained QObject workers retire on their own thread, move back to the owner, and stop
+their former QThread. The owner checks thread exit without blocking, schedules deletion,
+and publishes closure only after a queued destruction acknowledgement. The same lifecycle
+applies to process decoding and project restore; this avoids a reproduced Qt object-lock/
+Python GIL inversion during worker-thread QObject destruction.
 The `bioimage_app.storage` DEBUG logger records only request identity, operation, phase,
 monotonic time and native thread identity; it excludes paths, payloads and error text.
 Pytest captures this logger for failed-test diagnosis. Logging does not change time limits

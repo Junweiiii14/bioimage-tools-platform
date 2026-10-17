@@ -11,3 +11,12 @@ main19188等待QBasicMutex→QObject::connectImpl→PySide连接登记；23732�
 最终组合36passed/42.12秒/exit0：新4项+全部存储、进程、恢复UI、WB桌面（原20循环完整保留）。helper整理后新4项再次exit0，Ruff通过；类型最终、完整门禁和绑定独审结果另记，不能沿用旧659通过。
 
 依据：[Qt QObject moveToThread](https://doc.qt.io/qt-6/qobject.html#moveToThread)，须从对象所属线程push；[Qt6.12 QObject源码](https://raw.githubusercontent.com/qt/qtbase/v6.12.0/src/corelib/kernel/qobject.cpp)，析构持锁调用disconnectNotify；[PySide6.12连接登记](https://raw.githubusercontent.com/pyside/pyside-setup/v6.12.0/sources/pyside6/libpyside/dynamicslot.cpp)。2026-10-17核验。
+
+最终Pyright 0 errors/0 warnings，实际exit0。绑定79f9070..a811ccfd独立审查无阻断，审查者另跑18passed/4.17秒/实际exit0，未改文件。作者随后完成正式完整check，实际结果见文末，不以定向测试代替。
+
+8原图现有工作台正常host→真实worker→新结果→保存重开验证，最终关闭实际exit0；8run成功，N8/8/4/4/8/8/4/4，原图SHA不变、参考未读。输出.local/t043/workbench-ci006，独立旧结果仍保持。沿用测试驱动工作台服务，不注入ROI/N/识别结果；离屏GPU日志/截图不作为视觉验收。
+
+与CI003旧输出逐行比较8个原图SHA/尺寸/位深/N/空泳道/原像素ROI坐标全部相等；48个算法/单位/泳道顺序/积分/原始复核积分/状态和原因也相等，仍7valid/41quality_review。首次直接比较ROI含新项目生成lane_id，导致临时比较断言失败；排查确认仅身份不同，改为显式比较全部4坐标及来源/几何字段后exit0，未修改产品或评分标准。证据ci006-geometry-preservation.json、ci006-measurement-preservation.json。
+
+
+CI006产品a811ccfd正式完整check --all实际exit0：668passed/508.54秒；Ruff/format/Pyright/import/policy及全部隔离wheel、真实桌面异步关闭/OCR/worker均完成。日志.local/t043/check-ci006-final.log，退出回执.local/t043/ci006-final-gate.json。保留原测试/时限/依赖，之前79f9070失败不抹去。

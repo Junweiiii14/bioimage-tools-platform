@@ -2,12 +2,13 @@
   "schema": 1,
   "task": "SYNC-008",
   "base_commit": "4582976e4623e6ce25e433be59d08290bff3e3a9",
-  "source_head": "79f907027700da2147445c2d967bc174ceb2d236",
+  "source_head": "a811ccfd33834cfccdae1b38499dae7db70aa025",
   "historical_receipts": {
     "work/evidence/CI-002/rules-context.json": "4943c03b8c90df15d1d402e352fa6c044699f612",
     "work/evidence/CI-003/rules-context.json": "b4bc8baed0ceaaa6b365f667da5846e77af87b17",
     "work/evidence/CI-004/rules-context.json": "68c32654d8858331429f5f2a081dfe816ab155bd",
     "work/evidence/CI-005/rules-context.json": "79f907027700da2147445c2d967bc174ceb2d236",
+    "work/evidence/CI-006/rules-context.json": "a811ccfd33834cfccdae1b38499dae7db70aa025",
     "work/evidence/T-042/rules-context.json": "cba80df27f7e911ee0bd094cd269b998c174c935",
     "work/evidence/T-043/rules-context.json": "df68bb1aa45523f29711e747066c50137fa431d0"
   }
