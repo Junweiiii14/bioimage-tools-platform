@@ -134,7 +134,9 @@ def ordered_quant_rows(project: WBFigureProject) -> tuple[FigureRow, ...]:
     )
 
 
-def preserve_automatic_composition(project: WBLayoutProject, row_id: str) -> FigureComposition:
+def preserve_automatic_composition(
+    project: WBLayoutProject, row_id: str, *, geometry_changed: bool = False
+) -> FigureComposition:
     """Preserve layout; only a single whole-row segment may adapt to a changed N."""
     if not project.composition.slices:
         return initial_composition(project)
@@ -142,7 +144,9 @@ def preserve_automatic_composition(project: WBLayoutProject, row_id: str) -> Fig
     composition = project.composition.model_copy(
         update={
             "slices": tuple(
-                s.model_copy(update={"display_frame": None}) if s.row_id == row_id else s
+                s.model_copy(update={"display_frame": None})
+                if s.row_id == row_id and geometry_changed
+                else s
                 for s in project.composition.slices
             )
         }

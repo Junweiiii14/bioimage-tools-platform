@@ -360,7 +360,9 @@ def install_automatic_request(
         analyses=tuple(p for p in plans if p.row_id != row_id) + (plan,),
     )
     upgraded = WBAutomaticProject.model_validate(fields)
-    composition = preserve_automatic_composition(upgraded, row_id)
+    composition = preserve_automatic_composition(
+        upgraded, row_id, geometry_changed=row.roi != crop or row.lane_count != count
+    )
     if (
         isinstance(project, WBLayoutProject)
         and project.composition.slices

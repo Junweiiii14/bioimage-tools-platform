@@ -10,7 +10,7 @@ from numpy.typing import NDArray
 from wb_tool.domain.lanes import LaneROI, Polarity, compute_lane_profiles
 from wb_tool.domain.quant_supervision import QuantBandProposal, QuantLaneProposal
 from wb_tool.domain.quantify import BandBounds, Baseline
-from wb_tool.domain.scipy_geometry import filters
+from wb_tool.domain.scipy_geometry import filters, peaks
 
 
 def propose_background_lanes(
@@ -67,10 +67,20 @@ def propose_background_lanes(
         outside = np.concatenate((residual[:start], residual[end + 1 :]))
         if outside.size and float(outside.max()) > max(4 * noise, amplitude * 0.2):
             notes.append("boundary_review:multiple_signal_regions")
+        maxima, _ = peaks.find_peaks(
+            residual, prominence=max(4 * noise, amplitude * 0.2), distance=3
+        )
+        for a, b in zip(maxima[:-1], maxima[1:], strict=True):
+            valley = float(residual[int(a) : int(b) + 1].min())
+            smaller = min(float(residual[int(a)]), float(residual[int(b)]))
+            if valley < smaller * 0.25:
+                notes.append("boundary_review:multiple_signal_regions")
+                break
         baseline = Baseline(max(0.0, float(background[start])), max(0.0, float(background[end])))
         proposals.append(
             QuantLaneProposal(
-                roi, (QuantBandProposal(BandBounds(start, end), baseline, tuple(notes)),)
+                roi,
+                (QuantBandProposal(BandBounds(start, end), baseline, tuple(dict.fromkeys(notes))),),
             )
         )
     return tuple(proposals)

@@ -68,3 +68,29 @@ def test_truncated_broad_peak_requires_background_review() -> None:
     band = result.lanes[0].bands[0]
     assert band.status == "quality_review" and band.signal is None
     assert "boundary_review:insufficient_background_support" in band.quality_flags
+
+
+@pytest.mark.parametrize("gap", [5, 8, 12])
+def test_nearby_peaks_with_deep_valley_are_reviewed(gap: int) -> None:
+    profile = np.full(100, 3000.0)
+    profile[20:40] += 12000
+    profile[40 + gap : 60 + gap] += 6000
+    _, result = request(profile)
+    assert result.lanes[0].bands[0].status == "quality_review"
+
+
+def test_background_quality_survives_worker_wire_roundtrip() -> None:
+    from wb_tool.api import ResultFrame, encode_worker_frame, parse_worker_frame
+
+    profile = 3000 + 12000 * np.exp(-(((np.arange(60) - 30) / 30) ** 2))
+    _, result = request(profile)
+    frame = ResultFrame(
+        protocol_version=1,
+        kind="result",
+        sequence=2,
+        run_id="run",
+        attempt_id="attempt",
+        request_id="request",
+        result=result,
+    )
+    assert parse_worker_frame(encode_worker_frame(frame)) == frame

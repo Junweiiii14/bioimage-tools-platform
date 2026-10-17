@@ -1,6 +1,7 @@
 """Source-only geometric oracles: angled rectangles, distinct marker, original samples."""
 
 from math import cos, radians, sin
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -89,3 +90,21 @@ def test_explicit_marker_exclusion_preserves_sample_without_marker_in_target_row
     )
     assert result.candidates and result.settings.lane_count == 5
     assert (result.marker is not None) == marker
+
+
+def test_reanalysis_preserves_source_frame(tmp_path: Path) -> None:
+    import tifffile
+    from wb_tool.api import automatic_project_row
+
+    from tools.wb.tests.test_automatic_wb import project_for
+
+    path = tmp_path / "tilted.tif"
+    tifffile.imwrite(path, membrane(angle=7))
+    first = automatic_project_row(path, project_for(path), "r", crop_policy="source_geometry@2")
+    frame = first.composition.slices[0].display_frame
+    assert frame is not None
+    again = automatic_project_row(path, first, "r", quant_policy="background_support@1")
+    assert again.composition.slices[0].display_frame == frame
+    assert tuple(lane.roi for lane in again.analyses[0].request.lanes) == tuple(
+        lane.roi for lane in first.analyses[0].request.lanes
+    )
