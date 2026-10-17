@@ -962,12 +962,30 @@ class FigureProjectView(QWidget):
         if plans or isinstance(self._project, WBNormalizedProject):
             project = project_with_normalizations(project, plans)
         if self.laboratory_layout.active:
-            project = with_figure_layout(
-                project,
+            composition = (
                 self.laboratory_layout.composition()
                 if include_layout
-                else initial_composition(project),
-                self.laboratory_layout.layout_style(),
+                else initial_composition(project)
+            )
+            previous = {row.row_id: row for row in self._project.rows}
+            changed = {
+                row.row_id
+                for row in rows
+                if row.roi != previous[row.row_id].roi
+                or row.lane_count != previous[row.row_id].lane_count
+            }
+            composition = composition.model_copy(
+                update={
+                    "slices": tuple(
+                        part.model_copy(update={"display_frame": None})
+                        if part.row_id in changed
+                        else part
+                        for part in composition.slices
+                    )
+                }
+            )
+            project = with_figure_layout(
+                project, composition, self.laboratory_layout.layout_style()
             )
         if isinstance(self._project, WBRestoredProject):
             project = with_archive_history(

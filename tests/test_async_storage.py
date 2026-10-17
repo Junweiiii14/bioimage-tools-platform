@@ -8,9 +8,64 @@ from threading import Event
 from bioimage_app.api import AsyncStorage, StorageCommand, StorageReply
 from platform_runtime.api import Workspace
 from PySide6.QtCore import QThread, QTimer
-from pytest import MonkeyPatch
+from pytest import LogCaptureFixture, MonkeyPatch
 from pytestqt.qtbot import QtBot
 from tool_contracts.api import DraftSnapshot, ProcessExitReceipt, RunRecord
+
+
+def test_storage_trace_orders_each_request_without_private_content(
+    qtbot: QtBot, tmp_path: Path, monkeypatch: MonkeyPatch, caplog: LogCaptureFixture
+) -> None:
+    secret = "private-exception-and-document-sentinel"
+    original = Workspace.create
+
+    def fail_create(root: str | Path) -> Workspace:
+        raise ValueError(secret)
+
+    port = AsyncStorage()
+    replies: list[StorageReply] = []
+    port.replied.connect(replies.append)
+    requests: list[str] = []
+    try:
+        monkeypatch.setattr(Workspace, "create", fail_create)
+        requests.append(port.submit(StorageCommand("create", path=str(tmp_path / "private-path"))))
+        qtbot.waitUntil(lambda: len(replies) == 1)
+        assert replies[0].error_code == "ValueError" and replies[0].message == secret
+        monkeypatch.setattr(Workspace, "create", original)
+        requests.append(port.submit(StorageCommand("create", path=str(tmp_path / "private-path"))))
+        requests.append(
+            port.submit(
+                StorageCommand(
+                    "save",
+                    document_id="private-document",
+                    tool_id="probe",
+                    revision=0,
+                    data=('{"secret":"' + secret + '"}').encode(),
+                )
+            )
+        )
+        qtbot.waitUntil(lambda: len(replies) == 3)
+        assert all(reply.error_code is None for reply in replies[1:])
+    finally:
+        with qtbot.waitSignal(port.closed, timeout=10000):
+            port.shutdown()
+    messages = [
+        record.getMessage() for record in caplog.records if record.name == "bioimage_app.storage"
+    ]
+    for request in requests:
+        phases = [
+            message.split("phase=", 1)[1].split()[0]
+            for message in messages
+            if f"request={request} " in message
+        ]
+        assert phases == ["enqueue", "execute-start", "execute-end", "reply-emit", "deliver"]
+    text = "\n".join(messages)
+    assert "outcome=error" in text and "outcome=ok" in text
+    assert "monotonic_ns=" in text and "native_thread=" in text
+    assert all(
+        value not in text
+        for value in (secret, str(tmp_path), "private-path", "private-document", '"secret"')
+    )
 
 
 def test_slow_storage_leaves_gui_event_loop_responsive(

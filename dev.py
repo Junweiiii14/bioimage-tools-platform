@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import importlib.metadata
 import json
+import os
 import platform
 import subprocess
 import sys
@@ -17,7 +18,31 @@ ROOT = Path(__file__).resolve().parent
 
 def run_module(*args: str) -> int:
     print("RUN", sys.executable, "-m", *args, flush=True)
-    return subprocess.run([sys.executable, "-m", *args], cwd=ROOT, check=False).returncode
+    environment = os.environ.copy()
+    if args[0] in {"pytest", "tooling.installed_wheels"}:
+        environment["QT_QPA_PLATFORM"] = "offscreen"
+    if args[0] == "pytest":
+        native_watch = environment.pop("BIOIMAGE_NATIVE_STACKS", "") == "1"
+        linux_debug = environment.pop("BIOIMAGE_LINUX_NATIVE_STACKS", "") == "1"
+        windows_faults = environment.pop("BIOIMAGE_WINDOWS_FAULTS", "") == "1"
+        if linux_debug and sys.platform == "linux":
+            from tooling.linux_native_run import run_with_native_debugger
+
+            return run_with_native_debugger(
+                [sys.executable, "-m", *args], cwd=ROOT, env=environment
+            )
+        if (native_watch or windows_faults) and sys.platform == "win32":
+            from tooling.hang_watch import run_with_native_watch
+
+            return run_with_native_watch(
+                [sys.executable, "-m", *args],
+                cwd=ROOT,
+                env=environment,
+                watch_faults=windows_faults,
+            )
+    return subprocess.run(
+        [sys.executable, "-m", *args], cwd=ROOT, env=environment, check=False
+    ).returncode
 
 
 def doctor() -> int:
@@ -33,7 +58,7 @@ def doctor() -> int:
         "expected_python": (ROOT / ".python-version").read_text().strip(),
         "platform": platform.platform(),
         "packages": versions,
-        "product_status": "wb-reference-domain; desktop not implemented",
+        "product_status": "wb-workbench-development; validation status is task-specific",
     }
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return int("MISSING" in versions.values() or result["python"] != result["expected_python"])

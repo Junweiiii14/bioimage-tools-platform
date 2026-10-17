@@ -1,59 +1,5 @@
 # Current Work Log
 
-- 2026-10-16 T035：用户批准比例1.25*n，核心/网页分工完成，产品25ac71d；两指定叠加原图自动3/5泳道并直接拼图，原值裁图逐像素匹配。独审P2已修复闭环，视觉ship；最终验证见T035证据。
-
-- 2026-10-16 T033：网页优先，同源WebEngine桥由T034分工集成；独立代码/视觉发现已修，独立文档同步。高级窗口网页化未完成，产品a68000e。
-
-
-## 2026-10-14 / T-003 TIFF 输入与泳道剖面
-
-wb-tool 0.2.0 新增 uint8/16 灰度及显式 RGB 单页 TIFF、极性与半开 ROI。5 张本地真实 TIFF 只读输入烟测通过；私人摘要在 .local。增加 TIFF/积分 independence 合约和第 4 个传递负例。隔离 wheel 先按锁文件装依赖后 no-deps 装产物；直接 offline pip 缺索引缓存的问题已修复。下一步后台任务/工作区/手工 GUI。
-
-## 2026-10-14 / T-004 手工分析用例
-
-上一目标回合归类 progress：93a84bb 实现并验证 TIFF/剖面。本回合实现 WB application，明确来源/revision/缺失/排除/无效/真实零/待质量复核，并支持取消无完成结果。90 测试、4 合约及隔离 wheel TIFF→手工分析通过。独审、后台进程、存储与 GUI 未完成，目标保持 active。
-
-## 2026-10-14 / T-005 后台协议与真实进程
-
-上一回合 progress：e3932ee/45d0c5f 手工分析。本回合实现协议 v1、strict JSON/schema、host 会话门禁与数值限线程真实 worker，123 测试及隔离 wheel 启动通过。布尔 Literal/JSON tuple 模式反例已修复且保留。合作取消不是宿主强停/存储完成证据；后续继续宿主、工作区与 GUI，目标 active。
-
-## 2026-10-14 / T-006 工作区与恢复
-
-上一回合 progress：bd1af2e/74e6561 后台协议。本回合新增通用契约与工作区宿主存储；164 测试、7 合约、三独立 wheel 通过。原图快照、草稿 CAS、旧运行保持修订、发布/DB 故障、3 真实 os._exit、取消竞态、同大小损坏、Windows junction/硬链接及一致性备份均验证。平台无 WB 字段，Qt/UI/强停和独审未完成；目标 active。
-
-## 2026-10-14 / T-009 恢复并完成桌面自验
-用户补充真实项目与组合图后恢复开发。增加OCR-first/独立拼图/显式跨图关联、严格OCR进程与v2保存重开、后台XLSX导出；205全量/9合约/4wheel5场景通过。高置信误读和源导出身份不明保留人工复核，不使用任务趋势优化信号。下一阶段裁剪/固定泳道/Marker/模板，T-009进入review待独审。
-
-## 2026-10-14 / T-010 网格与原像素裁剪
-在用户补充资料基础上，增加固定数量网格/人工Marker左右排除/单框原像素TIFF导出。网格保留空泳道，原像素不受预览影响，来源/坐标嵌入派生TIFF；主文档保存明确ROI，未扩展schema。wb-tool0.8.0/bioimage-app0.3.0；215全量/9合约/4wheel5场景通过。一次原生中止仍未定位，详见T-010证据。用户原/goal在暂停后明确继续，Goal已重新建立为active，无token预算；不能因当前阶段通过标完整产品完成。
-
-## 2026-10-14 / T-011 诊断与首版验收追踪
-四轮36桌面用例含GC阈值与线程生命周期探针未复现旧中止。增加桌面入口本地日志、Qt fatal显式线程栈、保留原处理器与已有faulthandler配置；真实子进程Qt致命错误证明退出前证据落盘，完整218通过。根因仍UNKNOWN，不改线程和Qt版本。整理用户方案第7–11节首版验收矩阵，T-012多原图项目/模板ready；Goal保持active。
-
-## 2026-10-14 / T-012 多原图与Fig模板
-在cfe0c56上创建feat/T-012-figure-project。新增独立项目文档/行身份、Qt批量导入去重/审核/排序/模板、后台PNG+原值TIFF+原图ZIP、CAS保存重开和复用模板新项目；旧单图v1/v2保持。全量230及隔离安装通过，用户10原图只读导入重开通过。新增契约/研究/验收证据，更新模块地图及规则回执，任务review待独审；T-013自动候选ready。未推送/发布，不把该手工阶段记为完整自动化。
-
-## 2026-10-14 / T-013 自动候选与项目复核
-在194794e上创建feat/T-013-crop-candidates。实现工程候选@1、项目schema v2快照与旧兼容、Qt后台逐图/失败继续/取消/过期保护、切换/应用/恢复/筛选和膜聚焦。原图与定量公式保持，真实10图探针暴露边缘误检后加入显式guard及回归；白背景/原导出身份不明保留。最终244全量/隔离安装通过，真实10图快照保存重开与源SHA保持；T-013 review待独审，T-014项目定量/OCR自动表ready。Goal active，未推送/发布。
-
-## 2026-10-14 / T-014 多源定量第一阶段
-从5bea9d3创建feat/T-014-project-measurements，产品提交79a675a。接通项目v3标注/run引用、固定N原图曲线/边界/基线、逐源真实进程、已提交结果自动表/XLSX、取消关闭/保存重开与过期拒绝。损坏结果逐行核验，新增通用run查询；模型/公式/平台字段不扩展。用户CLX排除说明进入契约、风险和任务。T-014仍implementing，下一步项目OCR显式绑定；整体Goal active。完整验证与失败修复见work/evidence/T-014/validation.md；未独审/推送/发布。
-
-## 2026-10-14 / T-014 项目OCR关联
-上一目标回合progress完成多源定量，本回合产品05e5d56接通项目v4独立拼图OCR、原文位置/置信度、人工校正、明确原图绑定、自动填表/XLSX及重开校验。取消保留旧关联、关闭等待退出、过期导入/识别拒绝覆盖；原图审核变化同步绑定候选。268全量/9合约/隔离安装通过，真实组合TIFF15token/11未确认行保存重开和SHA保持通过。T-014 review待独审，T-015归一化ready；用户偏好询问尚无回复，不推断科学默认。Goal active，未推送/发布；详情work/evidence/T-014/ocr-validation.md。
-
-## 2026-10-14 / T-015 项目归一化
-从9dddcba创建feat/T-015-project-normalization，产品0cd390b实现v5显式目标/参照、逐槽样本/包含/对照、比值与相对单对照/均值、Qt编辑撤回确认/自动表/OCR标签/保存重开/XLSX。派生值从核验run重建，无epsilon或静默丢坏对照；v5可无OCR，旧v4约束保持。284全量/9合约/隔离安装通过，源码Qt截图已查看。T-015 review待独审，T-016生成PNG衔接ready；用户偏好仍未知，Goal active，未推送/发布。证据work/evidence/T-015/validation.md。
-
-## 2026-10-14 / T-016 完整生成拼图与PNG OCR
-从5cf7c71创建feat/T-016-composed-figure-ocr，产品1d5ae2a新增PNG专用解码/已知预处理、完整PNG生成/来源/异步字节导入、真实OCR复核自动表、单图PNG入口。保留原图/归一化，取消与过期保存/成图不覆盖编辑；诊断发现成图错误被刷新覆盖，改为合并计时和错误保留。304全量/隔离安装通过；真实用户组合TIFF的独立PNG显示副本15token/11未确认行、源SHA保持、保存重开一致，两个Qt截图已看。T-016 review、T-017批量元信息/缩略图ready；整体Goal active，未独审/推送/发布。
-
-## 2026-10-14 / T-017 批量元信息与缩略图
-从0c8fc3f创建feat/T-017-project-metadata-batch，产品9ea4089实现有界只读XLSX/CSV、明确完整键匹配/可改预览、显式行字段选择、共同值与文件名分段原子应用，以及后台128边缩略图/坏图继续。v1–v5和积分保持，N/空位变更沿既有有效性撤回审核，保留历史run/OCR/归一化。335全量/隔离安装通过；真实表1张50×49/190公式、47提议0绑定0应用、2原图缩略图/重开，源SHA保持。关闭导入回退按旧测试修复；另一次全门禁停滞未复现/未定位，保留风险。T-017 review、T-018统一结果CSV/归档ready；Goal active，独审/发布仍未完成。
-
-## 2026-10-14 / T-018 CSV与统一结果归档
-从ba8a678创建feat/T-018-project-result-archive，产品c5f5787接通源/OCR/归一化CSV与XLSX共用表、原值资产/裁剪/PNG/当前配置/原始请求结果的统一ZIP v2。保存后逐个核对工作区run和资产并后台重读，不用旧缓存冒充；成员SHA/大小/角色与坏run原因明确，取消/关闭/代际和无覆盖保持。364全量/9合约/隔离安装通过，作者自验不替代独审；T-019准备有界ZIP检查/恢复与历史证据保留。Goal active，未推送/发布，用户原资料未改。详情T-018/validation.md。
-
 ## 2026-10-14 / T-019 ZIP恢复与历史证据
 从f79b7b3创建feat/T-019-project-archive-restore，产品6a06369实现schema6历史来源/原ZIP/复制请求结果、有界普通/ZIP64检查/表与像素重建、专用线程新工作区恢复/初始修订快照、重开核验/编辑失效/真实复算及再次恢复。398全量124.27秒、Ruff244、Pyright0、9合约、4wheel5场景通过；旧Qt/停滞风险未宣称解决。T-019 review待独审，T-020直接TIFF/PNG成图ready；整体Goal active。未推送/发布、用户资料未改；详情T-019/validation.md。
 
@@ -111,3 +57,75 @@ Executed approved real dataset, published8no-overwrite named crops,4Fig images,4
 
 ## 2026-10-17 T040 deep technical audit
 Three independent readers traced crop/quant/pipeline and cross-reviewed17-section report. Source-only membrane/Marker and17boundary replays exit0, original hashes unchanged. Corrected prior vague attribution, documented script-vs-product and scientific/units/precision/coordinate/model-validation limits; no product modifications. Fullcheck not rerun for this report.
+
+
+## 2026-10-17 T042 实现与真实网页验证
+
+社区原始来源调研、几何与背景策略已接现有网页工作台；8图独审8/8，原图旧结果保持，web3正常8run保存重开及48网页结果验证exit0。发现并修复Marker显式误删、ROI旧frame、同框重算frame、双峰漏警、worker质量flag。误开旧Qt测试入口已纠正；无web_ui设计变更。完整门禁/最终独审进行中，详见T042任务和validation；未发布。
+
+## 2026-10-17 T042 源输入修复与现有网页验证
+
+产品至9eb5a1b：8图裁图1/8→8/8，冻结后参考评分；新积分7valid/41quality_review，原图/参考/旧结果SHA保持。修正误开的旧Qt测试入口，正常WebWorkbenchWindow完成8run、导出、保存重开和48DOM结果。独审问题已关闭；Schema与N8/7°性质反例修复。独立wheel通过；完整628项门禁在窗口关闭测试原生connect挂起，停止专属进程exit1，根因未定；没有放松测试或更换锁。详见T042任务及validation。
+
+## 2026-10-17 T042 GitHub 开发日志与仓库盘点
+
+按用户明确请求发布开发日志Issue #6并回读比对正文一致。记录本次8提交、8图1/8→8/8、积分复核、独审、完整门禁挂起及分跑退出码；没有上传私有图像或推送累计产品代码。核对远端main221a2df、活动d71c8ec领先127、本地48分支/19worktree、原主目录dirty、开放PR3项。没有清理他人内容、合main或发布软件。
+
+## 2026-10-17 T043 完整门禁与当前入口
+
+产品2e5021d入口统一及独审后642全门禁退出0；治理0b786cb独立44项退出0；合并开发树e0be945正式完整657项/427.30s和全部隔离wheel退出0。分阶段草稿PR7（治理）、3（P0）、8–13（阶段2–7）已推送；P0初次检查用了旧main基线，真实失败保留，更新基线后关闭/重开触发当前基线检查，无新提交/状态篡改。34原有未提交文件与8原图/12参考SHA保持，19树备份、6干净历史树原位锁定；旧结果无删除。原生间歇挂起仍UNKNOWN。
+
+
+## 2026-10-17 T043 最终阶段与平台分支
+
+CI001之后最终产品树fa9c5f2正式完整check实际exit0：657passed/451.28s，全部隔离wheel含真实OCR完成。日志.local/t043/check-final-ci001.log；文档后继与此产品内容相同。 Linux真实CI暴露Windows句柄guard，2b9f643修复并独审；阶段2–8仅此产品差异。P0补基线转换说明，8阶段精确清单再次独审全部exit0。全部草稿PR7、3、8–14，main不变；远端CI看PR/Issue6实时。原有34未提交文件、8原图/12参考及旧预测SHA保持，6历史树原位锁定。原生间歇挂起仍UNKNOWN，完整科学/发布验收待后续。
+
+
+## 2026-10-17 T043 入口指针、宿主与回执诊断
+
+核对固定活动树快捷方式并纠正AGENT_HANDOFF旧目录指针；原dirty历史树保持。CI003b4bc8ba修确定隐藏host所有权，独审3项、658完整check/497.50秒及全部wheel真实exit0；8原图功能链exit0，参考未读，离屏截图空白不作视觉通过。阶段7首次超时后原SHA重跑成功，阶段8bcf15分钟取消和5de首次create10秒失败保留，根因UNKNOWN。CI00468c3265加无载荷请求阶段DEBUG日志，独审2项exit0，最终659完整check实际exit0/509.86秒及全部隔离wheel通过。main不变、PR全草稿。
+
+
+## 2026-10-17 CI005 Windows原生锁证据
+
+ea6178e远端Windows再次15分钟取消，60秒栈停finally关闭的QTimer.timeout.connect；此前create通过。Linux659/184.75秒+wheels0；本机50次精确关闭26.81秒0未复现。79f9070补显式owned-tree native观察并独审8项0，不改时限/预期/退出。定向首两轮各1失败7通过已修venv启动器和线程查询权限，最终8项0及真实默认采集保留子退出23；本机664完整门禁随后真实挂起，保存原生证据后仅停止自有pytest，check实际exit1、wheel未跑；CI006继续修复。父工作区旧WB路由已备份后改正并独审，原34文件保持；旧窗口路由修复独立于未知挂起根因。
+
+
+## 2026-10-17 CI006真实挂起退出修复
+
+79f9070本地全量真实挂起，Python/native及补采三线程证据支持Qt对象锁/GIL反转。仅保存后停止自有pytest，check实际exit1、wheel未跑。a811ccfd四后台退休→owner析构→queued终态；36定向0、独审18项0、Pyright0，668完整check/508.54秒及全部隔离wheel实际exit0。8原图正常工作台8run/保存重开/原SHA/参考未读/关闭exit0，输出另存workbench-ci006。全部旧失败/输出保持；main未变。
+
+
+## 2026-10-17 CI007诊断平台边界
+
+bbf3cc5安全原子推送开发/阶段8，外置bundle06ac64d9验证并再验34原文件保持。Linux真实Pyright4错在诊断_processes，1021662仅补平台拒绝、绑定独审两平台类型0，相关8项0；产品仍a811全量668/508.54秒及wheel0。新清单来源1021662，等待bbf Windows结束再推后继，main不变。
+
+
+## 2026-10-17 CI008退出阶段诊断
+
+bbf3cc5 Windows668passed/508.43秒后外层exit1、wheel未跑，无timeout；保留失败和UNKNOWN。f5b1fe4记录真实子码，f2a61b3保留pytest后故障处理，均绑定独审；相关11项/4.14秒0，首次误写测试文件exit4保留。清单来源f2a61b3含CI007/008，待安全推新候选。产品仍a811本机完整668及wheel0，原图/旧结果/34文件保持，main不变。
+
+
+## 2026-10-17 CI009原子初始化与维护说明
+
+1bb远端Linux668/183.03秒+wheels0，Windows1failed667passed516.76秒/child1，create执行6.125秒后正常回执；非本轮native崩溃。57fd7ea显式单事务初始化，不改同步/schema/v1/旧库读或5秒等待。旧真实红例，作者45项11.05秒0/独审45项8.31秒0，本机20新目录median56.76→27.38ms但非CI保证；669完整check/497.77秒+全部隔离wheel实际exit0，child0；新远端待验。8原图正常工作台8run保存重开关闭0，8几何/48值状态保持。维护计划按用户要求补通俗维护流程，最终汇报待全检/阶段同步。
+
+
+## 2026-10-17 T043本轮交付
+
+产品57fd7ea本机669/497.77秒+全部wheel实际0；becb389远端run39025981922完整成功：Windows669/407.87秒child0、Linux669/178.49秒，两平台全部隔离wheel/dev最终成功，规则/桌面环境成功。CI009及T043本轮complete，T003/科学/交互/发布/历史UNKNOWN继续保留。8图正常工作台链0，8几何/48值状态保持，参考未读。独审复核远端两HEAD、入口/父路由、最新bundle/34原文件SHA和已发日志正文；9草稿PR未合main、6旧树仅锁定，其余原改动/旧结果保留。后继仅收尾文档，仍按规则/独审/安全普通同步完成。维护计划已给简单报bug材料与后续维护步骤，无自动调度。
+
+
+## 2026-10-17 CI010 Linux退出SIGSEGV
+
+0d仅文档后继Linux669/146.29秒后SIGSEGV主线程noPythonframe，exit245/wheel未跑；同HEAD Windows669/346.68秒child0+wheels/dev成功。T043重开in_progress，旧成功/失败全保留；CI010只增显式GDB观察/0与17与真实SIGSEGV控制，不猜测性修Qt清理，不改产品/断言/15分钟。作者相关8项2.49秒0，双平台模块类型0；Linux控制/全检待真实执行，独审待绑定。
+
+
+## 2026-10-17 CI011 Windows异常观察
+
+40f Linux真实669/158.32秒GDB+全wheel/dev0；Windows669/433.12秒后Aborted/AV，childc0000005。WSL同锁定环境669/398.40秒pytest0及正常关闭page/profile释放0，不支持必然泄漏假设。无CDB，仅枚举未执行官方Nuget包；新增系统API单个owned live解释器异常观察，五控制0且真实AV原码保留，相关9项2.64秒0/双平台模块类型0，正式670/独审待执行；不称产品修复。
+
+
+## 2026-10-17 CI011本机全检与独审
+
+CI011 aabd39e本机正式check --all实际exit0：670passed/517.68秒，原pytest child0，Ruff/format/Pyright/import/policy及全部隔离wheel、桌面异步关闭、OCR真实worker完成。日志.local/t043/check-ci011-final.log，回执.local/t043/ci011-final-gate.json。绑定独审无阻断、五真实控制0、相关9项/2.56秒0；这是当前环境一次完整通过，原间歇原生退出根因仍UNKNOWN，远端当前后继另查，不宣告T043稳定性完成。

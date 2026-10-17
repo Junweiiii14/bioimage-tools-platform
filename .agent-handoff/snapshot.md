@@ -1,15 +1,15 @@
 # Handoff Snapshot
 
-- 更新2026-10-17；当前T-040真实多蛋白Fig验收，唯一状态work/tasks/T-040-real-fig-validation.md。总体T003/WB未科学验收完成。
-- 活动树C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform；codex/t040-real-fig-validation；产品f7a6651。旧主目录dirty及.impeccable/questions保留。
-- 用户授权只处理8张(1).tiff，4Fig各2蛋白(N8/4/8/4)，标准960×1200N TIFF按蛋白名放原目录，原像素定量，命名冲突不覆盖。验证目录只读评分。
-- 首轮纯自动冻结并独审：1/8=12.5%，7fail。N/Marker/倾斜截断问题尚未由本任务解决；不可用后续参考辅助纠正8/8冒充自动成功。
-- 参考辅助注册8/8视觉通过，NCC0.99786..0.99977；原图/参考hash不变。标准显示文件8/16位保持且禁止quant导入，native crop切片逐像素一致。
-- 实际桌面4Fig+48值+Excel/CSV+4高res标注图+ZIP已跑通。独审发现17/48旧自动bounds/baseline切穿主峰，另存明确整窗监督修正版，48与独立原像素整窗公式一致。33quality_review/15valid，全部actin有0平台，曝光线性未知，不做默认归一化。
-- T041显式standard_lane_ratio@1与DisplayFrame仅显示、source_to_output回源，native默认/冻结manifest保留。P1分段复用整行frame已限制仅整行可用；88专项及31后续通过，独审至f7a6651无未解发现。
-- .local/t040含首轮冻结、audit、诊断、delivery-report.json(最终workspace/output/supervised_output)、验证JSON及真实截图；用户可见输出在WB资料中新结果目录，原目录仅新增8标准裁图。脚本finish/supervise均exit0；Excel48单元格及ZIP8frame复读通过。
-- T040实际执行已交付，桌面PID32064可见8原图/4Fig；.local/t040/opened-desktop.png已目视核验。全check虽600passed但exit1，原因UNKNOWN，不宣称全门禁通过；独立wheel另记。下一步排查测试退出异常并修科学自动化。未来优先修原图膜/倾斜/周期泳道与自动bounds，不能继续以UI或合成数据替代科学验证。PR/main/干净Windows未做。
+- 更新2026-10-17；状态唯一来源work/tasks/T-043-gate-repair-and-staged-sync.md，本轮in_progress，CI011定位Windows测试后原生AV，CI010 Linux原生故障仍UNKNOWN。CI009原子初始化complete；T003整体产品/科学/交互/发布验收仍待办，不自动扩展路线图。
+- 活动树C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform，codex/t043-gate-and-staged-sync。产品57fd7ea，本机669/497.77秒+全部wheel/最终check0；becb389远端run39025981922已全部成功：Windows669/407.87秒child0、Linux669/178.49秒，两平台全部wheel/最终check成功，规则/桌面环境成功。0d269db纯文档后继Linux669/146.29秒后SIGSEGV、exit245/wheel未跑，Windows669/346.68秒/child0及全部wheel0；前次成功不覆盖新失败。使用前核对实际HEAD/dirty。
+- 日常从活动树Start-BioImage.ps1或桌面“BioImage WB 工作台（当前开发）”启动；默认/历史常用参数统一现有绿色工作台，HTML/CSS未变，旧原生工具仅显式legacy。父工作区WB路由已备份后修正，快捷方式/实际文件由独审复核；测试强制离屏，关闭失败不回退旧host。用户工作台46512未强制关闭，不恢复停止的CUA。
+- CI006修四worker退休→owner线程实际析构→queued终态；79f9070真实native/Python栈及受控正负对照支持Qt对象锁/GIL反转。CI009新DB版本/5表/身份单事务，真实故障回滚旧红新绿/45独审0，不改schema/v1/同步/fsync/测试时限。源码QtCore6.12.0与WebEngine6.140.0不可混用。
+- 历史bbf668passed后外层exit1仍UNKNOWN；1bb的create执行6.125秒后正常回执是另一实际失败。当前通过不能将所有旧失败一概归因；WebEngine资源析构边界仅假设，未据此乱改。详情见risks及CI005–009证据。
+- 最新8图正常工作台功能链.local/t043/workbench-ci009实际0：8run/保存重开/关闭，原图SHA保持、参考未读，8原像素ROI/N和48值/状态与CI006保持，N8/8/4/4/8/8/4/4、7valid41review。T042旧1/8→新8/8是开发回归集，无独立积分真值/留出验收；离屏截图不当作视觉通过。
+- 治理#7→产品#3→#8/9/10/11/12/13/14均草稿，main221a2df未变，不一次集成累计128历史。SYNC008精确base4582976e，清单来源aabd39e，保留CI002–011祖先回执。后续集成先按真实base重载规则/清单再跑检查。
+- 原ResearchVault根及各历史dirty树保留；34原未提交文件SHA反复核验，原.impeccable/questions4文件不提交。19树外置patch/untracked/refs备份；6干净无.local旧树仅原位锁定，未删/移。最新bundle位置/SHA在.local/t043/backup-final.json，原图/旧结果原位保留，Git不能代替原资料备份。
+- 已授权只读独审复核becb远端两HEAD/PR/main、入口/父路由、备份/34SHA及发布日志正文，无阻断；收尾文档仍须独审/精确规则后正常FF、unique备份、atomic推开发及stage8并回读Issue6/PR14。不强推/不合main。
+- 用户最终要求简单专业维护汇报。docs/maintenance-plan.md已说明固定入口、模块/API边界、依赖锁、小回归→完整检查→独审→小PR、备份/任务/交接及4项报bug材料；每周检查是人工建议，没有后台定时任务。发布/科学/恢复演练/历史独审缺口继续真实保留。
 
-- 用户要求原因推理与尝试方案，已核对原图诊断/首轮审计/48profile及源代码；归因与分阶段消融方案补T040末节，本轮未改算法。膜阈值、倾斜和边界选择问题有证据；最近原始profile局部极小值及向内收紧已由17/17重放定位；零平台来源及退出异常仍未知。
-
-- 深度报告work/evidence/T-040/deep-technical-limitations.md（17节/逐层代码索引）已三路复核；新probes均exit0。明确最终参考辅助/监督脚本尚未产品化、默认先量后拼、CSV2位舍入、像素/厘米DPI区别、高res临时内嵌参数超限；>2048缩略manifest风险本次未触发。本轮无产品修复。
+- CI010现行40f Linux云端GDB15.1真实控制成功、669/158.32秒及全wheel/dev0；WSL同锁定环境669/398.40秒pytest0（非full dev check）。同HEAD Windows669/433.12秒后Aborted/AV，原child3221225477/c0000005、wheel未跑。不能凭一次Linux成功关闭间歇故障。
+- CI011诊断提交aabd39e：标准Windows API仅观察自有单个解释器，保留原退出码；五真实控制作者/独审均0，相关9项作者2.64秒/独审2.56秒0，修改模块双平台类型0。绑定独审无阻断；PC0故障线程无帧，其他线程有栈，罕见OS API组合仅静审。正式670/517.68秒及全wheel/dev本机实际0，云端后继待验证，产品仍57fd7ea；不是产品崩溃修复，不混淆故意控制fault与产品fault。

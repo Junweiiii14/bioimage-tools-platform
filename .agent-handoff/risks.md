@@ -10,7 +10,24 @@
 
 ## Current Risks
 
-- T040真实8图独立裁剪首轮仅1/8(12.5%)；原检测短膜阈值/倾斜投影、Marker和周期泳道数误判尚未解决。后续8/8是参考辅助配准纠正，不可报自动8/8。
+- 当前CI011：40f Windows669passed后原始c0000005，Linux同HEAD GDB全检0；原生异常不同平台是否同因未证明。WSL完整pytest与单关闭均0，page/profile按时释放，不能认定必然UAF。系统API观察先真实控制后正式670；仅诊断，不改成功状态或测试答案。
+
+- 当前阻断：0d269db Linux669passed后SIGSEGV/noPythonframe，exit245，wheel未跑。CI010增加原生栈观察，不推断扩展或析构根因；Windows同HEAD完整成功。
+
+- 最新1bb Windows为create执行区间6.125秒/默认5秒setup超时（1failed667passed，child1），Linux668/183.03秒+wheels0。CI009仅合并新库初始化事务，45定向/45独审0、本机完整669/497.77秒+全部隔离wheel0；becb389远端Windows669/407.87秒、Linux669/178.49秒及全部wheel/规则/桌面环境成功；不保证托管I/O任意时限。旧bbf668passed后exit1仍UNKNOWN。
+
+- bbf3cc5远端Linux诊断工具4项Pyright失败；CI0071021662最小平台guard两平台类型0/相关8项0并独审，后续becb389真实Linux669/178.49秒及全部wheel成功。Windows最终668passed/508.43秒后外层exit1、wheel未跑，无挂起/真实子码。CI008仅增加子码/pytest后故障处理观察，未认定Qt崩溃或完整修复；后续becb389双平台完整CI已成功，不能抹去该次未定位退出。
+
+- 79f9070本地真实全量Qt锁/GIL反转有三线程原生证据；CI006修复四处worker退休和owner销毁，36项定向通过，a811ccfd完整668/508.54秒及全部wheel实际exit0、绑定独审18项0；后续becb389双平台完整CI已成功。远端其他超时不一概归因；诊断前32线程可能被OpenBLAS占满，需按明确owned TID补采。
+
+- ea6178e远端Windows再次15分钟取消，60秒栈明确关闭阶段QTimer.timeout.connect阻塞，未证明GC或锁顺序；CI005只补原生证据，不宣称修复。Linux659完整通过；本机50关闭循环未复现。父工作区旧路由已独立备份后修正，旧dirty项目保留。
+
+- 远端阶段8仍有未定位回执超时：bcf Windows15分钟取消、5de Windows首个create10秒超时（1failed/656passed），finally关闭完成；阶段7原SHA重跑成功不抹初败。CI003仅修确定宿主所有权，CI004仅补无载荷阶段日志，不能据后续通过认定根因修复。
+
+- T043正常启动已统一绿色WebWorkbenchWindow，测试默认离屏，最近CI003完整658门禁通过；旧原生交互式间歇挂起仍UNKNOWN。当前活动树见workspace/snapshot；原ResearchVault目录是保留dirty成果的历史树，从该目录运行旧入口仍会得到旧代码，必须使用固定当前检出的启动器。
+- T043阶段PR仅整理与安全同步，历史阶段仍须独立CI/审查；前置合main后精确base变化会使回执过期，必须重载并重跑，不能直接串行点击合并。6树仅原位锁定，不代表释放磁盘；忽略旧结果未打入Git备份，不能删除其持有树。
+
+- T042原图独立新裁图8/8，旧T040首轮1/8；不是T040参考辅助配准8/8。只证明本开发回归集，未做不同仪器/多膜/弯曲独立留出。
 - T040原自动48值中17槽因端点落主峰坡面/峰顶而低于整窗50%；监督版显式全窗参数已另存，不代表自动检峰问题修复。33/48原矩形有下限0，全部actin有平台，不能解释为恢复线性丰度/自动归一化有效。
 
 
@@ -66,3 +83,5 @@
 - T035首次全量581 passed但退出1，无异常文本；根因UNKNOWN，保留Qt退出风险，不以后续通过抹去。
 
 - T040深审：自主N两张8→7已复现为倾斜引起Marker误删；旧17低值最近局部谷边界/向内收紧已定位，低confidence未传应用门槛，3项仍valid。最终过滤/分组/标准回存/整窗修正依赖本地脚本，非普通UI端到端。实际自动编排仍先量后拼。CSV2位舍入；DPI物理单位未统一；单Fig临时内嵌字号校验失败（主项目/ZIP不受影响）；>2048manifest缩略坐标风险静态未触发。详见深度报告，不当作已修复。
+
+- T-042最终9eb5a1b完整门禁在重复关闭窗口测试的pytestqt QTimer.timeout.connect原生调用挂起；保留faulthandler后停止专属pytest，check退出1。隔离desktop10项exit0；只读独审无法证明GC死锁根因，不能认为旧退出/挂起风险已修复。8图回归8/8非留出泛化，真实48槽7valid/41quality_review，无积分准确率真值。

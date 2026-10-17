@@ -41,6 +41,15 @@ class CropDetectionSettings:
 
 
 @dataclass(frozen=True)
+class OrientedCrop:
+    center_x: float
+    center_y: float
+    width: float
+    height: float
+    angle_degrees: float
+
+
+@dataclass(frozen=True)
 class CropCandidate:
     roi: LaneROI
     peak_y: int
@@ -49,6 +58,8 @@ class CropCandidate:
     weak_lanes: tuple[int, ...]
     possible_empty_lanes: tuple[int, ...]
     flags: tuple[str, ...] = ()
+    lane_rois: tuple[LaneROI, ...] = ()
+    display_frame: OrientedCrop | None = None
 
 
 @dataclass(frozen=True)
@@ -61,7 +72,7 @@ class CropDetection:
     sample_region: LaneROI | None
     candidates: tuple[CropCandidate, ...]
     flags: tuple[str, ...]
-    algorithm_id: Literal["membrane_periodic_profile_candidates@1"] = ALGORITHM
+    algorithm_id: Literal["membrane_periodic_profile_candidates@1", "source_geometry@2"] = ALGORITHM
 
 
 def _check(cancelled: Callable[[], bool]) -> None:

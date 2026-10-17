@@ -20,6 +20,12 @@ jobs:
     timeout-minutes: 15
     env:
       QT_QPA_PLATFORM: offscreen
+      PYTHONUNBUFFERED: '1'
+      PYTHONFAULTHANDLER: '1'
+      PYTEST_ADDOPTS: '-vv -o faulthandler_timeout=60'
+      BIOIMAGE_NATIVE_STACKS: '1'
+      BIOIMAGE_LINUX_NATIVE_STACKS: '1'
+      BIOIMAGE_WINDOWS_FAULTS: '1'
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -32,8 +38,15 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libegl1 libopengl0 libxkbcommon0
+          sudo apt-get install -y --no-install-recommends libegl1 libopengl0 libxkbcommon0 gdb
+          gdb --version
       - run: uv sync --locked --group desktop
+      - name: Verify native diagnostic exit propagation (Linux)
+        if: runner.os == 'Linux'
+        run: uv run --locked --no-sync python -m tooling.linux_native_run --probe
+      - name: Verify owned native exception observation (Windows)
+        if: runner.os == 'Windows'
+        run: uv run --locked --no-sync python -m tooling.windows_fault_watch --probe
       - run: uv run --locked --no-sync python dev.py check --all
   desktop-environment:
     runs-on: windows-latest

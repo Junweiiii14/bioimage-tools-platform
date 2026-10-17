@@ -1,5 +1,7 @@
 # Validation History
 
+- 2026-10-17 T042/base b32acff：context/doctor/smoke-env/policy/gh只读认证/8源图SHA检查均exit0。配置证据work/evidence/T-042/configuration.md；私有清单.local/t042。未跑产品测试/全门禁/重新识别/独审；doctor过时product_status不作产品结论。
+
 - 2026-10-16 T035/25ac71d：两指定原图端到端与原值像素核对退出0；独审18专项退出0；首次全量581 passed但退出1、根因UNKNOWN，最终复查见work/evidence/T-035/validation.md，不把测试摘要等同进程成功。
 
 - 2026-10-16 T033/a68000e：全门禁568 passed/224.97s退出0，最终9专项退出0，独审另5项退出0；wheel含web资源；真实10原图SHA不变。网页1440/390、角点/拖画/减少动效实际操作；详见任务与.local/t033。
@@ -149,3 +151,33 @@ Product f7a6651 independently reviewed; actual8sources/4Fig/48values and supervi
 
 ## 2026-10-17 T040 causal replays
 HEADcc626d7/productf7a6651. deep-causal-replay.py and deep-boundary-replay.py each exit0; independent source-only diagnosis, no original/reference/project modification. Confirmed107/119/118membrane gate,8→7Marker deletion,4H_N2CVfallback,17/17old boundary reproduction. Report cross-reviewed by crop/quant/pipeline agents. Documentation only; no new fullgate or package claim.
+
+- 2026-10-17 T042产品9eb5a1b：58相关测试、114倾角×N探针、8图正常网页工作台/导出/重开及48DOM结果、独立wheel/smoke/policy均exit0，产品独审完成；完整check因原生挂起人工停止exit1，desktop单模块10passed/exit0。所有失败和分进程诊断以work/evidence/T-042/validation.md为准，不能据passed计数报全门禁成功。
+
+- 2026-10-17 GitHub日志：gh issue create退出0，Issue #6；gh issue view回读正文与本地副本归一换行后全等。只改文档，未重跑产品测试；既有全门禁失败状态不变。
+
+- 2026-10-17 T043产品2e5021d：642完整check/361.62s含隔离wheel exit0，独审14项exit0；治理0b786cb独立44完整check/165.88s exit0，独审6负例exit0；合并树e0be945再次正式完整check，657passed/427.30s及全部隔离wheel exit0。8原图/12参考SHA与34原有未提交文件SHA保持；原生间歇挂起仍UNKNOWN。阶段整理8清单独审exit0，不替代历史产品CI。
+
+
+- 2026-10-17 CI001：CI001之后最终产品树fa9c5f2正式完整check实际exit0：657passed/451.28s，全部隔离wheel含真实OCR完成。日志.local/t043/check-final-ci001.log；文档后继与此产品内容相同。 旧阶段自身环境8进程测试/10.89s退出0，guard模块双平台类型0；Windows全项目Linux目标因Qt平台存根8错不作为Linux CI，实际Linux以远端为准。
+
+- 2026-10-17 CI003b4bc8ba：完整check --all实际exit0，658passed/497.50秒及全部隔离wheel/真实OCR；独审3项exit0。8原图工作台宿主导入/处理/保存重开exit0，SHA不变、参考未读，离屏截图空白不作视觉验收。CI00468c3265独审2项exit0，完整659正在执行，结果另记。
+
+
+CI004产品68c3265正式完整check --all实际exit0：659passed/509.86秒，静态/架构/政策检查和全部隔离wheel、真实OCR/worker均通过；日志.local/t043/check-ci004-final.log，退出码记录.local/t043/ci004-final-gate.json。没有修改时限、预期、skip或依赖；通过不证明偶发超时根因。
+
+
+CI006产品a811ccfd正式完整check --all实际exit0：668passed/508.54秒；Ruff/format/Pyright/import/policy及全部隔离wheel、真实桌面异步关闭/OCR/worker均完成。日志.local/t043/check-ci006-final.log，退出回执.local/t043/ci006-final-gate.json。保留原测试/时限/依赖，之前79f9070失败不抹去。
+
+
+CI009产品57fd7ea正式check --all实际exit0：669passed/497.77秒，Observed child exit0/u32=0；Ruff/format/Pyright/import/policy及全部隔离wheel、真实桌面异步关闭/OCR/worker均完成。日志.local/t043/check-ci009-final.log，回执.local/t043/ci009-final-gate.json。原5秒等待/15分钟/全部断言/依赖不变。此前Windows与旧退出失败仍保留。
+
+
+## 2026-10-17 T043本轮交付
+
+产品57fd7ea本机669/497.77秒+全部wheel实际0；becb389远端run39025981922完整成功：Windows669/407.87秒child0、Linux669/178.49秒，两平台全部隔离wheel/dev最终成功，规则/桌面环境成功。CI009及T043本轮complete，T003/科学/交互/发布/历史UNKNOWN继续保留。8图正常工作台链0，8几何/48值状态保持，参考未读。独审复核远端两HEAD、入口/父路由、最新bundle/34原文件SHA和已发日志正文；9草稿PR未合main、6旧树仅锁定，其余原改动/旧结果保留。后继仅收尾文档，仍按规则/独审/安全普通同步完成。维护计划已给简单报bug材料与后续维护步骤，无自动调度。
+
+
+## 2026-10-17 CI010 Linux退出SIGSEGV
+
+0d仅文档后继Linux669/146.29秒后SIGSEGV主线程noPythonframe，exit245/wheel未跑；同HEAD Windows669/346.68秒child0+wheels/dev成功。T043重开in_progress，旧成功/失败全保留；CI010只增显式GDB观察/0与17与真实SIGSEGV控制，不猜测性修Qt清理，不改产品/断言/15分钟。作者相关8项2.49秒0，双平台模块类型0；Linux控制/全检待真实执行，独审待绑定。

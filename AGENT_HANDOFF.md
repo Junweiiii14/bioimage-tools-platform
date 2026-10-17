@@ -46,8 +46,10 @@
 
 ## Current Pointer
 
-- Last updated: 2026-10-13
-- Workspace root: `C:\Users\70236\ResearchVault\Codex-Workbench\bioimage-tools-platform`
+- Last updated: 2026-10-17
+- Active development checkout: `C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform`, branch `codex/t043-gate-and-staged-sync`; confirm current HEAD before use.
+- Current desktop entry: this checkout's `Start-BioImage.ps1`, also linked by desktop “BioImage WB 工作台（当前开发）”. Default and historical normal CLI options open `WebWorkbenchWindow`.
+- The original ResearchVault checkout preserves dirty historical development and old results. Do not launch it as the current product or overwrite it to synchronize versions. Compatibility tests run offscreen; explicit legacy windows are not the normal workbench.
 - Current state file: `.agent-handoff/snapshot.md`
 - Primary next-action source: `.agent-handoff/snapshot.md`
 - Risk source: `.agent-handoff/risks.md`

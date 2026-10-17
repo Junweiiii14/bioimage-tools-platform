@@ -1,13 +1,16 @@
 # Desktop host
 
-The default `python -m bioimage_app` entry opens the BioImage tool platform. Its static
-registry currently contains WB only. New/open/recent project actions launch the real WB
-project window and asynchronous storage; recent paths are recorded only after a successful
-workspace open. The tool's **返回工具平台** action saves valid edits, cancels/drains active
-work through its existing close lifecycle, then returns to the hub. Invalid or missing
-workspaces keep the error in the tool and are not added to recent history. `--figure-project`
-still opens WB directly; the legacy single-image window is available through `--wb-manual`.
-Project history stores at most eight local paths in Qt settings, never executable tool names.
+The default `python -m bioimage_app` entry opens the current green WB web workbench.
+`--web-workbench`, `--figure-project` and `--platform` all open that same workbench;
+an unknown argument fails before Qt starts. Its hidden native host supplies asynchronous
+storage, computation and advanced tools. Native editors open only on an explicit advanced
+action; a failed close does not switch the interface to the hidden host.
+
+Native compatibility windows require `--legacy-platform`, `--legacy-figure-project`, or
+`--legacy-wb-manual` and have a title marked **兼容工具（旧版）**. `--wb-manual` remains a
+historical alias for the last option. The old platform's static registry contains WB only;
+its navigation/history contract remains for compatibility, with at most eight recent paths.
+Worker routes remain unchanged and do not load the desktop window factory.
 
 Version 0.14.0 adds schema7 laboratory segments and independent template file actions in
 the existing template settings page. Template I/O runs in the tool background thread;
@@ -21,6 +24,15 @@ The QObject worker owns Workspace/SQLite on its own QThread. Commands are an exp
 immutable FIFO, with request IDs, 64 pending-operation and 16 MiB document budgets.
 Callbacks run on the owning GUI thread. Errors retain identity and do not stop the queue.
 Keep the port alive until its asynchronous `closed` signal; shutdown drains accepted work.
+Drained QObject workers retire on their own thread, move back to the owner, and stop
+their former QThread. The owner checks thread exit without blocking, schedules deletion,
+and publishes closure only after a queued destruction acknowledgement. The same lifecycle
+applies to process decoding and project restore; this avoids a reproduced Qt object-lock/
+Python GIL inversion during worker-thread QObject destruction.
+The `bioimage_app.storage` DEBUG logger records only request identity, operation, phase,
+monotonic time and native thread identity; it excludes paths, payloads and error text.
+Pytest captures this logger for failed-test diagnosis. Logging does not change time limits
+or establish the cause of an intermittent timeout; production DEBUG is disabled by default.
 The caller must stop active processes before shutdown. Switching workspaces requires a
 new port after closing the previous one. No database/Workspace objects are returned.
 

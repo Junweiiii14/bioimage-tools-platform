@@ -76,7 +76,8 @@
           "default": "legacy_bounds@1",
           "enum": [
             "legacy_bounds@1",
-            "wbquant_1_4_3@1"
+            "wbquant_1_4_3@1",
+            "background_support@1"
           ],
           "title": "Quant Policy",
           "type": "string"
@@ -120,8 +121,11 @@
           "type": "array"
         },
         "quality_policy": {
-          "const": "dtype_limits_review@1",
           "default": "dtype_limits_review@1",
+          "enum": [
+            "dtype_limits_review@1",
+            "background_support_review@1"
+          ],
           "title": "Quality Policy",
           "type": "string"
         },

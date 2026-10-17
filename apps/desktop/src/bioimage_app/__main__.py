@@ -21,15 +21,15 @@ def main() -> int:
         from wb_tool.api import run_ocr_worker
 
         return run_ocr_worker()
+    from bioimage_app.desktop_entry import create_desktop_window, desktop_mode
+
+    mode = desktop_mode(sys.argv[1:])
     from pathlib import Path
 
     from PySide6.QtCore import QStandardPaths
     from PySide6.QtWidgets import QApplication
 
     from bioimage_app.diagnostics import DesktopDiagnostics
-    from bioimage_app.figure_window import FigureProjectWindow
-    from bioimage_app.platform_window import PlatformWindow
-    from bioimage_app.wb_window import WBWindow
 
     app = QApplication(sys.argv)
     app.setApplicationName("BioImageTools")
@@ -45,16 +45,7 @@ def main() -> int:
         )
     except OSError:
         print("无法创建本地诊断日志；继续启动。", file=sys.stderr)
-    if sys.argv[1:] == ["--web-workbench"]:
-        from bioimage_app.web_window import WebWorkbenchWindow
-
-        window = WebWorkbenchWindow()
-    elif sys.argv[1:] == ["--figure-project"]:
-        window = FigureProjectWindow()
-    elif sys.argv[1:] == ["--wb-manual"]:
-        window = WBWindow()
-    else:
-        window = PlatformWindow()
+    window = create_desktop_window(mode)
     window.show()
     try:
         return app.exec()

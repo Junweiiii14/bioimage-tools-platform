@@ -71,13 +71,19 @@ class AnalysisRequest:
     polarity: Polarity
     lanes: tuple[LaneAnnotation, ...]
     geometry_policy: Literal["fixed_grid@1", "independent_lanes@1"] = "fixed_grid@1"
-    quant_policy: Literal["legacy_bounds@1", "wbquant_1_4_3@1"] = "legacy_bounds@1"
+    quant_policy: Literal["legacy_bounds@1", "wbquant_1_4_3@1", "background_support@1"] = (
+        "legacy_bounds@1"
+    )
 
     def __post_init__(self) -> None:
         if self.geometry_policy not in (
             "fixed_grid@1",
             "independent_lanes@1",
-        ) or self.quant_policy not in ("legacy_bounds@1", "wbquant_1_4_3@1"):
+        ) or self.quant_policy not in (
+            "legacy_bounds@1",
+            "wbquant_1_4_3@1",
+            "background_support@1",
+        ):
             raise AnalysisError("未知定量策略")
         if len(self.source_sha256) != 64 or any(c not in hexdigits for c in self.source_sha256):
             raise AnalysisError("输入来源摘要须为 SHA256")
@@ -123,7 +129,9 @@ class AnalysisResult:
     source_conversion: str | None
     lanes: tuple[LaneAnalysis, ...]
     algorithm_id: Literal["profile_integral@1"] = "profile_integral@1"
-    quality_policy: Literal["dtype_limits_review@1"] = "dtype_limits_review@1"
+    quality_policy: Literal["dtype_limits_review@1", "background_support_review@1"] = (
+        "dtype_limits_review@1"
+    )
     schema_version: Literal[1] = 1
 
 
@@ -182,7 +190,11 @@ def analyze_annotations(
             region = image.pixels[
                 roi.y0 + band.bounds.left : roi.y0 + band.bounds.right + 1, roi.x0 : roi.x1
             ]
-            flags: list[str] = []
+            flags: list[str] = (
+                [note for note in band.detection_notes if note.startswith("boundary_review:")]
+                if request.quant_policy == "background_support@1"
+                else []
+            )
             if np.any(region == 0):
                 flags.append("dtype_min_present")
             if np.any(region == profiles.dtype_max):
@@ -192,10 +204,18 @@ def analyze_annotations(
                     band,
                     "quality_review" if flags else "valid",
                     measurement,
-                    "条带区域含位深上下限像素，须核对曝光和饱和" if flags else None,
+                    "条带背景支持或位深上下限需要复核：" + ", ".join(flags) if flags else None,
                     tuple(flags),
                 )
             )
         lanes.append(LaneAnalysis(annotation.roi, profiles, tuple(results)))
     _check_cancel(cancelled)
-    return AnalysisResult(request, image.pixels.dtype.itemsize * 8, image.conversion, tuple(lanes))
+    return AnalysisResult(
+        request,
+        image.pixels.dtype.itemsize * 8,
+        image.conversion,
+        tuple(lanes),
+        quality_policy="background_support_review@1"
+        if request.quant_policy == "background_support@1"
+        else "dtype_limits_review@1",
+    )

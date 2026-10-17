@@ -17,3 +17,10 @@ schema8 `automatic_rows` 保存源SHA、源修订、设置、几何、泳道数�
 有效信号列继续遵守现有质量规则；`raw_integral` 单列保留已核验的待复核积分，不参与归一化。schema8审计表新增此列，旧schema表结构保持。界面摘要显示4位有效数字，完整表和导出保留现有完整精度。达到位深上下限会触发质量复核，绝不因为自动化而绕过。
 
 自动标签为 `Source 001` 等来源编号，各源默认独立Fig，避免猜测蛋白、样本或内参关系。OCR与归一化仍需明确的身份/配对信息；本流程不凭文件名或图像推断实验含义。
+
+
+## T-042 可选/默认策略扩展
+
+现网页工作台选择source_geometry@2、background_support@1。旧schema8记录不改写；旧策略Literal仍接受。几何新增candidate.lane_rois和display_frame均有空默认，旧检测证据可读。自动证据algorithm_id随source_geometry使用automatic_wb_proposals@2。源图尺寸、像素/位深保留，检测副本插值仅供方向与中心识别；定量只用独立原图矩形。未确定膜/方向/间距不返回成功候选。显式Marker排除仍需Marker证据，不能无条件删首样本。ROI/N编辑清除旧显示框，撤销恢复原几何时可恢复；分段不安装完整行旋转框。
+
+background_support@1用边缘窗口中位值建立线性背景，在检测副本上寻找连续3–10点低于max(3噪声,2.5%幅度)的支持端点。支持不足保留可检视面积，并以background_support_review@1质量策略标记quality_review；独立第二信号同样待复核。原始profile_integral@1梯形正残差公式、单位和均值剖面语义不变。手工调整边界/背景可解除自动边界提示，位深极值提示仍由原像素检查，包含/排除开关不能解除背景提示。重规划和灰度导出接受新旧独立泳道策略。
