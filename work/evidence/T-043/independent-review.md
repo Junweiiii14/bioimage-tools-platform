@@ -18,3 +18,21 @@
 | 原图修复 | 417fefadd21455d1260dc9cb537a40f63a29cc15 |
 
 后续阶段8若追加当前文档/回执，须重新核验受影响清单与规则；产品代码审查仍仅绑定上述产品提交。
+
+
+## 最终平台修复与阶段复核
+
+70d9b66..2b9f643的源码独审无确定问题；本次未由审查者重跑真实进程测试。最新8阶段逐一独立规则检查exit0，前置链连续，阶段1无产品变更、阶段2–8唯一产品差异逐字节等于已审单行guard。main/origin/main仍221a2df。
+
+| 阶段 | PR | 整理独审绑定HEAD |
+|---|---|---|
+| 1 P0 环境与便携探针 | [#3](https://github.com/Junweiiii14/bioimage-tools-platform/pull/3) | 66e0240bc211e5d9f08e1019cf686df249adbd97 |
+| 2 WB 原值定量、worker、存储与手工闭环 | [#8](https://github.com/Junweiiii14/bioimage-tools-platform/pull/8) | dd929960c4886e882d282490fd9ed59fdc8d2e50 |
+| 3 Fig、多原图、OCR 与显式归一化 | [#9](https://github.com/Junweiiii14/bioimage-tools-platform/pull/9) | d7dbee51543e6cc061065fc79598d2eda7a53e8c |
+| 4 元信息、归档恢复与维护基线 | [#10](https://github.com/Junweiiii14/bioimage-tools-platform/pull/10) | ef17d8a9c5dc800e6e0ea9842c3bd91714715ba0 |
+| 5 实验室版式、模板与自动处理平台 | [#11](https://github.com/Junweiiii14/bioimage-tools-platform/pull/11) | 8be1c56d2399f728ead09415ab8c9800b32cdc99 |
+| 6 现有工作台与网页宿主 | [#12](https://github.com/Junweiiii14/bioimage-tools-platform/pull/12) | 4a9c682883fbe552947c520e4e5b00284a8601ae |
+| 7 灰度监督、标准显示与真实图验证 | [#13](https://github.com/Junweiiii14/bioimage-tools-platform/pull/13) | 4582976e4623e6ce25e433be59d08290bff3e3a9 |
+| 8 原图几何、积分边界与入口统一 | [#14](https://github.com/Junweiiii14/bioimage-tools-platform/pull/14) | 0637250e33044c42a769ac8195a53b8916ff730e |
+
+后继仅文档/回执；不将作者最终完整门禁说成独审者执行。

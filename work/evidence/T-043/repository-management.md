@@ -30,3 +30,21 @@
 
 
 阶段远端PR：P0 #3；WB核心 #8；Fig/OCR #9；恢复 #10；自动化 #11；现有工作台 #12；灰度监督 #13；原图修复阶段待最终文档/清单提交后创建。P0推送先于base修改，首轮按main校验失败；之后close/reopen触发实际前置base的新检查，旧失败保留，没有改状态或添加空提交。
+
+
+## 最终阶段链与跨平台补充
+
+| 阶段 | PR | 整理独审绑定HEAD |
+|---|---|---|
+| 1 P0 环境与便携探针 | [#3](https://github.com/Junweiiii14/bioimage-tools-platform/pull/3) | 66e0240bc211e5d9f08e1019cf686df249adbd97 |
+| 2 WB 原值定量、worker、存储与手工闭环 | [#8](https://github.com/Junweiiii14/bioimage-tools-platform/pull/8) | dd929960c4886e882d282490fd9ed59fdc8d2e50 |
+| 3 Fig、多原图、OCR 与显式归一化 | [#9](https://github.com/Junweiiii14/bioimage-tools-platform/pull/9) | d7dbee51543e6cc061065fc79598d2eda7a53e8c |
+| 4 元信息、归档恢复与维护基线 | [#10](https://github.com/Junweiiii14/bioimage-tools-platform/pull/10) | ef17d8a9c5dc800e6e0ea9842c3bd91714715ba0 |
+| 5 实验室版式、模板与自动处理平台 | [#11](https://github.com/Junweiiii14/bioimage-tools-platform/pull/11) | 8be1c56d2399f728ead09415ab8c9800b32cdc99 |
+| 6 现有工作台与网页宿主 | [#12](https://github.com/Junweiiii14/bioimage-tools-platform/pull/12) | 4a9c682883fbe552947c520e4e5b00284a8601ae |
+| 7 灰度监督、标准显示与真实图验证 | [#13](https://github.com/Junweiiii14/bioimage-tools-platform/pull/13) | 4582976e4623e6ce25e433be59d08290bff3e3a9 |
+| 8 原图几何、积分边界与入口统一 | [#14](https://github.com/Junweiiii14/bioimage-tools-platform/pull/14) | 0637250e33044c42a769ac8195a53b8916ff730e |
+
+以上为最终整理复核绑定，后继仅补本记录/交接，产品不变。阶段1仅说明文档；阶段2–8唯一额外产品差异是独审2b9f643的Windows条件，原历史快照和旧失败均保留。
+CI001之后最终产品树fa9c5f2正式完整check实际exit0：657passed/451.28s，全部隔离wheel含真实OCR完成。日志.local/t043/check-final-ci001.log；文档后继与此产品内容相同。
+远端CI以PR实时为准，初轮Linux类型失败修复后重跑；不修改状态或门禁。P0新说明提交66e0240记录基线转换，使本次CI在新的可审查SHA运行，原失败仍在历史。

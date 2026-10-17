@@ -157,3 +157,6 @@ HEADcc626d7/productf7a6651. deep-causal-replay.py and deep-boundary-replay.py ea
 - 2026-10-17 GitHub日志：gh issue create退出0，Issue #6；gh issue view回读正文与本地副本归一换行后全等。只改文档，未重跑产品测试；既有全门禁失败状态不变。
 
 - 2026-10-17 T043产品2e5021d：642完整check/361.62s含隔离wheel exit0，独审14项exit0；治理0b786cb独立44完整check/165.88s exit0，独审6负例exit0；合并树e0be945再次正式完整check，657passed/427.30s及全部隔离wheel exit0。8原图/12参考SHA与34原有未提交文件SHA保持；原生间歇挂起仍UNKNOWN。阶段整理8清单独审exit0，不替代历史产品CI。
+
+
+- 2026-10-17 CI001：CI001之后最终产品树fa9c5f2正式完整check实际exit0：657passed/451.28s，全部隔离wheel含真实OCR完成。日志.local/t043/check-final-ci001.log；文档后继与此产品内容相同。 旧阶段自身环境8进程测试/10.89s退出0，guard模块双平台类型0；Windows全项目Linux目标因Qt平台存根8错不作为Linux CI，实际Linux以远端为准。

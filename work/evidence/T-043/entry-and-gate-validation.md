@@ -29,3 +29,8 @@
 
 
 治理合入开发树e0be945后再次正式完整check，实际exit0：657passed/427.30s，全部独立wheel及真实OCR验证完成。日志.local/t043/check-final-integrated.log；只读原生快照显示正常Git子进程管道ReadFile等待，没有复现挂起。8原图/12参考SHA再验相等，34个原有未提交文件SHA相等。
+
+
+CI001之后最终产品树fa9c5f2正式完整check实际exit0：657passed/451.28s，全部隔离wheel含真实OCR完成。日志.local/t043/check-final-ci001.log；文档后继与此产品内容相同。
+远端Linux首次暴露close中的Windows句柄类型分支，2b9f643最小guard修复并独审。旧阶段自身锁定环境8真实进程测试/10.89s退出0；模块Linux/Windows目标0错误。Windows Qt存根不含Unix接口，整个项目在Windows强制Linux目标的8个Qt存根错误不是有效Linux CI证据，前置尝试exit1且当时未执行完整check；真实Linux检查以GitHub runner为准。
+从原ResearchVault历史目录运行活动Start-BioImage.ps1 --help退出0，得到当前工作台及显式legacy参数。8原图/12参考与旧first-automatic.json SHA保持，34原有未提交文件保持。
