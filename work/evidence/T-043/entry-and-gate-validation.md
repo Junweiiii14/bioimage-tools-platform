@@ -23,4 +23,6 @@
 
 初轮入口10项exit0；入口/网页/平台21项exit0/24.61s。初轮Ruff长行由format修复；初轮Pyright两项测试直接访问protected成员已改为通过正常close路径观察，未加ignore或降低门禁。
 
-尚待最终类型、完整check、独审及同提交确认；没有将离屏配置修复称为已证明某个原生锁死根因。
+最终产品提交2e5021d：只读独审无确定阻断问题，独立新增14项exit0。正式uv run --locked --no-sync python dev.py check --all实际exit0：642passed/361.62s，Ruff/format/Pyright/import及隔离wheel全部完成。日志.local/t043/check-entry-fix.log。未把离屏配置修复称为已证明某个原生锁死根因；原生Windows显示/交互和旧间歇挂起仍独立保留。
+
+桌面新建“BioImage WB 工作台（当前开发）”快捷方式，固定当前检出目录的Start-BioImage.ps1；原有快捷方式/旧结果启动文件未覆盖。入口+网页+平台21项exit0，最终入口/环境/同步异步关闭拒绝14项exit0。

@@ -10,8 +10,10 @@
 
 ## 验证与进度
 
-待记录具体命令、提交和退出码；前任务完整门禁exit1不被本任务配置抹去。
+产品2e5021d已提交并独审；正式完整check exit0，642测试/361.62s及隔离wheel完成。证据work/evidence/T-043/entry-and-gate-validation.md。原生交互式间歇挂起根因仍UNKNOWN，不将离屏配置与正常入口修复夸大为已证明某个原生锁缺陷。前任务exit1记录保留。
 
 ## 用户追加：反复出现旧界面
 
 已查明两个入口问题：默认命令经PlatformWindow的注册表进入旧FigureProjectWindow，历史--figure-project也直接打开旧窗口；工作台关闭失败还自动host.show。另，本地pytest未默认offscreen，会显示遗留兼容测试窗口。修复正常入口统一现有绿色工作台、兼容入口显式标记、关闭失败留在工作台、测试默认离屏；保留兼容测试与worker，不修改网页样式和原图/旧结果。
+
+完整门禁通过后已建立仓库外all-refs.bundle并verify、19个工作树的index/unstaged binary patch与未跟踪文件tar/摘要；私有忽略结果仍在原路径保留，未将其当Git备份。备份位置仅记.local/t043/backup-location.json。下一步创建依赖阶段草稿PR并分类归档。
