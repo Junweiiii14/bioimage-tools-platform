@@ -36,3 +36,8 @@ CI001之后最终产品树fa9c5f2正式完整check实际exit0：657passed/451.28
 
 
 CI004产品68c3265正式完整check --all实际exit0：659passed/509.86秒，静态/架构/政策检查和全部隔离wheel、真实OCR/worker均通过；日志.local/t043/check-ci004-final.log，退出码记录.local/t043/ci004-final-gate.json。没有修改时限、预期、skip或依赖；通过不证明偶发超时根因。
+
+
+## CI005真实Windows栈
+
+ea6178e远端Windows15分钟取消，60秒栈锁定test_web_bridge.py:128 finally关闭期间QTimer.timeout.connect；不是随后显式gc.collect位置，2无Python帧线程不能诊断GC。Linux659/184.75秒及wheel0，本机50次关闭26.81秒0。79f9070新增受控owned-tree native栈观察，独审独立8项0，完整664门禁正在执行；保留全部旧失败与UNKNOWN。另修父工作区旧WB路由，原文件外置备份，仅该项目段变化并经只读核验；原34未提交内容不变。

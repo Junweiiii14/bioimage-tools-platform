@@ -10,6 +10,10 @@
 
 ## Current Risks
 
+- 79f9070本地真实全量Qt锁/GIL反转有三线程原生证据；CI006修复四处worker退休和owner销毁，36项定向通过，完整门禁/独审尚待完成。远端其他超时不一概归因；诊断前32线程可能被OpenBLAS占满，需按明确owned TID补采。
+
+- ea6178e远端Windows再次15分钟取消，60秒栈明确关闭阶段QTimer.timeout.connect阻塞，未证明GC或锁顺序；CI005只补原生证据，不宣称修复。Linux659完整通过；本机50关闭循环未复现。父工作区旧路由已独立备份后修正，旧dirty项目保留。
+
 - 远端阶段8仍有未定位回执超时：bcf Windows15分钟取消、5de Windows首个create10秒超时（1failed/656passed），finally关闭完成；阶段7原SHA重跑成功不抹初败。CI003仅修确定宿主所有权，CI004仅补无载荷阶段日志，不能据后续通过认定根因修复。
 
 - T043正常启动已统一绿色WebWorkbenchWindow，测试默认离屏，最近CI003完整658门禁通过；旧原生交互式间歇挂起仍UNKNOWN。当前活动树见workspace/snapshot；原ResearchVault目录是保留dirty成果的历史树，从该目录运行旧入口仍会得到旧代码，必须使用固定当前检出的启动器。
