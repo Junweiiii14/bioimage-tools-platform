@@ -20,3 +20,5 @@
 最终9eb5a1b全门禁：policy/Ruff/format/Pyright/import检查通过；pytest628项运行至反复窗口关闭测试挂起，60秒faulthandler主线程停在pytestqt wait_signal.py:37 QTimer.timeout.connect、两个线程无Python帧。保留check-all-9eb5a1b.log后停止专属pytest33896，实际check退出1。独审只读诊断未找到可证明GC死锁或确定性生命周期缺陷；有关代码未在本任务修改。隔离tests/test_wb_desktop.py全部10passed/29.39s/exit0，仅为诊断，不能替代全门禁。
 
 独立wheel：uv run --locked --no-sync python -m tooling.installed_wheels，exit0；WB、runtime/contracts、desktop独立环境和真实OCR worker检查完成，日志.local/t042/wheels-9eb.log。此项补跑未改变check --all的失败状态。
+
+分进程诊断完成：uv run --locked --no-sync python -m pytest -q --ignore=tests/test_wb_desktop.py -o faulthandler_timeout=60，618passed/343.79s/exit0（remaining-9eb.log）。连同隔离desktop10项，628项在两个独立进程内均通过；没有修改测试收集或门禁配置。原完整check --all仍exit1且原生挂起未归因，不以分跑替代该门禁。
