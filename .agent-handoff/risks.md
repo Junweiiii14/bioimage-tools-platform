@@ -10,6 +10,8 @@
 
 ## Current Risks
 
+- 当前CI011：40f Windows669passed后原始c0000005，Linux同HEAD GDB全检0；原生异常不同平台是否同因未证明。WSL完整pytest与单关闭均0，page/profile按时释放，不能认定必然UAF。系统API观察先真实控制后正式670；仅诊断，不改成功状态或测试答案。
+
 - 当前阻断：0d269db Linux669passed后SIGSEGV/noPythonframe，exit245，wheel未跑。CI010增加原生栈观察，不推断扩展或析构根因；Windows同HEAD完整成功。
 
 - 最新1bb Windows为create执行区间6.125秒/默认5秒setup超时（1failed667passed，child1），Linux668/183.03秒+wheels0。CI009仅合并新库初始化事务，45定向/45独审0、本机完整669/497.77秒+全部隔离wheel0；becb389远端Windows669/407.87秒、Linux669/178.49秒及全部wheel/规则/桌面环境成功；不保证托管I/O任意时限。旧bbf668passed后exit1仍UNKNOWN。

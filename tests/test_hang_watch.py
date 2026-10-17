@@ -4,11 +4,13 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from threading import Event
 
 import pytest
 
 import dev
 from tooling.hang_watch import run_with_native_watch
+from tooling.windows_fault_watch import watch_exceptions
 
 
 @pytest.mark.parametrize("capture_fails", [False, True])
@@ -69,12 +71,15 @@ def test_watch_opt_in_is_not_inherited_by_the_test_child(monkeypatch: pytest.Mon
         environments.append(env)
         return subprocess.CompletedProcess(command, 13)
 
-    def watch(command: list[str], *, cwd: Path, env: dict[str, str]) -> int:
+    def watch(
+        command: list[str], *, cwd: Path, env: dict[str, str], watch_faults: bool = False
+    ) -> int:
         environments.append(env)
         return 13
 
     monkeypatch.setenv("BIOIMAGE_NATIVE_STACKS", "1")
     monkeypatch.setenv("BIOIMAGE_LINUX_NATIVE_STACKS", "1")
+    monkeypatch.setenv("BIOIMAGE_WINDOWS_FAULTS", "1")
     monkeypatch.setenv("PYTHONFAULTHANDLER", "1")
     monkeypatch.setattr(dev.subprocess, "run", run)
     monkeypatch.setattr("tooling.hang_watch.run_with_native_watch", watch)
@@ -83,6 +88,7 @@ def test_watch_opt_in_is_not_inherited_by_the_test_child(monkeypatch: pytest.Mon
     assert environments[0]["QT_QPA_PLATFORM"] == "offscreen"
     assert "BIOIMAGE_NATIVE_STACKS" not in environments[0]
     assert "BIOIMAGE_LINUX_NATIVE_STACKS" not in environments[0]
+    assert "BIOIMAGE_WINDOWS_FAULTS" not in environments[0]
     assert environments[0]["PYTHONFAULTHANDLER"] == "1"
     assert os.environ["BIOIMAGE_NATIVE_STACKS"] == "1"
 
@@ -118,3 +124,33 @@ def test_native_collector_platform_guard_and_owned_child(tmp_path: Path) -> None
         finally:
             child.terminate()
             child.wait(timeout=10)
+
+
+def test_native_fault_observation_preserves_the_real_child_exit(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    if sys.platform != "win32":
+        with pytest.raises(ValueError, match="x64 Windows"):
+            watch_exceptions(1, os.getpid(), Event())
+        return
+    code = (
+        "import ctypes as c,time; k=c.windll.kernel32; k.SetErrorMode(3); "
+        "deadline=time.monotonic()+8; "
+        "exec('while not k.IsDebuggerPresent() and time.monotonic()<deadline: time.sleep(.01)'); "
+        "assert k.IsDebuggerPresent(); "
+        "k.CreateThread.argtypes=[c.c_void_p,c.c_size_t,c.c_void_p,c.c_void_p,"
+        "c.c_uint32,c.c_void_p]; "
+        "k.CreateThread.restype=c.c_void_p; k.CreateThread(None,0,None,None,0,None); "
+        "time.sleep(5); raise SystemExit(19)"
+    )
+    result = run_with_native_watch(
+        [sys.executable, "-I", "-c", code],
+        cwd=tmp_path,
+        env=dict(os.environ),
+        watch_faults=True,
+    )
+    assert result == 0xC0000005
+    observed = capsys.readouterr().out
+    assert "NATIVE_EXCEPTION_ATTACHED" in observed
+    assert "NATIVE_EXCEPTION 0xc0000005" in observed
+    assert "Observed child exit=3221225477 u32=0xc0000005" in observed

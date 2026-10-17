@@ -1,8 +1,5 @@
 # Current Work Log
 
-## 2026-10-14 / T-017 批量元信息与缩略图
-从0c8fc3f创建feat/T-017-project-metadata-batch，产品9ea4089实现有界只读XLSX/CSV、明确完整键匹配/可改预览、显式行字段选择、共同值与文件名分段原子应用，以及后台128边缩略图/坏图继续。v1–v5和积分保持，N/空位变更沿既有有效性撤回审核，保留历史run/OCR/归一化。335全量/隔离安装通过；真实表1张50×49/190公式、47提议0绑定0应用、2原图缩略图/重开，源SHA保持。关闭导入回退按旧测试修复；另一次全门禁停滞未复现/未定位，保留风险。T-017 review、T-018统一结果CSV/归档ready；Goal active，独审/发布仍未完成。
-
 ## 2026-10-14 / T-018 CSV与统一结果归档
 从ba8a678创建feat/T-018-project-result-archive，产品c5f5787接通源/OCR/归一化CSV与XLSX共用表、原值资产/裁剪/PNG/当前配置/原始请求结果的统一ZIP v2。保存后逐个核对工作区run和资产并后台重读，不用旧缓存冒充；成员SHA/大小/角色与坏run原因明确，取消/关闭/代际和无覆盖保持。364全量/9合约/隔离安装通过，作者自验不替代独审；T-019准备有界ZIP检查/恢复与历史证据保留。Goal active，未推送/发布，用户原资料未改。详情T-018/validation.md。
 
@@ -125,3 +122,8 @@ bbf3cc5 Windows668passed/508.43秒后外层exit1、wheel未跑，无timeout；�
 ## 2026-10-17 CI010 Linux退出SIGSEGV
 
 0d仅文档后继Linux669/146.29秒后SIGSEGV主线程noPythonframe，exit245/wheel未跑；同HEAD Windows669/346.68秒child0+wheels/dev成功。T043重开in_progress，旧成功/失败全保留；CI010只增显式GDB观察/0与17与真实SIGSEGV控制，不猜测性修Qt清理，不改产品/断言/15分钟。作者相关8项2.49秒0，双平台模块类型0；Linux控制/全检待真实执行，独审待绑定。
+
+
+## 2026-10-17 CI011 Windows异常观察
+
+40f Linux真实669/158.32秒GDB+全wheel/dev0；Windows669/433.12秒后Aborted/AV，childc0000005。WSL同锁定环境669/398.40秒pytest0及正常关闭page/profile释放0，不支持必然泄漏假设。无CDB，仅枚举未执行官方Nuget包；新增系统API单个owned live解释器异常观察，五控制0且真实AV原码保留，相关9项2.64秒0/双平台模块类型0，正式670/独审待执行；不称产品修复。

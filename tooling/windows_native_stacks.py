@@ -66,7 +66,7 @@ class Symbol(c.Structure):
     ]
 
 
-def _processes(kernel: c.CDLL) -> dict[int, tuple[int, str]]:
+def process_entries(kernel: c.CDLL) -> dict[int, tuple[int, str]]:
     if sys.platform != "win32":
         raise ValueError("Native process enumeration requires Windows")
     kernel.CreateToolhelp32Snapshot.argtypes = [w.DWORD, w.DWORD]
@@ -91,12 +91,12 @@ def _processes(kernel: c.CDLL) -> dict[int, tuple[int, str]]:
     return entries
 
 
-def capture(pid: int, owner_pid: int) -> None:
+def owned_python_processes(pid: int, owner_pid: int) -> list[int]:
     if sys.platform != "win32" or c.sizeof(c.c_void_p) != 8 or platform.machine() != "AMD64":
         raise ValueError("Native capture requires x64 Windows")
     if pid <= 0 or owner_pid <= 0 or pid in (os.getpid(), owner_pid):
         raise ValueError("An owned child process is required")
-    entries = _processes(c.WinDLL("kernel32", use_last_error=True))
+    entries = process_entries(c.WinDLL("kernel32", use_last_error=True))
     current = os.getpid()
     ancestors = {current}
     for _ in range(8):
@@ -118,6 +118,11 @@ def capture(pid: int, owner_pid: int) -> None:
         selected.extend(additional[: 4 - len(selected)])
         if not additional or len(selected) >= 4:
             break
+    return selected
+
+
+def capture(pid: int, owner_pid: int) -> None:
+    selected = owned_python_processes(pid, owner_pid)
     print("NATIVE_OWNED_TREE", selected, flush=True)
     frames = 0
     with _DBGHELP_LOCK:
@@ -130,7 +135,15 @@ def capture(pid: int, owner_pid: int) -> None:
         raise ValueError("No native frames were captured")
 
 
-def _capture_process(pid: int) -> int:
+def capture_fault(root_pid: int, owner_pid: int, pid: int, tid: int) -> None:
+    if pid not in owned_python_processes(root_pid, owner_pid):
+        raise ValueError("Fault target is outside the owned Python tree")
+    with _DBGHELP_LOCK:
+        if not _capture_process(pid, priority_tid=tid):
+            raise ValueError("No native fault frames were captured")
+
+
+def _capture_process(pid: int, *, priority_tid: int | None = None) -> int:
     if sys.platform != "win32":
         raise ValueError("Native capture requires Windows")
     kernel = c.WinDLL("kernel32", use_last_error=True)
@@ -175,6 +188,8 @@ def _capture_process(pid: int) -> int:
                 more = kernel.Thread32Next(snap, c.byref(thread_entry))
         finally:
             kernel.CloseHandle(snap)
+        if priority_tid is not None:
+            tids = [priority_tid] + [tid for tid in tids if tid != priority_tid][:31]
         kernel.OpenThread.argtypes = [w.DWORD, w.BOOL, w.DWORD]
         kernel.OpenThread.restype = w.HANDLE
         kernel.GetProcessIdOfThread.argtypes = [w.HANDLE]

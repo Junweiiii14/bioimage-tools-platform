@@ -24,6 +24,7 @@ def run_with_native_watch(
     env: dict[str, str],
     idle_seconds: float = 60,
     capture: Callable[[int], None] = _capture,
+    watch_faults: bool = False,
 ) -> int:
     """Forward the stream, take one snapshot per idle interval, and preserve the result.
 
@@ -66,6 +67,17 @@ def run_with_native_watch(
 
         observer = Thread(target=observe, name="native-test-watch", daemon=True)
         observer.start()
+        fault_observer: Thread | None = None
+        if watch_faults:
+            from tooling.windows_fault_watch import watch_exceptions
+
+            fault_observer = Thread(
+                target=watch_exceptions,
+                args=(child.pid, os.getpid(), stopped),
+                name="native-exception-watch",
+                daemon=True,
+            )
+            fault_observer.start()
         try:
             for line in child.stdout:
                 last_output = time.monotonic()
@@ -76,3 +88,5 @@ def run_with_native_watch(
         finally:
             stopped.set()
             observer.join(timeout=1)
+            if fault_observer is not None:
+                fault_observer.join(timeout=1)
