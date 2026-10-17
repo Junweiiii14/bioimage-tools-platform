@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "task": "SYNC-001",
+  "base_commit": "0b786cb5aa0770eaf546d452e6a7a72469015756",
+  "source_head": "850ec7545fa74f9db8bc2e9e426e0bc9a32aea04",
+  "historical_receipts": {
+    "work/evidence/T-002/rules-context.json": "d813508595883a7d1b0419c57d2ae85e358857c4"
+  }
+}
