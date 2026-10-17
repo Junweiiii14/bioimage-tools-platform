@@ -22,6 +22,7 @@ jobs:
       QT_QPA_PLATFORM: offscreen
       PYTHONUNBUFFERED: '1'
       PYTEST_ADDOPTS: '-vv -o faulthandler_timeout=60'
+      BIOIMAGE_NATIVE_STACKS: '1'
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:

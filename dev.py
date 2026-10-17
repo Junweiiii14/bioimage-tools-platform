@@ -21,6 +21,12 @@ def run_module(*args: str) -> int:
     environment = os.environ.copy()
     if args[0] in {"pytest", "tooling.installed_wheels"}:
         environment["QT_QPA_PLATFORM"] = "offscreen"
+    if args[0] == "pytest":
+        native_watch = environment.pop("BIOIMAGE_NATIVE_STACKS", "") == "1"
+        if native_watch and sys.platform == "win32":
+            from tooling.hang_watch import run_with_native_watch
+
+            return run_with_native_watch([sys.executable, "-m", *args], cwd=ROOT, env=environment)
     return subprocess.run(
         [sys.executable, "-m", *args], cwd=ROOT, env=environment, check=False
     ).returncode
