@@ -26,9 +26,9 @@ def install_quant_request(
         or request.revision != plan.request.revision
     ):
         raise ValueError("不能更换来源或运行修订")
-    if (
-        request.geometry_policy != "independent_lanes@1"
-        or request.quant_policy != "wbquant_1_4_3@1"
+    if request.geometry_policy != "independent_lanes@1" or request.quant_policy not in (
+        "wbquant_1_4_3@1",
+        "background_support@1",
     ):
         raise ValueError("此入口仅支持新版独立泳道策略")
     if tuple(item.roi.lane_id for item in request.lanes) != tuple(
@@ -91,7 +91,19 @@ def update_quant_lane(
                 bounds=bounds if bounds is not None else b.bounds,
                 baseline=baseline if bounds is not None or baseline is not None else b.baseline,
                 included=b.included if included is None else included,
-                detection_notes=tuple(dict.fromkeys((*b.detection_notes, "manually_adjusted"))),
+                detection_notes=tuple(
+                    dict.fromkeys(
+                        (
+                            *(
+                                note
+                                for note in b.detection_notes
+                                if not (bounds is not None or baseline is not None)
+                                or not note.startswith("boundary_review:")
+                            ),
+                            "manually_adjusted",
+                        )
+                    )
+                ),
             )
             if b.band_id == band_id
             else b

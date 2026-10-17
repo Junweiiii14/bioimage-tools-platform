@@ -19,14 +19,21 @@ def replan_quant_lanes(
     cancelled: Callable[[], bool] = lambda: False,
 ) -> WBAnalysisProject:
     plan = next((p for p in project.analyses if p.row_id == row_id), None)
-    if plan is None or plan.request.quant_policy != "wbquant_1_4_3@1":
+    if plan is None or plan.request.quant_policy not in ("wbquant_1_4_3@1", "background_support@1"):
         raise ValueError("没有新版定量计划")
     image = load_tiff(path)
     if image.sha256 != plan.request.source_sha256:
         raise ValueError("原图来源不一致")
     if cancelled():
         raise ValueError("重新规划已取消")
-    proposals = propose_quant_lanes(
+    from wb_tool.domain.background_bounds import propose_background_lanes
+
+    propose = (
+        propose_background_lanes
+        if plan.request.quant_policy == "background_support@1"
+        else propose_quant_lanes
+    )
+    proposals = propose(
         image.pixels, tuple(lane.roi for lane in plan.request.lanes), plan.request.polarity
     )
     lanes: list[LaneAnnotation] = []

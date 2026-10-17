@@ -7,7 +7,8 @@ import time
 from hashlib import sha256
 from pathlib import Path
 
-from bioimage_app.api import create_figure_project_window
+from bioimage_app.web_window import WebWorkbenchWindow
+from PySide6.QtCore import QSettings
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
 
@@ -20,7 +21,12 @@ def main() -> None:
     assert all(set(e) == {"path", "sha256"} for e in entries)
     assert not destination.exists()
     application = QApplication([])
-    window = create_figure_project_window()
+    shell = WebWorkbenchWindow(
+        settings=QSettings(
+            str(destination.parent / (destination.name + ".ini")), QSettings.Format.IniFormat
+        )
+    )
+    window = shell.host
     window.automatic.crop_policy = "source_geometry@2"
     window.automatic.quant_policy = sys.argv[3] if len(sys.argv) > 3 else "wbquant_1_4_3@1"
 
@@ -35,10 +41,11 @@ def main() -> None:
             if time.monotonic() > deadline:
                 raise TimeoutError(window.view.status.text())
             application.processEvents()
-            QTest.qWait(25)
+            QTest.qWait(5)
+            time.sleep(0.005)
 
     try:
-        window.show()
+        shell.show()
         window.open_workspace(str(destination), create=True)
         wait(lambda: not window.operation_busy)
         window.import_images(tuple(e["path"] for e in entries), automatic=True)
@@ -46,7 +53,7 @@ def main() -> None:
             lambda: (
                 bool(window.automatic.last_output_path) or "操作失败" in window.view.status.text()
             ),
-            300,
+            900,
         )
         assert window.automatic.last_output_path, window.view.status.text()
         wait(lambda: not window.operation_busy)
@@ -58,12 +65,15 @@ def main() -> None:
         )
         assert len(project.analyses) == len(entries)
         document = project.project_id
-        encoded = project.model_dump_json()
         output = Path(window.automatic.last_output_path)
+        window.save()
+        wait(lambda: not window.operation_busy)
+        project = window.view.project()
+        encoded = project.model_dump_json()
         window.load_document(document)
         wait(lambda: not window.operation_busy)
         assert window.view.project().model_dump_json() == encoded
-        window.grab().save(str(destination / "workbench.png"))
+        shell.grab().save(str(destination / "workbench.png"))
         for e in entries:
             assert sha256(Path(e["path"]).read_bytes()).hexdigest() == e["sha256"]
         report = {
@@ -81,7 +91,7 @@ def main() -> None:
         )
         print(json.dumps(report, ensure_ascii=True), flush=True)
     finally:
-        window.close()
+        shell.close()
         wait(lambda: window.resources_closed, 60)
     application.processEvents()
 

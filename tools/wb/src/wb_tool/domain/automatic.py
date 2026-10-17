@@ -21,7 +21,7 @@ from wb_tool.domain.crop_detection import (
 from wb_tool.domain.grid import fixed_lane_grid
 from wb_tool.domain.lanes import LaneROI, Polarity
 
-QuantPolicy = Literal["legacy_bounds@1", "wbquant_1_4_3@1"]
+QuantPolicy = Literal["legacy_bounds@1", "wbquant_1_4_3@1", "background_support@1"]
 
 CropPolicy = Literal["legacy_fixed_height@1", "lane_ratio@1", "source_geometry@2"]
 
@@ -57,7 +57,7 @@ class AutoWBSettings:
     quant_policy: QuantPolicy = "legacy_bounds@1"
 
     def __post_init__(self) -> None:
-        if self.quant_policy not in ("legacy_bounds@1", "wbquant_1_4_3@1"):
+        if self.quant_policy not in ("legacy_bounds@1", "wbquant_1_4_3@1", "background_support@1"):
             raise ValueError("未知定量策略")
         if self.crop_policy not in ("legacy_fixed_height@1", "lane_ratio@1", "source_geometry@2"):
             raise ValueError("裁剪比例策略无效")

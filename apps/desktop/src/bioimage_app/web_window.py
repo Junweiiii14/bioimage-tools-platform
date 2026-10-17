@@ -67,7 +67,7 @@ class WebWorkbenchWindow(QMainWindow):
         self.settings = settings or QSettings("BioImageTools", "Platform")
         self.host = AdvancedHost()
         self.host.automatic.crop_policy = "source_geometry@2"
-        self.host.automatic.quant_policy = "wbquant_1_4_3@1"
+        self.host.automatic.quant_policy = "background_support@1"
         self.host.closed.connect(self._backend_closed)
         self.host.workspace_opened.connect(self._workspace_ready)
         self.web = QWebEngineView(self)

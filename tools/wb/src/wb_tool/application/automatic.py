@@ -79,10 +79,16 @@ def suggest_analysis_for_crop(
     )
     if len(geometry) != lane_count:
         raise ValueError("检测泳道数与请求不一致")
-    if quant_policy == "wbquant_1_4_3@1":
+    if quant_policy in ("wbquant_1_4_3@1", "background_support@1"):
+        from wb_tool.domain.background_bounds import propose_background_lanes
         from wb_tool.domain.quant_supervision import propose_quant_lanes
 
-        proposals = propose_quant_lanes(image.pixels, geometry, polarity)
+        propose = (
+            propose_background_lanes
+            if quant_policy == "background_support@1"
+            else propose_quant_lanes
+        )
+        proposals = propose(image.pixels, geometry, polarity)
         for index, proposal in enumerate(proposals, 1):
             check_detection_cancelled(cancelled)
             lanes.append(
@@ -279,7 +285,8 @@ def install_automatic_result(
         project, row_id, crop, request, result.settings, result.warnings, empty
     )
     frame = result.detection.candidates[candidate_index].display_frame
-    if frame is not None:
+    segments = [s for s in installed.composition.slices if s.row_id == row_id]
+    if frame is not None and len(segments) == 1:
         display = DisplayFrame(
             center_x=frame.center_x,
             center_y=frame.center_y,

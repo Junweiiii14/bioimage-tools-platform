@@ -65,3 +65,5 @@ T-024新增 automatic_wb_proposals@1 与 WBAutomaticProject/schema8：原像素�
 T-024自动主流程已集成。schema8与自动输出契约见 `../../docs/contracts/wb-automatic-v1.md`；质量复核的原始积分与有效信号分列；失败来源保留，未知蛋白和归一化配对不猜测。
 
 T-041：FigureLayoutStyle显式standard_lane_ratio@1可将同Fig不同原生ROI尺寸显示为每泳道lane_unit宽、4/5 lane_unit高的RGB8 LANCZOS行；原生默认、定量和原值裁剪保持。manifest操作@2明确回源与显示重采样，TIFF定量入口拒绝；预算仍3200万像素。详见wb-laboratory-layout-v1.md。
+
+T-042：source_geometry@2以短膜轮廓、上下边方向和跨阈值泳道中心推断几何；多行Marker证据仅排除实际Marker。检测/显示拉正保留原像素逐泳道ROI。手动ROI/N变化撤销该行旧显示框，旧项目与旧策略仍可重放。background_support@1要求连续背景支持，原始profile_integral@1公式不变；背景不足/多信号需复核，不能作为有效信号。现网页工作台默认启用两项新策略，HTML/CSS布局未改。研究与8图限定评分见docs/research/2026-10-17-source-only-geometry.md、work/evidence/T-042/crop-scoring.md（仓库根）。

@@ -139,7 +139,14 @@ def preserve_automatic_composition(project: WBLayoutProject, row_id: str) -> Fig
     if not project.composition.slices:
         return initial_composition(project)
     row = next(row for row in project.rows if row.row_id == row_id)
-    composition = project.composition
+    composition = project.composition.model_copy(
+        update={
+            "slices": tuple(
+                s.model_copy(update={"display_frame": None}) if s.row_id == row_id else s
+                for s in project.composition.slices
+            )
+        }
+    )
     # Appending sources preserves the old composition until their automatic jobs run.
     # Add placeholders only for the current new row or still-unlocated pending rows.
     # A previously located row missing from the layout remains a validation error.

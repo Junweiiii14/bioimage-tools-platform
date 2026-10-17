@@ -27,3 +27,10 @@ GitHub只读API核验GelGenie：main SHA23fae2fb6ab2ade7149f4e7a76248dba7d9d23a9
 ## 尚待验证
 
 同一张图多目标行的身份不一定可由像素确定；白背景/多膜/折弯/缺失端部/不同仪器要另测。阈值集、角度一致性、ROI映射和旧项目读取需合成性质/回归/工作台端到端验证。8图不用于宣称泛化成功率。积分背景研究在裁图证据完成后开展。
+
+
+## 积分背景支持实验
+
+ImageJ Gel Analyzer 的封闭峰面积依赖背景线，不等于局部谷点之间面积。SciPy维护者的 [peak_widths](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.peak_widths.html) 按 prominence 相对高度求宽，不能直接证明端点属于背景；[issue 16350](https://github.com/scipy/scipy/issues/16350)也讨论平台与周围背景的区别。因此不修改冻结WBQuant源码；新增background_support@1，对原始均值剖面的检测副本平滑，要求连续背景支持，再以原始profile_integral@1积分。2.5%幅度/3倍二阶差分噪声门槛和3–10点支持是版本化工程策略，不是文献保证。峰内浅谷不再截断；多独立信号、背景不足保留诊断面积并标记quality_review，不进入有效信号/比值。显示插值仍不进入数值。
+
+合成独立矩形面积、内部缺口、斜背景、双峰、平坦、截断宽峰测试均有明确预期。真实48泳道使用同一新几何，分别运行旧WBQuant和新策略，结果冻结在.local/t042/boundary-comparison.json。新策略21/48缺少充分背景支持；另外保留位深端点警示，总计7 valid、41 quality_review。不能将48个数值或数值增加当正确率。缺少独立逐lane背景真值，真实积分准确率尚不能给出；必须在工作台扩大/调整ROI及显式背景复核后才能报告有效测量。

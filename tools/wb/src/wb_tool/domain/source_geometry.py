@@ -183,7 +183,7 @@ def detect_source_geometry(
         )
         outside = sum(not low <= int(y) <= high for y in peaks)
         marker = centers[0] < width * 0.28 and len(peaks) >= 2 and outside >= 1
-        if settings.left_marker == "exclude" or marker:
+        if marker:
             marker_center = centers.pop(0)
             support.pop(0)
             flags.append("left_marker_multiband_evidence")

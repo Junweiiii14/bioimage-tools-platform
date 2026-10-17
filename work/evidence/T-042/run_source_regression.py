@@ -44,7 +44,8 @@ def main() -> None:
             row_id=row_id,
             revision=0,
             settings=AutoWBSettings(
-                crop_policy="source_geometry@2", quant_policy="wbquant_1_4_3@1"
+                crop_policy="source_geometry@2",
+                quant_policy=sys.argv[3] if len(sys.argv) > 3 else "wbquant_1_4_3@1",
             ),
         )
         predictions.append(

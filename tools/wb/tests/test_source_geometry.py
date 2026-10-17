@@ -77,3 +77,15 @@ def test_explicit_n_conflict_does_not_invent_slots() -> None:
     )
     assert not result.candidates
     assert "explicit_lane_count_conflicts_with_evidence" in result.flags
+
+
+@pytest.mark.parametrize("marker", [False, True])
+def test_explicit_marker_exclusion_preserves_sample_without_marker_in_target_row(
+    marker: bool,
+) -> None:
+    result = detect_automatic_geometry(
+        membrane(marker=marker),
+        AutoWBSettings(crop_policy="source_geometry@2", left_marker="exclude"),
+    )
+    assert result.candidates and result.settings.lane_count == 5
+    assert (result.marker is not None) == marker
