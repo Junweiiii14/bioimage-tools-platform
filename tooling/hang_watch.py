@@ -70,7 +70,9 @@ def run_with_native_watch(
             for line in child.stdout:
                 last_output = time.monotonic()
                 print(line, end="", flush=True)
-            return child.wait()
+            code = child.wait()
+            print(f"Observed child exit={code} u32=0x{code & 0xFFFFFFFF:08x}", flush=True)
+            return code
         finally:
             stopped.set()
             observer.join(timeout=1)

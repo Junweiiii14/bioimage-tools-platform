@@ -40,6 +40,7 @@ def test_idle_capture_cannot_hide_child_failure(
     text = capsys.readouterr().out
     assert "start" in text and "end" in text
     assert "private-diagnostic-error-text" not in text
+    assert "Observed child exit=17 u32=0x00000011" in text
     if capture_fails:
         assert "Native snapshot unavailable: ValueError" in text
 
