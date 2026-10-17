@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from hypothesis import given, settings
+from hypothesis import example, given, settings
 from hypothesis import strategies as st
 from wb_tool.api import AutoWBSettings, detect_automatic_geometry
 
@@ -46,6 +46,7 @@ def test_tilted_short_membrane_and_marker(angle: float, marker: bool) -> None:
     assert np.array_equal(raw, before)
 
 
+@example(angle=7.0, count=8)
 @settings(max_examples=12, deadline=None)
 @given(angle=st.floats(min_value=-9, max_value=9, allow_nan=False), count=st.integers(3, 8))
 def test_original_geometry_contains_each_known_band(angle: float, count: int) -> None:

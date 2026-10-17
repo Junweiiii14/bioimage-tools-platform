@@ -126,6 +126,48 @@ def _centers(energy: NDArray[np.float64], height: int) -> tuple[list[float], lis
     return [float(np.median(g)) for g in stable], [len(g) for g in stable], width
 
 
+def _filled_membrane(pixels: NDArray[np.uint8 | np.uint16]) -> tuple[LaneROI | None, bool]:
+    """Recover a tilted contour rejected because internal bands reduced raw occupancy."""
+    step = max(1, ceil(max(pixels.shape) / 256))
+    sample = pixels[::step, ::step].astype(np.float64)
+    border = np.concatenate((sample[0], sample[-1], sample[:, 0], sample[:, -1]))
+    distance = np.abs(sample - np.median(border))
+    contrast = float(distance.max())
+    if contrast <= max(2.0, 6 * detection_noise(border)):
+        return None, False
+    labels, _ = ndi.label(
+        ndi.binary_fill_holes(distance > max(contrast * 0.25, 6 * detection_noise(border)))
+    )
+    candidates: list[tuple[int, LaneROI]] = []
+    sizes = np.bincount(labels.ravel())
+    sizes[0] = 0
+    for label in np.flatnonzero(sizes >= sample.size * 0.01):
+        ys, xs = np.nonzero(labels == label)
+        if xs.size < sample.size * 0.01:
+            continue
+        area = int(xs.size)
+        x0, x1, y0, y1 = int(xs.min()), int(xs.max()) + 1, int(ys.min()), int(ys.max()) + 1
+        if area < (x1 - x0) * (y1 - y0) * 0.35 or area > sample.size * 0.95:
+            continue
+        candidates.append(
+            (
+                area,
+                LaneROI(
+                    "membrane",
+                    x0 * step,
+                    y0 * step,
+                    min(pixels.shape[1], x1 * step),
+                    min(pixels.shape[0], y1 * step),
+                ),
+            )
+        )
+    candidates.sort(key=lambda item: item[0], reverse=True)
+    if not candidates:
+        return None, False
+    multiple = len(candidates) > 1 and candidates[1][0] >= candidates[0][0] * 0.25
+    return candidates[0][1], multiple
+
+
 def detect_source_geometry(
     pixels: NDArray[np.uint8 | np.uint16], settings: "AutoWBSettings", cancelled: Callable[[], bool]
 ) -> CropDetection:
@@ -134,6 +176,10 @@ def detect_source_geometry(
         settings.lane_count or 1, 2, settings.polarity, left_marker=False
     )
     membrane, old_flags = detection_membrane(pixels, initial, cancelled)
+    if membrane is None:
+        membrane, multiple = _filled_membrane(pixels)
+        if membrane is not None:
+            old_flags = ("filled_membrane_contour",) + (("multiple_membranes",) if multiple else ())
     flags = ["crop_policy:source_geometry@2", "automatic_geometry_unreviewed", *old_flags]
 
     def failure(reason: str) -> CropDetection:
