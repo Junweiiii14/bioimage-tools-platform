@@ -1,6 +1,6 @@
 # T-042：真实原图自动裁图与积分修复
 
-- 状态：in_progress；社区调研、source_geometry@2、background_support@1及现有网页工作台接入已实现；8图裁图独审8/8，正常工作台8run与重开/48前端cells通过；最终兼容增量独审完成，全门禁进行中。
+- 状态：in_progress；社区调研、source_geometry@2、background_support@1及现有网页工作台接入已实现；8图裁图独审8/8，正常工作台8run与重开/48前端cells通过；最终兼容增量独审完成；完整门禁挂起后退出1，分进程10+618项通过，仍未通过完整门禁。
 - base commit：b32acff0dff9d6c6a84741ecc3aba8a3be4a010f。
 - 分支：codex/t042-source-only-repair；活动目录为 t021-coordination/bioimage-tools-platform。
 - 依赖：T-040 失败基线与深度报告、T-041 显示/原像素分离；总体 T-003 未完成。
@@ -49,3 +49,7 @@
 ## 下一步
 
 调查完整测试进程的未归因原生层挂起；独立审查已完成，分进程测试与独立wheel证据见validation.md，分跑不等于完整门禁。严格保持现有网页工作台界面；误开旧Qt测试入口已修正。真实积分21/48背景支持不足及位深极值仍明确复核，不以数字增长当准确。其他仪器/多膜/弯曲/端部缺失留出数据、干净Windows与main集成未完成，不扩展无授权发布。
+
+## GitHub 开发日志（2026-10-17）
+
+用户授权将本次过程记录到GitHub；已发布并回读核对Issue #6：https://github.com/Junweiiii14/bioimage-tools-platform/issues/6。正文副本work/evidence/T-042/github-development-log.md。公开内容只含过程、汇总指标及仓库状态，不上传私有原图/参考/本地成果。记录前HEAD d71c8ec，本次8提交，累计领先origin/main127提交；本次未推送产品分支、未开产品PR、未合main，日志发布不等于代码已远端备份。

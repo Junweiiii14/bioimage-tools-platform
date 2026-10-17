@@ -10,3 +10,5 @@
 - 独立wheel和smoke/policy exit0，类型0错误；58相关测试及114角度×N探针通过。626项前轮622passed/4failed已经9eb修复Schema漂移和N8/7°反例。
 - 下一步调查原生挂起可复现顺序或原生线程栈，再完成全门禁；不得靠skip/改阈值或只看passed数量判成功。
 - 未发布/PR/main/干净Windows。原生CUA不重启。源路径仅.local/t042/sources-only.json；参考仅scoring。所有失败轮次与私有成果保持。
+
+- 用户要求的GitHub开发日志已发布并回读核对Issue #6：https://github.com/Junweiiii14/bioimage-tools-platform/issues/6；正文副本work/evidence/T-042/github-development-log.md。记录前开发HEAD d71c8ec领先远端main127提交（T042为8）；48本地分支/19worktree，原主目录dirty均保留，产品分支未推送。

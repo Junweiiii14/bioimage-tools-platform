@@ -153,3 +153,5 @@ Product f7a6651 independently reviewed; actual8sources/4Fig/48values and supervi
 HEADcc626d7/productf7a6651. deep-causal-replay.py and deep-boundary-replay.py each exit0; independent source-only diagnosis, no original/reference/project modification. Confirmed107/119/118membrane gate,8→7Marker deletion,4H_N2CVfallback,17/17old boundary reproduction. Report cross-reviewed by crop/quant/pipeline agents. Documentation only; no new fullgate or package claim.
 
 - 2026-10-17 T042产品9eb5a1b：58相关测试、114倾角×N探针、8图正常网页工作台/导出/重开及48DOM结果、独立wheel/smoke/policy均exit0，产品独审完成；完整check因原生挂起人工停止exit1，desktop单模块10passed/exit0。所有失败和分进程诊断以work/evidence/T-042/validation.md为准，不能据passed计数报全门禁成功。
+
+- 2026-10-17 GitHub日志：gh issue create退出0，Issue #6；gh issue view回读正文与本地副本归一换行后全等。只改文档，未重跑产品测试；既有全门禁失败状态不变。

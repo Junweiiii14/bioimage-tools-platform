@@ -1,9 +1,5 @@
 # Current Work Log
 
-## 2026-10-14 / T-005 后台协议与真实进程
-
-上一回合 progress：e3932ee/45d0c5f 手工分析。本回合实现协议 v1、strict JSON/schema、host 会话门禁与数值限线程真实 worker，123 测试及隔离 wheel 启动通过。布尔 Literal/JSON tuple 模式反例已修复且保留。合作取消不是宿主强停/存储完成证据；后续继续宿主、工作区与 GUI，目标 active。
-
 ## 2026-10-14 / T-006 工作区与恢复
 
 上一回合 progress：bd1af2e/74e6561 后台协议。本回合新增通用契约与工作区宿主存储；164 测试、7 合约、三独立 wheel 通过。原图快照、草稿 CAS、旧运行保持修订、发布/DB 故障、3 真实 os._exit、取消竞态、同大小损坏、Windows junction/硬链接及一致性备份均验证。平台无 WB 字段，Qt/UI/强停和独审未完成；目标 active。
@@ -107,3 +103,7 @@ Three independent readers traced crop/quant/pipeline and cross-reviewed17-sectio
 ## 2026-10-17 T042 源输入修复与现有网页验证
 
 产品至9eb5a1b：8图裁图1/8→8/8，冻结后参考评分；新积分7valid/41quality_review，原图/参考/旧结果SHA保持。修正误开的旧Qt测试入口，正常WebWorkbenchWindow完成8run、导出、保存重开和48DOM结果。独审问题已关闭；Schema与N8/7°性质反例修复。独立wheel通过；完整628项门禁在窗口关闭测试原生connect挂起，停止专属进程exit1，根因未定；没有放松测试或更换锁。详见T042任务及validation。
+
+## 2026-10-17 T042 GitHub 开发日志与仓库盘点
+
+按用户明确请求发布开发日志Issue #6并回读比对正文一致。记录本次8提交、8图1/8→8/8、积分复核、独审、完整门禁挂起及分跑退出码；没有上传私有图像或推送累计产品代码。核对远端main221a2df、活动d71c8ec领先127、本地48分支/19worktree、原主目录dirty、开放PR3项。没有清理他人内容、合main或发布软件。
