@@ -155,17 +155,17 @@ class WebWorkbenchWindow(QMainWindow):
             self._closing = True
             self.host.shutdown_requested = True
             self.host.close()
-            # Invalid advanced edits abort native shutdown; retain a visible correction route.
+            # Rejected shutdown keeps the current workbench; native tools open explicitly.
             if not self.host.is_closing and not self.host.resources_closed:
                 self._closing = False
                 self.host.shutdown_requested = False
-                self.host.show()
+                self.raise_()
 
     def _check_close_failure(self) -> None:
         if self._closing and not self.host.is_closing and not self.host.resources_closed:
             self._closing = False
             self.host.shutdown_requested = False
-            self.host.show()
+            self.raise_()
 
     def _backend_closed(self) -> None:
         self.bridge.timer.stop()

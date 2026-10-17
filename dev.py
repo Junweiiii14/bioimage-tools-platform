@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import importlib.metadata
 import json
+import os
 import platform
 import subprocess
 import sys
@@ -17,7 +18,12 @@ ROOT = Path(__file__).resolve().parent
 
 def run_module(*args: str) -> int:
     print("RUN", sys.executable, "-m", *args, flush=True)
-    return subprocess.run([sys.executable, "-m", *args], cwd=ROOT, check=False).returncode
+    environment = os.environ.copy()
+    if args[0] in {"pytest", "tooling.installed_wheels"}:
+        environment["QT_QPA_PLATFORM"] = "offscreen"
+    return subprocess.run(
+        [sys.executable, "-m", *args], cwd=ROOT, env=environment, check=False
+    ).returncode
 
 
 def doctor() -> int:
@@ -33,7 +39,7 @@ def doctor() -> int:
         "expected_python": (ROOT / ".python-version").read_text().strip(),
         "platform": platform.platform(),
         "packages": versions,
-        "product_status": "wb-reference-domain; desktop not implemented",
+        "product_status": "wb-workbench-development; validation status is task-specific",
     }
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return int("MISSING" in versions.values() or result["python"] != result["expected_python"])
