@@ -9,7 +9,16 @@ from pathlib import Path
 
 import pytest
 
-from tooling.rule_context import CORE, RECOVERY, ROOT, git, make_receipt, validate
+from tooling.rule_context import (
+    CORE,
+    RECOVERY,
+    ROOT,
+    IntegrationContext,
+    git,
+    make_integration_context,
+    make_receipt,
+    validate,
+)
 
 
 def commit(root: Path, message: str) -> str:
@@ -142,3 +151,133 @@ def test_cli_emits_readable_utf8_in_legacy_windows_encoding(repo: tuple[Path, st
         check=True,
     )
     assert "规则：原始图像不可覆盖。" in result.stdout.decode("utf-8")
+
+
+def historical_tasks(root: Path, base: str) -> IntegrationContext:
+    for task in ("T-001", "T-002"):
+        task_file = root / f"work/tasks/{task}-historic.md"
+        task_file.write_text("Historic scoped task", encoding="utf-8")
+        output = root / f"work/evidence/{task}/rules-context.json"
+        output.parent.mkdir(parents=True)
+        output.write_text(json.dumps(make_receipt(root, task, ["."], base)), encoding="utf-8")
+        commit(root, task)
+    record(root, base)
+    return make_integration_context(root, "F-002", base)
+
+
+def save_integration(root: Path, integration: IntegrationContext) -> None:
+    (root / "work/evidence/F-002/integration-context.json").write_text(
+        json.dumps(integration), encoding="utf-8"
+    )
+
+
+def test_multiple_receipts_still_require_explicit_manifest(repo: tuple[Path, str]) -> None:
+    root, base = repo
+    historical_tasks(root, base)
+    assert "exactly one" in validate(root, base, commit(root, "no manifest"))[0]
+
+
+def test_integration_preserves_and_checks_every_historical_source(repo: tuple[Path, str]) -> None:
+    root, base = repo
+    integration = historical_tasks(root, base)
+    originals = {
+        path: git(root, "show", f"{source}:{path}")
+        for path, source in integration["historical_receipts"].items()
+    }
+    save_integration(root, integration)
+    assert validate(root, base, commit(root, "explicit integration")) == []
+    assert all((root / path).read_bytes() == data for path, data in originals.items())
+
+
+@pytest.mark.parametrize(
+    "change", ["missing", "extra", "wrong-base", "wrong-task", "invalid-source"]
+)
+def test_integration_manifest_fails_closed(repo: tuple[Path, str], change: str) -> None:
+    root, base = repo
+    integration = historical_tasks(root, base)
+    if change == "missing":
+        integration["historical_receipts"].pop("work/evidence/T-001/rules-context.json")
+    elif change == "extra":
+        integration["historical_receipts"]["../outside.json"] = base
+    elif change == "wrong-base":
+        integration["base_commit"] = integration["source_head"]
+    elif change == "wrong-task":
+        integration["task"] = "T-001"
+    else:
+        integration["historical_receipts"]["work/evidence/T-001/rules-context.json"] = "HEAD"
+    save_integration(root, integration)
+    assert validate(root, base, commit(root, "invalid integration"))
+
+
+def test_integration_rejects_changed_historical_bytes(repo: tuple[Path, str]) -> None:
+    root, base = repo
+    integration = historical_tasks(root, base)
+    historic = root / "work/evidence/T-001/rules-context.json"
+    historic.write_text(historic.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+    save_integration(root, integration)
+    assert "immutable source" in validate(root, base, commit(root, "changed original"))[0]
+
+
+def test_recording_integration_rejects_uncommitted_history_edits(repo: tuple[Path, str]) -> None:
+    root, base = repo
+    historical_tasks(root, base)
+    (root / "work/evidence/T-001/rules-context.json").write_text("{}", encoding="utf-8")
+    with pytest.raises(ValueError, match="Commit and verify"):
+        make_integration_context(root, "F-002", base)
+
+
+def test_historical_rule_drift_requires_auditable_reload(repo: tuple[Path, str]) -> None:
+    root, base = repo
+    integration = historical_tasks(root, base)
+    path = "work/evidence/T-001/rules-context.json"
+    historic = make_receipt(root, "T-001", ["."], base)
+    historic["rules"]["AGENTS.md"] = "0" * 64
+    (root / path).write_text(json.dumps(historic), encoding="utf-8")
+    bad_source = commit(root, "stale history record")
+    integration["source_head"] = bad_source
+    integration["historical_receipts"][path] = bad_source
+    save_integration(root, integration)
+    assert "rules changed" in validate(root, base, commit(root, "cannot waive drift"))[0]
+    original_bytes = git(root, "show", f"{bad_source}:{path}")
+    (root / path).write_text(json.dumps(make_receipt(root, "T-001", ["."], base)), encoding="utf-8")
+    corrected = commit(root, "explicit historical rule reload")
+    record(root, base)
+    integration = make_integration_context(root, "F-002", base)
+    assert integration["historical_receipts"][path] == corrected
+    save_integration(root, integration)
+    assert validate(root, base, commit(root, "integration after recorded reload")) == []
+    assert git(root, "show", f"{bad_source}:{path}") == original_bytes
+
+
+def test_historical_source_from_another_branch_is_rejected(repo: tuple[Path, str]) -> None:
+    root, base = repo
+    integration = historical_tasks(root, base)
+    actual = git(root, "rev-parse", "HEAD").decode().strip()
+    git(root, "checkout", "-qb", "unrelated", base)
+    (root / "unrelated.txt").write_text("other branch", encoding="utf-8")
+    other = commit(root, "unrelated source")
+    git(root, "checkout", "--detach", actual)
+    record(root, base)
+    integration["historical_receipts"]["work/evidence/T-001/rules-context.json"] = other
+    save_integration(root, integration)
+    assert "not an ancestor" in validate(root, base, commit(root, "foreign source"))[0]
+
+
+@pytest.mark.parametrize("change", ["scope", "head-rule", "base", "task"])
+def test_integration_does_not_waive_current_checks(repo: tuple[Path, str], change: str) -> None:
+    root, base = repo
+    integration = historical_tasks(root, base)
+    if change == "scope":
+        record(root, base, ["work"])
+        (root / "outside.py").write_text("pass\n", encoding="utf-8")
+    elif change == "head-rule":
+        (root / "AGENTS.md").write_text("Changed current rules", encoding="utf-8")
+    elif change == "base":
+        receipt = make_receipt(root, "F-002", ["."], integration["source_head"])
+        (root / "work/evidence/F-002/rules-context.json").write_text(
+            json.dumps(receipt), encoding="utf-8"
+        )
+    else:
+        (root / "work/tasks/F-002-example.md").unlink()
+    save_integration(root, integration)
+    assert validate(root, base, commit(root, "current context invalid"))
