@@ -141,13 +141,34 @@ def detect_source_geometry(
             initial, w, h, membrane, None, None, (), (*flags, reason), "source_geometry@2"
         )
 
-    if membrane is None or "multiple_membranes" in old_flags:
+    if "multiple_membranes" in old_flags:
         return failure("no_reliable_membrane")
     check_detection_cancelled(cancelled)
-    try:
-        plane = _plane(pixels, membrane)
-    except ValueError as exc:
-        return failure(str(exc))
+    if membrane is None:
+        # Previously cropped fields have no membrane/background contour. Accept
+        # only a uniform perimeter with sparse signal of the declared polarity.
+        raw_field = pixels.astype(np.float64)
+        perimeter = np.concatenate((raw_field[0], raw_field[-1], raw_field[:, 0], raw_field[:, -1]))
+        base = float(np.median(perimeter))
+        contrast = base - raw_field if settings.polarity == "dark" else raw_field - base
+        amplitude = float(contrast.max())
+        noise_field = detection_noise(raw_field)
+        occupied = float(np.mean(contrast > max(settings.min_snr * noise_field, amplitude * 0.1)))
+        if (
+            amplitude < settings.min_snr * noise_field
+            or not 0.005 <= occupied <= 0.35
+            or float(np.quantile(np.abs(perimeter - base), 0.95))
+            > max(3 * noise_field, amplitude * 0.01)
+        ):
+            return failure("no_reliable_membrane")
+        membrane = LaneROI("pre_cropped_field", 0, 0, w, h)
+        plane = DetectionPlane(raw_field, np.ones(pixels.shape, dtype=np.bool_), 0.0, 0.0, 0.0)
+        flags.append("uniform_background_field_without_orientation_evidence")
+    else:
+        try:
+            plane = _plane(pixels, membrane)
+        except ValueError as exc:
+            return failure(str(exc))
     raw, valid = plane.values, plane.valid
     height, width = raw.shape
     signed = raw if settings.polarity == "dark" else -raw

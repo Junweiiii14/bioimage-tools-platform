@@ -108,3 +108,17 @@ def test_reanalysis_preserves_source_frame(tmp_path: Path) -> None:
     assert tuple(lane.roi for lane in again.analyses[0].request.lanes) == tuple(
         lane.roi for lane in first.analyses[0].request.lanes
     )
+
+
+@pytest.mark.parametrize("light", [False, True])
+def test_pre_cropped_uniform_field_retains_supported_input(light: bool) -> None:
+    raw = np.full((180, 360), 50000, dtype=np.uint16)
+    for x in (60, 120, 180, 240, 300):
+        raw[70:85, x - 17 : x + 17] = 15000
+    if light:
+        raw = 65535 - raw
+    result = detect_automatic_geometry(
+        raw, AutoWBSettings(crop_policy="source_geometry@2", polarity="light" if light else "dark")
+    )
+    assert result.candidates and result.settings.lane_count == 5
+    assert "uniform_background_field_without_orientation_evidence" in result.flags
