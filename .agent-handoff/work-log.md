@@ -5,10 +5,6 @@
 - 2026-10-16 T033：网页优先，同源WebEngine桥由T034分工集成；独立代码/视觉发现已修，独立文档同步。高级窗口网页化未完成，产品a68000e。
 
 
-## 2026-10-14 / T-003 首个 WB 产品核心
-
-用户授权扩展至 WB 软件完成。冻结参考 8 文件 SHA/本地快照与数值契约，独立实现标准库剖面积分包；新增真实 import-linter、传递依赖负例和隔离 wheel 门禁。完整检查 61 测试通过。真实图像标注与 GUI/自动化闭环未完成，独审未执行。下一步图像输入与 ROI。
-
 ## 2026-10-14 / T-003 TIFF 输入与泳道剖面
 
 wb-tool 0.2.0 新增 uint8/16 灰度及显式 RGB 单页 TIFF、极性与半开 ROI。5 张本地真实 TIFF 只读输入烟测通过；私人摘要在 .local。增加 TIFF/积分 independence 合约和第 4 个传递负例。隔离 wheel 先按锁文件装依赖后 no-deps 装产物；直接 offline pip 缺索引缓存的问题已修复。下一步后台任务/工作区/手工 GUI。
@@ -112,3 +108,6 @@ wb-tool 0.2.0 新增 uint8/16 灰度及显式 RGB 单页 TIFF、极性与半开 
 
 ## 2026-10-17 T040
 Executed approved real dataset, published8no-overwrite named crops,4Fig images,48supervised observations/Excel/ZIP and reopened real desktop. Preserved first failed automatic predictions and old integrals. Integrated display-only standard frames and source overlays, independently reviewed throughf7a6651. Detector/baseline shortcomings and fullcheck abnormalexit remain explicit; see task/evidence.
+
+## 2026-10-17 T040 deep technical audit
+Three independent readers traced crop/quant/pipeline and cross-reviewed17-section report. Source-only membrane/Marker and17boundary replays exit0, original hashes unchanged. Corrected prior vague attribution, documented script-vs-product and scientific/units/precision/coordinate/model-validation limits; no product modifications. Fullcheck not rerun for this report.

@@ -146,3 +146,6 @@ context --task T-028 --scope work --scope .agent-handoff --scope .impeccable/cri
 
 ## 2026-10-17 T040 real-data execution
 Product f7a6651 independently reviewed; actual8sources/4Fig/48values and supervised workbook audited. Scripts finish/supervise/open passed, visible8row project.600pytest passed summary, fullcheck exit1 unexplained beforewheel; not gate success. Separate installed-wheels exit0. First automatic crop1/8, corrected8/8 reference-assisted;33/48quality warnings. Details work/evidence/T-040/validation.md; no private originals committed.
+
+## 2026-10-17 T040 causal replays
+HEADcc626d7/productf7a6651. deep-causal-replay.py and deep-boundary-replay.py each exit0; independent source-only diagnosis, no original/reference/project modification. Confirmed107/119/118membrane gate,8→7Marker deletion,4H_N2CVfallback,17/17old boundary reproduction. Report cross-reviewed by crop/quant/pipeline agents. Documentation only; no new fullgate or package claim.

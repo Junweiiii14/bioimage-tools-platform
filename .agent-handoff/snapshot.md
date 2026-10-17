@@ -9,3 +9,7 @@
 - T041显式standard_lane_ratio@1与DisplayFrame仅显示、source_to_output回源，native默认/冻结manifest保留。P1分段复用整行frame已限制仅整行可用；88专项及31后续通过，独审至f7a6651无未解发现。
 - .local/t040含首轮冻结、audit、诊断、delivery-report.json(最终workspace/output/supervised_output)、验证JSON及真实截图；用户可见输出在WB资料中新结果目录，原目录仅新增8标准裁图。脚本finish/supervise均exit0；Excel48单元格及ZIP8frame复读通过。
 - T040实际执行已交付，桌面PID32064可见8原图/4Fig；.local/t040/opened-desktop.png已目视核验。全check虽600passed但exit1，原因UNKNOWN，不宣称全门禁通过；独立wheel另记。下一步排查测试退出异常并修科学自动化。未来优先修原图膜/倾斜/周期泳道与自动bounds，不能继续以UI或合成数据替代科学验证。PR/main/干净Windows未做。
+
+- 用户要求原因推理与尝试方案，已核对原图诊断/首轮审计/48profile及源代码；归因与分阶段消融方案补T040末节，本轮未改算法。膜阈值、倾斜和边界选择问题有证据；最近原始profile局部极小值及向内收紧已由17/17重放定位；零平台来源及退出异常仍未知。
+
+- 深度报告work/evidence/T-040/deep-technical-limitations.md（17节/逐层代码索引）已三路复核；新probes均exit0。明确最终参考辅助/监督脚本尚未产品化、默认先量后拼、CSV2位舍入、像素/厘米DPI区别、高res临时内嵌参数超限；>2048缩略manifest风险本次未触发。本轮无产品修复。
