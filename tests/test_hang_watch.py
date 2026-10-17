@@ -74,12 +74,15 @@ def test_watch_opt_in_is_not_inherited_by_the_test_child(monkeypatch: pytest.Mon
         return 13
 
     monkeypatch.setenv("BIOIMAGE_NATIVE_STACKS", "1")
+    monkeypatch.setenv("BIOIMAGE_LINUX_NATIVE_STACKS", "1")
     monkeypatch.setenv("PYTHONFAULTHANDLER", "1")
     monkeypatch.setattr(dev.subprocess, "run", run)
     monkeypatch.setattr("tooling.hang_watch.run_with_native_watch", watch)
+    monkeypatch.setattr("tooling.linux_native_run.run_with_native_debugger", watch)
     assert dev.run_module("pytest", "-q") == 13
     assert environments[0]["QT_QPA_PLATFORM"] == "offscreen"
     assert "BIOIMAGE_NATIVE_STACKS" not in environments[0]
+    assert "BIOIMAGE_LINUX_NATIVE_STACKS" not in environments[0]
     assert environments[0]["PYTHONFAULTHANDLER"] == "1"
     assert os.environ["BIOIMAGE_NATIVE_STACKS"] == "1"
 

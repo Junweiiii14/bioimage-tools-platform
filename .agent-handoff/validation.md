@@ -176,3 +176,8 @@ CI009产品57fd7ea正式check --all实际exit0：669passed/497.77秒，Observed 
 ## 2026-10-17 T043本轮交付
 
 产品57fd7ea本机669/497.77秒+全部wheel实际0；becb389远端run39025981922完整成功：Windows669/407.87秒child0、Linux669/178.49秒，两平台全部隔离wheel/dev最终成功，规则/桌面环境成功。CI009及T043本轮complete，T003/科学/交互/发布/历史UNKNOWN继续保留。8图正常工作台链0，8几何/48值状态保持，参考未读。独审复核远端两HEAD、入口/父路由、最新bundle/34原文件SHA和已发日志正文；9草稿PR未合main、6旧树仅锁定，其余原改动/旧结果保留。后继仅收尾文档，仍按规则/独审/安全普通同步完成。维护计划已给简单报bug材料与后续维护步骤，无自动调度。
+
+
+## 2026-10-17 CI010 Linux退出SIGSEGV
+
+0d仅文档后继Linux669/146.29秒后SIGSEGV主线程noPythonframe，exit245/wheel未跑；同HEAD Windows669/346.68秒child0+wheels/dev成功。T043重开in_progress，旧成功/失败全保留；CI010只增显式GDB观察/0与17与真实SIGSEGV控制，不猜测性修Qt清理，不改产品/断言/15分钟。作者相关8项2.49秒0，双平台模块类型0；Linux控制/全检待真实执行，独审待绑定。

@@ -10,6 +10,8 @@
 
 ## Current Risks
 
+- 当前阻断：0d269db Linux669passed后SIGSEGV/noPythonframe，exit245，wheel未跑。CI010增加原生栈观察，不推断扩展或析构根因；Windows同HEAD完整成功。
+
 - 最新1bb Windows为create执行区间6.125秒/默认5秒setup超时（1failed667passed，child1），Linux668/183.03秒+wheels0。CI009仅合并新库初始化事务，45定向/45独审0、本机完整669/497.77秒+全部隔离wheel0；becb389远端Windows669/407.87秒、Linux669/178.49秒及全部wheel/规则/桌面环境成功；不保证托管I/O任意时限。旧bbf668passed后exit1仍UNKNOWN。
 
 - bbf3cc5远端Linux诊断工具4项Pyright失败；CI0071021662最小平台guard两平台类型0/相关8项0并独审，后续becb389真实Linux669/178.49秒及全部wheel成功。Windows最终668passed/508.43秒后外层exit1、wheel未跑，无挂起/真实子码。CI008仅增加子码/pytest后故障处理观察，未认定Qt崩溃或完整修复；后续becb389双平台完整CI已成功，不能抹去该次未定位退出。
