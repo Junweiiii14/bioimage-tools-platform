@@ -1,16 +1,41 @@
 """Bounded one-shot background requests for preview and document/result codecs."""
 
+from hashlib import file_digest
 from math import ceil
+from pathlib import Path
 from uuid import uuid4
 
 import numpy as np
 from pydantic import TypeAdapter
 from PySide6.QtCore import QObject, Qt, QThread, QTimer, Signal, Slot
 
+from wb_tool.adapters.crop_export import export_crop
 from wb_tool.adapters.tiff_input import load_tiff
+from wb_tool.adapters.worksheet_export import export_worksheet
 from wb_tool.application.analysis import AnalysisResult
-from wb_tool.application.desktop_data import PreviewRaster, WBJob, WBReply
-from wb_tool.application.document import WBDocument
+from wb_tool.application.crop_suggestions import CropSuggestion, read_figure_project
+from wb_tool.application.desktop_data import PreviewRaster, ProjectDerivedTables, WBJob, WBReply
+from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
+from wb_tool.application.figure_project import FigurePNG, FigureRender, WBFigureProject
+from wb_tool.application.project_analysis import (
+    LoadedProjectResult,
+    ProjectTableSnapshot,
+    fill_project_table,
+    read_project_result,
+)
+from wb_tool.application.project_normalization import (
+    NormalizationSnapshot,
+    WBNormalizedProject,
+    fill_project_normalization,
+)
+from wb_tool.application.project_ocr import (
+    LoadedProjectOCR,
+    WBProjectOCR,
+    fill_project_ocr_table,
+    install_project_recognition,
+    read_project_ocr_result,
+)
+from wb_tool.domain.worksheet import OCRRecognition
 
 
 class _Work(QObject):
@@ -19,8 +44,176 @@ class _Work(QObject):
     @Slot(str, object)
     def execute(self, request_id: str, job: WBJob) -> None:
         try:
-            value: PreviewRaster | WBDocument | AnalysisResult | bytes
-            if job.operation == "preview":
+            value: (
+                PreviewRaster
+                | WBDocument
+                | WBWorksheetDocument
+                | WBFigureProject
+                | FigureRender
+                | FigurePNG
+                | CropSuggestion
+                | LoadedProjectResult
+                | ProjectTableSnapshot
+                | LoadedProjectOCR
+                | ProjectDerivedTables
+                | AnalysisResult
+                | OCRRecognition
+                | bytes
+                | str
+            )
+            if job.operation == "project_derived_tables":
+                if not isinstance(job.document, WBProjectOCR):
+                    raise ValueError("缺少项目派生结果配置")
+                value = ProjectDerivedTables(
+                    fill_project_ocr_table(
+                        job.document, job.project_results, job.project_ocr_result
+                    ),
+                    fill_project_normalization(
+                        job.document, job.project_results, job.project_ocr_result
+                    )
+                    if isinstance(job.document, WBNormalizedProject)
+                    else NormalizationSnapshot(),
+                )
+            elif job.operation == "project_normalization_export":
+                from wb_tool.adapters.normalization_export import export_project_normalization
+
+                if not isinstance(job.document, WBNormalizedProject):
+                    raise ValueError("缺少归一化配置")
+                value = str(
+                    export_project_normalization(
+                        job.document,
+                        job.project_results,
+                        job.project_ocr_result,
+                        job.destination,
+                        ocr_labels=job.ocr_labels,
+                    )
+                )
+            elif job.operation in (
+                "project_ocr_result",
+                "project_ocr_install",
+                "project_ocr_table",
+                "project_ocr_export",
+            ):
+                if not isinstance(job.document, WBProjectOCR):
+                    raise ValueError("缺少项目OCR状态")
+                if job.operation == "project_ocr_result":
+                    if job.ocr_run is None:
+                        raise ValueError("缺少OCR运行记录")
+                    value = read_project_ocr_result(job.document, job.ocr_run, job.data)
+                elif job.operation == "project_ocr_install":
+                    if job.project_ocr_result is None:
+                        raise ValueError("缺少已校验OCR结果")
+                    value = install_project_recognition(job.document, job.project_ocr_result)
+                elif job.operation == "project_ocr_export":
+                    from wb_tool.adapters.project_ocr_export import export_project_ocr_table
+
+                    value = str(
+                        export_project_ocr_table(
+                            job.document,
+                            job.project_results,
+                            job.project_ocr_result,
+                            job.destination,
+                        )
+                    )
+                else:
+                    value = ProjectTableSnapshot(
+                        fill_project_ocr_table(
+                            job.document, job.project_results, job.project_ocr_result
+                        )
+                    )
+            elif job.operation == "project_result":
+                if job.analysis_plan is None:
+                    raise ValueError("缺少结果所属定量计划")
+                value = read_project_result(job.analysis_plan, job.data)
+            elif job.operation in ("project_table", "project_export"):
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少项目文档")
+                if job.operation == "project_export":
+                    from wb_tool.adapters.project_export import export_project_table
+
+                    value = str(
+                        export_project_table(job.document, job.project_results, job.destination)
+                    )
+                else:
+                    value = ProjectTableSnapshot(
+                        fill_project_table(job.document, job.project_results)
+                    )
+            elif job.operation == "crop_suggest":
+                from wb_tool.adapters.crop_suggestions import suggest_crops
+
+                if job.detection_settings is None:
+                    raise ValueError("缺少候选检测参数")
+                value = suggest_crops(
+                    job.path,
+                    job.source_sha256,
+                    job.row_id,
+                    job.revision,
+                    job.detection_settings,
+                    cancelled=job.cancellation.is_set if job.cancellation else lambda: False,
+                )
+            elif job.operation == "font_digest":
+                path = Path(job.path)
+                if (
+                    path.suffix.lower() not in (".ttf", ".ttc", ".otf")
+                    or path.stat().st_size > 32 * 1024 * 1024
+                ):
+                    raise ValueError("请选择不超过 32 MiB 的字体文件")
+                with path.open("rb") as stream:
+                    value = file_digest(stream, "sha256").hexdigest()
+            elif job.operation == "figure_document":
+                value = read_figure_project(job.data)
+            elif job.operation in ("figure_preview", "figure_export", "figure_ocr"):
+                from wb_tool.adapters.figure_export import (
+                    encode_figure_png,
+                    export_figure_bundle,
+                    render_figure,
+                )
+
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少拼图项目")
+                cancel = job.cancellation.is_set if job.cancellation is not None else lambda: False
+                if job.operation == "figure_ocr":
+                    rendered = render_figure(job.document, job.sources, cancelled=cancel)
+                    if cancel():
+                        raise ValueError("生成拼图已取消")
+                    value = encode_figure_png(rendered, job.document.template.dpi)
+                    if cancel():
+                        raise ValueError("生成拼图已取消")
+                elif job.operation == "figure_preview":
+                    from PIL import Image
+
+                    value = render_figure(
+                        job.document, job.sources, require_review=False, cancelled=cancel
+                    )
+                    if max(value.width, value.height) > 2048:
+                        preview = Image.frombytes("RGB", (value.width, value.height), value.rgb)
+                        preview.thumbnail((2048, 2048), Image.Resampling.NEAREST)
+                        value = FigureRender(
+                            preview.width, preview.height, preview.tobytes(), value.manifest_json
+                        )
+                else:
+                    value = export_figure_bundle(
+                        job.document, job.sources, job.destination, cancelled=cancel
+                    )
+            elif job.operation == "ocr_preview":
+                from wb_tool.adapters.ocr_input import load_ocr_image
+
+                ocr_image = load_ocr_image(job.path)
+                height, width = ocr_image.pixels.shape
+                step = max(1, ceil(max(height, width) / 2048))
+                sampled = ocr_image.pixels[::step, ::step]
+                ph, pw = sampled.shape
+                value = PreviewRaster(
+                    ocr_image.sha256,
+                    width,
+                    height,
+                    pw,
+                    ph,
+                    sampled.tobytes(),
+                    ocr_image.bit_depth,
+                    ocr_image.warnings,
+                )
+            elif job.operation == "preview":
                 image = load_tiff(job.path)
                 height, width = image.pixels.shape
                 step = max(1, ceil(max(height, width) / 2048))
@@ -38,9 +231,23 @@ class _Work(QObject):
                     image.warnings,
                 )
             elif job.operation == "document":
-                value = WBDocument.from_bytes(job.data)
+                value = read_wb_document(job.data)
             elif job.operation == "result":
                 value = TypeAdapter(AnalysisResult).validate_json(job.data, strict=True)
+            elif job.operation == "ocr_result":
+                value = TypeAdapter(OCRRecognition).validate_json(job.data, strict=True)
+            elif job.operation == "stored_result":
+                value = TypeAdapter(AnalysisResult | OCRRecognition).validate_json(
+                    job.data, strict=True
+                )
+            elif job.operation == "export":
+                if job.worksheet is None or job.result is None:
+                    raise ValueError("缺少已复核工作表/测量")
+                value = str(export_worksheet(job.worksheet, job.result, job.path))
+            elif job.operation == "crop":
+                if job.crop is None:
+                    raise ValueError("缺少原图裁剪范围")
+                value = export_crop(job.path, job.crop, job.destination)
             else:
                 if job.document is None:
                     raise ValueError("缺少文档")

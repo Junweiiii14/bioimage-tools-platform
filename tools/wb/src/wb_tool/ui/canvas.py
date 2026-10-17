@@ -17,8 +17,10 @@ class ImageCanvas(QWidget):
         super().__init__(parent)
         self.setMinimumSize(300, 240)
         self._image = QImage()
-        self._size = (0, 0)
+        self._size: tuple[int, int] = (0, 0)
+        self._view_region: LaneROI | None = None
         self._lanes: tuple[LaneROI, ...] = ()
+        self._regions: tuple[LaneROI, ...] = ()
         self._anchor: QPointF | None = None
         self.setMouseTracking(True)
 
@@ -31,14 +33,35 @@ class ImageCanvas(QWidget):
             QImage.Format.Format_Grayscale8,
         ).copy()
         self._size = (raster.width, raster.height)
+        self._view_region = None
+        self._anchor = None
         self.update()
 
     def set_lanes(self, lanes: tuple[LaneROI, ...]) -> None:
         self._lanes = lanes
         self.update()
 
+    def set_regions(self, regions: tuple[LaneROI, ...]) -> None:
+        self._regions = regions
+        self.update()
+
+    def set_view_region(self, region: LaneROI | None) -> None:
+        if region and (region.x1 > self._size[0] or region.y1 > self._size[1]):
+            raise ValueError("显示范围超出原图")
+        self._view_region = region
+        self._anchor = None
+        self.update()
+
+    def _view_bounds(self) -> tuple[int, int, int, int]:
+        region = self._view_region
+        return (
+            (region.x0, region.y0, region.width, region.y1 - region.y0)
+            if region
+            else (0, 0, *self._size)
+        )
+
     def image_rect(self) -> QRectF:
-        width, height = self._size
+        _, _, width, height = self._view_bounds()
         if not width or not height:
             return QRectF()
         scale = min((self.width() - 20) / width, (self.height() - 20) / height)
@@ -51,10 +74,10 @@ class ImageCanvas(QWidget):
 
     def _pixel(self, position: QPointF) -> QPointF:
         rect = self.image_rect()
-        width, height = self._size
+        x, y, width, height = self._view_bounds()
         return QPointF(
-            max(0.0, min(float(width), (position.x() - rect.x()) * width / rect.width())),
-            max(0.0, min(float(height), (position.y() - rect.y()) * height / rect.height())),
+            x + max(0.0, min(float(width), (position.x() - rect.x()) * width / rect.width())),
+            y + max(0.0, min(float(height), (position.y() - rect.y()) * height / rect.height())),
         )
 
     def paintEvent(self, event: QPaintEvent) -> None:
@@ -65,18 +88,23 @@ class ImageCanvas(QWidget):
             painter.setPen(QColor("#e1e7ef"))
             painter.drawText(self.rect(), Qt.AlignmentFlag.AlignCenter, "导入 TIFF 后拖出泳道矩形")
             return
-        painter.drawImage(rect, self._image)
-        painter.setPen(QPen(QColor("#36d9b0"), 2))
-        width, height = self._size
-        for lane in self._lanes:
+        x, y, width, height = self._view_bounds()
+        sx, sy = self._image.width() / self._size[0], self._image.height() / self._size[1]
+        painter.drawImage(rect, self._image, QRectF(x * sx, y * sy, width * sx, height * sy))
+        painter.setClipRect(rect.adjusted(-2, -18, 2, 2))
+        for lane, color, label_y in [
+            *((r, "#ffbb52", 14 if i == 1 else -4) for i, r in enumerate(self._regions)),
+            *((r, "#36d9b0", 14) for r in self._lanes),
+        ]:
+            painter.setPen(QPen(QColor(color), 2))
             box = QRectF(
-                rect.x() + lane.x0 * rect.width() / width,
-                rect.y() + lane.y0 * rect.height() / height,
+                rect.x() + (lane.x0 - x) * rect.width() / width,
+                rect.y() + (lane.y0 - y) * rect.height() / height,
                 (lane.x1 - lane.x0) * rect.width() / width,
                 (lane.y1 - lane.y0) * rect.height() / height,
             )
             painter.drawRect(box)
-            painter.drawText(box.topLeft() + QPointF(2, 14), lane.lane_id)
+            painter.drawText(box.topLeft() + QPointF(2, label_y), lane.lane_id)
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.MouseButton.LeftButton and self.image_rect().contains(

@@ -145,3 +145,48 @@ def test_run_commit_and_reopen_through_storage_port(qtbot: QtBot, tmp_path: Path
             port.shutdown()
     with Workspace.open(tmp_path / "run-store") as store:
         assert store.get_run(run_id) == completed.value
+
+
+def test_import_bytes_is_immutable_validated_and_off_gui_thread(
+    qtbot: QtBot, tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
+    from hashlib import sha256
+
+    from tool_contracts.api import AssetRef
+
+    port = AsyncStorage()
+    replies: list[StorageReply] = []
+    port.replied.connect(replies.append)
+    threads: list[QThread] = []
+    original = Workspace.import_asset
+
+    def observed(store: Workspace, path: str | Path, digest: str) -> AssetRef:
+        threads.append(QThread.currentThread())
+        return original(store, path, digest)
+
+    monkeypatch.setattr(Workspace, "import_asset", observed)
+    try:
+        port.submit(StorageCommand("create", path=str(tmp_path / "workspace")))
+        qtbot.waitUntil(lambda: len(replies) == 1)
+        data = b"immutable generated binary"
+        digest = sha256(data).hexdigest()
+        for command in (
+            StorageCommand("import_bytes", path="figure.png", data=data, source_sha256=digest),
+            StorageCommand(
+                "import_bytes", path="../../outside.png", data=data, source_sha256=digest
+            ),
+            StorageCommand("import_bytes", path="figure.png", data=data, source_sha256="0" * 64),
+        ):
+            port.submit(command)
+        qtbot.waitUntil(lambda: len(replies) == 4)
+        asset = replies[1].value
+        assert isinstance(asset, AssetRef) and asset.sha256 == digest
+        assert replies[2].error_code == replies[3].error_code == "ValueError"
+        assert threads and all(thread != port.thread() for thread in threads)
+        assert (tmp_path / "workspace" / asset.relative_path).read_bytes() == data
+        port.submit(StorageCommand("read", asset=asset))
+        qtbot.waitUntil(lambda: len(replies) == 5)
+        assert replies[4].data == data
+    finally:
+        with qtbot.waitSignal(port.closed, timeout=10000):
+            port.shutdown()
