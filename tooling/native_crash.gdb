@@ -4,6 +4,7 @@ set print frame-arguments none
 set print entry-values no
 set print thread-events off
 set startup-with-shell off
+set disable-randomization off
 handle all nostop noprint pass
 handle SIGSEGV SIGABRT SIGBUS SIGILL SIGFPE stop print pass
 python
