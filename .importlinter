@@ -1,0 +1,88 @@
+[importlinter]
+root_packages =
+    wb_tool
+    tool_contracts
+    platform_runtime
+    bioimage_app
+include_external_packages = True
+
+[importlinter:contract:domain-purity]
+name = WB domain is independent of GUI and storage
+type = forbidden
+source_modules = wb_tool.domain
+forbidden_modules =
+    PySide6
+    sqlite3
+    subprocess
+    multiprocessing
+    pathlib
+
+[importlinter:contract:public-layer]
+name = Public API may depend on domain, never the reverse
+type = layers
+layers =
+    wb_tool.api
+    wb_tool.application
+    wb_tool.domain
+
+[importlinter:contract:application-purity]
+name = Analysis depends on image ports, never file adapters or GUI
+type = forbidden
+source_modules = wb_tool.application
+forbidden_modules =
+    wb_tool.adapters
+    PySide6
+    sqlite3
+    subprocess
+
+[importlinter:contract:input-quantification-independence]
+name = TIFF decoding and profile integration are independent
+type = independence
+modules =
+    wb_tool.adapters.tiff_input
+    wb_tool.domain.quantify
+
+[importlinter:contract:contracts-purity]
+name = Shared contracts never import runtime, tools, GUI, numbers or database
+type = forbidden
+source_modules = tool_contracts
+forbidden_modules =
+    platform_runtime
+    wb_tool
+    PySide6
+    numpy
+    sqlite3
+
+[importlinter:contract:runtime-purity]
+name = Runtime never imports experiment tools, GUI or numerical processing
+type = forbidden
+source_modules = platform_runtime
+forbidden_modules =
+    wb_tool
+    PySide6
+    numpy
+
+[importlinter:contract:tool-runtime-independence]
+name = WB tool and host persistence remain independent
+type = independence
+modules =
+    wb_tool
+    platform_runtime
+
+[importlinter:contract:host-storage-purity]
+name = Host storage queue has no experimental or image processing dependencies
+type = forbidden
+source_modules = bioimage_app.storage
+forbidden_modules =
+    wb_tool
+    numpy
+
+[importlinter:contract:lower-host-independence]
+name = Contracts runtime and WB never import the desktop assembly
+type = forbidden
+source_modules =
+    tool_contracts
+    platform_runtime
+    wb_tool
+forbidden_modules = bioimage_app
+

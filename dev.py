@@ -33,7 +33,7 @@ def doctor() -> int:
         "expected_python": (ROOT / ".python-version").read_text().strip(),
         "platform": platform.platform(),
         "packages": versions,
-        "product_status": "not-started",
+        "product_status": "wb-reference-domain; desktop not implemented",
     }
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return int("MISSING" in versions.values() or result["python"] != result["expected_python"])
@@ -65,7 +65,9 @@ def main() -> int:
         ("ruff", "check", "."),
         ("ruff", "format", "--check", "."),
         ("pyright",),
+        ("tooling.import_contracts",),
         ("pytest", "-q"),
+        ("tooling.installed_wheels",),
     ]:
         code = run_module(*command)
         if code:

@@ -1,0 +1,239 @@
+{
+  "$defs": {
+    "AnalysisRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "source_sha256": {
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "revision": {
+          "title": "Revision",
+          "type": "integer"
+        },
+        "polarity": {
+          "enum": [
+            "dark",
+            "light"
+          ],
+          "title": "Polarity",
+          "type": "string"
+        },
+        "lanes": {
+          "items": {
+            "$ref": "#/$defs/LaneAnnotation"
+          },
+          "title": "Lanes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "source_sha256",
+        "revision",
+        "polarity",
+        "lanes"
+      ],
+      "title": "AnalysisRequest",
+      "type": "object"
+    },
+    "AssetRef": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "relative_path": {
+          "maxLength": 512,
+          "pattern": "^[A-Za-z0-9._/-]+$",
+          "title": "Relative Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "size_bytes": {
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        },
+        "schema_version": {
+          "default": 1,
+          "maximum": 1,
+          "minimum": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "asset_id",
+        "relative_path",
+        "sha256",
+        "size_bytes"
+      ],
+      "title": "AssetRef",
+      "type": "object"
+    },
+    "BandAnnotation": {
+      "additionalProperties": false,
+      "properties": {
+        "band_id": {
+          "title": "Band Id",
+          "type": "string"
+        },
+        "bounds": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BandBounds"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "baseline": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Baseline"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "included": {
+          "default": true,
+          "title": "Included",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "band_id",
+        "bounds"
+      ],
+      "title": "BandAnnotation",
+      "type": "object"
+    },
+    "BandBounds": {
+      "additionalProperties": false,
+      "description": "Inclusive endpoints relative to the original, unsmoothed lane profile.",
+      "properties": {
+        "left": {
+          "title": "Left",
+          "type": "integer"
+        },
+        "right": {
+          "title": "Right",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "left",
+        "right"
+      ],
+      "title": "BandBounds",
+      "type": "object"
+    },
+    "Baseline": {
+      "additionalProperties": false,
+      "description": "Endpoint intensities in the same polarity and units as the profile.",
+      "properties": {
+        "left_value": {
+          "title": "Left Value",
+          "type": "number"
+        },
+        "right_value": {
+          "title": "Right Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "left_value",
+        "right_value"
+      ],
+      "title": "Baseline",
+      "type": "object"
+    },
+    "LaneAnnotation": {
+      "additionalProperties": false,
+      "properties": {
+        "roi": {
+          "$ref": "#/$defs/LaneROI"
+        },
+        "bands": {
+          "items": {
+            "$ref": "#/$defs/BandAnnotation"
+          },
+          "title": "Bands",
+          "type": "array"
+        }
+      },
+      "required": [
+        "roi",
+        "bands"
+      ],
+      "title": "LaneAnnotation",
+      "type": "object"
+    },
+    "LaneROI": {
+      "additionalProperties": false,
+      "properties": {
+        "lane_id": {
+          "title": "Lane Id",
+          "type": "string"
+        },
+        "x0": {
+          "title": "X0",
+          "type": "integer"
+        },
+        "y0": {
+          "title": "Y0",
+          "type": "integer"
+        },
+        "x1": {
+          "title": "X1",
+          "type": "integer"
+        },
+        "y1": {
+          "title": "Y1",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "lane_id",
+        "x0",
+        "y0",
+        "x1",
+        "y1"
+      ],
+      "title": "LaneROI",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": 1,
+      "maximum": 1,
+      "minimum": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "source": {
+      "$ref": "#/$defs/AssetRef"
+    },
+    "request": {
+      "$ref": "#/$defs/AnalysisRequest"
+    }
+  },
+  "required": [
+    "source",
+    "request"
+  ],
+  "title": "WBDocument",
+  "type": "object"
+}

@@ -2,6 +2,15 @@ version = 1
 revision = 5
 requires-python = "==3.12.*"
 
+[manifest]
+members = [
+    "bioimage-app",
+    "bioimage-tools-platform",
+    "platform-runtime",
+    "tool-contracts",
+    "wb-tool",
+]
+
 [[package]]
 name = "annotated-types"
 version = "0.8.0"
@@ -12,9 +21,38 @@ wheels = [
 ]
 
 [[package]]
+name = "bioimage-app"
+version = "0.1.0"
+source = { editable = "apps/desktop" }
+dependencies = [
+    { name = "platform-runtime" },
+    { name = "pyside6" },
+    { name = "tool-contracts" },
+]
+
+[package.optional-dependencies]
+wb = [
+    { name = "wb-tool", extra = ["desktop"] },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "platform-runtime", editable = "packages/platform_runtime" },
+    { name = "pyside6", specifier = "==6.12.0" },
+    { name = "tool-contracts", editable = "packages/tool_contracts" },
+    { name = "wb-tool", extras = ["desktop"], marker = "extra == 'wb'", editable = "tools/wb" },
+]
+provides-extras = ["wb"]
+
+[[package]]
 name = "bioimage-tools-platform"
 version = "0.0.0"
 source = { virtual = "." }
+dependencies = [
+    { name = "bioimage-app", extra = ["wb"] },
+    { name = "platform-runtime" },
+    { name = "wb-tool" },
+]
 
 [package.dev-dependencies]
 build = [
@@ -44,6 +82,11 @@ dev = [
 ]
 
 [package.metadata]
+requires-dist = [
+    { name = "bioimage-app", extras = ["wb"], editable = "apps/desktop" },
+    { name = "platform-runtime", editable = "packages/platform_runtime" },
+    { name = "wb-tool", editable = "tools/wb" },
+]
 
 [package.metadata.requires-dev]
 build = [
@@ -548,6 +591,17 @@ wheels = [
 ]
 
 [[package]]
+name = "platform-runtime"
+version = "0.1.0"
+source = { editable = "packages/platform_runtime" }
+dependencies = [
+    { name = "tool-contracts" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "tool-contracts", editable = "packages/tool_contracts" }]
+
+[[package]]
 name = "platformdirs"
 version = "4.13.0"
 source = { registry = "https://pypi.org/simple" }
@@ -956,6 +1010,17 @@ wheels = [
 ]
 
 [[package]]
+name = "tool-contracts"
+version = "0.1.0"
+source = { editable = "packages/tool_contracts" }
+dependencies = [
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "pydantic", specifier = "==2.14.1" }]
+
+[[package]]
 name = "typing-extensions"
 version = "4.16.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1000,6 +1065,32 @@ sdist = { url = "https://files.pythonhosted.org/packages/dc/3f/935cf1757643381fb
 wheels = [
     { url = "https://files.pythonhosted.org/packages/52/5b/799c3e5b8e04d5fa1c9b61a4c1f5079603e747205c7311b92abd30283df5/virtualenv-21.14.7-py3-none-any.whl", hash = "sha256:3769219a308c5d2f093e7729621ad12a6346b5767a7ec4338414e2a0fb0c526b", size = 5487587, upload-time = "2026-10-12T01:27:29.37Z" },
 ]
+
+[[package]]
+name = "wb-tool"
+version = "0.5.0"
+source = { editable = "tools/wb" }
+dependencies = [
+    { name = "numpy" },
+    { name = "pydantic" },
+    { name = "tifffile" },
+    { name = "tool-contracts" },
+]
+
+[package.optional-dependencies]
+desktop = [
+    { name = "pyside6" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "numpy", specifier = "==2.5.4" },
+    { name = "pydantic", specifier = "==2.14.1" },
+    { name = "pyside6", marker = "extra == 'desktop'", specifier = "==6.12.0" },
+    { name = "tifffile", specifier = "==2026.9.20" },
+    { name = "tool-contracts", editable = "packages/tool_contracts" },
+]
+provides-extras = ["desktop"]
 
 [[package]]
 name = "zstandard"
