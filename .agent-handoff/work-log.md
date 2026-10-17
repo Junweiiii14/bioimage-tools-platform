@@ -1,9 +1,5 @@
 # Current Work Log
 
-## 2026-10-14 / T-003 TIFF 输入与泳道剖面
-
-wb-tool 0.2.0 新增 uint8/16 灰度及显式 RGB 单页 TIFF、极性与半开 ROI。5 张本地真实 TIFF 只读输入烟测通过；私人摘要在 .local。增加 TIFF/积分 independence 合约和第 4 个传递负例。隔离 wheel 先按锁文件装依赖后 no-deps 装产物；直接 offline pip 缺索引缓存的问题已修复。下一步后台任务/工作区/手工 GUI。
-
 ## 2026-10-14 / T-004 手工分析用例
 
 上一目标回合归类 progress：93a84bb 实现并验证 TIFF/剖面。本回合实现 WB application，明确来源/revision/缺失/排除/无效/真实零/待质量复核，并支持取消无完成结果。90 测试、4 合约及隔离 wheel TIFF→手工分析通过。独审、后台进程、存储与 GUI 未完成，目标保持 active。
@@ -106,3 +102,8 @@ Executed approved real dataset, published8no-overwrite named crops,4Fig images,4
 
 ## 2026-10-17 T040 deep technical audit
 Three independent readers traced crop/quant/pipeline and cross-reviewed17-section report. Source-only membrane/Marker and17boundary replays exit0, original hashes unchanged. Corrected prior vague attribution, documented script-vs-product and scientific/units/precision/coordinate/model-validation limits; no product modifications. Fullcheck not rerun for this report.
+
+
+## 2026-10-17 T042 实现与真实网页验证
+
+社区原始来源调研、几何与背景策略已接现有网页工作台；8图独审8/8，原图旧结果保持，web3正常8run保存重开及48网页结果验证exit0。发现并修复Marker显式误删、ROI旧frame、同框重算frame、双峰漏警、worker质量flag。误开旧Qt测试入口已纠正；无web_ui设计变更。完整门禁/最终独审进行中，详见T042任务和validation；未发布。
