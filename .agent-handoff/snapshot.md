@@ -6,12 +6,12 @@
 - 已确认旧界面三路径：真实默认/历史CLI旧窗口、失败关闭host.show、可见兼容测试；2e5021d修复并独审。CI003b4bc8ba又修确定隐藏宿主Qt所有权，审查者3项exit0；不是原挂起根因证明。
 - CI00579f9070诊断独审8项0，正式664全检真实挂起，Python/native三线程证据支持Qt对象锁/GIL反转；仅停止自有pytest，check实际exit1、wheel未跑。CI006a811ccfd四后台退休→owner析构→queued终态，独审18项0、作者36项0/Pyright0，668完整check/508.54秒及全部隔离wheel实际exit0；8原图功能链退出0。
 - ea6178e远端Windows15分钟再次取消，60秒栈test_web_bridge.py:128 finally关闭等待内QTimer.timeout.connect，20秒等待未运行完成，随后gc.collect尚未执行；2线程无Python帧不能归因GC。Linux659/184.75秒及wheel0。本机精确关闭50次26.81秒0未复现，转native证据，不同样压力无限重跑。
-- bbf3cc5已原子推开发/阶段8，main不变；远端Linux诊断辅助函数4条平台类型错，CI0071021662仅补guard并独审两平台0/相关8项0，最新清单已含CI007。Windows旧作业仍运行，等待其结束后推后继，不记全平台通过。
+- bbf3cc5已原子推开发/阶段8，main不变；远端Linux诊断辅助函数4条平台类型错，CI0071021662仅补guard并独审两平台0/相关8项0，最新清单已含CI007。Windows最终668passed/508.43秒后exit1、wheel未跑，无hang；CI008f5b1fe4/f2a61b3补原始子退出码及pytest后故障处理，追加独审、相关11项0，后继新CI待执行，不记全平台通过。
 - 父工作区AGENTS旧WB路由已仅替换为活动树/分支/固定启动器，完整原文件先外置备份，.local/t043/workspace-routing-fix.json记SHA；独审确认只改该段，原34未提交文件保持。原dirty根目录不变。
 - 最近完整产品b4bc8ba：check --all实际exit0，658passed/497.50s及全部隔离wheel/真实OCR。此前642/657两轮完整成功与失败记录均保留，见T043验证。
 - CI00468c3265补存储enqueue/execute/end/reply/deliver的DEBUG单调时间/请求/线程日志，不含载荷；独审2项实际exit0。最终659完整check实际exit0、509.86秒及全部隔离wheel/真实OCR通过，日志.local/t043/check-ci004-final.log；无时限/skip/锁/公式变更。
 - 远端阶段7 Windows首次初始化5秒超时，原SHA重跑成功；阶段8bcf Windows15分钟无节点取消，5de诊断后Windows首个create10秒超时，1failed/656passed；finally shutdown完成。根因UNKNOWN，无永久死锁证明；日志.local/t043/pr14-windows-diagnostic-failed.log。诊断通过也不能声称根因修复。
-- 同步分支为codex/t043-gate-and-staged-sync与codex/stage-08-source-repair，精确HEAD现场核对；CI003/004/006已完成本地完整门禁与绑定独审，SYNC008清单已更新至1021662来源快照（产品仍a811ccfd）。治理PR7及产品阶段1–7当前CI成功，阶段8实时CI以PR14/Issue6为准；全草稿、main221a2df不变。
+- 同步分支为codex/t043-gate-and-staged-sync与codex/stage-08-source-repair，精确HEAD现场核对；CI003/004/006已完成本地完整门禁与绑定独审，SYNC008清单已更新至f2a61b3来源快照（产品仍a811ccfd）。治理PR7及产品阶段1–7当前CI成功，阶段8实时CI以PR14/Issue6为准；全草稿、main221a2df不变。
 - 阶段链PR7→3→8/9/10/11/12/13/14；.local/t043/stages-published-final.json结束时更新。前置合main后需真实重载base及CI，禁止一次合累计历史。旧T007/T026回执Git版本保留。
 - T042 source_geometry@2/background_support@1已接现有工作台；8原图独立推理，参考仅评分，旧1/8→新8/8（开发回归集）。48槽7有效/41复核，没有独立积分真值。8原图/12参考/旧预测保持；最新8图功能链.local/t043/workbench-ci006退出0，离屏截图空白不作视觉验收。
 - 原19树外置allrefs/二进制patch/未跟踪tar保留；34原有未提交文件SHA保持；6干净无.local树原位锁定，未删/移目录。私有原图/旧结果仍原路径，不能以Git bundle替代而删除。最新备份指针.local/t043/backup-final.json需在最终refs后更新。

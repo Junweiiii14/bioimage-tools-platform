@@ -52,3 +52,6 @@ CI006产品a811ccfd正式完整check --all实际exit0：668passed/508.54秒；Ru
 
 
 CI007：bbf3cc5远端Linux真实4项Pyright失败位于诊断辅助函数，pytest未跑；1021662仅补平台guard、绑定独审两平台类型0、作者相关8项0，未变产品或门禁。准备精确清单后继，等待bbf Windows结束再正常推送，保留原作业证据。最新远端状态始终看Issue6/PR14，main未变。
+
+
+CI008：bbf3cc5 Windows最终668passed/508.43秒但外层exit1/wheel未跑，未定位退出根因，不当全量成功。f5b1fe4/f2a61b3补真实子码和pytest后faulthandler保留，绑定独审、11项0。当前新候选合CI007最小guard及CI008诊断，待正常推送重跑真实远端；main不变。

@@ -1,8 +1,5 @@
 # Current Work Log
 
-## 2026-10-14 / T-014 多源定量第一阶段
-从5bea9d3创建feat/T-014-project-measurements，产品提交79a675a。接通项目v3标注/run引用、固定N原图曲线/边界/基线、逐源真实进程、已提交结果自动表/XLSX、取消关闭/保存重开与过期拒绝。损坏结果逐行核验，新增通用run查询；模型/公式/平台字段不扩展。用户CLX排除说明进入契约、风险和任务。T-014仍implementing，下一步项目OCR显式绑定；整体Goal active。完整验证与失败修复见work/evidence/T-014/validation.md；未独审/推送/发布。
-
 ## 2026-10-14 / T-014 项目OCR关联
 上一目标回合progress完成多源定量，本回合产品05e5d56接通项目v4独立拼图OCR、原文位置/置信度、人工校正、明确原图绑定、自动填表/XLSX及重开校验。取消保留旧关联、关闭等待退出、过期导入/识别拒绝覆盖；原图审核变化同步绑定候选。268全量/9合约/隔离安装通过，真实组合TIFF15token/11未确认行保存重开和SHA保持通过。T-014 review待独审，T-015归一化ready；用户偏好询问尚无回复，不推断科学默认。Goal active，未推送/发布；详情work/evidence/T-014/ocr-validation.md。
 
@@ -117,3 +114,8 @@ ea6178e远端Windows再次15分钟取消，60秒栈停finally关闭的QTimer.tim
 ## 2026-10-17 CI007诊断平台边界
 
 bbf3cc5安全原子推送开发/阶段8，外置bundle06ac64d9验证并再验34原文件保持。Linux真实Pyright4错在诊断_processes，1021662仅补平台拒绝、绑定独审两平台类型0，相关8项0；产品仍a811全量668/508.54秒及wheel0。新清单来源1021662，等待bbf Windows结束再推后继，main不变。
+
+
+## 2026-10-17 CI008退出阶段诊断
+
+bbf3cc5 Windows668passed/508.43秒后外层exit1、wheel未跑，无timeout；保留失败和UNKNOWN。f5b1fe4记录真实子码，f2a61b3保留pytest后故障处理，均绑定独审；相关11项/4.14秒0，首次误写测试文件exit4保留。清单来源f2a61b3含CI007/008，待安全推新候选。产品仍a811本机完整668及wheel0，原图/旧结果/34文件保持，main不变。
