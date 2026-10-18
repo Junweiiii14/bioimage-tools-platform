@@ -198,6 +198,54 @@ def test_real_page_manual_import_compute_save_reopen_without_automatic_or_compos
         assert restored.rows == project.rows
         assert window.host.project_results[0].result.request == project.analyses[0].request
         assert source.read_bytes() == original
+        # The same shipped page returns reviewed crops after reopening, using
+        # local origin memory rather than an archive-supplied destination.
+        qtbot.waitUntil(lambda: js("Boolean(typeof bridge !== 'undefined' && bridge)") is True)
+        assert js("switchMode('review'); true") is True
+        qtbot.waitUntil(
+            lambda: js("Boolean(document.querySelector('[data-action=return_crop]'))") is True
+        )
+        current = window.host.view.project()
+        selected = current.rows[0]
+        assert selected.source is not None
+        valid_return: dict[str, object] = {
+            "projectId": current.project_id,
+            "id": selected.row_id,
+            "sourceId": selected.source.sha256,
+            "revision": window.host.view.generation,
+        }
+        for bad in (
+            {"projectId": "other"},
+            {"sourceId": "0" * 64},
+            {"revision": True},
+            {"revision": -1},
+            {"locate": "true"},
+        ):
+            window.bridge.request("return_crop", json.dumps({**valid_return, **bad}))
+            assert not list(originals.glob("*_WB裁图_*"))
+            assert not window.host.operation_busy
+        # Any extra file picker means persisted local origin lookup failed.
+        monkeypatch.setattr(QFileDialog, "getOpenFileName", forbidden)
+        assert js("document.querySelector('[data-action=return_crop]').click(); true") is True
+        qtbot.waitUntil(
+            lambda: (
+                bool(list(originals.glob("*_记录.json")))
+                or (not window.host.operation_busy and "失败" in window.host.view.status.text())
+            ),
+            timeout=30000,
+        )
+        qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=20000)
+        assert len(list(originals.glob("*_记录.json"))) == 1, window.host.view.status.text()
+        assert "裁图已核验并回存" in window.host.view.status.text()
+        raw_path = next(originals.glob("*_原值.tiff"))
+        with tifffile.TiffFile(raw_path) as image:
+            page = image.pages[0]
+            assert isinstance(page, tifffile.TiffPage)
+            np.testing.assert_array_equal(
+                page.asarray(),
+                np.repeat(profile.astype(np.uint16)[:, None], 100, axis=1)[38:62, 10:90],
+            )
+        assert source.read_bytes() == original
     finally:
         window.close()
         qtbot.waitUntil(lambda: window.host.resources_closed, timeout=20000)

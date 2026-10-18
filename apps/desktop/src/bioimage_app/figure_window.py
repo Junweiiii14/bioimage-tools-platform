@@ -41,6 +41,7 @@ from wb_tool.api import (
     ProjectOCRState,
     ProjectTableSnapshot,
     RestoredProjectResults,
+    ReturnedCrop,
     WBAnalysisProject,
     WBFigureProject,
     WBJob,
@@ -67,6 +68,7 @@ from bioimage_app.project_measurements import ProjectBatchCompletion, ProjectMea
 from bioimage_app.project_ocr import ProjectOCRCompletion, ProjectOCRSession
 from bioimage_app.project_restore import ArchiveRestoreJob, ArchiveRestoreResult
 from bioimage_app.project_start import ProjectSelectionJob
+from bioimage_app.source_origins import SourceOrigins
 from bioimage_app.storage import AsyncStorage, StorageCommand, StorageReply
 from bioimage_app.workbench_motion import NavigationMotion, PanelReveal
 from bioimage_app.workbench_style import apply_workbench_theme
@@ -103,6 +105,7 @@ class FigureProjectWindow(QMainWindow):
         self._store.closed.connect(self._store_stopped)
         self._background.closed.connect(self._background_stopped)
         self._workspace = ""
+        self.source_origins = SourceOrigins()
         self._paths: dict[str, str] = {}
         self._saved_revision: int | None = None
         self._saved_generation = 0
@@ -1628,6 +1631,9 @@ class FigureProjectWindow(QMainWindow):
                         )
                         self.view.generation += 1
                         generation = self.view.generation
+                        self.source_origins.remember(
+                            self._workspace, current.project_id, row.row_id, asset.sha256, path
+                        )
                         self.view.install_thumbnail(raster)
                         imported_ids.append(row.row_id)
                         next_image()
@@ -1641,6 +1647,82 @@ class FigureProjectWindow(QMainWindow):
             self._wb(WBJob("preview", path=path, preview_edge=128), previewed, accept_errors=True)
 
         next_image()
+
+    def return_selected_crop(self, *, locate: bool = False) -> None:
+        if self._busy or self._closing or not self._workspace:
+            return
+        row = self.view.selected_row()
+        if row is None or row.source is None or row.roi is None:
+            raise ValueError("请先选定原图裁剪范围")
+        project = self.view.project()
+        source_sha = row.source.sha256
+        source_path = (
+            ""
+            if locate
+            else self.source_origins.lookup(
+                self._workspace, project.project_id, row.row_id, source_sha
+            )
+        )
+        if not source_path:
+            source_path, _ = QFileDialog.getOpenFileName(
+                self, "定位原图：核验后在其所在文件夹生成新裁图", "", "TIFF (*.tif *.tiff)"
+            )
+            if not source_path:
+                return
+        self._auto_save.stop()
+        self.view.confirm_selected()
+        generation, workspace = self.view.generation, self._workspace
+
+        def saved() -> None:
+            current = self.view.project()
+            if (
+                self._closing
+                or self._cancellation.is_set()
+                or generation != self.view.generation
+                or workspace != self._workspace
+                or current.project_id != project.project_id
+            ):
+                return
+            self._start()
+
+            def returned(reply: WBReply) -> None:
+                if reply.error or not isinstance(reply.value, ReturnedCrop):
+                    message = reply.error or "裁图回存未返回核验记录"
+                    if self._closing:
+                        self._done(message)
+                    else:
+                        self._error(message)
+                    return
+                result = reply.value
+                if (
+                    self._closing
+                    or generation != self.view.generation
+                    or workspace != self._workspace
+                    or self.view.project().project_id != project.project_id
+                ):
+                    self._done("旧裁图输出已保留；当前项目未替换")
+                    return
+                self.source_origins.remember(
+                    workspace, project.project_id, row.row_id, source_sha, source_path
+                )
+                self._done(
+                    f"裁图已核验并回存至 {Path(source_path).parent}；"
+                    f"新增 {len(result.files)} 个图像和1份记录，原图与旧结果保留。"
+                )
+
+            self._wb(
+                WBJob(
+                    "return_crop",
+                    path=source_path,
+                    document=current,
+                    row_id=row.row_id,
+                    cancellation=self._cancellation,
+                ),
+                returned,
+                accept_errors=True,
+            )
+
+        self.save(after=saved)
 
     def select_source(self, row_id: str) -> None:
         if self._busy or self._closing:

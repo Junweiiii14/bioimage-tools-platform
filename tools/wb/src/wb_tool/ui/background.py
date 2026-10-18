@@ -14,6 +14,7 @@ from wb_tool.adapters.crop_export import export_crop
 from wb_tool.adapters.tiff_input import load_tiff
 from wb_tool.adapters.worksheet_export import export_worksheet
 from wb_tool.application.analysis import AnalysisResult
+from wb_tool.application.crop_return import ReturnedCrop
 from wb_tool.application.crop_suggestions import CropSuggestion, read_figure_project
 from wb_tool.application.desktop_data import PreviewRaster, ProjectDerivedTables, WBJob, WBReply
 from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
@@ -80,6 +81,7 @@ class _Work(QObject):
                 )
             value: (
                 PreviewRaster
+                | ReturnedCrop
                 | WBDocument
                 | WBWorksheetDocument
                 | WBFigureProject
@@ -98,7 +100,13 @@ class _Work(QObject):
                 | bytes
                 | str
             )
-            if job.operation == "discover_tiffs":
+            if job.operation == "return_crop":
+                from wb_tool.adapters.crop_return import return_reviewed_crop
+
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少审核后回存项目")
+                value = return_reviewed_crop(job.document, job.row_id, job.path, cancelled=cancel)
+            elif job.operation == "discover_tiffs":
                 from wb_tool.adapters.automatic_export import discover_tiffs
 
                 value = discover_tiffs(job.path, cancelled=cancel, with_report=True)

@@ -16,6 +16,7 @@ from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import QApplication, QFileDialog, QMainWindow
 
 from bioimage_app.figure_window import FigureProjectWindow
+from bioimage_app.source_origins import SourceOrigins
 from bioimage_app.web_bridge import WorkbenchBridge
 
 
@@ -66,6 +67,7 @@ class WebWorkbenchWindow(QMainWindow):
         self.resize(1440, 940)
         self.settings = settings or QSettings("BioImageTools", "Platform")
         self.host = AdvancedHost()
+        self.host.source_origins = SourceOrigins(self.settings)
         self.host.setParent(self, Qt.WindowType.Window)
         self.host.automatic.crop_policy = "source_geometry@2"
         self.host.automatic.quant_policy = "anchored_background@1"

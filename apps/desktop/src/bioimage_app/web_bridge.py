@@ -207,6 +207,7 @@ class WorkbenchBridge(QObject):
             )
         return {
             "projectId": project.project_id,
+            "revision": view.generation,
             "projectName": project.name,
             "canRetryLocation": not self.host.retry_location_button.isHidden(),
             "busy": self.host.operation_busy,
@@ -296,6 +297,21 @@ class WorkbenchBridge(QObject):
                     self.host.select_source(rows[index].row_id)
             elif action == "quant_edit":
                 self._edit_quant(data)
+            elif action == "return_crop":
+                project = self.host.view.project()
+                row = self.host.view.selected_row()
+                if (
+                    row is None
+                    or row.source is None
+                    or data.get("projectId") != project.project_id
+                    or data.get("id") != row.row_id
+                    or data.get("sourceId") != row.source.sha256
+                    or type(data.get("revision")) is not int
+                    or data.get("revision") != self.host.view.generation
+                    or type(data.get("locate", False)) is not bool
+                ):
+                    raise ValueError("原图或裁剪已改变，请重新审核后回存")
+                self.host.return_selected_crop(locate=data.get("locate", False) is True)
             elif action == "quant_target":
                 self._configure_quant_target(data)
             elif action == "quant_group":

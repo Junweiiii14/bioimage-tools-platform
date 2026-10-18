@@ -17,6 +17,11 @@ membrane detection or composition. A shipped local script presents free target s
 and all-lane/single-lane profiles; it never supplies quantitative results. See
 `../../docs/contracts/wb-standalone-quant-v1.md` for identity/cancellation and compatibility.
 
+Reviewed crops can be returned beside the locally selected original from the same workbench.
+The project is saved first; the background rechecks the origin and publishes distinct verified
+display PNG/raw TIFF files and a final receipt without replacement. Local origin paths never
+enter project archives. See `../../docs/contracts/wb-crop-return-v1.md`.
+
 Native compatibility windows require `--legacy-platform`, `--legacy-figure-project`, or
 `--legacy-wb-manual` and have a title marked **兼容工具（旧版）**. `--wb-manual` remains a
 historical alias for the last option. The old platform's static registry contains WB only;

@@ -78,3 +78,7 @@ T-042：source_geometry@2以短膜轮廓、上下边方向和跨阈值泳道中�
 T-044当前阶段：folder_sources@1目录头信息筛选已知派生图和明确采集编号变体；literal_source_labels@1按明确Fig路径/采集文件名保留字面分组与条带标签，不推断配对。后台自动选择支持标签的已安装字体后导入项目资产。旧项目/原值/积分策略保持，完整状态和未完功能见work/tasks/T-044-wb-workflow-and-integrals.md。
 
 T-044新增当前网页工作台默认anchored_context@1/anchored_background@1，固定原目标、逐步扩展最多25%背景上下文；保存目标/采样原坐标与比例，手动几何编辑清除旧边界并从目标重新规划。旧策略和已有请求不会静默升级，旧序列化字节保持，三份机器schema增加显式版本化扩展。原始profile_integral@1/位深风险保持，背景不足不强判有效。详见wb-anchored-context-v1.md与T044实际验证。
+
+审核后原位置回存契约见 `../../docs/contracts/wb-crop-return-v1.md`。
+`return_reviewed_crop` 复用显示分段映射和原值裁剪，写后核验且不替换旧文件；
+多文件部分失败明确列出已发布文件，无完成记录，不改变定量公式或项目格式。

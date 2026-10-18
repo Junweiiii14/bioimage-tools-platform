@@ -8,6 +8,7 @@ from tool_contracts.api import RunRecord
 
 from wb_tool.application.analysis import AnalysisResult
 from wb_tool.application.crop import CropRequest
+from wb_tool.application.crop_return import ReturnedCrop
 from wb_tool.application.crop_suggestions import CropSuggestion
 from wb_tool.application.document import WBDocument, WBWorksheetDocument
 from wb_tool.application.figure_project import (
@@ -62,6 +63,7 @@ class WBJob:
         "stored_result",
         "export",
         "crop",
+        "return_crop",
         "figure_document",
         "figure_preview",
         "figure_ocr",
@@ -123,6 +125,7 @@ class WBReply:
     request_id: str
     value: (
         PreviewRaster
+        | ReturnedCrop
         | WBDocument
         | WBWorksheetDocument
         | WBFigureProject
