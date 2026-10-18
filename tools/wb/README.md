@@ -1,5 +1,9 @@
 # WB 数值核心
 
+T045增加完整泳道手动框选、共享原图分组、补峰/排除及schema9 Fig拼图定量。
+`WBPartitionProject`保留原图OCR与版本化机器建议；普通WBQuant多峰和UB整段共用
+已有积分。新契约`../../docs/contracts/wb-fig-quant-v1.md`，验证状态以T045任务为准。
+
 公开入口 `wb_tool.api`；包版本0.19.0，实现定量/手工Qt闭环、OCR复核、结果表、归一化、批量元信息、统一归档和明确分段版式。
 数值契约与参考来源见 `../../docs/contracts/wb-reference-v1.md`。
 

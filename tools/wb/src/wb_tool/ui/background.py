@@ -241,6 +241,14 @@ class _Work(QObject):
                 value = configure_manual_quantification(
                     load_tiff(job.path), job.document, job.manual_target, cancelled=cancel
                 )
+            elif job.operation == "quant_fig":
+                from wb_tool.adapters.fig_quant import prepare_fig_quantification
+
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少Fig测量项目")
+                value = prepare_fig_quantification(
+                    job.path, job.document, job.row_id, cancelled=cancel
+                )
             elif job.operation == "quant_export":
                 from wb_tool.adapters.quant_export import export_wbquant_table
 

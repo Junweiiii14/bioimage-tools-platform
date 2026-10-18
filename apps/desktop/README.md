@@ -1,5 +1,12 @@
 # Desktop host
 
+T045 extends the same workbench with WBQuant-style independent full-lane copying,
+group reselection that retains completed runs, peak inclusion and bounded session
+undo/redo. Fig-sheet detection runs in the existing background service, followed by
+the normal durable measurement workers. Schema9 survives native view reconstruction;
+its source-sheet group view does not require a newly composed montage. See
+`../../docs/contracts/wb-fig-quant-v1.md` and the T045 task for actual validation.
+
 The default `python -m bioimage_app` entry opens the current green WB web workbench.
 For daily Windows use, `Start-BioImage.ps1` runs Python in isolated mode and verifies
 the installed desktop module and shipped UI against its own checkout before dispatch.

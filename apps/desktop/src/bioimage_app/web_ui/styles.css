@@ -48,3 +48,19 @@
 .quant-profiles-footer { padding:14px 24px; border-top:1px solid var(--line); color:var(--muted); line-height:1.7; }
 
 .quality-details{margin:12px 0;color:var(--muted);font-size:12px;line-height:1.7}.quality-details summary{cursor:pointer;padding:6px 0;min-height:30px}.quality-details summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.quality-details ul{padding-left:20px;margin:8px 0}.quality-details li{margin:8px 0;overflow-wrap:anywhere}.quant-quality-mark{color:var(--warning);font-size:12px;margin-left:3px}.result-state{color:var(--muted);font-size:12px}
+/* Same workbench, complete WBQuant manual lane controls. */
+.manual-lane-tools { padding: 14px 16px; border-bottom: 1px solid var(--line, #dce5df); }
+.manual-lane-tools h3 { margin: 0 0 8px; font-size: 13px; }
+.manual-lane-tools p { margin: 0 0 12px; font-size: 12px; line-height: 1.55; color: #486456; }
+.manual-lane-tools .quant-field { margin: 10px 0; }
+.manual-action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.manual-action-grid .button { padding: 8px 6px; justify-content: center; font-size: 12px; }
+.manual-profile-actions { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; padding: 10px 24px; border-bottom: 1px solid #dce5df; }
+.manual-profile-actions input { width: 90px; }
+.manual-lane-tools[hidden] { display: none; }
+.manual-lane-shape { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.manual-lane-shape rect { fill: none; stroke: var(--warning); stroke-width: 1.5px; }
+.selected > .manual-lane-shape rect { stroke: var(--accent); }
+.manual-lane-tools > .button:first-child { margin-bottom: 16px; }
+.manual-compact-controls { display: none; }
+@media(max-width:900px) { .manual-compact-controls { display: block; padding: 16px; } }

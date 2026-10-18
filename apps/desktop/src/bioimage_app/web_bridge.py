@@ -3,6 +3,7 @@
 import base64
 import json
 import math
+from collections import Counter
 from collections.abc import Callable
 from hashlib import sha256
 from typing import cast
@@ -17,10 +18,12 @@ from wb_tool.api import (
     ProjectTableCell,
     WBAnalysisProject,
     WBLayoutProject,
+    WBPartitionProject,
     row_is_ready,
 )
 
 from bioimage_app.figure_window import FigureProjectWindow
+from bioimage_app.web_manual_quant import ManualQuantCommands
 from bioimage_app.web_quant import quant_snapshot
 
 
@@ -66,6 +69,7 @@ class WorkbenchBridge(QObject):
         self._error = ""
         self._completed_key = ""
         self._quant_overview: tuple[str, str] | None = None
+        self.manual_commands = ManualQuantCommands(self)
         self.host.automatic.finished.connect(self._automatic_completed)
         self.timer = QTimer(self)
         self.timer.setInterval(180)
@@ -90,6 +94,7 @@ class WorkbenchBridge(QObject):
             )
             self._images[preview.sha256] = image_url(image)
         live_sources = {r.source.sha256 for r in project.rows if r.source}
+        source_counts = Counter(r.source.sha256 for r in project.rows if r.source)
         self._images = {key: value for key, value in self._images.items() if key in live_sources}
         pixmap = view.preview_label.full_pixmap
         if pixmap.cacheKey() != self._montage_key:
@@ -181,6 +186,7 @@ class WorkbenchBridge(QObject):
                     "name": row.filename,
                     "fig": row.figure,
                     "protein": row.protein,
+                    "notes": row.notes,
                     "width": row.width,
                     "bitDepth": row.bit_depth,
                     "height": row.height,
@@ -195,7 +201,9 @@ class WorkbenchBridge(QObject):
                     else "pending"
                     if row.roi
                     else "failed",
-                    "preview": self._images.get(row.source.sha256) if row.source else None,
+                    "preview": self._images.get(row.source.sha256)
+                    if row.source and source_counts[row.source.sha256] == 1
+                    else None,
                     "reason": "；".join(reasons) or ("尚未定位裁剪区域" if not roi else "等待复核"),
                     "status": "valid"
                     if results and all(c["status"] == "valid" for c in results)
@@ -206,6 +214,9 @@ class WorkbenchBridge(QObject):
                 }
             )
         return {
+            "sourcePreviews": {
+                key: value for key, value in self._images.items() if source_counts[key] > 1
+            },
             "projectId": project.project_id,
             "revision": view.generation,
             "projectName": project.name,
@@ -258,7 +269,7 @@ class WorkbenchBridge(QObject):
     @Slot(str, str)
     def request(self, action: str, payload: str = "{}") -> None:
         try:
-            if len(payload) > 4096:
+            if len(payload) > (32768 if action == "quant_target" else 4096):
                 raise ValueError("操作参数过长")
             parsed: object = json.loads(payload)
             if not isinstance(parsed, dict):
@@ -288,7 +299,11 @@ class WorkbenchBridge(QObject):
                 index = next((i for i, row in enumerate(rows) if row.row_id == data.get("id")), -1)
                 if index < 0:
                     raise ValueError("原图已改变，请重新选择")
-                if action == "quant_select" and data.get("overview") is True:
+                if (
+                    action == "quant_select"
+                    and data.get("overview") is True
+                    and not isinstance(self.host.view.project(), WBPartitionProject)
+                ):
                     self._quant_overview = (self.host.view.project().project_id, rows[index].row_id)
                 else:
                     self._quant_overview = None
@@ -297,6 +312,16 @@ class WorkbenchBridge(QObject):
                     self.host.select_source(rows[index].row_id)
             elif action == "quant_edit":
                 self._edit_quant(data)
+            elif action in {
+                "quant_new_group",
+                "quant_rename",
+                "quant_move_row",
+                "quant_merge_group",
+                "quant_band",
+                "quant_history",
+                "quant_fig",
+            }:
+                self.manual_commands.run(action, data)
             elif action == "return_crop":
                 project = self.host.view.project()
                 row = self.host.view.selected_row()
@@ -330,7 +355,10 @@ class WorkbenchBridge(QObject):
                 ):
                     raise ValueError("组内各蛋白行须有裁剪且泳道数一致，才能按列对应定量")
                 self.host.analyze_project(
-                    row_ids=tuple(r.row_id for r in members), after=self.host.compose
+                    row_ids=tuple(r.row_id for r in members),
+                    after=None
+                    if isinstance(self.host.view.project(), WBPartitionProject)
+                    else self.host.compose,
                 )
             elif action == "quant_auto":
                 row = self.host.view.selected_row()
@@ -451,6 +479,24 @@ class WorkbenchBridge(QObject):
         reset = data.get("resetBounds", False)
         if type(reset) is not bool:
             raise ValueError("重置边界须为明确布尔值")
+        raw_lanes = data.get("laneRois", [])
+        measurement_mode = data.get("measurementMode", "peaks")
+        if (
+            not isinstance(raw_lanes, list)
+            or len(cast(list[object], raw_lanes)) > 96
+            or measurement_mode not in ("peaks", "smear")
+        ):
+            raise ValueError("泳道列表或测量模式无效")
+        lane_rois: list[LaneROI] = []
+        for index, raw_box in enumerate(cast(list[object], raw_lanes), 1):
+            if not isinstance(raw_box, dict):
+                raise ValueError("泳道坐标无效")
+            box = cast(dict[str, object], raw_box)
+            coords = [box.get(key) for key in ("x", "y", "width", "height")]
+            if any(type(value) is not int for value in coords):
+                raise ValueError("泳道须使用整数原图坐标")
+            lx, ly, lw, lh = cast(list[int], coords)
+            lane_rois.append(LaneROI(f"{row.row_id}:{index:02d}", lx, ly, lx + lw, ly + lh))
         target = ManualQuantTarget(
             row.source.sha256,
             project.revision,
@@ -459,6 +505,8 @@ class WorkbenchBridge(QObject):
             polarity,
             tuple(cast(list[int], raw_empty)),
             reset,
+            tuple(lane_rois),
+            measurement_mode,
         )
         self.host.analyze_manual_target(target)
 
@@ -558,8 +606,10 @@ class WorkbenchBridge(QObject):
         )
         if updated is project:
             return
+        self.manual_commands.remember()
         self.host.view.set_project(updated)
         self.host.view.generation += 1
+        self.manual_commands.bind()
         if roi is not None:
             self.host.replan_quant_lane(row.row_id)
         else:

@@ -987,8 +987,17 @@ class FigureProjectView(QWidget):
                 project, self._project.archive_sources, self._project.imported_runs
             )
         from wb_tool.application.automatic import WBAutomaticProject, with_automatic_rows
+        from wb_tool.application.fig_quant import WBPartitionProject
 
-        if isinstance(self._project, WBAutomaticProject):
+        if isinstance(self._project, WBPartitionProject):
+            fields = {name: getattr(project, name) for name in type(project).model_fields}
+            fields.update(
+                schema_version=9,
+                automatic_rows=self._project.automatic_rows,
+                partition_sources=self._project.partition_sources,
+            )
+            project = WBPartitionProject.model_validate(fields)
+        elif isinstance(self._project, WBAutomaticProject):
             project = with_automatic_rows(project, self._project.automatic_rows)
         return project
 

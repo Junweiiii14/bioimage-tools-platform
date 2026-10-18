@@ -1,5 +1,13 @@
 # 同源网页工作台
 
+## T045 手动泳道与整图Fig定量
+
+延续本页Operate方向与三栏视觉体系。用户已经明确要求旧WBQuant手动操作回归，
+并批准自动Fig切分后直接定量、按需手动修改。左侧同处提供框选/复制/删除/清空/重选、
+分组切换和自动处理；中央始终显示原图或源图Fig区域，右侧为参数/结果；不另开旧工具。
+普通完整泳道多峰与UB整段模式共用曲线/封底编辑，自动OCR歧义可见，旧组结果保持。
+当前新增能力为既有视觉体系扩展，未批准或执行整体重设计；已有sidecar漂移不在本次修复。
+
 Target: apps/desktop/src/bioimage_app/web_ui/index.html
 Mode: Operate; Web + QtWebEngine; code-led. 用户要求先网页、再完全同源还原，沿用已确认三栏与product-performs方向，不重新投票。
 

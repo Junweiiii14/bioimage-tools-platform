@@ -56,6 +56,7 @@ from wb_tool.application.crop_suggestions import (
 )
 from wb_tool.application.desktop_data import PreviewRaster, ProjectDerivedTables, WBJob, WBReply
 from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
+from wb_tool.application.fig_quant import WBPartitionProject
 from wb_tool.application.figure_project import (
     FigurePNG,
     FigureRender,
@@ -88,6 +89,7 @@ from wb_tool.application.laboratory_layout import (
     plan_laboratory_layout,
     with_figure_layout,
 )
+from wb_tool.application.manual_groups import add_manual_group, edit_quant_band
 from wb_tool.application.ocr_protocol import (
     OCRConversation,
     OCRRequest,
@@ -221,6 +223,10 @@ __all__ = [
     "ReturnedCrop",
     "return_reviewed_crop",
     "ManualQuantTarget",
+    "add_manual_group",
+    "edit_quant_band",
+    "WBPartitionProject",
+    "prepare_fig_quantification",
     "configure_manual_quantification",
     "export_wbquant_table",
     "wbquant_table_rows",
@@ -507,6 +513,18 @@ def recognize_figure(
     from wb_tool.adapters.ocr import recognize_figure as recognize
 
     return recognize(source, expected_sha256, cancelled=cancelled)
+
+
+def prepare_fig_quantification(
+    source: str,
+    project: WBFigureProject,
+    row_id: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> WBPartitionProject:
+    from wb_tool.adapters.fig_quant import prepare_fig_quantification as prepare
+
+    return prepare(source, project, row_id, cancelled=cancelled)
 
 
 def export_worksheet(worksheet: Worksheet, result: AnalysisResult, destination: str) -> str:

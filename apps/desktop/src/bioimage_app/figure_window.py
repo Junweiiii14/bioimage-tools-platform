@@ -911,6 +911,59 @@ class FigureProjectWindow(QMainWindow):
         if self._closing:
             session.cancel()
 
+    def analyze_fig_sheet(self, row_id: str) -> None:
+        """Partition a sheet off-thread; measure each accepted row through durable runs."""
+        if self._busy or self._closing or not self._workspace:
+            return
+        project = self.view.project()
+        row = next((r for r in project.rows if r.row_id == row_id), None)
+        path = self.source_paths.get(row.source.sha256) if row and row.source else None
+        if path is None:
+            raise ValueError("原图资产不可用")
+        generation = self.view.generation
+        old_ids = {r.row_id for r in project.rows}
+        self._start()
+
+        def prepared(reply: WBReply) -> None:
+            from wb_tool.api import WBPartitionProject
+
+            if self._closing or self._cancellation.is_set():
+                self._done("Fig识别已取消；原项目保留")
+                return
+            if (
+                generation != self.view.generation
+                or self.view.project().project_id != project.project_id
+            ):
+                self._done("参数已改变，旧Fig识别未覆盖当前草稿")
+                return
+            if reply.error or not isinstance(reply.value, WBPartitionProject):
+                self._error(reply.error or "Fig识别结果无效")
+                return
+            installed = reply.value
+            self.view.set_project(installed)
+            self.view.generation += 1
+            first = next((i for i, r in enumerate(installed.rows) if r.row_id not in old_ids), 0)
+            self.view.table.setCurrentCell(first, 0)
+            self._busy = False
+            ids = tuple(p.row_id for p in installed.analyses if p.row_id not in old_ids)
+            if ids:
+                self.analyze_project(row_ids=ids)
+            else:
+                self.save()
+                self._done("Fig已分组，泳道定位不足，请手动框选")
+
+        self._wb(
+            WBJob(
+                "quant_fig",
+                path=path,
+                document=project,
+                row_id=row_id,
+                cancellation=self._cancellation,
+            ),
+            prepared,
+            accept_errors=True,
+        )
+
     def analyze_manual_target(self, target: ManualQuantTarget) -> None:
         """Configure in the background, then use normal durable measurement runs."""
         if self._busy or self._closing or not self._workspace:

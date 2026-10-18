@@ -1,5 +1,10 @@
 # 模块地图
 
+T045增量：`tools/wb/application/{standalone_quant,manual_groups,fig_quant}.py`负责明确
+泳道/组/版本9证据；`domain/fig_partition.py`只给几何建议；`adapters/fig_quant.py`
+本地OCR与原图规划；桌面`web_manual_quant.py`绑定当前项目身份，`web_ui/manual_lanes.js`
+只维护交互草稿。worker/存储沿用原闭环。状态与验收见T045，不外推完整科学验收。
+
 标记“规划”的模块当前不存在；只有真实消费者和就绪任务出现时创建。
 
 | 位置 | 职责与入口 | 状态 / 验证 |

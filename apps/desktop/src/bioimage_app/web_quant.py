@@ -1,6 +1,12 @@
 """Presentation of committed original-pixel measurements, never browser-side analysis."""
 
-from wb_tool.api import LaneROI, WBAnalysisProject, analysis_is_current, ordered_quant_rows
+from wb_tool.api import (
+    LaneROI,
+    WBAnalysisProject,
+    WBPartitionProject,
+    analysis_is_current,
+    ordered_quant_rows,
+)
 
 from bioimage_app.figure_window import FigureProjectWindow
 
@@ -42,7 +48,10 @@ def quant_snapshot(host: FigureProjectWindow) -> dict[str, object]:
                 )
                 bands: list[dict[str, object]] = []
                 included_index = 0
-                for band in annotation.bands:
+                ordered_bands = list(annotation.bands)
+                if any("manually_added@1" in b.detection_notes for b in ordered_bands):
+                    ordered_bands.sort(key=lambda b: b.bounds.left if b.bounds else 100000)
+                for band in ordered_bands:
                     measured = (
                         next(
                             (b for b in result.bands if b.annotation.band_id == band.band_id), None
@@ -69,6 +78,7 @@ def quant_snapshot(host: FigureProjectWindow) -> dict[str, object]:
                             "baselineEnd": baseline.right_value if baseline else None,
                             "signal": signal,
                             "status": status,
+                            "included": actual.included,
                             "reason": reason or "",
                         }
                     )
@@ -144,6 +154,13 @@ def quant_snapshot(host: FigureProjectWindow) -> dict[str, object]:
     compatible = (
         bool(present) and len({r.lane_count for r in present}) == 1 and all(r.roi for r in present)
     )
+    sheet_group = bool(
+        isinstance(project, WBPartitionProject)
+        and selected
+        and selected.source
+        and any(e.source_sha256 == selected.source.sha256 for e in project.partition_sources)
+        and all(r.source == selected.source for r in members)
+    )
     # Keep the source image view large enough to inspect the sampled background.
     context_bounds = None
     if selected_contexts:
@@ -155,6 +172,7 @@ def quant_snapshot(host: FigureProjectWindow) -> dict[str, object]:
     return {
         "rowOrder": [row.row_id for _, row in ordered],
         "group": {
+            "sourceSheet": sheet_group,
             "figure": selected.figure if selected else "",
             "rows": group_rows,
             "laneCount": present[0].lane_count if compatible else 0,
@@ -162,6 +180,15 @@ def quant_snapshot(host: FigureProjectWindow) -> dict[str, object]:
             "reason": "" if compatible else "组内各蛋白行须有裁剪且泳道数一致，才能按列对应定量",
         },
         "rowId": selected.row_id if selected else "",
+        "measurementMode": "smear"
+        if any(
+            "whole_lane_smear@1" in b.detection_notes
+            for p in plans
+            if selected and p.row_id == selected.row_id
+            for lane in p.request.lanes
+            for b in lane.bands
+        )
+        else "peaks",
         "sourceId": selected.source.sha256 if selected and selected.source else "",
         "polarity": next(
             (

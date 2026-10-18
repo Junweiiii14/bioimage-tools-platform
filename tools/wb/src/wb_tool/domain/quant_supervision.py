@@ -7,7 +7,7 @@ from numpy.typing import NDArray
 
 from wb_tool.domain.lanes import LaneROI, Polarity
 from wb_tool.domain.quantify import BandBounds, Baseline
-from wb_tool.domain.wbquant143.core import quantify_image
+from wb_tool.domain.wbquant143.core import detect_border_insets, quantify_image
 from wb_tool.domain.wbquant143.models import LaneROI as ReferenceROI
 from wb_tool.domain.wbquant143.models import LoadedImage
 
@@ -23,6 +23,36 @@ class QuantBandProposal:
 class QuantLaneProposal:
     roi: LaneROI
     bands: tuple[QuantBandProposal, ...]
+
+
+def exclude_smear_frame(
+    pixels: NDArray[np.uint8 | np.uint16], roi: LaneROI, polarity: Polarity
+) -> LaneROI:
+    """Reuse WBQuant's conservative frame test, without narrowing to a peak."""
+    raw = pixels[roi.y0 : roi.y1, roi.x0 : roi.x1]
+    maximum = int(np.iinfo(raw.dtype).max)
+    raw = raw if polarity == "dark" else maximum - raw
+    image = LoadedImage(
+        "original-crop",
+        raw,
+        raw.astype(np.float64),
+        maximum,
+        raw.dtype.itemsize * 8,
+        0,
+        0,
+        0.0,
+        0.0,
+    )
+    local = ReferenceROI(1, 0, 0, roi.width, roi.y1 - roi.y0)
+    insets, _ = detect_border_insets(image, local)
+    effective = insets.apply(local)
+    return LaneROI(
+        roi.lane_id,
+        roi.x0 + effective.x0,
+        roi.y0 + effective.y0,
+        roi.x0 + effective.x1,
+        roi.y0 + effective.y1,
+    )
 
 
 def propose_quant_lanes(

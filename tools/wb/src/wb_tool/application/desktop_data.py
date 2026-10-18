@@ -80,6 +80,7 @@ class WBJob:
         "quant_export",
         "quant_replan",
         "quant_target",
+        "quant_fig",
         "project_ocr_result",
         "project_ocr_install",
         "project_ocr_table",
