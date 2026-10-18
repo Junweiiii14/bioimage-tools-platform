@@ -1,5 +1,7 @@
 # Validation History
 
+- 2026-10-18 T045最终f18589a：747passed/517.90秒，原child0/u32=0x00000000/外层0，全部隔离wheel/9导入合约/静态通过。独审原5项+Space全部resolved，兼容反例独立14项6.28秒0；真实33Fig106运行/重开106、CSV/XLSX33组135行545数值/拒绝覆盖0。先前停止/746通过1旧schema反例失败保留；未销原生UNKNOWN。详见work/evidence/T-045/validation.md。
+
 - 2026-10-18 da00768完整704passed/483.01秒、原child0、全部隔离wheel/最终check实际0，独审6项2.08秒0；原生AV未复现不销账。后继独立灰度当前本地41相关34.78秒0，全项目Pyright/Ruff格式491文件/9导入契约/Node0；真实发货页面入口/正常worker/不调用自动或compose/位置失败重选/全泳道弹框/键盘基线/保存重开已验。后继绑定独审/完整检查/8图/视觉待做。新二次背景反例36750→25158，故不接仅扩大上限v2，保留现有2背景不足。细节work/evidence/T-044/standalone-quant.md。
 
 - 2026-10-18 662d767绑定独审5项0.37秒0；实际View两个自有原生观察进程actual0/noAV，显式parent/view无效后仍11无parent控件。后继补隐藏控件父归属，隔离生命周期旧红1failed/2.27秒、新绿连诊断6项2.21秒0，工作流/保存重开/定量重算12项18.09秒0、相关Pyright/Ruff/格式0。共享Qt试验caplog teardown KeyError保留，正式用独立进程未忽略错误。原生AV根因UNKNOWN，后继完整检查/绑定独审待做。

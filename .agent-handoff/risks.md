@@ -10,6 +10,9 @@
 
 ## Current Risks
 
+- T-045自动拼图只是排版几何建议：33组106成功运行不代表框/标签真值，OCR I/L和缺标签保留提示；UB端点封底可能扣除持续拖尾，手动调整不等于科学有效性。旧ROI JSON不作为第二权威存储导入，迁移取舍见T045审计。
+- T-045原活动t021目录缺.git/隐藏资料原因UNKNOWN；仅在新候选t045树开发，原dirty/结果/快捷方式保持。不要根据此候选自动清理或修复其他树。
+
 - 当前CI011：40f Windows669passed后原始c0000005，Linux同HEAD GDB全检0；原生异常不同平台是否同因未证明。WSL完整pytest与单关闭均0，page/profile按时释放，不能认定必然UAF。系统API观察先真实控制后正式670；仅诊断，不改成功状态或测试答案。
 
 - 当前阻断：0d269db Linux669passed后SIGSEGV/noPythonframe，exit245，wheel未跑。CI010增加原生栈观察，不推断扩展或析构根因；Windows同HEAD完整成功。

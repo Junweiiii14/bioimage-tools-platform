@@ -48,3 +48,5 @@
 ## 2026-10-15 F-003采用决定
 
 Taste v2用于公开网页；科研Qt应用优先Impeccable Operate，不迁移框架。两技能固定来源，Impeccable引擎另锁SHA；cmd固定LF维持跨平台来源hash。REA保留按问题调用的隔离工具，静态Electron已验证，暂不增加全局MCP或产品依赖；真实社区学习收益按后续同题对照决定。
+
+| 2026-10-18 | T045独立完整泳道复用冻结WBQuant，UB全高/端点封底，Fig项目schema9保存原OCR与源坐标 | 用户明确授权自动计算后手动修正；不另建显示像素量化或旧前端表存储 | docs/contracts/wb-fig-quant-v1.md、work/tasks/T-045-wbquant-manual-and-fig.md |

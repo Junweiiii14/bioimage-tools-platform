@@ -1,10 +1,5 @@
 # Current Work Log
 
-## 2026-10-17 T043 最终阶段与平台分支
-
-CI001之后最终产品树fa9c5f2正式完整check实际exit0：657passed/451.28s，全部隔离wheel含真实OCR完成。日志.local/t043/check-final-ci001.log；文档后继与此产品内容相同。 Linux真实CI暴露Windows句柄guard，2b9f643修复并独审；阶段2–8仅此产品差异。P0补基线转换说明，8阶段精确清单再次独审全部exit0。全部草稿PR7、3、8–14，main不变；远端CI看PR/Issue6实时。原有34未提交文件、8原图/12参考及旧预测SHA保持，6历史树原位锁定。原生间歇挂起仍UNKNOWN，完整科学/发布验收待后续。
-
-
 ## 2026-10-17 T043 入口指针、宿主与回执诊断
 
 核对固定活动树快捷方式并纠正AGENT_HANDOFF旧目录指针；原dirty历史树保持。CI003b4bc8ba修确定隐藏host所有权，独审3项、658完整check/497.50秒及全部wheel真实exit0；8原图功能链exit0，参考未读，离屏截图空白不作视觉通过。阶段7首次超时后原SHA重跑成功，阶段8bcf15分钟取消和5de首次create10秒失败保留，根因UNKNOWN。CI00468c3265加无载荷请求阶段DEBUG日志，独审2项exit0，最终659完整check实际exit0/509.86秒及全部隔离wheel通过。main不变、PR全草稿。
@@ -194,3 +189,8 @@ a72e7102891df287e3484f20f3724612779b53f5：733 passed in 525.53s、pytest child/
 ## 2026-10-18 CI012 有范围的测试窗口管理
 
 精确清点Web/平台/共享fixture，统一仅显式自有窗口的异步close/wait→GUI销毁，不动产品/全局GC/Qt根，保留业务断言与原时限。67项157.28秒0、全类型/静态0，总736。c5 Linux735/133.44秒及wheel/dev0，Windows待；925 Linux失败/Windows取消分别保留。待本批绑定独审/最后备份push/最终736远端，实际结论写issue6/ignored receipt不重复文档触发全检循环。
+
+
+## 2026-10-18 T045本地实现完成
+
+从f42f069仅新增t045隔离树，产品a2cda5f/3f4c593/8246eb1和测试后继f18589a；手动泳道/UB整段/Fig自动工程闭环完成。指定图33Fig106运行成功、重开106、真实CSV/XLSX135行545值拒绝覆盖。独审原5项及Space全部resolved，schema9未知反例9→10独审14项0；最终747passed517.90秒/原child及check0、全部wheel与9合约通过。原停止/746+1失败记录不抹去。原项目/旧树/快捷方式保持，源图SHA与旧四核心文件已复核。后继仅文档/私图捕获gitignore；本地completed未push/main/发布。历史原生UNKNOWN与科学/干净机留出保留，使用候选Start脚本，详见T045验证/说明。
