@@ -230,3 +230,5 @@ a72e7102891df287e3484f20f3724612779b53f5：733 passed in 525.53s、pytest child/
 ## CI012：远端Linux原生失败后继
 
 3e5cee3 Linux约29% OCR用例SIGSEGV，quality未通过，本地成功不替代；GDB证实非GUI线程QWidget析构，具体对象/全部旧根因仍UNKNOWN。只修test_wb_desktop fixture自有窗口：原异步关闭等待后GUI deleteLater并等原生无效；新销毁线程回归旧红1/2.87秒，新11项25.58秒0，相关类型/Ruff/格式0。受控真实窗口引用环实验未dispose Fatal Aborted/3，先GUI销毁0；不禁GC/不全局删除/不改产品。详见ci012-fixture-lifetime.md。待绑定独审及远端完整门禁，本轮尚未最终完成。
+
+CI012独审5c932b8整份11项24.94秒0，P2新测试finally等待失败时可能提前析构；后继复用安全helper，作者1项2.01秒0、类型/静态0。待后继绑定复核后安全备份/push，旧远端失败仍保留。

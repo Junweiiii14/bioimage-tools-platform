@@ -15,3 +15,7 @@ GDB线程587在Shiboken::Object::destroy→QObjectPrivate::deleteChildren→QWid
 新增回归要求fixture清理后原生窗口无效、destroyed只能发生主线程，随后后台GC不能再次析构窗口。提取原close/wait为helper、尚未dispose时新断言真实红1failed/2.87秒；增加精确销毁后原11用例绿25.58秒实际0。初次无参destroyed监听lambda产生类型Unknown，改显式object可变参数命名回调；最终相关Pyright/Ruff/格式0，没有ignore。
 
 本修复是测试生命周期的明确缺口修正，产品代码未变；生产旧入口多窗口移除持有路径仍有审计价值，未据此改动或宣称全部历史native根因解决。提交绑定独审、最终远端734用例全检待验证；不得将当前PR标记完整通过。
+
+## 绑定独审与错误清理补正
+
+5c932b8独审整份11项24.94秒实际0，发现新回归finally仅isValid就deleteLater：若helper等待后台超时，会提前销毁仍有线程的窗口（P2）。正式fixture helper本身顺序正确。后继finally改复用同一个close/wait/dispose helper，不以包装器有效代替资源退休；新回归1项2.01秒0、相关Pyright/Ruff/格式0。后继绑定复核与远端734全检待做，不把初审写作无阻断。

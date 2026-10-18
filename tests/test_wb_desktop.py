@@ -366,8 +366,7 @@ def test_owned_fixture_windows_are_destroyed_on_gui_before_worker_collection(qtb
         assert destroyed_threads == [threading.get_ident()]
     finally:
         if isValid(window):
-            window.deleteLater()
-            qtbot.waitUntil(lambda: not isValid(window), timeout=10000)
+            _dispose_owned_windows([window], qtbot)
 
 
 def test_desktop_draw_compute_save_reopen(
