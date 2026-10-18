@@ -116,7 +116,8 @@ def export_automatic_results(
             project, evidence.results, str(stage / "measurements.csv"), cancelled=cancelled
         )
         if any(
-            p.request.quant_policy in ("wbquant_1_4_3@1", "background_support@1")
+            p.request.quant_policy
+            in ("wbquant_1_4_3@1", "background_support@1", "anchored_background@1")
             for p in getattr(project, "analyses", ())
         ):
             export_wbquant_table(

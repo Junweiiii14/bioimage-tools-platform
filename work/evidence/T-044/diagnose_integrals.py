@@ -14,6 +14,11 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("sources", type=Path)
     parser.add_argument("destination", type=Path)
+    parser.add_argument(
+        "--policy",
+        choices=("background_support@1", "anchored_background@1"),
+        default="background_support@1",
+    )
     args = parser.parse_args()
     if args.destination.exists():
         raise FileExistsError("Keep earlier diagnostic evidence")
@@ -28,13 +33,12 @@ def main() -> None:
             image,
             row_id=f"source-{index}",
             revision=0,
-            settings=AutoWBSettings(
-                crop_policy="source_geometry@2", quant_policy="background_support@1"
-            ),
+            settings=AutoWBSettings(crop_policy="source_geometry@2", quant_policy=args.policy),
         )
         for request in suggestion.requests:
             result = analyze_annotations(image, request)
             for number, lane in enumerate(result.lanes, 1):
+                annotation = request.lanes[number - 1]
                 assert lane.profiles is not None
                 profile = np.asarray(lane.profiles.quantitative)
                 for band in lane.bands:
@@ -51,6 +55,13 @@ def main() -> None:
                             "file": path.name,
                             "lane": number,
                             "roi": {key: getattr(roi, key) for key in ("x0", "y0", "x1", "y1")},
+                            "target_roi": {
+                                key: getattr(annotation.target_roi, key)
+                                for key in ("x0", "y0", "x1", "y1")
+                            }
+                            if annotation.target_roi
+                            else None,
+                            "context_expansion_percent": annotation.context_expansion_percent,
                             "bounds": {"left": bounds.left, "right": bounds.right}
                             if bounds
                             else None,
@@ -83,6 +94,7 @@ def main() -> None:
                 "flags": flags,
                 "source_hashes_unchanged": True,
                 "reference_reads": False,
+                "quant_policy": args.policy,
             },
             ensure_ascii=False,
             indent=2,

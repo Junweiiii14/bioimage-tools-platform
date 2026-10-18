@@ -30,7 +30,8 @@
           "default": "fixed_grid@1",
           "enum": [
             "fixed_grid@1",
-            "independent_lanes@1"
+            "independent_lanes@1",
+            "anchored_context@1"
           ],
           "title": "Geometry Policy",
           "type": "string"
@@ -40,7 +41,8 @@
           "enum": [
             "legacy_bounds@1",
             "wbquant_1_4_3@1",
-            "background_support@1"
+            "background_support@1",
+            "anchored_background@1"
           ],
           "title": "Quant Policy",
           "type": "string"
@@ -197,6 +199,22 @@
           },
           "title": "Bands",
           "type": "array"
+        },
+        "target_roi": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LaneROI"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "context_expansion_percent": {
+          "default": 0,
+          "title": "Context Expansion Percent",
+          "type": "integer"
         }
       },
       "required": [

@@ -82,11 +82,12 @@ def automatic_project_row(
             empty_lanes=row.empty_lanes,
             quant_policy=quant_policy,
             lane_rois=(
-                tuple(lane.roi for lane in current_plan.request.lanes)
+                tuple(lane.target_roi or lane.roi for lane in current_plan.request.lanes)
                 if current_plan is not None
                 and current_plan.crop == row.roi
                 and len(current_plan.request.lanes) == count
-                and current_plan.request.geometry_policy == "independent_lanes@1"
+                and current_plan.request.geometry_policy
+                in ("independent_lanes@1", "anchored_context@1")
                 else ()
             ),
             cancelled=cancelled,

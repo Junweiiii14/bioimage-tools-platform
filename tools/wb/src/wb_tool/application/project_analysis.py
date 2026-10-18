@@ -39,9 +39,10 @@ class ProjectRowAnalysis(DocumentIO):
             and tuple(lane.roi for lane in lanes) != expected
         ):
             raise ValueError("项目定量必须保留已配置的固定N网格与顺序")
-        if self.request.geometry_policy == "independent_lanes@1":
+        if self.request.geometry_policy in ("independent_lanes@1", "anchored_context@1"):
             for index, lane in enumerate(lanes):
-                roi = lane.roi
+                # The target belongs to the crop; sampling context can extend in y.
+                roi = lane.target_roi or lane.roi
                 if roi.lane_id != expected[index].lane_id or not (
                     self.crop.x0 <= roi.x0 < roi.x1 <= self.crop.x1
                     and self.crop.y0 <= roi.y0 < roi.y1 <= self.crop.y1

@@ -32,9 +32,9 @@ class AutomaticWorkflow(QObject):
         self.crop_policy: Literal["legacy_fixed_height@1", "lane_ratio@1", "source_geometry@2"] = (
             "legacy_fixed_height@1"
         )
-        self.quant_policy: Literal["legacy_bounds@1", "wbquant_1_4_3@1", "background_support@1"] = (
-            "legacy_bounds@1"
-        )
+        self.quant_policy: Literal[
+            "legacy_bounds@1", "wbquant_1_4_3@1", "background_support@1", "anchored_background@1"
+        ] = "legacy_bounds@1"
         self.failures: tuple[str, ...] = ()
         self._discovery_report: bytes = b""
         self._discovery_context: tuple[str, str] | None = None

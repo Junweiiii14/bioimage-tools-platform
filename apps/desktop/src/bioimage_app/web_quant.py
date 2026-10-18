@@ -1,6 +1,6 @@
 """Presentation of committed original-pixel measurements, never browser-side analysis."""
 
-from wb_tool.api import WBAnalysisProject, analysis_is_current, ordered_quant_rows
+from wb_tool.api import LaneROI, WBAnalysisProject, analysis_is_current, ordered_quant_rows
 
 from bioimage_app.figure_window import FigureProjectWindow
 
@@ -11,6 +11,7 @@ def quant_snapshot(host: FigureProjectWindow) -> dict[str, object]:
     plans = project.analyses if isinstance(project, WBAnalysisProject) else ()
     table: list[dict[str, object]] = []
     selected_lanes: list[dict[str, object]] = []
+    selected_contexts: list[LaneROI] = []
     group_rows: list[dict[str, object]] = []
     order_by_figure = {figure: i for i, figure in enumerate(project.figure_order, 1)}
     ordered = [(order_by_figure[row.figure], row) for row in ordered_quant_rows(project)]
@@ -84,6 +85,8 @@ def quant_snapshot(host: FigureProjectWindow) -> dict[str, object]:
                         )
                 if selected and row.figure == selected.figure:
                     roi = annotation.roi
+                    if row.row_id == selected.row_id:
+                        selected_contexts.append(roi)
                     row_lanes.append(
                         {
                             "lane": index,
@@ -94,6 +97,15 @@ def quant_snapshot(host: FigureProjectWindow) -> dict[str, object]:
                                 "width": roi.width,
                                 "height": roi.y1 - roi.y0,
                             },
+                            "targetRoi": {
+                                "x": annotation.target_roi.x0,
+                                "y": annotation.target_roi.y0,
+                                "width": annotation.target_roi.width,
+                                "height": annotation.target_roi.y1 - annotation.target_roi.y0,
+                            }
+                            if annotation.target_roi
+                            else None,
+                            "contextExpansionPercent": annotation.context_expansion_percent,
                             "profile": list(result.profiles.quantitative)
                             if result and result.profiles
                             else [],
@@ -132,6 +144,14 @@ def quant_snapshot(host: FigureProjectWindow) -> dict[str, object]:
     compatible = (
         bool(present) and len({r.lane_count for r in present}) == 1 and all(r.roi for r in present)
     )
+    # Keep the source image view large enough to inspect the sampled background.
+    context_bounds = None
+    if selected_contexts:
+        x0 = min(roi.x0 for roi in selected_contexts)
+        y0 = min(roi.y0 for roi in selected_contexts)
+        x1 = max(roi.x1 for roi in selected_contexts)
+        y1 = max(roi.y1 for roi in selected_contexts)
+        context_bounds = {"x": x0, "y": y0, "width": x1 - x0, "height": y1 - y0}
     return {
         "rowOrder": [row.row_id for _, row in ordered],
         "group": {
@@ -153,5 +173,6 @@ def quant_snapshot(host: FigureProjectWindow) -> dict[str, object]:
         else "unconfigured",
         "reason": "原图曲线扣除直线封底后的积分；质量提示与数值分别保留。",
         "lanes": selected_lanes,
+        "contextBounds": context_bounds,
         "table": table,
     }

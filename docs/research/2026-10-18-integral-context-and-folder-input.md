@@ -12,3 +12,15 @@
 目录主线发现：现discover_tiffs把所有TIFF都送入定量，包括带本软件显示标识的成图；实际目录另有同次采集(1)/(2)/(3)。旧自动导入还将每源分别放入独立Fig并标Unassigned。新增folder_sources@1只读元数据排除已知派生文件，并按明确采集编号优先主文件，不解码参考像素；literal_source_labels@1只读明确文件夹/文件名标签，不推断实验配对。真实目录经正常后台选出的8源与冻结源清单匹配，四Fig真实工作台端到端0，量值保持。未知第三方处理图不能只凭后缀可靠识别，手动原图选择保留。
 
 适用限制：编号规则仅同目录同采集键，未提供主版本不排除编号文件；文件路径/命名可能有歧义，详情需可查看并允许显式文件选择。未知来源/实验科学语义仍不得靠热门算法猜测。具体命令/退出和剩余项见work/evidence/T-044/validation.md及任务。新策略或新文件格式出现时重新核验。
+
+2026-10-18后继实施anchored_context@1：只有原目标背景不足才逐步5–25%扩区，
+最高峰必须仍在目标内且无竞争信号；第一个完整候选优先，不能选最大面积。
+8原图正常工作台48槽背景不足21→2、有效7→13；33零值风险不动，没有积分真值准确率。
+新采样区和目标原坐标分别保存，旧请求序列化字节保持，历史结果不迁移。
+
+序列化来源访问2026-10-18，实际Pydantic2.14.1：
+[官方dataclass/TypeAdapter说明](https://pydantic.dev/docs/validation/latest/concepts/dataclasses/)
+和[官方wrap serializer说明](https://github.com/pydantic/pydantic/blob/main/docs/concepts/serialization.md)。
+用局部wrap serializer省略旧策略两个新默认字段；实际冻结worker NDJSON字节回归，
+而非仅凭文档假设兼容。三份机器schema可选扩展单独审查，新策略由显式版本识别、
+旧读取器拒绝新策略；不声称任何旧软件都能读新策略。

@@ -3,10 +3,11 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 from string import hexdigits
-from typing import Literal, Protocol
+from typing import Literal, Protocol, cast
 
 import numpy as np
 from numpy.typing import NDArray
+from pydantic import SerializerFunctionWrapHandler, model_serializer
 
 from wb_tool.domain.lanes import LaneProfiles, LaneROI, Polarity, compute_lane_profiles
 from wb_tool.domain.quantify import (
@@ -56,12 +57,49 @@ class BandAnnotation:
 class LaneAnnotation:
     roi: LaneROI
     bands: tuple[BandAnnotation, ...]
+    target_roi: LaneROI | None = None
+    context_expansion_percent: int = 0
 
     def __post_init__(self) -> None:
         if type(self.bands) is not tuple:
             raise AnalysisError("条带标注须为不可变元组")
         if len({band.band_id for band in self.bands}) != len(self.bands):
             raise AnalysisError("同一泳道的条带身份不能重复")
+        if type(self.context_expansion_percent) is not int:
+            raise AnalysisError("上下文扩展比例须为整数")
+        target = self.target_roi
+        if target is None:
+            if self.context_expansion_percent:
+                raise AnalysisError("没有目标范围不能扩展背景上下文")
+            return
+        roi = self.roi
+        if (
+            target.lane_id != roi.lane_id
+            or (target.x0, target.x1) != (roi.x0, roi.x1)
+            or not roi.y0 <= target.y0 < target.y1 <= roi.y1
+            or len(self.bands) != 1
+            or self.bands[0].band_id != "target"
+        ):
+            raise AnalysisError("背景上下文须包含同身份、同宽度的唯一目标")
+        percent = self.context_expansion_percent
+        if percent == 0:
+            if roi != target:
+                raise AnalysisError("未扩展上下文须等于目标范围")
+        else:
+            from wb_tool.domain.anchored_context import context_padding
+
+            pad = context_padding(target.y1 - target.y0, percent)
+            if max(target.y0 - roi.y0, roi.y1 - target.y1) > pad:
+                raise AnalysisError("背景上下文超过声明的有界扩展范围")
+
+    @model_serializer(mode="wrap")
+    def serialize_annotation(self, handler: SerializerFunctionWrapHandler) -> dict[str, object]:
+        # Preserve the exact old wire/document shape when replaying old policies.
+        result = cast(dict[str, object], handler(self))
+        if self.target_roi is None:
+            result.pop("target_roi", None)
+            result.pop("context_expansion_percent", None)
+        return result
 
 
 @dataclass(frozen=True, slots=True)
@@ -70,19 +108,23 @@ class AnalysisRequest:
     revision: int
     polarity: Polarity
     lanes: tuple[LaneAnnotation, ...]
-    geometry_policy: Literal["fixed_grid@1", "independent_lanes@1"] = "fixed_grid@1"
-    quant_policy: Literal["legacy_bounds@1", "wbquant_1_4_3@1", "background_support@1"] = (
-        "legacy_bounds@1"
+    geometry_policy: Literal["fixed_grid@1", "independent_lanes@1", "anchored_context@1"] = (
+        "fixed_grid@1"
     )
+    quant_policy: Literal[
+        "legacy_bounds@1", "wbquant_1_4_3@1", "background_support@1", "anchored_background@1"
+    ] = "legacy_bounds@1"
 
     def __post_init__(self) -> None:
         if self.geometry_policy not in (
             "fixed_grid@1",
             "independent_lanes@1",
+            "anchored_context@1",
         ) or self.quant_policy not in (
             "legacy_bounds@1",
             "wbquant_1_4_3@1",
             "background_support@1",
+            "anchored_background@1",
         ):
             raise AnalysisError("未知定量策略")
         if len(self.source_sha256) != 64 or any(c not in hexdigits for c in self.source_sha256):
@@ -95,6 +137,11 @@ class AnalysisRequest:
             raise AnalysisError("至少提供一个泳道，且使用不可变元组")
         if len({lane.roi.lane_id for lane in self.lanes}) != len(self.lanes):
             raise AnalysisError("泳道身份不能重复")
+        anchored = self.geometry_policy == "anchored_context@1"
+        if anchored != (self.quant_policy == "anchored_background@1") or any(
+            (lane.target_roi is not None) != anchored for lane in self.lanes
+        ):
+            raise AnalysisError("目标锚定上下文必须使用配套版本化策略与目标记录")
 
 
 BandStatus = Literal["valid", "quality_review", "invalid", "excluded", "not_detected"]
@@ -129,9 +176,9 @@ class AnalysisResult:
     source_conversion: str | None
     lanes: tuple[LaneAnalysis, ...]
     algorithm_id: Literal["profile_integral@1"] = "profile_integral@1"
-    quality_policy: Literal["dtype_limits_review@1", "background_support_review@1"] = (
-        "dtype_limits_review@1"
-    )
+    quality_policy: Literal[
+        "dtype_limits_review@1", "background_support_review@1", "anchored_background_review@1"
+    ] = "dtype_limits_review@1"
     schema_version: Literal[1] = 1
 
 
@@ -192,7 +239,7 @@ def analyze_annotations(
             ]
             flags: list[str] = (
                 [note for note in band.detection_notes if note.startswith("boundary_review:")]
-                if request.quant_policy == "background_support@1"
+                if request.quant_policy in ("background_support@1", "anchored_background@1")
                 else []
             )
             if np.any(region == 0):
@@ -215,7 +262,9 @@ def analyze_annotations(
         image.pixels.dtype.itemsize * 8,
         image.conversion,
         tuple(lanes),
-        quality_policy="background_support_review@1"
+        quality_policy="anchored_background_review@1"
+        if request.quant_policy == "anchored_background@1"
+        else "background_support_review@1"
         if request.quant_policy == "background_support@1"
         else "dtype_limits_review@1",
     )

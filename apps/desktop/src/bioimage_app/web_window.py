@@ -68,7 +68,7 @@ class WebWorkbenchWindow(QMainWindow):
         self.host = AdvancedHost()
         self.host.setParent(self, Qt.WindowType.Window)
         self.host.automatic.crop_policy = "source_geometry@2"
-        self.host.automatic.quant_policy = "background_support@1"
+        self.host.automatic.quant_policy = "anchored_background@1"
         self.host.closed.connect(self._backend_closed)
         self.host.workspace_opened.connect(self._workspace_ready)
         self.web = QWebEngineView(self)

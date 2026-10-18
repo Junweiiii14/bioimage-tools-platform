@@ -150,7 +150,7 @@ class ResultFrame(IdentifiedFrame):
                 if not band.annotation.included and band.status != "excluded":
                     raise ValueError("排除条带不能被恢复为其他状态")
                 allowed_flags = {"dtype_min_present", "dtype_max_present"}
-                if result.request.quant_policy == "background_support@1":
+                if result.request.quant_policy in ("background_support@1", "anchored_background@1"):
                     allowed_flags.update(
                         {
                             "boundary_review:insufficient_background_support",

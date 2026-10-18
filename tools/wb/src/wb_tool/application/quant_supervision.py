@@ -26,9 +26,13 @@ def install_quant_request(
         or request.revision != plan.request.revision
     ):
         raise ValueError("不能更换来源或运行修订")
-    if request.geometry_policy != "independent_lanes@1" or request.quant_policy not in (
+    if request.geometry_policy not in (
+        "independent_lanes@1",
+        "anchored_context@1",
+    ) or request.quant_policy not in (
         "wbquant_1_4_3@1",
         "background_support@1",
+        "anchored_background@1",
     ):
         raise ValueError("此入口仅支持新版独立泳道策略")
     if tuple(item.roi.lane_id for item in request.lanes) != tuple(
@@ -109,7 +113,15 @@ def update_quant_lane(
             else b
             for b in lane.bands
         )
-    changed = LaneAnnotation(roi or lane.roi, bands)
+    geometry_changed = roi is not None and roi != lane.roi
+    changed = LaneAnnotation(
+        roi or lane.roi,
+        bands,
+        (roi if geometry_changed else lane.target_roi)
+        if plan.request.geometry_policy == "anchored_context@1"
+        else None,
+        0 if geometry_changed else lane.context_expansion_percent,
+    )
     request = replace(
         plan.request,
         lanes=tuple(

@@ -35,3 +35,45 @@ literal_source_labels@1从明确Fig文件夹或Fig文件名前缀读组名，从
 父工作区WB入口行原写死t043，现去掉硬编码分支，要求以活动检出实际HEAD/任务核对，避免为匹配历史分支切回旧代码。仅1行变化、原字节外置备份；before SHA b1afede8094f82ec6299c4e220de53246623a1b24a72fd274f46a9d13b5d7f97，after SHA 7a924ce02ebcf41ec226ba047760e2a24ebb172e71de1fc4cbe03078bc9723aa，回执.local/t044/parent-route-receipt.json。路径及桌面启动器不变，历史dirty树不动。
 
 积分原型只在.local/t044：target固定，小幅5–25%上下文首个完整支持候选；19/21背景不足槽找到支持（6仅边界、13仍含零值），source5 lane2/4仍无可靠支持。已知斜背景面积20000、邻强峰拒绝、无目标不能借峰、截断宽峰拒绝四解析对照均0；不是产品实现/准确率，待明确target/context持久化和UI原坐标后接入。旧WBQuant参考界面源码已核对，重点全部泳道纵向峰/封底/面积、单泳道细调，不照搬额外审查状态。
+
+## 锚定上下文实现阶段（完整任务仍进行中）
+
+e6d1abd绑定独审关闭报告跨项目P2：独立2项2.33秒exit0；父路由备份/1行字节diff匹配。
+仓库AGENT_HANDOFF短索引也移除过时分支名，统一按实际活动树/当前任务核对。
+
+新增anchored_context@1/anchored_background@1/anchored_background_review@1。
+显式保存target_roi、实际roi、扩展比例，目标在裁图内，背景上下文纵向最多25%，
+手动几何修改清除原边界与上下文，重算从目标开始；只改基线保留目标。
+默认网页工作台切换新策略；历史请求不静默升级，旧策略输出省略新默认字段。
+三份机器schema是新版本化策略的可选扩展，外层v1/v2不改；旧读取器明确拒绝新策略。
+详见docs/contracts/wb-anchored-context-v1.md。未修改公式、质量阈值、锁定依赖或门禁。
+
+作者初轮107相关：3failed/104passed、实际1；一个新增旧wire字面漏NDJSON末尾LF，
+另两个是机器schema漂移（新增策略字段未同步快照）。修正字面保留真实LF、同步三个schema
+并单独说明扩展，无删除漂移断言/放宽预期。后继112passed/20.79秒exit0，覆盖新解析
+控制、旧数值/文档/worker/OCR兼容与编辑重开。全项目Pyright最终0，Ruff/格式/Node语法0。
+网页相关既有9项27.89秒0；新增目标/采样快照独立1项1.98秒0；默认入口12项4.17秒0。
+
+8原图公开API复算48槽13valid/35review；背景不足21→2，含零值风险33保持。
+当前绿色WebWorkbenchWindow真实目录导入/8worker/导出/保存重开/关闭actual0：
+.local/t044/workbench-anchored/validation.json；输出measurements.csv实际48行，
+13valid/35quality_review，与API诊断一致；N、4Fig/标签与原SHA保持，参考像素未读。
+.local/t044/integrals-anchored-api.json逐槽保留目标/上下文/边界/原面积；旧证据不改。
+离屏GPU告警仍存在，不作视觉验收。新的提交绑定独审/完整门禁尚待执行，旧205全检不能覆盖本阶段。
+
+逐源背景不足数及有效槽数（不是积分正确率，无独立积分真值）：
+
+| 源 | N | 背景不足旧→新 | valid旧→新 |
+|---|---|---|---|
+| 1D ABCA9 | 8 | 5→0 | 0→2 |
+| 1D β-actin | 8 | 1→0 | 0→0 |
+| 1F ABCA9 | 4 | 1→0 | 2→3 |
+| 1F β-actin | 4 | 0→0 | 0→0 |
+| 4F NSUN6 | 8 | 5→2 | 3→6 |
+| 4F β-actin | 8 | 6→0 | 0→0 |
+| 4H NSUN6 | 4 | 1→0 | 2→2 |
+| 4H β-actin | 4 | 2→0 | 0→0 |
+
+剩余：4F NSUN6泳道2/4背景仍不足；35质量项不能强制有效。审核后原目录回存、
+独立灰度与全泳道峰交互、重复审查提示精简、最终全库审查/视觉/全检/安全GitHub同步
+尚未完成；原生间歇退出UNKNOWN。最终须按用户要求提供简单专业的维护汇报。
