@@ -1,9 +1,5 @@
 # Current Work Log
 
-## 2026-10-17 T040 deep technical audit
-Three independent readers traced crop/quant/pipeline and cross-reviewed17-section report. Source-only membrane/Marker and17boundary replays exit0, original hashes unchanged. Corrected prior vague attribution, documented script-vs-product and scientific/units/precision/coordinate/model-validation limits; no product modifications. Fullcheck not rerun for this report.
-
-
 ## 2026-10-17 T042 实现与真实网页验证
 
 社区原始来源调研、几何与背景策略已接现有网页工作台；8图独审8/8，原图旧结果保持，web3正常8run保存重开及48网页结果验证exit0。发现并修复Marker显式误删、ROI旧frame、同框重算frame、双峰漏警、worker质量flag。误开旧Qt测试入口已纠正；无web_ui设计变更。完整门禁/最终独审进行中，详见T042任务和validation；未发布。
@@ -180,3 +176,22 @@ work/evidence/T-044/code-maintenance-audit.md。整项最后全检/真实8图/�
 成功输出600/1且原样本像素/字节保持；注入真实错误分辨率失败并清临时文件、不发布目标。
 18项8.07秒实际0、相关类型0；不是容差放宽，无公式/schema/默认参数变化。
 后继提交绑定独审/最终真实8与全检/有界视觉待继续。
+
+## 2026-10-18：有界视觉检查发现弹框迟到事件覆盖结果页
+
+f0696ed绑定独审18项6.76秒实际0，Fraction精确比较无规则弱化。随后真实8worker和正常
+自动导出完成，预测冻结后合并成图与此前已评分成图像素一致。验证器错误假设应有4个PNG，
+实际格式为一个figure.png包含4 Fig/8源，因诊断断言退出1、未回存；不是产品识别失败。
+后继诊断明确核对唯一成图manifest全部8源及逐源ROI/泳道范围/显示框/映射/输出框，不能
+仅删掉数量断言后宣称通过。首次6张实际Qt截图已检查（1440/960，拼图/全部曲线/结果），
+不是只凭DOM或GPU日志。保持绿色工作台、曲线填充和原图，整体无重画需求。
+
+截图发现结果页右侧仍是Fig组定量：曲线原生dialog关闭事件异步到达，在立即切页后仍调用
+renderQuant覆盖结果页质量说明。已在直接关闭与close事件回调核对当前mode，仅quant页
+才刷新定量。真实发货HTML“打开→关闭→立即结果页”先红1failed/7.42秒
+显示“定量监督”而非“输出结果”；新绿1passed7.80秒，保留质量说明文本断言。
+
+为避免途中修改冒充同提交完整门禁，f0696ed全检在约13%由已核对PID34144的自有dev进程
+树明确停止，实际1，wheel未运行，check-before-modal-fix回执/日志保留；不是原生退出复现，
+不是完整通过，用户窗口未动。后继源码检查/独审/完整check/真实回存与最多一次截图确认待做。
+Impeccable detector已运行一次，后续不重复。

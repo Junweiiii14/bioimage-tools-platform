@@ -153,7 +153,7 @@ const manualQuant = {
     if (dialog?.open) dialog.close();
     this.profileBinding = null;
     this.profileKey = null;
-    renderQuant();
+    if (mode === 'quant') renderQuant();
   },
 
   refreshProfiles(force = false) {
@@ -227,7 +227,7 @@ document.addEventListener('change', event => {
 document.getElementById('quant-profiles-dialog').addEventListener('close', () => {
   manualQuant.profileBinding = null;
   manualQuant.profileKey = null;
-  renderQuant();
+  if (mode === 'quant') renderQuant();
 });
 
 document.addEventListener('input', event => {

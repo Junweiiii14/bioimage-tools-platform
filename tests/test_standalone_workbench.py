@@ -185,6 +185,24 @@ def test_real_page_manual_import_compute_save_reopen_without_automatic_or_compos
         )
         assert js("document.querySelector('[data-close-quant-profiles]').click(); true") is True
         assert js("document.querySelector('#quant-profiles-dialog').open") is False
+        qtbot.waitUntil(lambda: js("!state.busy") is True)
+        assert (
+            js(
+                "manualQuant.openProfiles(); manualQuant.closeProfiles(); "
+                "switchMode('results'); true"
+            )
+            is True
+        )
+        # Native dialog close is queued. Its late event must not restore the
+        # quantification inspector over the results page and hide quality reasons.
+        qtbot.wait(100)
+        assert js("document.querySelector('#inspector-title').textContent") == "输出结果"
+        assert (
+            js(
+                "document.querySelector('#inspector-content').textContent.includes('原始积分不等于有效信号')"
+            )
+            is True
+        )
         workspace = window.host.workspace_path
         window.close()
         qtbot.waitUntil(lambda: window.host.resources_closed, timeout=20000)
