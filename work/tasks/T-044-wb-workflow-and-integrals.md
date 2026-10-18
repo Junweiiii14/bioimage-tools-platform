@@ -1,6 +1,6 @@
 # T-044：积分边界、文件夹/同Fig工作流与独立灰度分析
 
-- 状态：in_progress；2026-10-18用户明确要求规划后执行，最终全库审查冗杂/无效代码。
+- 状态：review；2026-10-18用户明确要求规划后执行，最终全库审查冗杂/无效代码。
 - 基线：d11552c32b87538e33ef3bfbe70fb3797e3f403e；同一活动树，新分支codex/t044-wb-workflow-and-integrals。原.impeccable/questions与历史dirty树/原图/旧结果保留。
 - 前轮当前事实：d11552c远端run39030621380两平台670和全部wheel/最终check成功，规则/桌面成功；历史间歇退出根因UNKNOWN，不以通过销账。
 
@@ -232,3 +232,7 @@ a72e7102891df287e3484f20f3724612779b53f5：733 passed in 525.53s、pytest child/
 3e5cee3 Linux约29% OCR用例SIGSEGV，quality未通过，本地成功不替代；GDB证实非GUI线程QWidget析构，具体对象/全部旧根因仍UNKNOWN。只修test_wb_desktop fixture自有窗口：原异步关闭等待后GUI deleteLater并等原生无效；新销毁线程回归旧红1/2.87秒，新11项25.58秒0，相关类型/Ruff/格式0。受控真实窗口引用环实验未dispose Fatal Aborted/3，先GUI销毁0；不禁GC/不全局删除/不改产品。详见ci012-fixture-lifetime.md。待绑定独审及远端完整门禁，本轮尚未最终完成。
 
 CI012独审5c932b8整份11项24.94秒0，P2新测试finally等待失败时可能提前析构；后继复用安全helper，作者1项2.01秒0、类型/静态0。待后继绑定复核后安全备份/push，旧远端失败仍保留。
+
+## CI012审查后阶段交付
+
+ab6a68e绑定独审新增回归1项1.96秒实际0，P2关闭；5c整份独审11项24.94秒0。原3e5cee3远端Windows已733passed575.75秒、child0、全部wheel/dev成功；同run Linux29% SIGSEGV失败仍保留，run39104680503最终failure。ab6a68e已经外置完整bundle核验并重核原34未提交、safe push PR15；SHA0842f55b468becb38ed9345d45b3b840e006a688202ee83f581eb5d852217e1f。本轮实现和独审进入review，待最终文档后继HEAD的远端734门禁与按阶段集成；状态不代表正式发布，实际检查结论以PR15/issue6更新为准。产品代码a72e710未变，无需重复真实图或截图。

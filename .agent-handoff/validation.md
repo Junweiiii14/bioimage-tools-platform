@@ -197,4 +197,4 @@ CI009产品57fd7ea正式check --all实际exit0：669passed/497.77秒，Observed 
 - T044诊断容错：694279f独审2项0.38秒0，后继故障注入旧1failed/0.58秒1、新3passed/0.45秒0，相关类型/Ruff/格式0；未改原测试结果/时限。提交绑定复核及带对象清单的必要完整检查待执行。
 
 - T044最终本地交付：a72e7102891df287e3484f20f3724612779b53f5：733 passed in 525.53s、pytest child/全部wheel/dev实际0。最终正常Web8原图/8回存/保存重开/关闭0；8图产物独审0。API延迟依赖修复独审11项3.31秒0+隔离导入/发现0，无阻断。裁图回归1/8→8/8，积分13有效35复核不是准确率。详见work/evidence/T-044/final-delivery.md。下一步外置最终备份、阶段9草稿PR/日志/远端检查；main不直接合并。
-- CI012后继：3e5cee3远端Linux约29% SIGSEGV/debugger255/wheel未跑；精准fixture窗口销毁新断言红1/2.87秒、新11项25.58秒0、类型/Ruff/格式0，产品不变。受控窗口workerGC旧Aborted/3，GUI先dispose组0；待提交独审/远端734完整验证。
+- CI012：3e5cee3 Linux29% SIGSEGV/debugger255/wheel未跑；同HEAD Windows733passed575.75秒/child+wheels+dev0。精准fixture清理红1/2.87秒、新作者11/25.58秒0、独审11/24.94秒0；ab6a68e finally安全顺序补正独审1/1.96秒0关闭P2。最终远端734以PR15实际状态为准；产品a72代码未变。

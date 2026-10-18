@@ -19,3 +19,5 @@ GDB线程587在Shiboken::Object::destroy→QObjectPrivate::deleteChildren→QWid
 ## 绑定独审与错误清理补正
 
 5c932b8独审整份11项24.94秒实际0，发现新回归finally仅isValid就deleteLater：若helper等待后台超时，会提前销毁仍有线程的窗口（P2）。正式fixture helper本身顺序正确。后继finally改复用同一个close/wait/dispose helper，不以包装器有效代替资源退休；新回归1项2.01秒0、相关Pyright/Ruff/格式0。后继绑定复核与远端734全检待做，不把初审写作无阻断。
+
+后继ab6a68e绑定独审1项1.96秒实际0，P2已关闭，无新增阻断。原3e5cee3 Windows实际733passed575.75秒、child0、全部wheel/dev成功；同run Linux失败保持。审查后ab6a68e已备份核34原未提交并安全push；最终文档后继的远端734全检结论见PR15/issue6，不以本地/旧HEAD通过替代。

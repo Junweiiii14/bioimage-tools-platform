@@ -1,6 +1,6 @@
 # Handoff Snapshot
 
-- 更新2026-10-18。任务work/tasks/T-044-wb-workflow-and-integrals.md，in_progress；本地实现验证和PR15同步完成，但CI012远端Linux失败，最终工作尚未完成。
+- 更新2026-10-18。任务work/tasks/T-044-wb-workflow-and-integrals.md，review；本地实现/独审和PR15同步完成，CI012精确fixture修正已审查并推送，最终远端734门禁待实际结果。
 - 活动检出C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform，codex/t044-wb-workflow-and-integrals，基线d11552c，最新产品a72e7102891df287e3484f20f3724612779b53f5。核对实际HEAD/dirty，不为旧指针切历史代码。
 - 当前入口Start-BioImage.ps1/桌面当前开发绿色WebWorkbenchWindow，-I核验模块和资源路径；旧ResearchVault树不作当前入口。用户PID33256不动，停止的CUA不恢复。
 - 21工作树59分支、6干净历史树原位锁定，原dirty/原图/旧结果保留。.impeccable/questions四文件未提交并外置核SHA，见.local/t044/untracked-backup.json。
@@ -23,3 +23,7 @@
 ## CI012 当前优先项
 
 3e5cee3/run39104680503 Linux约29% OCR用例SIGSEGV，debugger255，wheel未跑；GDB非主线程587 QWidget析构，具体对象/历史全部根因仍UNKNOWN。test_wb_desktop fixture只有close/wait未destroy。受控真实窗口+holder环，后台GC未dispose进程Aborted/3，先GUI销毁0；只修本fixture拥有窗口的close/wait之后deleteLater/waitinvalid，无全局GC或Qt清理。新断言旧红1/2.87秒，新11项25.58秒0、类型/Ruff/格式0。见ci012-fixture-lifetime.md，需提交绑定独审、safe备份/push、远端734完整验证；产品a72代码不变，无理由重复8图/截图。issue6日志已明确更新失败，不当通过。Windows旧run仍待实际状态。
+
+## CI012审查后最新指针
+
+ab6a68e only tests/docs，无产品差异；独审1项1.96秒0关闭P2，原11项独审24.94秒0。原run39104680503 Windows733passed575.75秒和全部wheel/dev成功，Linux29% SIGSEGV使整run失败；均已保存日志。不取消真实失败。ab已外置bundle verified/SHA0842f55b468becb38ed9345d45b3b840e006a688202ee83f581eb5d852217e1f，再核34原未提交一致，safe push。此文档后继也会重新备份和push，不再改产品/测试；最终HEAD/CI run/开发日志链接见.local/t044/github-delivery.json及PR15/issue6。下一步只看最终PR的rules、Windows/Linux734和desktop实际结果；失败按证据继续，成功后给维护汇报，任务review表示待依赖集成main，不要求合main。不要因旧快照pending重复实现/验证。
