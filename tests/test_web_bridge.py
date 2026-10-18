@@ -43,10 +43,45 @@ def test_folder_report_is_visible_and_only_current_variant_can_be_added(
     assert isinstance(snapshot, dict) and snapshot["id"] == identity
     bridge.host.automatic.include_discovered_source(0, identity)
     assert calls == [(("input/other (2).tif",), True)]
-    for index, token in [(1, identity), (0, "old-report"), (True, identity), (99, identity)]:
+    current_identity = sha256(bridge.host.automatic.discovery_report).hexdigest()
+    assert current_identity != identity
+    for index, token in [
+        (1, current_identity),
+        (0, "old-report"),
+        (True, current_identity),
+        (99, current_identity),
+    ]:
         with pytest.raises(ValueError):
             bridge.host.automatic.include_discovered_source(index, token)
     assert len(calls) == 1
+
+
+def test_folder_report_cannot_cross_project_or_workspace(
+    bridge: WorkbenchBridge, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    workflow = bridge.host.automatic
+    workflow.discovery_report = (
+        FolderDiscoveryReport.model_validate(
+            {
+                "paths": ["A/source.tif"],
+                "skipped": [{"path": "A/source (2).tif", "reason": "numbered_acquisition_variant"}],
+            }
+        )
+        .model_dump_json()
+        .encode()
+    )
+    identity = sha256(workflow.discovery_report).hexdigest()
+    first = bridge.host.view.project()
+    bridge.host.view.set_project(first.model_copy(update={"project_id": "another-project"}))
+    assert workflow.discovery_report == b""
+    assert bridge.snapshot()["sourceDiscovery"] is None
+    with pytest.raises(ValueError, match="筛选记录已改变"):
+        workflow.include_discovered_source(0, identity)
+    bridge.host.view.set_project(first)
+    assert workflow.discovery_report
+    monkeypatch.setattr(bridge.host, "_workspace", "different-workspace")
+    assert workflow.discovery_report == b""
+    assert bridge.snapshot()["sourceDiscovery"] is None
 
 
 @pytest.fixture

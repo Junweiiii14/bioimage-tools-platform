@@ -36,8 +36,21 @@ class AutomaticWorkflow(QObject):
             "legacy_bounds@1"
         )
         self.failures: tuple[str, ...] = ()
-        self.discovery_report: bytes = b""
+        self._discovery_report: bytes = b""
+        self._discovery_context: tuple[str, str] | None = None
         self.cancelled = False
+
+    @property
+    def discovery_report(self) -> bytes:
+        context = (self.window.workspace_path, self.window.view.project().project_id)
+        return self._discovery_report if context == self._discovery_context else b""
+
+    @discovery_report.setter
+    def discovery_report(self, value: bytes) -> None:
+        self._discovery_report = value
+        self._discovery_context = (
+            (self.window.workspace_path, self.window.view.project().project_id) if value else None
+        )
 
     def cancel(self) -> None:
         self.cancelled = True
