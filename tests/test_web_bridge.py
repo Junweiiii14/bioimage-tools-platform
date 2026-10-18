@@ -3,6 +3,7 @@
 import gc
 import json
 from collections.abc import Iterator
+from hashlib import sha256
 from pathlib import Path
 
 import numpy as np
@@ -11,6 +12,41 @@ import tifffile
 from bioimage_app.figure_window import FigureProjectWindow
 from bioimage_app.web_bridge import WorkbenchBridge
 from pytestqt.qtbot import QtBot
+from wb_tool.api import FolderDiscoveryReport
+
+
+def test_folder_report_is_visible_and_only_current_variant_can_be_added(
+    bridge: WorkbenchBridge, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    report = (
+        FolderDiscoveryReport.model_validate(
+            {
+                "paths": ["input/original.tif"],
+                "skipped": [
+                    {"path": "input/other (2).tif", "reason": "numbered_acquisition_variant"},
+                    {"path": "input/display.tif", "reason": "generated_display_or_crop"},
+                ],
+            }
+        )
+        .model_dump_json()
+        .encode()
+    )
+    bridge.host.automatic.discovery_report = report
+    calls: list[tuple[tuple[str, ...], bool]] = []
+
+    def capture(paths: tuple[str, ...], *, automatic: bool = False) -> None:
+        calls.append((paths, automatic))
+
+    monkeypatch.setattr(bridge.host, "import_images", capture)
+    identity = sha256(report).hexdigest()
+    snapshot = bridge.snapshot()["sourceDiscovery"]
+    assert isinstance(snapshot, dict) and snapshot["id"] == identity
+    bridge.host.automatic.include_discovered_source(0, identity)
+    assert calls == [(("input/other (2).tif",), True)]
+    for index, token in [(1, identity), (0, "old-report"), (True, identity), (99, identity)]:
+        with pytest.raises(ValueError):
+            bridge.host.automatic.include_discovered_source(index, token)
+    assert len(calls) == 1
 
 
 @pytest.fixture

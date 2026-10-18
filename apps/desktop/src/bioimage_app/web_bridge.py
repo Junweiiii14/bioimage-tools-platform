@@ -4,6 +4,7 @@ import base64
 import json
 import math
 from collections.abc import Callable
+from hashlib import sha256
 from typing import cast
 
 from PySide6.QtCore import QBuffer, QIODevice, QObject, QTimer, Signal, Slot
@@ -216,6 +217,12 @@ class WorkbenchBridge(QObject):
             "montageHeight": montage_height,
             "autoCompletedKey": self._completed_key,
             "outputPath": self.host.automatic.last_output_path,
+            "sourceDiscovery": {
+                **json.loads(self.host.automatic.discovery_report),
+                "id": sha256(self.host.automatic.discovery_report).hexdigest(),
+            }
+            if self.host.automatic.discovery_report
+            else None,
         }
 
     @Slot()
@@ -261,6 +268,10 @@ class WorkbenchBridge(QObject):
                 raise ValueError("当前任务仍在处理中，请稍候或取消")
             elif action in {"import", "import_folder", "open_project"}:
                 self.choose(action)
+            elif action == "include_folder_source":
+                self.host.automatic.include_discovered_source(
+                    data.get("index"), data.get("reportId")
+                )
             elif action in {"select", "quant_select"}:
                 rows = self.host.view.project().rows
                 index = next((i for i, row in enumerate(rows) if row.row_id == data.get("id")), -1)

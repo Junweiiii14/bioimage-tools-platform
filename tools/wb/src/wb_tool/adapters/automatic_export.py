@@ -15,7 +15,7 @@ from wb_tool.adapters.project_export import export_project_table
 from wb_tool.adapters.quant_export import export_wbquant_table
 from wb_tool.adapters.tiff_input import is_generated_tiff
 from wb_tool.application.figure_project import FigureSourcePath, WBFigureProject
-from wb_tool.application.import_labels import preferred_acquisition_sources
+from wb_tool.application.import_labels import FolderDiscoveryReport, preferred_acquisition_sources
 from wb_tool.application.project_analysis import fill_project_table
 from wb_tool.application.project_archive import ArchiveRunEvidence
 
@@ -90,6 +90,7 @@ def export_automatic_results(
     *,
     runs: tuple[ArchiveRunEvidence, ...] = (),
     processing_errors: tuple[str, ...] = (),
+    discovery_report: bytes = b"",
     cancelled: Callable[[], bool] = lambda: False,
 ) -> str:
     from wb_tool.application.automatic import row_is_ready
@@ -141,6 +142,11 @@ def export_automatic_results(
             "rendered_source_count": len(ready),
             "human_reviewed_count": sum(r.reviewed for r in project.rows),
             "processing_errors": list(processing_errors),
+            "source_discovery": FolderDiscoveryReport.model_validate_json(
+                discovery_report
+            ).model_dump(mode="json")
+            if discovery_report
+            else None,
             "rows": [
                 {
                     "row_id": r.row_id,

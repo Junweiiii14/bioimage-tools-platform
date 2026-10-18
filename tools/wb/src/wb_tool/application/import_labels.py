@@ -3,6 +3,9 @@
 import re
 from dataclasses import dataclass
 from pathlib import PurePosixPath
+from typing import Literal
+
+from pydantic import BaseModel, Field
 
 _FIG_FOLDER = re.compile(r"(?:fig(?:ure)?[ ._-]*)?([1-9]\d{0,3}[a-z]?)", re.IGNORECASE)
 _FIG_FILE = re.compile(r"fig(?:ure)?[ ._-]*([1-9]\d{0,3}[a-z]?)(?=$|[ ._-])", re.IGNORECASE)
@@ -15,6 +18,18 @@ class SourceImportLabels:
     figure: str | None
     protein: str | None
     policy: str = "literal_source_labels@1"
+
+
+class FolderSkippedFile(BaseModel):
+    path: str = Field(min_length=1, max_length=4096)
+    reason: Literal["generated_display_or_crop", "numbered_acquisition_variant"]
+
+
+class FolderDiscoveryReport(BaseModel):
+    policy: Literal["folder_sources@1"] = "folder_sources@1"
+    paths: tuple[str, ...] = Field(max_length=512)
+    skipped: tuple[FolderSkippedFile, ...] = Field(max_length=4096)
+    requested_additions: tuple[str, ...] = Field(default=(), max_length=512)
 
 
 def source_import_labels(source: str) -> SourceImportLabels:

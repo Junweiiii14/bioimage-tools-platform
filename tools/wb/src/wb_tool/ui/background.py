@@ -126,6 +126,7 @@ class _Work(QObject):
                     job.destination,
                     runs=job.archive_runs or (),
                     processing_errors=job.processing_errors,
+                    discovery_report=job.data,
                     cancelled=cancel,
                 )
             elif job.operation == "project_evidence":

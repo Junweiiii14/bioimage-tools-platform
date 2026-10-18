@@ -68,6 +68,9 @@ def test_directory_import_detect_compute_export_and_reopen(
     assert (output / "measurements.xlsx").is_file()
     assert (output / "figure.png").is_file()
     assert (output / "figure.tif").is_file()
+    status = json.loads((output / "status.json").read_text(encoding="utf-8"))
+    assert status["source_discovery"]["policy"] == "folder_sources@1"
+    assert len(status["source_discovery"]["paths"]) == 3
     with ZipFile(output / "project.zip") as archive:
         manifest = json.loads(archive.read("manifest.json"))
         assert manifest["unrendered_rows"][0]["row_id"] == project.rows[0].row_id
@@ -97,7 +100,7 @@ def test_explicit_fig_folder_groups_acquisition_rows(
 ) -> None:
     group = tmp_path / "1D"
     group.mkdir()
-    paths = []
+    paths: list[str] = []
     for offset, protein in enumerate(("ABCA9", "β-actin")):
         image = np.full((180, 360), 50000, dtype=np.uint16)
         image[0, 0] -= offset  # Distinct source identities with the same measured geometry.

@@ -68,7 +68,11 @@ from wb_tool.application.figure_template import (
     PortableFigureTemplate,
     TemplateFont,
 )
-from wb_tool.application.import_labels import SourceImportLabels, source_import_labels
+from wb_tool.application.import_labels import (
+    FolderDiscoveryReport,
+    SourceImportLabels,
+    source_import_labels,
+)
 from wb_tool.application.laboratory_layout import (
     DisplayFrame,
     FigureColumn,
@@ -271,6 +275,7 @@ __all__ = [
     "apply_metadata",
     "filename_metadata",
     "SourceImportLabels",
+    "FolderDiscoveryReport",
     "source_import_labels",
     "preview_metadata",
     "read_metadata_file",
