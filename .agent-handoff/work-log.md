@@ -1,12 +1,5 @@
 # Current Work Log
 
-## 2026-10-17 T-041 标准显示
-
-- 新显式standard_lane_ratio@1和DisplayFrame，仅显示RGB8重采样，manifest含原ROI/输出框/仿射矩阵，原生默认冻结hash保持。
-- 目标88测试、Ruff、strict Pyright通过；独审/全仓/真实8图未运行，交协调任务。详见work/tasks/T-041-standard-display.md。
-
-- T041独审P1：禁止部分泳道段携带完整行display_frame，新增重复三泳道负例；31专项通过，详见任务。
-
 ## 2026-10-17 T040
 Executed approved real dataset, published8no-overwrite named crops,4Fig images,48supervised observations/Excel/ZIP and reopened real desktop. Preserved first failed automatic predictions and old integrals. Integrated display-only standard frames and source overlays, independently reviewed throughf7a6651. Detector/baseline shortcomings and fullcheck abnormalexit remain explicit; see task/evidence.
 
@@ -156,3 +149,24 @@ b0e6c37独审1项2.42秒0，关闭多选误确认P2。只读全库覆盖123产�
 绿色工作台质量原因集中去重，重复标签改简洁关联标记，原值/有效值区别及来源错误保留。
 现成12UI相关34.16秒0、Node0。机械detector一次85项及明确保留/待视觉判断理由见
 work/evidence/T-044/code-maintenance-audit.md。整项最后全检/真实8图/视觉/独审/GitHub尚未完成。
+
+## 2026-10-18：最终真实验证发现首页文件夹入口遗漏
+
+9fb79e2绑定独审25项8.75秒实际0，无阻断。随后最终真实验证从首页首次目录建项目，
+发现ProjectSelectionJob仅collect_source_images，选入32项；旧首阶段目录证据只覆盖已有
+项目的automatic.import_directory，不能证明首页路径已修复。该次自有验证明确中止，
+核对PID34304命令行是本地验证脚本后仅停止其子树，外层实际1；用户PID/窗口未动，
+部分新验证工作区保留，未执行回存，未形成最终8图或视觉通过。旧日志另存
+.local/t044/first-folder-real-aborted.log，之前成功证据不抹掉这次产品遗漏。
+
+现统一首页单目录automatic模式为既有folder_sources@1发现函数，仍在ProjectSelectionJob
+后台线程，先筛选再验证/创建；通过wb_tool.api导出真实复用函数，不跨内部实现。
+保留原目录用于保存位置重叠判断，显式文件选择/独立灰度不套目录偏好；新工作区/项目创建
+后再绑定完整筛选记录，随后正常导入/状态导出，重试保留原路径和模式。
+
+新增发货HTML首页按钮反例：两个设备源、同设置编号变体、已导出原值TIFF。旧路径真实
+4行误导入失败1项8.49秒；初次新测试用普通短名称却期待设备采集文件偏好（依旧保留普通
+编号文件的契约），改为实际采集命名样本，不扩展/放宽政策；中间1failed9passed16.11秒
+保留。最终10项14.07秒实际0，覆盖首页筛选报告可见和status.json、旧新建/取消/目录
+重叠/独立灰度及回存，原文件集合/字节保持。全项目类型/静态后继见命令结果，绑定独审、
+最终真实8/全检/视觉仍待做；不能用9fb79e2检查覆盖后继。

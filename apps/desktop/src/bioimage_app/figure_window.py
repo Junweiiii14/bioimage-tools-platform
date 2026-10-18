@@ -394,7 +394,10 @@ class FigureProjectWindow(QMainWindow):
         self.view.status.setText("正在查找 WB 原图…")
         self.welcome_status.setText("正在查找 WB 原图…")
         job = ProjectSelectionJob(
-            paths, project_parent or default_project_parent(), self._cancellation
+            paths,
+            project_parent or default_project_parent(),
+            self._cancellation,
+            automatic=automatic,
         )
         self._selection_job = job
 
@@ -436,6 +439,7 @@ class FigureProjectWindow(QMainWindow):
                         self.view.set_project(
                             WBFigureProject(project_id=uuid4().hex, name=selection.name)
                         )
+                        self.automatic.discovery_report = selection.discovery_report
                         self.workspace_opened.emit(self._workspace)
                         self._busy = False
                         if self._closing or self._cancellation.is_set():

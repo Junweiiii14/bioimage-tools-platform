@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from wb_tool.ui.view import WBView
 
 from wb_tool.adapters.automatic import automatic_project_row
+from wb_tool.adapters.automatic_export import discover_tiffs
 from wb_tool.adapters.crop_return import return_reviewed_crop
 from wb_tool.adapters.metadata_input import read_metadata_file
 from wb_tool.adapters.ocr_input import OCRImage, load_ocr_image
@@ -217,6 +218,7 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "discover_tiffs",
     "ReturnedCrop",
     "return_reviewed_crop",
     "ManualQuantTarget",
