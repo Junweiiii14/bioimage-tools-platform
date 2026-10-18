@@ -1,6 +1,11 @@
 # Desktop host
 
 The default `python -m bioimage_app` entry opens the current green WB web workbench.
+For daily Windows use, `Start-BioImage.ps1` runs Python in isolated mode and verifies
+the installed desktop module and shipped UI against its own checkout before dispatch.
+A stale editable installation or missing UI stops with an actionable error; there is no
+older-version fallback. `./Start-BioImage.ps1 --verify-launch` prints the verified paths
+without opening Qt. Direct Python invocations do not receive this launcher protection.
 `--web-workbench`, `--figure-project` and `--platform` all open that same workbench;
 an unknown argument fails before Qt starts. Its hidden native host supplies asynchronous
 storage, computation and advanced tools. Native editors open only on an explicit advanced
