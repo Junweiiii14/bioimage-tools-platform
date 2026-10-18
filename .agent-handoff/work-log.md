@@ -1,9 +1,5 @@
 # Current Work Log
 
-## 2026-10-17 T042 实现与真实网页验证
-
-社区原始来源调研、几何与背景策略已接现有网页工作台；8图独审8/8，原图旧结果保持，web3正常8run保存重开及48网页结果验证exit0。发现并修复Marker显式误删、ROI旧frame、同框重算frame、双峰漏警、worker质量flag。误开旧Qt测试入口已纠正；无web_ui设计变更。完整门禁/最终独审进行中，详见T042任务和validation；未发布。
-
 ## 2026-10-17 T042 源输入修复与现有网页验证
 
 产品至9eb5a1b：8图裁图1/8→8/8，冻结后参考评分；新积分7valid/41quality_review，原图/参考/旧结果SHA保持。修正误开的旧Qt测试入口，正常WebWorkbenchWindow完成8run、导出、保存重开和48DOM结果。独审问题已关闭；Schema与N8/7°性质反例修复。独立wheel通过；完整628项门禁在窗口关闭测试原生connect挂起，停止专属进程exit1，根因未定；没有放松测试或更换锁。详见T042任务及validation。
@@ -195,3 +191,7 @@ renderQuant覆盖结果页质量说明。已在直接关闭与close事件回调�
 树明确停止，实际1，wheel未运行，check-before-modal-fix回执/日志保留；不是原生退出复现，
 不是完整通过，用户窗口未动。后继源码检查/独审/完整check/真实回存与最多一次截图确认待做。
 Impeccable detector已运行一次，后续不重复。
+
+## 2026-10-18 T044 最终本地交付
+
+a72e7102891df287e3484f20f3724612779b53f5：733 passed in 525.53s、pytest child/全部wheel/dev实际0。最终正常Web8原图/8回存/保存重开/关闭0；8图产物独审0。API延迟依赖修复独审11项3.31秒0+隔离导入/发现0，无阻断。裁图回归1/8→8/8，积分13有效35复核不是准确率。详见work/evidence/T-044/final-delivery.md。下一步外置最终备份、阶段9草稿PR/日志/远端检查；main不直接合并。

@@ -86,4 +86,4 @@
 
 - T-042最终9eb5a1b完整门禁在重复关闭窗口测试的pytestqt QTimer.timeout.connect原生调用挂起；保留faulthandler后停止专属pytest，check退出1。隔离desktop10项exit0；只读独审无法证明GC死锁根因，不能认为旧退出/挂起风险已修复。8图回归8/8非留出泛化，真实48槽7valid/41quality_review，无积分准确率真值。
 
-- T044最新3a830fb本机696passed/488.23秒后退出AV，child c0000005、dev/外层-1/wheel未跑。native栈1线程Qt窗口/父子/包装器析构，最近retrieveMetaObject符号不能代替匹配PDB/源码位置；不认定WebEngine或旧GIL死锁同因。四组基本Qt退出控制尚未运行，完整门禁未通过，不安全发布或改成功状态。独审P2不变目标清人工边界后继已修，尚待绑定复核。
+- T044历史AV/c0000005精确根因仍UNKNOWN，native-exit.md保留；后继修复真实隐藏无parent控件但不证明AV因果，Qt-only控制未复现。最终a72e710 733 passed in 525.53s、全部wheel/dev0且独审通过，仅证明本轮运行。积分13有效35复核，无积分真值/留出；恢复/最终Windows/DPI待验。旧P2不变目标丢边界已绑定独审关闭；中途失败/中止均保留，不改成功状态。

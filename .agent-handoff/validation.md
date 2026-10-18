@@ -195,3 +195,5 @@ CI009产品57fd7ea正式check --all实际exit0：669passed/497.77秒，Observed 
 - T044 9f96f5c绑定独审2项1.64秒0，P2关闭。四组Qt-only控制observer均附着、exit0/无fault，未复现非产品修复。新增可选qt_exit_inventory观察器2项0.34秒0/相关类型Ruff格式0，源码/描述见T044/native-exit.md；绑定审查和必要完整检查待做。
 
 - T044诊断容错：694279f独审2项0.38秒0，后继故障注入旧1failed/0.58秒1、新3passed/0.45秒0，相关类型/Ruff/格式0；未改原测试结果/时限。提交绑定复核及带对象清单的必要完整检查待执行。
+
+- T044最终本地交付：a72e7102891df287e3484f20f3724612779b53f5：733 passed in 525.53s、pytest child/全部wheel/dev实际0。最终正常Web8原图/8回存/保存重开/关闭0；8图产物独审0。API延迟依赖修复独审11项3.31秒0+隔离导入/发现0，无阻断。裁图回归1/8→8/8，积分13有效35复核不是准确率。详见work/evidence/T-044/final-delivery.md。下一步外置最终备份、阶段9草稿PR/日志/远端检查；main不直接合并。
