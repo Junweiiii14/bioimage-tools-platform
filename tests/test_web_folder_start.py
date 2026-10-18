@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from typing import cast
 
 import numpy as np
 import pytest
@@ -84,7 +85,8 @@ def test_first_folder_import_filters_before_creating_project_and_records_choices
             "generated_display_or_crop",
         }
         snapshot = window.bridge.snapshot()["sourceDiscovery"]
-        assert isinstance(snapshot, dict) and len(snapshot["skipped"]) == 2
+        assert isinstance(snapshot, dict)
+        assert len(cast(list[object], snapshot["skipped"])) == 2
         output = Path(window.host.automatic.last_output_path)
         exported = json.loads((output / "status.json").read_bytes())
         assert exported["source_discovery"]["paths"] == list(report.paths)
