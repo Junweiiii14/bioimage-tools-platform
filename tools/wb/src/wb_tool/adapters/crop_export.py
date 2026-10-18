@@ -4,6 +4,7 @@ import json
 import os
 from collections.abc import Callable
 from dataclasses import asdict
+from fractions import Fraction
 from hashlib import file_digest, sha256
 from pathlib import Path
 from typing import cast
@@ -116,7 +117,12 @@ def export_crop(
             if resolution is not None:
                 for name, expected in zip(("XResolution", "YResolution"), resolution, strict=True):
                     tag = page.tags.get(name)
-                    if tag is None or tag.value != expected:
+                    if (
+                        tag is None
+                        or not tag.value[1]
+                        or not expected[1]
+                        or Fraction(*tag.value) != Fraction(*expected)
+                    ):
                         raise ValueError("原值裁剪分辨率写后核验失败，未发布当前文件")
         check_cancel()
         if os.name == "nt":

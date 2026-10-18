@@ -1,8 +1,5 @@
 # Current Work Log
 
-## 2026-10-17 T040
-Executed approved real dataset, published8no-overwrite named crops,4Fig images,48supervised observations/Excel/ZIP and reopened real desktop. Preserved first failed automatic predictions and old integrals. Integrated display-only standard frames and source overlays, independently reviewed throughf7a6651. Detector/baseline shortcomings and fullcheck abnormalexit remain explicit; see task/evidence.
-
 ## 2026-10-17 T040 deep technical audit
 Three independent readers traced crop/quant/pipeline and cross-reviewed17-section report. Source-only membrane/Marker and17boundary replays exit0, original hashes unchanged. Corrected prior vague attribution, documented script-vs-product and scientific/units/precision/coordinate/model-validation limits; no product modifications. Fullcheck not rerun for this report.
 
@@ -170,3 +167,16 @@ work/evidence/T-044/code-maintenance-audit.md。整项最后全检/真实8图/�
 保留。最终10项14.07秒实际0，覆盖首页筛选报告可见和status.json、旧新建/取消/目录
 重叠/独立灰度及回存，原文件集合/字节保持。全项目类型/静态后继见命令结果，绑定独审、
 最终真实8/全检/视觉仍待做；不能用9fb79e2检查覆盖后继。
+
+## 2026-10-18：真实设备TIFF分辨率等价表示兼容
+
+5f90c40绑定独审10项14.76秒实际0，首页目录遗漏关闭。最终真实8图随后完成8个worker，
+但新写后核验在自动导出遇到设备元数据6000000/10000，输出约分600/1，错误地当成分辨率
+改变而拒绝，尚未最终8图成功/未回存/未截图。日志real-rational-resolution-failure.log及
+新工作区保留；核对自有脚本PID16632命令行后只停止该树，外层1，用户窗口未动。
+
+修复为Fraction精确比较物理分辨率数值，保持单位及像素/通道/位深/来源等核验。非等价
+720与600仍拒绝；零分母明确失败，避免异常漏回后台回执。新增真实非约分header结构样本，
+成功输出600/1且原样本像素/字节保持；注入真实错误分辨率失败并清临时文件、不发布目标。
+18项8.07秒实际0、相关类型0；不是容差放宽，无公式/schema/默认参数变化。
+后继提交绑定独审/最终真实8与全检/有界视觉待继续。
