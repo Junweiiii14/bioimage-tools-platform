@@ -1895,13 +1895,20 @@ class FigureProjectWindow(QMainWindow):
             else:
                 self.select_source(project.rows[index].row_id)
 
-    def save(self, after: Callable[[], None] | None = None) -> None:
+    def save(
+        self,
+        after: Callable[[], None] | None = None,
+        *,
+        transform: Callable[[WBFigureProject], WBFigureProject] | None = None,
+    ) -> None:
         if self._busy or not self._workspace:
             return
         try:
             project = self.view.project(
                 0 if self._saved_revision is None else self._saved_revision + 1
             )
+            if transform is not None:
+                project = transform(project)
         except ValueError as error:
             self._error(str(error))
             return
@@ -1921,6 +1928,9 @@ class FigureProjectWindow(QMainWindow):
                     self._done("旧修订已保存，当前编辑保留；请重新执行操作")
                     return
                 self.view.set_project(project)
+                if transform is not None:
+                    self.view.generation += 1
+                    self._saved_generation = self.view.generation
                 if self.documents.findData(project.project_id) < 0:
                     self.documents.addItem(project.name, project.project_id)
                 self._busy = False

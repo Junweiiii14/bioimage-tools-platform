@@ -5,7 +5,7 @@ window.groupReview = (() => {
   const esc = escapeText;
   let manual = false, selection = null, draft = null, dragging = null;
   let contentKey = '', navigationKey = '', pendingFocus = false, tableFilter = 'all';
-  let zoomLevel = 1, pan = null;
+  let zoomLevel = 1, pan = null, pendingSelection = null;
   const root = document.createElement('section');
   root.id = 'gr-workspace'; root.hidden = true;
   root.setAttribute('aria-label', '全组灰度审核'); $('.workspace').append(root);
@@ -18,6 +18,13 @@ window.groupReview = (() => {
   $('.source-panel .panel-heading').after(back);
   back.onclick = () => {manual = false; manualQuant.active = false; contentKey = ''; render();};
   const group = () => state.quant?.group;
+  function sizeTicks() {
+    $$('.gr-curve>svg,#gr-edit-curve',root).forEach(svg=>{
+      const r=svg.getBoundingClientRect(),v=svg.viewBox.baseVal,scale=Math.min(r.width/v.width,r.height/v.height);
+      if(scale>0)svg.style.setProperty('--gr-tick-size',`${11/scale}px`);
+    });
+  }
+  new ResizeObserver(()=>requestAnimationFrame(sizeTicks)).observe(root);
   const chosen = () => {
     const protein = group()?.rows.find(r => r.rowId === selection?.rowId);
     const lane = protein?.lanes.find(l => l.lane === selection?.lane);
@@ -50,7 +57,7 @@ window.groupReview = (() => {
     let lo = 0, hi = 1;
     for (const v of [...values,...bands.flatMap(b=>[b.baselineStart,b.baselineEnd]).filter(Number.isFinite)]) {lo=Math.min(lo,v);hi=Math.max(hi,v);}
     const span=hi-lo || 1; hi+=span*.06;
-    return {w,h,lo,hi,x:i=>32+i/Math.max(1,values.length-1)*(w-44),y:v=>12+(hi-v)/(hi-lo)*(h-36)};
+    return {w,h,lo,hi,x:i=>48+i/Math.max(1,values.length-1)*(w-60),y:v=>12+(hi-v)/(hi-lo)*(h-36)};
   }
   function curve(lane, large=false) {
     const values=lane.profile || [], bands=lane.bands.map(b=>large&&draft&&b.id===selection?.bandId?{...b,...draft}:b);
@@ -62,7 +69,7 @@ window.groupReview = (() => {
       const editable=large&&b.id===selection?.bandId;
       return `<polygon class="gr-area" points="${x(b.start)},${y(b.baselineStart)} ${points} ${x(b.end)},${y(b.baselineEnd)}"/><path class="gr-guide" d="M${x(b.start)} ${y(b.baselineStart)}V${h-24} M${x(b.end)} ${y(b.baselineEnd)}V${h-24}"/><path class="gr-baseline" d="M${x(b.start)} ${y(b.baselineStart)}L${x(b.end)} ${y(b.baselineEnd)}"/>${[0,1].map(side=>`<circle class="gr-endpoint" ${editable?`data-gr-end="${side}"`:''} cx="${x(side?b.end:b.start)}" cy="${y(side?b.baselineEnd:b.baselineStart)}" r="${large?5:3}"/>`).join('')}`;
     }).join('');
-    return {viewBox:`0 0 ${w} ${h}`,body:`<path class="gr-axis" d="M32 12V${h-24}H${w-12}"/>${lines}<path class="gr-line" d="${values.map((v,i)=>(i?'L':'M')+x(i).toFixed(2)+','+y(v).toFixed(2)).join(' ')}"/><g class="gr-ticks"><text x="1" y="18">${Math.round(G.hi)}</text><text x="1" y="${h-24}">${Math.round(G.lo)}</text><text x="32" y="${h-6}">0</text><text x="${w-12}" y="${h-6}" text-anchor="end">${values.length-1} y</text></g>`};
+    return {viewBox:`0 0 ${w} ${h}`,body:`<path class="gr-axis" d="M48 12V${h-24}H${w-12}"/>${lines}<path class="gr-line" d="${values.map((v,i)=>(i?'L':'M')+x(i).toFixed(2)+','+y(v).toFixed(2)).join(' ')}"/><g class="gr-ticks"><text x="1" y="18">${Math.round(G.hi)}</text><text x="1" y="${h-24}">${Math.round(G.lo)}</text><text x="48" y="${h-6}">0</text><text x="${w-12}" y="${h-6}" text-anchor="end">${values.length-1} y</text></g>`};
   }
   function sourceImages() {
     const bySource = new Map();
@@ -94,6 +101,7 @@ window.groupReview = (() => {
     const slot=$$('.gr-protein',root).find(el=>el.dataset.grProtein===protein.rowId)?.querySelector('.gr-editor-slot');if(!slot)return;
     const b=draft?{...band,...draft}:band,svg=curve(lane,true),disabled=!readyToEdit()?'disabled':'';
     slot.innerHTML=`<div class="gr-editor"><header><h3>${esc(protein.protein)} · 泳道 ${lane.lane}</h3><button class="text-button" data-gr-action="close">收起调整</button></header><p class="gr-muted">拖动橙色端点调整范围和封底高度；也可输入精确数值。</p><label class="gr-band-label">积分区间 <select id="gr-band" ${disabled}>${lane.bands.map(b=>`<option value="${esc(b.id)}" ${b.id===band.id?'selected':''}>${esc(b.id)}${b.included?'':'（已排除）'}</option>`).join('')}</select></label><svg id="gr-edit-curve" viewBox="${svg.viewBox}" aria-label="积分边界与封底曲线">${svg.body}</svg><div class="gr-fields">${[['start','起点 y'],['end','终点 y'],['baselineStart','左端封底灰度'],['baselineEnd','右端封底灰度']].map(([field,label])=>`<label>${label}<input data-gr-field="${field}" type="number" value="${Number.isFinite(b[field])?Number(b[field]).toFixed(field==='start'||field==='end'?0:2):''}" step="${field==='start'||field==='end'?1:.1}" ${disabled}></label>`).join('')}</div><footer><span>${state.busy?'后台处理中，完成后可修改':selection.rowId!==state.quant?.rowId?'正在载入当前蛋白…':draft?'范围草稿，应用后后台重算':'当前积分 '+(band.signal==null?'—':band.signal.toFixed(2))}</span><button class="button primary" data-gr-action="apply" ${disabled||!draft?'disabled':''}>应用并重算</button></footer><details class="gr-help"><summary>质量与检测依据</summary><p>${esc(band.reason||'当前记录没有附加质量说明。')}</p></details></div>`;
+    requestAnimationFrame(sizeTicks);
     if(pendingFocus){pendingFocus=false;requestAnimationFrame(()=>slot.scrollIntoView({block:'nearest',behavior:'auto'}));}
   }
   function choose(rowId,lane,bandId) {
@@ -116,12 +124,16 @@ window.groupReview = (() => {
     back.hidden=mode!=='quant'||!manual;
     if(!active){contentKey='';navigationKey='';return false;}
     navigation();
-    const key=JSON.stringify([state.projectId,state.quant?.revision,group()?.figure,mode,tableFilter,state.quant?.table?.length,[...new Set(state.rows.filter(r=>r.preview).map(r=>r.sourceId))]]);
+    if(pendingSelection&&state.projectId!==pendingSelection.projectId)pendingSelection=null;
+    if(pendingSelection&&group()?.rows.some(r=>r.rowId===pendingSelection.rowId)){
+      selection=pendingSelection;pendingSelection=null;pendingFocus=true;
+    }
+    const key=JSON.stringify([state.projectId,state.quant?.revision,group()?.figure,mode,tableFilter,state.quant?.table?.length,state.quant?.resultRuns,state.quant?.reviewedGroups,[...new Set(state.rows.filter(r=>r.preview).map(r=>r.sourceId))]]);
     if(key!==contentKey){
       root.scrollTop=0;
       contentKey=key;dragging=null;draft=null;
       if(!group()?.rows.some(r=>r.rowId===selection?.rowId))selection=null;
-      if(mode==='results')results();else review();
+      if(mode==='results')results();else {review();requestAnimationFrame(sizeTicks);}
     } else if(selection&&!dragging&&!draft) editor();
     updateControls();return true;
   }
@@ -148,7 +160,7 @@ window.groupReview = (() => {
   }
   document.addEventListener('click',e=>{
     const nav=e.target.closest('[data-gr-group]');if(nav){send('quant_select',{id:nav.dataset.grGroup,overview:false});return;}
-    const value=e.target.closest('[data-gr-value]');if(value){manual=false;selection={rowId:value.dataset.grValue,lane:Number(value.dataset.grLane),bandId:value.dataset.grBand};pendingFocus=true;send('quant_select',{id:selection.rowId,overview:false});switchMode('quant');return;}
+    const value=e.target.closest('[data-gr-value]');if(value){manual=false;pendingSelection={projectId:state.projectId,rowId:value.dataset.grValue,lane:Number(value.dataset.grLane),bandId:value.dataset.grBand};state.selectedId=pendingSelection.rowId;quantLane=pendingSelection.lane;quantBand=pendingSelection.bandId;quantDetail=true;switchMode('quant');return;}
     const el=e.target.closest('[data-gr-row]');if(el&&el.classList.contains('gr-curve')){choose(el.dataset.grRow,Number(el.dataset.grLane));return;}
     const m=e.target.closest('[data-gr-manual]');if(m){manualMode(m.dataset.grManual);return;}
     const exp=e.target.closest('[data-gr-export]');if(exp){send('quant_export',{format:exp.dataset.grExport});return;}
@@ -185,7 +197,7 @@ window.groupReview = (() => {
     if(!dragging)return;
     const d=dragging;if(state.busy||state.projectId!==d.projectId||state.quant.revision!==d.revision||selection.rowId!==d.rowId){dragging=null;draft=null;editor();return;}
     const {lane}=chosen(),G=d.geometry,rect=d.svg.getBoundingClientRect(),scale=Math.min(rect.width/G.w,rect.height/G.h),px=(e.clientX-rect.left-(rect.width-G.w*scale)/2)/scale,py=(e.clientY-rect.top-(rect.height-G.h*scale)/2)/scale;
-    const max=(2**(state.rows.find(r=>r.id===selection.rowId)?.bitDepth||8))-1,x=Math.round((px-32)/(G.w-44)*(lane.profile.length-1)),y=Math.max(0,Math.min(max,G.hi-(py-12)/(G.h-36)*(G.hi-G.lo)));
+    const max=(2**(state.rows.find(r=>r.id===selection.rowId)?.bitDepth||8))-1,x=Math.round((px-48)/(G.w-60)*(lane.profile.length-1)),y=Math.max(0,Math.min(max,G.hi-(py-12)/(G.h-36)*(G.hi-G.lo)));
     draft=d.side?{...draft,end:Math.max(d.band.start+1,Math.min(lane.profile.length-1,x)),baselineEnd:y}:{...draft,start:Math.max(0,Math.min(d.band.end-1,x)),baselineStart:y};
     d.svg.innerHTML=curve(lane,true).body;
     $$('[data-gr-field]',root).forEach(input=>{const v=draft[input.dataset.grField];if(v!=null)input.value=Number(v).toFixed(['start','end'].includes(input.dataset.grField)?0:2);});

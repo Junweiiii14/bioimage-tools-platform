@@ -226,6 +226,7 @@ def quant_snapshot(
             "dark",
         ),
         "revision": host.view.generation,
+        "resultRuns": [result.run_id for result in host.project_results],
         "status": "busy"
         if host.operation_busy
         else "ready"

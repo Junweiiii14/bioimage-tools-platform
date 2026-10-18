@@ -139,6 +139,12 @@ def test_real_page_manual_import_compute_save_reopen_without_automatic_or_compos
         ] == pytest.approx([20000, 20000])
         assert window.bridge.snapshot()["montage"] is None
         qtbot.waitUntil(lambda: js("document.querySelectorAll('.gr-curve').length") == 2)
+        qtbot.waitUntil(
+            lambda: (
+                js("!state.busy&&!document.querySelector('[data-gr-action=manual]').disabled")
+                is True
+            )
+        )
         assert js("document.querySelector('[data-gr-action=manual]').click(); true") is True
         qtbot.waitUntil(
             lambda: (

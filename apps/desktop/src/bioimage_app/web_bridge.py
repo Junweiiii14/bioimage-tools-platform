@@ -398,10 +398,7 @@ class WorkbenchBridge(QObject):
                     self.manual_commands.remember()
                     self.host.reset_quant_group(selected.row_id)
                 else:
-                    confirmed = confirm_quant_group(project, selected.figure)
                     self.manual_commands.remember()
-                    self.host.view.set_project(confirmed)
-                    self.host.view.generation += 1
 
                     def next_group() -> None:
                         current = self.host.view.project()
@@ -427,7 +424,10 @@ class WorkbenchBridge(QObject):
                         else:
                             self.host.view.status.setText("全部分组已审核并保存")
 
-                    self.host.save(after=next_group)
+                    self.host.save(
+                        after=next_group,
+                        transform=lambda current: confirm_quant_group(current, selected.figure),
+                    )
             elif action == "quant_group":
                 selected = self.host.view.selected_row()
                 if selected is None or selected.figure != data.get("figure"):
