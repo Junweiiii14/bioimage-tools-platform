@@ -183,3 +183,5 @@ CI009产品57fd7ea正式check --all实际exit0：669passed/497.77秒，Observed 
 0d仅文档后继Linux669/146.29秒后SIGSEGV主线程noPythonframe，exit245/wheel未跑；同HEAD Windows669/346.68秒child0+wheels/dev成功。T043重开in_progress，旧成功/失败全保留；CI010只增显式GDB观察/0与17与真实SIGSEGV控制，不猜测性修Qt清理，不改产品/断言/15分钟。作者相关8项2.49秒0，双平台模块类型0；Linux控制/全检待真实执行，独审待绑定。
 
 - T044锚定上下文阶段：112相关20.79秒0（含旧文档/worker/OCR/schema）、既有网页9项27.89秒0、新快照1项1.98秒0、入口12项4.17秒0，全项目Pyright/Ruff/格式/Node语法0。8原图当前Web正常导入8worker/新导出/重开关闭实际0，.local/t044/workbench-anchored/validation.json，原SHA/参考未读，CSV48槽13valid35review，背景不足2/旧21。旧205全检不覆盖新阶段，最终完整门禁/绑定独审待做；离屏GPU告警不作视觉验收。e6d1abd独审2项2.33秒0关闭归属P2及核父路由。
+
+- T044 3a830fb正式check：696passed/488.23秒后AV，原child3221225477/c0000005、dev/外层-1、wheel未跑，实际失败；native-exit.md新证据1线程Qt父子/包装器析构，精确根因UNKNOWN。独审18项11.36秒0/P2不变target清人工参数；后继作者38项29.70秒0+新API/公开桥接2项2.00秒0、相关类型/Ruff0，待绑定。29未扩展原面积/bounds/flags与完整成图像素保持。

@@ -79,7 +79,10 @@ def update_quant_lane(
         raise ValueError("泳道或条带不存在")
     if roi is not None and roi.lane_id != lane_id:
         raise ValueError("不能更换泳道身份")
-    if roi is not None and roi != lane.roi:
+    geometry_changed = roi is not None and roi != (lane.target_roi or lane.roi)
+    if not geometry_changed and bounds is None and baseline is None and included is None:
+        return project
+    if geometry_changed:
         bands = (
             BandAnnotation(
                 "target",
@@ -113,9 +116,8 @@ def update_quant_lane(
             else b
             for b in lane.bands
         )
-    geometry_changed = roi is not None and roi != lane.roi
     changed = LaneAnnotation(
-        roi or lane.roi,
+        roi if geometry_changed and roi is not None else lane.roi,
         bands,
         (roi if geometry_changed else lane.target_roi)
         if plan.request.geometry_policy == "anchored_context@1"

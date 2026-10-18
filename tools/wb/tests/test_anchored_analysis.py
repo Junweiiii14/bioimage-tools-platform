@@ -49,6 +49,55 @@ def anchored_request() -> tuple[Image, AnalysisRequest]:
     return image, request
 
 
+def anchored_project():
+    from tool_contracts.api import AssetRef
+    from wb_tool.api import FigureRow, FigureTemplate, WBAnalysisProject
+
+    image, request = anchored_request()
+    crop = LaneROI("r", 0, 38, 4, 62)
+    row = FigureRow(
+        row_id="r",
+        figure="Fig1",
+        protein="target",
+        lane_count=1,
+        source=AssetRef(
+            asset_id="source", relative_path="inputs/source.tif", sha256=image.sha256, size_bytes=1
+        ),
+        filename="source.tif",
+        width=4,
+        height=120,
+        bit_depth=16,
+        roi=crop,
+        reviewed=True,
+    )
+    return WBAnalysisProject(
+        project_id="p",
+        rows=(row,),
+        figure_order=("Fig1",),
+        template=FigureTemplate(crop_height=24),
+        analyses=(ProjectRowAnalysis(row_id="r", crop=crop, request=request),),
+    )
+
+
+def test_unchanged_target_preserves_manual_area_and_context() -> None:
+    project = anchored_project()
+    lane = project.analyses[0].request.lanes[0]
+    assert lane.target_roi is not None and lane.roi != lane.target_roi
+    edited = update_quant_lane(project, "r", lane.roi.lane_id, baseline=Baseline(1, 1))
+    unchanged = update_quant_lane(edited, "r", lane.roi.lane_id, roi=lane.target_roi)
+    assert unchanged is edited
+    assert unchanged.analyses[0].request.lanes[0].roi == lane.roi
+    assert unchanged.analyses[0].request.lanes[0].bands[0].baseline == Baseline(1, 1)
+    baseline_edit_with_same_target = update_quant_lane(
+        edited, "r", lane.roi.lane_id, roi=lane.target_roi, baseline=Baseline(2, 2)
+    )
+    changed = baseline_edit_with_same_target.analyses[0].request.lanes[0]
+    assert changed.roi == lane.roi and changed.target_roi == lane.target_roi
+    assert changed.context_expansion_percent == lane.context_expansion_percent
+    assert changed.bands[0].bounds == lane.bands[0].bounds
+    assert changed.bands[0].baseline == Baseline(2, 2)
+
+
 def test_original_coordinate_context_and_worker_roundtrip() -> None:
     image, request = anchored_request()
     lane = request.lanes[0]

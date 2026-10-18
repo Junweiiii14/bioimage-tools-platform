@@ -481,6 +481,8 @@ class WorkbenchBridge(QObject):
             baseline=baseline,
             band_id=band_id,
         )
+        if updated is project:
+            return
         self.host.view.set_project(updated)
         self.host.view.generation += 1
         if roi is not None:

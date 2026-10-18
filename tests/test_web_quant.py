@@ -17,6 +17,61 @@ from pytestqt.qtbot import QtBot
 from wb_tool.api import WBAnalysisProject, initial_composition, make_row_analysis
 
 
+def test_same_target_bridge_keeps_generation_and_manual_parameters(qtbot: QtBot) -> None:
+    from wb_tool.api import Baseline, update_quant_lane
+
+    from tools.wb.tests.test_anchored_analysis import anchored_project
+
+    project = anchored_project()
+    annotation = project.analyses[0].request.lanes[0]
+    assert annotation.target_roi is not None
+    target = annotation.target_roi
+    project = update_quant_lane(project, "r", annotation.roi.lane_id, baseline=Baseline(1, 1))
+    view = SimpleNamespace(
+        project=lambda: project, selected_row=lambda: project.rows[0], generation=9
+    )
+
+    # No setters/replan methods: any attempted mutation or recompute fails this control.
+    class NoErrorBridge(WorkbenchBridge):
+        def publish(self) -> None:
+            assert not self._error
+
+    def ignore_connection(callback: object) -> None:
+        pass
+
+    host = cast(
+        FigureProjectWindow,
+        SimpleNamespace(
+            view=view,
+            project_results=[],
+            operation_busy=False,
+            is_closing=False,
+            automatic=SimpleNamespace(finished=SimpleNamespace(connect=ignore_connection)),
+        ),
+    )
+    bridge = NoErrorBridge(host, lambda _: None)
+    bridge.timer.stop()
+    bridge.request(
+        "quant_edit",
+        json.dumps(
+            {
+                "id": "r",
+                "sourceId": project.rows[0].source.sha256 if project.rows[0].source else "",
+                "revision": 9,
+                "lane": 1,
+                "roi": {
+                    "x": target.x0,
+                    "y": target.y0,
+                    "width": target.width,
+                    "height": target.y1 - target.y0,
+                },
+            }
+        ),
+    )
+    assert view.generation == 9
+    assert view.project() is project
+
+
 def test_anchored_snapshot_keeps_target_distinct_from_sampling_context() -> None:
     from tool_contracts.api import AssetRef
     from wb_tool.api import FigureRow, FigureTemplate, LaneROI, ProjectRowAnalysis

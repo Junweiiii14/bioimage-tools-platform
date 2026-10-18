@@ -85,3 +85,5 @@
 - T040深审：自主N两张8→7已复现为倾斜引起Marker误删；旧17低值最近局部谷边界/向内收紧已定位，低confidence未传应用门槛，3项仍valid。最终过滤/分组/标准回存/整窗修正依赖本地脚本，非普通UI端到端。实际自动编排仍先量后拼。CSV2位舍入；DPI物理单位未统一；单Fig临时内嵌字号校验失败（主项目/ZIP不受影响）；>2048manifest缩略坐标风险静态未触发。详见深度报告，不当作已修复。
 
 - T-042最终9eb5a1b完整门禁在重复关闭窗口测试的pytestqt QTimer.timeout.connect原生调用挂起；保留faulthandler后停止专属pytest，check退出1。隔离desktop10项exit0；只读独审无法证明GC死锁根因，不能认为旧退出/挂起风险已修复。8图回归8/8非留出泛化，真实48槽7valid/41quality_review，无积分准确率真值。
+
+- T044最新3a830fb本机696passed/488.23秒后退出AV，child c0000005、dev/外层-1/wheel未跑。native栈1线程Qt窗口/父子/包装器析构，最近retrieveMetaObject符号不能代替匹配PDB/源码位置；不认定WebEngine或旧GIL死锁同因。四组基本Qt退出控制尚未运行，完整门禁未通过，不安全发布或改成功状态。独审P2不变目标清人工边界后继已修，尚待绑定复核。
