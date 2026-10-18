@@ -163,6 +163,14 @@ def quant_snapshot(host: FigureProjectWindow) -> dict[str, object]:
         },
         "rowId": selected.row_id if selected else "",
         "sourceId": selected.source.sha256 if selected and selected.source else "",
+        "polarity": next(
+            (
+                plan.request.polarity
+                for plan in plans
+                if selected and plan.row_id == selected.row_id
+            ),
+            "dark",
+        ),
         "revision": host.view.generation,
         "status": "busy"
         if host.operation_busy

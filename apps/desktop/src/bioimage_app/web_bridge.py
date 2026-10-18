@@ -13,6 +13,7 @@ from wb_tool.api import (
     BandBounds,
     Baseline,
     LaneROI,
+    ManualQuantTarget,
     ProjectTableCell,
     WBAnalysisProject,
     WBLayoutProject,
@@ -187,6 +188,7 @@ class WorkbenchBridge(QObject):
                     if roi
                     else None,
                     "lanes": row.lane_count,
+                    "emptyLanes": list(row.empty_lanes),
                     "reviewed": row.reviewed,
                     "cropStatus": "ready"
                     if row.roi and row_is_ready(project, row)
@@ -204,7 +206,9 @@ class WorkbenchBridge(QObject):
                 }
             )
         return {
+            "projectId": project.project_id,
             "projectName": project.name,
+            "canRetryLocation": not self.host.retry_location_button.isHidden(),
             "busy": self.host.operation_busy,
             "status": self._error or view.status.text(),
             "selectedId": selected.row_id if selected else "",
@@ -266,7 +270,13 @@ class WorkbenchBridge(QObject):
                 self.host.cancel()
             elif self.host.operation_busy or self.host.is_closing:
                 raise ValueError("当前任务仍在处理中，请稍候或取消")
-            elif action in {"import", "import_folder", "open_project"}:
+            elif action in {
+                "import",
+                "quant_import",
+                "import_folder",
+                "open_project",
+                "retry_location",
+            }:
                 self.choose(action)
             elif action == "include_folder_source":
                 self.host.automatic.include_discovered_source(
@@ -286,6 +296,8 @@ class WorkbenchBridge(QObject):
                     self.host.select_source(rows[index].row_id)
             elif action == "quant_edit":
                 self._edit_quant(data)
+            elif action == "quant_target":
+                self._configure_quant_target(data)
             elif action == "quant_group":
                 selected = self.host.view.selected_row()
                 if selected is None or selected.figure != data.get("figure"):
@@ -386,6 +398,53 @@ class WorkbenchBridge(QObject):
         except (ValueError, TypeError) as error:
             self._error = str(error)
         self.publish()
+
+    def _configure_quant_target(self, data: dict[str, object]) -> None:
+        project = self.host.view.project()
+        row = self.host.view.selected_row()
+        if (
+            data.get("projectId") != project.project_id
+            or row is None
+            or not row.source
+            or data.get("id") != row.row_id
+            or data.get("sourceId") != row.source.sha256
+            or type(data.get("revision")) is not int
+            or data.get("revision") != self.host.view.generation
+        ):
+            raise ValueError("当前项目、原图或参数已改变，请重新选择测量区域")
+        roi = data.get("roi")
+        if not isinstance(roi, dict):
+            raise ValueError("请先在原图上选择测量区域")
+        coords = cast(dict[str, object], roi)
+        values = [coords.get(key) for key in ("x", "y", "width", "height")]
+        if any(type(value) is not int for value in values):
+            raise ValueError("测量区域须使用原图整数像素")
+        x, y, width, height = cast(list[int], values)
+        if not (0 <= x < x + width <= row.width and 0 <= y < y + height <= row.height):
+            raise ValueError("测量区域超出原图")
+        count, polarity, empty = data.get("n"), data.get("polarity"), data.get("emptyLanes")
+        if (
+            type(count) is not int
+            or polarity not in ("dark", "light")
+            or not isinstance(empty, list)
+        ):
+            raise ValueError("请指定整数泳道数、信号极性及排除泳道")
+        raw_empty = cast(list[object], empty)
+        if any(type(value) is not int for value in raw_empty):
+            raise ValueError("排除泳道须为整数编号")
+        reset = data.get("resetBounds", False)
+        if type(reset) is not bool:
+            raise ValueError("重置边界须为明确布尔值")
+        target = ManualQuantTarget(
+            row.source.sha256,
+            project.revision,
+            LaneROI(row.row_id, x, y, x + width, y + height),
+            count,
+            polarity,
+            tuple(cast(list[int], raw_empty)),
+            reset,
+        )
+        self.host.analyze_manual_target(target)
 
     def _edit_quant(self, data: dict[str, object]) -> None:
         from wb_tool.api import update_quant_lane

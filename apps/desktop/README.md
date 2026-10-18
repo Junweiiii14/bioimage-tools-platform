@@ -6,6 +6,12 @@ an unknown argument fails before Qt starts. Its hidden native host supplies asyn
 storage, computation and advanced tools. Native editors open only on an explicit advanced
 action; a failed close does not switch the interface to the hidden host.
 
+The same workbench offers independent grayscale import: manual source-pixel targets,
+explicit lane count/polarity, normal worker commits and saved results, without automatic
+membrane detection or composition. A shipped local script presents free target selection
+and all-lane/single-lane profiles; it never supplies quantitative results. See
+`../../docs/contracts/wb-standalone-quant-v1.md` for identity/cancellation and compatibility.
+
 Native compatibility windows require `--legacy-platform`, `--legacy-figure-project`, or
 `--legacy-wb-manual` and have a title marked **兼容工具（旧版）**. `--wb-manual` remains a
 historical alias for the last option. The old platform's static registry contains WB only;

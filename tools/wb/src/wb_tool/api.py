@@ -159,6 +159,7 @@ from wb_tool.application.project_restore import (
     restore_staged_project,
 )
 from wb_tool.application.quant_supervision import install_quant_request, update_quant_lane
+from wb_tool.application.standalone_quant import ManualQuantTarget, configure_manual_quantification
 from wb_tool.application.worker_protocol import (
     AcceptedFrame,
     CancelFrame,
@@ -214,6 +215,8 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "ManualQuantTarget",
+    "configure_manual_quantification",
     "export_wbquant_table",
     "wbquant_table_rows",
     "wbquant_csv_bytes",

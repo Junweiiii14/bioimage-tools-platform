@@ -34,6 +34,7 @@ from wb_tool.api import (
     LoadedFigureTemplate,
     LoadedProjectOCR,
     LoadedProjectResult,
+    ManualQuantTarget,
     MetadataBook,
     PreviewRaster,
     ProjectDerivedTables,
@@ -119,6 +120,7 @@ class FigureProjectWindow(QMainWindow):
         self._restore_job: ArchiveRestoreJob | None = None
         self._selection_job: ProjectSelectionJob | None = None
         self._pending_project_paths: list[Path] = []
+        self._pending_project_automatic = True
         self._auto_save = QTimer(self)
         self._auto_save.setSingleShot(True)
         self._auto_save.setInterval(700)
@@ -372,15 +374,18 @@ class FigureProjectWindow(QMainWindow):
     def _retry_project_location(self) -> None:
         parent = QFileDialog.getExistingDirectory(self, "选择项目保存位置（软件自动创建子文件夹）")
         if parent and self._pending_project_paths:
-            self.start_project_from_images(self._pending_project_paths, Path(parent))
+            self.start_project_from_images(
+                self._pending_project_paths, Path(parent), automatic=self._pending_project_automatic
+            )
 
     def start_project_from_images(
-        self, paths: list[Path], project_parent: Path | None = None
+        self, paths: list[Path], project_parent: Path | None = None, *, automatic: bool = True
     ) -> None:
         """Select originals first; decode before any workspace or recent entry is created."""
         if not paths or self._busy or self._workspace or self._closing:
             return
         self._pending_project_paths = list(paths)
+        self._pending_project_automatic = automatic
         self.retry_location_button.hide()
         self._start()
         self.view.status.setText("正在查找 WB 原图…")
@@ -433,7 +438,9 @@ class FigureProjectWindow(QMainWindow):
                         if self._closing or self._cancellation.is_set():
                             self._done("创建后已取消；项目可稍后继续。")
                             return
-                        self.import_images(tuple(str(p) for p in selection.paths), automatic=True)
+                        self.import_images(
+                            tuple(str(p) for p in selection.paths), automatic=automatic
+                        )
 
                     self._storage(
                         StorageCommand("create", path=str(selection.destination)), created
@@ -896,6 +903,51 @@ class FigureProjectWindow(QMainWindow):
         session.start(project, self._workspace, restore=restore)
         if self._closing:
             session.cancel()
+
+    def analyze_manual_target(self, target: ManualQuantTarget) -> None:
+        """Configure in the background, then use normal durable measurement runs."""
+        if self._busy or self._closing or not self._workspace:
+            return
+        project = self.view.project()
+        path = self.source_paths.get(target.source_sha256)
+        if not path:
+            raise ValueError("原图资产不可用，无法配置测量区域")
+        generation = self.view.generation
+        self._start()
+
+        def configured(reply: WBReply) -> None:
+            if self._closing or self._cancellation.is_set():
+                self._done("独立灰度配置已取消；原项目和历史结果保留")
+                return
+            if (
+                generation != self.view.generation
+                or self.view.project().project_id != project.project_id
+            ):
+                self._done("项目或参数已改变，旧测量目标未覆盖当前编辑")
+                return
+            if reply.error or not isinstance(reply.value, WBAnalysisProject):
+                self._error(reply.error or "测量目标配置结果无效")
+                return
+            if reply.value != project:
+                self.view.set_project(reply.value)
+                self.view.generation += 1
+            self._project_results = tuple(
+                item for item in self._project_results if item.row_id != target.roi.lane_id
+            )
+            self._busy = False
+            self.analyze_project(row_ids=(target.roi.lane_id,))
+
+        self._wb(
+            WBJob(
+                "quant_target",
+                path=path,
+                document=project,
+                manual_target=target,
+                cancellation=self._cancellation,
+            ),
+            configured,
+            accept_errors=True,
+        )
 
     def replan_quant_lane(self, row_id: str) -> None:
         """Re-detect changed lane geometry off the GUI thread, then commit measurements."""

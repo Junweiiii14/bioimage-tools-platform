@@ -29,6 +29,9 @@ create_wb_view/create_wb_background 是延迟装配入口；PreviewRaster 是显
 owner非阻塞确认线程退出和实际QObject销毁后才发送closed，避免跨线程析构的Qt锁/GIL反转。
 隐藏兼容控件也须明确归属View；宿主排空完成不等于窗口已经析构。
 独立进程生命周期回归验证父对象销毁后子控件释放和真实退出码，不对全局测试窗口强制清理。
+`ManualQuantTarget/configure_manual_quantification` 提供不依赖自动裁膜/拼图的人工测量目标，
+复用已有schema7逐行高度及正常worker；相同目标保留人工参数，显式重置才恢复边界。
+契约见 `../../docs/contracts/wb-standalone-quant-v1.md`，旧运行/原图保持不可变。
 桌面入口由apps显式装配：`uv run --locked --no-sync python -m bioimage_app`。
 当前界面可拖ROI/编辑闭区间与基线/查看原始曲线、OCR原文和自动结果表。
 

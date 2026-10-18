@@ -223,6 +223,16 @@ class _Work(QObject):
                 if not isinstance(job.document, WBAnalysisProject):
                     raise ValueError("缺少定量项目")
                 value = replan_quant_lanes(job.path, job.document, job.row_id, cancelled=cancel)
+            elif job.operation == "quant_target":
+                from wb_tool.application.standalone_quant import configure_manual_quantification
+
+                if not isinstance(job.document, WBFigureProject) or job.manual_target is None:
+                    raise ValueError("缺少人工测量目标或项目")
+                if cancel():
+                    raise ValueError("独立灰度配置已取消")
+                value = configure_manual_quantification(
+                    load_tiff(job.path), job.document, job.manual_target, cancelled=cancel
+                )
             elif job.operation == "quant_export":
                 from wb_tool.adapters.quant_export import export_wbquant_table
 
