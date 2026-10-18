@@ -104,7 +104,20 @@ def pytest_runtest_teardown(item: pytest.Item) -> None:
         "qtbot" in item.fixturenames or "qapp" in item.fixturenames
     ):
         # Omit parametrized values; only repository test location/function names.
-        remember_roots(item.nodeid.split("[", 1)[0])
+        try:
+            remember_roots(item.nodeid.split("[", 1)[0])
+        except Exception as error:
+            print(
+                "QT_EXIT_INVENTORY_UNAVAILABLE "
+                + json.dumps(
+                    {
+                        "phase": "pytest_runtest_teardown",
+                        "error_type": type(error).__name__,
+                    }
+                ),
+                file=sys.stderr,
+                flush=True,
+            )
 
 
 @pytest.hookimpl(trylast=True)

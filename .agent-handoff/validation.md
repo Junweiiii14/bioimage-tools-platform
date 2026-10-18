@@ -187,3 +187,5 @@ CI009产品57fd7ea正式check --all实际exit0：669passed/497.77秒，Observed 
 - T044 3a830fb正式check：696passed/488.23秒后AV，原child3221225477/c0000005、dev/外层-1、wheel未跑，实际失败；native-exit.md新证据1线程Qt父子/包装器析构，精确根因UNKNOWN。独审18项11.36秒0/P2不变target清人工参数；后继作者38项29.70秒0+新API/公开桥接2项2.00秒0、相关类型/Ruff0，待绑定。29未扩展原面积/bounds/flags与完整成图像素保持。
 
 - T044 9f96f5c绑定独审2项1.64秒0，P2关闭。四组Qt-only控制observer均附着、exit0/无fault，未复现非产品修复。新增可选qt_exit_inventory观察器2项0.34秒0/相关类型Ruff格式0，源码/描述见T044/native-exit.md；绑定审查和必要完整检查待做。
+
+- T044诊断容错：694279f独审2项0.38秒0，后继故障注入旧1failed/0.58秒1、新3passed/0.45秒0，相关类型/Ruff/格式0；未改原测试结果/时限。提交绑定复核及带对象清单的必要完整检查待执行。

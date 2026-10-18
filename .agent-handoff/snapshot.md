@@ -1,27 +1,38 @@
 # Handoff Snapshot
 
-- 更新2026-10-18；当前任务唯一来源work/tasks/T-044-wb-workflow-and-integrals.md，in_progress。用户新增积分/目录识别/同Fig/审核后回存/独立灰度与峰交互/界面精简/全库冗余审查，完整范围见任务。T043历史间歇退出仍UNKNOWN；不宣告整项目完成。
-- 活动树C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform，codex/t044-wb-workflow-and-integrals，基线d11552c（其远端run39030621380两平台670及全部wheel/最终check、规则、桌面成功，独审已核验）。产品57fd7ea，本机669/497.77秒+全部wheel/最终check0；becb389远端run39025981922已全部成功：Windows669/407.87秒child0、Linux669/178.49秒，两平台全部wheel/最终check成功，规则/桌面环境成功。0d269db纯文档后继Linux669/146.29秒后SIGSEGV、exit245/wheel未跑，Windows669/346.68秒/child0及全部wheel0；前次成功不覆盖新失败。使用前核对实际HEAD/dirty。
-- 日常从活动树Start-BioImage.ps1或桌面“BioImage WB 工作台（当前开发）”启动；默认/历史常用参数统一现有绿色工作台，HTML/CSS未变，旧原生工具仅显式legacy。父工作区WB路由已备份后修正，快捷方式/实际文件由独审复核；测试强制离屏，关闭失败不回退旧host。用户工作台46512未强制关闭，不恢复停止的CUA。
-- CI006修四worker退休→owner线程实际析构→queued终态；79f9070真实native/Python栈及受控正负对照支持Qt对象锁/GIL反转。CI009新DB版本/5表/身份单事务，真实故障回滚旧红新绿/45独审0，不改schema/v1/同步/fsync/测试时限。源码QtCore6.12.0与WebEngine6.140.0不可混用。
-- 历史bbf668passed后外层exit1仍UNKNOWN；1bb的create执行6.125秒后正常回执是另一实际失败。当前通过不能将所有旧失败一概归因；WebEngine资源析构边界仅假设，未据此乱改。详情见risks及CI005–009证据。
-- 最新8图正常工作台功能链.local/t043/workbench-ci009实际0：8run/保存重开/关闭，原图SHA保持、参考未读，8原像素ROI/N和48值/状态与CI006保持，N8/8/4/4/8/8/4/4、7valid41review。T042旧1/8→新8/8是开发回归集，无独立积分真值/留出验收；离屏截图不当作视觉通过。
-- 治理#7→产品#3→#8/9/10/11/12/13/14均草稿，main221a2df未变，不一次集成累计128历史。SYNC008精确base4582976e，清单来源aabd39e，保留CI002–011祖先回执。后续集成先按真实base重载规则/清单再跑检查。
-- 原ResearchVault根及各历史dirty树保留；34原未提交文件SHA反复核验，原.impeccable/questions4文件不提交。19树外置patch/untracked/refs备份；6干净无.local旧树仅原位锁定，未删/移。最新bundle位置/SHA在.local/t043/backup-final.json，原图/旧结果原位保留，Git不能代替原资料备份。
-- 已授权只读独审复核becb远端两HEAD/PR/main、入口/父路由、备份/34SHA及发布日志正文，无阻断；收尾文档仍须独审/精确规则后正常FF、unique备份、atomic推开发及stage8并回读Issue6/PR14。不强推/不合main。
-- 用户最终要求简单专业维护汇报。docs/maintenance-plan.md已说明固定入口、模块/API边界、依赖锁、小回归→完整检查→独审→小PR、备份/任务/交接及4项报bug材料；每周检查是人工建议，没有后台定时任务。发布/科学/恢复演练/历史独审缺口继续真实保留。
+- 更新2026-10-18。唯一任务状态：work/tasks/T-044-wb-workflow-and-integrals.md，in_progress。用户完整目标尚未完成；结束后须给程序小白简洁专业的维护/快速修bug汇报，见docs/maintenance-plan.md。
+- 活动检出：C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform，codex/t044-wb-workflow-and-integrals，基线d11552c。每次核对实际HEAD/dirty，不为旧分支指针切回历史代码。正常入口Start-BioImage.ps1/桌面“BioImage WB 工作台（当前开发）”，默认WebWorkbenchWindow；旧原生host只显式兼容。
+- 原ResearchVault检出和历史dirty/旧结果保留，不启动作当前产品、不覆盖、不kill用户工作台；用户停止的CUA不恢复。.impeccable/questions四个原文件未提交。
 
-- CI010现行40f Linux云端GDB15.1真实控制成功、669/158.32秒及全wheel/dev0；WSL同锁定环境669/398.40秒pytest0（非full dev check）。同HEAD Windows669/433.12秒后Aborted/AV，原child3221225477/c0000005、wheel未跑。不能凭一次Linux成功关闭间歇故障。
-- CI011诊断提交aabd39e：标准Windows API仅观察自有单个解释器，保留原退出码；五真实控制作者/独审均0，相关9项作者2.64秒/独审2.56秒0，修改模块双平台类型0。绑定独审无阻断；PC0故障线程无帧，其他线程有栈，罕见OS API组合仅静审。正式670/517.68秒及全wheel/dev本机实际0，云端后继待验证，产品仍57fd7ea；不是产品崩溃修复，不混淆故意控制fault与产品fault。
+## 当前成果与证据
 
-- T044首阶段已实施目录头信息筛选、明确Fig/采集前缀标签、Unicode字体后台导入。真实目录选8/排除24，4 Fig，正常WebWorkbenchWindow/8真实worker/保存重开/关闭0，原SHA与48积分值状态原因全保持。20定向8.82秒0/相关类型0；完整门禁与提交绑定独审待执行。积分诊断20零值/8背景不足/13重叠，盲扩25%/50%不可靠，独审反例证明全区argmax可抢走目标。下一步先提交独审现阶段、定义显式目标锚定上下文策略与回归，再实现回存/独立灰度/精简UI/全库审查。不得将41项直接判有效，参考像素不参与识别。
+- T044目录头信息筛选folder_sources@1、明确Fig/蛋白字面解析、Unicode系统字体后台入资产已接现工作台。实际目录选8/排除24，4 Fig；有可见筛选记录和明确补入，状态落盘。e6d1abd将报告绑定workspace+project，独审2项2.33秒0关闭跨项目P2；父AGENTS原字节备份/1行去掉t043硬编码分支独审通过，快捷方式路径不变。
+- 锚定积分策略anchored_context@1/anchored_background@1/quality@1已实施并为Web默认。target_roi是目标，roi是采样区，逐步5–25%首个完整支持、无邻峰夺目标。原像素/公式/零值风险保持，三schema可选显式策略扩展；旧wire字节保持/旧请求不升级。手动几何清旧上下文/边界后从目标重算，基线修改保留锚点。
+- 3a830fb产品阶段作者112相关20.79秒0；网页9项27.89秒0、新快照1项1.98秒0、入口12项4.17秒0，全项目类型/static0。8原图正常Web目录导入/8worker/新导出/保存重开/关闭0，.local/t044/workbench-anchored/validation.json。CSV48槽13valid35review，背景不足21→2，33零值风险保持；不是积分准确率，原SHA/N8,8,4,4,8,8,4,4和4Fig保持，参考像素未读。
+- .local/t044/anchored-preservation.json：19槽扩展，29未扩展槽原面积/bounds/flags全保持；前后正常成图PNG像素完全相同。T042旧1/8→新8/8仅指定开发集裁图评分，没有独立积分真值/未知仪器留出验收。
+- 3a独审18项11.36秒0发现不变目标误清人工参数P2，9f96f5c已修；作者38相关29.70秒0+最终API/公开桥接2项2.00秒0，独审2项1.64秒0关闭。无变动保留原项目/代际、不重算；同目标伴基线编辑也保留上下文。
 
-- 5b9b752阶段独审P2（编号变体被静默排除）已补可见清单/改选和落盘，待后继绑定复核。5b9b752首轮完整check实际1，3项新增测试list类型错误，pytest/wheel未跑；已修，后继全项目Pyright0、18相关19.97秒0，完整门禁待后继执行。不要当作全量通过。
+## 最新完整门禁：失败，根因仍UNKNOWN
 
-- 当前20586fe已完整678/489.79秒、child0、全部wheel/check0。随后独审项目归属P2已补workspace+project_id绑定，A→B/跨workspace与当前SHA负例19项27.95秒0/全项目类型0，后继提交独审/最终全检待做。父AGENTS仅WB行硬编码分支已备份去除，回执.local/t044/parent-route-receipt.json。数值原型.local/t044/probe_anchored_context.py与anchored_analytic.py：19/21支持、4解析对照0，尚未接产品；下一步定义target_roi/上下文版本及原坐标/手动编辑全链，不把未完成的回存/独立灰度/UI精简/全库审查遗忘。
+- 3a830fb正式check --all：696passed/488.23秒后原生AV，原child3221225477/c0000005，dev/外层-1，wheel未跑；.local/t044/check-anchored.{log,json}。不能拿passed汇总或20586fe完整678/489.79秒+wheels0替代新失败。
+- 实际native栈仅1线程：Qt窗口/父子/QFormLayout/包装器退出析构，最近SignalManager.retrieveMetaObject符号不当精确源码定位；不是已证实旧跨线程GIL死锁或WebEngine profile问题。详细证据/主来源/计划：work/evidence/T-044/native-exit.md。
+- 四个最小Qt-only自有进程（普通/子类×自然/先销毁父对象）observer均附着、实际0、未复现；无产品/WebEngine/worker。receipt .local/t044/qt-exit-controls/receipt.json；不是根因修复。
+- 694279f新增显式-p tooling.qt_exit_inventory观察插件：弱引用首次来源，最终有界对象类型/父子ID；不读文本/标题/图像，不发事件/GC/删除/关闭，不改退出。独审2项0.38秒0。Qt先返回完整列表，所以仅输出/遍历预算，不是瞬时内存上限；临时包装器引用可能影响析构时序。
+- 后继已补teardown观察异常仅记录类型，不改变原测试结果。故障注入旧红1failed/0.58秒1、新绿3passed/0.45秒0，相关类型/Ruff/格式0；待后继提交绑定复核。下一必要全check显式带此插件及既有Windows native observer；先锁定提交，不边跑边改源码，不盲重跑/猜清理/弱化时限。
 
-- T044锚定上下文已实现并设为当前Web默认（待绑定独审/最终全检）；新target/context原坐标与比例、旧wire字节/历史兼容、手改失效重算已测。112相关20.79秒0、旧网页9项27.89秒0、新快照1项1.98秒0、入口12项4.17秒0、全项目类型/Ruff/格式/Node0；初轮3失败及schema扩展说明在T044验证。8真实目录/正常Web/8worker/新导出/重开/关闭实际0，CSV48槽13valid35review，背景不足21→2，33零值风险保持；不是积分准确率。e6d1abd独审2项2.33秒0关闭归属P2并核父路由。下一步绑定审查本阶段、审核后回存/独立灰度全泳道交互/UI精简/全库审查/最终视觉全检与安全同步，完整目标仍进行中；原生间歇退出UNKNOWN。用户最终报告需简单专业讲维护机制/快速修bug，非提前结项。
+## 下一步完整范围
 
-- 最新3a830fb完整check失败：696passed/488.23秒后原生AV，原child3221225477/c0000005，dev/外层-1，wheel未跑；.local/t044/check-anchored.{log,json}。实际native栈1线程，Qt/包装器/父子析构路径，最近符号不当精确源码根因，见T044/native-exit.md。独审18项11.36秒0发现P2目标不变清人工参数，后继已修target比较及桥接no-op，38相关29.70秒0+新API/公开桥接2项2.00秒0/相关类型0，待提交绑定复核。下步先最小四组Qt退出控制定位，勿重复盲跑/猜清理/抹失败；再继续回存/独立灰度/峰交互/UI精简/全库审查/最终门禁安全同步和简单维护报告。
+1. 提交绑定复核诊断容错，然后必要完整检查捕获退出对象来源/原生栈，定位并修真实故障；保留失败和控制，不能改成功状态绕过。
+2. 审核后裁图回存原文件夹：可信本机来源登记/源SHA重核、后台无覆盖新文件、显示裁图与原值区分、写后核验/保存/代际取消保护。尚未实现。
+3. 独立灰度入口/自由目标ROI+N，不需先裁图或拼图；复用原像素worker/持久化，旧WBQuant仅参考全部泳道纵向峰、单lane精调、封底/填充面积交互。尚未实现。
+4. 去除重复“需要审查”视觉噪声但集中保留真实质量原因；仍有NSUN6源5泳道2/4背景不足，不强判35项有效。之后全库冗余审查，按真实调用链保留兼容API/旧格式，更新过时文档；尚未完成。
+5. 最终真实8图/完整检查/绑定独审/有界视觉验收后，外置备份复核原34文件，再安全GitHub草稿PR/开发日志同步，main不合128提交；最终用简单语言报告维护机制与限制。
 
-- 9f96f5c绑定独审2项1.64秒实际0关闭不变目标P2，无新增阻断。四组Qt-only自有子进程（普通/子类×自然/父对象先销毁）observer附着、全部0、无fault；.local/t044/qt-exit-controls/receipt.json，原型SHA4a43f7a683bb73599edf5046a711e6e1bc980131c7c7f0540770cdaa71c3af0a，不是产品修复。新增显式pytest -p tooling.qt_exit_inventory观察插件，弱引用首次来源+最终有界对象类型/父子ID，无文本/标题/图像、不发事件/GC/清理/改退出。两项0.34秒0/相关类型Ruff格式0，待提交绑定独审及必要全检加观察器；默认不启用、CI/依赖不改。完整目标/其他功能仍未完。
+## GitHub与保留约束
+
+- T044全部仍本地，未新建/推送T044 PR。此前9草稿PR #7/#3/#8–14，远端t043/stage8 d11552c；main最近核验221a2df，不强推/不合main。发布前重新读远端实际状态。
+- 原19工作树patch/untracked/refs外置备份、6干净旧树原位锁定、34原未提交文件SHA历史核验保持，原路径/旧结果不移动删除。最新allrefs备份指针.local/t043/backup-final.json；T044最终同步前需再做unique bundle并重核34SHA。Git不包含私有原图或忽略旧结果，不能替代资料备份。
+- Issue6现有开发日志评论6231511951最后是T043；T044尚未发布。后续更新真实已验证事实，不公开私有图/绝对路径。
+- 历史CI006真实Qt锁/GIL反转已修、CI009新库事务已修；其他间歇退出/包态干净Windows/恢复演练/科学留出仍保留，详见T043任务/risks。
+- Impeccable已读取/上下文执行一次；全部网页修改后再运行机械detector一次和有界视觉循环。PRODUCT/设计sidecar过时已发现，不自动扩展刷新；最终说明一次。当前离屏GPU告警截图不作视觉验收。Qt官方支持--disable-gpu用于诊断，可只在自有视觉试验验证，不改用户环境/依赖。
+- 自有子进程已验证PYTHONPATH可抢同名包，-I定位活动安装检出；尚未改启动器，不认定用户此前旧版同因。可在后续入口加固中使用，勿为匹配历史路径切旧树。
