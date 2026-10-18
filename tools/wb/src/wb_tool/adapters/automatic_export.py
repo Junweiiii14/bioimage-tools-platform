@@ -8,15 +8,9 @@ from hashlib import file_digest
 from pathlib import Path
 from uuid import uuid4
 
-from wb_tool.adapters.figure_export import export_figure_bundle
-from wb_tool.adapters.figure_image_export import export_figure_image
-from wb_tool.adapters.project_evidence import verify_project_evidence
-from wb_tool.adapters.project_export import export_project_table
-from wb_tool.adapters.quant_export import export_wbquant_table
 from wb_tool.adapters.tiff_input import is_generated_tiff
 from wb_tool.application.figure_project import FigureSourcePath, WBFigureProject
 from wb_tool.application.import_labels import FolderDiscoveryReport, preferred_acquisition_sources
-from wb_tool.application.project_analysis import fill_project_table
 from wb_tool.application.project_archive import ArchiveRunEvidence
 
 
@@ -93,7 +87,13 @@ def export_automatic_results(
     discovery_report: bytes = b"",
     cancelled: Callable[[], bool] = lambda: False,
 ) -> str:
+    from wb_tool.adapters.figure_export import export_figure_bundle
+    from wb_tool.adapters.figure_image_export import export_figure_image
+    from wb_tool.adapters.project_evidence import verify_project_evidence
+    from wb_tool.adapters.project_export import export_project_table
+    from wb_tool.adapters.quant_export import export_wbquant_table
     from wb_tool.application.automatic import row_is_ready
+    from wb_tool.application.project_analysis import fill_project_table
 
     target = Path(destination).absolute()
     if target.exists() or target.is_symlink() or target.is_junction():

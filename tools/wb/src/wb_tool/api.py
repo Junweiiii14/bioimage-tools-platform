@@ -12,7 +12,6 @@ if TYPE_CHECKING:
 
 from wb_tool.adapters.automatic import automatic_project_row
 from wb_tool.adapters.automatic_export import discover_tiffs
-from wb_tool.adapters.crop_return import return_reviewed_crop
 from wb_tool.adapters.metadata_input import read_metadata_file
 from wb_tool.adapters.ocr_input import OCRImage, load_ocr_image
 from wb_tool.adapters.quant_export import (
@@ -440,6 +439,18 @@ def create_figure_project_view(parent: "QWidget | None" = None) -> "FigureProjec
     from wb_tool.ui.figure_view import FigureProjectView
 
     return FigureProjectView(parent)
+
+
+def return_reviewed_crop(
+    project: WBFigureProject,
+    row_id: str,
+    original_path: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> ReturnedCrop:
+    from wb_tool.adapters.crop_return import return_reviewed_crop as export
+
+    return export(project, row_id, original_path, cancelled=cancelled)
 
 
 def render_figure(

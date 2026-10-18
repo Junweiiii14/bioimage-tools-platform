@@ -1,0 +1,7 @@
+# T-044 独立安装发现的可选依赖越界
+
+8e4de82完整check的733项pytest在499.64秒通过、child实际0；但后续无Pillow的WB核心wheel导入失败，check最终退出1。路径为api直接导入automatic_export→figure_export→PIL；新增crop_return直接导入也存在相同边界问题。失败原日志/回执保留在.local/t044/check-final-modal.*，不当成完整通过。
+
+修复遵循既有公开API延迟导入模式：回存适配器仅在实际调用时加载；目录发现所在模块的拼图/导出依赖移入export_automatic_results调用内。目录发现仍可在核心环境使用，实际回存仍要求figures/desktop可选依赖。没有增加核心依赖、改锁文件、改变算法或写文件流程。
+
+独立wheel原检查不删：额外明确断言公开API导入与真实目录发现都不加载PIL，并在不装Pillow的安装环境调用发现函数。测试门禁加严，非降低要求。作者定向9项6.61秒实际0，全项目Pyright0、相关Ruff/格式0；全部独立wheel结果及绑定独审在后继记录。

@@ -214,3 +214,7 @@ renderQuant覆盖结果页质量说明。已在直接关闭与close事件回调�
 树明确停止，实际1，wheel未运行，check-before-modal-fix回执/日志保留；不是原生退出复现，
 不是完整通过，用户窗口未动。后继源码检查/独审/完整check/真实回存与最多一次截图确认待做。
 Impeccable detector已运行一次，后续不重复。
+
+## 2026-10-18：完整门禁检出可选依赖越界
+
+8e4de82实际733passed/499.64秒且pytest child0，但独立WB核心wheel因PIL未安装导入失败，最终check1。保留失败，不发布为完整通过。修复API回存延迟加载、目录发现不预载拼图导出依赖；核心依赖/锁/算法未变。增加无PIL真实安装环境断言与目录发现调用，9定向6.61秒0，全项目类型0。见wheel-import-boundary.md；独立wheel、绑定独审及最终全检待完成。
