@@ -115,6 +115,28 @@ def test_copy_manual_multipeak_history_new_group_save_and_reopen(
         QTest.mouseRelease(target_widget, Qt.MouseButton.LeftButton, pos=start + QPoint(15, 10))
         assert js("JSON.stringify([imagePan.x,imagePan.y,manualLanes.boxes.length])") == "[40,25,0]"
         js("document.querySelector('.image-actions .button').click();true")
+        # Space must activate focused native controls rather than start panning.
+        js("document.querySelector('.image-actions .button').focus();true")
+        QTest.keyClick(target_widget, Qt.Key.Key_Space)
+        qtbot.waitUntil(lambda: js("imagePan.hand&&!imagePan.space") is True)
+        QTest.keyClick(target_widget, Qt.Key.Key_Space)
+        qtbot.waitUntil(lambda: js("!imagePan.hand&&!imagePan.space") is True)
+        js("document.querySelector('#manual-lane-tools summary').focus();true")
+        QTest.keyClick(target_widget, Qt.Key.Key_Space)
+        qtbot.waitUntil(lambda: js("document.querySelector('[data-manual-tools]').open") is True)
+        QTest.keyClick(target_widget, Qt.Key.Key_Space)
+        qtbot.waitUntil(lambda: js("!document.querySelector('[data-manual-tools]').open") is True)
+        assert (
+            js(
+                "(()=>{const e=new KeyboardEvent('keydown',"
+                "{code:'Space',bubbles:true,cancelable:true});"
+                "$('#image-viewport').dispatchEvent(e);"
+                "return e.defaultPrevented&&imagePan.space})()"
+            )
+            is True
+        )
+        js("document.dispatchEvent(new KeyboardEvent('keyup',{code:'Space'}));true")
+        assert js("!imagePan.space") is True
         QTest.mousePress(target_widget, Qt.MouseButton.LeftButton, pos=image_point(35, 40))
         qtbot.waitUntil(lambda: js("Boolean(manualLanes.dragging)") is True)
         QTest.mouseMove(target_widget, image_point(55, 80))

@@ -153,7 +153,7 @@ const handButton=document.createElement('button');handButton.className='button s
 function panCursor(){laneViewport.classList.toggle('pan-ready',imagePan.hand||imagePan.space);laneViewport.classList.toggle('panning',!!imagePan.drag);handButton.setAttribute('aria-pressed',String(imagePan.hand));}
 handButton.addEventListener('click',()=>{imagePan.hand=!imagePan.hand;panCursor();});
 document.addEventListener('toggle',event=>{if(event.target.matches?.('[data-manual-tools]')&&event.target.closest('#manual-lane-tools'))manualLanes.toolsOpen=event.target.open;},true);
-document.addEventListener('keydown',event=>{if(event.code!=='Space'||event.target.closest('input,textarea,select,[contenteditable]'))return;event.preventDefault();imagePan.space=true;panCursor();});
+document.addEventListener('keydown',event=>{if(event.code!=='Space'||event.target.closest('input,textarea,select,[contenteditable],button,a[href],summary,[role="button"]'))return;event.preventDefault();imagePan.space=true;panCursor();});
 document.addEventListener('keyup',event=>{if(event.code==='Space'){imagePan.space=false;panCursor();}});
 function finishPan(cancel=false){if(cancel&&imagePan.drag){imagePan.x=imagePan.drag.x;imagePan.y=imagePan.drag.y;fitImage();}imagePan.drag=null;panCursor();}
 window.addEventListener('blur',()=>{imagePan.space=false;finishPan(true);});
