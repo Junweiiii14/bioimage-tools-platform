@@ -16,8 +16,9 @@ from PySide6.QtCore import QPoint, Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 from pytestqt.qtbot import QtBot
-from shiboken6 import isValid
 from wb_tool.api import CropDetectionSettings, CropSuggestion, WBFigureProject, WBReviewProject
+
+from tooling.qt_test_lifecycle import close_and_dispose_window
 
 if TYPE_CHECKING:
     from bioimage_app.api import FigureProjectWindow
@@ -41,11 +42,12 @@ def project_window(qtbot: QtBot) -> Iterator[Callable[[], "FigureProjectWindow"]
 
     yield make
     for window in windows:
-        if not window.resources_closed:
-            window.close()
-            qtbot.waitUntil(lambda window=window: window.resources_closed, timeout=15000)
-        window.deleteLater()
-        qtbot.waitUntil(lambda window=window: not isValid(window), timeout=10000)
+        close_and_dispose_window(
+            window,
+            qtbot,
+            resources_closed=lambda window=window: window.resources_closed,
+            timeout=15000,
+        )
 
 
 def test_project_batch_review_export_reopen(

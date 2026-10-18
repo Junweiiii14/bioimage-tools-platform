@@ -13,6 +13,8 @@ from PySide6.QtWidgets import QFileDialog
 from pytestqt.qtbot import QtBot
 from wb_tool.api import WBAnalysisProject
 
+from tooling.qt_test_lifecycle import close_and_dispose_window
+
 
 def test_real_page_manual_import_compute_save_reopen_without_automatic_or_compose(
     qtbot: QtBot, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -204,8 +206,9 @@ def test_real_page_manual_import_compute_save_reopen_without_automatic_or_compos
             is True
         )
         workspace = window.host.workspace_path
-        window.close()
-        qtbot.waitUntil(lambda: window.host.resources_closed, timeout=20000)
+        close_and_dispose_window(
+            window, qtbot, resources_closed=lambda: window.host.resources_closed, timeout=20000
+        )
         window = WebWorkbenchWindow(settings=settings)
         monkeypatch.setattr(window.host.automatic, "analyze", forbidden)
         monkeypatch.setattr(window.host, "compose", forbidden)
@@ -265,5 +268,6 @@ def test_real_page_manual_import_compute_save_reopen_without_automatic_or_compos
             )
         assert source.read_bytes() == original
     finally:
-        window.close()
-        qtbot.waitUntil(lambda: window.host.resources_closed, timeout=20000)
+        close_and_dispose_window(
+            window, qtbot, resources_closed=lambda: window.host.resources_closed, timeout=20000
+        )

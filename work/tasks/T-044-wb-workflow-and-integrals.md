@@ -238,3 +238,7 @@ CI012独审5c932b8整份11项24.94秒0，P2新测试finally等待失败时可能
 ab6a68e绑定独审新增回归1项1.96秒实际0，P2关闭；5c整份独审11项24.94秒0。原3e5cee3远端Windows已733passed575.75秒、child0、全部wheel/dev成功；同run Linux29% SIGSEGV失败仍保留，run39104680503最终failure。ab6a68e已经外置完整bundle核验并重核原34未提交、safe push PR15；SHA0842f55b468becb38ed9345d45b3b840e006a688202ee83f581eb5d852217e1f。本轮实现和独审进入review，待最终文档后继HEAD的远端734门禁与按阶段集成；状态不代表正式发布，实际检查结论以PR15/issue6更新为准。产品代码a72e710未变，无需重复真实图或截图。
 
 CI012同类fixture：另外三处项目/自动窗口只关闭未destroy的精确自有清理已补，作者28项85.63秒0；真实WB/Figure两类销毁线程回归2项1.77秒0，类型/静态0。产品未变，全检应735；旧734运行后续因新提交取消，不当自然失败/通过。见ci012-fixture-lifetime.md，待提交绑定独审后最终备份/push及735远端验证。
+
+## CI012系统化测试窗口管理收尾
+
+同类确定名单内Web/平台/共享fixture统一到测试专用close_and_dispose_window，只处理调用者明确拥有窗口、保留原异步退休判据及所有业务断言；新真实Qt等待失败不得安排销毁回归，全套736。作者67项157.28秒0，全项目类型/Ruff/格式525文件0。c5 Linux735/133.44秒和全部wheel/dev已成功，Windows仍运行；925 Linux真实SIGSEGV、Windows取消分别保留。下一步本批绑定独审→最后外置备份/推送→最终736远端门禁；不改产品、不复跑真实图或截图，不再无故文档提交重启CI。见ci012-fixture-lifetime.md，实际最终状态以PR15/issue6和.local/t044/github-delivery.json为准。

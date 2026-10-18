@@ -13,6 +13,8 @@ from PySide6.QtWidgets import QFileDialog
 from pytestqt.qtbot import QtBot
 from wb_tool.api import CropRequest, FolderDiscoveryReport, LaneROI, export_crop, load_tiff
 
+from tooling.qt_test_lifecycle import close_and_dispose_window
+
 
 def test_first_folder_import_filters_before_creating_project_and_records_choices(
     qtbot: QtBot, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -93,5 +95,6 @@ def test_first_folder_import_filters_before_creating_project_and_records_choices
         assert all(path.read_bytes() == data for path, data in before.items())
         assert set(directory.iterdir()) == set(before)
     finally:
-        window.close()
-        qtbot.waitUntil(lambda: window.host.resources_closed, timeout=20000)
+        close_and_dispose_window(
+            window, qtbot, resources_closed=lambda: window.host.resources_closed, timeout=20000
+        )

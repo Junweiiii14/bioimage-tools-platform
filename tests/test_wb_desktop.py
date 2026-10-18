@@ -41,6 +41,8 @@ from wb_tool.api import (
     read_wb_document,
 )
 
+from tooling.qt_test_lifecycle import close_and_dispose_window
+
 
 def cell_text(table: QTableWidget, row: int, column: int) -> str:
     item = table.item(row, column)
@@ -324,11 +326,12 @@ def _dispose_owned_windows(
     windows: Sequence["WBWindow | FigureProjectWindow"], qtbot: QtBot
 ) -> None:
     for window in windows:
-        if not window.resources_closed:
-            window.close()
-            qtbot.waitUntil(lambda window=window: window.resources_closed, timeout=15000)
-        window.deleteLater()
-        qtbot.waitUntil(lambda window=window: not isValid(window), timeout=10000)
+        close_and_dispose_window(
+            window,
+            qtbot,
+            resources_closed=lambda window=window: window.resources_closed,
+            timeout=15000,
+        )
 
 
 @pytest.fixture

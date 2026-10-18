@@ -14,6 +14,8 @@ from bioimage_app.web_bridge import WorkbenchBridge
 from pytestqt.qtbot import QtBot
 from wb_tool.api import FolderDiscoveryReport
 
+from tooling.qt_test_lifecycle import close_and_dispose_window
+
 
 def test_folder_report_is_visible_and_only_current_variant_can_be_added(
     bridge: WorkbenchBridge, monkeypatch: pytest.MonkeyPatch
@@ -90,8 +92,9 @@ def bridge(qtbot: QtBot) -> Iterator[WorkbenchBridge]:
     adapter = WorkbenchBridge(host, lambda action: None)
     yield adapter
     adapter.timer.stop()
-    host.close()
-    qtbot.waitUntil(lambda: host.resources_closed, timeout=20000)
+    close_and_dispose_window(
+        host, qtbot, resources_closed=lambda: host.resources_closed, timeout=20000
+    )
 
 
 def test_web_adapter_real_import_output_and_original_coordinates(
@@ -195,8 +198,9 @@ def test_local_page_channel_and_drain(qtbot: QtBot, tmp_path: Path) -> None:
         window.host.close()
         assert not window.host.isVisible() and not window.host.resources_closed
     finally:
-        window.close()
-        qtbot.waitUntil(lambda: window.host.resources_closed, timeout=20000)
+        close_and_dispose_window(
+            window, qtbot, resources_closed=lambda: window.host.resources_closed, timeout=20000
+        )
         qtbot.wait(20)
         gc.collect()
 
@@ -266,8 +270,9 @@ def test_existing_web_project_appends_files_and_folder(
             assert selected is not None and selected.row_id == rows[index + 1].row_id
 
     finally:
-        window.close()
-        qtbot.waitUntil(lambda: window.host.resources_closed, timeout=20000)
+        close_and_dispose_window(
+            window, qtbot, resources_closed=lambda: window.host.resources_closed, timeout=20000
+        )
         qtbot.wait(20)
         gc.collect()
 
@@ -296,8 +301,9 @@ def test_web_close_reopen_restores_saved_project(qtbot: QtBot, tmp_path: Path) -
         workspace = first.host.workspace_path
         original_project = first.host.view.project()
     finally:
-        first.close()
-        qtbot.waitUntil(lambda: first.host.resources_closed, timeout=20000)
+        close_and_dispose_window(
+            first, qtbot, resources_closed=lambda: first.host.resources_closed, timeout=20000
+        )
         qtbot.wait(20)
         gc.collect()
     reopened = WebWorkbenchWindow(asset_directory=assets, settings=settings)
@@ -315,8 +321,9 @@ def test_web_close_reopen_restores_saved_project(qtbot: QtBot, tmp_path: Path) -
         assert reopened.host.workspace_path == workspace
         assert reopened.host.view.project().project_id == original_project.project_id
     finally:
-        reopened.close()
-        qtbot.waitUntil(lambda: reopened.host.resources_closed, timeout=20000)
+        close_and_dispose_window(
+            reopened, qtbot, resources_closed=lambda: reopened.host.resources_closed, timeout=20000
+        )
         qtbot.wait(20)
         gc.collect()
 

@@ -11,6 +11,8 @@ from bioimage_app.project_entry import collect_source_images
 from PySide6.QtCore import QSettings
 from pytestqt.qtbot import QtBot
 
+from tooling.qt_test_lifecycle import close_and_dispose_window
+
 
 @pytest.fixture
 def entry_hub(qtbot: QtBot, tmp_path: Path) -> Iterator[PlatformWindow]:
@@ -19,8 +21,9 @@ def entry_hub(qtbot: QtBot, tmp_path: Path) -> Iterator[PlatformWindow]:
     window = PlatformWindow(settings=settings)
     window.show()
     yield window
-    window.close()
-    qtbot.waitUntil(lambda: window.active_tool is None, timeout=20000)
+    close_and_dispose_window(
+        window, qtbot, resources_closed=lambda: window.active_tool is None, timeout=20000
+    )
 
 
 def source_image(path: Path) -> bytes:

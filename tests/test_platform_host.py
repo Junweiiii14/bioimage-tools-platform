@@ -8,6 +8,8 @@ from bioimage_app.platform_window import TOOLS, PlatformWindow
 from PySide6.QtCore import QSettings
 from pytestqt.qtbot import QtBot
 
+from tooling.qt_test_lifecycle import close_and_dispose_window
+
 
 @pytest.fixture
 def platform(qtbot: QtBot, tmp_path: Path) -> Iterator[PlatformWindow]:
@@ -15,8 +17,9 @@ def platform(qtbot: QtBot, tmp_path: Path) -> Iterator[PlatformWindow]:
     window = PlatformWindow(settings=settings)
     window.show()
     yield window
-    window.close()
-    qtbot.waitUntil(lambda: window.active_tool is None, timeout=15000)
+    close_and_dispose_window(
+        window, qtbot, resources_closed=lambda: window.active_tool is None, timeout=15000
+    )
 
 
 def test_hub_has_only_available_tools(platform: PlatformWindow) -> None:

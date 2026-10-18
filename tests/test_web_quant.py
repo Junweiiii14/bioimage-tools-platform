@@ -16,6 +16,8 @@ from bioimage_app.web_quant import quant_snapshot
 from pytestqt.qtbot import QtBot
 from wb_tool.api import WBAnalysisProject, initial_composition, make_row_analysis
 
+from tooling.qt_test_lifecycle import close_and_dispose_window
+
 
 def test_same_target_bridge_keeps_generation_and_manual_parameters(qtbot: QtBot) -> None:
     from wb_tool.api import Baseline, update_quant_lane
@@ -247,5 +249,6 @@ def test_quant_supervision_recomputes_and_exports(qtbot: QtBot, tmp_path: Path) 
         assert source.read_bytes() == before
     finally:
         bridge.timer.stop()
-        host.close()
-        qtbot.waitUntil(lambda: host.resources_closed, timeout=20000)
+        close_and_dispose_window(
+            host, qtbot, resources_closed=lambda: host.resources_closed, timeout=20000
+        )

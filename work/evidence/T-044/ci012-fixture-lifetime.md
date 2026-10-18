@@ -27,3 +27,13 @@ GDB线程587在Shiboken::Object::destroy→QObjectPrivate::deleteChildren→QWid
 等待734远端期间只读检查发现另外三处同类共享fixture：test_figure_desktop.project_window、test_project_measurements.windows、test_automatic_workflow.automatic_window。独审只读确认均在close/wait后未销毁，限定各自拥有的对象补deleteLater/waitinvalid；保留所有关闭后业务断言、原等待阈值和失败不强删原则，不批量改Web测试、不改产品。
 
 作者三模块28项85.63秒实际0、相关类型/Ruff/格式0；WB/真实Figure两类窗口共同运行主线程销毁/后台GC回归2项1.77秒实际0，因此全套增加为735项。automatic_window初始化yield之前失败的清理没有扩展处理。与旧fixture同类缺口修正仍不能证明远端具体崩溃对象；提交绑定独审及最终735远端检查待完成。旧734运行会因这次精确同类补正推送被正常取消，不当失败或通过。
+
+## 有范围的窗口测试生命周期管理
+
+进一步一次只读清点确认bridge/prepared共享fixture、四个Web桥接窗口、独立灰度保存前旧Web重绑定、首页目录Web、独立定量host和两个Platform共享fixture也只close/wait未销毁。保留已有正确qtbot注册/等待路径，不改刻意检验主线程GC的重复关闭用例，不删除全局Qt对象或追随任意根对象。
+
+增加仅用于测试的tooling/qt_test_lifecycle.py：只接收测试明确拥有的窗口和原资源退休判据；确认调用线程、正常close、等待原判据成功，再deleteLater并等原生对象无效。已失效owner直接返回；资源等待错误原样抛出，不强删。Web只销毁owner，不再单独删除其已有父对象的host；Platform保持原active_tool为空判据，产品已安排工具自身deleteLater。原等待时限、关闭后业务断言和初始失败范围保持；此前三共享fixture也共用该路径，避免重复遗漏。
+
+新增真实Qt资源等待失败回归：故意保持未退休，实际等待超时后不允许安排deleteLater；finally仅对没有异步资源的技术QWidget进行正常清理。WB/Figure两类原生析构线程回归继续保留，总数736。作者12模块67项157.28秒实际0，全项目Pyright0/Ruff0/格式525文件0。初次批量替换误触两处测试体close/wait（含跨分支缩进），在执行批次前已据diff还原，两处原业务步骤完全保留；初轮导入排序12项修正后静态通过，没有ignore或放宽测试。
+
+精确补充运行历史：925的734运行中Linux在28%再次SIGSEGV，非主线程574 QWidget析构/主线程QItemSelectionModel::reset，日志github-linux-39105503647.log；其Windows因新提交取消。不能将该Linux失败写成仅取消。c5b5566后继Linux完整735passed133.44秒、debugger0、全部wheel/dev成功；Windows在本批次记录时仍运行。单次通过不证明所有旧故障因果；最终736实际状态以后继PR为准。本批只有测试/工具与文档，无产品代码变化，未再生成原图结果或截图。

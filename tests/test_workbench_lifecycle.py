@@ -13,6 +13,8 @@ from PySide6.QtWidgets import QApplication
 from pytestqt.qtbot import QtBot
 from wb_tool.api import WBAnalysisProject
 
+from tooling.qt_test_lifecycle import close_and_dispose_window
+
 
 @pytest.fixture
 def prepared(qtbot: QtBot, tmp_path: Path) -> Iterator[FigureProjectWindow]:
@@ -28,8 +30,9 @@ def prepared(qtbot: QtBot, tmp_path: Path) -> Iterator[FigureProjectWindow]:
     qtbot.waitUntil(lambda: bool(window.automatic.last_output_path), timeout=40000)
     qtbot.waitUntil(lambda: not window.operation_busy, timeout=15000)
     yield window
-    window.close()
-    qtbot.waitUntil(lambda: window.resources_closed, timeout=20000)
+    close_and_dispose_window(
+        window, qtbot, resources_closed=lambda: window.resources_closed, timeout=20000
+    )
 
 
 def test_delayed_save_keeps_source_and_recomputes_graphical_crop(

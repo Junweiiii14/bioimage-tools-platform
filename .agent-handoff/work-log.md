@@ -1,10 +1,5 @@
 # Current Work Log
 
-## 2026-10-17 T043 完整门禁与当前入口
-
-产品2e5021d入口统一及独审后642全门禁退出0；治理0b786cb独立44项退出0；合并开发树e0be945正式完整657项/427.30s和全部隔离wheel退出0。分阶段草稿PR7（治理）、3（P0）、8–13（阶段2–7）已推送；P0初次检查用了旧main基线，真实失败保留，更新基线后关闭/重开触发当前基线检查，无新提交/状态篡改。34原有未提交文件与8原图/12参考SHA保持，19树备份、6干净历史树原位锁定；旧结果无删除。原生间歇挂起仍UNKNOWN。
-
-
 ## 2026-10-17 T043 最终阶段与平台分支
 
 CI001之后最终产品树fa9c5f2正式完整check实际exit0：657passed/451.28s，全部隔离wheel含真实OCR完成。日志.local/t043/check-final-ci001.log；文档后继与此产品内容相同。 Linux真实CI暴露Windows句柄guard，2b9f643修复并独审；阶段2–8仅此产品差异。P0补基线转换说明，8阶段精确清单再次独审全部exit0。全部草稿PR7、3、8–14，main不变；远端CI看PR/Issue6实时。原有34未提交文件、8原图/12参考及旧预测SHA保持，6历史树原位锁定。原生间歇挂起仍UNKNOWN，完整科学/发布验收待后续。
@@ -195,3 +190,7 @@ a72e7102891df287e3484f20f3724612779b53f5：733 passed in 525.53s、pytest child/
 ## 2026-10-18 CI012 远端Linux与fixture销毁
 
 3e5cee3 Linux约29% OCR时SIGSEGV，真实非GUI线程QWidget析构；未最终通过。精准fixtureclose/wait后deleteLater/waitinvalid，回归红1/2.87秒、新11项25.58秒0。受控holder环窗口后台GC旧Aborted/3，先GUI销毁0，不能认定原对象身份。产品代码不变、旧证据保留；提交绑定独审及远端734全检待做，详见ci012-fixture-lifetime.md。
+
+## 2026-10-18 CI012 有范围的测试窗口管理
+
+精确清点Web/平台/共享fixture，统一仅显式自有窗口的异步close/wait→GUI销毁，不动产品/全局GC/Qt根，保留业务断言与原时限。67项157.28秒0、全类型/静态0，总736。c5 Linux735/133.44秒及wheel/dev0，Windows待；925 Linux失败/Windows取消分别保留。待本批绑定独审/最后备份push/最终736远端，实际结论写issue6/ignored receipt不重复文档触发全检循环。
