@@ -167,7 +167,7 @@ class FigureProjectView(QWidget):
         self.status = QLabel("导入原图文件夹后自动识别；需要修正时，直接拖动图中的裁剪框。")
         self.status.setWordWrap(True)
 
-        self.history_label = QLabel()
+        self.history_label = QLabel(self)
         self.history_label.setWordWrap(True)
         self.history_label.hide()
         actions = QHBoxLayout()
@@ -258,7 +258,8 @@ class FigureProjectView(QWidget):
         preview_page = QWidget()
         preview_layout = QVBoxLayout(preview_page)
         preview_note = QLabel(
-            "拼图显示：RGB 按 BT.601 转灰度；16 位整除 257。归档另含未改像素的 TIFF 裁剪和原图。"
+            "拼图显示：RGB 按 BT.601 转灰度；16 位整除 257。归档另含未改像素的 TIFF 裁剪和原图。",
+            preview_page,
         )
         preview_note.setWordWrap(True)
         preview_note.hide()
@@ -385,7 +386,7 @@ class FigureProjectView(QWidget):
         self.source_count = QLabel("项目原图")
         self.source_count.setObjectName("evidenceHeading")
         rail.addWidget(self.source_count)
-        self.import_directory_button = QPushButton("导入原图文件夹…")
+        self.import_directory_button = QPushButton("导入原图文件夹…", self)
         self.import_directory_button.clicked.connect(self.import_directory_requested)
         self.import_directory_button.hide()
         rail.addWidget(self.filter)
@@ -402,7 +403,7 @@ class FigureProjectView(QWidget):
         self.automatic_button.setMinimumHeight(38)
         self.automatic_button.clicked.connect(self.automatic_requested)
         rail.addWidget(self.automatic_button)
-        self.automatic_export_button = QPushButton("导出自动化结果…")
+        self.automatic_export_button = QPushButton("导出自动化结果…", self)
         self.automatic_export_button.clicked.connect(self.automatic_export_requested)
         self.automatic_export_button.hide()
         note = QLabel("选择原图查看识别结果。\n需要关注的项会保留具体原因。")
@@ -633,7 +634,7 @@ class FigureProjectView(QWidget):
         self.context_button.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
         navigation.addWidget(self.context_button)
         root.addWidget(self.sidebar)
-        self.step_title, self.step_help = QLabel(), QLabel()
+        self.step_title, self.step_help = QLabel(self), QLabel(self)
         self.step_title.hide()
         self.step_help.hide()
         self.context_header = QWidget()
@@ -766,7 +767,7 @@ class FigureProjectView(QWidget):
         self.analysis_tabs.addTab(self.ocr, "OCR / 结果表")
         self.analysis_tabs.addTab(self.normalization, "样本对应与归一化")
         self.pages.addWidget(self.analysis_tabs)
-        self.previous_step, self.next_step = QPushButton(), QPushButton()
+        self.previous_step, self.next_step = QPushButton(self), QPushButton(self)
         self.previous_step.hide()
         self.next_step.hide()
         root.addWidget(self.status)

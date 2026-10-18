@@ -85,3 +85,29 @@ first_observed_after仅首次观察来源，也不是对象创建位置。
 类型错误已修，未加忽略。插件运行行为未改，完整全局清单仍由最终钩子记录。
 后继提交绑定独审与完整检查待执行；下一原生定位应对照实际产品View生命周期，
 不通过测试清理全部对象来假装修复产品退出。
+
+## 实际View的所有权缺口与修正
+
+662d767绑定独审5项0.37秒实际0，确认诊断单测patch在全局观察钩子前恢复，未隐藏
+全局清单。该审查还指出隐藏控件缺少parent/布局归属；保留对象兼容比贸然删除稳妥。
+
+两个自有实际View进程使用公开`create_figure_project_view(parent)`，不创建后台或
+WebEngine，均附着原生观察器，natural/显式parent销毁实际0、无AV。显式组确认
+parent和view已无效，但Qt根数41→11；单独空View诊断逐个确认残留均无parent，包含
+历史提示、隐藏导入/导出/导航控件以及定量面板的隐藏提示/原图画布。
+本机receipt `.local/t044/figure-view-exit-controls/receipt.json`，脚本SHA256
+`255001f1afbbafd30efe97a2f841158ca6d9519d2ae5dd84d60e5f41e9706af6`；逐项记录
+`figure-view-residual-roots.json`只含静态属性名/类型/parent状态，不含用户文本。
+
+修正将这些保留控件和隐藏预览说明明确归属View/预览页；未入布局的source_heading
+明确hide，保持原来不展示的行为。数值/数据格式/原图/窗口关闭协议不变，没有全局
+delete/GC、强制退出或修改测试清理来掩盖问题。未用静态未引用作为删除兼容接口理由。
+
+新增独立进程回归先确认parent/view真实销毁，再要求本次全部Qt根包装器失效，并
+检查原进程退出码；旧实现1failed/2.27秒，残留11；新实现与诊断5项合计6passed/
+2.21秒、实际0。最初在pytest共享Qt会话直接flush DeferredDelete的试验出现失败及
+caplog stash teardown KeyError，日志view-ownership-red.log保留；因此改用隔离进程
+观察，未忽略异常或减弱预期。相关工作流/保存重开/定量重算12项18.09秒实际0，
+相关Pyright/Ruff/格式0。后继绑定独审/完整检查待执行。
+
+这是可复现的对象归属缺口修复，尚不能证明历史retrieveMetaObject AV根因已解决。

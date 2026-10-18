@@ -27,6 +27,8 @@ create_wb_view/create_wb_background 是延迟装配入口；PreviewRaster 是显
 不会传给定量用例。WBDocument v1 保存原输入资产/标注，契约见 wb-document-v1.md。
 后台关闭排空已接受请求后，由worker在自身线程移回owner，再停止原QThread；
 owner非阻塞确认线程退出和实际QObject销毁后才发送closed，避免跨线程析构的Qt锁/GIL反转。
+隐藏兼容控件也须明确归属View；宿主排空完成不等于窗口已经析构。
+独立进程生命周期回归验证父对象销毁后子控件释放和真实退出码，不对全局测试窗口强制清理。
 桌面入口由apps显式装配：`uv run --locked --no-sync python -m bioimage_app`。
 当前界面可拖ROI/编辑闭区间与基线/查看原始曲线、OCR原文和自动结果表。
 
