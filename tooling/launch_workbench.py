@@ -25,7 +25,7 @@ def verify_checkout(root: Path) -> dict[str, str]:
             "请在当前目录执行 uv sync --locked --all-groups 后重试；不要切换到历史目录。"
         )
     assets = expected / "web_ui"
-    for name in ("index.html", "app.js", "manual_quant.js"):
+    for name in ("index.html", "app.js", "manual_quant.js", "styles.css"):
         if not (assets / name).is_file():
             raise RuntimeError(f"启动已停止：当前工作台文件缺失（{name}）。请恢复当前版本文件。")
     return {"checkout": str(root.resolve()), "module": str(expected), "interface": str(assets)}

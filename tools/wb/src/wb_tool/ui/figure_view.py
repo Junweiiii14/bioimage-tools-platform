@@ -257,12 +257,6 @@ class FigureProjectView(QWidget):
 
         preview_page = QWidget()
         preview_layout = QVBoxLayout(preview_page)
-        preview_note = QLabel(
-            "拼图显示：RGB 按 BT.601 转灰度；16 位整除 257。归档另含未改像素的 TIFF 裁剪和原图。",
-            preview_page,
-        )
-        preview_note.setWordWrap(True)
-        preview_note.hide()
         preview_page.setMinimumWidth(250)
         preview_page.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.preview_label = FigurePreview()

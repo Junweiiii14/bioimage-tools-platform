@@ -177,13 +177,8 @@ const manualQuant = {
       $('#quant-profile-single').innerHTML = this.chart(lane, band, true);
       $('#quant-profile-fields').innerHTML = [['start','积分起点 y'],['end','积分终点 y'],['baselineStart','起点封底'],['baselineEnd','终点封底']].map(([key,label]) => `<label class="quant-field">${label}<input type="number" data-quant-field="${key}" value="${finiteQuantValue(band?.[key]) ? band[key] : ''}" step="${key.startsWith('baseline') ? '.1' : '1'}" ${state.busy || !bridge ? 'disabled' : ''}></label>`).join('');
     }
-    const reasons = new Map();
-    for (const lane of quant.lanes || []) for (const band of lane.bands || []) {
-      if (!band.reason) continue;
-      if (!reasons.has(band.reason)) reasons.set(band.reason, new Set());
-      reasons.get(band.reason).add(lane.lane);
-    }
-    $('#quant-profiles-quality').innerHTML = reasons.size ? `<summary>质量说明（${reasons.size} 类）</summary><ul>${[...reasons].map(([reason,lanes]) => `<li>泳道 ${[...lanes].join(', ')}：${escapeText(reason)}</li>`).join('')}</ul>` : '<summary>质量说明</summary><p>未发现当前检查能识别的质量问题；这不等于已证明实验准确性。</p>';
+    $('#quant-profiles-quality').innerHTML = qualityContent((quant.lanes || []).flatMap(lane =>
+      (lane.bands || []).map(band => ({reason: band.reason, label: '泳道 ' + lane.lane}))));
   }
 };
 

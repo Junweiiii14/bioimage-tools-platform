@@ -413,10 +413,12 @@ class _Work(QObject):
                 if job.crop is None:
                     raise ValueError("缺少原图裁剪范围")
                 value = export_crop(job.path, job.crop, job.destination)
-            else:
+            elif job.operation == "encode":
                 if job.document is None:
                     raise ValueError("缺少文档")
                 value = job.document.model_dump_json().encode("utf-8")
+            else:
+                raise ValueError("未知WB后台操作，未执行")
             reply = WBReply(request_id, value)
         except (ValueError, OSError, TypeError) as error:
             reply = WBReply(request_id, error=str(error))
