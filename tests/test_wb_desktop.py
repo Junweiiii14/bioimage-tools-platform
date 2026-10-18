@@ -4,7 +4,7 @@ import gc
 import json
 import os
 import threading
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterator, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING
 from xml.etree import ElementTree
@@ -13,11 +13,11 @@ from zipfile import ZipFile
 import numpy as np
 import pytest
 import tifffile
-from bioimage_app.api import create_wb_window
+from bioimage_app.api import create_figure_project_window, create_wb_window
 from PIL import Image, ImageDraw, ImageFont
 
 if TYPE_CHECKING:
-    from bioimage_app.api import WBWindow
+    from bioimage_app.api import FigureProjectWindow, WBWindow
 from platform_runtime.api import Workspace
 from PySide6.QtCore import QPoint, Qt, QThread
 from PySide6.QtTest import QTest
@@ -320,7 +320,9 @@ def test_actual_ocr_desktop_table_save_reopen_export(
     assert cell_text(reopened.view.worksheet.table, 0, 3) == "—"
 
 
-def _dispose_owned_windows(windows: list["WBWindow"], qtbot: QtBot) -> None:
+def _dispose_owned_windows(
+    windows: Sequence["WBWindow | FigureProjectWindow"], qtbot: QtBot
+) -> None:
     for window in windows:
         if not window.resources_closed:
             window.close()
@@ -342,8 +344,11 @@ def make_window(qtbot: QtBot) -> Iterator[Callable[[], "WBWindow"]]:
     _dispose_owned_windows(windows, qtbot)
 
 
-def test_owned_fixture_windows_are_destroyed_on_gui_before_worker_collection(qtbot: QtBot) -> None:
-    window = create_wb_window()
+@pytest.mark.parametrize("create_window", [create_wb_window, create_figure_project_window])
+def test_owned_fixture_windows_are_destroyed_on_gui_before_worker_collection(
+    qtbot: QtBot, create_window: Callable[[], "WBWindow | FigureProjectWindow"]
+) -> None:
+    window = create_window()
     destroyed_threads: list[int] = []
 
     def record_destroyed(*_args: object) -> None:

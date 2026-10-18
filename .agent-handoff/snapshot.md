@@ -27,3 +27,7 @@
 ## CI012审查后最新指针
 
 ab6a68e only tests/docs，无产品差异；独审1项1.96秒0关闭P2，原11项独审24.94秒0。原run39104680503 Windows733passed575.75秒和全部wheel/dev成功，Linux29% SIGSEGV使整run失败；均已保存日志。不取消真实失败。ab已外置bundle verified/SHA0842f55b468becb38ed9345d45b3b840e006a688202ee83f581eb5d852217e1f，再核34原未提交一致，safe push。此文档后继也会重新备份和push，不再改产品/测试；最终HEAD/CI run/开发日志链接见.local/t044/github-delivery.json及PR15/issue6。下一步只看最终PR的rules、Windows/Linux734和desktop实际结果；失败按证据继续，成功后给维护汇报，任务review表示待依赖集成main，不要求合main。不要因旧快照pending重复实现/验证。
+
+## CI012同类fixture最新后继
+
+等待925的734远端期间发现/只读确认三共享fixture同类遗漏：test_figure_desktop、test_project_measurements、test_automatic_workflow各自拥有窗口在原关闭等待后精确deleteLater/waitinvalid，28项85.63秒0；WB/Figure两类主线程销毁+workerGC回归2项1.77秒0，类型/Ruff/格式0。产品a72不变，不扩所有Web测试；总数735。当前待提交绑定独审/最后外置备份/push，再看最终HEAD735全检；925/ab的734运行若被新push取消须如实记录非通过。不要反复文档提交重启成功CI；最终实际状态记录issue6和.local/t044/github-delivery.json。

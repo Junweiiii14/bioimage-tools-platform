@@ -11,6 +11,7 @@ import tifffile
 from bioimage_app.api import create_figure_project_window
 from bioimage_app.figure_window import FigureProjectWindow
 from pytestqt.qtbot import QtBot
+from shiboken6 import isValid
 from wb_tool.api import WBAutomaticProject, read_figure_project
 
 
@@ -23,6 +24,8 @@ def automatic_window(qtbot: QtBot, tmp_path: Path) -> Iterator[FigureProjectWind
     yield window
     window.close()
     qtbot.waitUntil(lambda: window.resources_closed, timeout=20000)
+    window.deleteLater()
+    qtbot.waitUntil(lambda: not isValid(window), timeout=10000)
 
 
 def make_sources(root: Path) -> tuple[Path, Path]:

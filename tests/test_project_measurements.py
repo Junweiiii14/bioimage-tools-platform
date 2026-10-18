@@ -17,6 +17,7 @@ from PIL import Image, ImageDraw, ImageFont
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 from pytestqt.qtbot import QtBot
+from shiboken6 import isValid
 from wb_tool.api import WBAnalysisProject, WBNormalizedProject, WBProjectOCR, plan_figure_layout
 
 if TYPE_CHECKING:
@@ -44,6 +45,8 @@ def windows(qtbot: QtBot) -> Iterator[Callable[[], "FigureProjectWindow"]]:
         if not window.resources_closed:
             window.close()
             qtbot.waitUntil(lambda window=window: window.resources_closed, timeout=20000)
+        window.deleteLater()
+        qtbot.waitUntil(lambda window=window: not isValid(window), timeout=10000)
 
 
 def setup(

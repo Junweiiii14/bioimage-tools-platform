@@ -21,3 +21,9 @@ GDB线程587在Shiboken::Object::destroy→QObjectPrivate::deleteChildren→QWid
 5c932b8独审整份11项24.94秒实际0，发现新回归finally仅isValid就deleteLater：若helper等待后台超时，会提前销毁仍有线程的窗口（P2）。正式fixture helper本身顺序正确。后继finally改复用同一个close/wait/dispose helper，不以包装器有效代替资源退休；新回归1项2.01秒0、相关Pyright/Ruff/格式0。后继绑定复核与远端734全检待做，不把初审写作无阻断。
 
 后继ab6a68e绑定独审1项1.96秒实际0，P2已关闭，无新增阻断。原3e5cee3 Windows实际733passed575.75秒、child0、全部wheel/dev成功；同run Linux失败保持。审查后ab6a68e已备份核34原未提交并安全push；最终文档后继的远端734全检结论见PR15/issue6，不以本地/旧HEAD通过替代。
+
+## 同类项目fixture补齐
+
+等待734远端期间只读检查发现另外三处同类共享fixture：test_figure_desktop.project_window、test_project_measurements.windows、test_automatic_workflow.automatic_window。独审只读确认均在close/wait后未销毁，限定各自拥有的对象补deleteLater/waitinvalid；保留所有关闭后业务断言、原等待阈值和失败不强删原则，不批量改Web测试、不改产品。
+
+作者三模块28项85.63秒实际0、相关类型/Ruff/格式0；WB/真实Figure两类窗口共同运行主线程销毁/后台GC回归2项1.77秒实际0，因此全套增加为735项。automatic_window初始化yield之前失败的清理没有扩展处理。与旧fixture同类缺口修正仍不能证明远端具体崩溃对象；提交绑定独审及最终735远端检查待完成。旧734运行会因这次精确同类补正推送被正常取消，不当失败或通过。

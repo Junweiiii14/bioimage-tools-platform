@@ -16,6 +16,7 @@ from PySide6.QtCore import QPoint, Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 from pytestqt.qtbot import QtBot
+from shiboken6 import isValid
 from wb_tool.api import CropDetectionSettings, CropSuggestion, WBFigureProject, WBReviewProject
 
 if TYPE_CHECKING:
@@ -43,6 +44,8 @@ def project_window(qtbot: QtBot) -> Iterator[Callable[[], "FigureProjectWindow"]
         if not window.resources_closed:
             window.close()
             qtbot.waitUntil(lambda window=window: window.resources_closed, timeout=15000)
+        window.deleteLater()
+        qtbot.waitUntil(lambda window=window: not isValid(window), timeout=10000)
 
 
 def test_project_batch_review_export_reopen(
