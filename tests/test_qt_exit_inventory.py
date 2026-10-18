@@ -16,9 +16,22 @@ class RequestNode(Protocol):
     def node(self) -> pytest.Item: ...
 
 
-def test_inventory_records_live_structure_without_reading_widget_text(qtbot: QtBot) -> None:
+@pytest.fixture
+def controlled_roots(monkeypatch: pytest.MonkeyPatch) -> list[QWidget]:
+    # Unit observations must not depend on unrelated product windows or Qt's
+    # global root ordering. The plugin's real teardown observes globals again.
+    roots: list[QWidget] = []
+    monkeypatch.setattr(qt_exit_inventory, "_roots", lambda: roots)
+    monkeypatch.setattr(qt_exit_inventory, "_origins", {})
+    return roots
+
+
+def test_inventory_records_live_structure_without_reading_widget_text(
+    qtbot: QtBot, controlled_roots: list[QWidget]
+) -> None:
     root = QWidget()
     qtbot.addWidget(root)
+    controlled_roots.append(root)
     secret = "must-not-appear-in-diagnostics"
     root.setObjectName(secret)
     root.setWindowTitle(secret)
@@ -33,16 +46,55 @@ def test_inventory_records_live_structure_without_reading_widget_text(qtbot: QtB
     assert root.children() and child.text() == secret
 
 
-def test_inventory_budget_is_enforced(qtbot: QtBot) -> None:
+def test_inventory_budget_is_enforced(qtbot: QtBot, controlled_roots: list[QWidget]) -> None:
     root = QWidget()
     qtbot.addWidget(root)
+    other = QWidget()
+    qtbot.addWidget(other)
+    controlled_roots.extend((root, other))
     QLineEdit(root)
     report = snapshot(max_nodes=1)
     assert report["truncated"] is True
+    assert report["root_count"] == 2
     objects = report["objects"]
     assert isinstance(objects, list) and len(cast(list[object], objects)) == 1
     with pytest.raises(ValueError):
         snapshot(max_nodes=True)
+
+
+def test_root_budget_reports_omitted_roots(qtbot: QtBot, controlled_roots: list[QWidget]) -> None:
+    for _ in range(129):
+        root = QWidget()
+        qtbot.addWidget(root)
+        controlled_roots.append(root)
+    remember_roots("controlled_roots")
+    report = snapshot(max_nodes=512)
+    assert report["root_count"] == 129 and report["truncated"] is True
+    records = cast(list[dict[str, object]], report["objects"])
+    assert len(records) == 128
+    assert {record["python_id"] for record in records} == {
+        hex(id(root)) for root in controlled_roots[:128]
+    }
+    assert hex(id(controlled_roots[-1])) not in json.dumps(report)
+
+
+def test_origin_capacity_is_bounded_and_missing_origin_is_explicit(
+    qtbot: QtBot, controlled_roots: list[QWidget], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(qt_exit_inventory, "_MAX_ORIGINS", 2)
+    for _ in range(3):
+        root = QWidget()
+        qtbot.addWidget(root)
+        controlled_roots.append(root)
+    remember_roots("controlled_origin")
+    report = snapshot()
+    assert report["origin_capacity_reached"] is True
+    records = cast(list[dict[str, object]], report["objects"])
+    assert [record["first_observed_after"] for record in records] == [
+        "controlled_origin",
+        "controlled_origin",
+        "unattributed",
+    ]
 
 
 def test_teardown_observation_failure_is_reported_without_raising(

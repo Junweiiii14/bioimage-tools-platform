@@ -1,5 +1,7 @@
 # Validation History
 
+- 2026-10-18 efec471 check --all带退出清单/native observer：700passed/1failed、488.11秒，原child/外层1，wheel未跑；未复现AV。失败trace证实全局4208根超128根预算，新测试对象未入截断报告。测试隔离真实Qt根/来源表并补根/节点/容量反例，作者5项0.46秒0、相关Pyright/Ruff/格式0；后继完整检查/绑定独审待做。不是产品退出修复。独立三角峰解析36750在35%首次支持、准确36750，诊断原型0，无参考像素/产品注入；候选v2未实施。
+
 - 2026-10-17 T042/base b32acff：context/doctor/smoke-env/policy/gh只读认证/8源图SHA检查均exit0。配置证据work/evidence/T-042/configuration.md；私有清单.local/t042。未跑产品测试/全门禁/重新识别/独审；doctor过时product_status不作产品结论。
 
 - 2026-10-16 T035/25ac71d：两指定原图端到端与原值像素核对退出0；独审18专项退出0；首次全量581 passed但退出1、根因UNKNOWN，最终复查见work/evidence/T-035/validation.md，不把测试摘要等同进程成功。
