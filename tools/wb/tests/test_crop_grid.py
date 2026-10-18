@@ -15,8 +15,6 @@ from wb_tool.api import CropRequest, LaneROI, export_crop, fixed_lane_grid, load
 def test_genuinely_changed_resolution_is_not_published(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from wb_tool.adapters import crop_export
-
     source, target = tmp_path / "device.tiff", tmp_path / "crop.tiff"
     tifffile.imwrite(source, np.zeros((10, 12), dtype=np.uint16), resolution=(600, 600))
     original = source.read_bytes()
@@ -26,7 +24,7 @@ def test_genuinely_changed_resolution_is_not_published(
         kwargs["resolution"] = (720, 720)
         write(*args, **kwargs)
 
-    monkeypatch.setattr(crop_export.tifffile, "imwrite", wrong_resolution)
+    monkeypatch.setattr(tifffile, "imwrite", wrong_resolution)
     request = CropRequest(sha256(original).hexdigest(), 0, LaneROI("r", 2, 3, 8, 7))
     with pytest.raises(ValueError, match="分辨率写后核验失败"):
         export_crop(str(source), request, str(target))
