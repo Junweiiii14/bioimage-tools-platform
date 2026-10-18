@@ -8,7 +8,7 @@ from wb_tool.adapters.tiff_input import load_tiff
 from wb_tool.application.analysis import BandAnnotation, LaneAnnotation
 from wb_tool.application.project_analysis import WBAnalysisProject
 from wb_tool.application.quant_supervision import install_quant_request
-from wb_tool.domain.quant_supervision import propose_quant_lanes
+from wb_tool.domain.quant_supervision import propose_quant_lane, propose_smear_lane
 
 
 def replan_quant_lanes(
@@ -56,21 +56,19 @@ def replan_quant_lanes(
         return install_quant_request(project, row_id, request)
     from wb_tool.domain.background_bounds import propose_background_lanes
 
-    propose = (
-        propose_background_lanes
-        if plan.request.quant_policy == "background_support@1"
-        else propose_quant_lanes
-    )
-    proposals = propose(
-        image.pixels, tuple(lane.roi for lane in plan.request.lanes), plan.request.polarity
-    )
     lanes: list[LaneAnnotation] = []
-    for lane, proposal in zip(plan.request.lanes, proposals, strict=True):
+    for lane in plan.request.lanes:
         if cancelled():
             raise ValueError("重新规划已取消")
         if not any("geometry_changed:replan_required" in b.detection_notes for b in lane.bands):
             lanes.append(lane)
             continue
+        if any("whole_lane_smear@1" in b.detection_notes for b in lane.bands):
+            proposal = propose_smear_lane(image.pixels, lane.roi, plan.request.polarity)
+        elif plan.request.quant_policy == "background_support@1":
+            proposal = propose_background_lanes(image.pixels, (lane.roi,), plan.request.polarity)[0]
+        else:
+            proposal = propose_quant_lane(image.pixels, lane.roi, plan.request.polarity)
         lanes.append(
             LaneAnnotation(
                 proposal.roi,

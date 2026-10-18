@@ -1,5 +1,6 @@
 """Shipped manual controls use durable workers and preserve completed groups."""
 
+import json
 from dataclasses import replace
 from pathlib import Path
 
@@ -7,7 +8,8 @@ import numpy as np
 import pytest
 import tifffile
 from bioimage_app.web_window import WebWorkbenchWindow
-from PySide6.QtCore import QSettings
+from PySide6.QtCore import QPoint, QSettings, Qt
+from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QFileDialog
 from pytestqt.qtbot import QtBot
 from wb_tool.api import WBAnalysisProject
@@ -76,9 +78,53 @@ def test_copy_manual_multipeak_history_new_group_save_and_reopen(
             timeout=20000,
         )
         qtbot.waitUntil(lambda: js("mode==='quant'&&Boolean(row()?.preview)") is True)
-        # Seed the first rectangle explicitly; copy, numeric positioning and all
-        # following calculations exercise the shipped controls. Pointer drawing
-        # has a separate geometry contract and is not claimed by this test.
+        # Real Qt pointer events verify view translation, cancellation and the
+        # original-coordinate mapping after zoom/pan; numerical fixtures follow.
+        js("manualLanes.activate();focusCrop=false;zoom=1.4;render();true")
+        qtbot.wait(100)
+
+        def image_point(x: int, y: int) -> QPoint:
+            coords = js(
+                "(()=>{const b=$('#image-transform').getBoundingClientRect();"
+                f"return JSON.stringify([b.left+{x}/row().width*b.width,"
+                f"b.top+{y}/row().height*b.height])"
+                "})()"
+            )
+            assert isinstance(coords, str)
+            coords = json.loads(coords)
+            return QPoint(round(coords[0]), round(coords[1]))
+
+        target_widget = window.web.focusProxy()
+        assert target_widget is not None
+        js("document.querySelector('.image-actions .button').click();true")
+        start = image_point(50, 60)
+        QTest.mousePress(target_widget, Qt.MouseButton.LeftButton, pos=start)
+        qtbot.waitUntil(lambda: js("Boolean(imagePan.drag)") is True)
+        QTest.mouseMove(target_widget, start + QPoint(40, 25))
+        qtbot.waitUntil(lambda: js("imagePan.x===40&&imagePan.y===25") is True)
+        QTest.mouseRelease(target_widget, Qt.MouseButton.LeftButton, pos=start + QPoint(40, 25))
+        qtbot.waitUntil(lambda: js("imagePan.drag===null") is True)
+        assert js("JSON.stringify([imagePan.x,imagePan.y,manualLanes.boxes.length])") == "[40,25,0]"
+        # Cancel restores only the view; it must not create or alter lane boxes.
+        QTest.mousePress(target_widget, Qt.MouseButton.LeftButton, pos=start)
+        qtbot.waitUntil(lambda: js("Boolean(imagePan.drag)") is True)
+        QTest.mouseMove(target_widget, start + QPoint(15, 10))
+        qtbot.waitUntil(lambda: js("imagePan.x===55&&imagePan.y===35") is True)
+        js("$('#image-viewport').dispatchEvent(new PointerEvent('pointercancel'));true")
+        assert js("imagePan.drag===null&&imagePan.x===40&&imagePan.y===25") is True
+        QTest.mouseRelease(target_widget, Qt.MouseButton.LeftButton, pos=start + QPoint(15, 10))
+        assert js("JSON.stringify([imagePan.x,imagePan.y,manualLanes.boxes.length])") == "[40,25,0]"
+        js("document.querySelector('.image-actions .button').click();true")
+        QTest.mousePress(target_widget, Qt.MouseButton.LeftButton, pos=image_point(35, 40))
+        qtbot.waitUntil(lambda: js("Boolean(manualLanes.dragging)") is True)
+        QTest.mouseMove(target_widget, image_point(55, 80))
+        qtbot.waitUntil(lambda: js("Boolean(manualLanes.dragging?.next)") is True)
+        QTest.mouseRelease(target_widget, Qt.MouseButton.LeftButton, pos=image_point(55, 80))
+        qtbot.waitUntil(lambda: js("manualLanes.boxes.length") == 1)
+        box = js("JSON.stringify(manualLanes.boxes[0])")
+        assert isinstance(box, str)
+        box = json.loads(box)
+        assert box == pytest.approx({"x": 35, "y": 40, "width": 20, "height": 40}, abs=1)
         assert (
             js(
                 "manualLanes.boxes=[{x:5,y:0,width:20,height:120}];"

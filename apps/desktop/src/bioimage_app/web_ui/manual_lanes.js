@@ -2,7 +2,7 @@
 
 // Lane geometry is a local draft. Only the durable original-pixel worker measures.
 const manualLanes = {
-  method: 'lanes', selected: 0, dragging: null, key: null, boxes: [], measurementMode: 'peaks',
+  toolsOpen:false, actualZoom:1, method: 'lanes', selected: 0, dragging: null, key: null, boxes: [], measurementMode: 'peaks',
   identity() {
     return {projectId:state.projectId,id:row()?.id,sourceId:row()?.sourceId,revision:quantData()?.revision};
   },
@@ -31,11 +31,11 @@ const manualLanes = {
     }
     tools.hidden = mode !== 'quant';
     if (tools.hidden) return;
-    tools.innerHTML = `<button class="button primary full" data-lane-action="automatic" ${disabled}>按 Fig 自动分组并定量</button>${this.warnings()}<h3>手动泳道</h3><p>框选第一条完整泳道，再复制并移动。已完成的其他组保持。</p>
+    tools.innerHTML = `<button class="button primary full" data-lane-action="automatic" ${disabled}>按 Fig 自动分组并定量</button>${this.warnings()}<details data-manual-tools ${this.toolsOpen?'open':''}><summary>手动泳道工具</summary><h3>手动泳道</h3><p>框选第一条完整泳道，再复制并移动。已完成的其他组保持。</p>
       <div class="manual-action-grid"><button class="button subtle" data-lane-action="draw" ${disabled}>框选泳道</button><button class="button subtle" data-lane-action="copy" ${disabled || !this.boxes.length?'disabled':''}>复制泳道</button><button class="button subtle" data-lane-action="delete" ${disabled || !this.boxes.length?'disabled':''}>删除选中</button><button class="button subtle" data-lane-action="clear" ${disabled}>清空本轮</button></div>
       <button class="text-button" data-lane-action="reselect" ${disabled}>重新框选当前组</button>
       <label class="quant-field">选择泳道<select data-manual-lane-select ${disabled}>${this.boxes.map((box,index)=>`<option value="${index}" ${index===this.selected?'selected':''}>泳道 ${index+1} · ${box.width}×${box.height}px</option>`).join('') || '<option>尚未框选</option>'}</select></label>
-      <div class="manual-action-grid"><button class="button subtle" data-lane-action="new" ${disabled}>添加分组</button><button class="button subtle" data-lane-action="rename" ${disabled}>修改名称</button><button class="button subtle" data-lane-action="move" ${disabled}>调整这排分组</button><button class="button subtle" data-lane-action="merge" ${disabled}>合并分组</button></div><button class="text-button" data-lane-action="next" ${disabled}>保留结果，切换下一组</button>`;
+      <div class="manual-action-grid"><button class="button subtle" data-lane-action="new" ${disabled}>添加分组</button><button class="button subtle" data-lane-action="rename" ${disabled}>修改名称</button><button class="button subtle" data-lane-action="move" ${disabled}>调整这排分组</button><button class="button subtle" data-lane-action="merge" ${disabled}>合并分组</button></div><button class="text-button" data-lane-action="next" ${disabled}>保留结果，切换下一组</button></details>`;
   },
   setup() { return mode === 'quant' && quantDetail && manualQuant.isSetup() && this.method === 'lanes'; },
   activate() { manualQuant.active = true; this.method = 'lanes'; quantDetail = true; focusCrop = false; },
@@ -82,9 +82,10 @@ const manualLanes = {
     send('quant_target',{...this.identity(),roi,n:boxes.length,laneRois:boxes,polarity:draft.polarity,emptyLanes,resetBounds,measurementMode:this.measurementMode});
   },
   overlay(actualZoom) {
+    this.actualZoom=actualZoom;
     const layer=$('#quant-lanes'),source=row();
     layer.hidden=mode!=='quant';
-    layer.innerHTML=!source?'':this.boxes.map((box,index)=>`<div class="quant-lane ${index===this.selected?'selected':''}" data-manual-lane="${index}" tabindex="0" role="button" aria-label="泳道 ${index+1}，方向键移动" style="left:${box.x/source.width*100}%;top:${box.y/source.height*100}%;width:${box.width/source.width*100}%;height:${box.height/source.height*100}%;border-width:0"><svg class="manual-lane-shape"><rect x="0" y="0" width="100%" height="100%" vector-effect="non-scaling-stroke"/></svg><span class="quant-lane-tag" style="transform:scale(${1/actualZoom})">${index+1}</span></div>`).join('');
+    layer.innerHTML=!source?'':this.boxes.map((box,index)=>`<div class="quant-lane ${index===this.selected?'selected':''}" data-manual-lane="${index}" tabindex="0" role="button" aria-label="泳道 ${index+1}，方向键移动" style="left:${box.x/source.width*100}%;top:${box.y/source.height*100}%;width:${box.width/source.width*100}%;height:${box.height/source.height*100}%;border-width:0"><svg class="manual-lane-shape"><rect x="0" y="0" width="100%" height="100%" style="stroke-width:${1.5/actualZoom}px"/></svg><span class="quant-lane-tag" style="transform:scale(${1/actualZoom})">${index+1}</span></div>`).join('');
   }
 };
 manualLanes.legacySubmit=manualQuant.submit.bind(manualQuant);
@@ -148,6 +149,24 @@ document.addEventListener('change',event=>{
 document.addEventListener('click',event=>{if(event.target.closest('[data-manual-quant-whole]'))manualLanes.method='grid';},true);
 document.addEventListener('input',event=>{if(event.target.matches('[data-manual-quant-coordinate],[data-manual-quant-field="n"]'))manualLanes.method='grid';},true);
 const laneViewport=$('#image-viewport');
+const handButton=document.createElement('button');handButton.className='button subtle';handButton.textContent='手形平移';handButton.type='button';handButton.setAttribute('aria-pressed','false');handButton.title='拖动查看大图；按住空格临时平移';$('.image-actions').prepend(handButton);
+function panCursor(){laneViewport.classList.toggle('pan-ready',imagePan.hand||imagePan.space);laneViewport.classList.toggle('panning',!!imagePan.drag);handButton.setAttribute('aria-pressed',String(imagePan.hand));}
+handButton.addEventListener('click',()=>{imagePan.hand=!imagePan.hand;panCursor();});
+document.addEventListener('toggle',event=>{if(event.target.matches?.('[data-manual-tools]')&&event.target.closest('#manual-lane-tools'))manualLanes.toolsOpen=event.target.open;},true);
+document.addEventListener('keydown',event=>{if(event.code!=='Space'||event.target.closest('input,textarea,select,[contenteditable]'))return;event.preventDefault();imagePan.space=true;panCursor();});
+document.addEventListener('keyup',event=>{if(event.code==='Space'){imagePan.space=false;panCursor();}});
+function finishPan(cancel=false){if(cancel&&imagePan.drag){imagePan.x=imagePan.drag.x;imagePan.y=imagePan.drag.y;fitImage();}imagePan.drag=null;panCursor();}
+window.addEventListener('blur',()=>{imagePan.space=false;finishPan(true);});
+laneViewport.addEventListener('pointerdown',event=>{
+  if(!(imagePan.hand||imagePan.space||event.button===1)||!row()?.preview)return;
+  if(event.button!==0&&event.button!==1)return;
+  event.preventDefault();event.stopImmediatePropagation();
+  imagePan.drag={clientX:event.clientX,clientY:event.clientY,x:imagePan.x,y:imagePan.y};laneViewport.setPointerCapture(event.pointerId);panCursor();
+},true);
+laneViewport.addEventListener('pointermove',event=>{const d=imagePan.drag;if(!d)return;event.preventDefault();event.stopImmediatePropagation();imagePan.x=d.x+event.clientX-d.clientX;imagePan.y=d.y+event.clientY-d.clientY;fitImage();},true);
+laneViewport.addEventListener('pointerup',event=>{if(imagePan.drag){event.stopImmediatePropagation();finishPan();}},true);
+laneViewport.addEventListener('pointercancel',event=>{if(imagePan.drag){event.stopImmediatePropagation();finishPan(true);}},true);
+document.addEventListener('click',event=>{if(event.target.closest('[data-action="fit"],[data-action="focus"]')){imagePan.x=0;imagePan.y=0;fitImage();}},true);
 laneViewport.addEventListener('pointerdown',event=>{
   if(!manualLanes.setup()||state.busy||!bridge||event.button!==0)return;
   const source=row(),rect=$('#image-transform').getBoundingClientRect();
@@ -163,7 +182,7 @@ laneViewport.addEventListener('pointermove',event=>{
   event.stopImmediatePropagation();const end=manualQuant.point(event,d.rect,row());
   if(d.original){const b=d.original;manualLanes.boxes[d.index]={...b,x:Math.max(0,Math.min(row().width-b.width,b.x+end.x-d.start.x)),y:Math.max(0,Math.min(row().height-b.height,b.y+end.y-d.start.y))};}
   else {const first=manualLanes.boxes[0];d.next=first?{x:Math.min(d.start.x,row().width-first.width),y:Math.min(d.start.y,row().height-first.height),width:first.width,height:first.height}:{x:Math.min(d.start.x,end.x),y:Math.min(d.start.y,end.y),width:Math.abs(end.x-d.start.x),height:Math.abs(end.y-d.start.y)};
-    const layer=$('#quant-lanes');manualLanes.overlay(1);layer.insertAdjacentHTML('beforeend',`<div class="quant-target-draft" style="left:${d.next.x/row().width*100}%;top:${d.next.y/row().height*100}%;width:${d.next.width/row().width*100}%;height:${d.next.height/row().height*100}%"></div>`);return;}
+    const layer=$('#quant-lanes');manualLanes.overlay(manualLanes.actualZoom);layer.insertAdjacentHTML('beforeend',`<div class="quant-target-draft" style="left:${d.next.x/row().width*100}%;top:${d.next.y/row().height*100}%;width:${d.next.width/row().width*100}%;height:${d.next.height/row().height*100}%;border:0"><svg class="manual-lane-shape"><rect x="0" y="0" width="100%" height="100%" style="stroke-width:${1.5/manualLanes.actualZoom}px"/></svg></div>`);return;}
   fitImage();
 },true);
 laneViewport.addEventListener('pointerup',event=>{
@@ -176,5 +195,5 @@ $('#quant-lanes').addEventListener('keydown',event=>{
   const el=event.target.closest('[data-manual-lane]');if(!el||state.busy||!manualLanes.setup())return;
   const b=manualLanes.boxes[Number(el.dataset.manualLane)],step=event.shiftKey?10:1;
   if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key))return;
-  event.preventDefault();event.stopImmediatePropagation();b.x=Math.max(0,Math.min(row().width-b.width,b.x+(event.key==='ArrowLeft'?-step:event.key==='ArrowRight'?step:0)));b.y=Math.max(0,Math.min(row().height-b.height,b.y+(event.key==='ArrowUp'?-step:event.key==='ArrowDown'?step:0)));manualLanes.overlay(1);$(`[data-manual-lane="${el.dataset.manualLane}"]`)?.focus();
+  event.preventDefault();event.stopImmediatePropagation();b.x=Math.max(0,Math.min(row().width-b.width,b.x+(event.key==='ArrowLeft'?-step:event.key==='ArrowRight'?step:0)));b.y=Math.max(0,Math.min(row().height-b.height,b.y+(event.key==='ArrowUp'?-step:event.key==='ArrowDown'?step:0)));manualLanes.overlay(manualLanes.actualZoom);$(`[data-manual-lane="${el.dataset.manualLane}"]`)?.focus();
 },true);

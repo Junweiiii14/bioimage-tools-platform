@@ -25,7 +25,6 @@ from wb_tool.application.project_analysis import (
     set_row_analysis,
 )
 from wb_tool.domain.lanes import LaneROI, Polarity
-from wb_tool.domain.quantify import BandBounds
 
 
 @dataclass(frozen=True, slots=True)
@@ -124,6 +123,10 @@ def configure_manual_quantification(
         and row.lane_count == target.lane_count
         and row.empty_lanes == target.empty_lanes
         and old_plan.request.polarity == target.polarity
+        and old_plan.request.geometry_policy
+        == ("independent_lanes@1" if target.lane_rois else "anchored_context@1")
+        and old_plan.request.quant_policy
+        == ("wbquant_1_4_3@1" if target.lane_rois else "anchored_background@1")
         and (
             not target.lane_rois
             or all(
@@ -202,9 +205,9 @@ def explicit_lane_request(
     from dataclasses import replace
 
     from wb_tool.domain.quant_supervision import (
-        exclude_smear_frame,
         propose_quant_lane,
         propose_quant_lanes,
+        propose_smear_lane,
     )
 
     rois = tuple(
@@ -212,28 +215,20 @@ def explicit_lane_request(
         for i, roi in enumerate(target.lane_rois, 1)
     )
     if target.measurement_mode == "smear":
-        originals = rois
-        rois = tuple(exclude_smear_frame(image.pixels, roi, target.polarity) for roi in rois)
+        proposals = tuple(propose_smear_lane(image.pixels, roi, target.polarity) for roi in rois)
         lanes = tuple(
             LaneAnnotation(
-                roi,
+                proposal.roi,
                 (
                     BandAnnotation(
                         "target",
-                        BandBounds(0, roi.y1 - roi.y0 - 1),
+                        proposal.bands[0].bounds,
                         included=i not in target.empty_lanes,
-                        detection_notes=(
-                            "whole_lane_smear@1",
-                            "endpoint_baseline@1",
-                            "manual_range_adjustable",
-                            f"original_roi:{originals[i - 1].x0},{originals[i - 1].y0},"
-                            f"{originals[i - 1].x1},{originals[i - 1].y1}; "
-                            f"effective_roi:{roi.x0},{roi.y0},{roi.x1},{roi.y1}",
-                        ),
+                        detection_notes=proposal.bands[0].notes,
                     ),
                 ),
             )
-            for i, roi in enumerate(rois, 1)
+            for i, proposal in enumerate(proposals, 1)
         )
     else:
         shapes = {(roi.width, roi.y1 - roi.y0) for roi in rois}

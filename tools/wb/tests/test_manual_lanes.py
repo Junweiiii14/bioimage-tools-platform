@@ -22,6 +22,7 @@ from wb_tool.api import (
     edit_quant_band,
     load_tiff,
     read_figure_project,
+    replan_quant_lanes,
     update_quant_lane,
 )
 
@@ -106,6 +107,39 @@ def test_manual_add_exclude_and_invalid_peak_are_atomic(tmp_path: Path) -> None:
     excluded = edit_quant_band(changed, "source", "source:01", "exclude", "target")
     assert not excluded.analyses[0].request.lanes[0].bands[0].included
     assert configured.analyses[0] == plan
+
+
+@pytest.mark.parametrize(
+    "roi", [LaneROI("source:01", 6, 0, 26, 120), LaneROI("source:01", 5, 5, 28, 115)]
+)
+def test_smear_geometry_edit_and_reopen_keep_complete_integration(
+    tmp_path: Path, roi: LaneROI
+) -> None:
+    image, project, target = example(tmp_path)
+    configured = configure_manual_quantification(
+        image, project, replace(target, measurement_mode="smear")
+    )
+    changed = update_quant_lane(configured, "source", "source:01", roi=roi)
+    reopened = read_figure_project(changed.model_dump_json().encode())
+    assert isinstance(reopened, WBAnalysisProject)
+    replanned = replan_quant_lanes(image.source, reopened, "source")
+    request = replanned.analyses[0].request
+    lane = request.lanes[0]
+    assert lane.roi == roi and len(lane.bands) == 1
+    assert lane.bands[0].bounds == BandBounds(0, roi.y1 - roi.y0 - 1)
+    assert "whole_lane_smear@1" in lane.bands[0].detection_notes
+    assert request.lanes[1] == configured.analyses[0].request.lanes[1]
+    assert analyze_annotations(image, request).lanes[0].bands[0].signal == pytest.approx(1800)
+
+
+def test_switch_explicit_lanes_to_same_envelope_grid_changes_policy(tmp_path: Path) -> None:
+    image, project, target = example(tmp_path)
+    configured = configure_manual_quantification(image, project, target)
+    grid = configure_manual_quantification(image, configured, replace(target, lane_rois=()))
+    assert grid is not configured
+    assert grid.analyses[0].request.geometry_policy == "anchored_context@1"
+    assert grid.analyses[0].request.quant_policy == "anchored_background@1"
+    assert configure_manual_quantification(image, grid, replace(target, lane_rois=())) is grid
 
 
 def test_invalid_explicit_lanes_rejected(tmp_path: Path) -> None:

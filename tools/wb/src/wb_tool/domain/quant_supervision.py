@@ -55,6 +55,29 @@ def exclude_smear_frame(
     )
 
 
+def propose_smear_lane(
+    pixels: NDArray[np.uint8 | np.uint16], roi: LaneROI, polarity: Polarity
+) -> QuantLaneProposal:
+    """Keep the complete chosen lane, excluding only a confirmed thin frame."""
+    effective = exclude_smear_frame(pixels, roi, polarity)
+    return QuantLaneProposal(
+        effective,
+        (
+            QuantBandProposal(
+                BandBounds(0, effective.y1 - effective.y0 - 1),
+                None,
+                (
+                    "whole_lane_smear@1",
+                    "endpoint_baseline@1",
+                    "manual_range_adjustable",
+                    f"original_roi:{roi.x0},{roi.y0},{roi.x1},{roi.y1}; "
+                    f"effective_roi:{effective.x0},{effective.y0},{effective.x1},{effective.y1}",
+                ),
+            ),
+        ),
+    )
+
+
 def propose_quant_lanes(
     pixels: NDArray[np.uint8 | np.uint16], rois: tuple[LaneROI, ...], polarity: Polarity = "dark"
 ) -> tuple[QuantLaneProposal, ...]:
