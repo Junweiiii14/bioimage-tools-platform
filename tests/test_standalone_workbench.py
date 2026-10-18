@@ -138,6 +138,8 @@ def test_real_page_manual_import_compute_save_reopen_without_automatic_or_compos
             lane.bands[0].signal for lane in window.host.project_results[0].result.lanes
         ] == pytest.approx([20000, 20000])
         assert window.bridge.snapshot()["montage"] is None
+        qtbot.waitUntil(lambda: js("document.querySelectorAll('.gr-curve').length") == 2)
+        assert js("document.querySelector('[data-gr-action=manual]').click(); true") is True
         qtbot.waitUntil(
             lambda: (
                 js(
@@ -198,10 +200,11 @@ def test_real_page_manual_import_compute_save_reopen_without_automatic_or_compos
         # Native dialog close is queued. Its late event must not restore the
         # quantification inspector over the results page and hide quality reasons.
         qtbot.wait(100)
-        assert js("document.querySelector('#inspector-title').textContent") == "输出结果"
+        assert js("document.querySelector('#gr-workspace h1').textContent") == "灰度分析"
         assert (
             js(
-                "document.querySelector('#inspector-content').textContent.includes('原始积分不等于有效信号')"
+                "document.querySelector('.gr-table-note').textContent"
+                ".includes('显示原始积分不等于判定为有效信号')"
             )
             is True
         )

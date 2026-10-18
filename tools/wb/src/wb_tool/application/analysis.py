@@ -112,7 +112,11 @@ class AnalysisRequest:
         "fixed_grid@1"
     )
     quant_policy: Literal[
-        "legacy_bounds@1", "wbquant_1_4_3@1", "background_support@1", "anchored_background@1"
+        "legacy_bounds@1",
+        "wbquant_1_4_3@1",
+        "peak_envelope@1",
+        "background_support@1",
+        "anchored_background@1",
     ] = "legacy_bounds@1"
 
     def __post_init__(self) -> None:
@@ -123,6 +127,7 @@ class AnalysisRequest:
         ) or self.quant_policy not in (
             "legacy_bounds@1",
             "wbquant_1_4_3@1",
+            "peak_envelope@1",
             "background_support@1",
             "anchored_background@1",
         ):
@@ -177,7 +182,10 @@ class AnalysisResult:
     lanes: tuple[LaneAnalysis, ...]
     algorithm_id: Literal["profile_integral@1"] = "profile_integral@1"
     quality_policy: Literal[
-        "dtype_limits_review@1", "background_support_review@1", "anchored_background_review@1"
+        "dtype_limits_review@1",
+        "background_support_review@1",
+        "anchored_background_review@1",
+        "peak_envelope_review@1",
     ] = "dtype_limits_review@1"
     schema_version: Literal[1] = 1
 
@@ -239,7 +247,8 @@ def analyze_annotations(
             ]
             flags: list[str] = (
                 [note for note in band.detection_notes if note.startswith("boundary_review:")]
-                if request.quant_policy in ("background_support@1", "anchored_background@1")
+                if request.quant_policy
+                in ("peak_envelope@1", "background_support@1", "anchored_background@1")
                 else []
             )
             if np.any(region == 0):
@@ -262,7 +271,9 @@ def analyze_annotations(
         image.pixels.dtype.itemsize * 8,
         image.conversion,
         tuple(lanes),
-        quality_policy="anchored_background_review@1"
+        quality_policy="peak_envelope_review@1"
+        if request.quant_policy == "peak_envelope@1"
+        else "anchored_background_review@1"
         if request.quant_policy == "anchored_background@1"
         else "background_support_review@1"
         if request.quant_policy == "background_support@1"

@@ -19,6 +19,8 @@ from wb_tool.api import (
     WBAnalysisProject,
     WBLayoutProject,
     WBPartitionProject,
+    confirm_quant_group,
+    quant_group_reviewed,
     row_is_ready,
 )
 
@@ -52,6 +54,7 @@ def cell_state(cell: ProjectTableCell) -> dict[str, object]:
 
 class WorkbenchBridge(QObject):
     stateChanged = Signal(str)
+    progressChanged = Signal(str)
 
     def __init__(
         self,
@@ -63,12 +66,14 @@ class WorkbenchBridge(QObject):
         self.host = host
         self.choose = choose
         self._previous = ""
+        self._published_key: tuple[object, ...] | None = None
         self._images: dict[str, str | None] = {}
         self._montage_key = 0
         self._montage: str | None = None
         self._error = ""
         self._completed_key = ""
         self._quant_overview: tuple[str, str] | None = None
+        self._pending_source: tuple[str, str] | None = None
         self.manual_commands = ManualQuantCommands(self)
         self.host.automatic.finished.connect(self._automatic_completed)
         self.timer = QTimer(self)
@@ -82,7 +87,8 @@ class WorkbenchBridge(QObject):
     def snapshot(self) -> dict[str, object]:
         view = self.host.view
         project = view.project()
-        selected = view.selected_row()
+        selected_index = view.table.currentRow()
+        selected = project.rows[selected_index] if 0 <= selected_index < len(project.rows) else None
         preview = view.source_preview
         if preview and preview.sha256 not in self._images:
             image = QImage(
@@ -226,7 +232,7 @@ class WorkbenchBridge(QObject):
             "selectedId": selected.row_id if selected else "",
             "rows": rows,
             "cells": cells,
-            "quant": quant_snapshot(self.host),
+            "quant": quant_snapshot(self.host, project),
             "montage": montage,
             "montageRegions": regions,
             "montageWidth": montage_width,
@@ -247,6 +253,22 @@ class WorkbenchBridge(QObject):
             self.timer.stop()
             return
         try:
+            if self._pending_source and not self.host.operation_busy and not self.host.is_closing:
+                project_id, row_id = self._pending_source
+                self._pending_source = None
+                if self.host.view.project_identity == project_id:
+                    self.host.select_source(row_id)
+            progress = json.dumps(
+                {
+                    "busy": self.host.operation_busy,
+                    "status": self._error or self.host.view.status.text(),
+                    "progress": self.host.quant_progress,
+                },
+                ensure_ascii=False,
+            )
+            if progress != getattr(self, "_previous_progress", ""):
+                self._previous_progress = progress
+                self.progressChanged.emit(progress)
             if self._quant_overview and not self.host.operation_busy and not self.host.is_closing:
                 project_id, row_id = self._quant_overview
                 self._quant_overview = None
@@ -259,7 +281,24 @@ class WorkbenchBridge(QObject):
                     and self.host.view.rendered_preview is None
                 ):
                     self.host.compose()
+            view = self.host.view
+            key = (
+                view.presentation_key,
+                id(self.host.project_results),
+                id(view.analysis.result_view.cells),
+                id(view.source_preview),
+                view.preview_label.full_pixmap.cacheKey(),
+                self.host.operation_busy,
+                self.host.retry_location_button.isHidden(),
+                self.host.automatic.last_output_path,
+                self.host.automatic.discovery_report,
+                self._completed_key,
+                self._error,
+            )
+            if self._previous and key == self._published_key:
+                return
             state = json.dumps(self.snapshot(), ensure_ascii=False, allow_nan=False)
+            self._published_key = key
         except ValueError:
             return  # An incomplete native advanced edit is not a replacement project.
         if state != self._previous:
@@ -280,7 +319,9 @@ class WorkbenchBridge(QObject):
             elif action == "cancel":
                 self._quant_overview = None
                 self.host.cancel()
-            elif self.host.operation_busy or self.host.is_closing:
+            elif self.host.is_closing or (
+                self.host.operation_busy and action not in {"select", "quant_select"}
+            ):
                 raise ValueError("当前任务仍在处理中，请稍候或取消")
             elif action in {
                 "import",
@@ -307,8 +348,11 @@ class WorkbenchBridge(QObject):
                     self._quant_overview = (self.host.view.project().project_id, rows[index].row_id)
                 else:
                     self._quant_overview = None
+                previous_index = self.host.view.table.currentRow()
                 self.host.view.table.setCurrentCell(index, 0)
-                if not self.host.operation_busy:
+                if self.host.operation_busy:
+                    self._pending_source = (self.host.view.project_identity, rows[index].row_id)
+                elif previous_index == index:
                     self.host.select_source(rows[index].row_id)
             elif action == "quant_edit":
                 self._edit_quant(data)
@@ -339,6 +383,51 @@ class WorkbenchBridge(QObject):
                 self.host.return_selected_crop(locate=data.get("locate", False) is True)
             elif action == "quant_target":
                 self._configure_quant_target(data)
+            elif action in {"quant_review_group", "quant_reset_group"}:
+                project = self.host.view.project()
+                selected = self.host.view.selected_row()
+                if (
+                    selected is None
+                    or data.get("projectId") != project.project_id
+                    or data.get("figure") != selected.figure
+                    or type(data.get("revision")) is not int
+                    or data.get("revision") != self.host.view.generation
+                ):
+                    raise ValueError("当前分组或参数已改变，请重新审核")
+                if action == "quant_reset_group":
+                    self.manual_commands.remember()
+                    self.host.reset_quant_group(selected.row_id)
+                else:
+                    confirmed = confirm_quant_group(project, selected.figure)
+                    self.manual_commands.remember()
+                    self.host.view.set_project(confirmed)
+                    self.host.view.generation += 1
+
+                    def next_group() -> None:
+                        current = self.host.view.project()
+                        current_row = self.host.view.selected_row()
+                        if (
+                            current.project_id != project.project_id
+                            or current_row is None
+                            or current_row.figure != selected.figure
+                        ):
+                            return  # Browsing another group while saving is a newer intent.
+                        figures = list(current.figure_order)
+                        index = figures.index(selected.figure)
+                        following = figures[index + 1 :] + figures[:index]
+                        target = next(
+                            (f for f in following if not quant_group_reviewed(current, f)), None
+                        )
+                        if target:
+                            row_index = next(
+                                i for i, r in enumerate(current.rows) if r.figure == target
+                            )
+                            self.host.view.table.setCurrentCell(row_index, 0)
+                            self.host.select_source(current.rows[row_index].row_id)
+                        else:
+                            self.host.view.status.setText("全部分组已审核并保存")
+
+                    self.host.save(after=next_group)
             elif action == "quant_group":
                 selected = self.host.view.selected_row()
                 if selected is None or selected.figure != data.get("figure"):

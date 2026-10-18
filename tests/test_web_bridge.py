@@ -17,6 +17,31 @@ from wb_tool.api import FolderDiscoveryReport
 from tooling.qt_test_lifecycle import close_and_dispose_window
 
 
+def test_idle_publish_and_progress_do_not_rebuild_project_snapshot(
+    bridge: WorkbenchBridge, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    bridge.publish()
+    calls: list[str] = []
+    progress: list[str] = []
+    original = bridge.snapshot
+
+    def snapshot() -> dict[str, object]:
+        calls.append("snapshot")
+        return original()
+
+    monkeypatch.setattr(bridge, "snapshot", snapshot)
+    bridge.progressChanged.connect(progress.append)
+    for index in range(8):
+        bridge.host.view.status.setText(f"正在计算 {index}")
+        bridge.host.quant_progress = {"phase": "measure", "finished": index, "total": 10}
+        bridge.publish()
+    assert calls == []
+    assert len(progress) == 8
+    bridge.host.view.generation += 1
+    bridge.publish()
+    assert calls == ["snapshot"]
+
+
 def test_folder_report_is_visible_and_only_current_variant_can_be_added(
     bridge: WorkbenchBridge, monkeypatch: pytest.MonkeyPatch
 ) -> None:

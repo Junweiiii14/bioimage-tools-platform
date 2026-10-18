@@ -98,6 +98,34 @@ def test_strict_round_trip_and_schema(start: StartFrame) -> None:
 
 
 @pytest.mark.parametrize(
+    "flag",
+    [
+        "boundary_review:background_at_roi_edge",
+        "boundary_review:unequal_or_overlapping_peak_support",
+    ],
+)
+def test_peak_envelope_quality_flags_survive_real_worker(start: StartFrame, flag: str) -> None:
+    lane = start.request.lanes[0]
+    request = replace(
+        start.request,
+        quant_policy="peak_envelope@1",
+        lanes=(replace(lane, bands=(replace(lane.bands[0], detection_notes=(flag,)),)),),
+    )
+    start = start.model_copy(update={"request": request})
+    completed = subprocess.run(
+        [sys.executable, "-m", "wb_tool.worker"],
+        input=encode_worker_frame(start),
+        capture_output=True,
+        timeout=20,
+    )
+    assert completed.returncode == 0, completed.stderr
+    frame = parse_worker_frame(completed.stdout.splitlines()[-1])
+    assert isinstance(frame, ResultFrame)
+    assert frame.result.quality_policy == "peak_envelope_review@1"
+    assert frame.result.lanes[0].bands[0].quality_flags == (flag,)
+
+
+@pytest.mark.parametrize(
     ("path", "value"),
     [
         (("extra",), 1),

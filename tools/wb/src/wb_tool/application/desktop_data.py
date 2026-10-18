@@ -79,6 +79,7 @@ class WBJob:
         "project_export",
         "quant_export",
         "quant_replan",
+        "quant_group_reset",
         "quant_target",
         "quant_fig",
         "project_ocr_result",

@@ -105,16 +105,17 @@ def suggest_analysis_for_crop(
         return AnalysisRequest(
             image.sha256, revision, polarity, tuple(lanes), "anchored_context@1", quant_policy
         )
-    if quant_policy in ("wbquant_1_4_3@1", "background_support@1"):
+    if quant_policy in ("wbquant_1_4_3@1", "peak_envelope@1", "background_support@1"):
         from wb_tool.domain.background_bounds import propose_background_lanes
         from wb_tool.domain.quant_supervision import propose_quant_lanes
 
-        propose = (
-            propose_background_lanes
+        proposals = (
+            propose_background_lanes(image.pixels, geometry, polarity)
             if quant_policy == "background_support@1"
-            else propose_quant_lanes
+            else propose_quant_lanes(
+                image.pixels, geometry, polarity, complete_peaks=quant_policy == "peak_envelope@1"
+            )
         )
-        proposals = propose(image.pixels, geometry, polarity)
         for index, proposal in enumerate(proposals, 1):
             check_detection_cancelled(cancelled)
             lanes.append(

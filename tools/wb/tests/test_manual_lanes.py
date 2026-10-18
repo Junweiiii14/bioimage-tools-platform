@@ -62,7 +62,8 @@ def test_manual_full_lanes_preserve_gap_multiple_peaks_and_saved_groups(tmp_path
     plan = configured.analyses[0]
     assert [lane.roi for lane in plan.request.lanes] == list(target.lane_rois)
     assert [len(lane.bands) for lane in plan.request.lanes] == [2, 2]
-    assert plan.request.quant_policy == "wbquant_1_4_3@1"
+    # T046 versions the automatic boundary proposal; the analytic areas stay fixed.
+    assert plan.request.quant_policy == "peak_envelope@1"
     result = analyze_annotations(image, plan.request)
     assert [[b.signal for b in lane.bands] for lane in result.lanes] == [[1000, 800], [1000, 800]]
     added = add_manual_group(configured, "source", "Fig2B")

@@ -171,6 +171,11 @@ def test_copy_manual_multipeak_history_new_group_save_and_reopen(
         assert [
             [b.signal for b in lane.bands] for lane in window.host.project_results[0].result.lanes
         ] == [[1000, 800], [1000, 800]]
+        # T046 lands on the approved whole-group review after calculation.
+        # Re-enter the retained manual tools before testing their original controls.
+        qtbot.waitUntil(lambda: js("document.querySelectorAll('.gr-curve').length===2") is True)
+        assert js("document.querySelectorAll('.gr-curve .gr-baseline').length") == 4
+        assert js("document.querySelector('[data-gr-action=manual]').click();true") is True
         qtbot.waitUntil(
             lambda: js("Boolean(document.querySelector('[data-quant-profiles]'))") is True
         )

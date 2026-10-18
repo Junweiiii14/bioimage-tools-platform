@@ -103,7 +103,7 @@ def prepare_fig_quantification(
                 settings=AutoWBSettings(
                     lane_count=len(proposal.lanes),
                     crop_height=crop.y1 - crop.y0,
-                    quant_policy="wbquant_1_4_3@1",
+                    quant_policy=request.quant_policy,
                 ),
                 warnings=proposal.warnings,
                 algorithm_id="fig_partition@1",

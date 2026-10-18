@@ -42,7 +42,7 @@ class AutomaticWorkflow(QObject):
 
     @property
     def discovery_report(self) -> bytes:
-        context = (self.window.workspace_path, self.window.view.project().project_id)
+        context = (self.window.workspace_path, self.window.view.project_identity)
         return self._discovery_report if context == self._discovery_context else b""
 
     @discovery_report.setter

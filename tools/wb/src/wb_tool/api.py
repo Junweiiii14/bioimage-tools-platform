@@ -71,6 +71,7 @@ from wb_tool.application.figure_template import (
     PortableFigureTemplate,
     TemplateFont,
 )
+from wb_tool.application.group_review import confirm_quant_group, quant_group_reviewed
 from wb_tool.application.import_labels import (
     FolderDiscoveryReport,
     SourceImportLabels,
@@ -219,6 +220,8 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "confirm_quant_group",
+    "quant_group_reviewed",
     "discover_tiffs",
     "ReturnedCrop",
     "return_reviewed_crop",

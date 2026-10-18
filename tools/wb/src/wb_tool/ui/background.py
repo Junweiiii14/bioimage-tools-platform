@@ -225,6 +225,14 @@ class _Work(QObject):
                 if job.analysis_plan is None:
                     raise ValueError("缺少结果所属定量计划")
                 value = read_project_result(job.analysis_plan, job.data)
+            elif job.operation == "quant_group_reset":
+                from wb_tool.adapters.quant_supervision import reset_group_boundaries
+
+                if not isinstance(job.document, WBAnalysisProject):
+                    raise ValueError("缺少定量项目")
+                value = reset_group_boundaries(
+                    job.document, job.row_id, job.sources, cancelled=cancel
+                )
             elif job.operation == "quant_replan":
                 from wb_tool.adapters.quant_supervision import replan_quant_lanes
 

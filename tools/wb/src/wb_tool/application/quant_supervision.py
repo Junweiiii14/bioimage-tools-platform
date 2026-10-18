@@ -31,6 +31,7 @@ def install_quant_request(
         "anchored_context@1",
     ) or request.quant_policy not in (
         "wbquant_1_4_3@1",
+        "peak_envelope@1",
         "background_support@1",
         "anchored_background@1",
     ):

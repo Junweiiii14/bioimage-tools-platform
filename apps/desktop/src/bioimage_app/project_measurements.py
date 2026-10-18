@@ -37,6 +37,7 @@ class ProjectBatchCompletion:
 
 class ProjectMeasurementSession(QObject):
     progress = Signal(str)
+    counts = Signal(object)
     finished = Signal(object)
 
     def __init__(
@@ -54,6 +55,8 @@ class ProjectMeasurementSession(QObject):
         self._results: list[LoadedProjectResult] = []
         self._errors: list[str] = []
         self._loaded_bytes = 0
+        self._total = self._finished = 0
+        self._current_label = ""
         self._store.replied.connect(self._storage_reply)
         self._background.replied.connect(self._wb_reply)
 
@@ -71,6 +74,7 @@ class ProjectMeasurementSession(QObject):
         self._project = self._frozen = project
         self._workspace, self._restore = workspace, restore
         self._pending = [p for p in project.analyses if p.row_id in row_ids]
+        self._total = len(self._pending)
         self._next()
 
     def cancel(self) -> None:
@@ -106,6 +110,7 @@ class ProjectMeasurementSession(QObject):
 
     def _failed(self, error: str) -> None:
         self._errors.append(error)
+        self._row_finished()
         # A failed row does not fabricate a value or stop later independent sources.
         QTimer.singleShot(0, self._next)
 
@@ -119,12 +124,16 @@ class ProjectMeasurementSession(QObject):
             self._finish()
             return
         plan = self._pending.pop(0)
+        row = next(r for r in self._project.rows if r.row_id == plan.row_id)
+        self._current_label = f"{row.figure} · {row.protein}"
+        self._emit_counts()
         self.progress.emit(
             f"{'校验结果' if self._restore else '计算'}：{plan.row_id}；"
             f"剩余 {len(self._pending)} 行"
         )
         if self._restore:
             if plan.run is None:
+                self._row_finished()
                 QTimer.singleShot(0, self._next)
             else:
                 self._storage(
@@ -203,6 +212,9 @@ class ProjectMeasurementSession(QObject):
 
     def _read_result(self, plan: ProjectRowAnalysis) -> None:
         if plan.run is None or plan.run.state != "succeeded" or plan.run.result is None:
+            if not self._restore and plan.run is not None:
+                self._errors.append(f"{self._current_label}：{plan.run.reason or plan.run.state}")
+            self._row_finished()
             QTimer.singleShot(0, self._next)
             return
         if self._loaded_bytes + plan.run.result.size_bytes > 64 * 1024 * 1024:
@@ -216,11 +228,27 @@ class ProjectMeasurementSession(QObject):
                 if not isinstance(result.value, LoadedProjectResult):
                     raise ValueError("已提交结果解码失败")
                 self._results.append(result.value)
+                self._row_finished()
                 self._next()
 
             self._wb(WBJob("project_result", data=reply.data, analysis_plan=plan), decoded)
 
         self._storage(StorageCommand("read", asset=plan.run.result), read)
+
+    def _emit_counts(self) -> None:
+        self.counts.emit(
+            {
+                "phase": "restore" if self._restore else "measure",
+                "finished": self._finished,
+                "total": self._total,
+                "failed": len(self._errors),
+                "label": self._current_label,
+            }
+        )
+
+    def _row_finished(self) -> None:
+        self._finished += 1
+        self._emit_counts()
 
     def _finish(self) -> None:
         self._store.replied.disconnect(self._storage_reply)

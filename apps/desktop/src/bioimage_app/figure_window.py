@@ -110,6 +110,7 @@ class FigureProjectWindow(QMainWindow):
         self._saved_revision: int | None = None
         self._saved_generation = 0
         self._busy = False
+        self.quant_progress: dict[str, object] = {}
         self._closing = False
         self._shutting = False
         self._store_closed = False
@@ -923,6 +924,7 @@ class FigureProjectWindow(QMainWindow):
         generation = self.view.generation
         old_ids = {r.row_id for r in project.rows}
         self._start()
+        self.quant_progress = {"phase": "partition", "label": "识别 Fig、蛋白与泳道"}
 
         def prepared(reply: WBReply) -> None:
             from wb_tool.api import WBPartitionProject
@@ -1091,6 +1093,49 @@ class FigureProjectWindow(QMainWindow):
 
         self.save(after=saved)
 
+    def reset_quant_group(self, row_id: str) -> None:
+        if self._busy or self._closing or not self._workspace:
+            return
+        project = self.view.project()
+        if not isinstance(project, WBAnalysisProject):
+            raise ValueError("请先配置泳道")
+        selected = next(r for r in project.rows if r.row_id == row_id)
+        row_ids = tuple(r.row_id for r in project.rows if r.figure == selected.figure)
+        generation = self.view.generation
+        self._start()
+        self.view.status.setText("重新规划本组完整峰边界…")
+        self.quant_progress = {"phase": "planning", "label": "重新规划本组完整峰边界"}
+
+        def prepared(reply: WBReply) -> None:
+            if self._closing or self._cancellation.is_set():
+                self._done("重新封底已取消；原参数保留")
+                return
+            if (
+                generation != self.view.generation
+                or project.project_id != self.view.project().project_id
+            ):
+                self._done("项目已改变，旧封底任务未覆盖当前草稿")
+                return
+            if reply.error or not isinstance(reply.value, WBAnalysisProject):
+                self._error(reply.error or "封底结果无效")
+                return
+            self.view.set_project(reply.value)
+            self.view.generation += 1
+            self._busy = False
+            self.analyze_project(row_ids=row_ids)
+
+        self._wb(
+            WBJob(
+                "quant_group_reset",
+                document=project,
+                row_id=row_id,
+                sources=tuple(FigureSourcePath(k, v) for k, v in self.source_paths.items()),
+                cancellation=self._cancellation,
+            ),
+            prepared,
+            accept_errors=True,
+        )
+
     def _start_measurements(
         self,
         project: WBAnalysisProject,
@@ -1105,6 +1150,7 @@ class FigureProjectWindow(QMainWindow):
         self._measurement_session = session
         session.progress.connect(self.view.status.setText)
         session.progress.connect(self.measurement_progress)
+        session.counts.connect(self._quant_counts)
 
         def completed(completion: ProjectBatchCompletion) -> None:
             self._measurement_session = None
@@ -1134,11 +1180,28 @@ class FigureProjectWindow(QMainWindow):
                 )
             )
             if completion.errors:
-                message += "；" + "；".join(completion.errors[:3])
+                message = (
+                    (
+                        "结果核验结束"
+                        if restore
+                        else (
+                            "计算已取消；已完成行保留"
+                            if completion.cancelled
+                            else "计算结束，部分行未完成"
+                        )
+                    )
+                    + "；"
+                    + "；".join(completion.errors[:3])
+                )
             if overflow:
                 message += "；部分曲线超过 64 MiB 显示预算，结果仍保留在历史"
             self._busy = False
             if not restore:
+                self.quant_progress = {
+                    **self.quant_progress,
+                    "phase": "save",
+                    "cancelled": completion.cancelled,
+                }
                 self.view.set_project(completion.project)
                 self.view.generation += 1
                 self.save(
@@ -1155,6 +1218,9 @@ class FigureProjectWindow(QMainWindow):
         if self._closing:
             session.cancel()
 
+    def _quant_counts(self, counts: dict[str, object]) -> None:
+        self.quant_progress = counts
+
     def refresh_project_table(
         self, message: str = "项目结果表已刷新", after: Callable[[], None] | None = None
     ) -> None:
@@ -1167,6 +1233,7 @@ class FigureProjectWindow(QMainWindow):
             return
         generation = self.view.generation
         self._start()
+        self.quant_progress = {"phase": "save", "label": "核验已提交结果"}
 
         def filled(reply: WBReply) -> None:
             # A phase transition is part of the same operation: do not let the
@@ -1364,6 +1431,7 @@ class FigureProjectWindow(QMainWindow):
 
     def _start(self) -> None:
         self._busy = True
+        self.quant_progress = {"phase": "working", "label": "后台处理中"}
         self._cancellation.clear()
         self._controls()
 
@@ -1794,6 +1862,11 @@ class FigureProjectWindow(QMainWindow):
             self.view.canvas.set_image(PreviewRaster("", 0, 0, 0, 0, b"", 0, ()))
             self.view.canvas.set_lanes(())
             return
+        preview = self.view.source_preview
+        if preview is not None and preview.sha256 == asset.sha256:
+            # Fig rows on the same sheet share one immutable display raster.
+            self.view.set_source_preview(preview)
+            return
         self._start()
 
         def previewed(reply: WBReply) -> None:
@@ -1834,6 +1907,7 @@ class FigureProjectWindow(QMainWindow):
             return
         generation = self.view.generation
         self._start()
+        self.quant_progress = {"phase": "save", "label": "保存项目"}
 
         def encoded(reply: WBReply) -> None:
             if not isinstance(reply.value, bytes):

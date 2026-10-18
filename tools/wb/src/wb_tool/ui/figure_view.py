@@ -1243,11 +1243,17 @@ class FigureProjectView(QWidget):
                 self._refresh_analysis_sources()
                 return
             self._refresh_analysis_sources()
-            self._source_preview = None
-            self.canvas.set_image(PreviewRaster("", 0, 0, 0, 0, b"", 0, ()))
-            self.canvas.set_lanes(())
-            self.canvas.set_regions(())
-            self.analysis.clear_source_preview()
+            source = self._project.rows[row].source
+            if (
+                not self._source_preview
+                or not source
+                or self._source_preview.sha256 != source.sha256
+            ):
+                self._source_preview = None
+                self.canvas.set_image(PreviewRaster("", 0, 0, 0, 0, b"", 0, ()))
+                self.canvas.set_lanes(())
+                self.canvas.set_regions(())
+                self.analysis.clear_source_preview()
             self.show_analysis(row)
             self._overlay()
             self.source_requested.emit(self._project.rows[row].row_id)
@@ -1358,6 +1364,20 @@ class FigureProjectView(QWidget):
     def selected_row(self) -> FigureRow | None:
         index = self.table.currentRow()
         return self.project().rows[index] if 0 <= index < len(self._project.rows) else None
+
+    @property
+    def presentation_key(self) -> tuple[int, int, int]:
+        """Cheap invalidation token; never reconstruct a project just to poll it.
+
+        Native edits increment generation; model installations replace the frozen
+        project. Selection is separate because it changes visible profiles.
+        """
+        return id(self._project), self.generation, self.table.currentRow()
+
+    @property
+    def project_identity(self) -> str:
+        """Immutable document identity; native editing cannot change it."""
+        return self._project.project_id
 
     @property
     def source_preview(self) -> PreviewRaster | None:

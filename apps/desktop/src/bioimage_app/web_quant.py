@@ -3,17 +3,25 @@
 from wb_tool.api import (
     LaneROI,
     WBAnalysisProject,
+    WBFigureProject,
     WBPartitionProject,
     analysis_is_current,
     ordered_quant_rows,
+    quant_group_reviewed,
 )
 
 from bioimage_app.figure_window import FigureProjectWindow
 
 
-def quant_snapshot(host: FigureProjectWindow) -> dict[str, object]:
-    project = host.view.project()
-    selected = host.view.selected_row()
+def quant_snapshot(
+    host: FigureProjectWindow, project: WBFigureProject | None = None
+) -> dict[str, object]:
+    if project is None:
+        project = host.view.project()
+        selected = host.view.selected_row()
+    else:
+        selected_index = host.view.table.currentRow()
+        selected = project.rows[selected_index] if 0 <= selected_index < len(project.rows) else None
     plans = project.analyses if isinstance(project, WBAnalysisProject) else ()
     table: list[dict[str, object]] = []
     selected_lanes: list[dict[str, object]] = []
@@ -63,8 +71,19 @@ def quant_snapshot(host: FigureProjectWindow) -> dict[str, object]:
                     measurement = measured.measurement if measured else None
                     baseline = measurement.baseline if measurement else actual.baseline
                     bounds = measurement.bounds if measurement else actual.bounds
-                    status = measured.status if measured else "not_run"
-                    reason = measured.reason if measured else "等待当前参数计算"
+                    failed = bool(
+                        plan.run and plan.run.state in ("failed", "cancelled", "interrupted")
+                    )
+                    status = measured.status if measured else "failed" if failed else "not_run"
+                    reason = (
+                        measured.reason
+                        if measured
+                        else (
+                            f"运行未完成：{plan.run.reason or plan.run.state}"
+                            if failed and plan.run
+                            else "等待当前参数计算"
+                        )
+                    )
                     notes = actual.detection_notes
                     reason = "；".join(dict.fromkeys(v for v in (reason, *notes) if v))
                     signal = measurement.signal if measurement else None
@@ -133,7 +152,14 @@ def quant_snapshot(host: FigureProjectWindow) -> dict[str, object]:
                 for i in range(1, row.lane_count + 1)
             ]
         if selected and row.figure == selected.figure:
-            group_rows.append({"rowId": row.row_id, "protein": row.protein, "lanes": row_lanes})
+            group_rows.append(
+                {
+                    "rowId": row.row_id,
+                    "protein": row.protein,
+                    "sourceId": row.source.sha256 if row.source else "",
+                    "lanes": row_lanes,
+                }
+            )
             if row.row_id == selected.row_id:
                 selected_lanes = row_lanes
         if not band_rows:
@@ -171,6 +197,7 @@ def quant_snapshot(host: FigureProjectWindow) -> dict[str, object]:
         context_bounds = {"x": x0, "y": y0, "width": x1 - x0, "height": y1 - y0}
     return {
         "rowOrder": [row.row_id for _, row in ordered],
+        "reviewedGroups": [f for f in project.figure_order if quant_group_reviewed(project, f)],
         "group": {
             "sourceSheet": sheet_group,
             "figure": selected.figure if selected else "",
