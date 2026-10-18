@@ -200,3 +200,6 @@ CI009产品57fd7ea正式check --all实际exit0：669passed/497.77秒，Observed 
 
 - T044最终本地交付：a72e7102891df287e3484f20f3724612779b53f5：733 passed in 525.53s、pytest child/全部wheel/dev实际0。最终正常Web8原图/8回存/保存重开/关闭0；8图产物独审0。API延迟依赖修复独审11项3.31秒0+隔离导入/发现0，无阻断。裁图回归1/8→8/8，积分13有效35复核不是准确率。详见work/evidence/T-044/final-delivery.md。下一步外置最终备份、阶段9草稿PR/日志/远端检查；main不直接合并。
 - CI012：3e5 Linux29%SIGSEGV/Windows733+wheels成功；925 Linux28%SIGSEGV/Windows因新push取消；c5 Linux735passed133.44秒/wheels/dev0，Windows记录时仍跑。独审ab1/1.96秒关闭P2、c5 5/9.96秒0。后继测试专用自有窗口helper作者67/157.28秒0、全类型/静态0，总736，最终实际CI见PR15/issue6；产品a72未改。
+
+
+- T046最终4d4944a：761passed/526.85秒，原pytest child0及全部隔离wheel/dev/check0，9导入契约/全类型/静态通过。独审五项resolved/ship只评分范围，documenter完成。私图12框12曲线/UB16/33组135行、实际保存重开/重算/取消0；sourceSHA一致。首次755+3失败、次轮observer GBK错误、新Qt fixture失败路径0xc0000409与原生UNKNOWN保留；不改时限/门禁/失败结果。仅本地候选，详见work/evidence/T-046/validation.md。

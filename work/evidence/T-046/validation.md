@@ -43,8 +43,17 @@
 - save新增可选待保存transform；审核回执不先安装view，编码/存储失败保持未审核；正常存储提交后安装并推进generation。
 - 前端缓存增加已加载run ID与审核状态；同修订恢复成功、移除失败数据、再次恢复均重绘。
 - 新标签至少11px，SVG按实际CTM缩放补偿到11px；390px导航标题独立行、固定组宽，单列曲线。截图覆盖同一文件，未改批准方向。
-- 新三项Qt回归初次fixture漏拦源图文件选择，造成测试自身等待/关闭失败并以0xc0000409退出；已修测试的源图适配隔离及持久化初始状态。没有调整产品关闭路径、测试超时或类型忽略；三项8.02秒exit0，随后连同独立手动入口4项9.17秒exit0。
+- 新三项Qt回归初次fixture漏拦源图文件选择且未建立正确持久化初态，出现等待/关闭失败和0xc0000409退出；没有采到精确原生故障栈，原生原因仍UNKNOWN。已修测试的源图适配隔离及持久化初始状态。没有调整产品关闭路径、测试超时或类型忽略；三项8.02秒exit0，随后连同独立手动入口4项9.17秒exit0。
 - 首次相关14项1失败13通过，手动入口点击时页面busy尚未更新；测试明确等待可用按钮，保留全部数值/保存/原图断言。修正与新三项合跑4项9.17秒通过。
 - 第二完整检查启用observer但未设UTF8；pytest至少一处上述入口时序失败，observer转发中文异常在GBK编码抛UnicodeEncodeError，外层exit1，未完成门禁。不宣称通过，第三轮将以UTF8环境保留完整诊断；未修改门禁脚本。
 - Pyright最终0 errors/0 warnings，Ruff check/format与Node语法0。新测试用已有monkeypatch注入I/O故障，无新增类型忽略。
 - 修复后真实私图整套探针exit0：12框/12曲线、所有刻度实际11px、33组135行表格、960/390无文档横溢出、手动入口、审核保存/下一组、UB16曲线。交互复测exit0：审核重开、修改失效、实际重算、忙时切组、取消均保留；取消文案明确“计算已取消”。
+
+
+## 最终完成（2026-10-18 23:18）
+
+- 产品提交4d4944a18877d10da4f2a7cef4bd4662ba4007a8。Windows / Python3.12.14 / Qt离屏，PYTHONUTF8=1及既有BIOIMAGE_WINDOWS_FAULTS=1；`uv run --locked --no-sync python dev.py check --all`自然结束exit0。
+- Ruff check/format、Pyright 0 errors/0 warnings、9导入边界契约通过；**761 passed in 526.85s**，observer记录原pytest child exit=0/u32=0。全部隔离wheel、真实Qt关闭、PP-OCRv6/静态worker及TIFF/PNG来源检查通过，dev及外层exit0。日志 `.local/t046/check-all-release-candidate.log`。
+- fresh独审绑定4d4944a的五项修复全部resolved、remaining clear、disposition ship（范围见independent-review.md）。documenter已核对并更新能力说明，DESIGN/sidecar未变。后继仅交付文档，不更改已检查产品。
+- `Start-BioImage.ps1 --verify-launch` exit0，确认源码与界面均来自此候选树。原图SHA256最终仍为a2db16a4833db3116196968f22461e2b6d204f7d027c12e15881ae29885556d1。
+- 本地任务完成；未替换旧版本/快捷方式、未关闭用户窗口、未push/main/发布。干净Windows/DPI/独立科学留出及历史原生UNKNOWN不因本轮通过销账。

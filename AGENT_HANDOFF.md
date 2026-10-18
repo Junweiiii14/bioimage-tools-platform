@@ -47,7 +47,7 @@
 ## Current Pointer
 
 - Last updated: 2026-10-18
-- T-045 candidate checkout: `C:/Users/70236/.codex/worktrees/t045-wbquant/bioimage-tools-platform`, branch `codex/t045-wbquant-manual-and-fig`; verify actual HEAD against the task. This is the one isolated worktree created for this task.
+- T-046 reuses T-045 candidate checkout: `C:/Users/70236/.codex/worktrees/t045-wbquant/bioimage-tools-platform`, branch `codex/t045-wbquant-manual-and-fig`; verify actual HEAD against the task. T-046 creates no additional worktree; it reuses this isolated candidate.
 - Candidate entry: this checkout's `Start-BioImage.ps1`; `--verify-launch` confirms its source. The desktop “BioImage WB 工作台（当前开发）” shortcut remains pointed at the earlier t021 checkout; it was not changed for T-045.
 - Earlier t021 checkout currently lacks Git/hidden handoff files; cause UNKNOWN. Original ResearchVault checkout retains dirty historical work. Do not repair, delete, synchronize or switch old trees/shortcuts based on this candidate. Main/PR integration and release are separate.
 - Current state file: `.agent-handoff/snapshot.md`
