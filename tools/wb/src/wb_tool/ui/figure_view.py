@@ -1669,6 +1669,20 @@ class FigureProjectView(QWidget):
         except ValueError as error:
             self.status.setText(str(error))
 
+    def confirm_row(self, row_id: str) -> None:
+        """Confirm exactly the bound row, irrespective of retained table selection."""
+        project = self.project()
+        index = next((i for i, row in enumerate(project.rows) if row.row_id == row_id), None)
+        if index is None or self.table.isRowHidden(index):
+            raise ValueError("当前原图行不可审核")
+        row = project.rows[index]
+        if row.source is None or row.roi is None:
+            raise ValueError("请先选定原图裁剪范围")
+        item = self.table.item(index, 9)
+        if item is None:
+            raise ValueError("当前原图行缺少审核控件")
+        item.setCheckState(Qt.CheckState.Checked)
+
     def confirm_selected(self) -> None:
         for index in self.table.selectionModel().selectedRows():
             item = self.table.item(index.row(), 9)

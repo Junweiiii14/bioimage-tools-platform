@@ -1670,7 +1670,7 @@ class FigureProjectWindow(QMainWindow):
             if not source_path:
                 return
         self._auto_save.stop()
-        self.view.confirm_selected()
+        self.view.confirm_row(row.row_id)
         generation, workspace = self.view.generation, self._workspace
 
         def saved() -> None:
