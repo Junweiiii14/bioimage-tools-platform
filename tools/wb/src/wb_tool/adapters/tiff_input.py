@@ -41,6 +41,22 @@ class ImageInputError(ValueError):
     """Unsupported or unreadable quantitative source."""
 
 
+def is_generated_tiff(path: str | Path) -> bool:
+    """Inspect provenance tags only, without decoding image pixels.
+
+    Broken/unrecognized files stay in discovery so the importer reports their
+    actual error instead of silently hiding a damaged original.
+    """
+    try:
+        with tifffile.TiffFile(path) as image:
+            page = image.pages[0]
+            return isinstance(page, tifffile.TiffPage) and (
+                _display_only(page) or page.software == "bioimage-wb original_sample_crop@1"
+            )
+    except (OSError, ValueError, IndexError):
+        return False
+
+
 @dataclass(frozen=True, slots=True)
 class LoadedTiff:
     source: Path

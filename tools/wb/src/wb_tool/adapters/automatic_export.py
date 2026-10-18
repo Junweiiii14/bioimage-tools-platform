@@ -13,16 +13,25 @@ from wb_tool.adapters.figure_image_export import export_figure_image
 from wb_tool.adapters.project_evidence import verify_project_evidence
 from wb_tool.adapters.project_export import export_project_table
 from wb_tool.adapters.quant_export import export_wbquant_table
+from wb_tool.adapters.tiff_input import is_generated_tiff
 from wb_tool.application.figure_project import FigureSourcePath, WBFigureProject
+from wb_tool.application.import_labels import preferred_acquisition_sources
 from wb_tool.application.project_analysis import fill_project_table
 from wb_tool.application.project_archive import ArchiveRunEvidence
 
 
-def discover_tiffs(path: str, *, cancelled: Callable[[], bool] = lambda: False) -> bytes:
+def discover_tiffs(
+    path: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+    with_report: bool = False,
+) -> bytes:
     root = Path(path)
     if not root.is_dir() or root.is_symlink() or root.is_junction():
         raise ValueError("请选择实际原图文件夹")
     files: list[str] = []
+    skipped: list[dict[str, str]] = []
+    examined = 0
 
     def unreadable(error: OSError) -> None:
         raise ValueError(f"无法读取目录：{error.filename}") from error
@@ -42,12 +51,36 @@ def discover_tiffs(path: str, *, cancelled: Callable[[], bool] = lambda: False) 
             and not (Path(parent) / d).is_symlink()
         )
         for name in sorted(names):
+            if cancelled():
+                raise ValueError("文件夹读取已取消")
             source = Path(parent) / name
-            if source.suffix.lower() in (".tif", ".tiff") and not source.is_symlink():
+            if (
+                source.suffix.lower() in (".tif", ".tiff")
+                and not source.is_symlink()
+                and not source.is_junction()
+            ):
+                examined += 1
+                if examined > 4096:
+                    raise ValueError("超过4096个TIFF候选文件，请选择具体原图文件夹")
+                if is_generated_tiff(source):
+                    skipped.append({"path": str(source), "reason": "generated_display_or_crop"})
+                    continue
                 files.append(str(source))
                 if len(files) > 512:
                     raise ValueError("超过512张TIFF，请分批选择文件夹")
-    return json.dumps(files, ensure_ascii=False).encode()
+    selected = preferred_acquisition_sources(tuple(files))
+    selected_set = set(selected)
+    skipped.extend(
+        {"path": source, "reason": "numbered_acquisition_variant"}
+        for source in files
+        if source not in selected_set
+    )
+    payload = (
+        {"policy": "folder_sources@1", "paths": selected, "skipped": skipped}
+        if with_report
+        else selected
+    )
+    return json.dumps(payload, ensure_ascii=False).encode()
 
 
 def export_automatic_results(

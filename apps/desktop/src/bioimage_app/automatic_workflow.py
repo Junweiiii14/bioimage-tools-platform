@@ -34,6 +34,7 @@ class AutomaticWorkflow(QObject):
             "legacy_bounds@1"
         )
         self.failures: tuple[str, ...] = ()
+        self.discovery_report: bytes = b""
         self.cancelled = False
 
     def cancel(self) -> None:
@@ -64,6 +65,13 @@ class AutomaticWorkflow(QObject):
                 window.fail_operation("原图文件列表无效")
                 return
             paths: object = json.loads(reply.value)
+            if isinstance(paths, dict):
+                report = cast(dict[str, object], paths)
+                if report.get("policy") != "folder_sources@1":
+                    window.fail_operation("原图文件筛选记录版本无效")
+                    return
+                self.discovery_report = reply.value
+                paths = report.get("paths")
             if not isinstance(paths, list) or not all(
                 isinstance(path, str) for path in cast(list[object], paths)
             ):

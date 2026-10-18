@@ -1,8 +1,5 @@
 # Current Work Log
 
-## 2026-10-14 / T-019 ZIP恢复与历史证据
-从f79b7b3创建feat/T-019-project-archive-restore，产品6a06369实现schema6历史来源/原ZIP/复制请求结果、有界普通/ZIP64检查/表与像素重建、专用线程新工作区恢复/初始修订快照、重开核验/编辑失效/真实复算及再次恢复。398全量124.27秒、Ruff244、Pyright0、9合约、4wheel5场景通过；旧Qt/停滞风险未宣称解决。T-019 review待独审，T-020直接TIFF/PNG成图ready；整体Goal active。未推送/发布、用户资料未改；详情T-019/validation.md。
-
 ## 2026-10-14 / T-020 直接成图
 从3a38af6创建feat/T-020-direct-figure-image，实现完整RGB8 TIFF/PNG直接输出、来源/DPI与像素重读核验、原图/字体声明大小检查、已知显示TIFF拒绝定量而OCR允许。Qt精确保存后后台导出，取消/关闭/修改与已发布文件状态有回归；425全量143.71秒、Ruff251、Pyright0、9合约、4wheel/4个隔离环境通过。真实组合图格式探针原SHA/显示像素保持，OCR17token未确认/绑定，Qt与导出截图已看。T-020 review待独审，T-021实验室版式/横向分段ready；Goal active，未推送/发布。详情T-020/validation.md。
 
@@ -129,3 +126,8 @@ bbf3cc5 Windows668passed/508.43秒后外层exit1、wheel未跑，无timeout；�
 ## 2026-10-17 CI011本机全检与独审
 
 CI011 aabd39e本机正式check --all实际exit0：670passed/517.68秒，原pytest child0，Ruff/format/Pyright/import/policy及全部隔离wheel、桌面异步关闭、OCR真实worker完成。日志.local/t043/check-ci011-final.log，回执.local/t043/ci011-final-gate.json。绑定独审无阻断、五真实控制0、相关9项/2.56秒0；这是当前环境一次完整通过，原间歇原生退出根因仍UNKNOWN，远端当前后继另查，不宣告T043稳定性完成。
+
+
+## 2026-10-18 T044积分诊断与目录/分组首阶段
+
+建立完整任务并scope .规则（精确base d11552c）；新分支同活动树、固定入口路径保持。原41复核原因分解已实测，盲扩有误选目标反例；不改科学状态。目录筛选精确8源，同Fig四组及β字体正常工作台端到端0，原SHA/48值状态原因保持；20定向0/类型0。完整门禁和提交独审待执行，其余全部需求继续推进，见T044任务/validation。

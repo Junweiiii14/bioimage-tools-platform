@@ -67,6 +67,7 @@ class WBJob:
         "figure_export",
         "figure_image_export",
         "font_digest",
+        "label_font",
         "template_read",
         "template_export",
         "crop_suggest",

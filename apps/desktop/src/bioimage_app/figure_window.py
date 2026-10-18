@@ -56,6 +56,7 @@ from wb_tool.api import (
     project_assets,
     project_with_ocr,
     record_crop_suggestion,
+    source_import_labels,
     with_figure_layout,
 )
 
@@ -1504,7 +1505,7 @@ class FigureProjectWindow(QMainWindow):
                     and not self._cancellation.is_set()
                     and not self._closing
                 ):
-                    self.automatic.analyze(row_ids=tuple(imported_ids), import_errors=tuple(errors))
+                    self._analyze_imported_rows(tuple(imported_ids), tuple(errors))
                 return
             if len(self.view.project().rows) >= 512:
                 self._done(f"项目已达 512 行；剩余 {len(pending)} 张未导入，请另建项目。")
@@ -1543,17 +1544,20 @@ class FigureProjectWindow(QMainWindow):
                             next_image()
                             return
                         self._paths[asset.sha256] = reply.value
+                        labels = source_import_labels(path) if automatic else None
                         row = FigureRow(
                             row_id=uuid4().hex,
                             source=asset,
                             filename=Path(path).name,
-                            # Portable, explicitly unknown label, never a source/protein inference.
-                            protein="Unassigned",
+                            # Literal labels do not establish a control/sample pairing.
+                            protein=labels.protein if labels and labels.protein else "Unassigned",
                             width=raster.width,
                             height=raster.height,
                             bit_depth=16 if raster.bit_depth == 16 else 8,
                             figure=(
-                                f"Fig{len(current.rows) + 1}"
+                                labels.figure or f"Fig{len(current.rows) + 1}"
+                                if labels
+                                else f"Fig{len(current.rows) + 1}"
                                 if automatic
                                 else current.figure_order[-1]
                                 if current.figure_order
@@ -2044,7 +2048,35 @@ class FigureProjectWindow(QMainWindow):
         if path:
             self.import_font(path)
 
-    def import_font(self, path: str) -> None:
+    def _analyze_imported_rows(self, row_ids: tuple[str, ...], errors: tuple[str, ...]) -> None:
+        project = self.view.project()
+
+        def analyze() -> None:
+            self.automatic.analyze(row_ids=row_ids, import_errors=errors)
+
+        if project.template.font or not any(
+            ord(char) > 255
+            for label in (*project.figure_order, *(row.protein for row in project.rows))
+            for char in label
+        ):
+            analyze()
+            return
+        generation = self.view.generation
+        self._start()
+
+        def selected(reply: WBReply) -> None:
+            if generation != self.view.generation or self._closing or self._cancellation.is_set():
+                self._done("标签字体选择已取消。")
+                return
+            if not isinstance(reply.value, str):
+                self._error(reply.error or "标签字体路径无效")
+                return
+            self._done("已找到标签字体，正在保存到项目。")
+            self.import_font(reply.value, finished=analyze)
+
+        self._wb(WBJob("label_font", document=project), selected)
+
+    def import_font(self, path: str, *, finished: Callable[[], None] | None = None) -> None:
         if self._busy:
             return
         try:
@@ -2053,6 +2085,7 @@ class FigureProjectWindow(QMainWindow):
             self._error(str(error))
             return
         self._start()
+        generation = self.view.generation
 
         def fingerprinted(reply: WBReply) -> None:
             if not isinstance(reply.value, str):
@@ -2066,6 +2099,13 @@ class FigureProjectWindow(QMainWindow):
                 asset = reply.value
 
                 def resolved(reply: StorageReply) -> None:
+                    if (
+                        generation != self.view.generation
+                        or self._closing
+                        or self._cancellation.is_set()
+                    ):
+                        self._done("字体导入已取消：当前项目已更改或正在关闭。")
+                        return
                     if not isinstance(reply.value, str):
                         self._error("字体路径无效")
                         return
@@ -2077,6 +2117,8 @@ class FigureProjectWindow(QMainWindow):
                     )
                     self.view.generation += 1
                     self._done("字体已导入，随项目保存。")
+                    if finished is not None:
+                        finished()
 
                 self._storage(StorageCommand("asset", asset=asset), resolved)
 

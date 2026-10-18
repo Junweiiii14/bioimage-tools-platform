@@ -92,6 +92,42 @@ def test_directory_import_detect_compute_export_and_reopen(
     assert window.view.canvas.image_rect().width() > 0
 
 
+def test_explicit_fig_folder_groups_acquisition_rows(
+    qtbot: QtBot, tmp_path: Path, automatic_window: FigureProjectWindow
+) -> None:
+    group = tmp_path / "1D"
+    group.mkdir()
+    paths = []
+    for offset, protein in enumerate(("ABCA9", "β-actin")):
+        image = np.full((180, 360), 50000, dtype=np.uint16)
+        image[0, 0] -= offset  # Distinct source identities with the same measured geometry.
+        for x in (60, 120, 180, 240, 300):
+            image[70:85, x - 17 : x + 17] = 15000
+        source = group / f"{protein}_100646_0_14_0_0 (1).tiff"
+        tifffile.imwrite(source, image)
+        paths.append(str(source))
+    window = automatic_window
+    window.import_images(tuple(paths), automatic=True)
+    qtbot.waitUntil(
+        lambda: bool(window.automatic.last_output_path) or "操作失败" in window.view.status.text(),
+        timeout=40000,
+    )
+    assert window.automatic.last_output_path, window.view.status.text()
+    qtbot.waitUntil(lambda: not window.operation_busy, timeout=15000)
+    project = window.view.project()
+    assert project.figure_order == ("1D",)
+    assert [(row.figure, row.protein) for row in project.rows] == [
+        ("1D", "ABCA9"),
+        ("1D", "β-actin"),
+    ]
+    assert project.template.font is not None
+    saved = read_figure_project(
+        (Path(window.automatic.last_output_path) / "project.json").read_bytes()
+    )
+    assert saved.figure_order == project.figure_order
+    assert saved.template.font == project.template.font
+
+
 def test_close_during_directory_discovery_drains_resources(
     qtbot: QtBot, tmp_path: Path, automatic_window: FigureProjectWindow
 ) -> None:

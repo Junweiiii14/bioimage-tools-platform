@@ -69,3 +69,5 @@ T-024自动主流程已集成。schema8与自动输出契约见 `../../docs/cont
 T-041：FigureLayoutStyle显式standard_lane_ratio@1可将同Fig不同原生ROI尺寸显示为每泳道lane_unit宽、4/5 lane_unit高的RGB8 LANCZOS行；原生默认、定量和原值裁剪保持。manifest操作@2明确回源与显示重采样，TIFF定量入口拒绝；预算仍3200万像素。详见wb-laboratory-layout-v1.md。
 
 T-042：source_geometry@2以短膜轮廓、上下边方向和跨阈值泳道中心推断几何；多行Marker证据仅排除实际Marker。检测/显示拉正保留原像素逐泳道ROI。手动ROI/N变化撤销该行旧显示框，旧项目与旧策略仍可重放。background_support@1要求连续背景支持，原始profile_integral@1公式不变；背景不足/多信号需复核，不能作为有效信号。现网页工作台默认启用两项新策略，HTML/CSS布局未改。研究与8图限定评分见docs/research/2026-10-17-source-only-geometry.md、work/evidence/T-042/crop-scoring.md（仓库根）。
+
+T-044当前阶段：folder_sources@1目录头信息筛选已知派生图和明确采集编号变体；literal_source_labels@1按明确Fig路径/采集文件名保留字面分组与条带标签，不推断配对。后台自动选择支持标签的已安装字体后导入项目资产。旧项目/原值/积分策略保持，完整状态和未完功能见work/tasks/T-044-wb-workflow-and-integrals.md。

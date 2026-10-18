@@ -48,7 +48,10 @@ def main() -> None:
         shell.show()
         window.open_workspace(str(destination), create=True)
         wait(lambda: not window.operation_busy)
-        window.import_images(tuple(e["path"] for e in entries), automatic=True)
+        if len(sys.argv) > 4:
+            window.automatic.import_directory(sys.argv[4])
+        else:
+            window.import_images(tuple(e["path"] for e in entries), automatic=True)
         wait(
             lambda: (
                 bool(window.automatic.last_output_path) or "操作失败" in window.view.status.text()
@@ -80,6 +83,12 @@ def main() -> None:
             "source_count": len(entries),
             "lane_counts": [row.lane_count for row in project.rows],
             "runs": len(project.analyses),
+            "figures": list(project.figure_order),
+            "proteins": [row.protein for row in project.rows],
+            "font_asset_saved": project.template.font is not None,
+            "folder_report": json.loads(window.automatic.discovery_report)
+            if window.automatic.discovery_report
+            else None,
             "output": str(output),
             "source_hashes_unchanged": True,
             "reopen_equal": True,

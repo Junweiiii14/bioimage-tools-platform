@@ -101,7 +101,7 @@ class _Work(QObject):
             if job.operation == "discover_tiffs":
                 from wb_tool.adapters.automatic_export import discover_tiffs
 
-                value = discover_tiffs(job.path, cancelled=cancel)
+                value = discover_tiffs(job.path, cancelled=cancel, with_report=True)
             elif job.operation == "automatic_row":
                 from wb_tool.adapters.automatic import automatic_project_row
 
@@ -274,6 +274,15 @@ class _Work(QObject):
                     value = export_figure_template(
                         job.document, job.sources, job.destination, cancelled=cancel
                     )
+            elif job.operation == "label_font":
+                from wb_tool.adapters.label_font import find_label_font
+
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少标签所属项目")
+                value = find_label_font(
+                    (*job.document.figure_order, *(row.protein for row in job.document.rows)),
+                    cancelled=cancel,
+                )
             elif job.operation == "font_digest":
                 path = Path(job.path)
                 if (
