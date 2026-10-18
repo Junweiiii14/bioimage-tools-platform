@@ -3,6 +3,7 @@
 import gc
 import json
 import os
+import threading
 from collections.abc import Callable, Iterator
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -23,6 +24,7 @@ from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QPushButton, QTableWidget
 from pytest import MonkeyPatch
 from pytestqt.qtbot import QtBot
+from shiboken6 import isValid
 from wb_tool.api import (
     AnalysisRequest,
     BandAnnotation,
@@ -318,6 +320,15 @@ def test_actual_ocr_desktop_table_save_reopen_export(
     assert cell_text(reopened.view.worksheet.table, 0, 3) == "—"
 
 
+def _dispose_owned_windows(windows: list["WBWindow"], qtbot: QtBot) -> None:
+    for window in windows:
+        if not window.resources_closed:
+            window.close()
+            qtbot.waitUntil(lambda window=window: window.resources_closed, timeout=15000)
+        window.deleteLater()
+        qtbot.waitUntil(lambda window=window: not isValid(window), timeout=10000)
+
+
 @pytest.fixture
 def make_window(qtbot: QtBot) -> Iterator[Callable[[], "WBWindow"]]:
     windows: list[WBWindow] = []
@@ -328,10 +339,35 @@ def make_window(qtbot: QtBot) -> Iterator[Callable[[], "WBWindow"]]:
         return window
 
     yield make
-    for window in windows:
-        if not window.resources_closed:
-            window.close()
-            qtbot.waitUntil(lambda window=window: window.resources_closed, timeout=15000)
+    _dispose_owned_windows(windows, qtbot)
+
+
+def test_owned_fixture_windows_are_destroyed_on_gui_before_worker_collection(qtbot: QtBot) -> None:
+    window = create_wb_window()
+    destroyed_threads: list[int] = []
+
+    def record_destroyed(*_args: object) -> None:
+        destroyed_threads.append(threading.get_ident())
+
+    window.destroyed.connect(record_destroyed, Qt.ConnectionType.DirectConnection)
+    # A retained reference cycle may be collected by the next allocating worker.
+    # Teardown must dispose its native widgets before releasing these references.
+    holder: dict[str, object] = {"window": window}
+    holder["cycle"] = holder
+    try:
+        _dispose_owned_windows([window], qtbot)
+        assert not isValid(window)
+        assert destroyed_threads == [threading.get_ident()]
+        del holder
+        collector = threading.Thread(target=gc.collect)
+        collector.start()
+        collector.join(timeout=10)
+        assert not collector.is_alive()
+        assert destroyed_threads == [threading.get_ident()]
+    finally:
+        if isValid(window):
+            window.deleteLater()
+            qtbot.waitUntil(lambda: not isValid(window), timeout=10000)
 
 
 def test_desktop_draw_compute_save_reopen(

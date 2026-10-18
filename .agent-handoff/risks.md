@@ -87,3 +87,5 @@
 - T-042最终9eb5a1b完整门禁在重复关闭窗口测试的pytestqt QTimer.timeout.connect原生调用挂起；保留faulthandler后停止专属pytest，check退出1。隔离desktop10项exit0；只读独审无法证明GC死锁根因，不能认为旧退出/挂起风险已修复。8图回归8/8非留出泛化，真实48槽7valid/41quality_review，无积分准确率真值。
 
 - T044历史AV/c0000005精确根因仍UNKNOWN，native-exit.md保留；后继修复真实隐藏无parent控件但不证明AV因果，Qt-only控制未复现。最终a72e710 733 passed in 525.53s、全部wheel/dev0且独审通过，仅证明本轮运行。积分13有效35复核，无积分真值/留出；恢复/最终Windows/DPI待验。旧P2不变目标丢边界已绑定独审关闭；中途失败/中止均保留，不改成功状态。
+
+- CI012真实远端Linux在OCR运行时SIGSEGV，观察非GUI线程QWidget析构；不是全用例通过后退出。精准fixture销毁缺口修正待绑定独审/远端验证，不以本机成功或受控引用环实验宣称全部原生问题已解决。

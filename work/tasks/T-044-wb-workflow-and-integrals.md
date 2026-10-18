@@ -1,6 +1,6 @@
 # T-044：积分边界、文件夹/同Fig工作流与独立灰度分析
 
-- 状态：review；2026-10-18用户明确要求规划后执行，最终全库审查冗杂/无效代码。
+- 状态：in_progress；2026-10-18用户明确要求规划后执行，最终全库审查冗杂/无效代码。
 - 基线：d11552c32b87538e33ef3bfbe70fb3797e3f403e；同一活动树，新分支codex/t044-wb-workflow-and-integrals。原.impeccable/questions与历史dirty树/原图/旧结果保留。
 - 前轮当前事实：d11552c远端run39030621380两平台670和全部wheel/最终check成功，规则/桌面成功；历史间歇退出根因UNKNOWN，不以通过销账。
 
@@ -226,3 +226,7 @@ a72e7102891df287e3484f20f3724612779b53f5：733 passed in 525.53s、pytest child/
 ## 2026-10-18：阶段草稿同步与保留核验
 
 本轮本地实现/完整门禁/8图正常工作台与绑定独审完成，进入阶段集成review。已安全推送并创建草稿PR #15，base stage-08=d11552c，不合main；原9草稿链保持。原19工作树备份保留，21现有工作树/59分支/6原位锁定；新allrefs bundle已verify，407083e文档提交备份SHA 1a40a4da10723b86026348741892296fbe4baf14ac0b125379b8341758b1cf2a，再核34原未提交文件一致；当前4未提交文件独立外置拷贝并核SHA，不入提交。最后文档后继也将重新备份并安全push，最新索引.local/t043/backup-final.json。远端检查以PR最终HEAD实际状态为准；本记录时仍运行，不能写已通过。用户要求最终简单专业维护汇报已落实到docs/maintenance-plan.md，GitHub开发日志更新issue6。
+
+## CI012：远端Linux原生失败后继
+
+3e5cee3 Linux约29% OCR用例SIGSEGV，quality未通过，本地成功不替代；GDB证实非GUI线程QWidget析构，具体对象/全部旧根因仍UNKNOWN。只修test_wb_desktop fixture自有窗口：原异步关闭等待后GUI deleteLater并等原生无效；新销毁线程回归旧红1/2.87秒，新11项25.58秒0，相关类型/Ruff/格式0。受控真实窗口引用环实验未dispose Fatal Aborted/3，先GUI销毁0；不禁GC/不全局删除/不改产品。详见ci012-fixture-lifetime.md。待绑定独审及远端完整门禁，本轮尚未最终完成。
