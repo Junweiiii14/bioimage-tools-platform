@@ -1,6 +1,6 @@
 # Handoff Snapshot
 
-- 更新2026-10-18。任务work/tasks/T-044-wb-workflow-and-integrals.md，in_progress；本地已实现验证，下一步仅完成安全同步及维护汇报。
+- 更新2026-10-18。任务work/tasks/T-044-wb-workflow-and-integrals.md，review；本地实现验证与阶段草稿同步完成，待最终远端CI和维护汇报。
 - 活动检出C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform，codex/t044-wb-workflow-and-integrals，基线d11552c，最新产品a72e7102891df287e3484f20f3724612779b53f5。核对实际HEAD/dirty，不为旧指针切历史代码。
 - 当前入口Start-BioImage.ps1/桌面当前开发绿色WebWorkbenchWindow，-I核验模块和资源路径；旧ResearchVault树不作当前入口。用户PID33256不动，停止的CUA不恢复。
 - 21工作树59分支、6干净历史树原位锁定，原dirty/原图/旧结果保留。.impeccable/questions四文件未提交并外置核SHA，见.local/t044/untracked-backup.json。
@@ -13,9 +13,9 @@
 - 31旧文件作者前后SHA一致，前态仅RAM，独审不可复算；current-ledger只作未来基线。各阶段绑定独审见任务/final-delivery.md。
 - detector已恰好一次、视觉初6/确认8截图完成，勿再运行；离屏resize部分视口陈旧/DOM空不算全DPI，设计sidecar/PRODUCT待更新。
 
-## 下一步
+## 同步与下一步
 
-1. 当前收尾仅文档，运行handoff维护/容量检查和规则校验。无新失败不重复全检/改产品。
-2. 运行.local/t043/backup_final_refs.py：外置唯一allrefs bundle/verify/SHA、重核34原未提交；当前4额外已备份。Git不含忽略原图/旧结果。
-3. safe push T044，建并attach草稿阶段9 PR，base codex/stage-08-source-repair=d11552c；更新issue6开发日志并等远端CI。main最近221a2df，原9草稿#7/#3/#8–14保留，不直接合128提交。用户已授权同步和只读独审，不再问。
-4. 记录PR/备份/CI真实结果并给小白维护汇报，docs/maintenance-plan.md。历史原生UNKNOWN、科学真值/留出、恢复、干净Windows/DPI/最终包仍待后续，不夸大正式发布。
+- 已safe push并创建/attach草稿PR #15：https://github.com/Junweiiii14/bioimage-tools-platform/pull/15，base stage-08=d11552c；main仍221a2df，原9草稿链保留。工作树不删除/移动，当前4未提交文件不入Git。
+- 407083e全引用外置bundle verified，SHA1a40a4da10723b86026348741892296fbe4baf14ac0b125379b8341758b1cf2a，原34未提交文件再次核SHA一致。最后文档提交也将新建bundle；最新索引.local/t043/backup-final.json，当前4文件备份.local/t044/untracked-backup.json。Git不含忽略原图/旧结果。
+- 仅文档后继，不改产品。收尾完成后按PR最终HEAD看Windows/Linux/rules/desktop远端CI；本快照提交时运行中，不声称通过。如失败按日志修复，不弱化门禁；无新失败不重跑本地全检。
+- issue6开发日志记录本轮结果/PR/备份/CI真实状态；最后给用户简单专业维护汇报（docs/maintenance-plan.md）。任务review指待按依赖阶段集成main，不是正式产品发布。历史原生UNKNOWN、科学真值/留出、恢复和最终Windows/DPI/包仍待后续。

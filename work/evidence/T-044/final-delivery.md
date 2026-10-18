@@ -40,3 +40,7 @@
 21工作树59本地分支，6干净历史树原位锁定；原19树备份/34原未提交文件待最终allrefs再核验，当前4未提交文件已外置唯一目录核SHA。Git不备份私有原图/忽略结果。T044按阶段9草稿PR接stage-08，不直接合128提交到main。远端CI/备份/PR以GitHub和后继记录为准。
 
 本轮完整成功不关闭历史间歇原生退出UNKNOWN；独立科学真值/留出、恢复演练、干净Windows最终包和全DPI交互待后续。维护说明见docs/maintenance-plan.md。
+
+## 阶段同步
+
+[草稿PR #15](https://github.com/Junweiiii14/bioimage-tools-platform/pull/15)已创建，base stage-08=d11552c；main仍221a2df，原阶段链保留。407083e全引用bundle已verify并再核原34未提交文件，SHA 1a40a4da10723b86026348741892296fbe4baf14ac0b125379b8341758b1cf2a。当前4未提交文件另存外置唯一目录并核SHA。本文最后文档后继将另建完整bundle，最新索引.local/t043/backup-final.json；GitHub开发日志issue6记录最新摘要。远端CI在本文提交时仍运行，实际结果见PR最终HEAD；不由本机通过推断。
