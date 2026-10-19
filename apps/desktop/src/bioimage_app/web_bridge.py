@@ -17,14 +17,17 @@ from wb_tool.api import (
     ManualQuantTarget,
     ProjectTableCell,
     WBAnalysisProject,
+    WBIntakeProject,
     WBLayoutProject,
     WBPartitionProject,
     confirm_quant_group,
+    intake_snapshot,
     quant_group_reviewed,
     row_is_ready,
 )
 
 from bioimage_app.figure_window import FigureProjectWindow
+from bioimage_app.web_intake import apply_intake_command
 from bioimage_app.web_manual_quant import ManualQuantCommands
 from bioimage_app.web_quant import quant_snapshot
 
@@ -125,6 +128,31 @@ class WorkbenchBridge(QObject):
             )
             self._images[preview.sha256] = image_url(image)
         live_sources = {r.source.sha256 for r in project.rows if r.source}
+        intake = None
+        if isinstance(project, WBIntakeProject):
+            live_sources.update(source.asset.sha256 for source in project.intake.sources)
+            intake = intake_snapshot(project)
+            sources: list[dict[str, object]] = []
+            for source in project.intake.sources:
+                raster = view.thumbnail(source.asset.sha256)
+                if raster and source.asset.sha256 not in self._images:
+                    self._images[source.asset.sha256] = image_url(
+                        QImage(
+                            raster.pixels,
+                            raster.preview_width,
+                            raster.preview_height,
+                            raster.preview_width,
+                            QImage.Format.Format_Grayscale8,
+                        )
+                    )
+                sources.append(
+                    {
+                        **source.model_dump(mode="json"),
+                        "preview": self._images.get(source.asset.sha256),
+                    }
+                )
+            intake["sources"] = sources
+            intake["issues"] = list(self.host.intake.issues)
         source_counts = Counter(r.source.sha256 for r in project.rows if r.source)
         self._images = {key: value for key, value in self._images.items() if key in live_sources}
         pixmap = view.preview_label.full_pixmap
@@ -252,6 +280,7 @@ class WorkbenchBridge(QObject):
             "projectId": project.project_id,
             "revision": view.generation,
             "projectName": project.name,
+            "intake": intake,
             "canRetryLocation": not self.host.retry_location_button.isHidden(),
             "busy": self.host.operation_busy,
             "status": self._error or view.status.text(),
@@ -334,7 +363,14 @@ class WorkbenchBridge(QObject):
     @Slot(str, str)
     def request(self, action: str, payload: str = "{}") -> None:
         try:
-            if len(payload) > (32768 if action == "quant_target" else 4096):
+            limit = (
+                262144
+                if action in {"intake_plan", "intake_assign"}
+                else 32768
+                if action == "quant_target"
+                else 4096
+            )
+            if len(payload) > limit:
                 raise ValueError("操作参数过长")
             parsed: object = json.loads(payload)
             if not isinstance(parsed, dict):
@@ -349,12 +385,24 @@ class WorkbenchBridge(QObject):
                 self.host.operation_busy and action not in {"select", "quant_select"}
             ):
                 raise ValueError("当前任务仍在处理中，请稍候或取消")
+            elif isinstance(self.host.view.project(), WBIntakeProject) and action not in {
+                "intake_plan",
+                "intake_assign",
+                "intake_confirm",
+                "intake_import_folder",
+                "open_project",
+                "retry_location",
+            }:
+                raise ValueError("仪器导入项目当前仅支持清单与原图分配；后续裁剪流程尚未接通")
+            elif action in {"intake_plan", "intake_assign", "intake_confirm"}:
+                apply_intake_command(self, action, data)
             elif action in {
                 "import",
                 "quant_import",
                 "import_folder",
                 "open_project",
                 "retry_location",
+                "intake_import_folder",
             }:
                 self.choose(action)
             elif action == "include_folder_source":

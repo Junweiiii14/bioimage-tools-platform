@@ -44,6 +44,7 @@ from wb_tool.api import (
     ReturnedCrop,
     WBAnalysisProject,
     WBFigureProject,
+    WBIntakeProject,
     WBJob,
     WBLayoutProject,
     WBProjectOCR,
@@ -52,6 +53,7 @@ from wb_tool.api import (
     WBReviewProject,
     analysis_is_current,
     create_figure_project_view,
+    create_intake,
     create_wb_background,
     initial_composition,
     prepare_project_analyses,
@@ -62,6 +64,7 @@ from wb_tool.api import (
     with_figure_layout,
 )
 
+from bioimage_app.instrument_intake import InstrumentIntakeSession
 from bioimage_app.project_archive import ProjectArchiveSession
 from bioimage_app.project_entry import default_project_parent
 from bioimage_app.project_measurements import ProjectBatchCompletion, ProjectMeasurementSession
@@ -127,6 +130,8 @@ class FigureProjectWindow(QMainWindow):
         self._selection_job: ProjectSelectionJob | None = None
         self._pending_project_paths: list[Path] = []
         self._pending_project_automatic = True
+        self._pending_project_intake = False
+        self.intake = InstrumentIntakeSession(self)
         self._auto_save = QTimer(self)
         self._auto_save.setSingleShot(True)
         self._auto_save.setInterval(700)
@@ -381,17 +386,28 @@ class FigureProjectWindow(QMainWindow):
         parent = QFileDialog.getExistingDirectory(self, "选择项目保存位置（软件自动创建子文件夹）")
         if parent and self._pending_project_paths:
             self.start_project_from_images(
-                self._pending_project_paths, Path(parent), automatic=self._pending_project_automatic
+                self._pending_project_paths,
+                Path(parent),
+                automatic=self._pending_project_automatic,
+                intake=self._pending_project_intake,
             )
 
     def start_project_from_images(
-        self, paths: list[Path], project_parent: Path | None = None, *, automatic: bool = True
+        self,
+        paths: list[Path],
+        project_parent: Path | None = None,
+        *,
+        automatic: bool = True,
+        intake: bool = False,
     ) -> None:
         """Select originals first; decode before any workspace or recent entry is created."""
         if not paths or self._busy or self._workspace or self._closing:
             return
+        if intake:
+            automatic = False
         self._pending_project_paths = list(paths)
         self._pending_project_automatic = automatic
+        self._pending_project_intake = intake
         self.retry_location_button.hide()
         self._start()
         self.view.status.setText("正在查找 WB 原图…")
@@ -439,18 +455,20 @@ class FigureProjectWindow(QMainWindow):
 
                     def created(_reply: StorageReply) -> None:
                         self._workspace = str(selection.destination)
-                        self.view.set_project(
-                            WBFigureProject(project_id=uuid4().hex, name=selection.name)
-                        )
+                        empty = WBFigureProject(project_id=uuid4().hex, name=selection.name)
+                        self.view.set_project(create_intake(empty) if intake else empty)
                         self.automatic.discovery_report = selection.discovery_report
                         self.workspace_opened.emit(self._workspace)
                         self._busy = False
                         if self._closing or self._cancellation.is_set():
                             self._done("创建后已取消；项目可稍后继续。")
                             return
-                        self.import_images(
-                            tuple(str(p) for p in selection.paths), automatic=automatic
-                        )
+                        if intake:
+                            self.intake.import_paths(selection.paths, paths[0].resolve())
+                        else:
+                            self.import_images(
+                                tuple(str(p) for p in selection.paths), automatic=automatic
+                            )
 
                     self._storage(
                         StorageCommand("create", path=str(selection.destination)), created
@@ -570,9 +588,9 @@ class FigureProjectWindow(QMainWindow):
             return
         generation = self.view.generation
         sources = {
-            r.source.sha256: self._paths.get(r.source.sha256, "")
-            for r in project.rows
-            if r.source and not self.view.has_thumbnail(r.source.sha256)
+            asset.sha256: self._paths.get(asset.sha256, "")
+            for asset in project_assets(project, history=False)
+            if not self.view.has_thumbnail(asset.sha256)
         }
         pending = list(sources.items())
         errors: list[str] = []
@@ -1387,6 +1405,19 @@ class FigureProjectWindow(QMainWindow):
     ) -> None:
         self._wb(job, callback, accept_errors=accept_errors)
 
+    def submit_storage_job(
+        self,
+        command: StorageCommand,
+        callback: Callable[[StorageReply], None],
+        *,
+        accept_errors: bool = False,
+    ) -> None:
+        self._storage(command, callback, accept_errors=accept_errors)
+
+    def remember_source_path(self, asset: AssetRef, path: str) -> None:
+        """Remember a path returned by the verified storage asset resolver."""
+        self._paths[asset.sha256] = path
+
     def submit_export_job(self, job: WBJob, callback: Callable[[WBReply], None]) -> None:
         self._export_with_evidence(job, callback)
 
@@ -1397,6 +1428,7 @@ class FigureProjectWindow(QMainWindow):
             and self._background_closed
             and self._restore_job is None
             and self._selection_job is None
+            and not self.intake.scanning
         )
 
     @property
@@ -1676,7 +1708,8 @@ class FigureProjectWindow(QMainWindow):
         if self._busy or not self._workspace:
             return
         try:
-            self.view.project()
+            if isinstance(self.view.project(), WBIntakeProject):
+                raise ValueError("请使用仪器导入页的“添加原图文件夹”")
         except ValueError as error:
             self._error(str(error))
             return
@@ -1964,7 +1997,12 @@ class FigureProjectWindow(QMainWindow):
                     # result presentation. Rebuild from verified runs before any
                     # follow-up (including display-only compose), even when no
                     # scientific parameters changed.
-                    self.refresh_project_table("项目已保存，结果表已核验。", after=after)
+                    if isinstance(project, WBIntakeProject):
+                        self._done("导入清单已保存，可重新打开。")
+                        if after:
+                            after()
+                    else:
+                        self.refresh_project_table("项目已保存，结果表已核验。", after=after)
 
             self._storage(
                 StorageCommand(
@@ -2015,7 +2053,10 @@ class FigureProjectWindow(QMainWindow):
                         self._saved_generation = self.view.generation
                         self._project_results = ()
                         self._loaded_ocr = None
-                        if isinstance(project, WBRestoredProject):
+                        if isinstance(project, WBIntakeProject):
+                            self._done("导入清单已恢复，正在加载缩略图。")
+                            self.load_thumbnails()
+                        elif isinstance(project, WBRestoredProject):
                             self._restore_project_evidence(project)
                         elif isinstance(project, WBAnalysisProject):
                             analysis_project = project

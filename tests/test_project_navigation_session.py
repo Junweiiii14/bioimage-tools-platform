@@ -235,6 +235,10 @@ def test_busy_cancel_rechecks_draft_then_unsaved_changes_before_shutdown(
     window.bridge.session("reply", '{"choice":"cancel"}')
     assert window.shutdown_stage == "cancel"
     window.host.finish_operation("任务已取消")
+    # A queued pre-close heartbeat cannot clear the captured unapplied draft.
+    window.bridge.session(
+        "position", json.dumps({"projectId": project_id, "mode": "quant", "draft": False})
+    )
     qtbot.waitUntil(lambda: window.shutdown_stage == "confirm_draft", timeout=3000)
     assert window.isVisible() and not window.host.is_closing
     window.bridge.session("reply", '{"choice":"discard"}')

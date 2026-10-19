@@ -8,7 +8,7 @@ from typing import cast
 
 from PySide6.QtCore import QSettings
 
-MODES = frozenset({"review", "layout", "quant", "results"})
+MODES = frozenset({"review", "layout", "quant", "results", "intake"})
 
 
 class ProjectNavigation:

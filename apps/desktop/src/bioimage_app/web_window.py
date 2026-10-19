@@ -19,6 +19,7 @@ from PySide6.QtWebEngineCore import (
 )
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import QApplication, QFileDialog, QMainWindow
+from wb_tool.api import WBIntakeProject
 
 from bioimage_app.figure_window import FigureProjectWindow
 from bioimage_app.project_navigation import MODES, ProjectNavigation
@@ -131,7 +132,14 @@ class WebWorkbenchWindow(QMainWindow):
         self.session_timer.start()
 
     def choose(self, action: str) -> None:
-        if action in {"import", "quant_import", "quant_import_folder"}:
+        if action in {"new_intake_folder", "intake_import_folder"}:
+            directory = QFileDialog.getExistingDirectory(self, "选择仪器直接导出的 TIFF 文件夹")
+            if directory:
+                if action == "intake_import_folder" and self.host.workspace_path:
+                    self.host.intake.import_folder(Path(directory))
+                else:
+                    self.start_from_images([Path(directory)], automatic=False, intake=True)
+        elif action in {"import", "quant_import", "quant_import_folder"}:
             if action == "quant_import_folder":
                 directory = QFileDialog.getExistingDirectory(self, "选择 TIFF 原图文件夹")
                 if directory:
@@ -197,20 +205,25 @@ class WebWorkbenchWindow(QMainWindow):
             if isinstance(document_id, str) and document_id:
                 self.host.load_document(document_id)
 
-    def start_from_images(self, paths: list[Path], *, automatic: bool = True) -> None:
+    def start_from_images(
+        self, paths: list[Path], *, automatic: bool = True, intake: bool = False
+    ) -> None:
         if self.host.workspace_path:
             self._request_transition(
-                "new", lambda: self.start_from_images(paths, automatic=automatic)
+                "new", lambda: self.start_from_images(paths, automatic=automatic, intake=intake)
             )
             return
         self._starting = True
         self._stage = "opening"
         self._message = "正在核验原图并创建独立项目…"
-        self._target_mode = "layout" if automatic else "quant"
+        self._target_mode = "intake" if intake else "layout" if automatic else "quant"
         self._restore = {}
         parent = str(self.settings.value("project_parent", ""))
         self.host.start_project_from_images(
-            paths, project_parent=Path(parent) if parent else None, automatic=automatic
+            paths,
+            project_parent=Path(parent) if parent else None,
+            automatic=automatic,
+            intake=intake,
         )
 
     def closeEvent(self, event: QCloseEvent) -> None:
@@ -296,7 +309,7 @@ class WebWorkbenchWindow(QMainWindow):
             self._message = "正在处理项目。取消任务后，已提交的结果会保留。"
         elif self._draft:
             self._stage = "confirm_draft"
-            self._message = "有尚未应用的选框或曲线调整。请返回应用调整，或放弃这部分草稿。"
+            self._message = "有尚未应用的清单、分配或图像调整。请返回应用修改，或放弃这部分草稿。"
         elif self.host.has_unsaved_changes:
             self._stage = "confirm_dirty"
             self._message = "当前项目有未保存修改。保存后可从当前页面和 Fig 继续工作。"
@@ -349,7 +362,12 @@ class WebWorkbenchWindow(QMainWindow):
             data = cast(dict[str, object], raw)
             if action == "position":
                 if self._ready_project and data.get("projectId") == self._ready_project:
-                    self._draft = data.get("draft") is True
+                    # A queued page heartbeat may predate the close request. Once
+                    # cancelling/closing, it must not erase the captured draft.
+                    if self._stage in {"idle", "opening"}:
+                        self._draft = data.get("draft") is True
+                    elif self._stage in {"confirm_busy", "cancel"}:
+                        self._draft = self._draft or data.get("draft") is True
                     self.navigation.remember(self.host.workspace_path, data)
             elif action == "reply":
                 self._reply(str(data.get("choice", "")))
@@ -370,6 +388,8 @@ class WebWorkbenchWindow(QMainWindow):
                     self.start_from_images([Path(self._last_open_path)], automatic=False)
             elif action == "new":
                 self._request_transition("new", lambda: self.choose("quant_import"))
+            elif action == "new_intake_folder":
+                self._request_transition("new", lambda: self.choose("new_intake_folder"))
             elif action == "folder":
                 self.choose("quant_import_folder")
             elif action == "save":
@@ -398,16 +418,21 @@ class WebWorkbenchWindow(QMainWindow):
             self._message = "仍在等待本次会话的后台资源退出，窗口将保持可见。"
         if self._starting and self._stage == "opening" and not self.host.operation_busy:
             project = self.host.view.project()
+            has_content = bool(project.rows) or (
+                isinstance(project, WBIntakeProject) and bool(project.intake.sources)
+            )
             if (
-                project.rows
+                has_content
                 and not self.host.view.status.text().startswith("操作失败")
                 and self.host.has_unsaved_changes
             ):
                 self.host.save()
                 return
             self._starting = False
-            if project.rows and not self.host.view.status.text().startswith("操作失败"):
+            if has_content and not self.host.view.status.text().startswith("操作失败"):
                 self._ready_project = project.project_id
+                if isinstance(project, WBIntakeProject):
+                    self._target_mode = "intake"
                 restore = (
                     self._restore if self._restore.get("projectId") == project.project_id else {}
                 )
@@ -415,14 +440,14 @@ class WebWorkbenchWindow(QMainWindow):
                 if selected is None:
                     selected = next(
                         (r for r in project.rows if r.figure == restore.get("figure")),
-                        project.rows[0],
+                        project.rows[0] if project.rows else None,
                     )
                 self._route_number += 1
                 self._route = {
                     "token": self._route_number,
                     "projectId": project.project_id,
                     "mode": self._target_mode,
-                    "rowId": selected.row_id,
+                    "rowId": selected.row_id if selected else "",
                     "lane": restore.get("lane", 1),
                 }
                 self.navigation.remember(
@@ -431,8 +456,8 @@ class WebWorkbenchWindow(QMainWindow):
                         "projectId": project.project_id,
                         "name": project.name,
                         "mode": self._target_mode,
-                        "rowId": selected.row_id,
-                        "figure": selected.figure,
+                        "rowId": selected.row_id if selected else "",
+                        "figure": selected.figure if selected else "",
                         "lane": 1,
                     },
                 )
