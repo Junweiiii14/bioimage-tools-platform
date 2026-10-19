@@ -28,7 +28,7 @@ def crop_payload(bridge: WorkbenchBridge) -> dict[str, object]:
     }
 
 
-@pytest.mark.parametrize("action", ["crop", "confirm"])
+@pytest.mark.parametrize("action", ["crop", "confirm", "set_lanes"])
 def test_stale_crop_commands_preserve_new_draft_and_fresh_edit_works(
     qtbot: QtBot,
     tmp_path: Path,

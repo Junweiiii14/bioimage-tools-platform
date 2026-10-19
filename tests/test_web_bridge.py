@@ -285,7 +285,18 @@ def test_ratio_crop_no_confirmation_montage_and_lane_resize(
     qtbot.waitUntil(lambda: not host.operation_busy, timeout=15000)
     assert row.source is not None
     bridge.request(
-        "set_lanes", json.dumps({"id": row.row_id, "sourceId": row.source.sha256, "n": 4})
+        "set_lanes",
+        json.dumps(
+            {
+                "cropEditContract": bridge.snapshot()["cropEditContract"],
+                "projectId": bridge.snapshot()["projectId"],
+                "sessionEpoch": bridge.snapshot()["sessionEpoch"],
+                "revision": bridge.snapshot()["revision"],
+                "id": row.row_id,
+                "sourceId": row.source.sha256,
+                "n": 4,
+            }
+        ),
     )
     changed = host.view.project().rows[0]
     assert changed.roi is not None and changed.lane_count == 4

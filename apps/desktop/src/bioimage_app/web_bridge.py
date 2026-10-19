@@ -386,6 +386,7 @@ class WorkbenchBridge(QObject):
         self.publish()
 
     def _edit_quant(self, data: dict[str, object]) -> None:
+        self._validate_quant_session(data)
         from wb_tool.api import update_quant_lane
 
         project = self.host.view.project()
@@ -502,3 +503,11 @@ class WorkbenchBridge(QObject):
             or data.get("sourceId") != row.source.sha256
         ):
             raise ValueError("原图身份或裁剪已改变，请重新调整并复核")
+
+    def _validate_quant_session(self, data: dict[str, object]) -> None:
+        if (
+            data.get("projectId") != self.host.view.project().project_id
+            or type(data.get("sessionEpoch")) is not int
+            or data.get("sessionEpoch") != self.session_epoch
+        ):
+            raise ValueError("项目会话已改变，请刷新后重新调整")

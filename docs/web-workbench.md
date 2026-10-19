@@ -13,3 +13,7 @@
 ## 原图编辑契约 legacy_crop_edit@1
 
 本阶段crop/confirm需要契约标记、projectId、严格整数sessionEpoch/revision、行id和sourceId；revision为界面generation，旧/缺身份拒绝且不写入。此历史宿主在同一窗口不替换后端（已有workspace再打开被拒绝），sessionEpoch初始化0代表该bridge实例；后继支持替换时须递增会话。手势开始冻结身份，快照变化清手势，移动/释放/取消重查；键盘使用当前快照，旧ROI不补新代次。无项目schema/算法变化。
+
+## 定量会话身份 v2
+
+本阶段新增quant_edit必须在原row/source/generation检查前核对projectId及严格整数sessionEpoch；旧请求缺字段须刷新。定量拖动冻结项目/会话/草稿/行/来源/泳道/条带，状态或选中目标改变时释放不提交旧几何。新set_lanes沿legacy_crop_edit@1保护，不引入后继quant_target/manual命令。无schema/算法变化。
