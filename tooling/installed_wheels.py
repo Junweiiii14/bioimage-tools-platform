@@ -175,6 +175,13 @@ figure_pipeline = prepare_intake_figures(crop_pipeline)
 figure_roundtrip = read_figure_project(figure_pipeline.model_dump_json().encode())
 assert isinstance(figure_roundtrip, WBIntakeFigureProject)
 assert not figure_pipeline.intake_figures and not figure_pipeline.analyses
+from wb_tool.api import prepare_intake_outputs, WBIntakeOutputProject, fill_intake_table
+output_pipeline = prepare_intake_outputs(figure_pipeline)
+output_reopened = read_figure_project(output_pipeline.model_dump_json().encode())
+assert isinstance(output_reopened, WBIntakeOutputProject)
+assert not output_pipeline.intake_outputs
+assert len(fill_intake_table(output_pipeline, ())) == 3
+assert not any(name == 'PIL' or name.startswith('PIL.') for name in sys.modules)
 
 assert isinstance(pipeline_reopened, WBIntakeWorkflowProject) and pipeline_reopened == pipeline
 assert all(step.status == 'pending' for step in pipeline.workflow.steps)

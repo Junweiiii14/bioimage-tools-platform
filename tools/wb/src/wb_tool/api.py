@@ -14,6 +14,7 @@ from wb_tool.adapters.automatic import automatic_project_row
 from wb_tool.adapters.automatic_export import discover_tiffs
 from wb_tool.adapters.intake_crop import export_intake_crop, propose_intake_crop
 from wb_tool.adapters.intake_figure import load_intake_figure_preview, prepare_intake_figure
+from wb_tool.adapters.intake_output import export_intake_outputs
 from wb_tool.adapters.metadata_input import read_metadata_file
 from wb_tool.adapters.ocr_input import OCRImage, load_ocr_image
 from wb_tool.adapters.quant_export import (
@@ -125,6 +126,16 @@ from wb_tool.application.intake_figure import (
     intake_figure_rows,
     prepare_intake_figures,
     prepare_intake_measurement_revision,
+)
+from wb_tool.application.intake_output import (
+    IntakeOutputEvidence,
+    IntakeOutputPreparation,
+    IntakeResultCell,
+    WBIntakeOutputProject,
+    fill_intake_table,
+    intake_output_digest,
+    prepare_intake_outputs,
+    record_intake_output,
 )
 from wb_tool.application.intake_workflow import (
     IntakeWorkflowLedger,
@@ -285,6 +296,15 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "export_intake_outputs",
+    "IntakeOutputEvidence",
+    "IntakeOutputPreparation",
+    "IntakeResultCell",
+    "WBIntakeOutputProject",
+    "fill_intake_table",
+    "intake_output_digest",
+    "prepare_intake_outputs",
+    "record_intake_output",
     "load_intake_figure_preview",
     "IntakeFigureEvidence",
     "IntakeFigurePreparation",

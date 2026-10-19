@@ -43,6 +43,34 @@ def render_figure(
     require_review: bool = True,
     cancelled: Callable[[], bool] = lambda: False,
 ) -> FigureRender:
+    from wb_tool.application.intake_output import WBIntakeOutputProject, intake_archive_projection
+
+    if isinstance(project, WBIntakeOutputProject):
+        projection = intake_archive_projection(project)
+        rendered = render_figure(
+            projection, sources, require_review=require_review, cancelled=cancelled
+        )
+        manifest = json.loads(rendered.manifest_json)
+        indices = {row.row_id: i for i, row in enumerate(project.rows, 1)}
+        for record in manifest["rows"]:
+            if record.get("crop_file"):
+                record["crop_file"] = f"crops/{indices[str(record['row_id'])]:04d}.tif"
+        manifest["project"] = project.model_dump(mode="json")
+        displayed = {row.row_id for row in projection.rows}
+        manifest["unrendered_rows"] = [
+            {
+                "row_id": row.row_id,
+                "source_sha256": row.source.sha256 if row.source else None,
+                "status": "incomplete_figure",
+                "reason": "所属Fig尚缺完整已保存成图依据",
+            }
+            for row in project.rows
+            if row.row_id not in displayed
+        ]
+        return FigureRender(
+            rendered.width, rendered.height, rendered.rgb, json.dumps(manifest, ensure_ascii=True)
+        )
+
     from wb_tool.application.automatic import WBAutomaticProject, row_is_ready
     from wb_tool.application.laboratory_layout import WBLayoutProject
 

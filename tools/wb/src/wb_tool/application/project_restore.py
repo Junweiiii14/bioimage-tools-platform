@@ -111,6 +111,10 @@ def project_assets(project: WBFigureProject, *, history: bool = True) -> tuple[A
 
     if isinstance(project, WBIntakeFigureProject):
         assets.extend(e.image for e in project.intake_figures)
+    from wb_tool.application.intake_output import WBIntakeOutputProject
+
+    if isinstance(project, WBIntakeOutputProject):
+        assets.extend(e.index for e in project.intake_outputs)
     if project.template.font:
         assets.append(project.template.font)
     if isinstance(project, WBProjectOCR) and project.ocr:
@@ -206,6 +210,12 @@ def restore_staged_project(
     if isinstance(project, WBIntakeFigureProject):
         changes["intake_figures"] = tuple(
             e.model_copy(update={"image": mapped(e.image)}) for e in project.intake_figures
+        )
+    from wb_tool.application.intake_output import WBIntakeOutputProject
+
+    if isinstance(project, WBIntakeOutputProject):
+        changes["intake_outputs"] = tuple(
+            e.model_copy(update={"index": mapped(e.index)}) for e in project.intake_outputs
         )
 
     if isinstance(project, WBIntakeProject):

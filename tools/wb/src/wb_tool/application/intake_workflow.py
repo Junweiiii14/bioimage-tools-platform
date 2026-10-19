@@ -356,5 +356,6 @@ def return_to_intake_editing(project: WBIntakeWorkflowProject) -> WBIntakeProjec
     fields.pop("workflow")
     fields.pop("intake_crops", None)
     fields.pop("intake_figures", None)
+    fields.pop("intake_outputs", None)
     fields["schema_version"] = 10
     return WBIntakeProject.model_validate(fields)

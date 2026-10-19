@@ -13,7 +13,16 @@ from wb_tool.application.project_restore import WBRestoredProject
 def project_table_rows(
     project: WBFigureProject, results: tuple[LoadedProjectResult, ...]
 ) -> tuple[tuple[tuple[Cell, ...], ...], tuple[tuple[Cell, ...], ...]]:
-    cells = fill_project_table(project, results)
+    from wb_tool.application.intake_output import WBIntakeOutputProject, fill_intake_table
+
+    intake_cells = (
+        fill_intake_table(project, results) if isinstance(project, WBIntakeOutputProject) else ()
+    )
+    cells = (
+        tuple(item.cell for item in intake_cells)
+        if intake_cells
+        else fill_project_table(project, results)
+    )
     by_position = {(c.row_id, c.lane_index): c for c in cells}
     count = max((r.lane_count for r in project.rows), default=0)
     rows: list[tuple[Cell, ...]] = [("Fig", "蛋白", *(f"泳道 {n}" for n in range(1, count + 1)))]
@@ -76,6 +85,18 @@ def project_table_rows(
         audit[4] += ("原始积分（待复核）",)
         for index, cell in enumerate(cells, 5):
             audit[index] += (cell.raw_integral,)
+    if isinstance(project, WBIntakeOutputProject):
+        identities = {(item.cell.row_id, item.cell.lane_index): item for item in intake_cells}
+        policies = {plan.row_id: plan.request.quant_policy for plan in project.analyses}
+        audit[4] += ("稳定 Fig ID", "稳定槽位 ID", "填表策略", "定量策略")
+        for index, cell in enumerate(cells, 5):
+            item = identities[cell.row_id, cell.lane_index]
+            audit[index] += (
+                item.figure_id,
+                item.slot_id,
+                "intake_table@1",
+                policies.get(cell.row_id, ""),
+            )
     return tuple(rows), tuple(audit)
 
 

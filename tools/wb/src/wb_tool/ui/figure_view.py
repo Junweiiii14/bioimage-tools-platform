@@ -1021,6 +1021,10 @@ class FigureProjectView(QWidget):
 
             if isinstance(self._project, WBIntakeFigureProject):
                 fields["intake_figures"] = self._project.intake_figures
+            from wb_tool.application.intake_output import WBIntakeOutputProject
+
+            if isinstance(self._project, WBIntakeOutputProject):
+                fields["intake_outputs"] = self._project.intake_outputs
             project = type(self._project).model_validate(fields)
         elif isinstance(self._project, WBIntakeProject):
             fields = dict(project)
