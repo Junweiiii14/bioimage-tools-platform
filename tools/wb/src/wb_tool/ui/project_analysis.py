@@ -51,7 +51,7 @@ class ProjectAnalysisPanel(QWidget):
             ("计算所选行", lambda: self.run_requested.emit(False)),
             ("计算全部已配置行", lambda: self.run_requested.emit(True)),
             ("刷新项目表", self.refresh_requested.emit),
-            ("导出结果 XLSX", self.export_requested.emit),
+            ("导出结果 XLSX / CSV", self.export_requested.emit),
         ):
             button = QPushButton(text)
             button.clicked.connect(callback)

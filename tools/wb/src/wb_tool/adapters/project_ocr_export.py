@@ -1,18 +1,20 @@
 """Literal OCR-labelled project values, including both recognition and measurement lineage."""
 
+from collections.abc import Callable
 from pathlib import Path
 
+from wb_tool.adapters.csv_export import csv_bytes
 from wb_tool.adapters.worksheet_export import Cell, publish_xlsx, two_sheet_xlsx_bytes
 from wb_tool.application.project_analysis import LoadedProjectResult
 from wb_tool.application.project_ocr import LoadedProjectOCR, WBProjectOCR, fill_project_ocr_table
+from wb_tool.application.project_restore import WBRestoredProject, run_origin
 
 
-def export_project_ocr_table(
+def project_ocr_table_rows(
     project: WBProjectOCR,
     results: tuple[LoadedProjectResult, ...],
     loaded: LoadedProjectOCR | None,
-    destination: str | Path,
-) -> Path:
+) -> tuple[tuple[tuple[Cell, ...], ...], tuple[tuple[Cell, ...], ...]]:
     if project.ocr is None:
         raise ValueError("请先导入独立拼图")
     cells = fill_project_ocr_table(project, results, loaded)
@@ -66,4 +68,43 @@ def export_project_ocr_table(
                 c.reason,
             )
         )
-    return publish_xlsx(two_sheet_xlsx_bytes(tuple(rows), tuple(audit)), destination)
+    if isinstance(project, WBRestoredProject):
+        audit[6] += ("定量运行来源", "定量来源归档SHA256", "OCR运行来源", "OCR来源归档SHA256")
+        origin = run_origin(project, project.ocr.run.run_id if project.ocr.run else "")
+        for index, cell in enumerate(cells, 7):
+            audit[index] += (cell.evidence_origin, cell.archive_sha256, *origin)
+    return tuple(rows), tuple(audit)
+
+
+def project_ocr_csv_bytes(
+    project: WBProjectOCR, results: tuple[LoadedProjectResult, ...], loaded: LoadedProjectOCR | None
+) -> bytes:
+    _, audit = project_ocr_table_rows(project, results, loaded)
+    return csv_bytes(
+        (tuple(row[0] for row in audit[:6]) + audit[6],)
+        + tuple(tuple(row[1] for row in audit[:6]) + item for item in audit[7:])
+    )
+
+
+def export_project_ocr_table(
+    project: WBProjectOCR,
+    results: tuple[LoadedProjectResult, ...],
+    loaded: LoadedProjectOCR | None,
+    destination: str | Path,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> Path:
+    if Path(destination).suffix.lower() == ".csv":
+        from wb_tool.adapters.worksheet_export import publish_table_bytes
+
+        return publish_table_bytes(
+            project_ocr_csv_bytes(project, results, loaded),
+            destination,
+            ".csv",
+            cancelled=cancelled,
+        )
+    return publish_xlsx(
+        two_sheet_xlsx_bytes(*project_ocr_table_rows(project, results, loaded)),
+        destination,
+        cancelled=cancelled,
+    )

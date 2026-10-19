@@ -203,7 +203,7 @@ class NormalizationPanel(QWidget):
         actions = QHBoxLayout()
         for title, callback in (
             ("刷新归一化结果", self.refresh_requested.emit),
-            ("导出当前标签视图 XLSX", self.export_requested.emit),
+            ("导出当前标签视图 XLSX / CSV", self.export_requested.emit),
         ):
             button = QPushButton(title)
             button.clicked.connect(callback)

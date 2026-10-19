@@ -1,6 +1,6 @@
 # WB 数值核心
 
-公开入口 `wb_tool.api`；包版本0.14.0，实现定量/手工Qt闭环、OCR复核、结果表与显式样本归一化。
+公开入口 `wb_tool.api`；包版本0.16.0，实现定量/手工Qt闭环、OCR复核、结果表、归一化、批量元信息和统一归档。
 数值契约与参考来源见 `../../docs/contracts/wb-reference-v1.md`。
 
 - 输入：未平滑且已声明极性的非负有限剖面、闭区间 `BandBounds`、可选 `Baseline`。
@@ -49,3 +49,11 @@ v1草稿继续读取，协议/文档契约见wb-document-v2.md。自动裁剪、
 0.13.0新增WBNormalizedProject/schema v5，继续读取v1–v4，允许无OCR配置归一化。显式选择目标/内参或磷酸化/总蛋白、逐泳道样本映射、包含与对照；初始无样本名、参照泳道或确认。lane_reference_ratio@1分开保存原始积分展示、比值、对照均值和相对值，派生值从核验run重算，不写回原始结果。零/缺失/异常分母和无效对照给空值及原因，不加epsilon或跳过坏对照。Qt复核、OCR标签视图、重开与带来源XLSX共用同一计算；改映射撤回确认，源/ROI/N变化使关系过期。契约见wb-project-normalization-v1.md。用户实验偏好和真实对应未替用户选择；独审与完整产品验收待办。
 
 0.14.0增加PNG专用OCR输入（含透明白底和16位灰度），TIFF旧预处理身份保持；PNG不进入原图定量。项目“生成并识别当前拼图”保存精确修订后在后台生成完整PNG/嵌入来源，通过不可变资产导入进入既有真实OCR/人工校正/明确绑定流程，保留定量/归一化。单图独立拼图入口也支持PNG。成图/导入取消或晚到结果不替换当前源；自动刷新合并调度，不覆盖操作错误。预算和预处理详见wb-png-ocr-v1.md；JPEG/16位彩色PNG、统一归档及完整产品验收仍待办。
+
+0.15.0增加read_metadata_file/preview_metadata/filename_metadata/apply_metadata：有界只读XLSX/UTF-8 CSV、表头/字段选择、严格row_id/SHA/文件名匹配、重复/未匹配提示、可修正预览、所选行/字段原子应用、共同参数及字面文件名分段。公式缓存不导入，空白不覆盖，几何/N/空位有效性沿用原契约；v1–v5字段不变，已有run/OCR/归一化保持。原图列表增加128边后台缩略图及SHA缓存；重开可按需加载。详见wb-project-metadata-v1.md。真实匹配、独审与完整产品验收仍待办。
+
+0.16.0为原图/OCR/归一化导出增加CSV，和XLSX共用表格数据；文字以可逆text:前缀编码，数值/真实0/空值分开。export_figure_bundle新增可选ArchiveRunEvidence，archive.json v2索引所有成员的SHA/大小/角色，ZIP统一包含原图、原值裁剪、拼图、CSV/XLSX、原始请求/结果及当前配置。重新校验运行资产，坏结果标明不可用、其他行继续；不把缓存或外来记录当本机成功。后台有界、取消/无覆盖发布，项目v1–v5与原算法不变。详见wb-project-archive-v2.md；ZIP导入和完整产品验收待办。
+
+0.17.0增加有界ZIP检查/stage_project_archive和schema6归档历史证据，保留原ZIP、原图、OCR关联、原始结果，严格重建表/像素检查。schema1–5兼容，来源表/界面区分归档历史与本机运行，外来RunRecord不登记本机收据。再次导出保留历史来源链，最多8代并受2GiB总预算限制。见wb-project-restore-v1.md；真实科学准确率/独审与最终产品验收仍待办。
+
+0.18.0新增export_figure_image：直接保存完整RGB8显示TIFF/PNG，沿用原裁剪几何及既有16位整除257显示映射；嵌入相同来源JSON、DPI，原图/字体SHA与字节数核验，写入后重读核对像素和标签再无覆盖发布。已知本软件显示TIFF可走OCR，load_tiff定量入口明确拒绝；未知第三方图不按扩展名猜来源。PNG64MiB/TIFF128MiB、来源16MiB、3200万像素/32768边长预算；项目schema和数值公式保持，完整恢复仍用ZIP。见wb-direct-figure-image-v1.md。

@@ -20,3 +20,5 @@ backup 使用 SQLite 一致性备份 API 和不可变文件副本，拒绝现存
 操作系统崩溃/断电持久性还依赖目标文件系统；本轮以真实文件/SQLite 与阶段故障测试验证。
 
 测试见仓库根 tests/test_workspace.py；完整门禁还构建并隔离安装独立 wheel。
+
+T-019：import_draft_snapshot只在尚无文档/run的新工作区保存一个外来修订，后续继续正常CAS；不注册外来run/PID。带.restore-incomplete标记的目录拒绝打开。文档内容保持opaque，格式仍为v1。

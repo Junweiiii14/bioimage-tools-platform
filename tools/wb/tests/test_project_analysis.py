@@ -19,6 +19,8 @@ from wb_tool.api import (
     FigureTemplate,
     LaneROI,
     LoadedProjectResult,
+    MetadataCell,
+    MetadataSheet,
     NormalizationPlan,
     OCRRecognition,
     ProjectOCRRow,
@@ -34,6 +36,7 @@ from wb_tool.api import (
     WBReviewProject,
     analysis_is_current,
     analyze_annotations,
+    apply_metadata,
     bind_project_ocr_row,
     export_project_normalization,
     export_project_table,
@@ -45,6 +48,7 @@ from wb_tool.api import (
     make_normalization_plan,
     make_row_analysis,
     prepare_project_analyses,
+    preview_metadata,
     project_with_analyses,
     project_with_normalizations,
     project_with_ocr,
@@ -609,3 +613,70 @@ def test_normalization_preserves_ocr_and_requires_verified_labels(tmp_path: Path
     assert all(
         c.ratio is None for c in fill_project_normalization(reidentified, results, loaded).ocr_cells
     )
+
+
+def test_metadata_batch_preserves_verified_ocr_and_ratios_until_n_changes(tmp_path: Path) -> None:
+    project, results, loaded, _ = recognized_project(tmp_path)
+    assert project.ocr is not None
+    project = bind_project_ocr_row(project, project.ocr.rows[0].row_id, "row0")
+    assert project.ocr is not None
+    project = project_with_ocr(
+        project,
+        project.ocr.model_copy(
+            update={
+                "rows": tuple(r.model_copy(update={"confirmed": True}) for r in project.ocr.rows)
+            }
+        ),
+    )
+    plan = make_normalization_plan(project, "row0", "row1", "housekeeping")
+    plan = plan.model_copy(
+        update={
+            "confirmed": True,
+            "pairs": (
+                SamplePair(target_lane=1, sample="S1", reference_lane=1),
+                plan.pairs[1],
+                SamplePair(target_lane=3, sample="S3", reference_lane=2),
+            ),
+        }
+    )
+    normalized = project_with_normalizations(project, (plan,))
+    sheet = MetadataSheet(
+        "labels",
+        tuple(
+            tuple(MetadataCell(v) for v in row) for row in (("id", "protein"), ("row0", "renamed"))
+        ),
+    )
+    preview = preview_metadata(normalized, sheet, 0, "row_id", 0, (("protein", 1),))
+    renamed = apply_metadata(normalized, preview, preview.entries, ("protein",))
+    assert isinstance(renamed, WBNormalizedProject)
+    assert renamed.ocr == normalized.ocr and renamed.analyses == normalized.analyses
+    assert (
+        renamed.normalizations == normalized.normalizations
+        and renamed.suggestions == normalized.suggestions
+    )
+    assert [c.value for c in fill_project_ocr_table(renamed, results, loaded)[:3]] == [
+        4000,
+        None,
+        0,
+    ]
+    assert [c.ratio for c in fill_project_normalization(renamed, results, loaded).ocr_cells] == [
+        0.5,
+        None,
+        0,
+    ]
+    assert read_figure_project(renamed.model_dump_json().encode()) == renamed
+    sheet = MetadataSheet(
+        "geometry",
+        tuple(
+            tuple(MetadataCell(v) for v in row)
+            for row in (("id", "N", "empty"), ("row0", "1", "无"))
+        ),
+    )
+    preview = preview_metadata(
+        renamed, sheet, 0, "row_id", 0, (("lane_count", 1), ("empty_lanes", 2))
+    )
+    changed = apply_metadata(renamed, preview, preview.entries, ("lane_count", "empty_lanes"))
+    assert isinstance(changed, WBNormalizedProject)
+    assert changed.analyses == renamed.analyses and changed.ocr == renamed.ocr
+    assert all(c.ratio is None for c in fill_project_normalization(changed, results, loaded).cells)
+    assert fill_project_ocr_table(changed, results, loaded)[0].value is None

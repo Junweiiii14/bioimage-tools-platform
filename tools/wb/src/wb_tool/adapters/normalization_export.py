@@ -1,7 +1,9 @@
 """Literal, provenance-bearing ratios and relative values, with no replacement of prior exports."""
 
+from collections.abc import Callable
 from pathlib import Path
 
+from wb_tool.adapters.csv_export import csv_bytes
 from wb_tool.adapters.worksheet_export import Cell, publish_xlsx, two_sheet_xlsx_bytes
 from wb_tool.application.project_analysis import LoadedProjectResult
 from wb_tool.application.project_normalization import (
@@ -9,16 +11,16 @@ from wb_tool.application.project_normalization import (
     fill_project_normalization,
 )
 from wb_tool.application.project_ocr import LoadedProjectOCR
+from wb_tool.application.project_restore import WBRestoredProject, run_origin
 
 
-def export_project_normalization(
+def normalization_table_rows(
     project: WBNormalizedProject,
     results: tuple[LoadedProjectResult, ...],
     loaded: LoadedProjectOCR | None,
-    destination: str | Path,
     *,
     ocr_labels: bool = False,
-) -> Path:
+) -> tuple[tuple[tuple[Cell, ...], ...], tuple[tuple[Cell, ...], ...]]:
     if ocr_labels and project.ocr is None:
         raise ValueError("项目没有OCR行名")
     snapshot = fill_project_normalization(project, results, loaded)
@@ -143,4 +145,84 @@ def export_project_normalization(
                 plan.notes,
             )
         )
-    return publish_xlsx(two_sheet_xlsx_bytes(tuple(rows), tuple(audit)), destination)
+    if isinstance(project, WBRestoredProject):
+        audit[5] += (
+            "目标运行来源",
+            "目标归档SHA256",
+            "参照运行来源",
+            "参照归档SHA256",
+            "OCR运行来源",
+            "OCR归档SHA256",
+        )
+        for index, cell in enumerate(cells, 6):
+            audit[index] += (
+                *run_origin(project, cell.target.run_id if cell.target else ""),
+                *run_origin(project, cell.reference.run_id if cell.reference else ""),
+                *run_origin(
+                    project,
+                    project.ocr.run.run_id
+                    if ocr_labels and project.ocr and project.ocr.run
+                    else "",
+                ),
+            )
+    return tuple(rows), tuple(audit)
+
+
+def normalization_csv_bytes(
+    project: WBNormalizedProject,
+    results: tuple[LoadedProjectResult, ...],
+    loaded: LoadedProjectOCR | None,
+    *,
+    ocr_labels: bool = False,
+) -> bytes:
+    rows, audit = normalization_table_rows(project, results, loaded, ocr_labels=ocr_labels)
+    prefix: tuple[Cell, ...] = (
+        project.project_id,
+        project.revision,
+        "lane_reference_ratio@1",
+        audit[2][1],
+        audit[3][1],
+        audit[4][1],
+    )
+    return csv_bytes(
+        (
+            (
+                "项目 ID",
+                "项目修订",
+                "算法",
+                "标签来源",
+                "OCR源",
+                "OCR运行",
+                *rows[0],
+                *("来源_" + str(value) for value in audit[5]),
+            ),
+        )
+        + tuple(prefix + row + lineage for row, lineage in zip(rows[1:], audit[6:], strict=True))
+    )
+
+
+def export_project_normalization(
+    project: WBNormalizedProject,
+    results: tuple[LoadedProjectResult, ...],
+    loaded: LoadedProjectOCR | None,
+    destination: str | Path,
+    *,
+    ocr_labels: bool = False,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> Path:
+    if Path(destination).suffix.lower() == ".csv":
+        from wb_tool.adapters.worksheet_export import publish_table_bytes
+
+        return publish_table_bytes(
+            normalization_csv_bytes(project, results, loaded, ocr_labels=ocr_labels),
+            destination,
+            ".csv",
+            cancelled=cancelled,
+        )
+    return publish_xlsx(
+        two_sheet_xlsx_bytes(
+            *normalization_table_rows(project, results, loaded, ocr_labels=ocr_labels)
+        ),
+        destination,
+        cancelled=cancelled,
+    )

@@ -6,3 +6,6 @@
 *.tiff binary
 *.bat text eol=crlf
 *.cmd text eol=crlf
+
+# Preserve pinned upstream bytes for skill provenance on every checkout.
+/.agents/skills/impeccable/scripts/impeccable.cmd text eol=lf

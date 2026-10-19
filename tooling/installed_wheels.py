@@ -71,6 +71,7 @@ from wb_tool.api import (
     analyze_annotations, compute_lane_profiles, integrate_profile, load_tiff,
     StartFrame, WorkerConversation, encode_worker_frame, ResultFrame,
     CropRequest, export_crop, fixed_lane_grid,
+    FigureRow, WBFigureProject, read_metadata_file, preview_metadata, apply_metadata,
 )
 import numpy as np
 import tifffile
@@ -102,6 +103,24 @@ session = WorkerConversation(start)
 received = [session.accept(data) for data in frames]
 assert isinstance(received[-1], ResultFrame)
 assert received[-1].result.lanes[0].bands[0].signal == 10
+metadata_path = Path('installed-metadata.csv')
+metadata_path.write_text(chr(10).join(('row_id,protein,lane_count', 'r,AKT,3', '')),
+                         encoding='utf-8')
+metadata_book = read_metadata_file(metadata_path)
+metadata_project = WBFigureProject(project_id='p', rows=(FigureRow(row_id='r'),),
+                                   figure_order=('Fig1',))
+metadata_preview = preview_metadata(metadata_project, metadata_book.sheets[0], 0,
+                                   'row_id', 0, (('protein', 1), ('lane_count', 2)))
+metadata_updated = apply_metadata(metadata_project, metadata_preview, metadata_preview.entries,
+                                  ('protein', 'lane_count'))
+assert metadata_updated.rows[0].protein == 'AKT' and metadata_updated.rows[0].lane_count == 3
+from wb_tool.api import export_project_table, project_runs
+import csv
+export_project_table(metadata_updated, (), 'installed-results.csv')
+with Path('installed-results.csv').open(encoding='utf-8-sig', newline='') as stream:
+    exported = list(csv.DictReader(stream))
+assert len(exported) == 3 and all(row['积分'] == '' for row in exported)
+assert exported[0]['蛋白'] == 'text:AKT' and project_runs(metadata_updated) == ()
 assert not any(name.startswith(('PySide6', 'sqlite3')) for name in sys.modules)
 assert not any(name.startswith(('rapidocr', 'onnxruntime', 'cv2')) for name in sys.modules)
 print('Isolated WB wheel: TIFF/analysis, crop/grid and worker; no GUI/storage dependencies')
@@ -185,7 +204,7 @@ tifffile.imwrite('installed-fig.tif',np.array(figure))
 source = load_tiff('installed-fig.tif')
 from tool_contracts.api import AssetRef
 from wb_tool.api import (FigureRow, FigureTemplate, FigureSourcePath, WBFigureProject,
-    LaneROI, export_figure_bundle)
+    LaneROI, export_figure_bundle, export_figure_image, load_ocr_image, ImageInputError)
 asset = AssetRef(asset_id='figure-source', relative_path='inputs/original.tif',
     sha256=source.sha256, size_bytes=Path('installed-fig.tif').stat().st_size)
 row = FigureRow(row_id='row', source=asset, filename='original.tif', width=1200, height=500,
@@ -197,6 +216,46 @@ source_path = FigureSourcePath(source.sha256, str(Path('installed-fig.tif').reso
 export_figure_bundle(project, (source_path,),
     str(Path('installed-figure.zip').resolve()))
 assert Path('installed-figure.zip').exists()
+export_figure_image(project, (source_path,), 'installed-direct.tiff')
+export_figure_image(project, (source_path,), 'installed-direct.png')
+with Image.open('installed-direct.png') as png, tifffile.TiffFile('installed-direct.tiff') as tiff:
+    assert np.array_equal(np.array(png), tiff.asarray())
+    assert png.info['wb_provenance'] == tiff.pages[0].description
+    assert tiff.pages[0].software == 'bioimage-wb figure_display@1'
+    assert tiff.pages[0].tags['XResolution'].value == (300, 1)
+np.testing.assert_array_equal(load_ocr_image('installed-direct.png').pixels,
+                              load_ocr_image('installed-direct.tiff').pixels)
+try:
+    load_tiff('installed-direct.tiff')
+except ImageInputError as exc:
+    assert 'OCR' in str(exc)
+else:
+    raise AssertionError('Display TIFF was admitted as a quantitative source')
+assert load_tiff('installed-fig.tif').sha256 == source.sha256
+print('Installed direct TIFF/PNG: same full pixels/provenance/DPI; OCR only, original unchanged')
+from zipfile import ZipFile
+import json
+from hashlib import sha256
+with ZipFile('installed-figure.zip') as archive:
+    index = json.loads(archive.read('archive.json'))
+    assert index['schema_version'] == 2 and 'tables/source.csv' in archive.namelist()
+    assert all(sha256(archive.read(member['path'])).hexdigest() == member['sha256']
+               for member in index['members'])
+from wb_tool.api import (inspect_project_archive, stage_project_archive,
+    restore_staged_project, WBRestoredProject)
+assert inspect_project_archive('installed-figure.zip') == project
+staged = stage_project_archive('installed-figure.zip', 'installed-restore-staging')
+from platform_runtime.api import Workspace
+with Workspace.create('installed-restored') as store:
+    original = store.import_asset(staged.archive_path, staged.archive_sha256)
+    assets = tuple(store.import_asset(a.path, a.sha256) for a in staged.assets)
+    restored = restore_staged_project(staged, assets, original)
+    assert isinstance(restored, WBRestoredProject)
+    store.import_draft_snapshot(restored.project_id, 'wb-figure', restored.revision,
+                               restored.model_dump_json().encode())
+    assert store.list_runs() == ()
+with Workspace.open('installed-restored') as store:
+    assert store.load_draft(project.project_id).revision == project.revision
 from wb_tool.api import (CropDetectionSettings, WBReviewProject, suggest_crops,
     record_crop_suggestion, read_figure_project)
 suggestion = suggest_crops('installed-fig.tif', source.sha256, 'row', 0,
