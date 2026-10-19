@@ -101,3 +101,14 @@ wb-tool 0.2.0 新增 uint8/16 灰度及显式 RGB 单页 TIFF、极性与半开 
 ## 2026-10-15 F-003续办完成
 
 网络恢复。两技能固定SHA安装/锁及许可，Impeccable引擎SHA/默认启动器验证。REA6.5.0隔离静态Electron分析/追踪通过，篡改记录按预期拒绝，覆盖partial。PR #5独立目录补回执并推送ac75f6f，四项CI全通过。未合并/发布、未动T-021产品内容。
+## 2026-10-19 T-050 规划修订
+
+用户确认清单驱动的仪器原图流程。对产品a234354只读审计，核对原始PDF；从main221a2df独立文档分支创建新版规划和README入口，避免夹带未集成产品。清单/固定N/原像素定量是已确认需求，局部异常续作/独立输出目录/可选OCR发行是待审建议。代码、依赖、锁、门禁及原始PDF未改。旧main恢复快照留档。
+
+## 2026-10-19 T050 审核回复落盘
+
+根据用户回复更新第5/6/7/8节：批准局部暂停与独立结果目录，独立灰度定量OCR作为继续支持的功能。主流程不加载OCR与安装发行拆分是不同事项，后者未决；同步任务/风险/待办和交接。未改产品/PDF/依赖，旧审查不外推本轮修订。
+
+## 2026-10-20 E7 governance integration
+
+INT001 resumes authorized E7 only in this temporary historical integration tree. Merged planning main43d520f into original governance0b7, retained immutable RULE001 receipt source; loaded/read exact rules and current full scope. Main PR/CI not yet accepted. WB product development/checks remain in t051, not represented by this zero-product checkout.
