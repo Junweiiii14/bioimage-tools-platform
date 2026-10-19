@@ -180,9 +180,11 @@ def approve_intake_workflow(
 
 
 def claim_intake_workflow_step(
-    project: WBIntakeWorkflowProject, *, session_key: str
+    project: WBIntakeWorkflowProject, *, session_key: str, stage_filter: Stage | None = None
 ) -> tuple[WBIntakeWorkflowProject, IntakeWorkflowTicket | None]:
     type(project).model_validate(dict(project))
+    if stage_filter not in {None, "crop", "compose", "measure", "export"}:
+        raise ValueError("未知阶段过滤条件")
     if not session_key or len(session_key) > 160:
         raise ValueError("阶段执行需要明确会话身份")
     if not project.workflow.approved:
@@ -197,7 +199,9 @@ def claim_intake_workflow_step(
     pending = [
         s
         for s in project.workflow.steps
-        if s.status == "pending" and _prerequisites(project, s, statuses)
+        if s.status == "pending"
+        and (stage_filter is None or s.stage == stage_filter)
+        and _prerequisites(project, s, statuses)
     ]
     # Finish a ready Fig before moving to the next pending crop; failed Fig never blocks another.
     pending.sort(key=lambda s: s.stage == "crop")
@@ -243,6 +247,21 @@ def finish_intake_workflow_step(
 ) -> WBIntakeWorkflowProject:
     if outcome not in {"done", "needs_review", "failed", "cancelled"}:
         raise ValueError("执行器只能返回明确阶段终态")
+    active = validate_intake_workflow_ticket(project, ticket)
+    if project.workflow.cancel_requested:
+        outcome, reason = "cancelled", "取消已由执行器确认；已完成结果保留"
+    finished = IntakeWorkflowStep.model_validate(
+        {**dict(active), "status": outcome, "reason": reason}
+    )
+    return _replace_ledger(
+        project, steps=tuple(finished if s == active else s for s in project.workflow.steps)
+    )
+
+
+def validate_intake_workflow_ticket(
+    project: WBIntakeWorkflowProject, ticket: IntakeWorkflowTicket
+) -> IntakeWorkflowStep:
+    """Verify ownership before a side effect as well as when accepting its reply."""
     type(project).model_validate(dict(project))
     active = next((s for s in project.workflow.steps if s.status == "running"), None)
     if (
@@ -254,14 +273,7 @@ def finish_intake_workflow_step(
         != (active.stage, active.target_id, active.attempt, active.claim_id)
     ):
         raise ValueError("阶段回复已过期或身份不一致")
-    if project.workflow.cancel_requested:
-        outcome, reason = "cancelled", "取消已由执行器确认；已完成结果保留"
-    finished = IntakeWorkflowStep.model_validate(
-        {**dict(active), "status": outcome, "reason": reason}
-    )
-    return _replace_ledger(
-        project, steps=tuple(finished if s == active else s for s in project.workflow.steps)
-    )
+    return active
 
 
 def recover_intake_workflow(project: WBIntakeWorkflowProject) -> WBIntakeWorkflowProject:

@@ -10,6 +10,10 @@ from wb_tool.application.intake_crop import (
     WBIntakeCropProject,
     make_intake_crop_evidence,
 )
+from wb_tool.application.intake_workflow import (
+    IntakeWorkflowTicket,
+    validate_intake_workflow_ticket,
+)
 from wb_tool.domain.automatic import AutoWBSettings, detect_automatic_geometry
 
 
@@ -47,9 +51,14 @@ def export_intake_crop(
     row_id: str,
     destination: str,
     *,
+    ticket: IntakeWorkflowTicket,
     cancelled: Callable[[], bool] = lambda: False,
 ) -> str:
-    type(project).model_validate(dict(project))
+    validate_intake_workflow_ticket(project, ticket)
+    if ticket.stage != "crop" or ticket.target_id != row_id:
+        raise ValueError("原值裁剪必须属于当前活动裁剪票据")
+    if project.workflow.cancel_requested or cancelled():
+        raise ValueError("原值裁剪已取消，不发布新文件")
     evidence = next((e for e in project.intake_crops if e.row_id == row_id), None)
     if evidence is None or not evidence.reviewed or evidence.crop is None:
         raise ValueError("请先明确核对并审核原图裁剪范围")

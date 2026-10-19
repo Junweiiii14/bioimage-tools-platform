@@ -119,10 +119,27 @@ def test_review_crop_exports_exact_original_samples_and_no_overwrite(tmp_path: P
     assert not p.workflow.approved
     assert all(s.signal == "undetermined" for s in p.intake_crops[0].slots)
     assert p.rows[0].empty_lanes == ()
+    target = tmp_path / "crop.tiff"
+    for no_claim in (p, approve(p)):
+        with pytest.raises(ValueError, match="过期"):
+            export_intake_crop(str(source), no_claim, "r", str(target), ticket=ticket)
+        assert not target.exists()
     p, ticket = claim_intake_workflow_step(approve(p), session_key="test")
     assert isinstance(p, WBIntakeCropProject) and ticket is not None
-    target = tmp_path / "crop.tiff"
-    export_intake_crop(str(source), p, "r", str(target))
+    with pytest.raises(ValueError, match="过期"):
+        export_intake_crop(
+            str(source),
+            p,
+            "r",
+            str(target),
+            ticket=ticket.model_copy(update={"claim_id": "0" * 64}),
+        )
+    cancelled = request_intake_workflow_cancel(p)
+    assert isinstance(cancelled, WBIntakeCropProject)
+    with pytest.raises(ValueError, match="取消"):
+        export_intake_crop(str(source), cancelled, "r", str(target), ticket=ticket)
+    assert not target.exists()
+    export_intake_crop(str(source), p, "r", str(target), ticket=ticket)
     expected = np.array(
         [list(range(y * 144 + 12, y * 144 + 132)) for y in range(10, 50)], dtype=np.uint16
     )
@@ -132,7 +149,7 @@ def test_review_crop_exports_exact_original_samples_and_no_overwrite(tmp_path: P
         assert np.array_equal(page.asarray(), expected)
     assert source.read_bytes() == before
     with pytest.raises(FileExistsError):
-        export_intake_crop(str(source), p, "r", str(target))
+        export_intake_crop(str(source), p, "r", str(target), ticket=ticket)
     asset = AssetRef(
         asset_id="crop",
         relative_path="assets/crop.tiff",
@@ -142,6 +159,7 @@ def test_review_crop_exports_exact_original_samples_and_no_overwrite(tmp_path: P
     finished = complete_intake_crop(p, ticket, asset)
     assert finished.workflow.steps[0].status == "done"
     assert finished.intake_crops[0].raw_crop == asset
+    assert claim_intake_workflow_step(finished, session_key="test", stage_filter="crop")[1] is None
     next_project, compose = claim_intake_workflow_step(finished, session_key="test")
     assert isinstance(next_project, WBIntakeCropProject)
     assert compose is not None and compose.stage == "compose"
