@@ -147,12 +147,66 @@ def test_real_page_cancels_old_drag_and_accepts_new_gesture(
             ),
             timeout=10000,
         )
-        start = """(()=>{const el=$('#crop-overlay'),rect=el.getBoundingClientRect();
-            el.setPointerCapture=()=>{};
-            window.testGesture={x:rect.x+rect.width/2,y:rect.y+rect.height/2};
-            el.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:1,
-                clientX:testGesture.x,clientY:testGesture.y}));return drag!==null;})()"""
-        assert js(start) is True
+
+        def start_gesture() -> None:
+            # Freeze the native identity once. Poll only before sending an event;
+            # rejection of an actual pointerdown must fail, never trigger a retry.
+            snapshot = window.bridge.snapshot()
+            selected = host.view.selected_row()
+            assert selected is not None and selected.source is not None
+            identity = {
+                "projectId": snapshot["projectId"],
+                "sessionEpoch": snapshot["sessionEpoch"],
+                "revision": snapshot["revision"],
+                "id": selected.row_id,
+                "sourceId": selected.source.sha256,
+            }
+            before = js("window.testGestureDispatches||0")
+            assert isinstance(before, (int, float))
+            start = """(()=>{const expected=EXPECTED,current=cropIdentity();
+                if(state.busy||!row()?.roi||
+                   !Object.keys(expected).every(key=>expected[key]===current[key]))return 'waiting';
+                switchMode('review');
+                const el=$('#crop-overlay'),rect=el.getBoundingClientRect();
+                if(el.hidden||rect.width<=0||rect.height<=0)return 'waiting';
+                el.setPointerCapture=()=>{};
+                window.testGesture={x:rect.x+rect.width/2,y:rect.y+rect.height/2};
+                window.testGestureDispatches=(window.testGestureDispatches||0)+1;
+                el.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:1,
+                    clientX:testGesture.x,clientY:testGesture.y}));
+                return drag!==null;})()""".replace("EXPECTED", json.dumps(identity))
+
+            dispatched: list[object] = []
+
+            def attempt() -> bool:
+                result = js(start)
+                if result == "waiting":
+                    return False
+                dispatched.append(result)
+                return True
+
+            qtbot.waitUntil(attempt, timeout=10000)
+            assert dispatched == [True], js(
+                "JSON.stringify({busy:state.busy,mode,identity:cropIdentity(),"
+                "roi:row()?.roi,intake:state.intake,dispatches:window.testGestureDispatches})"
+            )
+            assert js("window.testGestureDispatches") == before + 1
+
+        # A real dispatched event rejected by the page must fail immediately,
+        # even though pytest-qt retries AssertionError from waitUntil callbacks.
+        assert (
+            js(
+                "(()=>{$('#crop-overlay').addEventListener('pointerdown',"
+                "event=>event.stopImmediatePropagation(),{capture:true,once:true});return true})()"
+            )
+            is True
+        )
+        before_rejection = js("window.testGestureDispatches||0")
+        assert isinstance(before_rejection, (int, float))
+        with pytest.raises(AssertionError, match="busy"):
+            start_gesture()
+        assert js("window.testGestureDispatches") == before_rejection + 1
+        start_gesture()
         if change == "generation":
             host.view.canvas.roi_drawn.emit((40, 40, 340, 70))
         else:
@@ -177,9 +231,7 @@ def test_real_page_cancels_old_drag_and_accepts_new_gesture(
             if getattr(advanced, name) != getattr(current, name)
         }
         qtbot.waitUntil(lambda: not host.operation_busy, timeout=10000)
-        qtbot.waitUntil(lambda: js("!state.busy") is True, timeout=10000)
-        assert js("switchMode('review'); true") is True
-        assert js(start) is True
+        start_gesture()
         generation = host.view.generation
         assert (
             js("""(()=>{const el=$('#crop-overlay');el.dispatchEvent(new PointerEvent('pointermove',
