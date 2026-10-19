@@ -47,7 +47,7 @@
 ## Current Pointer
 
 - Last updated: 2026-10-20
-- Current implementation: E6/T-059 completed at ea7ed55 in t051/codex/wb-e0-e7; full check0 (862/624.64s, raw child0, all wheels/real OCR), bound scoped non-author review and UI ship. Continue E7/T060: fix historical OCR late-cancellation P2 from whole-live-code audit, integrate dependency PRs with exact receipts/checks, build a new isolated installer. No stage reapproval/automation; old installs/checkouts preserved. Native purecall UNKNOWN and scientific/target-machine gaps remain. Tasks are the only status authority.
+- Current implementation: E0–E6 locally completed with bound reviews; E7/T-060 implementing in t051/codex/wb-e0-e7. Product e57949b; predecessor full900/check0 plus focused diagnostic correction3/0. New isolated E7 installed dual-flow and PS5.1 selfcheck0; lifecycle/reintegration/final CI pending. Accepted main aac126e; PR11 e478 new CI, PR12–15 prepared. See task/snapshot; historical native UNKNOWN and scientific/clean Win10/DPI gaps remain. No reapproval or automation.
 - T-048 offline x64 Win10 test installer delivered from existing T-045 checkout: `C:/Users/70236/.codex/worktrees/t045-wbquant/bioimage-tools-platform`, branch `codex/t045-wbquant-manual-and-fig`; product3821c64, verify actual HEAD. Separate test installation/mandatory shortcuts/private runtime; Win11 nonadmin install/uninstall/reinstall and scoped independent review passed. Desktop delivery folder `BioImage-WB-Win10-测试版-T048`; clean Win10 acceptance still not run. No new worktree, original replacement or formal release. See T-048 task, validation and snapshot; previous T047 candidate/user windows retained.
 - Candidate entry: this checkout's `Start-BioImage.ps1`; `--verify-launch` confirms its source. The desktop “BioImage WB 工作台（当前开发）” shortcut remains pointed at the earlier t021 checkout; it was not changed for T-045.
 - Earlier t021 checkout currently lacks Git/hidden handoff files; cause UNKNOWN. Original ResearchVault checkout retains dirty historical work. Do not repair, delete, synchronize or switch old trees/shortcuts based on this candidate. Main/PR integration and release are separate.
@@ -71,4 +71,5 @@ For non-trivial work, update the relevant files before final response:
 - Update `.agent-handoff/decisions.md` when a durable decision was made.
 - Update `.agent-handoff/backlog.md` and `.agent-handoff/risks.md` when follow-ups, blockers, risks, or unknowns changed.
 - Run the handoff maintenance check and resolve hard-limit findings before final response.
+
 
