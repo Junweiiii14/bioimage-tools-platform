@@ -8,6 +8,7 @@ This file stores compressed old history that should not be part of normal startu
 - Move stale but potentially useful history here as concise summaries.
 - Keep pointers to relevant decisions, validation entries, or source files.
 
+
 ## Rotated Records
 - [work-log-20261015T082420238818Z.md](archive/work-log-20261015T082420238818Z.md): work log exceeded 64 KiB or 30 dated sections
 - [work-log-20261015T091217179005Z.md](archive/work-log-20261015T091217179005Z.md): work log exceeded 64 KiB or 30 dated sections
@@ -75,3 +76,7 @@ This file stores compressed old history that should not be part of normal startu
 - 2026-10-20 E5收尾：validation原始227行先完整备份至 `.agent-handoff/archive/validation-20261020-e5-closeout.md`，当前索引压缩至200行以内；未删除历史失败。
 - [work-log-20261019T192501846754Z.md](archive/work-log-20261019T192501846754Z.md): work log exceeded 64 KiB or 30 dated sections
 - [work-log-20261019T200915753365Z.md](archive/work-log-20261019T200915753365Z.md): work log exceeded 64 KiB or 30 dated sections
+
+T050初次归档复制因archive目录尚不存在失败，随后从未修改的main基线恢复原快照并归档；无历史丢失。原快照见archive/T050-before-plan-snapshot.md。
+- 2026-10-20 INT001集成前T050快照：archive/INT001-before-integration-snapshot.md（先保存后更新当前状态）。
+- INT001合入时main当前快照：archive/INT001-at-merge-snapshot.md；实际合入事实见T060/SYNC阶段证据。

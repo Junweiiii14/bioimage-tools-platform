@@ -12,6 +12,7 @@ CI011 aabd39e本机正式check --all实际exit0：670passed/517.68秒，原pytes
 
 ## 2026-10-18 T044积分诊断与目录/分组首阶段
 
+
 建立完整任务并scope .规则（精确base d11552c）；新分支同活动树、固定入口路径保持。原41复核原因分解已实测，盲扩有误选目标反例；不改科学状态。目录筛选精确8源，同Fig四组及β字体正常工作台端到端0，原SHA/48值状态原因保持；20定向0/类型0。完整门禁和提交独审待执行，其余全部需求继续推进，见T044任务/validation。
 
 
@@ -187,3 +188,11 @@ T058 done，产品8feffce：schema14稳定身份填表、冻结资产/run、新�
 ## 2026-10-20 E6 closeout
 
 Completed ea7ed55 frozen render reuse, exact-owned widgets and full stage pagination. 862/624.64s + original child0/all wheels/real OCR/full gate0; independent scoped review/UI ship. Export20x2 thresholds passed; desktop20/phase1/cancel5 explicitly limited. Inventory4 does not resolve purecall UNKNOWN. Auto-next E7, including historical OCR late cancellation P2 discovered by separate high-risk audit. No remote mutation/new installer yet.
+
+## 2026-10-19 T050 规划回复（保留main记录）
+
+根据用户回复更新第5/6/7/8节：批准局部暂停与独立结果目录，独立灰度定量OCR作为继续支持的功能。主流程不加载OCR与安装发行拆分是不同事项，后者未决；同步任务/风险/待办和交接。未改产品/PDF/依赖，旧审查不外推本轮修订。
+
+## 2026-10-20 E7 governance integration
+
+INT001 resumes authorized E7 only in this temporary historical integration tree. Merged planning main43d520f into original governance0b7, retained immutable RULE001 receipt source; loaded/read exact rules and current full scope. Main PR/CI not yet accepted. WB product development/checks remain in t051, not represented by this zero-product checkout.
