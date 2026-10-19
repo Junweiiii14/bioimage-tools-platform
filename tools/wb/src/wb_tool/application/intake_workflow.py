@@ -331,6 +331,8 @@ def retry_intake_workflow_step(
 
 
 def intake_workflow_snapshot(project: WBIntakeWorkflowProject) -> dict[str, object]:
+    from wb_tool.application.intake_output import WBIntakeOutputProject
+
     return {
         **project.workflow.model_dump(mode="json"),
         "digest": intake_workflow_digest(project),
@@ -338,7 +340,7 @@ def intake_workflow_snapshot(project: WBIntakeWorkflowProject) -> dict[str, obje
         "ready_count": sum(s.status == "done" for s in project.workflow.steps),
         "pending_ready": sum(
             s.status == "pending"
-            and s.stage != "export"
+            and (s.stage != "export" or isinstance(project, WBIntakeOutputProject))
             and _prerequisites(
                 project, s, {(p.stage, p.target_id): p.status for p in project.workflow.steps}
             )

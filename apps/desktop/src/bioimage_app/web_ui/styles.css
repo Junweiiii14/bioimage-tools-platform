@@ -74,3 +74,7 @@
 
 .intake-source-links { display: flex; flex-direction: column; align-items: stretch; gap: 12px; margin-top: 12px; }
 .intake-source-links .text-button { text-align: left; white-space: normal; overflow-wrap: anywhere; line-height: 1.7; }
+
+.intake-output-path { overflow-wrap: anywhere; user-select: text; }
+.intake-output-info details { font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
+.intake-output-info ul { padding-left: 18px; }

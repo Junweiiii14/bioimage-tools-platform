@@ -13,13 +13,16 @@ from wb_tool.api import (
     IntakeCropEvidence,
     IntakeCropFile,
     IntakeFigurePreparation,
+    IntakeOutputPreparation,
     IntakeWorkflowTicket,
     WBFigureProject,
     WBIntakeCropProject,
     WBIntakeFigureProject,
+    WBIntakeOutputProject,
     WBIntakeWorkflowProject,
     WBJob,
     WBReply,
+    approve_intake_workflow,
     claim_intake_workflow_step,
     complete_intake_crop,
     complete_intake_figure,
@@ -28,8 +31,12 @@ from wb_tool.api import (
     finish_intake_workflow_step,
     intake_workflow_digest,
     prepare_intake_measurement_revision,
+    prepare_intake_outputs,
+    project_assets,
     record_intake_crop_proposal,
+    record_intake_output,
     request_intake_workflow_cancel,
+    retry_intake_workflow_step,
 )
 
 from bioimage_app.project_measurements import ProjectBatchCompletion
@@ -46,9 +53,52 @@ class IntakeWorkflowSession:
         self._cancelled = False
         self._temporary: TemporaryDirectory[str] | None = None
         self._temporary_root: Path | None = None
+        self._output_context: tuple[str, str] | None = None
+        self._output_path = ""
+        self._output_committed = False
 
     def cancel(self) -> None:
         self._cancelled = True
+
+    def output_snapshot(self, project: WBIntakeOutputProject) -> dict[str, object]:
+        if self._output_context == (self.host.workspace_path, project.project_id):
+            return {"path": self._output_path, "committed": self._output_committed}
+        last = project.intake_outputs[-1] if project.intake_outputs else None
+        return {"path": last.destination if last else "", "committed": bool(last)}
+
+    def publish_snapshot(self, expected_digest: str) -> None:
+        host = self.host
+        project = host.view.project()
+        if host.operation_busy or host.is_closing:
+            return
+        if not isinstance(
+            project, WBIntakeFigureProject
+        ) or expected_digest != intake_workflow_digest(project):
+            raise ValueError("输出输入已改变，请重新核对")
+        self._key, self._cancelled = uuid4().hex, False
+        host.begin_operation()
+        prepared = prepare_intake_outputs(project)
+        step = next(s for s in prepared.workflow.steps if s.stage == "export")
+        ticket: IntakeWorkflowTicket | None = None
+        if step.status != "done" and all(
+            s.status == "done" for s in prepared.workflow.steps if s.stage != "export"
+        ):
+            if step.status != "pending":
+                prepared = retry_intake_workflow_step(
+                    prepared,
+                    "export",
+                    prepared.project_id,
+                    expected_digest=intake_workflow_digest(prepared),
+                )
+            prepared = approve_intake_workflow(
+                prepared, expected_digest=intake_workflow_digest(prepared)
+            )
+            prepared, ticket = claim_intake_workflow_step(
+                prepared, session_key=self._key, stage_filter="export"
+            )
+        if not isinstance(prepared, WBIntakeOutputProject):
+            raise ValueError("输出快照准备类型无效")
+        self._persist(prepared, lambda: self._export(ticket))
 
     def show_figure(self, figure_id: str, expected_digest: str) -> None:
         host = self.host
@@ -181,16 +231,14 @@ class IntakeWorkflowSession:
             if not isinstance(active, WBIntakeCropProject):
                 raise ValueError("裁剪阶段返回无效快照")
             if ticket is None:
-                pending = sum(
-                    s.stage != "export" and s.status != "done" for s in project.workflow.steps
-                )
+                pending = sum(s.status != "done" for s in project.workflow.steps)
                 host.finish_operation(
                     f"阶段已保存；{pending} 项待复核或重试，其他完整Fig结果保留。"
                     if pending
-                    else "原值裁剪已保存，等待完整Fig拼图；尚未生成定量结果。"
+                    else "全部阶段已保存；输出索引与原始运行证据保持。"
                 )
                 return
-            if ticket.stage == "export":
+            if ticket.stage == "export" and not isinstance(active, WBIntakeOutputProject):
                 host.finish_operation("完整Fig与原像素运行已保存，等待结果输出；原图和历史保持。")
                 return
             if ticket.stage == "measure":
@@ -211,14 +259,20 @@ class IntakeWorkflowSession:
     def _execute(self, ticket: IntakeWorkflowTicket) -> None:
         host = self.host
         project = host.view.project()
-        if not isinstance(project, WBIntakeCropProject) or self._cancelled or host.is_closing:
+        if not isinstance(project, WBIntakeCropProject) or host.is_closing:
             host.finish_operation("裁剪已停止，阶段记录保留。")
+            return
+        if self._cancelled:
+            self._failed_stage(ticket, "执行在启动前取消")
             return
         if ticket.stage == "compose":
             self._compose(ticket)
             return
         if ticket.stage == "measure":
             self._measure(ticket)
+            return
+        if ticket.stage == "export":
+            self._export(ticket)
             return
         generation, key = host.view.generation, self._key
         published: IntakeCropFile | None = None
@@ -351,18 +405,18 @@ class IntakeWorkflowSession:
     def _failed_stage(self, ticket: IntakeWorkflowTicket, message: str) -> None:
         host = self.host
         project = host.view.project()
-        if not isinstance(project, WBIntakeFigureProject):
+        if not isinstance(project, WBIntakeCropProject):
             host.fail_operation(message)
             return
         try:
             if self._cancelled or host.cancellation.is_set():
                 marked = request_intake_workflow_cancel(project)
-                if not isinstance(marked, WBIntakeFigureProject):
+                if not isinstance(marked, WBIntakeCropProject):
                     raise ValueError("当前阶段类型改变")
                 project = marked
                 self._cancelled = True
             updated = finish_intake_workflow_step(project, ticket, "failed", reason=message[:2000])
-            if not isinstance(updated, WBIntakeFigureProject):
+            if not isinstance(updated, WBIntakeCropProject):
                 raise ValueError("阶段终态无效")
             self._persist(updated, self._advance, terminal_cancel=self._cancelled)
         except ValueError as error:
@@ -475,6 +529,143 @@ class IntakeWorkflowSession:
                 self._failed_stage(ticket, str(error))
 
         next_source()
+
+    def _export(self, ticket: IntakeWorkflowTicket | None) -> None:
+        host = self.host
+        project = host.view.project()
+        if not isinstance(project, WBIntakeOutputProject):
+            host.fail_operation("缺少当前身份输出项目")
+            return
+        key, generation = self._key, host.view.generation
+        parent = Path(host.workspace_path) / "outputs"
+        try:
+            parent.mkdir(exist_ok=True)
+        except OSError as error:
+            if ticket is not None:
+                self._failed_stage(ticket, str(error))
+            else:
+                host.fail_operation(str(error))
+            return
+        destination = parent / ("WB-intake-" + uuid4().hex)
+        pending = list(project_assets(project))
+        sources: list[FigureSourcePath] = []
+        published: IntakeOutputPreparation | None = None
+        host.begin_operation()
+        host.view.status.setText("正在核验原资产与运行证据，生成新结果快照…")
+
+        def stopped() -> bool:
+            if self._obsolete(key, generation):
+                if key == self._key:
+                    host.finish_operation("旧输出回复未安装；已发布目录保持。")
+                return True
+            return False
+
+        def failed(message: str) -> None:
+            if ticket is not None:
+                self._failed_stage(ticket, message)
+            else:
+                host.fail_operation(message)
+
+        def next_asset() -> None:
+            if stopped():
+                return
+            if self._cancelled or host.cancellation.is_set():
+                failed("结果输出已取消，原始运行与旧目录保持")
+            elif pending:
+                ref = pending.pop(0)
+
+                def resolved(reply: StorageReply) -> None:
+                    if not reply.error_code and isinstance(reply.value, str):
+                        sources.append(FigureSourcePath(ref.sha256, reply.value))
+                    next_asset()
+
+                host.submit_storage_job(
+                    StorageCommand("asset", asset=ref), resolved, accept_errors=True
+                )
+            else:
+                host.submit_export_job(
+                    WBJob(
+                        "intake_output_export",
+                        document=project,
+                        sources=tuple(sources),
+                        destination=str(destination),
+                        cancellation=host.cancellation,
+                        data=ticket.model_dump_json().encode() if ticket else b"",
+                    ),
+                    exported,
+                    accept_errors=True,
+                )
+
+        def exported(reply: WBReply) -> None:
+            nonlocal published
+            if stopped():
+                return
+            if reply.error or not isinstance(reply.value, IntakeOutputPreparation):
+                failed(reply.error or "输出索引回复无效")
+                return
+            published = reply.value
+            if (
+                Path(published.destination) != destination
+                or Path(published.path) != destination / "index.json"
+            ):
+                failed("输出索引路径不属于本次新目录")
+                return
+            self._output_context = (host.workspace_path, project.project_id)
+            self._output_path, self._output_committed = published.destination, False
+            host.submit_storage_job(
+                StorageCommand("import", path=published.path, source_sha256=published.sha256),
+                imported,
+                accept_errors=True,
+            )
+
+        def imported(reply: StorageReply) -> None:
+            if stopped() or published is None:
+                return
+            if reply.error_code or not isinstance(reply.value, AssetRef):
+                failed(
+                    (reply.message or "输出索引导入失败")
+                    + "；目录已发布并保留："
+                    + published.destination
+                )
+                return
+            current = host.view.project()
+            if not isinstance(current, WBIntakeOutputProject):
+                host.fail_operation("输出项目已改变，目录保留：" + published.destination)
+                return
+            try:
+                if self._cancelled or host.cancellation.is_set():
+                    self._cancelled = True
+                    if ticket is None:
+                        host.finish_operation(
+                            "输出已发布，项目登记已取消；目录保留：" + published.destination
+                        )
+                        return
+                    marked = request_intake_workflow_cancel(current)
+                    if not isinstance(marked, WBIntakeOutputProject):
+                        raise ValueError("输出取消类型改变")
+                    current = marked
+                updated = record_intake_output(current, published, reply.value, ticket=ticket)
+
+                def registered() -> None:
+                    if self._cancelled:
+                        host.finish_operation(
+                            "输出已发布，登记取消；原目录保留：" + self._output_path
+                        )
+                    else:
+                        self._output_committed = True
+                        label = (
+                            "完整结果已保存："
+                            if published and published.complete
+                            else "部分结果快照已保存，请查看异常："
+                        )
+                        host.end_phase()
+                        host.refresh_project_table(label + self._output_path)
+
+                self._persist(updated, registered, terminal_cancel=self._cancelled)
+            except ValueError as error:
+                failed(str(error) + "；已发布目录保留：" + published.destination)
+
+        next_asset()
 
     def _measure(self, ticket: IntakeWorkflowTicket) -> None:
         host = self.host

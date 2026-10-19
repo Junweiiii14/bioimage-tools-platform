@@ -163,9 +163,7 @@ def record_intake_output(
         fields["workflow"] = project.workflow.model_copy(update={"steps": steps})
         if project.workflow.cancel_requested:
             return type(project).model_validate(fields)
-    elif project.workflow.cancel_requested or any(
-        s.status == "running" for s in project.workflow.steps
-    ):
+    elif any(s.status == "running" for s in project.workflow.steps):
         raise ValueError("活动或取消中的阶段不能接受其他输出快照")
     if (
         prepared.project_id != project.project_id

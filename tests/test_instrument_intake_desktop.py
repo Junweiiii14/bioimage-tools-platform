@@ -9,8 +9,9 @@ from typing import cast
 import numpy as np
 import pytest
 import tifffile
+from bioimage_app.intake_workflow import IntakeWorkflowSession
 from bioimage_app.project_measurements import ProjectMeasurementSession
-from bioimage_app.storage import StorageReply
+from bioimage_app.storage import StorageCommand, StorageReply
 from bioimage_app.web_window import WebWorkbenchWindow
 from platform_runtime.api import Workspace
 from PySide6.QtCore import QSettings
@@ -18,11 +19,13 @@ from pytestqt.qtbot import QtBot
 from tool_contracts.api import AssetRef, DraftSnapshot, RunRecord
 from wb_tool.api import (
     FigureTemplate,
+    IntakeWorkflowTicket,
     PreviewRaster,
     ProjectRowAnalysis,
     WBFigureProject,
     WBIntakeCropProject,
     WBIntakeFigureProject,
+    WBIntakeOutputProject,
     WBIntakeProject,
     WBIntakeWorkflowProject,
     WBJob,
@@ -31,6 +34,7 @@ from wb_tool.api import (
     intake_workflow_digest,
     prepare_intake_workflow,
     propose_intake_crop,
+    read_figure_project,
 )
 
 from tooling.qt_test_lifecycle import close_and_dispose_window
@@ -359,7 +363,7 @@ def test_fixed_n_crop_run_review_original_asset_and_reopen(
         timeout=20000,
     )
     wait_saved(window, qtbot)
-    assert current(window).schema_version == 13
+    assert current(window).schema_version == 14
     assert current(window).rows[0].lane_count == 8
 
 
@@ -731,7 +735,17 @@ def test_complete_intake_fig_is_saved_before_real_worker_and_restores_verified_r
     assert next(s for s in finished.workflow.steps if s.stage == "measure").status == "done", (
         window.host.view.status.text()
     )
-    assert next(s for s in finished.workflow.steps if s.stage == "export").status == "pending"
+    assert isinstance(finished, WBIntakeOutputProject)
+    assert next(s for s in finished.workflow.steps if s.stage == "export").status == "done"
+    assert len(finished.intake_outputs) == 1 and finished.intake_outputs[0].complete
+    output = Path(finished.intake_outputs[0].destination)
+    assert (output / "project.zip").is_file() and (output / "measurements.xlsx").is_file()
+    index = json.loads((output / "index.json").read_bytes())
+    assert index["complete"] is True and index["errors"] == []
+    assert len(window.bridge.snapshot()["cells"]) == 16
+    (tmp_path / "complete-web-snapshot.json").write_text(
+        json.dumps(window.bridge.snapshot(), ensure_ascii=False), encoding="utf-8"
+    )
     assert len(finished.analyses) == 2 and len(window.host.project_results) == 2
     assert all(
         p.run and p.run.state == "succeeded" and p.run.pid and p.run.pid > 0
@@ -775,6 +789,46 @@ def test_complete_intake_fig_is_saved_before_real_worker_and_restores_verified_r
     assert len(window.host.project_results) == 2
     assert tuple(p.run for p in restored.analyses) == tuple(p.run for p in finished.analyses)
     assert not restored.workflow.approved
+    assert isinstance(restored, WBIntakeOutputProject)
+    assert restored.intake_outputs == finished.intake_outputs
+    old_zip = (output / "project.zip").read_bytes()
+    request(window, "intake_export", workflowDigest=intake_workflow_digest(restored))
+    wait_saved(window, qtbot)
+    repeated = current(window)
+    assert isinstance(repeated, WBIntakeOutputProject) and len(repeated.intake_outputs) == 2
+    assert repeated.intake_outputs[-1].complete
+    assert repeated.intake_outputs[-1].destination != str(output)
+    assert (output / "project.zip").read_bytes() == old_zip
+    assert len(window.host.project_results) == 2
+    settings = QSettings(str(tmp_path / "restored-intake.ini"), QSettings.Format.IniFormat)
+    fresh = WebWorkbenchWindow(settings=settings)
+    fresh.show()
+    try:
+        target = tmp_path / "restored-intake"
+        fresh.host.restore_archive(str(output / "project.zip"), str(target))
+        qtbot.waitUntil(lambda: fresh.host.workspace_path == str(target), timeout=20000)
+        wait_saved(fresh, qtbot)
+        imported = current(fresh)
+        assert isinstance(imported, WBIntakeOutputProject)
+        assert len(imported.imported_runs) == 2 and len(fresh.host.project_results) == 2
+        assert (
+            next(s for s in imported.workflow.steps if s.stage == "export").status == "interrupted"
+        )
+        replies: list[StorageReply] = []
+        fresh.host.submit_storage_job(StorageCommand("runs"), replies.append)
+        qtbot.waitUntil(lambda: bool(replies), timeout=10000)
+        assert replies[0].value == ()
+        request(fresh, "intake_export", workflowDigest=intake_workflow_digest(imported))
+        wait_saved(fresh, qtbot)
+        again = current(fresh)
+        assert isinstance(again, WBIntakeOutputProject)
+        assert again.intake_outputs[-1].complete
+        assert next(s for s in again.workflow.steps if s.stage == "export").status == "done"
+        assert (output / "project.zip").read_bytes() == old_zip
+    finally:
+        close_and_dispose_window(
+            fresh, qtbot, resources_closed=lambda: fresh.host.resources_closed, timeout=20000
+        )
     monkeypatch.undo()
 
 
@@ -901,4 +955,104 @@ def test_cancelled_intake_measurement_does_not_launch_next_source(
     assert not window.host.project_results
     assert all(p.run is None or p.run.state != "succeeded" for p in cancelled.analyses)
     assert not window.host.has_unsaved_changes
+    monkeypatch.undo()
+
+
+@pytest.mark.parametrize(
+    "fault", ["claim_save", "output_save", "late_cancel", "worker_error", "cancel_before_export"]
+)
+def test_intake_output_failure_and_cancellation_never_fabricate_completion(
+    intake_window: WebWorkbenchWindow,
+    qtbot: QtBot,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    fault: str,
+) -> None:
+    from wb_tool.adapters import intake_output
+
+    window = intake_window
+    reviewed_intake_fig(window, qtbot, tmp_path)
+    original_save = Workspace.save_draft
+    original_export = window.host.submit_export_job
+    execute = cast(
+        Callable[[IntakeWorkflowSession, IntakeWorkflowTicket], None],
+        IntakeWorkflowSession.__dict__["_execute"],
+    )
+    held: list[tuple[Callable[[WBReply], None], WBReply]] = []
+
+    def save(
+        store: Workspace,
+        document_id: str,
+        tool_id: str,
+        revision: int,
+        data: bytes,
+        *,
+        expected_previous_revision: int | None = None,
+    ) -> DraftSnapshot:
+        saved = read_figure_project(data)
+        step = (
+            next((s for s in saved.workflow.steps if s.stage == "export"), None)
+            if isinstance(saved, WBIntakeWorkflowProject)
+            else None
+        )
+        status = step.status if step else ""
+        if (fault == "claim_save" and status == "running") or (
+            fault == "output_save" and status == "done"
+        ):
+            raise OSError("injected output CAS failure")
+        return original_save(
+            store,
+            document_id,
+            tool_id,
+            revision,
+            data,
+            expected_previous_revision=expected_previous_revision,
+        )
+
+    def submit(
+        job: WBJob, callback: Callable[[WBReply], None], *, accept_errors: bool = False
+    ) -> None:
+        if fault == "late_cancel" and job.operation == "intake_output_export":
+            original_export(
+                job, lambda reply: held.append((callback, reply)), accept_errors=accept_errors
+            )
+        else:
+            original_export(job, callback, accept_errors=accept_errors)
+
+    def before_execute(ticket: IntakeWorkflowTicket) -> None:
+        if fault == "cancel_before_export" and ticket.stage == "export":
+            window.host.cancel()
+        execute(window.host.intake_workflow, ticket)
+
+    def error(*args: object, **kwargs: object) -> None:
+        raise OSError("injected output disk failure")
+
+    monkeypatch.setattr(Workspace, "save_draft", save)
+    monkeypatch.setattr(window.host, "submit_export_job", submit)
+    monkeypatch.setattr(window.host.intake_workflow, "_execute", before_execute)
+    if fault == "worker_error":
+        monkeypatch.setattr(intake_output, "export_intake_outputs", error)
+    before = current(window)
+    assert isinstance(before, WBIntakeOutputProject)
+    request(window, "intake_run", workflowDigest=intake_workflow_digest(before))
+    if fault == "late_cancel":
+        qtbot.waitUntil(lambda: bool(held), timeout=20000)
+        window.host.cancel()
+        held[0][0](held[0][1])
+    qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=20000)
+    final = current(window)
+    assert isinstance(final, WBIntakeOutputProject)
+    step = next(s for s in final.workflow.steps if s.stage == "export")
+    assert step.status != "done" and not final.intake_outputs
+    assert len(window.host.project_results) == 2
+    assert all(plan.run and plan.run.state == "succeeded" for plan in final.analyses)
+    folders = list((Path(window.host.workspace_path) / "outputs").glob("WB-intake-*"))
+    assert len(folders) == (1 if fault in {"output_save", "late_cancel"} else 0)
+    if folders:
+        assert (folders[0] / "project.zip").is_file()
+        assert window.host.intake_workflow.output_snapshot(final)["committed"] is False
+    if fault in {"late_cancel", "cancel_before_export"}:
+        assert step.status == "cancelled"
+    if fault == "worker_error":
+        assert step.status == "failed" and "disk failure" in step.reason
     monkeypatch.undo()

@@ -143,7 +143,7 @@ def export_intake_outputs(
         raise ValueError("活动阶段不能发布其他快照")
 
     def check() -> None:
-        if project.workflow.cancel_requested or cancelled():
+        if (ticket is not None and project.workflow.cancel_requested) or cancelled():
             raise ValueError("结果输出已取消，未发布目录")
 
     check()

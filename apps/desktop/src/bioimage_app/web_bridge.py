@@ -19,6 +19,7 @@ from wb_tool.api import (
     WBAnalysisProject,
     WBIntakeCropProject,
     WBIntakeFigureProject,
+    WBIntakeOutputProject,
     WBIntakeProject,
     WBIntakeWorkflowProject,
     WBLayoutProject,
@@ -159,6 +160,17 @@ class WorkbenchBridge(QObject):
             intake["issues"] = list(self.host.intake.issues)
             intake["cropEnabled"] = isinstance(project, WBIntakeCropProject)
             intake["figureEnabled"] = isinstance(project, WBIntakeFigureProject)
+            intake["outputEnabled"] = isinstance(project, WBIntakeOutputProject)
+            intake["outputs"] = (
+                [e.model_dump(mode="json") for e in project.intake_outputs]
+                if isinstance(project, WBIntakeOutputProject)
+                else []
+            )
+            intake["output"] = (
+                self.host.intake_workflow.output_snapshot(project)
+                if isinstance(project, WBIntakeOutputProject)
+                else None
+            )
             intake["figuresReady"] = (
                 [e.model_dump(mode="json") for e in project.intake_figures]
                 if isinstance(project, WBIntakeFigureProject)
@@ -459,6 +471,7 @@ class WorkbenchBridge(QObject):
                 "intake_crop_retry",
                 "intake_stage_retry",
                 "intake_view_figure",
+                "intake_export",
                 "select",
                 "intake_import_folder",
                 "open_project",
@@ -476,6 +489,7 @@ class WorkbenchBridge(QObject):
                 "intake_crop_retry",
                 "intake_stage_retry",
                 "intake_view_figure",
+                "intake_export",
             }:
                 apply_intake_command(self, action, data)
             elif (

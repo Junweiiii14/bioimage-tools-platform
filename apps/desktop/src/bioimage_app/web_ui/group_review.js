@@ -119,7 +119,7 @@ window.groupReview = (() => {
     $$('[data-gr-action="confirm"],[data-gr-action="reset"],[data-gr-action="manual"],[data-gr-manual],[data-gr-export]',root).forEach(el=>el.disabled=!!state.busy||!bridge||(el.dataset.grAction==='confirm'&&!configured));
   }
   function renderActive() {
-    const active=(mode==='quant'&&!manual&&group()?.rows.some(r=>r.lanes.length))||(mode==='results'&&state.quant?.table?.length);
+    const active=!state.intake?.figureEnabled&&((mode==='quant'&&!manual&&group()?.rows.some(r=>r.lanes.length))||(mode==='results'&&state.quant?.table?.length));
     document.body.classList.toggle('gr-active',!!active);root.hidden=!active;job.hidden=!state.busy||!['quant','results'].includes(mode);
     back.hidden=mode!=='quant'||!manual;
     if(!active){contentKey='';navigationKey='';return false;}

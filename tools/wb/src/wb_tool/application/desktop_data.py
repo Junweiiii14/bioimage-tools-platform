@@ -20,6 +20,7 @@ from wb_tool.application.figure_project import (
 from wb_tool.application.figure_template import LoadedFigureTemplate
 from wb_tool.application.intake_crop import IntakeCropEvidence, IntakeCropFile
 from wb_tool.application.intake_figure import IntakeFigurePreparation
+from wb_tool.application.intake_output import IntakeOutputPreparation
 from wb_tool.application.project_analysis import (
     LoadedProjectResult,
     ProjectRowAnalysis,
@@ -61,6 +62,7 @@ class WBJob:
         "intake_crop_export",
         "intake_figure_prepare",
         "intake_figure_preview",
+        "intake_output_export",
         "automatic_export",
         "metadata_read",
         "ocr_preview",
@@ -147,6 +149,7 @@ class WBReply:
         | IntakeCropEvidence
         | IntakeCropFile
         | IntakeFigurePreparation
+        | IntakeOutputPreparation
         | LoadedProjectResult
         | ProjectTableSnapshot
         | LoadedProjectOCR

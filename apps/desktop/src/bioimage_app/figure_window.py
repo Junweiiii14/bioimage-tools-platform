@@ -1343,11 +1343,16 @@ class FigureProjectWindow(QMainWindow):
         if self._export_generation is not None and self._export_generation != self.view.generation:
             self._cancellation.set()
 
-    def _export_with_evidence(self, job: WBJob, callback: Callable[[WBReply], None]) -> None:
+    def _export_with_evidence(
+        self, job: WBJob, callback: Callable[[WBReply], None], *, accept_errors: bool = False
+    ) -> None:
         from dataclasses import replace
 
         if not isinstance(job.document, WBFigureProject):
-            self._error("缺少导出项目")
+            if accept_errors:
+                callback(WBReply("", error="缺少导出项目"))
+            else:
+                self._error("缺少导出项目")
             return
         generation = self.view.generation
         self._export_generation = generation
@@ -1355,11 +1360,14 @@ class FigureProjectWindow(QMainWindow):
         def collected(evidence: tuple[ArchiveRunEvidence, ...]) -> None:
             self._archive_session = None
             if self._cancellation.is_set() or self._closing or generation != self.view.generation:
-                self._done("导出已取消，未发布输出")
+                if accept_errors:
+                    callback(WBReply("", error="导出已取消，未发布输出"))
+                else:
+                    self._done("导出已取消，未发布输出")
                 return
 
             def completed(reply: WBReply) -> None:
-                if reply.error:
+                if reply.error and not accept_errors:
                     if self._cancellation.is_set():
                         self._done("导出已取消，未发布输出")
                     else:
@@ -1376,7 +1384,10 @@ class FigureProjectWindow(QMainWindow):
             self._archive_session = session
             session.start()
         except (ValueError, RuntimeError) as error:
-            self._error(str(error))
+            if accept_errors:
+                callback(WBReply("", error=str(error)))
+            else:
+                self._error(str(error))
 
     @property
     def workspace_path(self) -> str:
@@ -1466,8 +1477,10 @@ class FigureProjectWindow(QMainWindow):
                     retained.append(result)
         self._project_results = tuple(retained)
 
-    def submit_export_job(self, job: WBJob, callback: Callable[[WBReply], None]) -> None:
-        self._export_with_evidence(job, callback)
+    def submit_export_job(
+        self, job: WBJob, callback: Callable[[WBReply], None], *, accept_errors: bool = False
+    ) -> None:
+        self._export_with_evidence(job, callback, accept_errors=accept_errors)
 
     @property
     def resources_closed(self) -> bool:

@@ -286,6 +286,76 @@ def test_intake_fig_routes_preserve_saved_preview_results_and_source_identity(
     assert javascript(window, qtbot, "document.querySelectorAll('#results-body tr').length") == 200
 
 
+def test_output_snapshot_actions_distinguish_partial_busy_and_unregistered_publication(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    bridge_snapshot(
+        window,
+        qtbot,
+        """({...state,quant:{table:[{figure:"Fig 1",protein:"GAPDH",lanes:[]}]},
+      intake:{...state.intake,confirmed:true,
+      cropEnabled:true,figureEnabled:true,outputEnabled:true,
+      output:{path:'C:/合成结果/首次快照',committed:true},
+      outputs:[{destination:'C:/合成结果/首次快照',complete:false,errors:['原资产缺项']}],
+      workflow:{digest:'wf-output',pending_ready:0,ready_count:0,steps:[
+        {stage:'export',target_id:'intake-project',status:'failed',reason:'原资产缺项',attempt:1}]}}})""",
+    )
+    javascript(window, qtbot, "switchMode('results');true")
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('#inspector-content').innerText.includes('部分快照已登记')",
+    )
+    javascript(
+        window,
+        qtbot,
+        "document.querySelector('#inspector-content "
+        "[data-intake-crop-action=export]').click();true",
+    )
+    assert javascript(window, qtbot, "document.querySelector('#gr-workspace').hidden")
+    assert javascript(window, qtbot, "!document.querySelector('.workspace').hidden")
+    sent = javascript(window, qtbot, "JSON.stringify(sent)")
+    assert isinstance(sent, str)
+    assert json.loads(sent)[-1]["action"] == "intake_export"
+    assert json.loads(sent)[-1]["payload"]["workflowDigest"] == "wf-output"
+    bridge_snapshot(
+        window,
+        qtbot,
+        "({...state,busy:true,intake:{...state.intake,output:{path:'C:/合成结果/新快照',committed:false}}})",
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('#inspector-content [data-intake-crop-action=export]').disabled",
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('#inspector-content').innerText.includes('正在登记项目')",
+    )
+    bridge_snapshot(window, qtbot, "({...state,busy:false})")
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('#inspector-content').innerText.includes('项目尚未登记')",
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "!document.querySelector('#inspector-content').innerText.includes('完整快照已登记')",
+    )
+    javascript(
+        window,
+        qtbot,
+        "switchMode('intake');document.querySelector('[data-intake=retry-stage]').click();true",
+    )
+    sent = javascript(window, qtbot, "JSON.stringify(sent)")
+    assert isinstance(sent, str)
+    assert json.loads(sent)[-1]["payload"]["stage"] == "export"
+    assert json.loads(sent)[-1]["payload"]["targetId"] == "intake-project"
+
+
 @pytest.fixture
 def intake_page(qtbot: QtBot, tmp_path: Path) -> Iterator[WebWorkbenchWindow]:
     window = WebWorkbenchWindow(

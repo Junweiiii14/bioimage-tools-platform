@@ -10,6 +10,7 @@ from wb_tool.api import (
     WBFigureProject,
     WBIntakeCropProject,
     WBIntakeFigureProject,
+    WBIntakeOutputProject,
     WBIntakeProject,
     WBIntakeWorkflowProject,
     WBJob,
@@ -91,6 +92,12 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
             raise ValueError("请核对当前裁剪执行摘要")
         host.intake_workflow.start(workflow_digest)
         return
+    if action == "intake_export":
+        workflow_digest = data.get("workflowDigest")
+        if not isinstance(workflow_digest, str) or intake_digest(project) != digest:
+            raise ValueError("请核对当前输出快照摘要")
+        host.intake_workflow.publish_snapshot(workflow_digest)
+        return
     if action == "intake_view_figure":
         workflow_digest, figure_id = data.get("workflowDigest"), data.get("figureId")
         if (
@@ -132,13 +139,15 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
             )
         else:
             stage = data.get("stage") if action == "intake_stage_retry" else "crop"
-            if stage not in {"crop", "compose", "measure"}:
+            if stage not in {"crop", "compose", "measure", "export"}:
                 raise ValueError("此阶段尚未接通重试")
+            if stage == "export" and not isinstance(project, WBIntakeOutputProject):
+                raise ValueError("此项目没有身份输出阶段")
             if stage != "crop" and not isinstance(project, WBIntakeFigureProject):
                 raise ValueError("此项目没有完整Fig阶段")
             retried = retry_intake_workflow_step(
                 project,
-                cast(Literal["crop", "compose", "measure"], stage),
+                cast(Literal["crop", "compose", "measure", "export"], stage),
                 row_id,
                 expected_digest=workflow_digest,
             )

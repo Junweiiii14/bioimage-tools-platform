@@ -22,6 +22,7 @@ from wb_tool.application.figure_project import FigurePNG, FigureRender, WBFigure
 from wb_tool.application.figure_template import LoadedFigureTemplate
 from wb_tool.application.intake_crop import IntakeCropEvidence, IntakeCropFile
 from wb_tool.application.intake_figure import IntakeFigurePreparation
+from wb_tool.application.intake_output import IntakeOutputPreparation
 from wb_tool.application.project_analysis import (
     LoadedProjectResult,
     ProjectTableSnapshot,
@@ -95,6 +96,7 @@ class _Work(QObject):
                 | IntakeCropEvidence
                 | IntakeCropFile
                 | IntakeFigurePreparation
+                | IntakeOutputPreparation
                 | LoadedProjectResult
                 | ProjectTableSnapshot
                 | LoadedProjectOCR
@@ -138,13 +140,31 @@ class _Work(QObject):
                 if intake_workflow_digest(job.document) != job.data.decode("ascii"):
                     raise ValueError("执行摘要已变化，请重新核对")
                 from wb_tool.application.intake_figure import prepare_intake_figures
+                from wb_tool.application.intake_output import prepare_intake_outputs
 
-                prepared = prepare_intake_figures(prepare_intake_crops(job.document))
+                prepared = prepare_intake_outputs(
+                    prepare_intake_figures(prepare_intake_crops(job.document))
+                )
                 value = approve_intake_workflow(
                     prepared, expected_digest=intake_workflow_digest(prepared)
                 )
                 if cancel():
                     raise ValueError("裁剪执行准备已取消")
+            elif job.operation == "intake_output_export":
+                from wb_tool.adapters.intake_output import export_intake_outputs
+                from wb_tool.application.intake_output import WBIntakeOutputProject
+                from wb_tool.application.intake_workflow import IntakeWorkflowTicket
+
+                if not isinstance(job.document, WBIntakeOutputProject):
+                    raise ValueError("输出需要当前版本仪器清单项目")
+                value = export_intake_outputs(
+                    job.document,
+                    job.sources,
+                    job.destination,
+                    runs=job.archive_runs or (),
+                    ticket=IntakeWorkflowTicket.model_validate_json(job.data) if job.data else None,
+                    cancelled=cancel,
+                )
             elif job.operation == "intake_figure_preview":
                 from wb_tool.adapters.intake_figure import load_intake_figure_preview
                 from wb_tool.application.intake_figure import WBIntakeFigureProject
@@ -357,8 +377,18 @@ class _Work(QObject):
                         )
                     )
                 else:
+                    from wb_tool.application.intake_output import (
+                        WBIntakeOutputProject,
+                        fill_intake_table,
+                    )
+
                     value = ProjectTableSnapshot(
-                        fill_project_table(job.document, job.project_results)
+                        tuple(
+                            item.cell
+                            for item in fill_intake_table(job.document, job.project_results)
+                        )
+                        if isinstance(job.document, WBIntakeOutputProject)
+                        else fill_project_table(job.document, job.project_results)
                     )
             elif job.operation == "crop_suggest":
                 from wb_tool.adapters.crop_suggestions import suggest_crops
