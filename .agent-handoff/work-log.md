@@ -1,21 +1,5 @@
 # Current Work Log
 
-## 2026-10-17 CI011 Windows异常观察
-
-40f Linux真实669/158.32秒GDB+全wheel/dev0；Windows669/433.12秒后Aborted/AV，childc0000005。WSL同锁定环境669/398.40秒pytest0及正常关闭page/profile释放0，不支持必然泄漏假设。无CDB，仅枚举未执行官方Nuget包；新增系统API单个owned live解释器异常观察，五控制0且真实AV原码保留，相关9项2.64秒0/双平台模块类型0，正式670/独审待执行；不称产品修复。
-
-
-## 2026-10-17 CI011本机全检与独审
-
-CI011 aabd39e本机正式check --all实际exit0：670passed/517.68秒，原pytest child0，Ruff/format/Pyright/import/policy及全部隔离wheel、桌面异步关闭、OCR真实worker完成。日志.local/t043/check-ci011-final.log，回执.local/t043/ci011-final-gate.json。绑定独审无阻断、五真实控制0、相关9项/2.56秒0；这是当前环境一次完整通过，原间歇原生退出根因仍UNKNOWN，远端当前后继另查，不宣告T043稳定性完成。
-
-
-## 2026-10-18 T044积分诊断与目录/分组首阶段
-
-
-建立完整任务并scope .规则（精确base d11552c）；新分支同活动树、固定入口路径保持。原41复核原因分解已实测，盲扩有误选目标反例；不改科学状态。目录筛选精确8源，同Fig四组及β字体正常工作台端到端0，原SHA/48值状态原因保持；20定向0/类型0。完整门禁和提交独审待执行，其余全部需求继续推进，见T044任务/validation。
-
-
 ## 2026-10-18 T044报告可见性与项目归属
 
 5b9b首检类型失败已修；20586fe678/489.79秒及全wheel/check0。两轮独审P2分别为隐藏筛选选择及跨项目报告，均补代码/定向反例，后一后继待绑定复核。父路由只改一行并外置原字节，消除旧分支硬指针。锚定原型19/21背景支持及四解析对照0，未接产品，整项T044保持in_progress。
@@ -196,3 +180,7 @@ Completed ea7ed55 frozen render reuse, exact-owned widgets and full stage pagina
 ## 2026-10-20 E7 governance integration
 
 INT001 resumes authorized E7 only in this temporary historical integration tree. Merged planning main43d520f into original governance0b7, retained immutable RULE001 receipt source; loaded/read exact rules and current full scope. Main PR/CI not yet accepted. WB product development/checks remain in t051, not represented by this zero-product checkout.
+
+## 2026-10-20 E7 OCR, candidate and dependency integration
+
+80a84ef OCR取消/CAS修复13边界与42兼容0/独审关闭；ea8f914候选与14检查自检，32d9733启动故障关闭2/8.17s0/独审关闭。首E7 gate主动中止，32d gate单一standalone失败后UTF8/GBK监视器异常，原OS exit未知/outer1/wheels未跑；8日志回归0及原页独立重放0不销未知失败。PR7经最终69a/四项CI/独审后merge7730bcd，primary合入并重载T060实际base；临时集成树继续PR3/SYNC001。暂无新安装包或正式发布。

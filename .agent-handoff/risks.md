@@ -104,3 +104,5 @@
 - CI012真实远端Linux在OCR运行时SIGSEGV，观察非GUI线程QWidget析构；不是全用例通过后退出。精准fixture销毁缺口修正待绑定独审/远端验证，不以本机成功或受控引用环实验宣称全部原生问题已解决。
 
 - E7前置独审ea7ed55发现历史OCR迟到取消P2：project_ocr异步decode和figure_window安装只查generation，取消/关闭后仍可能替换关联；T060须受保护CAS/失败及取消回归后解决。E6最终862/624.64s原child0/check0、inventory4/nontruncated只证明本轮，不销原生UNKNOWN。
+
+- E7/32d全量standalone真实页面断言失败（最后失败缓存单项），监视器GBK/UTF8转发异常截断详情，outer1且原OS child exit未知，wheel未跑。日志修复回归8/4.49s0、原页面单独重放1/10.57s0；原间歇失败原因仍未定位，不改测试或据孤立成功销账。见T060/fullcheck-diagnostics.md。

@@ -5,6 +5,7 @@ from __future__ import annotations
 import ctypes
 import os
 import subprocess
+import sys
 import time
 from collections.abc import Callable
 from pathlib import Path
@@ -33,10 +34,16 @@ def run_with_native_watch(
     """
     if idle_seconds <= 0:
         raise ValueError("Idle interval must be positive")
+    # The pipe is decoded as UTF-8 below. Windows locale defaults must neither
+    # corrupt the child's failure report nor abort forwarding before its exit.
+    for stream in (sys.stdout, sys.stderr):
+        configure_output = getattr(stream, "reconfigure", None)
+        if callable(configure_output):
+            configure_output(encoding="utf-8", errors="backslashreplace")
     with subprocess.Popen(
         command,
         cwd=cwd,
-        env=env,
+        env={**env, "PYTHONIOENCODING": "utf-8"},
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,

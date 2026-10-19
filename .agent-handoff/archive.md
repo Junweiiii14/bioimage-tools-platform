@@ -80,3 +80,4 @@ This file stores compressed old history that should not be part of normal startu
 T050初次归档复制因archive目录尚不存在失败，随后从未修改的main基线恢复原快照并归档；无历史丢失。原快照见archive/T050-before-plan-snapshot.md。
 - 2026-10-20 INT001集成前T050快照：archive/INT001-before-integration-snapshot.md（先保存后更新当前状态）。
 - INT001合入时main当前快照：archive/INT001-at-merge-snapshot.md；实际合入事实见T060/SYNC阶段证据。
+- [work-log-20261019T204531813868Z.md](archive/work-log-20261019T204531813868Z.md): work log exceeded 64 KiB or 30 dated sections
