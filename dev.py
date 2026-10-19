@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import importlib.metadata
 import json
+import os
 import platform
 import subprocess
 import sys
@@ -17,6 +18,16 @@ ROOT = Path(__file__).resolve().parent
 
 def run_module(*args: str) -> int:
     print("RUN", sys.executable, "-m", *args, flush=True)
+    if (
+        args[0] == "pytest"
+        and sys.platform == "linux"
+        and os.environ.get("BIOIMAGE_LINUX_NATIVE_STACKS") == "1"
+    ):
+        from tooling.linux_native_run import run_with_native_debugger
+
+        environment = dict(os.environ)
+        environment.pop("BIOIMAGE_LINUX_NATIVE_STACKS", None)
+        return run_with_native_debugger([sys.executable, "-m", *args], cwd=ROOT, env=environment)
     return subprocess.run([sys.executable, "-m", *args], cwd=ROOT, check=False).returncode
 
 
