@@ -3,10 +3,11 @@
 ## Current Blockers
 
 - 无。用户已明确要求公开；仓库已公开，服务器 ruleset 已 active。此前私有套餐限制已解除。
+- T-002 的包态窗口操作被用户物理 Esc 停止，本轮不再调用 Computer Use。包态自动进程与性能已通过，原生按钮/ROI/DPI 尚未完成；详见 T-002 记录。
 
 ## Current Risks
 
-- P0 仍未进行，Qt/worker/standalone 和真实数据行为不因环境安装而成立。
+- P0 本机验证已开始；只使用合成技术样本，不代表 WB 科学正确性。干净 Windows 依用户决定待办；未冻结完整产品栈。
 - AST 边界检查仅检查直接导入；首个真实包必须启用 import-linter 与隔离 wheel 测试。
 - 本任务作者自验不是独立审查；后续产品变更须有绑定 head 的审查证据。
 - Python 3.12 生命周期至预计 2028-10，P0 需评估长期基线。

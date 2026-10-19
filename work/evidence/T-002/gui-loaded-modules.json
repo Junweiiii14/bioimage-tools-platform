@@ -1,0 +1,41 @@
+{
+  "scope": "loaded Python, Qt, image and schema runtime modules only; other OS/driver modules omitted",
+  "modules": [
+    {
+      "ModuleName": "python312.dll",
+      "FileName": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\deliverables\\P0独立验收\\BioimageP0-293c6c0\\app\\python312.dll"
+    },
+    {
+      "ModuleName": "Shiboken.pyd",
+      "FileName": "C:\\Users\\70236\\RESEAR~1\\CODEX-~1\\DELIVE~1\\P0独立~1\\BIOIMA~1\\app\\shiboken6\\Shiboken.pyd"
+    },
+    {
+      "ModuleName": "shiboken6.abi3.dll",
+      "FileName": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\deliverables\\P0独立验收\\BioimageP0-293c6c0\\app\\shiboken6.abi3.dll"
+    },
+    {
+      "ModuleName": "python3.dll",
+      "FileName": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\deliverables\\P0独立验收\\BioimageP0-293c6c0\\app\\python3.dll"
+    },
+    {
+      "ModuleName": "pyside6.abi3.dll",
+      "FileName": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\deliverables\\P0独立验收\\BioimageP0-293c6c0\\app\\pyside6.abi3.dll"
+    },
+    {
+      "ModuleName": "Qt6Core.dll",
+      "FileName": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\deliverables\\P0独立验收\\BioimageP0-293c6c0\\app\\Qt6Core.dll"
+    },
+    {
+      "ModuleName": "Qt6Gui.dll",
+      "FileName": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\deliverables\\P0独立验收\\BioimageP0-293c6c0\\app\\Qt6Gui.dll"
+    },
+    {
+      "ModuleName": "Qt6Widgets.dll",
+      "FileName": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\deliverables\\P0独立验收\\BioimageP0-293c6c0\\app\\Qt6Widgets.dll"
+    },
+    {
+      "ModuleName": "qwindows.dll",
+      "FileName": "C:\\Users\\70236\\RESEAR~1\\CODEX-~1\\DELIVE~1\\P0独立~1\\BIOIMA~1\\app\\PySide6\\qt-plugins\\platforms\\qwindows.dll"
+    }
+  ]
+}

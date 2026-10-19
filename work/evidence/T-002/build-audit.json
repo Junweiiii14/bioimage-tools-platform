@@ -1,0 +1,23 @@
+{
+  "files": [
+    {
+      "path": ".local\\p0\\build-293c6c0632e2\\build.log",
+      "bytes": 2352,
+      "sha256": "81294509d2684e9b504c89f1a834c7e9b6eeb6783ed8e7a6f52c4e5ad56ea6c2"
+    },
+    {
+      "path": ".local\\p0\\build-293c6c0632e2\\compilation-report.xml",
+      "bytes": 1288990,
+      "sha256": "7dfe4e9f18c2e7d547b5c26ef23e14ce613a164d471644c5a773b6bda7cbba14"
+    },
+    {
+      "path": "C:\\Users\\70236\\.cache\\bioimage-nuitka\\downloads\\depends\\x86_64\\depends.exe",
+      "bytes": 566272,
+      "sha256": "57c483dc985a9757501993e969c2a7043c26517f97fd49a42b33d2d6a4193d8b"
+    }
+  ],
+  "dependency_walker_source": "https://dependencywalker.com/depends22_x64.zip",
+  "compiled_c_files": 364,
+  "ccache_hits": 0,
+  "ccache_misses": 364
+}
