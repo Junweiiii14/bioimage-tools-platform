@@ -7,6 +7,15 @@ window.intakeWorkspace = (() => {
   root.hidden = true;
   root.setAttribute('aria-label', '仪器原图导入与分配');
   $('.workspace').before(root);
+  const live = document.createElement('div');
+  live.className = 'sr-only';
+  live.id = 'intake-live-status';
+  Object.assign(live.style, {position: 'absolute', width: '1px', height: '1px', padding: '0', overflow: 'hidden', clipPath: 'inset(50%)', whiteSpace: 'nowrap'});
+  live.setAttribute('role', 'status');
+  live.setAttribute('aria-live', 'polite');
+  live.setAttribute('aria-atomic', 'true');
+  root.after(live);
+  let renderedWorkflow = null, focusAction = null;
   let key = '', baseDigest = '', basePlan = '', draft = null, batch = [], selected = new Set();
   let conflict = false, pending = null, replace = false, allowReuse = false, filter = '';
   const copyPlan = intake => ({
@@ -28,6 +37,7 @@ window.intakeWorkspace = (() => {
   };
 
   function reset() {
+    renderedWorkflow = null; focusAction = null; live.textContent = '';
     key = ''; baseDigest = ''; basePlan = ''; draft = null; batch = []; selected.clear();
     conflict = false; pending = null; replace = false; allowReuse = false; filter = '';
   }
@@ -146,6 +156,10 @@ window.intakeWorkspace = (() => {
     $$('.mode-tab').forEach(item => item.hidden = item.dataset.mode === 'intake' ? !state.intake : !!state.intake);
     if (!active) return false;
     const focused = root.contains(document.activeElement) ? document.activeElement : null;
+    const action = focused?.dataset.intake;
+    const workflow = !!state.intake.workflow;
+    const transitioned = renderedWorkflow !== null && workflow !== renderedWorkflow;
+    renderedWorkflow = workflow;
     const field = focused?.dataset.intakeField, id = focused?.dataset.id;
     const searchFocus = focused?.hasAttribute('data-intake-search');
     const caret = focused?.type === 'text' || focused?.type === 'search' ? [focused.selectionStart, focused.selectionEnd] : null;
@@ -154,8 +168,21 @@ window.intakeWorkspace = (() => {
     const editingDisabled = disabled || state.intake.workflow ? 'disabled' : '';
     root.innerHTML = `<div class="intake-heading"><div><h1>仪器导入与分配</h1><p>先保存 Fig 清单，再将原图分配到蛋白行。原始文件保持原名。</p></div><span class="status-badge ${state.intake.confirmed ? 'ok' : 'pending'}">${state.intake.confirmed ? '已确认' : '待确认'}</span></div>${conflict ? '<div class="intake-conflict" role="alert">项目清单已在后台变化。本地草稿已保留，请核对后使用“放弃草稿并重新载入”获取最新清单。</div>' : ''}<div class="intake-columns">${renderPlan(batch.length ? 'disabled' : editingDisabled)}<div class="intake-allocation">${renderSources(editingDisabled)}${renderBatch(editingDisabled)}</div></div>${renderSummary(disabled)}`;
     controls(); root.scrollTop = scroll;
-    const replacement = searchFocus ? $('[data-intake-search]', root) : field ? $$('[data-intake-field]', root).find(item => item.dataset.intakeField === field && item.dataset.id === id) : null;
+    const summary = $('.intake-summary h2', root);
+    summary?.setAttribute('tabindex', '-1');
+    if (transitioned) {
+      live.textContent = workflow ? '执行计划已保存并准备。' : '已返回清单修改。';
+      const target = workflow ? summary : $('[data-intake-field]', root);
+      target?.focus();
+      focusAction = null;
+      return true;
+    }
+    if (action) focusAction = {action, id};
+    const button = focusAction ? $$('[data-intake]', root).find(item => item.dataset.intake === focusAction.action && item.dataset.id === focusAction.id && !item.disabled) : null;
+    const replacement = searchFocus ? $('[data-intake-search]', root) : field ? $$('[data-intake-field]', root).find(item => item.dataset.intakeField === field && item.dataset.id === id) : button;
     if (replacement) { replacement.focus({preventScroll: true}); if (caret) replacement.setSelectionRange(...caret); }
+    else if (focused || focusAction) summary?.focus({preventScroll: true});
+    if (focusAction && state.status && live.textContent !== state.status) live.textContent = state.status;
     return true;
   }
 

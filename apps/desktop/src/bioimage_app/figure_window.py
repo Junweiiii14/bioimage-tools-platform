@@ -1959,6 +1959,7 @@ class FigureProjectWindow(QMainWindow):
         after: Callable[[], None] | None = None,
         *,
         transform: Callable[[WBFigureProject], WBFigureProject] | None = None,
+        install_guard: Callable[[], bool] | None = None,
     ) -> None:
         if self._busy or not self._workspace:
             return
@@ -1976,6 +1977,9 @@ class FigureProjectWindow(QMainWindow):
         self.quant_progress = {"phase": "save", "label": "保存项目"}
 
         def encoded(reply: WBReply) -> None:
+            if install_guard is not None and not install_guard():
+                self._done("执行计划准备已停止；当前清单保留，未提交新修订。")
+                return
             if not isinstance(reply.value, bytes):
                 self._error("项目编码无效")
                 return
@@ -1983,6 +1987,14 @@ class FigureProjectWindow(QMainWindow):
             def saved(reply: StorageReply) -> None:
                 self._saved_revision = project.revision
                 self._saved_generation = generation
+                if install_guard is not None and not install_guard():
+                    # CAS already committed. Retain that history and mark the
+                    # current draft unsaved instead of installing a cancelled result.
+                    self.view.generation += 1
+                    self._done(
+                        "执行计划已写入历史；已停止安装，当前清单草稿保留，请保存或继续编辑。"
+                    )
+                    return
                 if generation != self.view.generation:
                     self._done("旧修订已保存，当前编辑保留；请重新执行操作")
                     return

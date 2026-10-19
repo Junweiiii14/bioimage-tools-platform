@@ -203,7 +203,7 @@ def restore_staged_project(
             manifest_fields["confirmed_digest"] = remapped_digest
             changes["intake"] = IntakeManifest.model_validate(manifest_fields)
         if isinstance(project, WBIntakeWorkflowProject):
-            changes["workflow"] = project.workflow.model_copy(
+            changes["workflow"] = recover_intake_workflow(project).workflow.model_copy(
                 update={"intake_digest": remapped_digest}
             )
     if isinstance(project, WBProjectOCR) and project.ocr:

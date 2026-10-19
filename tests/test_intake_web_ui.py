@@ -31,6 +31,14 @@ def test_prepared_workflow_summary_preserves_pending_and_edit_guard(
         "{protein_id:'protein-b',source_id:'source-b'}]}});true",
     )
     assert javascript(window, qtbot, "!!document.querySelector('[data-intake=prepare]')")
+    javascript(window, qtbot, "document.querySelector('[data-intake=prepare]').focus();true")
+    javascript(window, qtbot, "setState({busy:true,status:'正在保存'});true")
+    assert javascript(window, qtbot, "document.activeElement.matches('.intake-summary h2')")
+    javascript(window, qtbot, "setState({busy:false,status:'保存失败'});true")
+    assert javascript(window, qtbot, "document.activeElement.dataset.intake==='prepare'")
+    assert javascript(
+        window, qtbot, "document.querySelector('#intake-live-status').textContent==='保存失败'"
+    )
     javascript(
         window,
         qtbot,
@@ -52,9 +60,17 @@ def test_prepared_workflow_summary_preserves_pending_and_edit_guard(
     )
     assert javascript(window, qtbot, "!document.querySelector('[data-intake=edit]').disabled")
     assert javascript(window, qtbot, "!document.querySelector('[data-intake=start]')")
+    assert javascript(window, qtbot, "document.activeElement.matches('.intake-summary h2')")
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('#intake-live-status').textContent.includes('已保存')",
+    )
     javascript(window, qtbot, "document.querySelector('[data-intake=edit]').click();true")
     sent = javascript(window, qtbot, "JSON.stringify(sent)")
     assert isinstance(sent, str) and json.loads(sent)[-1]["action"] == "intake_edit"
+    javascript(window, qtbot, "setState({intake:{...state.intake,workflow:null}});true")
+    assert javascript(window, qtbot, "document.activeElement.dataset.intakeField==='fig-label'")
 
 
 @pytest.fixture

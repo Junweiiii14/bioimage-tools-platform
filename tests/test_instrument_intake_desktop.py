@@ -3,6 +3,7 @@
 import json
 from collections.abc import Callable, Iterator
 from pathlib import Path
+from threading import Event
 from typing import cast
 
 import numpy as np
@@ -202,6 +203,74 @@ def test_prepared_workflow_never_installs_after_cancel_edit_or_failed_save(
     if mode == "save_failure":
         assert "保存失败" in window.host.view.status.text()
     monkeypatch.undo()
+
+
+def test_prepare_cancel_during_storage_commit_preserves_draft_and_committed_history(
+    intake_window: WebWorkbenchWindow,
+    qtbot: QtBot,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    window = intake_window
+    root = tmp_path / "raw"
+    make_source(root / "a.tif")
+    make_source(root / "b.tif", 2000)
+    start(window, qtbot, root)
+    plan(window, qtbot)
+    project = current(window)
+    request(
+        window,
+        "intake_assign",
+        bindings=[
+            {"protein_id": p.protein_id, "source_id": s.source_id}
+            for p, s in zip(project.intake.proteins, project.intake.sources, strict=True)
+        ],
+    )
+    wait_saved(window, qtbot)
+    request(window, "intake_confirm")
+    wait_saved(window, qtbot)
+    before = current(window)
+    entered, release = Event(), Event()
+    original = Workspace.save_draft
+
+    def delayed_save(
+        self: Workspace,
+        document_id: str,
+        tool_id: str,
+        revision: int,
+        data: bytes,
+        *,
+        expected_previous_revision: int | None,
+    ) -> object:
+        entered.set()
+        if not release.wait(10):
+            raise ValueError("测试未释放保存线程")
+        return original(
+            self,
+            document_id,
+            tool_id,
+            revision,
+            data,
+            expected_previous_revision=expected_previous_revision,
+        )
+
+    monkeypatch.setattr(Workspace, "save_draft", delayed_save)
+    try:
+        request(window, "intake_prepare")
+        qtbot.waitUntil(entered.is_set, timeout=10000)
+        window.host.cancel()
+    finally:
+        release.set()
+    qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=10000)
+    assert type(current(window)) is WBIntakeProject
+    assert current(window).intake == before.intake
+    assert window.host.has_unsaved_changes
+    assert "已写入历史" in window.host.view.status.text()
+    monkeypatch.undo()
+    window.host.save()
+    wait_saved(window, qtbot)
+    assert current(window).revision == before.revision + 2
+    assert not window.host.has_unsaved_changes
 
 
 def test_raw_variants_assign_and_reopen_without_algorithm(

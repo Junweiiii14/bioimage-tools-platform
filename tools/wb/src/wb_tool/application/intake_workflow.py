@@ -4,7 +4,7 @@ import json
 from hashlib import sha256
 from typing import Literal
 
-from pydantic import Field, model_validator
+from pydantic import ConfigDict, Field, model_validator
 
 from wb_tool.application.document import DocumentIO
 from wb_tool.application.figure_project import WBFigureProject
@@ -28,16 +28,21 @@ def _hash(value: object) -> str:
 
 
 class IntakeWorkflowStep(DocumentIO):
+    model_config = ConfigDict(revalidate_instances="always")
+
     stage: Stage
     target_id: str = Field(min_length=1, max_length=80)
     status: StepStatus = "pending"
     attempt: int = Field(default=0, ge=0)
     claim_id: str = Field(default="", pattern="^(?:[0-9a-f]{64})?$")
+    input_digest: str = Field(default="", pattern="^(?:[0-9a-f]{64})?$")
     reason: str = Field(default="", max_length=2000)
 
     @model_validator(mode="after")
     def valid_status(self) -> "IntakeWorkflowStep":
-        if self.status != "pending" and (self.attempt < 1 or not self.claim_id):
+        if self.status != "pending" and (
+            self.attempt < 1 or not self.claim_id or not self.input_digest
+        ):
             raise ValueError("非待处理阶段必须有实际尝试身份")
         if (
             self.status in {"needs_review", "failed", "cancelled", "interrupted"}
@@ -48,6 +53,8 @@ class IntakeWorkflowStep(DocumentIO):
 
 
 class IntakeWorkflowLedger(DocumentIO):
+    model_config = ConfigDict(revalidate_instances="always")
+
     policy: Literal["intake_workflow@1"] = "intake_workflow@1"
     intake_digest: str = Field(pattern="^[0-9a-f]{64}$")
     approved: bool = False
@@ -62,6 +69,7 @@ class IntakeWorkflowTicket(DocumentIO):
     target_id: str
     attempt: int
     claim_id: str
+    input_digest: str
 
 
 def _addresses(project: WBIntakeProject) -> tuple[tuple[Stage, str], ...]:
@@ -101,6 +109,8 @@ class WBIntakeWorkflowProject(WBIntakeProject):
             (s.stage, s.target_id): s.status for s in self.workflow.steps
         }
         for step in self.workflow.steps:
+            if step.status == "running" and step.input_digest != _inputs_digest(self):
+                raise ValueError("阶段输入已改变，不能接收旧执行回复")
             if step.status in {"running", "done"} and not _prerequisites(self, step, statuses):
                 raise ValueError("执行阶段越过尚未就绪的裁剪、拼图或定量依赖")
         return self
@@ -148,9 +158,15 @@ def prepare_intake_workflow(
     )
 
 
+def _inputs_digest(project: WBIntakeWorkflowProject) -> str:
+    # Saving changes revision only. Executor outputs must be merged after finishing
+    # the owned ticket against these frozen inputs, never into a running snapshot.
+    return _hash(project.model_dump(mode="json", exclude={"workflow", "revision"}))
+
+
 def intake_workflow_digest(project: WBIntakeWorkflowProject) -> str:
     WBIntakeWorkflowProject.model_validate(dict(project))
-    return _hash((project.project_id, project.workflow.model_dump(mode="json")))
+    return _hash((_inputs_digest(project), project.workflow.model_dump(mode="json")))
 
 
 def approve_intake_workflow(
@@ -188,14 +204,14 @@ def claim_intake_workflow_step(
     if not pending:
         return project, None
     step = pending[0]
-    claim_id = _hash(
-        (session_key, project.workflow.intake_digest, step.stage, step.target_id, step.attempt + 1)
-    )
+    input_digest = _inputs_digest(project)
+    claim_id = _hash((session_key, input_digest, step.stage, step.target_id, step.attempt + 1))
     active = step.model_copy(
         update={
             "status": "running",
             "attempt": step.attempt + 1,
             "claim_id": claim_id,
+            "input_digest": input_digest,
             "reason": "",
         }
     )
@@ -209,6 +225,7 @@ def claim_intake_workflow_step(
         target_id=step.target_id,
         attempt=active.attempt,
         claim_id=claim_id,
+        input_digest=input_digest,
     )
 
 
@@ -232,6 +249,7 @@ def finish_intake_workflow_step(
         active is None
         or ticket.project_id != project.project_id
         or ticket.intake_digest != project.workflow.intake_digest
+        or ticket.input_digest != _inputs_digest(project)
         or (ticket.stage, ticket.target_id, ticket.attempt, ticket.claim_id)
         != (active.stage, active.target_id, active.attempt, active.claim_id)
     ):

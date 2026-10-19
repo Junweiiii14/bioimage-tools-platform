@@ -7,6 +7,7 @@ from wb_tool.api import (
     IntakeFigure,
     IntakeProtein,
     IntakeSource,
+    LaneROI,
     StagedProjectArchive,
     WBFigureProject,
     WBIntakeProject,
@@ -163,7 +164,9 @@ def test_tampered_stage_order_and_identity_and_stale_summary_are_rejected() -> N
     with pytest.raises(ValueError, match="完整对应"):
         WBIntakeWorkflowProject.model_validate({**dict(project), "workflow": ledger})
     premature = tuple(
-        s.model_copy(update={"status": "done", "attempt": 1, "claim_id": "a" * 64})
+        s.model_copy(
+            update={"status": "done", "attempt": 1, "claim_id": "a" * 64, "input_digest": "b" * 64}
+        )
         if s.stage == "measure"
         else s
         for s in project.workflow.steps
@@ -190,3 +193,34 @@ def test_restore_remaps_sources_and_interrupts_claims_without_losing_stages() ->
     assert not restored.workflow.approved
     assert len(restored.workflow.steps) == len(project.workflow.steps)
     assert restored.intake.sources[0].asset == imported[0]
+
+
+def test_claim_binds_actual_inputs_but_allows_save_revision_only() -> None:
+    project, crop = claim_intake_workflow_step(approved(), session_key="a")
+    assert crop is not None
+    project = finish_intake_workflow_step(project, crop, "done")
+    project, compose = claim_intake_workflow_step(project, session_key="a")
+    assert compose is not None and compose.stage == "compose"
+    saved = WBIntakeWorkflowProject.model_validate({**dict(project), "revision": 3})
+    assert finish_intake_workflow_step(saved, compose, "done").workflow.steps[2].status == "done"
+    changed_row = project.rows[0].model_copy(
+        update={"roi": LaneROI("r1", 0, 5, 60, 25), "reviewed": True}
+    )
+    changed = {**dict(project), "rows": (changed_row, *project.rows[1:])}
+    with pytest.raises(ValueError, match="输入已改变"):
+        WBIntakeWorkflowProject.model_validate(changed)
+    # Even bypassing construction cannot make a stale reply acceptable.
+    with pytest.raises(ValueError, match="输入已改变"):
+        finish_intake_workflow_step(
+            project.model_copy(update={"rows": changed["rows"]}), compose, "done"
+        )
+
+
+def test_nested_model_copy_cannot_bypass_attempt_validation() -> None:
+    project, ticket = claim_intake_workflow_step(approved(), session_key="a")
+    assert ticket is not None
+    invalid = project.workflow.steps[0].model_copy(update={"attempt": 0, "claim_id": ""})
+    ledger = project.workflow.model_copy(update={"steps": (invalid, *project.workflow.steps[1:])})
+    tampered = project.model_copy(update={"workflow": ledger})
+    with pytest.raises(ValueError, match="实际尝试"):
+        intake_workflow_snapshot(tampered)

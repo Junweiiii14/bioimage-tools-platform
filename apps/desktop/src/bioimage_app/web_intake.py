@@ -59,7 +59,14 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
                     {**dict(snapshot), "revision": current.revision}
                 )
 
-            host.save(transform=install)
+            host.save(
+                transform=install,
+                install_guard=lambda: (
+                    not host.is_closing
+                    and not host.cancellation.is_set()
+                    and host.view.generation == generation
+                ),
+            )
 
         host.submit_tool_job(
             WBJob(
