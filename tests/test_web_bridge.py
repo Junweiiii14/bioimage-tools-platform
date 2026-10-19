@@ -94,19 +94,47 @@ def test_local_page_channel_and_drain(qtbot: QtBot, tmp_path: Path) -> None:
     from bioimage_app.web_window import WebWorkbenchWindow
     from PySide6.QtCore import QUrl
     from PySide6.QtWebEngineCore import QWebEnginePage
+    from pytestqt.exceptions import TimeoutError as QtTimeoutError
 
     (tmp_path / "index.html").write_text(
-        '<html><script src="qrc:///qtwebchannel/qwebchannel.js"></script>'
-        "<script>new QWebChannel(qt.webChannelTransport, function(c) {"
+        "<html><script>window.channelPhase='before-qrc';"
+        "window.addEventListener('error',e=>window.channelError=e.message||'resource-error');"
+        '</script><script src="qrc:///qtwebchannel/qwebchannel.js"></script>'
+        "<script>window.channelPhase='initializing';"
+        "new QWebChannel(qt.webChannelTransport, function(c) {"
+        "window.channelPhase='connected';"
         "c.objects.workbench.stateChanged.connect(function(s) {"
+        "window.channelPhase='received';"
         'document.title = JSON.parse(s).projectName || "ready";});'
         'c.objects.workbench.request("refresh", "{}");});</script></html>',
         encoding="utf-8",
     )
     window = WebWorkbenchWindow(asset_directory=tmp_path)
+    loads: list[bool] = []
+    renderer_exits: list[tuple[str, int]] = []
+    window.web.loadFinished.connect(loads.append)
+    window.web.page().renderProcessTerminated.connect(
+        lambda status, code: renderer_exits.append((str(status), code))
+    )
     window.show()
     try:
-        qtbot.waitUntil(lambda: window.web.title() not in ("", "index.html"), timeout=15000)
+        try:
+            qtbot.waitUntil(lambda: window.web.title() not in ("", "index.html"), timeout=15000)
+        except QtTimeoutError as error:
+            observed: list[object] = []
+            window.web.page().runJavaScript(
+                "JSON.stringify({ready:document.readyState,phase:window.channelPhase,"
+                "error:window.channelError,qt:typeof qt,channel:typeof QWebChannel})",
+                observed.append,
+            )
+            qtbot.wait(250)  # Failure-only capture; the original pass deadline is unchanged.
+            error.add_note(
+                json.dumps(
+                    {"loadFinished": loads, "rendererExits": renderer_exits, "dom": observed},
+                    ensure_ascii=False,
+                )
+            )
+            raise
         assert window.web.title() == window.host.view.project().name
         page = window.web.page()
         assert not page.acceptNavigationRequest(
