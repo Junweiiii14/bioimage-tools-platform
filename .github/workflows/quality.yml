@@ -20,6 +20,7 @@ jobs:
     timeout-minutes: 15
     env:
       QT_QPA_PLATFORM: offscreen
+      QTWEBENGINE_CHROMIUM_FLAGS: --disable-gpu
       PYTHONUNBUFFERED: '1'
       PYTHONFAULTHANDLER: '1'
       PYTEST_ADDOPTS: '-vv -o faulthandler_timeout=60'
