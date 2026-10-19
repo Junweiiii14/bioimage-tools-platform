@@ -98,7 +98,7 @@ def test_import_linter_rejects_transitive_dependencies(tmp_path: Path, violation
         (adapters / "bridge.py").write_text(
             "from wb_tool.domain import quantify\n", encoding="utf-8"
         )
-    env = {**os.environ, "PYTHONPATH": str(tmp_path)}
+    env = {**os.environ, "PYTHONPATH": str(tmp_path), "PYTHONIOENCODING": "utf-8"}
     result = subprocess.run(
         [
             sys.executable,
@@ -112,6 +112,7 @@ def test_import_linter_rejects_transitive_dependencies(tmp_path: Path, violation
         env=env,
         capture_output=True,
         text=True,
+        encoding="utf-8",
         check=False,
     )
     assert result.returncode == (0 if violation == "none" else 1), result.stdout + result.stderr
