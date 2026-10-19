@@ -333,7 +333,18 @@ def test_fixed_n_crop_run_review_original_asset_and_reopen(
     assert next(s for s in finished.workflow.steps if s.target_id == "protein-a").status == "done"
     assert all(s.status == "pending" for s in finished.workflow.steps if s.stage != "crop")
     assert not finished.analyses
+    previous_host, epoch = window.host, window.bridge.session_epoch
+    project_id = finished.project_id
     window.open_project(window.host.workspace_path)
+    qtbot.waitUntil(
+        lambda: (
+            window.host is not previous_host
+            and window.bridge.session_epoch > epoch
+            and window.shutdown_stage == "idle"
+            and current(window).project_id == project_id
+        ),
+        timeout=20000,
+    )
     wait_saved(window, qtbot)
     assert current(window).schema_version == 12
     assert current(window).rows[0].lane_count == 8
