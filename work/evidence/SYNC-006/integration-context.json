@@ -2,7 +2,7 @@
   "schema": 1,
   "task": "SYNC-006",
   "base_commit": "8be1c56d2399f728ead09415ab8c9800b32cdc99",
-  "source_head": "3dbd0c3eab06db929fdec952d88ef4f1491e18fa",
+  "source_head": "4a9c682883fbe552947c520e4e5b00284a8601ae",
   "historical_receipts": {
     "work/evidence/T-028/rules-context.json": "a802b0f7e7ea08f9426190b49aed9baeae4165b7",
     "work/evidence/T-029/rules-context.json": "7d97a6ebccc0da00c5aa049664c9dd35e5514cfa",
