@@ -180,6 +180,13 @@ def test_intake_fig_routes_preserve_saved_preview_results_and_source_identity(
     assert javascript(window, qtbot, "document.querySelector('[data-intake=run]').disabled")
     javascript(window, qtbot, "document.querySelector('[data-intake=view-figure]').click();true")
     assert javascript(window, qtbot, "mode==='layout'")
+    assert javascript(
+        window,
+        qtbot,
+        "getComputedStyle(document.querySelector('.intake-source-links')).flexDirection==='column'"
+        "&&document.querySelectorAll('.intake-source-links "
+        "[data-intake-crop-action=source]').length===2",
+    )
     sent = javascript(window, qtbot, "JSON.stringify(sent)")
     assert isinstance(sent, str)
     assert json.loads(sent)[-1]["action"] == "intake_view_figure"
@@ -239,6 +246,44 @@ def test_intake_fig_routes_preserve_saved_preview_results_and_source_identity(
     assert retry["action"] == "intake_stage_retry"
     assert retry["payload"]["stage"] == "measure" and retry["payload"]["targetId"] == "fig-a"
     assert retry["payload"]["workflowDigest"] == "wf-retry"
+
+    bridge_snapshot(
+        window,
+        qtbot,
+        "({...state,cells:Array.from({length:201},(_,i)=>({...state.cells[0],"
+        "rowId:i===200?'protein-b':'protein-a',lane:i+1,"
+        "value:i===200?null:400,status:i===200?'failed':'valid',"
+        "reason:i===200?'最后槽位真实失败':''}))})",
+    )
+    javascript(window, qtbot, "switchMode('results');true")
+    assert javascript(window, qtbot, "document.querySelectorAll('#results-body tr').length") == 200
+    javascript(
+        window,
+        qtbot,
+        "document.querySelector('[data-intake-crop-action=next-results]').click();true",
+    )
+    assert javascript(window, qtbot, "document.querySelectorAll('#results-body tr').length") == 1
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('#results-body').innerText.includes('最后槽位真实失败')",
+    )
+    assert javascript(
+        window, qtbot, "document.querySelector('#results-body td:nth-child(3)').innerText==='—'"
+    )
+    assert javascript(
+        window, qtbot, "document.querySelector('#result-count').innerText.includes('201–201')"
+    )
+    bridge_snapshot(window, qtbot, "({...state,status:'刷新后保持结果页'})")
+    assert javascript(window, qtbot, "document.querySelectorAll('#results-body tr').length") == 1
+    javascript(window, qtbot, "document.querySelector('#results-body button').click();true")
+    assert javascript(window, qtbot, "state.selectedId==='protein-b'&&mode==='review'")
+    javascript(
+        window,
+        qtbot,
+        "switchMode('results');document.querySelector('[data-intake-crop-action=previous-results]').click();true",
+    )
+    assert javascript(window, qtbot, "document.querySelectorAll('#results-body tr').length") == 200
 
 
 @pytest.fixture
