@@ -1,5 +1,10 @@
 # WB 数值核心
 
+T051新增`WBIntakeProject/schema10`与仪器原图池、稳定Fig/蛋白身份、固定槽位数、
+显式批量分配及确认摘要；未分配来源和原名/相对路径可保存重开。
+当前仅接通导入规划阶段，禁止把确认当作裁剪审核或产生定量；旧独立灰度OCR保留。
+公开API和兼容约束见`../../docs/contracts/wb-instrument-intake-v1.md`。
+
 T045增加完整泳道手动框选、共享原图分组、补峰/排除及schema9 Fig拼图定量。
 `WBPartitionProject`保留原图OCR与版本化机器建议；普通WBQuant多峰和UB整段共用
 已有积分。新契约`../../docs/contracts/wb-fig-quant-v1.md`，验证状态以T045任务为准。
