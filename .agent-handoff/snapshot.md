@@ -4,7 +4,7 @@
 - 只在现有候选 `C:/Users/70236/.codex/worktrees/t045-wbquant/bioimage-tools-platform`、分支 `codex/t045-wbquant-manual-and-fig` 工作，T047 基线 6b643a3957852a87827f85912544ea36da3b712f，核对实际 HEAD/dirty。无新增 worktree；原 ResearchVault dirty、旧树/原图/项目/快捷方式及用户现有窗口保留。
 - 用户要求 UI/动画先交互预览审批。T046 的批准不覆盖 T047 新入口/退出。新预览 http://127.0.0.1:58339/index.html，仅 loopback，ignored .local/t047-preview；IAB 已打开。只演示文件选择/进度/退出/安装，不读写项目或改系统。
 - 实施方案 `work/evidence/T-047/design-and-implementation-plan.md`。入口/导航/关闭协调、epoch、打包配方及源码安装自检已接入；下一步完整门禁、独立审查、完整编译/安装与重启退出实证。旧P0不作为产品配方。
-- node --check exit0，IAB 实际验证新建直达灰度、恢复结果/Fig1F、错误目录拦截、忙碌取消/退出、保存失败与退出失败保留窗口、安装演示。真实关闭根因 UNKNOWN，未跑 T047 产品测试/全门禁/安装/移动端/DPI，不能引用旧761作为本任务通过。
+- node/Ruff/格式/Pyright exit0；90ae入口等33项通过，53a2030取消后草稿/未保存会话8项通过。源码安装自检v4合成TIFF真实worker/OCR/保存失败/重开/忙碌退出7检查exit0。完整v2 pytest768通过、wheel仍跑；真实安装/DPI未验收。见 work/evidence/T-047/validation.md。
 - 上轮候选实际启动并打开用户00060263(1).tif于独立项目；启动信息在 ignored .local/t046/user-trial/latest-launch.json。PID是历史值须重新核验，不关闭用户窗口进行本任务预览。
 - T046 本地完成：最终产品4d4944a，docs HEAD6b643a3；761完整门禁与隔离wheel0，独审五项resolved/ship仅评分范围。完整峰 policy/UB与手调/全组审核已接入，科学留出及历史native故障未销账。原快照 archive/2026-10-19-before-T047.md，详见T046任务。
 - 不自动同步/修复/删除其他树；不推送/main/发布或替换原版。候选安装使用独立名称/AppId/目录/卸载与快捷方式；项目和原图不得随卸载删除。
