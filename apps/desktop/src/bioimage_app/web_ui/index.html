@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>BioImage · 图像工作台</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <aside class="platform-rail" aria-label="工具平台">
+    <button class="brand" data-action="home" aria-label="BioImage 工具平台"><svg viewBox="0 0 32 32" fill="none"><path d="M7 5h10a7 7 0 0 1 0 14H7V5Z" stroke="currentColor" stroke-width="3"/><path d="M7 13h12a7 7 0 1 1 0 14H7V13Z" stroke="currentColor" stroke-width="3"/></svg></button>
+    <div class="rail-tools"><button class="rail-button" data-action="home" aria-label="项目与工具" title="项目与工具"><i data-icon="grid"></i><span>工作台</span></button><button class="rail-button selected" data-action="workbench" aria-label="WB 自动化" title="WB 自动化"><i data-icon="lanes"></i><span>WB</span></button></div>
+    <div class="rail-bottom"><button class="rail-button" data-action="help" aria-label="使用帮助"><i data-icon="help"></i></button><button class="rail-button" data-action="settings" aria-label="界面设置"><i data-icon="settings"></i></button><span class="local-indicator" title="本地运行，原图保留"></span></div>
+  </aside>
+  <div class="app-shell">
+    <header class="project-header">
+      <div class="breadcrumb"><button data-action="home">工作台</button><i data-icon="chevron"></i><span>WB 自动化</span><span class="header-divider"></span><strong id="project-name">新建实验项目</strong></div>
+      <div class="header-actions"><span id="save-status" class="save-status"><i data-icon="check"></i>就绪</span><span id="runtime-badge" class="runtime-badge">网页预览</span><button class="button subtle" data-action="import"><i data-icon="plus"></i><span>添加原图</span></button><button class="button primary" data-action="export"><i data-icon="download"></i><span>导出结果</span></button></div>
+    </header>
+    <main id="home-view" class="home-view" hidden>
+      <div class="home-intro"><div><h1>让图像，成为清晰的结果。</h1><p>从原始图像到可追溯的分析，在一个工作台里完成。</p></div><span class="local-label"><span></span>本地工作空间</span></div>
+      <section class="tool-feature"><div class="tool-feature-copy"><div class="tool-symbol"><i data-icon="lanes"></i></div><h2>WB 自动化</h2><p>导入原图，自动定位泳道与裁剪范围。<br>在图上复核细节，让每一项结果都有依据。</p><button class="button primary large" data-action="import"><i data-icon="upload"></i>选择原图并开始<i data-icon="arrow"></i></button><button class="text-button" data-action="import_folder">或选择原图文件夹</button><small>项目文件夹自动创建 · 原始图像完整保留</small></div><div class="tool-feature-image"><img id="home-image" alt="WB 原始图像预览"><div class="feature-caption"><span>原图 · 泳道 · 结果</span><span>同一条证据链</span></div></div></section>
+      <section class="recent-section"><div class="section-heading"><h2>继续你的工作</h2><button class="text-button" data-action="open_project"><i data-icon="folder"></i>打开已有项目</button></div><button class="recent-project" data-action="demo"><div class="recent-thumbnail"><img id="recent-image" alt="项目缩略图"></div><div><h3 id="recent-name">查看交互预览</h3><p id="recent-description">体验原图复核、拼图与结果浏览</p></div><span class="recent-label">打开项目</span><i data-icon="arrow"></i></button></section>
+      <p class="home-note" id="home-note">网页用于界面与交互预览。真实导入、计算和导出由同源桌面版执行。</p>
+    </main>
+    <div id="work-view" class="work-view">
+      <nav class="mode-bar" aria-label="工作模式"><div class="mode-tabs" role="tablist"><span class="mode-indicator"></span><button class="mode-tab active" data-mode="review" role="tab" aria-selected="true"><i data-icon="scan"></i>图像复核</button><button class="mode-tab" data-mode="layout" role="tab" aria-selected="false"><i data-icon="layout"></i>拼图排版</button><button class="mode-tab" data-mode="results" role="tab" aria-selected="false"><i data-icon="table"></i>结果</button></div><div class="mode-actions"><button class="text-button compact-inspect" data-action="inspect"><i data-icon="eye"></i>复核详情</button><button class="text-button" data-action="tools"><i data-icon="sliders"></i><span>项目工具</span><i data-icon="chevron-down"></i></button></div></nav>
+      <div class="workspace">
+        <aside class="source-panel" aria-label="项目原图"><div class="panel-heading"><h2>项目原图 <span id="source-count">0</span></h2><button class="icon-button" data-action="import" aria-label="添加原图"><i data-icon="plus"></i></button></div><div class="source-filters" role="group" aria-label="筛选原图"><button class="active" data-filter="all">全部</button><button data-filter="attention">需关注 <span id="attention-count">0</span></button></div><label class="search-field"><i data-icon="search"></i><input id="source-search" type="search" placeholder="查找原图…" aria-label="查找原图"></label><div id="source-list" class="source-list"></div><div class="source-footer"><i data-icon="shield"></i><div><strong>原图始终保留</strong><small>调整仅影响当前分析草稿</small></div></div></aside>
+        <section class="main-panel" aria-label="图像与结果工作区">
+          <div class="canvas-heading"><div><h2 id="image-title">选择一张原图</h2><p id="image-subtitle">查看自动识别结果，在图上完成调整</p></div><div class="image-actions"><button class="icon-button" data-action="undo" aria-label="撤销调整" title="撤销 · Ctrl+Z"><i data-icon="undo"></i></button><button class="icon-button" data-action="redo" aria-label="重做调整" title="重做 · Ctrl+Shift+Z"><i data-icon="redo"></i></button><span class="toolbar-divider"></span><button class="icon-button" data-action="focus" aria-label="聚焦裁剪区域" title="聚焦裁剪区域"><i data-icon="focus"></i></button></div></div>
+          <div id="image-stage" class="image-stage"><div class="stage-label"><span class="image-dot"></span><span id="stage-label">原始图像</span></div><div id="image-viewport" class="image-viewport"><div id="image-transform" class="image-transform"><img id="source-image" alt="当前原图" draggable="false"><div id="crop-overlay" class="crop-overlay" tabindex="0" role="group" aria-label="裁剪范围，可拖动调整；方向键微调"><span class="crop-tag">自动建议</span><div id="lane-lines"></div><button class="crop-handle nw" data-handle="nw" tabindex="0" aria-label="左上角"></button><button class="crop-handle ne" data-handle="ne" tabindex="0" aria-label="右上角"></button><button class="crop-handle sw" data-handle="sw" tabindex="0" aria-label="左下角"></button><button class="crop-handle se" data-handle="se" tabindex="0" aria-label="右下角"></button></div></div></div><div id="empty-image" class="empty-image"><i data-icon="image"></i><h3>从一张原图开始</h3><p>选择项目中的原图，或打开界面预览。</p><button class="button primary" data-action="demo">打开预览项目<i data-icon="arrow"></i></button></div><div class="floating-tools"><button class="icon-button" data-action="zoom-out" aria-label="缩小"><i data-icon="minus"></i></button><button id="zoom-label" class="zoom-label" data-action="fit" title="适应窗口">适应窗口</button><button class="icon-button" data-action="zoom-in" aria-label="放大"><i data-icon="plus"></i></button><span></span><button class="icon-button" data-action="fit" aria-label="适应窗口"><i data-icon="expand"></i></button></div></div>
+          <div id="result-stage" class="result-stage" hidden><div class="result-intro"><h3>每一项结果，都有来源。</h3><p>待复核的原始积分与有效信号分开呈现。</p></div><div class="results-scroll"><table><thead><tr><th>图组 / 原图</th><th>泳道</th><th>有效信号</th><th>原始积分</th><th>状态</th></tr></thead><tbody id="results-body"></tbody></table></div><div class="table-footer"><span id="result-count">尚无结果</span><span>选择一行，查看完整依据</span></div></div>
+          <div class="canvas-footer"><span><i data-icon="mouse"></i><span id="canvas-hint">拖动边框调整裁剪 · 滚轮缩放 · 方向键微调</span></span><button class="text-button" data-action="overlay" id="overlay-toggle"><i data-icon="layers"></i>显示标注</button></div>
+        </section>
+        <aside class="inspector" aria-label="当前项目复核与操作"><div class="panel-heading"><h2 id="inspector-title">当前原图</h2><span id="review-badge" class="status-badge pending">待复核</span></div><div id="inspector-content" class="inspector-content"></div><div id="inspector-action" class="inspector-action"><button class="button primary full" data-action="confirm"><i data-icon="check"></i>确认裁剪，查看下一张<i data-icon="arrow"></i></button><small>裁剪确认不会消除质量警告</small></div></aside>
+      </div>
+      <footer class="status-bar"><span><span id="status-dot" class="status-dot"></span><span id="operation-status">就绪</span></span><button id="cancel-button" class="text-button" data-action="cancel" hidden>取消处理</button><span class="status-right" id="status-right">本地工作空间 · 原图保留</span></footer>
+    </div>
+  </div>
+  <div id="drawer-backdrop" class="drawer-backdrop" hidden></div><aside id="drawer" class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" hidden><div class="drawer-heading"><h2 id="drawer-title">项目工具</h2><button class="icon-button" data-action="close-drawer" aria-label="关闭面板"><i data-icon="close"></i></button></div><div id="drawer-content"></div></aside>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <noscript>需要启用 JavaScript 才能操作图像工作台。</noscript>
+  <script src="app.js" defer></script>
+</body>
+</html>

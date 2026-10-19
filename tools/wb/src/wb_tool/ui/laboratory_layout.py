@@ -1,5 +1,7 @@
 """Explicit layout editor; source geometry and scientific bindings are edited elsewhere."""
 
+from contextlib import suppress
+
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QAbstractItemView,
@@ -36,13 +38,10 @@ class LaboratoryLayoutPanel(QWidget):
         self._loading = False
         self._rows: dict[str, FigureRow] = {}
         root = QVBoxLayout(self)
-        self.rebuild = QPushButton("从当前原图行启用 / 重建版式")
+        self.rebuild = QPushButton("根据原图更新排版")
         self.rebuild.clicked.connect(self.rebuild_requested)
         root.addWidget(self.rebuild)
-        note = QLabel(
-            "按原图行明确配置显示行与段序；相同显示行的蛋白名须一致。\n"
-            "分段保留全部泳道及顺序，原ROI高度独立；新增/删除原图或改Fig后可重建。"
-        )
+        note = QLabel("在中央查看拼图，在这里调整所选来源的排列。分段不会改变原图或定量。")
         note.setWordWrap(True)
         root.addWidget(note)
         self.editor = QWidget()
@@ -64,6 +63,31 @@ class LaboratoryLayoutPanel(QWidget):
         ):
             form.addRow(text, widget)
         content.addLayout(form)
+        self.segment = QComboBox()
+        self.segment.setMinimumContentsLength(14)
+        self.segment.setSizeAdjustPolicy(
+            QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
+        )
+        content.addWidget(QLabel("当前来源与片段"))
+        content.addWidget(self.segment)
+        self.selection_note = QLabel("选择片段以调整排列。")
+        self.selection_note.setWordWrap(True)
+        content.addWidget(self.selection_note)
+        selected_form = QFormLayout()
+        self.segment_fields: dict[int, QSpinBox] = {}
+        for column, title in ((2, "显示行"), (3, "段序"), (6, "Fig 列")):
+            field = QSpinBox()
+            field.setRange(1, 10000)
+            field.valueChanged.connect(lambda value=0, c=column: self._set_segment_field(c, value))
+            self.segment_fields[column] = field
+            selected_form.addRow(title, field)
+        content.addLayout(selected_form)
+        self.advanced_toggle = QPushButton("完整分段表")
+        self.advanced_toggle.setCheckable(True)
+        content.addWidget(self.advanced_toggle)
+        self.advanced = QWidget()
+        advanced_layout = QVBoxLayout(self.advanced)
+        advanced_layout.setContentsMargins(0, 0, 0, 0)
         self.table = QTableWidget(0, 7)
         self.table.setHorizontalHeaderLabels(
             ["原图行", "Fig", "显示行", "段序", "起始", "结束", "Fig列"]
@@ -75,7 +99,8 @@ class LaboratoryLayoutPanel(QWidget):
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
         self.table.setColumnWidth(0, 76)
-        self.table.setMinimumWidth(410)
+        self.table.setMinimumWidth(0)
+        self.table.setMaximumHeight(230)
         for column, description in (
             (4, "起始泳道（原图序号，含本泳道）"),
             (5, "结束泳道（原图序号，含本泳道）"),
@@ -83,19 +108,23 @@ class LaboratoryLayoutPanel(QWidget):
             heading = self.table.horizontalHeaderItem(column)
             if heading is not None:
                 heading.setToolTip(description)
-        content.addWidget(self.table, 1)
+        advanced_layout.addWidget(self.table, 1)
         column_hint = QLabel("在表内编辑显示行、段序和起止泳道；悬停原图行可查看完整文件名。")
         column_hint.setWordWrap(True)
-        content.addWidget(column_hint)
+        advanced_layout.addWidget(column_hint)
+        content.addWidget(self.advanced)
+        self.advanced.hide()
+        self.advanced_toggle.toggled.connect(self.advanced.setVisible)
         split = QHBoxLayout()
         self.cut = QSpinBox()
         self.cut.setRange(1, 95)
         split.addWidget(QLabel("在原泳道"))
         split.addWidget(self.cut)
-        self.split_button = QPushButton("之后拆分所选段")
+        self.split_button = QPushButton("之后拆分")
         self.split_button.clicked.connect(self.split_selected)
         split.addWidget(self.split_button)
         content.addLayout(split)
+        content.addStretch()
         root.addWidget(self.editor, 1)
         self.status = QLabel("尚未启用；现有项目继续使用原版式。")
         self.status.setWordWrap(True)
@@ -105,10 +134,50 @@ class LaboratoryLayoutPanel(QWidget):
         self.flow.currentIndexChanged.connect(self._edited)
         self.alignment.currentIndexChanged.connect(self._edited)
         self.table.itemChanged.connect(self._edited)
+        self.segment.currentIndexChanged.connect(self._select_segment)
+        self.table.currentCellChanged.connect(self._table_selected)
         self.restore(WBFigureProject(project_id="empty"))
+
+    def _select_segment(self, index: int) -> None:
+        if self._loading or not 0 <= index < self.table.rowCount():
+            return
+        self.table.setCurrentCell(index, 0)
+        self.table.selectRow(index)
+        self._show_segment(index)
+
+    def _table_selected(self, row: int, *_args: object) -> None:
+        if self._loading or not 0 <= row < self.table.rowCount():
+            return
+        self.segment.blockSignals(True)
+        self.segment.setCurrentIndex(row)
+        self.segment.blockSignals(False)
+        self._show_segment(row)
+
+    def _show_segment(self, row: int) -> None:
+        loading, self._loading = self._loading, True
+        for column, field in self.segment_fields.items():
+            item = self.table.item(row, column)
+            if item is not None:
+                # Invalid advanced text remains visible for correction.
+                with suppress(ValueError):
+                    field.setValue(int(item.text()))
+        first, last, source = (self.table.item(row, c) for c in (4, 5, 0))
+        if first is not None and last is not None and source is not None:
+            self.selection_note.setText(f"{source.text()} · 泳道 {first.text()}–{last.text()}")
+            self.selection_note.setToolTip(source.toolTip())
+        self._loading = loading
+
+    def _set_segment_field(self, column: int, value: int) -> None:
+        if self._loading:
+            return
+        item = self.table.item(self.segment.currentIndex(), column)
+        if item is not None:
+            item.setText(str(value))
 
     def _edited(self) -> None:
         if not self._loading:
+            if self.table.currentRow() >= 0:
+                self._show_segment(self.table.currentRow())
             self.changed.emit()
 
     def layout_style(self) -> FigureLayoutStyle:
@@ -170,13 +239,17 @@ class LaboratoryLayoutPanel(QWidget):
         self.alignment.setCurrentIndex(0 if style.label_alignment == "right" else 1)
         self._fill(composition)
         self.status.setText(
-            "已启用；调整显示行号、段序与Fig列，然后生成预览。"
+            f"{len(composition.slices)} 个片段 · 选择来源调整排列。"
             if self.active
-            else "尚未启用；现有项目继续使用原版式。"
+            else "当前使用原版式。更新排版后可调整片段与显示顺序。"
         )
         self._loading = False
+        if self.table.rowCount():
+            self._select_segment(max(0, self.segment.currentIndex()))
 
     def _fill(self, composition: FigureComposition) -> None:
+        selected = self.segment.currentIndex()
+        self.segment.clear()
         columns = {entry.figure: entry.column for entry in composition.columns}
         self.table.setRowCount(len(composition.slices))
         for index, part in enumerate(composition.slices):
@@ -191,6 +264,9 @@ class LaboratoryLayoutPanel(QWidget):
                 str(part.last_lane),
                 str(columns.get(part.figure, 1)),
             ]
+            self.segment.addItem(
+                f"{values[0]} · {part.figure} · 泳道 {part.first_lane}–{part.last_lane}"
+            )
             for column, text in enumerate(values):
                 item = QTableWidgetItem(text)
                 if column < 2:
@@ -201,6 +277,9 @@ class LaboratoryLayoutPanel(QWidget):
                         f"{row.protein} · {row.filename}\n来源行：{part.row_id}" if row else text
                     )
                 self.table.setItem(index, column, item)
+
+        if self.segment.count():
+            self.segment.setCurrentIndex(min(max(0, selected), self.segment.count() - 1))
 
     def split_selected(self) -> None:
         try:
@@ -239,3 +318,5 @@ class LaboratoryLayoutPanel(QWidget):
             self.status.setText(str(error))
         finally:
             self._loading = False
+            if self.table.rowCount():
+                self._select_segment(max(0, self.segment.currentIndex()))

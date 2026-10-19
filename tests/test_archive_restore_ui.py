@@ -10,6 +10,7 @@ from zipfile import ZipFile
 import pytest
 from bioimage_app.project_restore import restore_archive_workspace
 from platform_runtime.api import IntegrityError, StateConflict, Workspace
+from PySide6.QtCore import Qt
 from pytestqt.qtbot import QtBot
 from wb_tool.api import (
     WBRestoredProject,
@@ -199,7 +200,9 @@ def test_corrupt_history_on_reopen_blanks_only_its_values(
     qtbot.waitUntil(window.import_button.isEnabled, timeout=15000)
     assert isinstance(window.view.project(), WBRestoredProject), window.view.status.text()
     table = window.view.analysis.results
-    assert item(table, 0, 3).text() == "" and item(table, 0, 4).text() == "result_unavailable"
+    assert item(table, 0, 3).text() == ""
+    assert item(table, 0, 4).text() == "结果不可用"
+    assert item(table, 0, 4).data(Qt.ItemDataRole.UserRole) == "result_unavailable"
     assert item(table, 3, 3).text() == "8000"
 
 

@@ -3,7 +3,7 @@
 from dataclasses import replace
 from uuid import uuid4
 
-from PySide6.QtCore import QSize, Qt, Signal
+from PySide6.QtCore import QEvent, QObject, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QIcon, QImage, QPixmap, QResizeEvent
 from PySide6.QtWidgets import (
     QAbstractItemView,
@@ -72,6 +72,7 @@ from wb_tool.ui.normalization import NormalizationPanel
 from wb_tool.ui.project_analysis import ProjectAnalysisPanel
 from wb_tool.ui.project_metadata import ProjectMetadataPanel
 from wb_tool.ui.project_ocr import ProjectOCRPanel
+from wb_tool.ui.result_workspace import ResultWorkspace
 
 
 class FigurePreview(QLabel):
@@ -117,6 +118,11 @@ class FigurePreview(QLabel):
 
 
 class FigureProjectView(QWidget):
+    image_export_button: QPushButton
+    archive_export_button: QPushButton
+    table_export_button: QPushButton
+    ocr_export_button: QPushButton
+    normalization_export_button: QPushButton
     changed = Signal()
     source_requested = Signal(str)
     preview_requested = Signal()
@@ -128,6 +134,7 @@ class FigureProjectView(QWidget):
     detection_requested = Signal(bool)
     automatic_requested = Signal()
     automatic_export_requested = Signal()
+    output_folder_requested = Signal()
     import_directory_requested = Signal()
 
     def __init__(self, parent: QWidget | None = None) -> None:
@@ -136,8 +143,16 @@ class FigureProjectView(QWidget):
         self._loading = False
         self._project = WBFigureProject(project_id=uuid4().hex)
         self._thumbnails: dict[str, QIcon] = {}
+        self._source_preview: PreviewRaster | None = None
+        self._last_review_focus: QWidget | None = None
+        self._pending_review_focus: QWidget | None = None
+        self._crop_history: list[
+            tuple[str, tuple[int, int, int, int], tuple[int, int, int, int]]
+        ] = []
+        self._crop_history_index = 0
+        self._restoring_crop = False
         root = QVBoxLayout(self)
-        root.setContentsMargins(12, 10, 12, 10)
+        root.setContentsMargins(8, 4, 8, 8)
         root.setSpacing(5)
         project_header = QHBoxLayout()
         caption = QLabel("当前项目")
@@ -152,13 +167,13 @@ class FigureProjectView(QWidget):
 
         self.history_label = QLabel()
         self.history_label.setWordWrap(True)
-        root.addWidget(self.history_label)
+        self.history_label.hide()
         actions = QHBoxLayout()
         self.filter = QComboBox()
         self.filter.addItems(
             [
-                "全部行",
-                "待审核",
+                "全部原图",
+                "需关注",
                 "已审核",
                 "预标空泳道",
                 "缺图",
@@ -167,7 +182,7 @@ class FigureProjectView(QWidget):
                 "无候选/失败",
             ]
         )
-        self.filter.setFixedWidth(132)
+        self.filter.setMinimumWidth(0)
         actions.addWidget(self.filter)
         for text, callback in (
             ("上移", lambda: self.move_row(-1)),
@@ -244,7 +259,7 @@ class FigureProjectView(QWidget):
             "拼图显示：RGB 按 BT.601 转灰度；16 位整除 257。归档另含未改像素的 TIFF 裁剪和原图。"
         )
         preview_note.setWordWrap(True)
-        preview_layout.addWidget(preview_note)
+        preview_note.hide()
         preview_page.setMinimumWidth(250)
         preview_page.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.preview_label = FigurePreview()
@@ -256,6 +271,9 @@ class FigureProjectView(QWidget):
 
         settings = QWidget()
         form = QFormLayout(settings)
+        form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapAllRows)
+        form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow)
+        settings.setMinimumWidth(0)
         self.figure_order = QLineEdit()
         form.addRow("Fig 顺序（逗号分隔）", self.figure_order)
         self.template_name = QLineEdit()
@@ -297,6 +315,11 @@ class FigureProjectView(QWidget):
         settings_scroll = QScrollArea()
         settings_scroll.setWidget(settings)
         settings_scroll.setWidgetResizable(True)
+        settings_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        settings_scroll.setMinimumWidth(0)
+        for label in settings.findChildren(QLabel):
+            label.setWordWrap(True)
+            label.setMinimumWidth(0)
 
         self.laboratory_layout = LaboratoryLayoutPanel()
         self.laboratory_layout.changed.connect(self._edited)
@@ -311,7 +334,40 @@ class FigureProjectView(QWidget):
         self.table.cellChanged.connect(self._cell_changed)
         self.table.currentCellChanged.connect(self._selected)
         self.canvas.roi_drawn.connect(self._drawn)
+        self.canvas.lane_selected.connect(self._select_graphical_lane)
+        self.analysis.lane_changed.connect(self._highlight_lane)
+        for editor in (
+            self.canvas,
+            self.analysis.plot,
+            self.analysis.lane_selector,
+            self.name,
+            *self.source_fields.values(),
+            *self.analysis.lane_fields.values(),
+        ):
+            editor.installEventFilter(self)
         self.set_project(self._project)
+
+    def resizeEvent(self, event: QResizeEvent) -> None:
+        super().resizeEvent(event)
+        if hasattr(self, "analysis_source"):
+            self._refresh_source_workspace()
+
+    def eventFilter(self, watched: QObject, event: QEvent) -> bool:
+        if event.type() == QEvent.Type.FocusIn and isinstance(watched, QWidget):
+            self._last_review_focus = watched
+        return super().eventFilter(watched, event)
+
+    def changeEvent(self, event: QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QEvent.Type.EnabledChange and self.isEnabled():
+            # Child enabled states settle after the parent's changeEvent.
+            QTimer.singleShot(0, self._restore_review_focus)
+
+    def _restore_review_focus(self) -> None:
+        focused = self._pending_review_focus
+        if self.isEnabled() and focused is not None and focused.isVisible() and focused.isEnabled():
+            self._pending_review_focus = None
+            focused.setFocus()
 
     def _build_source_workspace(self) -> QWidget:
         workspace = QWidget()
@@ -329,24 +385,25 @@ class FigureProjectView(QWidget):
         rail.addWidget(self.source_count)
         self.import_directory_button = QPushButton("导入原图文件夹…")
         self.import_directory_button.clicked.connect(self.import_directory_requested)
-        rail.addWidget(self.import_directory_button)
+        self.import_directory_button.hide()
+        rail.addWidget(self.filter)
         self.source_list = QListWidget()
         self.source_list.setObjectName("sourceList")
         self.source_list.setAccessibleName("项目原图列表")
         self.source_list.setIconSize(QSize(48, 40))
-        self.source_list.setWordWrap(True)
+        self.source_list.setWordWrap(False)
         self.source_list.setMinimumHeight(150)
         self.source_list.currentRowChanged.connect(self._select_analysis_source)
         rail.addWidget(self.source_list, 1)
-        self.automatic_button = QPushButton("自动识别并分析")
-        self.automatic_button.setObjectName("primaryAction")
+        self.automatic_button = QPushButton("重新自动识别")
+        self.automatic_button.setObjectName("secondaryAction")
         self.automatic_button.setMinimumHeight(38)
         self.automatic_button.clicked.connect(self.automatic_requested)
         rail.addWidget(self.automatic_button)
         self.automatic_export_button = QPushButton("导出自动化结果…")
         self.automatic_export_button.clicked.connect(self.automatic_export_requested)
-        rail.addWidget(self.automatic_export_button)
-        note = QLabel("自动处理原图、泳道与定量。\n有疑问的结果会保留复核提示。")
+        self.automatic_export_button.hide()
+        note = QLabel("选择原图查看识别结果。\n需要关注的项会保留具体原因。")
         note.setWordWrap(True)
         note.setObjectName("sourceHint")
         rail.addWidget(note)
@@ -366,9 +423,16 @@ class FigureProjectView(QWidget):
         fit = QPushButton("适应窗口")
         fit.clicked.connect(lambda: self.canvas.set_view_region(None))
         tools.addWidget(fit)
+        undo = QPushButton("撤销裁剪")
+        undo.clicked.connect(lambda: self._crop_history_step(-1))
+        tools.addWidget(undo)
+        redo = QPushButton("重做")
+        redo.clicked.connect(lambda: self._crop_history_step(1))
+        tools.addWidget(redo)
         evidence.addLayout(tools)
         self.canvas.setMinimumSize(280, 240)
         self.canvas.empty_message = "导入 TIFF 原图文件夹\n自动识别后，在这里检查和调整裁剪"
+        self.image_evidence_layout = evidence
         evidence.addWidget(self.canvas, 1)
         hint = QLabel("框内拖动：移动裁剪  ·  边角拖动：调整大小  ·  滚轮：缩放  ·  中键：平移")
         hint.setWordWrap(True)
@@ -401,11 +465,20 @@ class FigureProjectView(QWidget):
             field.editingFinished.connect(lambda c=column: self._source_field_edited(c))
             self.source_fields[column] = field
             form.addRow(label, field)
+        self.source_fields[2].setPlaceholderText("未指定")
         self.source_fields[8].setPlaceholderText("可选，例如 3, 6")
-        review.addLayout(form)
-        confirm = QPushButton("确认当前裁剪")
-        confirm.clicked.connect(self.confirm_selected)
+        self.source_metadata = QWidget()
+        self.source_metadata.setLayout(form)
+        self.source_metadata.hide()
+        details_toggle = QCheckBox("实验信息与泳道设置")
+        details_toggle.toggled.connect(self.source_metadata.setVisible)
+        review.addWidget(details_toggle)
+        review.addWidget(self.source_metadata)
+        confirm = QPushButton("确认裁剪并查看下一项")
+        confirm.setObjectName("primaryAction")
+        confirm.clicked.connect(self._confirm_and_next)
         review.addWidget(confirm)
+        self.source_review_layout = review
         self.suggestions_toggle = QCheckBox("检测候选与高级设置")
         self.suggestions_toggle.toggled.connect(self.suggestions.setVisible)
         review.addWidget(self.suggestions_toggle)
@@ -418,21 +491,35 @@ class FigureProjectView(QWidget):
         self.source_controls_scroll.setFixedWidth(272)
         self.source_controls_scroll.setWidget(right)
         layout.addWidget(self.source_controls_scroll)
-        workspace.setStyleSheet(
-            "QWidget#sourceRail, QWidget#sourceReview { background: #ffffff; }"
-            "QListWidget#sourceList { border: 0; background: #ffffff; outline: none; }"
-            "QListWidget#sourceList::item { padding: 9px 6px; border-radius: 5px; }"
-            "QListWidget#sourceList::item:selected { background: #e1f2ee; color: #096568; }"
-            "QListWidget#sourceList::item:hover { background: #eff7f6; }"
-            "QLabel#sourceHint { color: #536771; font-size: 11px; }"
-        )
         return workspace
+
+    def _select_graphical_lane(self, index: int) -> None:
+        if self.analysis.plan is not None:
+            self.analysis.lane_selector.setCurrentIndex(index)
+            self.analysis.lane_selector.activated.emit(index)
+            self.curve_toggle.setChecked(True)
+
+    def _highlight_lane(self) -> None:
+        row = self.analysis.source_row
+        if row and row.roi:
+            self.canvas.set_lanes(
+                tuple(
+                    replace(
+                        lane,
+                        lane_id=f"泳道 {i + 1}"
+                        + (" · 当前" if i == self.analysis.lanes.currentRow() else ""),
+                    )
+                    for i, lane in enumerate(fixed_lane_grid(row.roi, row.lane_count))
+                )
+            )
 
     def _source_field_edited(self, column: int) -> None:
         index = self.table.currentRow()
         item = self.table.item(index, column) if index >= 0 else None
         if item is not None:
-            item.setText(self.source_fields[column].text().strip())
+            item.setText(
+                self.source_fields[column].text().strip() or ("Unassigned" if column == 2 else "")
+            )
 
     def _refresh_source_workspace(self) -> None:
         self.source_list.blockSignals(True)
@@ -443,7 +530,9 @@ class FigureProjectView(QWidget):
             review = self.table.item(i, 9)
             reviewed = bool(review and review.checkState() == Qt.CheckState.Checked)
             state = (
-                "已复核"
+                "裁剪已确认 · 仍需关注"
+                if reviewed and self._needs_attention(i)
+                else "裁剪已确认"
                 if reviewed
                 else "自动结果 · 待复核"
                 if self._text(i, 4)
@@ -451,9 +540,13 @@ class FigureProjectView(QWidget):
                 if self._text(i, 10)
                 else "待识别"
             )
-            title = f"{self._text(i, 2) or row.filename or '缺图位'}\n{state} · {row.filename}"
-            entry = QListWidgetItem(title)
-            entry.setToolTip(title)
+            filename = row.filename or "缺图位"
+            width = max(80, self.source_list.viewport().width() - 72)
+            display = self.source_list.fontMetrics().elidedText(
+                filename, Qt.TextElideMode.ElideMiddle, width
+            )
+            entry = QListWidgetItem(f"{display}\n{state}")
+            entry.setToolTip(f"{filename}\n{state}")
             if row.source and row.source.sha256 in self._thumbnails:
                 entry.setIcon(self._thumbnails[row.source.sha256])
             self.source_list.addItem(entry)
@@ -466,7 +559,10 @@ class FigureProjectView(QWidget):
         for column, field in self.source_fields.items():
             field.setEnabled(row is not None)
             if not field.hasFocus():
-                field.setText(self._text(index, column) if row else "")
+                text = self._text(index, column) if row else ""
+                field.setText("" if column == 2 and text == "Unassigned" else text)
+                if column == 2:
+                    field.setToolTip("未指定蛋白，按来源文件名识别图片。中文拼图标签需要项目字体。")
         self.source_image_title.setText(row.filename if row else "原图预览")
         self.source_image_title.setToolTip(row.filename if row else "")
         self.source_details.setText(
@@ -476,13 +572,13 @@ class FigureProjectView(QWidget):
         )
         review = self.table.item(index, 9) if row else None
         self.source_review_status.setText(
-            "人工复核已确认"
+            "裁剪已确认；测量状态见下方。"
             if review and review.checkState() == Qt.CheckState.Checked
-            else "裁剪已就绪 · 待复核，可直接拖动图中绿框"
+            else "已找到裁剪与泳道。拖动框体或边角可调整，确认仅记录裁剪审核。"
             if row and self._text(index, 4)
-            else "等待自动识别泳道和裁剪"
+            else "尚无可靠裁剪。在中央框选膜区域后重新自动识别；不必填写坐标。"
             if row
-            else "从左侧导入原图文件夹"
+            else "选择 WB 原图后自动开始处理"
         )
         if row and self._text(index, 10):
             self.source_review_status.setText(
@@ -506,164 +602,176 @@ class FigureProjectView(QWidget):
     ) -> None:
         self.steps = QListWidget()
         self.steps.setObjectName("workflowSteps")
-        self.steps.setAccessibleName("实验项目步骤")
-        self.steps.addItems(["1  原图与裁剪", "2  定量与复核", "3  拼图排版", "4  导出"])
+        self.steps.setAccessibleName("工作区视图")
+        self.steps.addItems(["图像复核", "拼图", "结果"])
         self.steps.setFlow(QListView.Flow.LeftToRight)
         self.steps.setWrapping(False)
-        self.steps.setGridSize(QSize(220, 44))
-        self.steps.setFixedHeight(48)
+        self.steps.setGridSize(QSize(132, 38))
+        self.steps.setFixedHeight(42)
         self.steps.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.steps.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.sidebar = QWidget()
-        self.sidebar.setObjectName("workflowNavigation")
-        navigation_layout = QVBoxLayout(self.sidebar)
-        navigation_layout.setContentsMargins(0, 0, 0, 0)
-        navigation_layout.addWidget(self.steps)
+        navigation = QHBoxLayout(self.sidebar)
+        navigation.setContentsMargins(0, 0, 0, 0)
+        navigation.addWidget(self.steps, 1)
+        self.context_button = QToolButton()
+        self.context_button.setText("项目工具")
+        menu = QMenu(self.context_button)
+        for label, section in (
+            ("批量填写实验信息", "metadata"),
+            ("高级原图数据", "advanced"),
+            ("模板与样式", "template"),
+            ("OCR 识别与写表", "ocr"),
+            ("样本对应与归一化", "normalization"),
+        ):
+            menu.addAction(label).triggered.connect(
+                lambda _checked=False, s=section: self.show_section(s)
+            )
+        self.context_button.setMenu(menu)
+        self.context_button.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+        navigation.addWidget(self.context_button)
         root.addWidget(self.sidebar)
-        content = QVBoxLayout()
-        content.setSpacing(5)
-        self.step_title = QLabel()
-        self.step_title.setObjectName("stepTitle")
-        self.step_help = QLabel()
-        self.step_help.setWordWrap(True)
-        self.step_help.setObjectName("stepHelp")
-        content.addWidget(self.step_title)
-        content.addWidget(self.step_help)
+        self.step_title, self.step_help = QLabel(), QLabel()
+        self.step_title.hide()
+        self.step_help.hide()
+        self.context_header = QWidget()
+        context_layout = QHBoxLayout(self.context_header)
+        context_layout.setContentsMargins(0, 0, 0, 0)
+        self.context_back = QPushButton("返回图像复核")
+        self.context_back.clicked.connect(lambda: self.show_section(self._context_return))
+        self.context_title = QLabel()
+        self.context_title.setObjectName("sectionTitle")
+        context_layout.addWidget(self.context_back)
+        context_layout.addWidget(self.context_title, 1)
+        self._context_return = "source"
+        root.addWidget(self.context_header)
+        self.context_header.hide()
         self.pages = QStackedWidget()
-        content.addWidget(self.pages, 1)
-        root.addLayout(content, 1)
+        root.addWidget(self.pages, 1)
 
-        originals = QWidget()
-        originals_layout = QVBoxLayout(originals)
-        originals_layout.setContentsMargins(0, 0, 0, 0)
-        originals_layout.addWidget(source_page, 1)
+        # The legacy tab objects remain addressable for host integrations, but are
+        # contextual pages, not a second layer of visible navigation.
+        self.source_tabs = QTabWidget()
+        self.source_tabs.tabBar().hide()
+        self.source_tabs.addTab(source_page, "图像复核")
+        self.source_tabs.addTab(self.metadata, "批量填写信息")
         advanced = QWidget()
         advanced_layout = QVBoxLayout(advanced)
         advanced_layout.addWidget(source_controls)
         self.table.setMaximumHeight(16777215)
         advanced_layout.addWidget(self.table, 1)
-        self.source_tabs = QTabWidget()
-        self.source_tabs.addTab(originals, "原图工作区")
-        self.source_tabs.addTab(self.metadata, "批量填写信息")
         self.source_tabs.addTab(advanced, "高级数据表")
         self._add_step(self.source_tabs)
-
-        quantification = QWidget()
-        quantification_layout = QVBoxLayout(quantification)
-        quantification_layout.setContentsMargins(0, 0, 0, 0)
-        self.analysis_source = QComboBox(self.analysis.controls)
-        self.analysis_source.setAccessibleName("选择需要定量的原图行")
+        self.curve_toggle = QCheckBox("查看泳道曲线")
+        self.curve_toggle.setToolTip("在原始曲线上拖动边界或基线；修改后需重新测量")
+        self.image_evidence_layout.insertWidget(1, self.curve_toggle)
+        self.image_evidence_layout.insertWidget(3, self.analysis.curve_editor)
+        self.analysis.curve_editor.hide()
+        self.curve_toggle.toggled.connect(self.analysis.curve_editor.setVisible)
+        self.source_review_layout.insertWidget(3, self.analysis.review_controls)
+        self.source_review_layout.insertWidget(4, self.analysis.controls)
+        self.analysis.controls.hide()
+        self.curve_toggle.toggled.connect(self.analysis.controls.setVisible)
+        self.analysis_source = QComboBox(self.analysis)
         self.analysis_source.hide()
-        self.analysis_sources = QListWidget()
-        self.analysis_sources.setObjectName("evidenceSources")
-        self.analysis_sources.setAccessibleName("定量原图来源")
-        self.analysis_sources.setFixedHeight(82)
-        self.analysis.controls_layout.insertWidget(1, self.analysis_sources)
+        self.analysis_sources = QListWidget(self.analysis)
+        self.analysis_sources.hide()
         self.analysis_sources.currentRowChanged.connect(self._select_analysis_source)
-        back_to_source = QPushButton("返回裁剪与审核")
-        back_to_source.clicked.connect(lambda: self.show_section("source"))
-        back_to_source.setParent(self.analysis.controls)
-        back_to_source.hide()
-        self.analysis_tabs = QTabWidget()
-        self.analysis_tabs.addTab(self.analysis, "定量与曲线复核")
-        self.analysis_tabs.addTab(self.ocr, "OCR / 结果表")
-        self.analysis_tabs.addTab(self.normalization, "样本对应与归一化")
-        quantification_layout.addWidget(self.analysis_tabs, 1)
-        self.pages.addWidget(quantification)
         self.analysis_source.activated.connect(self._select_analysis_source)
 
         self.layout_tabs = QTabWidget()
+        self.layout_tabs.tabBar().hide()
         arrangement = QSplitter(Qt.Orientation.Horizontal)
-        self.layout_settings_tabs = QTabWidget()
-        self.layout_settings_tabs.setMinimumWidth(450)
-        self.layout_settings_tabs.addTab(self.laboratory_layout, "版式与分段")
-        self.layout_settings_tabs.addTab(settings, "样式与模板")
-        arrangement.addWidget(self.layout_settings_tabs)
+        layout_rail = QWidget()
+        layout_rail.setMaximumWidth(224)
+        rail = QVBoxLayout(layout_rail)
+        rail.addWidget(QLabel("拼图与模板"))
+        for label, section in (
+            ("排版与分段", "layout"),
+            ("模板与样式", "template"),
+            ("识别标签并写表", "ocr"),
+        ):
+            button = QPushButton(label)
+            button.clicked.connect(lambda _checked=False, s=section: self.show_section(s))
+            rail.addWidget(button)
+        rail.addStretch()
+        arrangement.addWidget(layout_rail)
         preview_layout = preview_page.layout()
         assert isinstance(preview_layout, QVBoxLayout)
-        self.preview_button = QPushButton("生成 / 更新预览")
-        self.preview_button.setObjectName("primaryAction")
+        self.preview_button = QPushButton("更新预览")
         self.preview_button.clicked.connect(self.preview_requested)
-        preview_toolbar = QHBoxLayout()
-        preview_toolbar.addWidget(self.preview_button, 1)
         self.preview_scale = QComboBox()
         self.preview_scale.addItems(["适应窗口", "100%"])
         self.preview_scale.setAccessibleName("预览显示比例")
         self.preview_scale.currentIndexChanged.connect(self._preview_scale_changed)
-        preview_toolbar.addWidget(self.preview_scale)
-        preview_layout.insertLayout(0, preview_toolbar)
+        toolbar = QHBoxLayout()
+        toolbar.addWidget(QLabel("当前拼图"), 1)
+        toolbar.addWidget(self.preview_button)
+        toolbar.addWidget(self.preview_scale)
+        preview_layout.insertLayout(0, toolbar)
         arrangement.addWidget(preview_page)
-        arrangement.setSizes([460, 400])
+        self.layout_settings_tabs = QTabWidget()
+        self.layout_settings_tabs.tabBar().hide()
+        self.layout_settings_tabs.setMinimumWidth(240)
+        self.layout_settings_tabs.addTab(self.laboratory_layout, "版式与分段")
+        self.layout_settings_tabs.addTab(settings, "样式与模板")
+        arrangement.addWidget(self.layout_settings_tabs)
+        arrangement.setSizes([200, 720, 280])
         arrangement.setChildrenCollapsible(False)
         self.layout_tabs.addTab(arrangement, "排版与预览")
         self._add_step(self.layout_tabs)
 
-        exports = QWidget()
-        export_layout = QVBoxLayout(exports)
-        export_layout.setSpacing(16)
-        self.image_export_button = QPushButton("导出拼图 TIFF / PNG…")
-        self.image_export_button.clicked.connect(self.image_export_requested)
-        self.archive_export_button = QPushButton("导出完整项目 ZIP…")
-        self.archive_export_button.clicked.connect(self.export_requested)
-        self.table_export_button = QPushButton("导出定量结果 XLSX / CSV…")
-        self.table_export_button.clicked.connect(self.analysis.export_requested)
-        self.ocr_export_button = QPushButton("导出 OCR 关联结果 XLSX / CSV…")
-        self.ocr_export_button.clicked.connect(self.ocr.export_requested)
-        self.normalization_export_button = QPushButton("导出归一化结果 XLSX / CSV…")
-        self.normalization_export_button.clicked.connect(self.normalization.export_requested)
-        for title, description, buttons in (
-            (
-                "完整项目",
-                "保留原图、原值裁剪、配置与可核验结果，用于迁移和恢复。",
-                [self.archive_export_button],
-            ),
-            (
-                "实验结果",
-                "导出已核验的结果表；缺失、失败与真实零值分别保留。",
-                [
-                    self.table_export_button,
-                    self.normalization_export_button,
-                    self.ocr_export_button,
-                ],
-            ),
-            (
-                "展示拼图",
-                "输出 RGB 8 位展示图。原始定量像素保存在完整项目中。",
-                [self.image_export_button],
-            ),
+        # Keep analysis host APIs while its result content occupies a three-column workspace.
+        result_layout = self.analysis.layout()
+        assert isinstance(result_layout, QVBoxLayout)
+        self.result_workspace = ResultWorkspace(self.analysis.result_view)
+        self._output_location = ""
+        self.result_workspace.export_requested.connect(self.automatic_export_requested)
+        self.result_workspace.open_output_requested.connect(self.output_folder_requested)
+        self.result_workspace.section_requested.connect(
+            lambda section="analysis": self.show_section(
+                "export" if section == "analysis" else section
+            )
+        )
+        result_layout.addWidget(self.result_workspace, 1)
+        self.export_options = self.result_workspace.formats
+        formats = self.export_options.layout()
+        assert isinstance(formats, QVBoxLayout)
+        while formats.count():
+            entry = formats.takeAt(0)
+            widget = entry.widget() if entry else None
+            if widget is not None:
+                widget.deleteLater()
+        for attribute, label, signal in (
+            ("image_export_button", "拼图 TIFF / PNG", self.image_export_requested),
+            ("archive_export_button", "完整项目 ZIP", self.export_requested),
+            ("table_export_button", "定量表", self.analysis.export_requested),
+            ("ocr_export_button", "OCR 关联表", self.ocr.export_requested),
+            ("normalization_export_button", "归一化表", self.normalization.export_requested),
         ):
-            heading = QLabel(title)
-            heading.setObjectName("exportHeading")
-            export_layout.addWidget(heading)
-            note = QLabel(description)
-            note.setWordWrap(True)
-            export_layout.addWidget(note)
-            for button in buttons:
-                button.setMaximumWidth(360)
-                export_layout.addWidget(button)
-        export_layout.addStretch()
-        exports_scroll = QScrollArea()
-        exports_scroll.setWidgetResizable(True)
-        exports_scroll.setWidget(exports)
-        self.pages.addWidget(exports_scroll)
-        navigation = QHBoxLayout()
-        self.previous_step = QPushButton("上一步")
-        self.next_step = QPushButton("下一步：定量与复核")
-        self.previous_step.clicked.connect(
-            lambda: self.steps.setCurrentRow(self.steps.currentRow() - 1)
-        )
-        self.next_step.clicked.connect(
-            lambda: self.steps.setCurrentRow(self.steps.currentRow() + 1)
-        )
-        navigation.addWidget(self.status, 1)
-        navigation.addWidget(self.previous_step)
-        navigation.addWidget(self.next_step)
-        content.addLayout(navigation)
+            button = QPushButton(label)
+            button.clicked.connect(signal)
+            setattr(self, attribute, button)
+            formats.addWidget(button)
+        self.export_disclosure = self.result_workspace.formats_toggle
+        self.analysis.result_view.cells_changed.connect(self._results_changed)
+        self.result_workspace.set_summary(self._project, ())
+        self.analysis_tabs = QTabWidget()
+        self.analysis_tabs.tabBar().hide()
+        # Analysis methods/signals remain on the same instance, while its live
+        # curve and controls are now embedded in the source workbench.
+        self.analysis_tabs.addTab(self.analysis, "结果")
+        self.analysis_tabs.addTab(self.ocr, "OCR / 结果表")
+        self.analysis_tabs.addTab(self.normalization, "样本对应与归一化")
+        self.pages.addWidget(self.analysis_tabs)
+        self.previous_step, self.next_step = QPushButton(), QPushButton()
+        self.previous_step.hide()
+        self.next_step.hide()
+        root.addWidget(self.status)
         self.steps.currentRowChanged.connect(self._step_changed)
         self.steps.setCurrentRow(0)
 
     def _add_step(self, content: QWidget) -> None:
-        # Bound the shell minimum size; small displays scroll the current step only.
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QScrollArea.Shape.NoFrame)
@@ -671,49 +779,96 @@ class FigureProjectView(QWidget):
         self.pages.addWidget(scroll)
 
     def _step_changed(self, index: int) -> None:
-        titles = ("原图与裁剪", "定量与复核", "拼图排版", "导出")
-        hints = (
-            "左侧选择原图，中间检查自动裁剪，右侧复核结果；拖动框体移动、拖动边角调整。",
-            "可先通过 OCR 建表，再关联已审核原图并复核定量；也可直接定量后导出结果。",
-            "需要展示拼图时，调整明确分段和标签样式并生成预览；定量结果可直接导出。",
-            "按用途选择输出。保存项目保留当前工作进度，完整 ZIP 用于迁移和恢复。",
-        )
-        if not 0 <= index < len(titles):
+        if not 0 <= index < 3:
             return
+        self.context_header.hide()
         self.pages.setCurrentIndex(index)
-        self.step_title.setText(titles[index])
-        self.step_help.setText(hints[index])
-        self.step_title.setVisible(index != 1)
-        self.step_help.setVisible(index != 1)
-        self.previous_step.setEnabled(index > 0)
-        self.next_step.setEnabled(index < 3)
-        self.next_step.setText(f"下一步：{titles[index + 1]}" if index < 3 else "已到最后一步")
+        self.source_tabs.setCurrentIndex(0)
+        self.analysis_tabs.setCurrentIndex(0)
         self._refresh_analysis_sources()
+        self.status.setText(
+            (
+                "检查自动结果；裁剪调整直接在图上完成，质量警告单独保留。",
+                "预览当前拼图；选择右侧属性调整，模板与 OCR 在项目工具中。",
+                "结果保留来源和状态；待复核的原始积分不等于有效信号。",
+            )[index]
+        )
 
     def show_section(self, section: str) -> None:
-        """Navigate without changing project data or committing scientific edits."""
+        """Navigate contextually without scientific edits or legacy tab layers."""
         sections = {
             "source": 0,
             "metadata": 0,
-            "analysis": 1,
-            "normalization": 1,
-            "layout": 2,
-            "template": 2,
-            "preview": 2,
-            "ocr": 1,
-            "export": 3,
+            "advanced": 0,
+            "analysis": 0,
+            "layout": 1,
+            "template": 1,
+            "preview": 1,
+            "normalization": 2,
+            "ocr": 2,
+            "export": 2,
         }
         self.steps.setCurrentRow(sections[section])
-        if section in ("source", "metadata"):
-            self.source_tabs.setCurrentIndex(int(section == "metadata"))
-        if section in ("analysis", "ocr", "normalization"):
-            self.analysis_tabs.setCurrentIndex(
-                {"analysis": 0, "ocr": 1, "normalization": 2}[section]
-            )
+        self._step_changed(sections[section])
+        if section in ("source", "metadata", "advanced", "analysis"):
+            self.source_tabs.setCurrentIndex({"metadata": 1, "advanced": 2}.get(section, 0))
+            if section == "analysis":
+                self.curve_toggle.setChecked(True)
+        if section in ("ocr", "normalization"):
+            self.analysis_tabs.setCurrentIndex(1 if section == "ocr" else 2)
         if section in ("layout", "template", "preview"):
-            self.layout_tabs.setCurrentIndex(0)
-            if section in ("layout", "template"):
-                self.layout_settings_tabs.setCurrentIndex(int(section == "template"))
+            self.layout_settings_tabs.setCurrentIndex(int(section == "template"))
+        contexts = {
+            "metadata": ("批量填写实验信息", "source"),
+            "advanced": ("高级原图数据", "source"),
+            "ocr": ("OCR 识别与写表", "export"),
+            "normalization": ("样本对应与归一化", "export"),
+        }
+        if section in contexts:
+            title, self._context_return = contexts[section]
+            self.context_title.setText(title)
+            self.context_back.setText(
+                "返回图像复核" if self._context_return == "source" else "返回结果"
+            )
+            self.context_header.show()
+        elif section == "export":
+            self.result_workspace.navigation["analysis"].setChecked(True)
+            self.result_workspace.navigation["ocr"].setChecked(False)
+            self.result_workspace.navigation["normalization"].setChecked(False)
+        self._update_result_summary()
+
+    def set_output_location(self, path: str) -> None:
+        """Host supplies the latest successfully committed output directory."""
+        self._output_location = path
+        self._update_result_summary()
+
+    def _update_result_summary(self) -> None:
+        self.result_workspace.set_summary(
+            self._project, self.analysis.result_view.cells, self._output_location
+        )
+
+    def _results_changed(self, _cells: object) -> None:
+        self._update_result_summary()
+        if not self._loading:
+            self.refresh_attention()
+
+    def _confirm_and_next(self) -> None:
+        self.confirm_selected()
+        current = self.table.currentRow()
+        for index in (*range(current + 1, self.table.rowCount()), *range(0, current)):
+            if self._needs_attention(index) and not self.table.isRowHidden(index):
+                self.table.setCurrentCell(index, 0)
+                return
+        self.status.setText("裁剪已确认；定量质量警告仍需独立复核。")
+
+    def _needs_attention(self, index: int) -> bool:
+        item = self.table.item(index, 9)
+        if item is None or item.checkState() != Qt.CheckState.Checked:
+            return True
+        if not 0 <= index < len(self._project.rows):
+            return False
+        row_id = self._project.rows[index].row_id
+        return self.analysis.row_needs_attention(row_id)
 
     def _refresh_analysis_sources(self) -> None:
         self.analysis_source.blockSignals(True)
@@ -824,6 +979,31 @@ class FigureProjectView(QWidget):
 
     def set_project(self, project: WBFigureProject) -> None:
         self._loading = True
+        old_index = self.table.currentRow()
+        selected = (
+            self._project.rows[old_index] if 0 <= old_index < len(self._project.rows) else None
+        )
+        same_project = project.project_id == self._project.project_id
+        selected_index = next(
+            (
+                i
+                for i, row in enumerate(project.rows)
+                if same_project
+                and selected
+                and row.row_id == selected.row_id
+                and row.source == selected.source
+            ),
+            -1,
+        )
+        selected_lane = self.analysis.lanes.currentRow()
+        focused = self._last_review_focus
+        if not same_project:
+            self._output_location = ""
+            self._crop_history.clear()
+            self._crop_history_index = 0
+            self.analysis.reset_history()
+            self._last_review_focus = None
+            self._pending_review_focus = None
         self._project = project
         self.history_label.setText(
             f"从归档恢复 · {len(project.archive_sources)} 个来源 · "
@@ -849,9 +1029,11 @@ class FigureProjectView(QWidget):
         self.ocr.result_view.invalidate()
         self.table.clearSelection()
         self.table.setCurrentCell(-1, -1)
-        self.canvas.set_image(PreviewRaster("", 0, 0, 0, 0, b"", 0, ()))
-        self.canvas.set_lanes(())
-        self.canvas.set_regions(())
+        if selected_index < 0:
+            self._source_preview = None
+            self.canvas.set_image(PreviewRaster("", 0, 0, 0, 0, b"", 0, ()))
+            self.canvas.set_lanes(())
+            self.canvas.set_regions(())
         self.suggestions.show_suggestion(None, None, project.template.crop_height)
         self.name.setText(project.name)
         self.figure_order.setText(", ".join(project.figure_order))
@@ -899,10 +1081,25 @@ class FigureProjectView(QWidget):
             self.table.setRowHeight(
                 index, 68 if row.source and row.source.sha256 in self._thumbnails else 28
             )
-        self.history_label.setVisible(bool(self.history_label.text()))
+        self.name.setToolTip(self.history_label.text())
+        self.history_label.hide()
+        if selected_index >= 0:
+            self.table.setCurrentCell(selected_index, 0)
         self._loading = False
+        if selected_index >= 0:
+            self.show_analysis(selected_index)
+            if self._source_preview is not None:
+                self.analysis.set_source_preview(self._source_preview)
+            if 0 <= selected_lane < self.analysis.lanes.rowCount():
+                self.analysis.lanes.setCurrentCell(selected_lane, 0)
+            self._overlay()
+            if focused is not None and focused.isVisible():
+                if self.isEnabled():
+                    focused.setFocus()
+                else:
+                    self._pending_review_focus = focused
         self._refresh_analysis_sources()
-        self._filter_rows()
+        self._filter_rows(select_visible=False)
         self._refresh_source_workspace()
 
     def rebuild_layout(self) -> None:
@@ -1019,6 +1216,7 @@ class FigureProjectView(QWidget):
                 self._refresh_analysis_sources()
                 return
             self._refresh_analysis_sources()
+            self._source_preview = None
             self.canvas.set_image(PreviewRaster("", 0, 0, 0, 0, b"", 0, ()))
             self.canvas.set_lanes(())
             self.canvas.set_regions(())
@@ -1134,11 +1332,17 @@ class FigureProjectView(QWidget):
         index = self.table.currentRow()
         return self.project().rows[index] if 0 <= index < len(self._project.rows) else None
 
+    @property
+    def source_preview(self) -> PreviewRaster | None:
+        """Display-only raster; never a quantitative input."""
+        return self._source_preview
+
     def set_source_preview(self, preview: PreviewRaster) -> None:
         index = self.table.currentRow()
         row = self._project.rows[index] if 0 <= index < len(self._project.rows) else None
         if row is None or row.source is None or row.source.sha256 != preview.sha256:
             return
+        self._source_preview = preview
         self.canvas.set_image(preview)
         self.analysis.set_source_preview(preview)
         if row.roi is not None:
@@ -1243,7 +1447,15 @@ class FigureProjectView(QWidget):
         index = self.table.currentRow()
         if index < 0 or self._project.rows[index].source is None:
             return
-        previous_roi = self._project.rows[index].roi
+        current = self.selected_row()
+        previous_roi = current.roi if current else None
+        if previous_roi and not self._restoring_crop:
+            before = (previous_roi.x0, previous_roi.y0, previous_roi.x1, previous_roi.y1)
+            if before != coords:
+                self._crop_history[self._crop_history_index :] = [
+                    (self._project.rows[index].row_id, before, coords)
+                ]
+                self._crop_history_index += 1
         self._loading = True
         for column, value in enumerate(coords, start=4):
             item = self.table.item(index, column)
@@ -1262,7 +1474,42 @@ class FigureProjectView(QWidget):
             self.laboratory_layout.restore(project)
         self._cell_changed(index, 4)
 
-    def _filter_rows(self) -> None:
+    def undo_review(self) -> None:
+        if self.analysis.plot.hasFocus():
+            self.analysis.undo_curve()
+        else:
+            self._crop_history_step(-1)
+
+    def redo_review(self) -> None:
+        if self.analysis.plot.hasFocus():
+            self.analysis.redo_curve()
+        else:
+            self._crop_history_step(1)
+
+    def _crop_history_step(self, step: int) -> None:
+        target = self._crop_history_index - 1 if step < 0 else self._crop_history_index
+        if not 0 <= target < len(self._crop_history):
+            return
+        row_id, before, after = self._crop_history[target]
+        index = next((i for i, row in enumerate(self._project.rows) if row.row_id == row_id), -1)
+        if index < 0:
+            return
+        self.table.setCurrentCell(index, 0)
+        if self.table.currentRow() != index:
+            return
+        self._restoring_crop = True
+        try:
+            self._drawn(before if step < 0 else after)
+            self._crop_history_index += step
+        finally:
+            self._restoring_crop = False
+
+    def refresh_attention(self) -> None:
+        """Refresh source statuses after the host installs verified result cells."""
+        self._refresh_source_workspace()
+        self._filter_rows(select_visible=False)
+
+    def _filter_rows(self, *_args: object, select_visible: bool = True) -> None:
         mode = self.filter.currentIndex()
         suggestions = (
             {s.row_id: s for s in self._project.suggestions}
@@ -1275,7 +1522,7 @@ class FigureProjectView(QWidget):
             review = self.table.item(i, 9)
             checked = bool(review and review.checkState() == Qt.CheckState.Checked)
             hidden = (
-                (mode == 1 and checked)
+                (mode == 1 and not self._needs_attention(i))
                 or (mode == 2 and not checked)
                 or (mode == 3 and not self._text(i, 8))
                 or (mode == 4 and row.source is not None)
@@ -1297,6 +1544,14 @@ class FigureProjectView(QWidget):
             self.table.setRowHidden(i, bool(hidden))
             if i < self.source_list.count():
                 self.source_list.item(i).setHidden(bool(hidden))
+
+        current = self.table.currentRow()
+        if select_visible and current >= 0 and self.table.isRowHidden(current):
+            visible = next(
+                (i for i in range(self.table.rowCount()) if not self.table.isRowHidden(i)), -1
+            )
+            if visible >= 0:
+                self._select_analysis_source(visible)
 
     def move_row(self, step: int) -> None:
         try:

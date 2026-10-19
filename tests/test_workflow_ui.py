@@ -106,6 +106,7 @@ def test_export_page_emits_existing_commands(
         signal.disconnect()
         spy = QSignalSpy(signal)
         view.show_section("export")
+        view.export_disclosure.setChecked(True)
         assert button.isVisible()
         button.click()
         assert spy.count() == 1
@@ -130,6 +131,7 @@ def test_welcome_and_menu_follow_existing_busy_guards(
         False,
         False,
         True,
+        True,  # Saving moved into the project menu in the integrated host shell.
     ]
 
 
@@ -221,7 +223,7 @@ def test_ocr_results_belong_to_quantification_without_requiring_composition(
     generation = view.generation
     assert not view.laboratory_layout.active
     view.show_section("ocr")
-    assert view.steps.currentRow() == 1
+    assert view.steps.currentRow() == 2
     assert view.analysis_tabs.currentWidget() is view.ocr
     assert view.analysis_tabs.tabText(view.analysis_tabs.currentIndex()) == "OCR / 结果表"
     assert view.layout_tabs.indexOf(view.ocr) == -1
@@ -231,6 +233,7 @@ def test_ocr_results_belong_to_quantification_without_requiring_composition(
     view.show_section("normalization")
     assert view.analysis_tabs.currentWidget() is view.normalization
     view.show_section("export")
+    view.export_disclosure.setChecked(True)
     assert view.table_export_button.isVisible()
     assert view.project() == before and view.generation == generation
     assert not view.laboratory_layout.active
