@@ -1,6 +1,7 @@
 """A stale web edit cannot overwrite or approve a newer source crop."""
 
 import json
+from dataclasses import fields
 from pathlib import Path
 
 import numpy as np
@@ -67,7 +68,12 @@ def test_stale_crop_commands_preserve_new_draft_and_fresh_edit_works(
     ]
     for payload in invalid:
         bridge.request(action, json.dumps(payload))
-        assert host.view.project() == advanced
+        current = host.view.project()
+        assert current == advanced, {
+            field.name: (getattr(advanced, field.name), getattr(current, field.name))
+            for field in fields(advanced)
+            if getattr(advanced, field.name) != getattr(current, field.name)
+        }
         assert "改变" in str(bridge.snapshot()["status"])
     bridge.request(action, json.dumps(fresh))
     changed = host.view.project().rows[0]
@@ -159,7 +165,12 @@ def test_real_page_cancels_old_drag_and_accepts_new_gesture(
             )
             is True
         )
-        assert host.view.project() == advanced
+        current = host.view.project()
+        assert current == advanced, {
+            field.name: (getattr(advanced, field.name), getattr(current, field.name))
+            for field in fields(advanced)
+            if getattr(advanced, field.name) != getattr(current, field.name)
+        }
         qtbot.waitUntil(lambda: not host.operation_busy, timeout=10000)
         qtbot.waitUntil(lambda: js("!state.busy") is True, timeout=10000)
         assert js("switchMode('review'); true") is True

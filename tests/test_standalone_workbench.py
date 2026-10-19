@@ -10,6 +10,7 @@ import tifffile
 from bioimage_app.web_window import WebWorkbenchWindow
 from PySide6.QtCore import QSettings
 from PySide6.QtWidgets import QFileDialog
+from pytestqt.exceptions import TimeoutError as QtTimeoutError
 from pytestqt.qtbot import QtBot
 from wb_tool.api import WBAnalysisProject
 
@@ -122,12 +123,33 @@ def test_real_page_manual_import_compute_save_reopen_without_automatic_or_compos
                     const input = document.querySelector('[data-manual-quant-field=' + key + ']');
                     input.value = value; input.dispatchEvent(new Event('input', {{bubbles:true}}));
                 }}
+                window.manualRunTrace = {{busy:state.busy, revision:state.quant?.revision,
+                    projectId:state.projectId, draft:structuredClone(manualQuant.draft),
+                    disabled:document.querySelector('[data-manual-quant-run]').disabled}};
                 document.querySelector('[data-manual-quant-run]').click(); return true;
             }})()"""
             )
             is True
         )
-        qtbot.waitUntil(lambda: bool(window.host.project_results), timeout=30000)
+        try:
+            qtbot.waitUntil(lambda: bool(window.host.project_results), timeout=30000)
+        except QtTimeoutError:
+            print(
+                "MANUAL_RUN_TRACE",
+                js(
+                    "JSON.stringify({before:window.manualRunTrace, "
+                    "busy:state.busy, revision:state.quant?.revision, "
+                    "draft:manualQuant.draft, submitted:manualQuant.submittedRevision, "
+                    "disabled:document.querySelector('[data-manual-quant-run]')?.disabled})"
+                ),
+            )
+            print(
+                "MANUAL_HOST_STATUS",
+                window.host.view.status.text(),
+                window.host.view.generation,
+                window.bridge.snapshot()["status"],
+            )
+            raise
         qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=20000)
         project = window.host.view.project()
         assert isinstance(project, WBAnalysisProject)
