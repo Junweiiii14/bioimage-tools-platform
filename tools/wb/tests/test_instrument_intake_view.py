@@ -15,14 +15,17 @@ from wb_tool.api import (
     replace_intake_plan,
 )
 
+from tools.wb.tests.owned_widgets import WidgetOwner
 from tools.wb.tests.test_instrument_intake import assigned, planned, source
 
 
-def test_host_view_save_retains_pool_confirmation_and_display_thumbnails(qtbot: QtBot) -> None:
+def test_host_view_save_retains_pool_confirmation_and_display_thumbnails(
+    qtbot: QtBot, owned_widgets: WidgetOwner
+) -> None:
     project = assigned()
     project = confirm_intake(project, expected_digest=intake_digest(project))
     view = create_figure_project_view()
-    qtbot.addWidget(view)
+    owned_widgets(view)
     view.set_project(project)
     raster = PreviewRaster(source(3).asset.sha256, 120, 80, 12, 8, b"\x80" * 96, 16, ())
     view.install_thumbnail(raster)
@@ -43,9 +46,11 @@ def test_host_view_save_retains_pool_confirmation_and_display_thumbnails(qtbot: 
     assert not view.has_thumbnail(source(3).asset.sha256)
 
 
-def test_legacy_row_edit_cannot_change_intake_mapping(qtbot: QtBot) -> None:
+def test_legacy_row_edit_cannot_change_intake_mapping(
+    qtbot: QtBot, owned_widgets: WidgetOwner
+) -> None:
     view = create_figure_project_view()
-    qtbot.addWidget(view)
+    owned_widgets(view)
     project = assigned()
     view.set_project(project)
     view.table.blockSignals(True)
@@ -63,7 +68,7 @@ def test_legacy_row_edit_cannot_change_intake_mapping(qtbot: QtBot) -> None:
     "figure,protein", [(" Fig 1 ", "AKT"), ("Fig 1", "AKT "), ("Fig 1, repeat", "AKT")]
 )
 def test_intake_labels_roundtrip_without_legacy_string_reparsing(
-    qtbot: QtBot, figure: str, protein: str
+    qtbot: QtBot, owned_widgets: WidgetOwner, figure: str, protein: str
 ) -> None:
     project = planned()
     project = replace_intake_plan(
@@ -73,7 +78,7 @@ def test_intake_labels_roundtrip_without_legacy_string_reparsing(
         expected_digest=intake_digest(project),
     )
     view = create_figure_project_view()
-    qtbot.addWidget(view)
+    owned_widgets(view)
     view.set_project(project)
     restored = read_figure_project(view.project(revision=4).model_dump_json().encode())
     assert isinstance(restored, WBIntakeProject)

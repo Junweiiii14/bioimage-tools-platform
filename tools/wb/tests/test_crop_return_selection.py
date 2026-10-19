@@ -6,18 +6,19 @@ from PySide6.QtCore import QItemSelectionModel
 from pytestqt.qtbot import QtBot
 from wb_tool.api import create_figure_project_view
 
+from tools.wb.tests.owned_widgets import WidgetOwner
 from tools.wb.tests.test_figure_project import sample
 
 
 def test_bound_confirmation_does_not_approve_other_selected_rows(
-    qtbot: QtBot, tmp_path: Path
+    qtbot: QtBot, owned_widgets: WidgetOwner, tmp_path: Path
 ) -> None:
     project, _ = sample(tmp_path)
     project = project.model_copy(
         update={"rows": tuple(row.model_copy(update={"reviewed": False}) for row in project.rows)}
     )
     view = create_figure_project_view()
-    qtbot.addWidget(view)
+    owned_widgets(view)
     view.set_project(project)
     view.table.setCurrentCell(1, 0)
     selection = view.table.selectionModel()
