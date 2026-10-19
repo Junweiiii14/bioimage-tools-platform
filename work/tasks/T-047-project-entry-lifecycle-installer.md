@@ -44,3 +44,5 @@
 - 编译/安装v4均exit0，安装包317863800字节，SHA256 b3d6f58fed96d1f3133276fe8cdb60818ac475bdb18a021c12752e7dd9608fb6；仅独立候选目录和AppId，桌面/开始菜单/卸载入口核对。安装EXE与dist一致，但包态验收失败，未交付启动。
 - 实际OCR worker failure(analysis_invalid)/ModuleNotFoundError：RapidOCR.main由__getattr__/import_module延迟导入，原配方只收录root及data，需显式include-package=rapidocr。控制器首轮另有SYSTEMROOT字典大小写错误，已更正并保留旧报告，不把控制器失败写成产品失败。
 - 包态GUI自检正常/离屏均exit3、初始化报告空白，精确根因UNKNOWN。只记录线程清理提示；补字体目录不能解决。新增显式诊断bootstrap检查点/异常记录，以定位初始化阶段；源码自检v5与类型复验。运行库已在最终dist根目录核对，未修改系统。
+- 全量AOT安装v4未通过真实启动/OCR验收；v5停止自有编译树，compile_exit4294967295，643.203秒，保留证据。基本Qt/WebEngine最小编译探针exit0；工作台编译态初始化exit3原因仍UNKNOWN，不宣称修复。
+- 改为同版本可重定位CPython3.12.14＋uv.lock导出的纯产品依赖＋四个独立wheel＋原生Windows入口。保留完整Python模块布局，避免动态导入遗漏与全量AOT初始化路径；软件不依赖系统Python/uv，科学代码和已批准UI不变。启动器转发参数/标准流、等待真实应用退出，独立Job仅管理自有进程树，退出码透传。新方案仍须实际安装/工作进程/关闭验收和独审，不因源码通过提前交付。
