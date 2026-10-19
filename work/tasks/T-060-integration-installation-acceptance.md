@@ -35,3 +35,5 @@ Post-reinstall installed v3 dual-flow actual0: intake controller14.8269492s, gra
 5bb准备树完整门禁908pass1fail/762s原child1/outer1/wheel未跑；旧latebatch测试遇合法autosave新批，4条真实运行/修订引用核验见late-batch-failure.json。仅测试隔离旧批完成并新增恢复自动重算两分支，30相关/176.96s0；待最终静态/提交独审与新完整门禁，产品仍e579。PR12 Linux202超时UNKNOWN、3f诊断控制全0但首WebChannel超时（609pass1fail/170.52s/原1），新观察/无GPU环境待验。
 
 8e11028完整910/705.48s、原pytest0/u32=0、inventory4非截断、全部隔离wheel/真实OCR/check actual0；最终非作者无P0–P2，历史失败保留。PR12/13四CI及独审已接受，main6e8b1e6；PR14 finalb1d2c8b四CI中，已最终独审/规则0。主树仅状态文档刷新，剩余实际main依赖与最终T060清单/PR检查未完成。安装态候选仍e579通过，外部科学/目标机/DPI未验。
+
+PR14旧b1 Windows699/644.74s+全wheel0，Linux15m16s超时停repeated WB close，实际native栈未捕获/rootUNKNOWN。仅窄移植后继已审CI012测试窗口所属销毁，真实red2/2.76s→16/32.60s0，原20轮/10s/GC与产品不动；最终2fbe9cb独审/冻结规则0，新四CI39343775888/39343775941运行。不得沿用旧Windows绿标新head通过。

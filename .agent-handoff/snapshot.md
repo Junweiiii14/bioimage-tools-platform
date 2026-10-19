@@ -5,7 +5,7 @@
 - 产品运行代码仍等installed e57949b；8e110280b4510c5bf1544bfabb9466792c1fa722完整910/705.48s，原pytest0/u32=0、inventory4/nontruncated、全部隔离wheel/真实OCR/check actual0。非作者8e绑定无P0–P2；拒绝手势只dispatch一次的测试P2已关闭。当前仅文档刷新阶段状态，需规则重载/提交审查。
 - 原5bb908pass1fail/762s、d7f909pass1fail/744.29s原child1/wheel未跑，保留fullcheck-diagnostics。latebatch测试隔离旧完成并验证合法新批；crop使用冻结身份原子就绪/单次事件，实际拒绝在waitUntil外失败，真实拒绝反例counter+1。原安全断言/时限均保持，旧native/GPU/页面间歇根因仍UNKNOWN。
 - actualmain6e8b1e665e07b78171203721ecbd6985fb52b981，PR7→3→8→9→10→11→12→13已接受。PR12eb60 Windows610/511.08s/Linux610/178.32s和全部wheel0；PR13final8cdc Windows646/640.19s/Linux646/240.28s和全部wheel0；都绑定独审/四检查。primary元数据合并1891f16后运行代码不变。
-- PR14 finalb1d2c8b827bd8eee1f8190390cdd2e8badf926c8，actualbase6e8、最终非作者无P0–P2/规则0；四CI39341804292与39341804369运行中（rules/desktop已pass）。准备态产品等已审ae14904，真实相关14Qt/18纯0，static499/types0。
+- PR14当前2fbe9cbf341fbab67d98f3898f2f14b7ec517f4a，actualbase6e8，绑定非作者无P0–P2/规则0。旧b1 Windows699/644.74s+全wheel0；Linux15m16s在旧WB重复关闭test资源wait/worker retire超时，无实际native栈，根因UNKNOWN。窄回移已审CI012所属fixture销毁，红2/2.76s→WB全模块及失败等待保护16/32.60s0，原20轮/10s/del+gc和产品不变。新四CI39343775888/39343775941运行中。
 - aux e7-integration当前codex/e7-integrate-10/3748bba，准备T044/PR15，合前置最终b1（PR14尚未接受）。产品等已审9adf5d5；19相关/20.01s0、static565/types0。准备独审04f529d无P0–P2。待actualmain14接受后merge/reload/最终提交审查/四CI，再接受PR15。
 - 当前主树普通scope .规则已按6e8读取并更新架构/模块说明。旧准备SYNC008/T044历史回执存在base祖先缺口，integration context正确拒绝；保留原版本，等实际接受PR14/15有效回执合入后生成唯一T060最终manifest，不改验证器/删记录。
 - E7测试包e579 build/install/upgrade/uninstall/reinstall0，非管理员Win11中文独立目录/AppId/E7Test/快捷方式。安装态v2/v3 intake14与gray7及真实PS5.1双自检均0，私有runtime/无开发模块/无所属残留。两处synthetic用户数据SHA和旧PID55936/exe摘要不变。f12证据独审无P0–P2。
