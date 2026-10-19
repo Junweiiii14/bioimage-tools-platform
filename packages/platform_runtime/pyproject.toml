@@ -1,0 +1,16 @@
+[project]
+name = "platform-runtime"
+version = "0.1.0"
+description = "Host-owned immutable workspace storage"
+requires-python = ">=3.12,<3.13"
+dependencies = ["tool-contracts"]
+
+[tool.uv.sources]
+tool-contracts = { workspace = true }
+
+[build-system]
+requires = ["uv_build==0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "platform_runtime"

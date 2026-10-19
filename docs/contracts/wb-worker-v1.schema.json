@@ -1,0 +1,827 @@
+{
+  "$defs": {
+    "AcceptedFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "title": "Attempt Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "accepted",
+          "title": "Kind",
+          "type": "string"
+        },
+        "protocol_version": {
+          "const": 1,
+          "title": "Protocol Version",
+          "type": "integer"
+        },
+        "request_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "run_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "sequence": {
+          "const": 1,
+          "title": "Sequence",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "protocol_version",
+        "run_id",
+        "attempt_id",
+        "request_id",
+        "kind",
+        "sequence"
+      ],
+      "title": "AcceptedFrame",
+      "type": "object"
+    },
+    "AnalysisRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "lanes": {
+          "items": {
+            "$ref": "#/$defs/LaneAnnotation"
+          },
+          "title": "Lanes",
+          "type": "array"
+        },
+        "polarity": {
+          "enum": [
+            "dark",
+            "light"
+          ],
+          "title": "Polarity",
+          "type": "string"
+        },
+        "revision": {
+          "title": "Revision",
+          "type": "integer"
+        },
+        "source_sha256": {
+          "title": "Source Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_sha256",
+        "revision",
+        "polarity",
+        "lanes"
+      ],
+      "title": "AnalysisRequest",
+      "type": "object"
+    },
+    "AnalysisResult": {
+      "additionalProperties": false,
+      "properties": {
+        "algorithm_id": {
+          "const": "profile_integral@1",
+          "default": "profile_integral@1",
+          "title": "Algorithm Id",
+          "type": "string"
+        },
+        "bit_depth": {
+          "title": "Bit Depth",
+          "type": "integer"
+        },
+        "lanes": {
+          "items": {
+            "$ref": "#/$defs/LaneAnalysis"
+          },
+          "title": "Lanes",
+          "type": "array"
+        },
+        "quality_policy": {
+          "const": "dtype_limits_review@1",
+          "default": "dtype_limits_review@1",
+          "title": "Quality Policy",
+          "type": "string"
+        },
+        "request": {
+          "$ref": "#/$defs/AnalysisRequest"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "source_conversion": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source Conversion"
+        }
+      },
+      "required": [
+        "request",
+        "bit_depth",
+        "source_conversion",
+        "lanes"
+      ],
+      "title": "AnalysisResult",
+      "type": "object"
+    },
+    "BandAnalysis": {
+      "additionalProperties": false,
+      "properties": {
+        "annotation": {
+          "$ref": "#/$defs/BandAnnotation"
+        },
+        "measurement": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProfileMeasurement"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "quality_flags": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Quality Flags",
+          "type": "array"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "status": {
+          "enum": [
+            "valid",
+            "quality_review",
+            "invalid",
+            "excluded",
+            "not_detected"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "annotation",
+        "status"
+      ],
+      "title": "BandAnalysis",
+      "type": "object"
+    },
+    "BandAnnotation": {
+      "additionalProperties": false,
+      "properties": {
+        "band_id": {
+          "title": "Band Id",
+          "type": "string"
+        },
+        "baseline": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Baseline"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "bounds": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BandBounds"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "included": {
+          "default": true,
+          "title": "Included",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "band_id",
+        "bounds"
+      ],
+      "title": "BandAnnotation",
+      "type": "object"
+    },
+    "BandBounds": {
+      "additionalProperties": false,
+      "description": "Inclusive endpoints relative to the original, unsmoothed lane profile.",
+      "properties": {
+        "left": {
+          "title": "Left",
+          "type": "integer"
+        },
+        "right": {
+          "title": "Right",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "left",
+        "right"
+      ],
+      "title": "BandBounds",
+      "type": "object"
+    },
+    "Baseline": {
+      "additionalProperties": false,
+      "description": "Endpoint intensities in the same polarity and units as the profile.",
+      "properties": {
+        "left_value": {
+          "title": "Left Value",
+          "type": "number"
+        },
+        "right_value": {
+          "title": "Right Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "left_value",
+        "right_value"
+      ],
+      "title": "Baseline",
+      "type": "object"
+    },
+    "CancelFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "title": "Attempt Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "cancel",
+          "title": "Kind",
+          "type": "string"
+        },
+        "protocol_version": {
+          "const": 1,
+          "title": "Protocol Version",
+          "type": "integer"
+        },
+        "request_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "run_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "sequence": {
+          "const": 1,
+          "title": "Sequence",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "protocol_version",
+        "run_id",
+        "attempt_id",
+        "request_id",
+        "kind",
+        "sequence"
+      ],
+      "title": "CancelFrame",
+      "type": "object"
+    },
+    "CancelledFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "title": "Attempt Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "cancelled",
+          "title": "Kind",
+          "type": "string"
+        },
+        "protocol_version": {
+          "const": 1,
+          "title": "Protocol Version",
+          "type": "integer"
+        },
+        "request_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "run_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "sequence": {
+          "const": 2,
+          "title": "Sequence",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "protocol_version",
+        "run_id",
+        "attempt_id",
+        "request_id",
+        "kind",
+        "sequence"
+      ],
+      "title": "CancelledFrame",
+      "type": "object"
+    },
+    "FailureFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "title": "Attempt Id",
+          "type": "string"
+        },
+        "code": {
+          "enum": [
+            "input_invalid",
+            "analysis_invalid",
+            "protocol_invalid",
+            "result_too_large"
+          ],
+          "title": "Code",
+          "type": "string"
+        },
+        "kind": {
+          "const": "failure",
+          "title": "Kind",
+          "type": "string"
+        },
+        "message": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "protocol_version": {
+          "const": 1,
+          "title": "Protocol Version",
+          "type": "integer"
+        },
+        "request_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "run_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "sequence": {
+          "const": 2,
+          "title": "Sequence",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "protocol_version",
+        "run_id",
+        "attempt_id",
+        "request_id",
+        "kind",
+        "sequence",
+        "code",
+        "message"
+      ],
+      "title": "FailureFrame",
+      "type": "object"
+    },
+    "HelloFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "hello",
+          "title": "Kind",
+          "type": "string"
+        },
+        "max_frame_bytes": {
+          "const": 4194304,
+          "default": 4194304,
+          "title": "Max Frame Bytes",
+          "type": "integer"
+        },
+        "protocol_version": {
+          "const": 1,
+          "title": "Protocol Version",
+          "type": "integer"
+        },
+        "sequence": {
+          "const": 0,
+          "title": "Sequence",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "protocol_version",
+        "kind",
+        "sequence"
+      ],
+      "title": "HelloFrame",
+      "type": "object"
+    },
+    "LaneAnalysis": {
+      "additionalProperties": false,
+      "properties": {
+        "bands": {
+          "items": {
+            "$ref": "#/$defs/BandAnalysis"
+          },
+          "title": "Bands",
+          "type": "array"
+        },
+        "profiles": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LaneProfiles"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "roi": {
+          "$ref": "#/$defs/LaneROI"
+        }
+      },
+      "required": [
+        "roi",
+        "profiles",
+        "bands"
+      ],
+      "title": "LaneAnalysis",
+      "type": "object"
+    },
+    "LaneAnnotation": {
+      "additionalProperties": false,
+      "properties": {
+        "bands": {
+          "items": {
+            "$ref": "#/$defs/BandAnnotation"
+          },
+          "title": "Bands",
+          "type": "array"
+        },
+        "roi": {
+          "$ref": "#/$defs/LaneROI"
+        }
+      },
+      "required": [
+        "roi",
+        "bands"
+      ],
+      "title": "LaneAnnotation",
+      "type": "object"
+    },
+    "LaneProfiles": {
+      "additionalProperties": false,
+      "properties": {
+        "dtype_max": {
+          "title": "Dtype Max",
+          "type": "integer"
+        },
+        "polarity": {
+          "enum": [
+            "dark",
+            "light"
+          ],
+          "title": "Polarity",
+          "type": "string"
+        },
+        "quantitative": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Quantitative",
+          "type": "array"
+        },
+        "raw": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Raw",
+          "type": "array"
+        },
+        "roi": {
+          "$ref": "#/$defs/LaneROI"
+        }
+      },
+      "required": [
+        "roi",
+        "raw",
+        "quantitative",
+        "polarity",
+        "dtype_max"
+      ],
+      "title": "LaneProfiles",
+      "type": "object"
+    },
+    "LaneROI": {
+      "additionalProperties": false,
+      "properties": {
+        "lane_id": {
+          "title": "Lane Id",
+          "type": "string"
+        },
+        "x0": {
+          "title": "X0",
+          "type": "integer"
+        },
+        "x1": {
+          "title": "X1",
+          "type": "integer"
+        },
+        "y0": {
+          "title": "Y0",
+          "type": "integer"
+        },
+        "y1": {
+          "title": "Y1",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "lane_id",
+        "x0",
+        "y0",
+        "x1",
+        "y1"
+      ],
+      "title": "LaneROI",
+      "type": "object"
+    },
+    "ProfileMeasurement": {
+      "additionalProperties": false,
+      "properties": {
+        "algorithm_id": {
+          "const": "profile_integral@1",
+          "default": "profile_integral@1",
+          "title": "Algorithm Id",
+          "type": "string"
+        },
+        "baseline": {
+          "$ref": "#/$defs/Baseline"
+        },
+        "baseline_source": {
+          "enum": [
+            "endpoints",
+            "manual"
+          ],
+          "title": "Baseline Source",
+          "type": "string"
+        },
+        "bounds": {
+          "$ref": "#/$defs/BandBounds"
+        },
+        "signal": {
+          "title": "Signal",
+          "type": "number"
+        },
+        "unit": {
+          "const": "intensity*pixel",
+          "default": "intensity*pixel",
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "signal",
+        "bounds",
+        "baseline",
+        "baseline_source"
+      ],
+      "title": "ProfileMeasurement",
+      "type": "object"
+    },
+    "ProtocolErrorFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "protocol_error",
+          "title": "Kind",
+          "type": "string"
+        },
+        "message": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "protocol_version": {
+          "const": 1,
+          "title": "Protocol Version",
+          "type": "integer"
+        },
+        "sequence": {
+          "const": 1,
+          "title": "Sequence",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "protocol_version",
+        "kind",
+        "sequence",
+        "message"
+      ],
+      "title": "ProtocolErrorFrame",
+      "type": "object"
+    },
+    "ResultFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "title": "Attempt Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "result",
+          "title": "Kind",
+          "type": "string"
+        },
+        "protocol_version": {
+          "const": 1,
+          "title": "Protocol Version",
+          "type": "integer"
+        },
+        "request_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result": {
+          "$ref": "#/$defs/AnalysisResult"
+        },
+        "run_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "sequence": {
+          "const": 2,
+          "title": "Sequence",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "protocol_version",
+        "run_id",
+        "attempt_id",
+        "request_id",
+        "kind",
+        "sequence",
+        "result"
+      ],
+      "title": "ResultFrame",
+      "type": "object"
+    },
+    "StartFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "title": "Attempt Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "start",
+          "title": "Kind",
+          "type": "string"
+        },
+        "protocol_version": {
+          "const": 1,
+          "title": "Protocol Version",
+          "type": "integer"
+        },
+        "request": {
+          "$ref": "#/$defs/AnalysisRequest"
+        },
+        "request_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "run_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "sequence": {
+          "const": 0,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "source_path": {
+          "maxLength": 32768,
+          "minLength": 1,
+          "title": "Source Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol_version",
+        "run_id",
+        "attempt_id",
+        "request_id",
+        "kind",
+        "sequence",
+        "source_path",
+        "request"
+      ],
+      "title": "StartFrame",
+      "type": "object"
+    }
+  },
+  "discriminator": {
+    "mapping": {
+      "accepted": "#/$defs/AcceptedFrame",
+      "cancel": "#/$defs/CancelFrame",
+      "cancelled": "#/$defs/CancelledFrame",
+      "failure": "#/$defs/FailureFrame",
+      "hello": "#/$defs/HelloFrame",
+      "protocol_error": "#/$defs/ProtocolErrorFrame",
+      "result": "#/$defs/ResultFrame",
+      "start": "#/$defs/StartFrame"
+    },
+    "propertyName": "kind"
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/HelloFrame"
+    },
+    {
+      "$ref": "#/$defs/StartFrame"
+    },
+    {
+      "$ref": "#/$defs/CancelFrame"
+    },
+    {
+      "$ref": "#/$defs/AcceptedFrame"
+    },
+    {
+      "$ref": "#/$defs/ResultFrame"
+    },
+    {
+      "$ref": "#/$defs/FailureFrame"
+    },
+    {
+      "$ref": "#/$defs/CancelledFrame"
+    },
+    {
+      "$ref": "#/$defs/ProtocolErrorFrame"
+    }
+  ]
+}

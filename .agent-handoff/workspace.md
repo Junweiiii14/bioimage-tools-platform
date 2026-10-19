@@ -9,7 +9,7 @@
 
 ## Main Entry Points
 
-正式产品入口不存在。P0 探针入口为 p0_probe.py，复现见 tooling/p0/README.md；开发入口为 dev.py。使用本项目 .venv 或 uv，避免系统 Python 商店别名。
+正式桌面产品入口不存在。WB 纯数值包公开入口 wb_tool.api，说明 tools/wb/README.md。P0 探针入口为 p0_probe.py，复现见 tooling/p0/README.md；开发入口为 dev.py。使用本项目 .venv 或 uv，避免系统 Python 商店别名。
 
 规则入口 `dev.py context --task <ID> --scope <目录> --record`，生成当前规则版本回执；`.github/workflows/rules-context.yml` 在 PR 校验。完整安装后本地命令加 `uv run --locked --no-sync` 保持桌面/构建依赖。
 
@@ -23,7 +23,7 @@
 
 ## Durable Project Context
 
-候选产品 Python/PySide6 桌面单体＋独立 worker；治理已建设，业务未启动。兄弟项目的归档工作流不适用。
+候选产品 Python/PySide6 桌面单体＋独立 worker；治理已建设，WB 核心已开始。兄弟项目的归档工作流不适用。
 
 ## Project Conventions
 

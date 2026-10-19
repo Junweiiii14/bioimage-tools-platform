@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-14",
+  "source": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\wbquant-improvements\\wb_quant",
+  "git_commit": null,
+  "snapshot": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-tools-platform\\.local\\wb-reference\\20261014",
+  "files": [
+    {
+      "file": "core.py",
+      "sha256": "0a62f6646715310f18ccdb91a700cb51a6edb088eb4b5452108d77203f643e97",
+      "bytes": 38963
+    },
+    {
+      "file": "normalize.py",
+      "sha256": "509938fcb15ce2a5ace321d6dcdefdfad733508b597d86b1df81af831cd4e218",
+      "bytes": 4484
+    },
+    {
+      "file": "io.py",
+      "sha256": "12d3b590b05b69ce76ffda63c5633395e1961a4b90579c5bb05da4b325d2be97",
+      "bytes": 4881
+    },
+    {
+      "file": "models.py",
+      "sha256": "e5a37874376a4a57c68b56fc887eaf2664ea72be0b5f114ecbad3519775e03ca",
+      "bytes": 7550
+    },
+    {
+      "file": "config.py",
+      "sha256": "76b73024b0a0dc5a0a21adc6e0df03d00d81624013a8d61b8faf3d487583d0ae",
+      "bytes": 1058
+    },
+    {
+      "file": "lanes_io.py",
+      "sha256": "c19c0871205901120885bd485aa3eb0df7112d139b212faf3d685a2e2a67be5b",
+      "bytes": 5425
+    },
+    {
+      "file": "errors.py",
+      "sha256": "3e22262aa5ed175ade9e019dabb1d135cff65913211e3017480b1a36d60bfb1a",
+      "bytes": 473
+    },
+    {
+      "file": "coordinates.py",
+      "sha256": "4482a78d98e76368426a8fa1c4e47d693d2283a0bd35674c0bc73917f02e0d66",
+      "bytes": 1517
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "task": "T-005",
+  "base_commit": "45d0c5f1484e5d37a4de4b98ea8cdc2285e15e8a",
+  "scopes": [
+    ".agent-handoff",
+    ".importlinter",
+    "docs",
+    "pyproject.toml",
+    "tests",
+    "tooling/installed_wheels.py",
+    "tools/wb",
+    "uv.lock",
+    "work"
+  ],
+  "rules": {
+    "AGENTS.md": "3c5ce28cf9b92099025bd50db0821e94c90b5759dfb32d19e510da1774c4941f",
+    "docs/ai-workflow.md": "99e0389b02727ee9071324e18d432c0d7f360c6eefecdbebade339845a693327",
+    "docs/architecture.md": "39e2557923da38d3124348423476fb8a625ac2be10a464e01a6b2f8fdd30efea",
+    "docs/coding-standards.md": "40fe9541a84163e6df6be9d2a57b836b9703471440f412bd16456f1ef0382d71",
+    "docs/module-map.md": "2fa3b9081a106f3287a0e59949f87dc452fa4fd2613f461cb95b709a640205bb",
+    "docs/research-protocol.md": "b1ab0f9bf291e50f5872e01147f7af2671fdc5885bf2f065c804c5f4a240aa51",
+    "docs/runbooks/rule-enforcement.md": "0486af74122ec432a463b05bff5732fbea61d0125ab5fda59fcc3c61910d4e72"
+  },
+  "base_rules": {
+    "AGENTS.md": "3c5ce28cf9b92099025bd50db0821e94c90b5759dfb32d19e510da1774c4941f",
+    "docs/ai-workflow.md": "99e0389b02727ee9071324e18d432c0d7f360c6eefecdbebade339845a693327",
+    "docs/architecture.md": "39e2557923da38d3124348423476fb8a625ac2be10a464e01a6b2f8fdd30efea",
+    "docs/coding-standards.md": "40fe9541a84163e6df6be9d2a57b836b9703471440f412bd16456f1ef0382d71",
+    "docs/module-map.md": "3a5a8b6a90565d8c42edba0de082fae465a15652fcf77c119b53f054bd586cac",
+    "docs/research-protocol.md": "b1ab0f9bf291e50f5872e01147f7af2671fdc5885bf2f065c804c5f4a240aa51",
+    "docs/runbooks/rule-enforcement.md": "0486af74122ec432a463b05bff5732fbea61d0125ab5fda59fcc3c61910d4e72"
+  }
+}
