@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 
 from wb_tool.adapters.automatic import automatic_project_row
 from wb_tool.adapters.automatic_export import discover_tiffs
+from wb_tool.adapters.intake_crop import export_intake_crop, propose_intake_crop
 from wb_tool.adapters.metadata_input import read_metadata_file
 from wb_tool.adapters.ocr_input import OCRImage, load_ocr_image
 from wb_tool.adapters.quant_export import (
@@ -92,6 +93,15 @@ from wb_tool.application.instrument_intake import (
     register_intake_source,
     replace_intake_plan,
     unassign_intake_sources,
+)
+from wb_tool.application.intake_crop import (
+    IntakeCropEvidence,
+    IntakeCropSlot,
+    WBIntakeCropProject,
+    complete_intake_crop,
+    prepare_intake_crops,
+    record_intake_crop_proposal,
+    review_intake_crop,
 )
 from wb_tool.application.intake_execution import (
     IntakeExecutionPlan,
@@ -260,6 +270,15 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "IntakeCropEvidence",
+    "IntakeCropSlot",
+    "WBIntakeCropProject",
+    "complete_intake_crop",
+    "export_intake_crop",
+    "prepare_intake_crops",
+    "propose_intake_crop",
+    "record_intake_crop_proposal",
+    "review_intake_crop",
     "IntakeWorkflowLedger",
     "IntakeWorkflowStep",
     "IntakeWorkflowTicket",

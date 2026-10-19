@@ -2,7 +2,7 @@
 
 - [ ] E6/原生生命周期：T055首次全量822后purecall/0xc0000409；同产品带只读inventory复验822/566.49s及wheel0。全量清单可追的旧无父FigureProjectView/ProjectOCRPanel需按所属测试完善销毁等待，不全局清扫；profile假设在E2所属对象探针未复现。根因UNKNOWN，不能据复验销账，详见T055 validation与docs/research/2026-10-20-qt-finalization.md。
 
-- [ ] T-052执行队列见docs/wb-execution-plan.md：E0/T053、E1/T054已通过；E2/T055修复独审通过、完整门禁在跑→E3固定N裁剪→E4拼图后定量→E5填表/恢复→E6性能/结构→E7集成/包态。用户授权连续推进，不设定时任务，阶段通过自动推进。
+- [ ] T-052执行队列见docs/wb-execution-plan.md：E0/T053、E1/T054、E2/T055已通过；E3/T056固定N裁剪实施中→E4拼图后定量→E5填表/恢复→E6性能/结构→E7集成/包态。用户授权连续推进，不设定时任务，阶段通过自动推进。
 
 - [x] T051仪器导入第一阶段：产品65ff278，801全门禁/全部隔离wheel/真实OCR及独审通过；清单与明确分配可保存重开。未重建安装包或集成产品main。
 - [ ] 后续按新规划连续接通固定N的自动定位/裁剪、Fig布局及原像素定量/表格；真实仪器留出、干净Windows/DPI仍待验，工程不依赖项继续。

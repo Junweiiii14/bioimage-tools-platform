@@ -100,10 +100,13 @@ def imported_run(project: WBFigureProject, run: RunRecord) -> ImportedRun | None
 
 def project_assets(project: WBFigureProject, *, history: bool = True) -> tuple[AssetRef, ...]:
     from wb_tool.application.instrument_intake import WBIntakeProject
+    from wb_tool.application.intake_crop import WBIntakeCropProject
 
     assets = [row.source for row in project.rows if row.source]
     if isinstance(project, WBIntakeProject):
         assets.extend(source.asset for source in project.intake.sources)
+    if isinstance(project, WBIntakeCropProject):
+        assets.extend(e.raw_crop for e in project.intake_crops if e.raw_crop is not None)
     if project.template.font:
         assets.append(project.template.font)
     if isinstance(project, WBProjectOCR) and project.ocr:
@@ -185,7 +188,14 @@ def restore_staged_project(
         WBIntakeProject,
         intake_manifest_digest,
     )
+    from wb_tool.application.intake_crop import WBIntakeCropProject
     from wb_tool.application.intake_workflow import WBIntakeWorkflowProject, recover_intake_workflow
+
+    if isinstance(project, WBIntakeCropProject):
+        changes["intake_crops"] = tuple(
+            e.model_copy(update={"raw_crop": mapped(e.raw_crop)}) if e.raw_crop is not None else e
+            for e in project.intake_crops
+        )
 
     if isinstance(project, WBIntakeProject):
         manifest_fields = dict(project.intake)

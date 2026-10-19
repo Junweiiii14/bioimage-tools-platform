@@ -1009,9 +1009,15 @@ class FigureProjectView(QWidget):
         if isinstance(self._project, WBIntakeWorkflowProject):
             fields = dict(project)
             fields.update(
-                schema_version=11, intake=self._project.intake, workflow=self._project.workflow
+                schema_version=self._project.schema_version,
+                intake=self._project.intake,
+                workflow=self._project.workflow,
             )
-            project = WBIntakeWorkflowProject.model_validate(fields)
+            from wb_tool.application.intake_crop import WBIntakeCropProject
+
+            if isinstance(self._project, WBIntakeCropProject):
+                fields["intake_crops"] = self._project.intake_crops
+            project = type(self._project).model_validate(fields)
         elif isinstance(self._project, WBIntakeProject):
             fields = dict(project)
             fields.update(schema_version=10, intake=self._project.intake)

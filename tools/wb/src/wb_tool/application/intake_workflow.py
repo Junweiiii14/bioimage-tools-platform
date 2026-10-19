@@ -133,7 +133,7 @@ def _prerequisites(
 
 def _replace_ledger(project: WBIntakeWorkflowProject, **changes: object) -> WBIntakeWorkflowProject:
     ledger = IntakeWorkflowLedger.model_validate({**dict(project.workflow), **changes})
-    return WBIntakeWorkflowProject.model_validate({**dict(project), "workflow": ledger})
+    return type(project).model_validate({**dict(project), "workflow": ledger})
 
 
 def prepare_intake_workflow(
@@ -141,7 +141,7 @@ def prepare_intake_workflow(
 ) -> WBIntakeWorkflowProject:
     plan = build_intake_execution_plan(project, expected_digest=expected_digest)
     if isinstance(project, WBIntakeWorkflowProject):
-        return WBIntakeWorkflowProject.model_validate(dict(project))
+        return type(project).model_validate(dict(project))
     if not isinstance(project, WBIntakeProject):
         raise ValueError("执行计划需要仪器清单")
     return WBIntakeWorkflowProject.model_validate(
@@ -165,7 +165,7 @@ def _inputs_digest(project: WBIntakeWorkflowProject) -> str:
 
 
 def intake_workflow_digest(project: WBIntakeWorkflowProject) -> str:
-    WBIntakeWorkflowProject.model_validate(dict(project))
+    type(project).model_validate(dict(project))
     return _hash((_inputs_digest(project), project.workflow.model_dump(mode="json")))
 
 
@@ -182,7 +182,7 @@ def approve_intake_workflow(
 def claim_intake_workflow_step(
     project: WBIntakeWorkflowProject, *, session_key: str
 ) -> tuple[WBIntakeWorkflowProject, IntakeWorkflowTicket | None]:
-    WBIntakeWorkflowProject.model_validate(dict(project))
+    type(project).model_validate(dict(project))
     if not session_key or len(session_key) > 160:
         raise ValueError("阶段执行需要明确会话身份")
     if not project.workflow.approved:
@@ -243,7 +243,7 @@ def finish_intake_workflow_step(
 ) -> WBIntakeWorkflowProject:
     if outcome not in {"done", "needs_review", "failed", "cancelled"}:
         raise ValueError("执行器只能返回明确阶段终态")
-    WBIntakeWorkflowProject.model_validate(dict(project))
+    type(project).model_validate(dict(project))
     active = next((s for s in project.workflow.steps if s.status == "running"), None)
     if (
         active is None
@@ -318,10 +318,11 @@ def intake_workflow_snapshot(project: WBIntakeWorkflowProject) -> dict[str, obje
 
 def return_to_intake_editing(project: WBIntakeWorkflowProject) -> WBIntakeProject:
     """Undo only an unused preparation; executed revisions require a new execution snapshot."""
-    WBIntakeWorkflowProject.model_validate(dict(project))
+    type(project).model_validate(dict(project))
     if any(s.attempt for s in project.workflow.steps):
         raise ValueError("已有执行尝试；请保留当前修订，不可删除阶段历史")
     fields = dict(project)
     fields.pop("workflow")
+    fields.pop("intake_crops", None)
     fields["schema_version"] = 10
     return WBIntakeProject.model_validate(fields)

@@ -1,6 +1,6 @@
 # Risks, Blockers, And Unknowns
 
-- 2026-10-20 E2/b4b519f首次全门禁822断言通过后原pytest0xc0000409；精确栈主线程abort→purecall→QObject析构→PySide destroyQCoreApplication→Py_FinalizeEx。wheel未执行，E2未完成。定向17项+只读对象清单0/root_count0不能排除parentless QObject或全量时序；全量inventory诊断复验在跑，来源UNKNOWN，不用重跑成功抹失败。见T055 validation。
+- 2026-10-20 E2/b4b519f首次全门禁822断言通过后原pytest0xc0000409；精确栈主线程abort→purecall→QObject析构→PySide destroyQCoreApplication→Py_FinalizeEx，首轮wheel未执行。同产品诊断复验822/566.49s及全部wheel/check0，独审解除E2阻断。全量inventory344/truncated包含旧无父视图/OCR面板，转E6精确所属销毁；E2所属host/view/page/profile探针均失效，profile假设未复现。来源UNKNOWN，不用复验成功抹失败。见T055 validation。
 
 - T051首轮192px缩略图超128预算导致Python回调失败与busy悬挂，关闭后PID56832在Qt6WebEngineCore.dll出现0x80000003。128px与异常预览拒绝、取消心跳修正后最终801测试/全部wheel及原生观察退出0，无新异常；这不证明Chromium内部断点精确根因已完全解决。未重建安装包；真实仪器/干净Windows/DPI不由本轮推出。
 

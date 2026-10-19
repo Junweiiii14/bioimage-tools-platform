@@ -20,6 +20,13 @@ class IntakePlannedSlot:
     position: int  # One-based position within this protein row; never a sample identity.
 
 
+def planned_intake_slots(project_id: str, row_id: str, count: int) -> tuple[IntakePlannedSlot, ...]:
+    """One identity formula shared by planning and persisted geometry validation."""
+    return tuple(
+        IntakePlannedSlot(_key("slot", project_id, row_id, i), i) for i in range(1, count + 1)
+    )
+
+
 @dataclass(frozen=True)
 class IntakePlannedRow:
     row_id: str
@@ -98,10 +105,7 @@ def build_intake_execution_plan(
             row_directory = (
                 directory + "/row-" + _key("row", checked.project_id, protein.protein_id)
             )
-            slots = tuple(
-                IntakePlannedSlot(_key("slot", checked.project_id, protein.protein_id, i), i)
-                for i in range(1, figure.lane_count + 1)
-            )
+            slots = planned_intake_slots(checked.project_id, protein.protein_id, figure.lane_count)
             geometry_key = _key(
                 "geometry",
                 checked.project_id,
