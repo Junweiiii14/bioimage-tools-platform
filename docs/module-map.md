@@ -1,5 +1,11 @@
 # 模块地图
 
+E4候选增量：`application/intake_figure.py`提供schema13完整Fig依据、稳定身份与
+冻结测量终态合并；`adapters/intake_figure.py`生成核验PNG及只读缩放预览，定量仍从
+原图坐标规划。桌面`intake_workflow.py`持久化成图后连接真实RunSession，
+`project_measurement_session.py`可延迟合并已验证结果；旧单独调用默认行为保留。
+当前实现/验证状态以T-057任务为准，完整产品未完成。
+
 E3增量：`application/intake_crop.py`提供schema12完整固定槽位/原图复核证据，
 `adapters/intake_crop.py`只读分配原图并发布原值TIFF；桌面`intake_workflow.py`
 串行连接已持久化票据、后台执行、所属临时资产导入与CAS；`web_intake.py`及

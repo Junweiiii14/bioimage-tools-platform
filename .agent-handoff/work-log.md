@@ -1,10 +1,5 @@
 # Current Work Log
 
-## 2026-10-17 CI009原子初始化与维护说明
-
-1bb远端Linux668/183.03秒+wheels0，Windows1failed667passed516.76秒/child1，create执行6.125秒后正常回执；非本轮native崩溃。57fd7ea显式单事务初始化，不改同步/schema/v1/旧库读或5秒等待。旧真实红例，作者45项11.05秒0/独审45项8.31秒0，本机20新目录median56.76→27.38ms但非CI保证；669完整check/497.77秒+全部隔离wheel实际exit0，child0；新远端待验。8原图正常工作台8run保存重开关闭0，8几何/48值状态保持。维护计划按用户要求补通俗维护流程，最终汇报待全检/阶段同步。
-
-
 ## 2026-10-17 T043本轮交付
 
 产品57fd7ea本机669/497.77秒+全部wheel实际0；becb389远端run39025981922完整成功：Windows669/407.87秒child0、Linux669/178.49秒，两平台全部隔离wheel/dev最终成功，规则/桌面环境成功。CI009及T043本轮complete，T003/科学/交互/发布/历史UNKNOWN继续保留。8图正常工作台链0，8几何/48值状态保持，参考未读。独审复核远端两HEAD、入口/父路由、最新bundle/34原文件SHA和已发日志正文；9草稿PR未合main、6旧树仅锁定，其余原改动/旧结果保留。后继仅收尾文档，仍按规则/独审/安全普通同步完成。维护计划已给简单报bug材料与后续维护步骤，无自动调度。
@@ -190,3 +185,7 @@ PR16四项必需检查通过，匹配cdf4b7d后合并43d520f。产品基线a2343
 ## 2026-10-20 E3完成，连续进入E4
 
 产品32da9f4，T056 done：固定N槽位/原值TIFF/真实宿主复核与CAS，独审发现票据导出及桥接强退review的P2均按新提交复验关闭。完整check0：832/553.10s、原child0、9契约、全部wheel/真实离线OCR；21桌面前端18.93s，UI限定ship/documenter No changes。旧purecall UNKNOWN与344/truncated inventory转E6，不消账；真实科学/目标环境仍未验。下一项T057 E4。
+
+## 2026-10-20 E4完成，连续进入E5
+
+T057 done，产品ff89867：完整Fig先持久化再真实原像素运行；843/579.73s、原child0、9契约/全隔离wheel/真实OCR/check0，绑定独审通过。df轮843/570.37s后wheel因顶层PIL失败1，ff延迟导入修复，独立API无PIL/核心5探针和完整复验0。分页与回源两P2已按提交关闭，UI限定ship、documenter No changes。原生UNKNOWN/344截断inventory/真实科学与目标机限制保留，无发布。下一阶段T058，详细证据work/evidence/T-057。

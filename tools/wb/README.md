@@ -110,6 +110,12 @@ T-044当前阶段：folder_sources@1目录头信息筛选已知派生图和明�
 
 T-044新增当前网页工作台默认anchored_context@1/anchored_background@1，固定原目标、逐步扩展最多25%背景上下文；保存目标/采样原坐标与比例，手动几何编辑清除旧边界并从目标重新规划。旧策略和已有请求不会静默升级，旧序列化字节保持，三份机器schema增加显式版本化扩展。原始profile_integral@1/位深风险保持，背景不足不强判有效。详见wb-anchored-context-v1.md与T044实际验证。
 
+E4/T057新增schema13完整Fig依据、稳定行/槽位与冻结原图请求映射，
+`prepare_intake_figure`生成并核验显示PNG，`complete_intake_figure`原子完成成图及计划；
+`complete_intake_measurement`只接受同冻结请求/真实运行/已验证结果。缩放预览另存
+显示变换，原PNG/原ROI不变。手动分段保留且不改变定量输入。桌面接通真实worker；
+最终全门禁状态见T057，不由API存在推出科学/发布完成。契约见wb-intake-figure-v1.md。
+
 审核后原位置回存契约见 `../../docs/contracts/wb-crop-return-v1.md`。
 `return_reviewed_crop` 复用显示分段映射和原值裁剪，写后核验且不替换旧文件；
 多文件部分失败明确列出已发布文件，无完成记录，不改变定量公式或项目格式。

@@ -1,3 +1,12 @@
+E4 adds schema13 complete-Fig evidence and original-pixel measurement to intake.
+IntakeWorkflowSession saves the complete Fig before starting its real RunSession batch;
+deferred installation merges only verified committed results with the terminal stage.
+Saved PNG previews use separate bounded display transforms and keep original source ROIs.
+Results and per-Fig source links retain stable row identities, including duplicate labels;
+measurement pages expose every fixed slot in batches of 200. Export-stage integration is
+still pending E5. See T-057 and `../../docs/contracts/wb-intake-figure-v1.md` for actual checks
+and limits; this is a Windows desktop workflow, not a standalone mobile web delivery.
+
 E3 adds schema12 fixed-N crop review to the existing intake page. IntakeWorkflowSession
 persists each owned claim before its WBBackground job, imports a verified original-value
 TIFF from its owned temporary directory, and installs the terminal state by guarded CAS.

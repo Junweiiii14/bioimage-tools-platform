@@ -1,4 +1,4 @@
-# E4/T057 验证（实施中）
+# E4/T057 验证（已完成）
 
 base1719a2d，Win11/Python3.12.14/Qt6.12.0，锁未改。
 核心首批3 passed/2.42s，定向Pyright与Ruff0；旧E2/E3核心14 passed/4.44s。
@@ -22,3 +22,28 @@ base1719a2d，Win11/Python3.12.14/Qt6.12.0，锁未改。
 - 最后Pyright0、Ruff0；纯核心增量e8e2f96非作者17 passed/3.12s及独立错行顺序/取消/恢复摘要探针0，无P0–P2，不代表宿主已独审。
 - 同源浏览器合成预览1280×720，.impeccable/review/t057-browser-{intake,stages,figure,results}.png已逐张打开核验；本地fixture的CPU数值/合成RunRecord仅作视觉，不冒充真实进程/科学真值。真实worker另由上列桌面测试证明。首轮fixture误用reviewed而非ready裁图enum已修正，并按真实ledger使未处理行pending；二轮同视口复验完成。Tab实测从Fig标题到手形平移；切results焦点为结果标题。
 - E4 detector仅一次，.local/t057-design-detector.json为[]、0 findings；未重扫。完整门禁及宿主/界面最终独审未完成，E4仍implementing。
+
+## 最终候选 d2cf9b8
+
+- 核心最终5 passed/3.21s（.local/t057-core-final.txt），新增明确横向手动分段保留与未分段逐字相同的原像素请求。不同显示段不改变数值输入。
+- 全仓Pyright 0 errors/0 warnings（.local/t057-type-final.txt），Ruff/pre-commit退出0；测试仅在故障注入中用类字典读取原launch，不增加类型忽略或更改门禁。
+- 已启动带原生栈与只读Qt退出inventory的完整check --all，日志.local/t057-fullcheck.txt；运行中，尚不能计通过。最终非作者代码审查与限定Windows桌面device class的UI finish审查并行，只读且不并发Qt测试。
+
+## 独审修正 df98166（完整门禁运行中）
+
+- d2cf9b8首轮check因独审发现UI两P2主动Ctrl+C，外层退出1，日志.local/t057-fullcheck.txt；不能计通过，也没有据此认定新原生故障。
+- 200项上限改为分页，页码随快照保持、新会话重置、长度减少夹紧；每项仍保留原rowId/槽位状态和值。新增201末槽失败/空值/回源/刷新保页/上一页真实WebChannel断言，8 passed/8.26s，日志.local/t057-review-ui.txt。无预期放宽/时限/skip/类型忽略。
+- 回源按钮纵向排列并支持长名换行。浏览器CSS缓存最初保留旧样式，fixture加入当前资源版本后computed style实测flex/column，Fig截图重新保存并打开；没有把缓存旧图当修正通过。
+- 新增t057-browser-results-page2.png：201项独立界面容量fixture，无真实运行；第201–201项/第2页/失败原值均空/真实rowId入口可见。明确合成标识，不混作原15槽技术样例或科学证据。
+- df98166全量check日志.local/t057-fullcheck-final.txt，仍运行中。绑定代码增量与UI两项复审已关闭，见independent-review.md。detector仍仅一次。
+
+- df98166最终pytest：843 passed/570.37s，原始child exit=0/u32=0x00000000；只读退出inventory仍344/truncated，不等于344泄漏，也不抹去旧purecall UNKNOWN。已进入隔离wheel验证，外层结果尚待。
+
+- 该轮隔离核心wheel失败：新intake_figure适配器顶层导入PIL，未安装figures extra时import wb_tool.api抛ModuleNotFoundError；完整check真实退出1（.local/t057-fullcheck-final.txt），不能记为通过。
+- ff89867仅把PIL及渲染/发布适配器导入移至实际调用函数，不新增依赖/extra/改锁或放宽既有无PIL断言。核心5 passed/2.72s（.local/t057-lazy-core.txt）、全Pyright0、Ruff/precommit0。全隔离wheel复验及新提交完整check待完成；独审增量待结论。此前UI结论仅覆盖未改变的UI产物。
+- ff89867整套隔离wheel真实退出0（.local/t057-wheels-lazy.txt）：核心无PIL/GUI导入、runtime/事务重开、显示像素/来源/DPI、schema7及模板、项目OCR与显式归一化、桌面widget/入口/异步关闭、真实PP-OCRv6 CPU/worker/PNG均通过。独审增量无阻断。最终完整check正在.local/t057-fullcheck-lazy-final.txt运行。
+
+## 最终通过 ff89867
+
+2026-10-20 Win11/Python3.12.14/Qt6.12.0，锁与门禁未改。
+最终dev.py check --all实际退出0（.local/t057-fullcheck-lazy-final.txt）：843 passed/579.73s，原child exit=0/u32=0x00000000，9导入契约/全类型/静态/全部隔离wheel及真实PP-OCRv6 CPU、worker、PNG OCR、桌面异步关闭通过。退出inventory仍344/truncated，旧原生风险不销账。该结果及绑定ff的非作者独审满足E4工程阶段退出；科学留出、干净Win10/DPI和正式发布仍未验收。
