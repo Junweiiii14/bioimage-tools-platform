@@ -1,5 +1,7 @@
 # 模块地图
 
+2026-10-19当前增量：`application/instrument_intake.py`提供schema10原图池、明确Fig/蛋白/N清单与确认；`bioimage_app/instrument_intake.py`异步导入，`web_intake.py`与`web_ui/intake.js`承接分配交互。确认仅表示来源对应，不产生ROI或结果。下表版本来自各包pyproject，不表示全部功能已集成main；运行/安装/证据地图见[execution-baseline.md](execution-baseline.md)。
+
 T045增量：`tools/wb/application/{standalone_quant,manual_groups,fig_quant}.py`负责明确
 泳道/组/版本9证据；`domain/fig_partition.py`只给几何建议；`adapters/fig_quant.py`
 本地OCR与原图规划；桌面`web_manual_quant.py`绑定当前项目身份，`web_ui/manual_lanes.js`
@@ -19,7 +21,7 @@ T045增量：`tools/wb/application/{standalone_quant,manual_groups,fig_quant}.py
 | `packages/desktop_sdk/` | ToolView、Qt 生命周期、宿主 UI 端口 | 规划；pytest-qt |
 | `packages/imaging_core/` | 原始图像、坐标和纯技术运算 | 规划；位深/几何/性质 |
 | `packages/imaging_ui/` | 真实复用需求出现后的画布适配 | 规划，不预建 |
-| `tools/wb/` | `wb_tool.api` 数值/单图文档v1/v2/严格协议、Qt画布/曲线/工作表、本地OCR与表格 | 已建0.19.0；schema7明确分段/原ROI逐行高度、逐源一次解码；独立模板/字体；有界ZIP历史；旧schema1–6读取及原渲染兼容 |
+| `tools/wb/` | `wb_tool.api` 数值/单图文档v1/v2/严格协议、Qt画布/曲线/工作表、本地OCR与表格 | 已建0.19.0；schema7分段/模板，8自动候选，9独立Fig定量，10仪器导入清单；旧schema1–9读取保留，10禁止夹带处理结果 |
 | `tools/if_intensity/` | 第二工具验证平台边界 | 规划，WB 最小闭环后 |
 | `tools/if_count/`, `tools/ihc_area/` | 各自独立的实验语义 | 后续规划 |
 
