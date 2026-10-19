@@ -3,10 +3,6 @@
 - 2026-10-16 T035：用户批准比例1.25*n，核心/网页分工完成，产品25ac71d；两指定叠加原图自动3/5泳道并直接拼图，原值裁图逐像素匹配。独审P2已修复闭环，视觉ship；最终验证见T035证据。
 
 - 2026-10-16 T033：网页优先，同源WebEngine桥由T034分工集成；独立代码/视觉发现已修，独立文档同步。高级窗口网页化未完成，产品a68000e。
-## 2026-10-18 T044 锚定上下文阶段
-
-e6d1abd提交独审2项2.33秒0关闭报告归属P2，父路由备份/单行差异吻合。新增版本化target/context与比例、局部旧wire序列化保持，手动几何失效后从目标重算；现Web默认新策略，图上目标与采样视野区分。112相关20.79秒0、网页9项27.89秒0、新快照1项1.98秒0、入口12项4.17秒0、全项目类型与静态0。初轮3失败是新字面LF与schema快照未同步，已说明扩展，无弱化检查。8真实原图正常Web/8worker/导出保存重开关闭0，原SHA/N/4Fig保持；背景不足21→2、有效7→13、35review，33零值风险保持，不称准确率。阶段绑定审查/最终全检、回存原目录/独立灰度峰交互/UI精简/全库审查与安全同步仍待做。
-
 ## 2026-10-18 T044 退出栈与独审补正
 
 3a830fb正式696passed/488.23秒后AV：原child c0000005，dev/外层-1，wheel未跑。原生栈仅1线程，SignalManager最近符号/Qt destroyed/父子窗口/QFormLayout/包装器析构；具体对象/次序UNKNOWN，不套用旧GIL死锁，不盲改清理。独审18项11.36秒0另发现不变target误与context比较清人工参数，已修无变动保留项目/代际和上下文，38相关29.70秒0、最终API/公开桥接2项2.00秒0/相关类型Ruff0，待绑定复核。29未扩展槽面积/边界/flags全保持，前后figure PNG像素相同。子进程已验证PYTHONPATH同名包隐患及-I定位活动包，但未改启动器、不认定用户旧版问题同因。
@@ -184,3 +180,7 @@ INT001 resumes authorized E7 only in this temporary historical integration tree.
 ## 2026-10-20 E7 OCR, candidate and dependency integration
 
 80a84ef OCR取消/CAS修复13边界与42兼容0/独审关闭；ea8f914候选与14检查自检，32d9733启动故障关闭2/8.17s0/独审关闭。首E7 gate主动中止，32d gate单一standalone失败后UTF8/GBK监视器异常，原OS exit未知/outer1/wheels未跑；8日志回归0及原页独立重放0不销未知失败。PR7经最终69a/四项CI/独审后merge7730bcd，primary合入并重载T060实际base；临时集成树继续PR3/SYNC001。暂无新安装包或正式发布。
+
+## 2026-10-20 E7 final gate and accepted quant stage
+
+8e11028完整910/705.48s、原pytest0/u32=0、全部隔离wheel/真实OCR/check0，inventory4非截断；单事件测试P2独审关闭。旧5bb/d7f失败保留，产品运行文件等e579。PR12/13实际四CI和独审接受main6e8b1e6，主树合1891仅元数据；77b文档刷新及交接。PR14最终b1四CI中，PR15准备3748，最终集成未完成。安装候选工程验证已通过，科学/干净Win10/物理DPI仍待验。
