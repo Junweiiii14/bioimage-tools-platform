@@ -1,10 +1,20 @@
+E5/schema14 now freezes assets and run evidence, fills stable Fig/row/slot tables, writes
+new output roots and imports the verified index before committing done. Reopening and
+archive recovery retain imported history rather than inventing local runs. E6 reuses
+same-operation frozen full renders, keeps original pixels separate and paginates all
+stages. See T058/T059 for actual checks and remaining scientific/target-machine gaps.
+
+E7 adds an explicit --execution-test builder profile with its own E7Test settings,
+AppId, Chinese install directory and shortcuts; existing profiles remain separate.
+--verify-intake-installation complements the independent grayscale/OCR diagnostic.
+The new package is not accepted until T060 installed evidence is recorded. Interface:
+../../docs/contracts/wb-installed-diagnostics-v1.md.
 E4 adds schema13 complete-Fig evidence and original-pixel measurement to intake.
 IntakeWorkflowSession saves the complete Fig before starting its real RunSession batch;
 deferred installation merges only verified committed results with the terminal stage.
 Saved PNG previews use separate bounded display transforms and keep original source ROIs.
 Results and per-Fig source links retain stable row identities, including duplicate labels;
-measurement pages expose every fixed slot in batches of 200. Export-stage integration is
-still pending E5. See T-057 and `../../docs/contracts/wb-intake-figure-v1.md` for actual checks
+measurement pages expose every fixed slot in batches of 200. Export-stage integration completed in E5; actual final status is recorded in T058. See T-057 and `../../docs/contracts/wb-intake-figure-v1.md` for actual checks
 and limits; this is a Windows desktop workflow, not a standalone mobile web delivery.
 
 E3 adds schema12 fixed-N crop review to the existing intake page. IntakeWorkflowSession

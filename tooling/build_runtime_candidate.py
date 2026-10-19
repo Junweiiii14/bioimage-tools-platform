@@ -22,6 +22,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--iscc", required=True, type=Path)
     parser.add_argument("--gcc", required=True, type=Path)
+    parser.add_argument(
+        "--execution-test", action="store_true", help="Build the isolated E7 test distribution"
+    )
     args = parser.parse_args()
     if subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT).strip():
         raise RuntimeError("A committed, clean checkout is required")
@@ -98,8 +101,9 @@ def main() -> int:
         raise RuntimeError("Locked Qt wheel is missing required MSVC redistributables")
     for library in redistributables:
         shutil.copyfile(library, runtime / library.name)
-    shutil.copyfile(ROOT / "tooling/windows_test_readme.txt", dist / "安装与使用说明.txt")
-    shutil.copyfile(ROOT / "tooling/windows_test_selfcheck.ps1", dist / "selfcheck.ps1")
+    distribution = "windows_execution_test" if args.execution_test else "windows_test"
+    shutil.copyfile(ROOT / f"tooling/{distribution}_readme.txt", dist / "安装与使用说明.txt")
+    shutil.copyfile(ROOT / f"tooling/{distribution}_selfcheck.ps1", dist / "selfcheck.ps1")
     shutil.copyfile(ROOT / "tooling/windows_test_selfcheck.cmd", dist / "测试版环境自检.cmd")
     # The lock's OCR wheel supplies models; verify bytes through the public API later.
     app_icon = dist / "bioimage.ico"
@@ -121,7 +125,9 @@ def main() -> int:
             "-municode",
             "-mwindows",
             "-static-libgcc",
-            '-DRELEASE_CHANNEL=L"win10-test"',
+            '-DRELEASE_CHANNEL=L"'
+            + ("wb-execution-test" if args.execution_test else "win10-test")
+            + '"',
             str(ROOT / "tooling/windows_candidate_launcher.c"),
             str(resource_object),
             "-o",
@@ -164,6 +170,14 @@ def main() -> int:
         "wheels": {p.name: digest(p) for p in wheels.glob("*.whl")},
     }
     manifest_path = output / "build-manifest.json"
+    if args.execution_test:
+        manifest.update(
+            schema=2,
+            distribution_id="BioImageTools.WB.E7Test",
+            release_channel="wb-execution-test",
+            settings_namespace="E7Test",
+            acceptance="candidate-only; clean Win10/DPI/scientific holdout pending",
+        )
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     shutil.copyfile(manifest_path, dist / "build-manifest.json")
     run(
@@ -172,7 +186,7 @@ def main() -> int:
             "/DAppSource=" + str(dist),
             "/DBuildCommit=" + commit[:12],
             "/DInstallerOutput=" + str(output),
-            str(ROOT / "tooling/windows_test.iss"),
+            str(ROOT / f"tooling/{distribution}.iss"),
         ],
         log=output / "installer.log",
     )

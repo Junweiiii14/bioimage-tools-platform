@@ -9,3 +9,5 @@ Fix: cancelled session cannot emit usable succeeded OCR while late read/decode f
 - Focused Ruff/types0. Initial new-test types rejected unknown base-model .ocr and protected field access; tests use narrowed public document and visible OCR pane instead of adding ignores or exposing internals. Assertions still verify exact prior run association and durable history, not text-only equality.
 
 Original OCR/other save consumers, final full gate and non-author fix review are pending; E7 not complete. Candidate/remote work not yet accepted.
+
+Original compatibility regressions (project_measurements, save_refresh_cancellation, instrument_intake_desktop): 42passed/130.31s/actual0, .local/t060-ocr-compatibility.txt. Non-author review bound80a84ef/base5e3459a closed initial P2 with no new P0-P2; review used frozen source/AST, not concurrent Qt.
