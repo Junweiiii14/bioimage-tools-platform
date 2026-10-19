@@ -6,11 +6,8 @@ from hashlib import file_digest, sha256
 from io import BytesIO
 from pathlib import Path
 
-from PIL import Image
 from pydantic import TypeAdapter
 
-from wb_tool.adapters.figure_export import render_figure
-from wb_tool.adapters.figure_image_export import publish_rendered_image
 from wb_tool.adapters.tiff_input import load_tiff
 from wb_tool.application.automatic import suggest_analysis_for_crop
 from wb_tool.application.figure_project import FigureRender, FigureSourcePath
@@ -36,6 +33,9 @@ def prepare_intake_figure(
     *,
     cancelled: Callable[[], bool] = lambda: False,
 ) -> IntakeFigurePreparation:
+    from wb_tool.adapters.figure_export import render_figure
+    from wb_tool.adapters.figure_image_export import publish_rendered_image
+
     validate_intake_workflow_ticket(project, ticket)
     if ticket.stage != "compose" or project.workflow.cancel_requested or cancelled():
         raise ValueError("完整Fig成图需要当前未取消的compose票据")
@@ -108,6 +108,8 @@ def load_intake_figure_preview(
     cancelled: Callable[[], bool] = lambda: False,
 ) -> FigureRender:
     """Read the immutable completed PNG, retaining source provenance and scaled hit boxes."""
+    from PIL import Image
+
     evidence = next((e for e in project.intake_figures if e.figure_id == figure_id), None)
     if evidence is None or evidence.input_digest != intake_figure_digest(project, figure_id):
         raise ValueError("当前Fig成图尚未就绪或已过期")
