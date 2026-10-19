@@ -42,6 +42,14 @@ class Receipt(TypedDict):
     base_rules: dict[str, str]
 
 
+class IntegrationContext(TypedDict):
+    schema: int
+    task: str
+    base_commit: str
+    source_head: str
+    historical_receipts: dict[str, str]
+
+
 def git(root: Path, *args: str) -> bytes:
     return subprocess.check_output(["git", "-C", str(root), *args])
 
@@ -157,38 +165,133 @@ def changed_paths(root: Path, base: str, head: str) -> list[str]:
     )
 
 
+def receipt_paths(names: list[str]) -> list[str]:
+    return [
+        p
+        for p in names
+        if re.fullmatch(r"work/evidence/[A-Z][A-Z0-9]*-[0-9]+/rules-context.json", p)
+    ]
+
+
+def check_receipt(root: Path, path: str, base: str, head: str, changed: list[str]) -> None:
+    raw = json.loads(read(root, path, head))
+    if not isinstance(raw, dict):
+        raise ValueError("Receipt must be an object")
+    receipt = cast(Receipt, raw)
+    if receipt["schema"] != 1 or receipt["base_commit"] != base:
+        raise ValueError("Receipt schema/base is stale; refresh after updating from main")
+    task = receipt["task"]
+    if task != PurePosixPath(path).parent.name:
+        raise ValueError("Receipt task does not match its directory")
+    scopes = parse_scopes(receipt["scopes"])
+    uncovered = [p for p in changed if not any(covers(s, p) for s in scopes)]
+    if uncovered:
+        raise ValueError("Changed files outside loaded scope: " + ", ".join(uncovered))
+    task_files = [p for p in paths(root, head) if p.startswith(f"work/tasks/{task}-")]
+    if not task_files:
+        raise ValueError("Task document is missing")
+    expected = fingerprints(root, selected_rules(root, scopes, head), head)
+    if receipt["rules"] != expected:
+        raise ValueError("Head rules changed or nested rules were omitted; reload context")
+    if receipt["base_rules"] != base_fingerprints(root, scopes, base):
+        raise ValueError("Base rules were not loaded correctly")
+
+
+def require_ancestor(root: Path, ancestor: str, head: str) -> None:
+    if not re.fullmatch(r"[0-9a-f]{40}", ancestor):
+        raise ValueError("Integration sources must be exact commit IDs")
+    if subprocess.run(
+        ["git", "-C", str(root), "merge-base", "--is-ancestor", ancestor, head],
+        capture_output=True,
+        check=False,
+    ).returncode:
+        raise ValueError("Integration source is not an ancestor of its recorded head")
+
+
+def check_historical(root: Path, path: str, source: str, source_head: str, head: str) -> None:
+    require_ancestor(root, source, source_head)
+    if read(root, path, head) != read(root, path, source):
+        raise ValueError("Historical receipt differs from its immutable source")
+    raw = json.loads(read(root, path, source))
+    if not isinstance(raw, dict):
+        raise ValueError("Historical receipt must be an object")
+    original_base = cast(dict[str, object], raw)["base_commit"]
+    if not isinstance(original_base, str):
+        raise ValueError("Historical receipt base must be a commit ID")
+    require_ancestor(root, original_base, source)
+    # Historical scopes describe an old rule-loading event, not the current PR's coverage.
+    # Full coverage of this PR remains mandatory on its one current receipt below.
+    check_receipt(root, path, original_base, source, [])
+
+
+def make_integration_context(root: Path, task: str, base: str) -> IntegrationContext:
+    base, source_head = revision(root, base), revision(root, "HEAD")
+    current = f"work/evidence/{task}/rules-context.json"
+    historical: dict[str, str] = {}
+    for path in receipt_paths(changed_paths(root, base, source_head)):
+        if path == current:
+            continue
+        if read(root, path, None).replace(b"\r\n", b"\n") != read(root, path, source_head):
+            raise ValueError("Commit and verify historical receipt updates before integration")
+        source = git(root, "log", "-1", "--format=%H", source_head, "--", path).decode().strip()
+        check_historical(root, path, source, source_head, source_head)
+        historical[path] = source
+    return {
+        "schema": 1,
+        "task": task,
+        "base_commit": base,
+        "source_head": source_head,
+        "historical_receipts": historical,
+    }
+
+
 def validate(root: Path, base: str, head: str) -> list[str]:
     base, head = revision(root, base), revision(root, head)
     changed = changed_paths(root, base, head)
-    receipts = [
+    receipts = receipt_paths(changed)
+    manifests = [
         p
         for p in changed
-        if re.fullmatch(r"work/evidence/[A-Z][A-Z0-9]*-[0-9]+/rules-context.json", p)
+        if re.fullmatch(r"work/evidence/[A-Z][A-Z0-9]*-[0-9]+/integration-context.json", p)
     ]
-    if len(receipts) != 1:
-        return ["PR needs exactly one changed rules-context.json; run dev.py context --record"]
     try:
-        raw = json.loads(read(root, receipts[0], head))
-        if not isinstance(raw, dict):
-            raise ValueError("Receipt must be an object")
-        receipt = cast(Receipt, raw)
-        if receipt["schema"] != 1 or receipt["base_commit"] != base:
-            raise ValueError("Receipt schema/base is stale; refresh after updating from main")
-        task = receipt["task"]
-        if task != PurePosixPath(receipts[0]).parent.name:
-            raise ValueError("Receipt task does not match its directory")
-        scopes = parse_scopes(receipt["scopes"])
-        uncovered = [p for p in changed if not any(covers(s, p) for s in scopes)]
-        if uncovered:
-            raise ValueError("Changed files outside loaded scope: " + ", ".join(uncovered))
-        task_files = [p for p in paths(root, head) if p.startswith(f"work/tasks/{task}-")]
-        if not task_files:
-            raise ValueError("Task document is missing")
-        expected = fingerprints(root, selected_rules(root, scopes, head), head)
-        if receipt["rules"] != expected:
-            raise ValueError("Head rules changed or nested rules were omitted; reload context")
-        if receipt["base_rules"] != base_fingerprints(root, scopes, base):
-            raise ValueError("Base rules were not loaded correctly")
+        if not manifests:
+            if len(receipts) != 1:
+                raise ValueError(
+                    "PR needs exactly one changed rules-context.json; "
+                    "use an explicit integration context for preserved historical receipts"
+                )
+            check_receipt(root, receipts[0], base, head, changed)
+        else:
+            if len(manifests) != 1:
+                raise ValueError("Integration needs exactly one changed integration context")
+            raw = json.loads(read(root, manifests[0], head))
+            if not isinstance(raw, dict):
+                raise ValueError("Integration context must be an object")
+            integration = cast(IntegrationContext, raw)
+            task = PurePosixPath(manifests[0]).parent.name
+            if (
+                integration["schema"] != 1
+                or integration["base_commit"] != base
+                or integration["task"] != task
+            ):
+                raise ValueError("Integration context task/schema/base does not match this PR")
+            current = f"work/evidence/{task}/rules-context.json"
+            if current not in receipts:
+                raise ValueError("Integration current receipt must be changed in this PR")
+            historical_raw = cast(dict[str, object], raw)["historical_receipts"]
+            if not isinstance(historical_raw, dict):
+                raise ValueError("Integration historical receipts must be an object")
+            historical = cast(dict[str, str], historical_raw)
+            if set(historical) != set(receipts) - {current}:
+                raise ValueError("Integration must list every extra historical receipt exactly")
+            source_head = integration["source_head"]
+            require_ancestor(root, source_head, head)
+            if source_head == head:
+                raise ValueError("Integration source head must precede its current receipt commit")
+            for path, source in historical.items():
+                check_historical(root, path, source, source_head, head)
+            check_receipt(root, current, base, head, changed)
     except (KeyError, TypeError, ValueError, OSError, subprocess.CalledProcessError) as exc:
         return [str(exc)]
     return []
@@ -205,6 +308,11 @@ def main(argv: list[str] | None = None) -> int:
     load.add_argument("--scope", action="append", required=True)
     load.add_argument("--base", default="origin/main")
     load.add_argument("--record", action="store_true")
+    load.add_argument(
+        "--integration",
+        action="store_true",
+        help="explicitly verify and retain historical receipts",
+    )
     verify = sub.add_parser("check")
     verify.add_argument("--base", required=True)
     verify.add_argument("--head", default="HEAD")
@@ -218,6 +326,9 @@ def main(argv: list[str] | None = None) -> int:
                 print("Rule context receipt matches this PR's base, scope and rule versions")
             return int(bool(errors))
         receipt = make_receipt(ROOT, args.task, args.scope, args.base)
+        integration = (
+            make_integration_context(ROOT, args.task, args.base) if args.integration else None
+        )
         task_files = [p for p in paths(ROOT, None) if p.startswith(f"work/tasks/{args.task}-")]
         if not task_files:
             raise ValueError("Create the task document before recording context")
@@ -234,6 +345,12 @@ def main(argv: list[str] | None = None) -> int:
                 json.dumps(receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
             )
             print(f"\nRecorded {output.relative_to(ROOT)}")
+            if integration is not None:
+                integration_output = output.with_name("integration-context.json")
+                integration_output.write_text(
+                    json.dumps(integration, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+                )
+                print(f"Recorded {integration_output.relative_to(ROOT)}")
         return 0
     except (ValueError, OSError, subprocess.CalledProcessError) as exc:
         print("ERROR", exc)
