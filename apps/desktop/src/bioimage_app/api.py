@@ -27,7 +27,15 @@ __all__ = [
     "RunSession",
     "create_wb_window",
     "create_figure_project_window",
+    "run_application",
 ]
+
+
+def run_application() -> int:
+    """Static desktop/worker dispatcher for the standalone application launcher."""
+    from bioimage_app.__main__ import main
+
+    return main()
 
 
 def create_wb_codec(start: "StartFrame") -> ProcessCodec:

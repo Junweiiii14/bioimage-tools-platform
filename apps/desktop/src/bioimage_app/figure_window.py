@@ -109,6 +109,8 @@ class FigureProjectWindow(QMainWindow):
         self._paths: dict[str, str] = {}
         self._saved_revision: int | None = None
         self._saved_generation = 0
+        self._save_on_close = True
+        self._transition_pending = False
         self._busy = False
         self.quant_progress: dict[str, object] = {}
         self._closing = False
@@ -311,12 +313,12 @@ class FigureProjectWindow(QMainWindow):
         self.motion.move()
 
     def _schedule_save(self) -> None:
-        if self._workspace and not self._closing:
+        if self._workspace and not self._closing and not self._transition_pending:
             self.save_state.setText("待保存…")
             self._auto_save.start()
 
     def _save_idle_edits(self) -> None:
-        if self._closing or not self._workspace:
+        if self._closing or self._transition_pending or not self._workspace:
             return
         if self._busy:
             self._auto_save.start()
@@ -1397,8 +1399,25 @@ class FigureProjectWindow(QMainWindow):
             and self._selection_job is None
         )
 
+    @property
+    def has_unsaved_changes(self) -> bool:
+        return bool(self._workspace) and self.view.generation != self._saved_generation
+
+    def pause_auto_save(self, paused: bool) -> None:
+        self._transition_pending = paused
+        if paused:
+            self._auto_save.stop()
+        elif self.has_unsaved_changes and not self._closing:
+            self._auto_save.start()
+        self._controls()
+
+    def prepare_shutdown(self, *, save_changes: bool = True) -> None:
+        """The visible shell has already resolved save/discard/cancel choices."""
+        self._save_on_close = save_changes
+        self.pause_auto_save(True)
+
     def _controls(self) -> None:
-        idle = not self._busy and not self._closing
+        idle = not self._busy and not self._closing and not self._transition_pending
         self.create_button.setEnabled(idle and not self._workspace)
         self.open_button.setEnabled(idle and not self._workspace)
         self.restore_button.setEnabled(idle and not self._workspace)
@@ -2416,7 +2435,11 @@ class FigureProjectWindow(QMainWindow):
     def _finish_close(self) -> None:
         if self._shutting:
             return
-        if self._workspace and self._saved_generation != self.view.generation:
+        if (
+            self._save_on_close
+            and self._workspace
+            and self._saved_generation != self.view.generation
+        ):
             self.save()
             return
         self._shutting = True

@@ -205,5 +205,5 @@ window.groupReview = (() => {
   root.addEventListener('pointerup',()=>{if(dragging){dragging=null;editor();}if(pan){const was=pan;if(!pan.moved&&pan.rowId)choose(pan.rowId,pan.lane);setTimeout(()=>{if(pan===was)pan=null;},0);}});
   root.addEventListener('pointercancel',()=>{if(dragging){draft=dragging.old;dragging=null;editor();}pan=null;});
   document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.gr-box')){e.preventDefault();choose(e.target.dataset.grRow,Number(e.target.dataset.grLane));}});
-  return {renderActive,progress,manualMode};
+  return {renderActive,progress,manualMode,hasDraft:()=>!!draft};
 })();

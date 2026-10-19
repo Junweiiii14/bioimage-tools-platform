@@ -1,5 +1,7 @@
 # Validation History
 
+- 2026-10-19 T047/6b643a3：规则context scope . exit0；node --check ignored预览最终脚本exit0；IAB约965×863核对导入直达、最近项目恢复结果/Fig1F、错误目录禁止误开/新建恢复、保存失败、计算取消与退出、后台退出失败保留窗口、安装入口演示。截图.local/t047-preview。未改产品，未跑T047测试/全检/真实退出复现/安装/移动端/DPI，等待UI预览审批；旧T046结果不用于本任务通过结论。
+
 - 2026-10-18 T045最终f18589a：747passed/517.90秒，原child0/u32=0x00000000/外层0，全部隔离wheel/9导入合约/静态通过。独审原5项+Space全部resolved，兼容反例独立14项6.28秒0；真实33Fig106运行/重开106、CSV/XLSX33组135行545数值/拒绝覆盖0。先前停止/746通过1旧schema反例失败保留；未销原生UNKNOWN。详见work/evidence/T-045/validation.md。
 
 - 2026-10-18 da00768完整704passed/483.01秒、原child0、全部隔离wheel/最终check实际0，独审6项2.08秒0；原生AV未复现不销账。后继独立灰度当前本地41相关34.78秒0，全项目Pyright/Ruff格式491文件/9导入契约/Node0；真实发货页面入口/正常worker/不调用自动或compose/位置失败重选/全泳道弹框/键盘基线/保存重开已验。后继绑定独审/完整检查/8图/视觉待做。新二次背景反例36750→25158，故不接仅扩大上限v2，保留现有2背景不足。细节work/evidence/T-044/standalone-quant.md。

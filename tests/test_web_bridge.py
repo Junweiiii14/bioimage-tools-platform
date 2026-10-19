@@ -302,7 +302,9 @@ def test_existing_web_project_appends_files_and_folder(
         gc.collect()
 
 
-def test_web_close_reopen_restores_saved_project(qtbot: QtBot, tmp_path: Path) -> None:
+def test_web_close_reopen_restores_saved_project(
+    qtbot: QtBot, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     from bioimage_app.web_window import WebWorkbenchWindow
     from PySide6.QtCore import QSettings
 
@@ -341,8 +343,14 @@ def test_web_close_reopen_restores_saved_project(qtbot: QtBot, tmp_path: Path) -
         assert restored.rows == original_project.rows
         assert reopened.host.view.analysis.result_view.cells
         assert reopened.host.view.source_preview is not None
+        # Same-window opening is supported now. Cancelling its chooser keeps this project.
+        from PySide6.QtWidgets import QFileDialog
+
+        def cancel_directory(*args: object) -> str:
+            return ""
+
+        monkeypatch.setattr(QFileDialog, "getExistingDirectory", cancel_directory)
         reopened.bridge.request("open_project", "{}")
-        assert "新开一个工作台窗口" in str(reopened.bridge.snapshot()["status"])
         assert reopened.host.workspace_path == workspace
         assert reopened.host.view.project().project_id == original_project.project_id
     finally:

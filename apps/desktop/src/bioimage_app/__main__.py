@@ -21,6 +21,12 @@ def main() -> int:
         from wb_tool.api import run_ocr_worker
 
         return run_ocr_worker()
+    if len(sys.argv) == 3 and sys.argv[1] == "--verify-installation":
+        from pathlib import Path
+
+        from bioimage_app.installation_check import verify_installation
+
+        return verify_installation(Path(sys.argv[2]))
     from bioimage_app.desktop_entry import create_desktop_window, desktop_mode
 
     mode = desktop_mode(sys.argv[1:])

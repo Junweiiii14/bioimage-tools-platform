@@ -55,6 +55,30 @@ def cell_state(cell: ProjectTableCell) -> dict[str, object]:
 class WorkbenchBridge(QObject):
     stateChanged = Signal(str)
     progressChanged = Signal(str)
+    sessionRequested = Signal(str, str)
+    sessionStateChanged = Signal(str)
+
+    @Slot(str, str)
+    def session(self, action: str, payload: str = "{}") -> None:
+        if len(payload) <= 8192:
+            self.sessionRequested.emit(action, payload)
+
+    def replace_host(self, host: FigureProjectWindow) -> None:
+        self.session_epoch += 1
+        self.host.automatic.finished.disconnect(self._automatic_completed)
+        self.host = host
+        self.host.automatic.finished.connect(self._automatic_completed)
+        self._previous = ""
+        self._previous_progress = ""
+        self._published_key = None
+        self._images.clear()
+        self._montage_key = 0
+        self._montage = None
+        self._error = ""
+        self._completed_key = ""
+        self._quant_overview = None
+        self._pending_source = None
+        self.timer.start()
 
     def __init__(
         self,
@@ -65,6 +89,7 @@ class WorkbenchBridge(QObject):
         super().__init__(parent)
         self.host = host
         self.choose = choose
+        self.session_epoch = 0
         self._previous = ""
         self._published_key: tuple[object, ...] | None = None
         self._images: dict[str, str | None] = {}
@@ -220,6 +245,7 @@ class WorkbenchBridge(QObject):
                 }
             )
         return {
+            "sessionEpoch": self.session_epoch,
             "sourcePreviews": {
                 key: value for key, value in self._images.items() if source_counts[key] > 1
             },

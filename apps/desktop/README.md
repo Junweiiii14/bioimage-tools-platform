@@ -1,5 +1,27 @@
 # Desktop host
 
+T047 adds the approved project start screen and a local versioned navigation record.
+New independent grayscale imports are saved and open the quantification page. Existing
+projects restore valid page/row/Fig/lane selections. Recent entries are actual projects,
+not demonstration links. A per-window session epoch rejects queued messages from a
+retired host. Closing a project reuses the same web window with a fresh native host.
+Scientific document schemas and completed measurements are unchanged.
+
+The visible shell coordinates close, cancellation, save/discard and recovery. Unapplied
+curve/lane drafts are distinct from unsaved project changes. Save failure keeps the
+window visible and does not automatically retry the final save. Only the owned host
+shuts down; other application instances are not terminated. The file menu and left
+exit action use the same route as the native window close button.
+
+`tooling/build_candidate.py --iscc <verified compiler>` builds a standalone Windows x64
+candidate from a clean commit using the locked Nuitka version, then compiles the Inno
+Setup recipe. The installer has independent identity/directories/shortcuts and retains
+project folders on uninstall. Build outputs, models and private data are not committed.
+`--verify-installation <new-report.json>` explicitly tests synthetic TIFF import, two-lane
+durable worker results, offline OCR and resource shutdown; its report never replaces an
+existing file. Passing this diagnostic does not establish scientific accuracy or clean
+Windows/DPI acceptance. See the T047 task for actual build/validation status.
+
 T045 extends the same workbench with WBQuant-style independent full-lane copying,
 group reselection that retains completed runs, peak inclusion and bounded session
 undo/redo. Fig-sheet detection runs in the existing background service, followed by
