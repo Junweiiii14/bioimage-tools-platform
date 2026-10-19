@@ -1,5 +1,7 @@
 # Handoff Snapshot
 
+- E0/T053与E1/T054均验证/独审通过；E1产品f975809，808全门禁/554.07s及9契约/全部wheel/真实OCR外层0。分支codex/wb-e0-e7，下一实施E2/T055。已获用户授权连续E0–E7、不逐步询问、不设定时任务；T052规划c57bfcf保留。日志.local/t054-fullcheck.txt。当前没有新包/远程集成/科学留出通过结论。
+
 - 2026-10-19 T-052规划交付：用户要求全仓优化并按最新需求持续开发，明确会话内连续推进、不设定时任务。执行计划docs/wb-execution-plan.md，状态work/tasks/T-052-repository-optimization-plan.md；下一实施从E0可信基线开始，每包另建任务。本轮仅规划文档，产品仍65ff278，原ResearchVault dirty树未改。
 
 - 最近产品任务T-051已完成本机源码与隔离wheel阶段，权威状态见work/tasks/T-051-instrument-intake.md；本轮规划任务T-052。
