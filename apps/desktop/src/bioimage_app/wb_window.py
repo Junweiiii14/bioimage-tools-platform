@@ -516,7 +516,11 @@ class WBWindow(QMainWindow):
             self.view.status.setText("正在取消，等待进程退出确认…")
 
     def _completed(self, completion: RunCompletion, generation: int, *, ocr: bool = False) -> None:
+        session = self._session
         self._session = None
+        if session is not None:
+            # Completion follows observed process exit and decoder shutdown.
+            session.deleteLater()
         self._controls()
         if self._closing:
             self._close_after_run()

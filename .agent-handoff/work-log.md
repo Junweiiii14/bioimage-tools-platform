@@ -1,5 +1,13 @@
 # Current Work Log
 
+## 2026-10-14 / T-008 手工桌面闭环
+
+上一回合progress：32a2bae进程宿主。本回合WBDocument v1、纯显示DTO/后台预览与codec、Qt ROI/条带/基线/原始曲线及中文窗口/静态worker入口。实际拖选→signal10→保存/重开、关闭自动保存、新编辑拒绝旧参数、uint16原图不变、实际窗口取消关闭通过；190完整tests/9合约/4wheel5场景，追加取消后最终pytest见证据。合成抓图已查看，无数值/工作区格式改写。用户回复首版必须Fig/行名OCR与自动写表，下一阶段优先；独审/远程CI/包态验收未执行，goal active。
+
+## 2026-10-14 / T-007 进程宿主
+
+上一回合progress：e61c3e3异步存储。本回合实现QProcess/后台解码、NDJSON与stderr预算、PID存储门禁、Windows JobObject/进程组、RunSession持久化取消与终态；补提交取消检查。真实WB输入快照→进程→存储→重开信号10，旧运行不覆盖新草稿；实际孙进程强停、残帧/超限/退出/提前取消与发布取消均验证。完整门禁185tests/9合约/4wheel通过；T-007进入review（独审未执行），下一步T-008桌面GUI，goal active。
+
 ## 2026-10-14 / T-007 异步存储子阶段
 
 上一回合 progress：ac01459/731cd70 工作区。本回合新增 bioimage_app 0.1.0，后台线程独占 Workspace；请求ID、明确命令、队列预算、错误后继续和异步关闭。真实Qt屏障/定时器确认主线程响应，真实进程退出→异步提交→重开通过。最终170测试/9导入合约/4wheel自验；任务仍 implementing，进程宿主/GUI与独审未完成，goal active。
@@ -105,3 +113,14 @@ wb-tool 0.2.0 新增 uint8/16 灰度及显式 RGB 单页 TIFF、极性与半开 
 ## 2026-10-15 T-024 平台与自动化闭环
 
 按用户纠偏实现真实平台、自动识别/裁剪/积分与完整输出；三独立worktree子代理集成至16f3877。真实10图5检出21泳道、5未检出，所有质量状态保留。532全门禁/193.25s与五缺陷修复独审通过；真实5视图完成两视觉修复复核。科学真值/完整配对/包态及PR集成未完成，未发布。
+## 2026-10-19 T-050 规划修订
+
+用户确认清单驱动的仪器原图流程。对产品a234354只读审计，核对原始PDF；从main221a2df独立文档分支创建新版规划和README入口，避免夹带未集成产品。清单/固定N/原像素定量是已确认需求，局部异常续作/独立输出目录/可选OCR发行是待审建议。代码、依赖、锁、门禁及原始PDF未改。旧main恢复快照留档。
+
+## 2026-10-19 T050 审核回复落盘
+
+根据用户回复更新第5/6/7/8节：批准局部暂停与独立结果目录，独立灰度定量OCR作为继续支持的功能。主流程不加载OCR与安装发行拆分是不同事项，后者未决；同步任务/风险/待办和交接。未改产品/PDF/依赖，旧审查不外推本轮修订。
+
+## 2026-10-20 E7 governance integration
+
+INT001 resumes authorized E7 only in this temporary historical integration tree. Merged planning main43d520f into original governance0b7, retained immutable RULE001 receipt source; loaded/read exact rules and current full scope. Main PR/CI not yet accepted. WB product development/checks remain in t051, not represented by this zero-product checkout.
