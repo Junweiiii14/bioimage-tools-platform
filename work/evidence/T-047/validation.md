@@ -30,3 +30,11 @@
 最终源码完整门禁v3已结束：769passed659.96秒，所有隔离wheel、真实OCR worker及PNG OCR检查、dev/check最终exit0。产品及科学代码对应53a2030，后继6325623仅增加显式ONNX后端打包与文档。完整编译v4仍在C阶段，未安装。
 
 安装v4成功但验收未通过：桌面/开始菜单/卸载及EXE哈希核对通过；真实OCR worker因RapidOCR延迟导入模块未收录而failure，已显式收录完整rapidocr。初始化自检normal/offscreen均exit3且报告空白，UNKNOWN；增加显式诊断检查点与异常持久记录。不宣称可用安装通过，不启动交付。控制器SYSTEMROOT大小写错误单独保留，非产品错误。
+
+## 最终本机候选交付
+
+产品b6df40edf2beb560971fee9f8ac94d1381d265ff采用private-cpython-locked-wheels，原生启动器GCC -Wall/-Wextra/-Werror退出0；Python类型/静态/格式检查0。安装包360638287字节，SHA256 `37865a43f7eed96be4ec410628814c8990c634a755c5636bdbf2414a3bcb18bc`；安装exit0。启动器摘要 `9be99393b4de771f40c81195dd52b224793bc93e87ddcb95bd2a545d03316bcb`，私有Python摘要 `f7ab44f15f6067dc0613fb2b2aeff1287d4fa90b6fbe719f3574055bb11904ab`。
+
+安装目录 `C:/Users/70236/AppData/Local/Programs/BioImage WB Candidate`；桌面/开始菜单 `BioImage WB（候选版）`。实际安装正常Windows窗口自检七检查11.516秒passed，控制器22.442秒/进程exit0，六个自有PID均退出，316个实际加载模块无开发目录路径。使用含空格报告路径验证启动器参数转发。真实OCR子进程在临时目录且PATH仅System32下识别Fig1A/AKT，定量错误协议exit2正确，stdout/退出码转发通过。精确 ignored 报告：`.local/t047/installed acceptance/final report.json`、`final report.json.process.json`，以及`.local/t047/installed-runtime-worker.json`、`installed-runtime-entries.json`。原TIFF/旧快捷方式摘要一致。没有运行卸载用户原版，仅卸载本轮失败AOT候选后全新安装本轮成功候选。
+
+真实桌面快捷方式启动成功：`.local/t047/installed-user-launch.json`记录父55936/窗口55440，标题“BioImage WB · 候选版”、响应正常，保留供用户试用。源图片未自动导入此新首页。独审最终对b6df40e关闭第二项，ship仅本轮评分项，第一项先前53a2030已关闭。所有旧失败保留；原生物理按钮、DPI、干净Windows及科学留出仍未验收，无main/PR/对外发布。

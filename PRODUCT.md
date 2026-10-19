@@ -29,6 +29,7 @@ T-037 同源 WB 工作区按“原图裁剪→拼图排版→灰度定量→结�
 ## Capabilities and Constraints
 
 - T-047 同源桌面首页把“灰度定量”和“裁图与拼图”作为新项目工作流选择，支持 TIFF 原图及原图文件夹创建独立项目，并提供已有项目、最近项目和新项目保存位置入口。新灰度项目就绪后进入灰度页；重开项目按项目身份校验上次页面、Fig、原图和泳道，无效选择安全回退。首页与项目在同一窗口切换，网页预览仍不执行真实导入和科学计算。
+- T-047 Windows 并行候选安装版采用私有 CPython 3.12.14、`uv.lock` 固定的产品依赖和 4 个产品 wheel，由原生 Windows launcher 启动，无需用户另装 Python 或 uv；提供桌面、开始菜单和卸载入口，既有开发入口与原图保留。
 - 文件菜单、返回首页、切换项目与关闭窗口共用会话退出流程。后台忙碌时先确认取消并等待，再重新检查未应用草稿及未保存修改；草稿与已提交项目修改分别确认。保存失败或后台退出失败保持窗口可见并提供返回/重试，等待期间不宣告退出完成。旧会话消息通过 epoch 拒绝，不能覆盖新项目。
 
 - T-046 在既有同源灰度页增加按 Fig 审核的工作区：同组各蛋白的原图泳道框同时显示，曲线按蛋白纵向分区、区内列出全部泳道；图框、曲线和结果数值互相定位。展开曲线可修改起止点与直线封底，经“应用并重算”提交；仍保留手动泳道绘制、复制、重选等入口，以及 UB 整段模式。浏览器草稿不产生新的科学结果。
@@ -51,7 +52,11 @@ T-037 同源 WB 工作区按“原图裁剪→拼图排版→灰度定量→结�
 
 ## Evidence on Hand
 
-T-047 本次能力记录核对产品提交 `53a2030ba62f97247f10595b78b9b526b8007d2d` 的 `web_ui/index.html`、`desktop_session.js`、`desktop_session.css` 和 `web_window.py`。已批准的独立交互预览为 `.local/t047-preview/`；产品静态截图为 `.local/t047/product-home.png`、`product-home-960.png`、`product-home-390.png`、`product-quant.png`。`product-exit-rendered.png` 是冻结真实 Qt DOM 后的浏览器渲染，离屏 Qt 抓图未包含顶层 dialog，不能将其称作原生退出提示截图。源码诊断 v4 记录真实 worker/OCR、保存失败恢复、重开与忙碌退出等 7 项检查通过；完整门禁、提交绑定独审、完整编译和安装验收由 T-047 主任务记录决定，本次不宣称安装成功、原生 DPI 或干净 Windows 验收通过。documenter 只读核对代码及既有截图，未另行运行 UI、测试、检测器或安装。
+T-047 界面能力记录最初核对 `53a2030ba62f97247f10595b78b9b526b8007d2d`，最终候选产品为 `b6df40edf2beb560971fee9f8ac94d1381d265ff`，该轮 UI/source 未变。独立预览 `.local/t047-preview/` 与产品静态截图 `.local/t047/product-home.png`、`product-home-960.png`、`product-home-390.png`、`product-quant.png` 分开。`product-exit-rendered.png` 是冻结真实 Qt DOM 后的浏览器渲染，离屏 Qt 抓图未包含顶层 dialog，不能称作原生退出提示截图。
+
+T-047 最终 `runtime-b6df40edf2be` 安装包编译、安装均 exit0，Setup SHA256 为 `37865a43f7eed96be4ec410628814c8990c634a755c5636bdbf2414a3bcb18bc`。本机实际已安装候选版在正常 Windows GUI 下的 7 项诊断通过（11.516 秒），覆盖真实 worker、离线 OCR、保存失败可见恢复、项目重开、忙碌退出及取消后的草稿/未保存确认，见 `.local/t047/installed acceptance/final report.json`。对应 `.process.json` 记录自有进程 exit0、全部结束、未加载开发目录 DLL；`installed-runtime-worker.json` 记录包态 OCR/worker 检查通过，`installed-runtime-entries.json` 记录桌面/开始菜单/卸载入口有效及原快捷方式、原 TIFF 哈希未变。`installed-user-launch.json` 记录桌面快捷方式已打开标题为“BioImage WB · 候选版”的响应窗口。先前 `6325623` AOT 编译包在实际 GUI/OCR 验证失败，未作为最终交付，失败记录保留。
+
+源码完整门禁 769 项及全部隔离 wheel exit0。以上是本机已安装候选版的局部验证；独立审查最终两项评分及任务完成状态以 `work/tasks/T-047-project-entry-lifecycle-installer.md` 为准，不据此宣告全产品 ship、干净 Windows、DPI、物理按钮操作或科学准确率验收通过。documenter 本轮仅核对既有报告并更新文档，未运行 UI、测试、检测器或安装，也未操作已为用户打开的窗口。
 
 T-046 能力记录核对产品提交 `4d4944a18877d10da4f2a7cef4bd4662ba4007a8` 的 `group_review.js`、`group_review.css`、同源页面及桌面桥接实现，契约见 `docs/contracts/wb-group-review-v1.md`。主任务本地产品截图位于 `.local/t046/`：`product-review.png`、`product-editor.png`、`product-results.png`、`product-review-960.png`、`product-mobile.png`、`product-ub.png`、`product-progress.png`；它们与获批的独立交互预览分开。独立界面审查的五项修复已关闭，最终 ship 仅限该五项评分范围。最终本地完整门禁761项及全部隔离wheel退出0；实际检查、性能与提交绑定独审以 T-046 任务及 `work/evidence/T-046/validation.md` 为准。本轮 documenter 未另行运行 UI、测试或服务器，未宣称完整产品、科学准确率、动效体验或干净 Windows 包态验收通过。
 

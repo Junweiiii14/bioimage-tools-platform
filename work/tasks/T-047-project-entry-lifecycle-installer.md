@@ -1,6 +1,6 @@
 # T-047 项目入口、退出生命周期与 Windows 安装版
 
-- 状态：verification/build；实现与最终源码门禁通过，完整候选编译进行中，尚未安装验收。用户再次明确继续编译/安装，通过后启动，原版保持。
+- 状态：local-complete / user-trial；本机候选安装验收与两项独审修复均通过，已从新桌面入口启动，等待用户实际测试反馈。原版保持；未推送、合并或发布。
 - 日期：2026-10-19。
 - 候选工作区：现有 t045-wbquant，分支 codex/t045-wbquant-manual-and-fig；基线 6b643a3957852a87827f85912544ea36da3b712f。不新增 worktree，不改历史工作区、快捷方式、原图或已有项目。
 - 用户确认：新灰度项目导入后进入灰度页；已有项目恢复上次页面及 Fig；同时支持软件项目文件夹与普通 TIFF 文件夹；最终安装包包含桌面和开始菜单图标。已报告关闭 × 无响应与窗口消失后后台残留。计算中退出及未保存修改的提示流程先纳入预览审核。
@@ -47,3 +47,7 @@
 - 全量AOT安装v4未通过真实启动/OCR验收；v5停止自有编译树，compile_exit4294967295，643.203秒，保留证据。基本Qt/WebEngine最小编译探针exit0；工作台编译态初始化exit3原因仍UNKNOWN，不宣称修复。
 - 改为同版本可重定位CPython3.12.14＋uv.lock导出的纯产品依赖＋四个独立wheel＋原生Windows入口。保留完整Python模块布局，避免动态导入遗漏与全量AOT初始化路径；软件不依赖系统Python/uv，科学代码和已批准UI不变。启动器转发参数/标准流、等待真实应用退出，独立Job仅管理自有进程树，退出码透传。新方案仍须实际安装/工作进程/关闭验收和独审，不因源码通过提前交付。
 - 内置运行库安装包首轮被Qt附带QML debug .obj超长路径挡住（ISCC exit2），未安装为成功。项目源码无QtQml/QtQuick依赖，移除仅依赖包中的qml/include开发内容后重新组包；QtWidgets/WebEngineWidgets及科学依赖保留。此前失败候选已通过自身卸载器移除，exit0，原版快捷方式保留。
+- 最终交付产品b6df40edf2beb560971fee9f8ac94d1381d265ff：原生启动器GCC严格警告编译0、运行库安装器编译0、全类型/Ruff/格式0。Setup360638287字节，SHA37865a43f7eed96be4ec410628814c8990c634a755c5636bdbf2414a3bcb18bc；实际安装exit0，无需重启。使用固定私有CPython3.12.14和锁定依赖，不依赖系统Python/uv。
+- 实际安装正常Windows窗口七检查11.516秒passed；外部生命周期22.442秒exit0、六个所属PID均结束，316个加载模块无开发目录依赖；临时目录/仅System32 PATH的真实OCR协议识别Fig1A/AKT与定量错误帧退出码2通过。带空格报告路径验证参数转发。报告仅ignored .local/t047/installed acceptance/final report.json及其.json.process.json；独立worker/入口报告同目录前缀installed-runtime-*。
+- 桌面/开始菜单入口及卸载AppId正确，安装EXE与dist摘要一致；原始TIFF及旧开发快捷方式摘要保持。实际桌面快捷方式启动父55936/窗口55440，标题BioImage WB · 候选版、响应正常；保留给用户测试，不结束旧版或用户窗口。PID仅为记录，后续使用须重查。
+- 绑定b6df40e独审最终关闭第二项，disposition ship仅限本轮两项评分范围；第一项取消后草稿/未保存绕过已在53a2030关闭。不外推全科学准确率、干净Windows、DPI或物理按钮验收；历史AOT失败保留UNKNOWN。最终本机实现/安装完成，用户实际试用待反馈。

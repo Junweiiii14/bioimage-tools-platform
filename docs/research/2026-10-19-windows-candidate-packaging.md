@@ -9,4 +9,6 @@
 
 最小实验：源码态 `--verify-installation` 用临时生成的16位TIFF经真实宿主/worker提交两泳道结果，离线加载OCR，核验原始字节未改并退出；v3报告passed、6.422秒、进程exit0。v1/v2诊断请求缺少当前项目/选择绑定而失败，未将失败当作成功；源码实验不是安装态证据。
 
-当前完整编译、安装态自检、快捷方式与卸载/保留数据验证仍在执行，结果以T047任务最终记录为准。未做干净Windows或多DPI验收，未签名的产品不能伪称受信任发布。
+最终采用内置运行库方案，完整AOT未通过真实启动/OCR验收，不作为交付。uv 管理的 Python 来自 Astral python-build-standalone，见[uv 官方说明](https://docs.astral.sh/uv/concepts/python-versions/)及[独立运行库文档](https://docs.astral.sh/python-build-standalone/)。本轮未升级运行库，复制已验证的同一 CPython3.12.14并记录二进制摘要，安装锁导出的产品依赖及四个wheel，保留运行库许可。`-I` 隔离工作目录/用户site，语义见[Python3.12命令行](https://docs.python.org/3.12/using/cmdline.html)。固定路径原生启动器转发参数与标准流、透传真实退出码，Job对象仅包含其创建的进程树，语义见[CreateProcessW](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessw)及[Job Objects](https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects)。
+
+最小实验已落到实际安装：b6df40e包态正常Windows窗口七检查通过，真实OCR子进程识别Fig1A/AKT、定量协议退出码通过；无剩余所属进程，316个加载模块未出现开发环境路径。桌面/开始菜单/卸载入口与原图/旧快捷方式摘要核对。实际快捷方式已启动响应正常的用户候选窗口。细节与限制见T047 validation，历史AOT初始化exit3仍UNKNOWN；没有将网页预览或源码检查当成安装态成功。干净Windows、多DPI和物理关闭按钮仍未验收。

@@ -1,10 +1,5 @@
 # Current Work Log
 
-## 2026-10-17 CI005 Windows原生锁证据
-
-ea6178e远端Windows再次15分钟取消，60秒栈停finally关闭的QTimer.timeout.connect；此前create通过。Linux659/184.75秒+wheels0；本机50次精确关闭26.81秒0未复现。79f9070补显式owned-tree native观察并独审8项0，不改时限/预期/退出。定向首两轮各1失败7通过已修venv启动器和线程查询权限，最终8项0及真实默认采集保留子退出23；本机664完整门禁随后真实挂起，保存原生证据后仅停止自有pytest，check实际exit1、wheel未跑；CI006继续修复。父工作区旧WB路由已备份后改正并独审，原34文件保持；旧窗口路由修复独立于未知挂起根因。
-
-
 ## 2026-10-17 CI006真实挂起退出修复
 
 79f9070本地全量真实挂起，Python/native及补采三线程证据支持Qt对象锁/GIL反转。仅保存后停止自有pytest，check实际exit1、wheel未跑。a811ccfd四后台退休→owner析构→queued终态；36定向0、独审18项0、Pyright0，668完整check/508.54秒及全部隔离wheel实际exit0。8原图正常工作台8run/保存重开/原SHA/参考未读/关闭exit0，输出另存workbench-ci006。全部旧失败/输出保持；main未变。
@@ -194,3 +189,7 @@ a72e7102891df287e3484f20f3724612779b53f5：733 passed in 525.53s、pytest child/
 ## 2026-10-18 T046 全组审核与边界修复
 
 用户批准独立交互预览后，复用t045候选树，base e78a14a，992c338实现完整峰半区搜谷/质量策略、全组框/按蛋白曲线、合并表格、真实进度及轻量缓存。独审五项fix在4d4944a修正：跨组选择、保存回执、恢复缓存、刻度11px、窄屏导航，复核全部resolved/ship仅五项范围。真实图副本12框12曲线、UB16、33组135行；保存重开、手改实际重算、忙时查看与取消都通过。首全检755/3失败与次轮observer编码失败保留；第三轮最终761passed/526.85秒、原pytest child0及全部隔离wheel/dev/check0。新测试fixture初败/关闭异常明确记在validation，原生精确根因UNKNOWN，不掩盖。文档代理完成普通扩展记录，旧tokens保持。原图SHA一致，原软件/窗口/快捷方式未动；无push/main/发布。
+
+## 2026-10-19 T047 本机安装候选交付
+
+复用t045候选树，无新worktree。入口/恢复/同窗epoch/关闭协调已按批准预览落地；独审P1取消后草稿绕过修复53a2030，最终源码769及所有隔离wheel/dev0。AOT632安装后GUI/OCR失败、c8编译中止保留UNKNOWN。改为同一CPython3.12.14私有运行库+锁依赖+四wheel+原生Job入口，b6df40e最终installer0/install0；真实安装七检查11.516秒、OCR/定量协议/进程归属/316模块路径/原图旧快捷方式摘要通过。两项独审resolved/ship仅评分范围。实际新桌面入口已启动候选窗口供用户测试，未关旧版或用户窗口。documenter保留既有设计系统。干净Windows/DPI/物理按钮/科学留出仍未验收。无push/main/发布；详见T047 validation及任务。

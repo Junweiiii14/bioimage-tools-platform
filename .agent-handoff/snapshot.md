@@ -1,10 +1,12 @@
 # Handoff Snapshot
 
-- 更新2026-10-19。当前唯一任务状态源 `work/tasks/T-047-project-entry-lifecycle-installer.md`，用户已明确批准58339预览，正在实现/验证入口、生命周期与并行安装版。原版/私图/用户窗口保持。尚未宣告完整产品通过。
-- 只在现有候选 `C:/Users/70236/.codex/worktrees/t045-wbquant/bioimage-tools-platform`、分支 `codex/t045-wbquant-manual-and-fig` 工作，T047 基线 6b643a3957852a87827f85912544ea36da3b712f，核对实际 HEAD/dirty。无新增 worktree；原 ResearchVault dirty、旧树/原图/项目/快捷方式及用户现有窗口保留。
-- 用户要求 UI/动画先交互预览审批。T046 的批准不覆盖 T047 新入口/退出。新预览 http://127.0.0.1:58339/index.html，仅 loopback，ignored .local/t047-preview；IAB 已打开。只演示文件选择/进度/退出/安装，不读写项目或改系统。
-- 实施方案 `work/evidence/T-047/design-and-implementation-plan.md`。入口/导航/关闭协调、epoch、打包配方及源码安装自检已接入；下一步完整门禁、独立审查、完整编译/安装与重启退出实证。旧P0不作为产品配方。
-- node/Ruff/格式/Pyright exit0；90ae入口等33项通过，53a2030会话8项通过、源码安装自检v4七检查exit0。最终完整v3 pytest769项659.96秒及全部隔离wheel/dev exit0。编译6325623 v4仍在C编译阶段（旧session91832，先核实日志/实际进程）；产物目录.local/releases/candidate-6325623a1c55。真实安装/DPI未验收。见T047 validation。
-- 上轮候选实际启动并打开用户00060263(1).tif于独立项目；启动信息在 ignored .local/t046/user-trial/latest-launch.json。PID是历史值须重新核验，不关闭用户窗口进行本任务预览。
-- T046 本地完成：最终产品4d4944a，docs HEAD6b643a3；761完整门禁与隔离wheel0，独审五项resolved/ship仅评分范围。完整峰 policy/UB与手调/全组审核已接入，科学留出及历史native故障未销账。原快照 archive/2026-10-19-before-T047.md，详见T046任务。
-- 不自动同步/修复/删除其他树；不推送/main/发布或替换原版。候选安装使用独立名称/AppId/目录/卸载与快捷方式；项目和原图不得随卸载删除。
+- 更新2026-10-19。唯一任务状态源 work/tasks/T-047-project-entry-lifecycle-installer.md；本机local-complete/user-trial，未PR/main/对外发布。
+- 只复用 C:/Users/70236/.codex/worktrees/t045-wbquant/bioimage-tools-platform，分支codex/t045-wbquant-manual-and-fig；T047 base6b643a3，产品b6df40edf2beb560971fee9f8ac94d1381d265ff，核对实际HEAD/dirty。无新增worktree，原ResearchVault dirty及旧树不动。
+- 已批准58339入口/退出预览并实现：首页原图/文件夹/已有项目、直达灰度、恢复页面/Fig/泳道、真实最近项目、同窗切换宿主与epoch、可见取消/草稿/保存/失败/退出流程。科学schema/公式不变。
+- 最终源码完整769passed659.96秒，全部隔离wheel/dev0；取消后重新确认草稿P1在53a2030已独审关闭。后继仅诊断/打包/文档，无科学UI变化。
+- 全AOT632编译/安装成功但真实GUI初始化exit3/OCR缺动态模块，未交付；c8重建停止。失败UNKNOWN保留。最终采用同版本CPython3.12.14私有运行库、锁定产品依赖和四wheel，原生Windows入口，仅管理自有Job/退出码/标准流。不是依赖本机Python或UV。
+- 当前已安装 C:/Users/70236/AppData/Local/Programs/BioImage WB Candidate；桌面和开始菜单入口 BioImage WB（候选版）。安装器 `.local/releases/runtime-b6df40edf2be/BioImage-WB-Candidate-T047-b6df40edf2be-Setup.exe`，360638287字节，SHA37865a43f7eed96be4ec410628814c8990c634a755c5636bdbf2414a3bcb18bc。
+- 实际安装正常Windows GUI七检查11.516秒passed；控制器22.442秒/exit0/所属六PID全部退出/316模块无开发路径；真实OCR及定量协议passed。报告 `.local/t047/installed acceptance/final report.json` 与精确 `final report.json.process.json`；worker/入口报告 `.local/t047/installed-runtime-*`。原00060263(1).tif与原桌面开发快捷方式摘要一致。
+- 从新桌面快捷方式已启动给用户：`.local/t047/installed-user-launch.json`，记录父55936/窗口55440、标题BioImage WB · 候选版、响应正常。后续须重新核对PID。不要关闭用户这个窗口、旧版/旧试用窗口；新首页未自动导入用户原图。
+- 独审最终对b6df40e关闭第二项、ship仅本轮两项评分范围。documenter更新PRODUCT/surface，DESIGN/sidecar保持。干净Windows、DPI、物理按钮、科学准确率未验收。下一步只响应用户试用反馈，不自动扩展路线图。
+- 完整证据 work/evidence/T-047/validation.md；历史T046产品4d4944a、761门禁与全组审核/完整峰/UB逻辑保留。原始输入/已完成结果/私图/安装包不得提交覆盖。历史全局说明见AGENT_HANDOFF索引。

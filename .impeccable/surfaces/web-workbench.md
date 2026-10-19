@@ -66,6 +66,15 @@ T-045（普通扩展）恢复独立完整泳道的复制/删除/清空/重选、
 
 入口面桌面为弹性主区加 290px 已有项目区，1100px 以下右区为 240px，660px 以下纵向排列并把操作按钮堆叠；最近项目窄屏隐藏路径及“继续工作”文字，保留项目名与工作位置。局部标题为 17px、退出标题 21px，正文与控件 12–14px，紧凑路径 11px；这些是本页观察值，不新增全局 type tokens。14px 入口/模态圆角、菜单的局部圆角与阴影同样只记为本页实现，不提升为系统规范。
 
-产品静态证据为 `.local/t047/product-home.png`、`product-home-960.png`、`product-home-390.png`、`product-quant.png`。`product-exit-rendered.png` 来自冻结真实 Qt DOM 的浏览器渲染；离屏 Qt grab 未捕获顶层 dialog，所以该图只证明同源 DOM 的模态布局，不证明原生显示。获批预览截图 `.local/t047-preview/home.png`、`exit-failure.png`、`install.png` 与产品证据分开。源码诊断 v4 7 项检查通过的范围包括真实 worker/OCR、保存失败恢复、重开和忙碌退出；完整检查、独审、编译、安装与最终完成状态以 T-047 主任务为准。本次 documenter 未运行 UI、测试、检测器或安装，未宣称原生 DPI、完整移动端或干净 Windows 验收通过。
+产品静态证据为 `.local/t047/product-home.png`、`product-home-960.png`、`product-home-390.png`、`product-quant.png`。`product-exit-rendered.png` 来自冻结真实 Qt DOM 的浏览器渲染；离屏 Qt grab 未捕获顶层 dialog，所以该图只证明同源 DOM 的模态布局，不证明原生显示。获批预览截图 `.local/t047-preview/home.png`、`exit-failure.png`、`install.png` 与产品证据分开。源码诊断 v4 的早期证据由下述最终安装版验证补充；本段静态图仍不证明原生 DPI 或完整移动端可用性。
 
 普通扩展保留 `DESIGN.md` 与 `.impeccable/design.json`。既有默认原生入口及原生曲线说明漂移未修复；一次检测器报告的局部配色、圆角、字号差异，以及既有不确定进度循环/阴影提示，仅保留为待评估的实际差异，不通过增加 token、禁令或重写系统来消除报告。
+
+
+### T-047 最终安装候选证据补充
+
+最终候选产品为 `b6df40edf2beb560971fee9f8ac94d1381d265ff`，入口与会话 UI/source 相对上述 documenter 核对未变。安装采用私有 CPython 3.12.14、`uv.lock` 固定产品依赖与 4 个产品 wheel，并通过原生 Windows launcher 启动，用户无需另装 Python 或 uv。`runtime-b6df40edf2be` 安装包编译/安装 exit0，Setup SHA256 为 `37865a43f7eed96be4ec410628814c8990c634a755c5636bdbf2414a3bcb18bc`。先前 `6325623` AOT 包实际 GUI/OCR 失败，未作为最终交付，失败记录保留。
+
+本机实际已安装候选版在正常 Windows GUI 下完成 7 项诊断，11.516 秒通过（`.local/t047/installed acceptance/final report.json`）：真实 worker、离线 OCR、保存失败可见恢复、项目重开、忙碌退出以及取消后的草稿与未保存逐层确认。对应 `.process.json` 记录自有进程 exit0、全部结束、无开发目录 DLL；`installed-runtime-worker.json` 记录包态 OCR/worker 检查通过，`installed-runtime-entries.json` 记录桌面、开始菜单和卸载入口及原快捷方式/原 TIFF 哈希保持，`installed-user-launch.json` 记录桌面快捷方式打开响应中的“BioImage WB · 候选版”窗口。源码完整门禁 769 项与全部隔离 wheel exit0。
+
+这些是本机安装候选的实际局部验证，不等于干净 Windows、DPI、物理按钮或科学准确率验收；独立审查最终两项评分与完成状态以 T-047 主任务为准，不宣称完整 ship。documenter 仅核对既有报告，无新增测试、安装、UI 操作或窗口干预。既有 DESIGN.md、sidecar 与未修复漂移维持上述边界。

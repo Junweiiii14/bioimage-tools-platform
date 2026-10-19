@@ -13,12 +13,19 @@ window visible and does not automatically retry the final save. Only the owned h
 shuts down; other application instances are not terminated. The file menu and left
 exit action use the same route as the native window close button.
 
-`tooling/build_candidate.py --iscc <verified compiler>` builds a standalone Windows x64
-candidate from a clean commit using the locked Nuitka version, then compiles the Inno
-Setup recipe. The installer has independent identity/directories/shortcuts and retains
-project folders on uninstall. Build outputs, models and private data are not committed.
+The accepted T047 Windows candidate uses `python -m tooling.build_runtime_candidate
+--iscc <verified compiler> --gcc <verified compiler>` from a clean checkout. It bundles
+the same private CPython 3.12.14, locked production dependencies and four installed
+product wheels. A native launcher uses the private interpreter with isolated imports,
+forwards arguments/standard streams, waits for its exit and owns only its process tree.
+The Inno installer has independent identity/directories/shortcuts and retains project
+folders on uninstall. No external Python/uv is required. Build outputs, models and private
+data are not committed. Unused Qt QML/development headers are excluded; the application
+uses QtWidgets/WebEngineWidgets. The earlier `build_candidate.py` full-AOT experiment
+did not pass installed startup/OCR validation and is not the delivered candidate.
 `--verify-installation <new-report.json>` explicitly tests synthetic TIFF import, two-lane
-durable worker results, offline OCR and resource shutdown; its report never replaces an
+durable worker results, offline OCR, save failure/reopen/cancellation and resource shutdown;
+its report never replaces an
 existing file. Passing this diagnostic does not establish scientific accuracy or clean
 Windows/DPI acceptance. See the T047 task for actual build/validation status.
 
