@@ -8,6 +8,7 @@ from dataclasses import asdict, replace
 from hashlib import file_digest, sha256
 from pathlib import Path
 from uuid import uuid4
+from zipfile import ZipFile
 
 from tool_contracts.api import AssetRef
 
@@ -26,7 +27,7 @@ from wb_tool.application.intake_workflow import (
     validate_intake_workflow_ticket,
 )
 from wb_tool.application.laboratory_layout import plan_laboratory_layout
-from wb_tool.application.project_archive import ArchiveRunEvidence
+from wb_tool.application.project_archive import ArchiveRunEvidence, project_runs
 from wb_tool.application.project_restore import project_assets
 
 
@@ -74,6 +75,46 @@ def _publish(stage: Path, target: Path, check: Callable[[], None]) -> None:
         marker.unlink()
     except (OSError, ValueError) as error:
         raise ValueError(f"输出发布未完成：{target}；未完成标记保留。{error}") from error
+
+
+def _freeze_runs(
+    project: WBIntakeOutputProject,
+    supplied: tuple[ArchiveRunEvidence, ...],
+    stage: Path,
+    cancelled: Callable[[], bool],
+) -> tuple[ArchiveRunEvidence, ...]:
+    entries = {entry.run.run_id: entry for entry in supplied}
+    expected = project_runs(project)
+    if len(entries) != len(supplied) or set(entries) - {run.run_id for run in expected}:
+        raise ValueError("输出运行证据重复或不属于当前项目")
+    frozen: list[ArchiveRunEvidence] = []
+    result_bytes = 0
+    for index, run in enumerate(expected, 1):
+        directory = stage / "runs" / f"{index:04d}"
+        directory.mkdir(parents=True)
+        (directory / "run.json").write_bytes(run.model_dump_json().encode())
+        entry = entries.get(run.run_id)
+        try:
+            if entry is None or entry.run != run or entry.error or not entry.request_path:
+                raise ValueError(entry.error if entry and entry.error else "未提供匹配的运行证据")
+            if run.request.size_bytes > 16 * 1024 * 1024:
+                raise ValueError("冻结请求超过16MiB预算")
+            request = directory / "request.json"
+            _copy(entry.request_path, request, run.request, cancelled)
+            result = directory / "result.json"
+            if run.result is not None:
+                if not entry.result_path or run.result.size_bytes > 8 * 1024 * 1024:
+                    raise ValueError("结果路径缺失或超过8MiB预算")
+                result_bytes += run.result.size_bytes
+                if result_bytes > 64 * 1024 * 1024:
+                    raise ValueError("累计结果超过64MiB预算")
+                _copy(entry.result_path, result, run.result, cancelled)
+            frozen.append(ArchiveRunEvidence(run, str(request), str(result) if run.result else ""))
+        except (OSError, ValueError) as error:
+            if cancelled():
+                raise ValueError("结果输出已取消") from error
+            frozen.append(ArchiveRunEvidence(run, error=str(error)))
+    return tuple(frozen)
 
 
 def export_intake_outputs(
@@ -153,7 +194,8 @@ def export_intake_outputs(
         frozen_sources = tuple(
             FigureSourcePath(digest, path) for digest, path in frozen_paths.items()
         )
-        verified = verify_project_evidence(project, runs, cancelled=cancelled)
+        frozen_runs = _freeze_runs(project, runs, stage, cancelled)
+        verified = verify_project_evidence(project, frozen_runs, cancelled=cancelled)
         errors.extend(
             f"运行{record['run_id']}：{record['reason']}"
             for record in verified.records
@@ -252,12 +294,26 @@ def export_intake_outputs(
                     project,
                     frozen_sources,
                     str(stage / "project.zip"),
-                    runs=runs,
+                    runs=frozen_runs,
                     cancelled=cancelled,
                 )
+                with (
+                    ZipFile(stage / "project.zip") as archive,
+                    archive.open("archive.json") as stream,
+                ):
+                    data = stream.read(16 * 1024 * 1024 + 1)
+                if len(data) > 16 * 1024 * 1024:
+                    raise ValueError("归档索引超过16MiB预算")
+                if json.loads(data).get("runs") != list(verified.records):
+                    raise ValueError("归档运行证据在发布前改变，不能宣布完整输出")
             except (OSError, ValueError) as error:
                 check()
-                errors.append(f"可恢复归档未生成：{error}")
+                state = (
+                    "归档未通过完整核验"
+                    if (stage / "project.zip").is_file()
+                    else "可恢复归档未生成"
+                )
+                errors.append(f"{state}：{error}")
         else:
             errors.append("原资产缺项，可恢复归档未生成；已有工作区与结果保持")
         unfinished = [

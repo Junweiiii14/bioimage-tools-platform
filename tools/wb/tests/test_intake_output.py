@@ -3,9 +3,11 @@
 import csv
 import errno
 import json
+from collections.abc import Callable
 from hashlib import sha256
 from io import StringIO
 from pathlib import Path
+from zipfile import ZipFile
 
 import pytest
 from hypothesis import given
@@ -22,6 +24,7 @@ from wb_tool.api import (
     LoadedProjectResult,
     ProjectRowAnalysis,
     StagedProjectArchive,
+    WBFigureProject,
     WBIntakeFigureProject,
     WBIntakeOutputProject,
     analyze_annotations,
@@ -361,3 +364,39 @@ def test_complete_output_requires_verified_runs_and_reexports_without_overwritin
     stage_project_archive(repeated.destination + "/project.zip", str(tmp_path / "restored-again"))
     missing = export_intake_outputs(project, paths[:-1], str(tmp_path / "missing-runs"))
     assert not missing.complete and any("运行" in error for error in missing.errors)
+
+
+@pytest.mark.parametrize("tamper_frozen", (False, True))
+def test_runs_are_frozen_once_and_archive_evidence_cannot_silently_degrade(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, tamper_frozen: bool
+) -> None:
+    from wb_tool.adapters import figure_export
+
+    project, paths, original_runs = full_files(tmp_path)
+    export = figure_export.export_figure_bundle
+
+    def change_after_first_verification(
+        snapshot: WBFigureProject,
+        sources: tuple[FigureSourcePath, ...],
+        destination: str,
+        *,
+        cancelled: Callable[[], bool] = lambda: False,
+        runs: tuple[ArchiveRunEvidence, ...] = (),
+    ) -> str:
+        changed = runs if tamper_frozen else original_runs
+        Path(changed[0].result_path).write_bytes(b"changed after first verification")
+        assert runs[0].result_path != original_runs[0].result_path
+        return export(snapshot, sources, destination, cancelled=cancelled, runs=runs)
+
+    monkeypatch.setattr(figure_export, "export_figure_bundle", change_after_first_verification)
+    destination = tmp_path / "raced-output"
+    prepared = export_intake_outputs(project, paths, str(destination), runs=original_runs)
+    with ZipFile(destination / "project.zip") as archive:
+        index = json.loads(archive.read("archive.json"))
+    if tamper_frozen:
+        assert not prepared.complete
+        assert any("发布前改变" in error for error in prepared.errors)
+        assert index["runs"][0]["verification"] == "unavailable"
+    else:
+        assert prepared.complete and prepared.errors == ()
+        assert index["runs"][0]["verification"] == "verified_result"
