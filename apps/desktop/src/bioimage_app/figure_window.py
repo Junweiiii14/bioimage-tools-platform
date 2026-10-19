@@ -5,15 +5,22 @@ from pathlib import Path
 from threading import Event
 from uuid import uuid4
 
-from PySide6.QtCore import QTimer, Signal
-from PySide6.QtGui import QCloseEvent
+from PySide6.QtCore import QTimer, QUrl, Signal
+from PySide6.QtGui import QAction, QCloseEvent, QColor, QDesktopServices, QFont, QPalette
 from PySide6.QtWidgets import (
     QComboBox,
     QFileDialog,
+    QLabel,
     QMainWindow,
+    QMenu,
     QMessageBox,
     QPushButton,
+    QSizePolicy,
+    QStackedWidget,
     QToolBar,
+    QToolButton,
+    QVBoxLayout,
+    QWidget,
 )
 from tool_contracts.api import AssetRef, DraftSnapshot
 from wb_tool.api import (
@@ -23,6 +30,7 @@ from wb_tool.api import (
     FigureRender,
     FigureRow,
     FigureSourcePath,
+    LoadedFigureTemplate,
     LoadedProjectOCR,
     LoadedProjectResult,
     MetadataBook,
@@ -34,16 +42,19 @@ from wb_tool.api import (
     WBAnalysisProject,
     WBFigureProject,
     WBJob,
+    WBLayoutProject,
     WBProjectOCR,
     WBReply,
     WBRestoredProject,
     WBReviewProject,
     create_figure_project_view,
     create_wb_background,
+    initial_composition,
     prepare_project_analyses,
     project_assets,
     project_with_ocr,
     record_crop_suggestion,
+    with_figure_layout,
 )
 
 from bioimage_app.project_archive import ProjectArchiveSession
@@ -55,14 +66,19 @@ from bioimage_app.storage import AsyncStorage, StorageCommand, StorageReply
 
 class FigureProjectWindow(QMainWindow):
     closed = Signal()
+    workspace_opened = Signal(str)
     measurement_progress = Signal(str)
 
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("WB 自动化 · 多原图与 Fig 拼图项目")
-        self.resize(1300, 950)
+        self.resize(1440, 900)
+        self.setObjectName("wbProjectWindow")
+        self._apply_theme()
         self.view = create_figure_project_view()
-        self.setCentralWidget(self.view)
+        self.surface = QStackedWidget()
+        self.surface.addWidget(self.view)
+        self.setCentralWidget(self.surface)
         self._store = AsyncStorage(self)
         self._background = create_wb_background()
         self._storage_callbacks: dict[str, Callable[[StorageReply], None]] = {}
@@ -95,7 +111,11 @@ class FigureProjectWindow(QMainWindow):
         self._ocr_refresh_timer.setSingleShot(True)
         self._ocr_refresh_timer.timeout.connect(self.refresh_ocr_table)
         bar = QToolBar("项目")
+        bar.setMovable(False)
         self.addToolBar(bar)
+        brand = QLabel("WB  实验图像工作台")
+        brand.setObjectName("appBrand")
+        bar.addWidget(brand)
         self.create_button = QPushButton("新建项目工作区")
         self.open_button = QPushButton("打开项目工作区")
         self.restore_button = QPushButton("从 ZIP 恢复")
@@ -104,18 +124,69 @@ class FigureProjectWindow(QMainWindow):
         self.new_button = QPushButton("复用模板新建项目")
         self.cancel_button = QPushButton("取消当前任务")
         self.documents = QComboBox()
-        self.documents.setMinimumWidth(240)
-        for button in (
-            self.create_button,
-            self.open_button,
-            self.restore_button,
-            self.import_button,
-            self.save_button,
-            self.new_button,
-            self.cancel_button,
-            self.documents,
-        ):
+        self.documents.setMinimumWidth(160)
+        bar.addWidget(self.documents)
+        spacer = QWidget()
+        spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        bar.addWidget(spacer)
+        for button in (self.import_button, self.save_button, self.cancel_button):
             bar.addWidget(button)
+        # Keep the existing buttons as command/state owners for host contracts and tests.
+        self.project_menu = QMenu("项目", self)
+        self.project_actions: list[tuple[QAction, QPushButton]] = []
+        for button in (self.create_button, self.open_button, self.restore_button, self.new_button):
+            button.setParent(self)
+            button.hide()
+            action = self.project_menu.addAction(button.text())
+            action.triggered.connect(button.click)
+            self.project_actions.append((action, button))
+        self.project_menu_button = QToolButton()
+        self.project_menu_button.setText("项目菜单")
+        self.project_menu_button.setMenu(self.project_menu)
+        self.project_menu_button.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+        bar.addWidget(self.project_menu_button)
+        self.documents.setMaximumWidth(280)
+        self.documents.setAccessibleName("当前工作区内的项目")
+        self.import_button.setObjectName("primaryAction")
+        self.welcome = QWidget()
+        self.welcome.setObjectName("welcomePage")
+        welcome_layout = QVBoxLayout(self.welcome)
+        welcome_layout.setContentsMargins(48, 32, 48, 32)
+        welcome_layout.setSpacing(12)
+        title = QLabel("开始一个 WB 实验项目")
+        title.setObjectName("welcomeTitle")
+        welcome_layout.addWidget(title)
+        description = QLabel(
+            "从原图裁剪、定量复核到拼图导出，按四个步骤完成。\n工作区会保存原图、项目配置和运行结果。"
+        )
+        description.setWordWrap(True)
+        welcome_layout.addWidget(description)
+        workflow = QLabel(
+            "1   原图与裁剪     导入原图，明确泳道与裁剪区域\n\n"
+            "2   定量与复核     检查边界、基线和来源结果\n\n"
+            "3   拼图排版        调整分段、标签和完整拼图\n\n"
+            "4   导出               保存展示图、结果表或完整项目"
+        )
+        workflow.setObjectName("welcomeWorkflow")
+        workflow.setWordWrap(True)
+        welcome_layout.addWidget(workflow)
+        welcome_layout.addSpacing(12)
+        self.welcome_buttons: list[tuple[QPushButton, QPushButton]] = []
+        for label, owner in (
+            ("新建项目工作区…", self.create_button),
+            ("打开已有工作区…", self.open_button),
+            ("从完整项目 ZIP 恢复…", self.restore_button),
+        ):
+            button = QPushButton(label)
+            button.setMaximumWidth(300)
+            button.clicked.connect(owner.click)
+            welcome_layout.addWidget(button)
+            self.welcome_buttons.append((button, owner))
+        self.welcome_status = QLabel("请选择一个工作区开始；已有工作区可继续上次进度。")
+        self.welcome_status.setWordWrap(True)
+        welcome_layout.addWidget(self.welcome_status)
+        welcome_layout.addStretch()
+        self.surface.addWidget(self.welcome)
         self.create_button.clicked.connect(lambda: self._choose_workspace(True))
         self.open_button.clicked.connect(lambda: self._choose_workspace(False))
         self.restore_button.clicked.connect(self._choose_restore)
@@ -129,7 +200,22 @@ class FigureProjectWindow(QMainWindow):
         self.view.export_requested.connect(self._choose_export)
         self.view.image_export_requested.connect(self._choose_image_export)
         self.view.font_requested.connect(self._choose_font)
+        self.view.template_export_requested.connect(self._choose_template_export)
+        self.view.template_import_requested.connect(self._choose_template_import)
         self.view.detection_requested.connect(self.detect_crops)
+        from bioimage_app.automatic_workflow import AutomaticWorkflow
+
+        self.automatic = AutomaticWorkflow(self)
+        self.output_button = QPushButton("打开结果文件夹")
+        self.output_button.setEnabled(False)
+        bar.addWidget(self.output_button)
+        self.output_button.clicked.connect(
+            lambda: QDesktopServices.openUrl(QUrl.fromLocalFile(self.automatic.last_output_path))
+        )
+        self.automatic.finished.connect(self._automatic_output_ready)
+        self.view.automatic_requested.connect(self.automatic.analyze)
+        self.view.automatic_export_requested.connect(self.automatic.choose_export)
+        self.view.import_directory_requested.connect(self.automatic.choose_directory)
         self.view.metadata.import_requested.connect(self._choose_metadata_import)
         self.view.metadata.thumbnails_requested.connect(self.load_thumbnails)
         self.view.analysis.run_requested.connect(self.analyze_project)
@@ -144,14 +230,109 @@ class FigureProjectWindow(QMainWindow):
         self.view.normalization.export_requested.connect(self._choose_normalization_export)
         self.view.changed.connect(self._queue_ocr_refresh)
         self.view.changed.connect(self._cancel_stale_export)
+        for widget in self.findChildren(QWidget):
+            widget.setPalette(self.palette())
+        self.view.status.setText("请选择一个工作区开始；已有工作区可继续上次进度。")
         self._controls()
+
+    def _apply_theme(self) -> None:
+        self.setFont(QFont("Microsoft YaHei UI", 10))
+        palette = QPalette(self.palette())
+        for role, color in (
+            (QPalette.ColorRole.Window, "#f3f6f7"),
+            (QPalette.ColorRole.WindowText, "#24363b"),
+            (QPalette.ColorRole.Base, "#ffffff"),
+            (QPalette.ColorRole.AlternateBase, "#f0f5f5"),
+            (QPalette.ColorRole.Text, "#24363b"),
+            (QPalette.ColorRole.Button, "#fafcfc"),
+            (QPalette.ColorRole.ButtonText, "#24363b"),
+            (QPalette.ColorRole.Highlight, "#087677"),
+            (QPalette.ColorRole.HighlightedText, "#ffffff"),
+            (QPalette.ColorRole.ToolTipBase, "#ffffff"),
+            (QPalette.ColorRole.ToolTipText, "#24363b"),
+        ):
+            for group in (
+                QPalette.ColorGroup.Active,
+                QPalette.ColorGroup.Inactive,
+                QPalette.ColorGroup.Disabled,
+            ):
+                palette.setColor(group, role, QColor(color))
+        self.setPalette(palette)
+        self.setStyleSheet("""
+            QMainWindow#wbProjectWindow { background: #f3f6f7; color: #24363b; }
+            QLabel, QCheckBox, QRadioButton { color: #24363b; background: transparent; }
+            QLabel:disabled, QCheckBox:disabled, QRadioButton:disabled { color: #697a84; }
+            QScrollArea, QScrollArea > QWidget, QScrollArea > QWidget > QWidget {
+                background: #ffffff; color: #24363b; }
+            QPlainTextEdit, QTextEdit { background: #ffffff; color: #24363b; }
+            QDoubleSpinBox { background: #ffffff; color: #24363b;
+                border: 1px solid #cbd8dd; padding: 4px; }
+            QSplitter::handle { background: #d3dde2; }
+            QTableCornerButton::section { background: #f0f5f5; border: 0; }
+            QToolBar { background: #ffffff; border: 0; padding: 10px 16px; spacing: 10px; }
+            QLabel#appBrand { font-size: 16px; font-weight: 600; padding-right: 12px; }
+            QPushButton, QToolButton { color: #24363b; background: #ffffff;
+                border: 1px solid #cbd8dd; border-radius: 5px; padding: 5px 9px; }
+            QPushButton:hover, QToolButton:hover { background: #eaf5f3; border-color: #087677; }
+            QPushButton:focus, QToolButton:focus { border: 2px solid #087677; }
+            QPushButton:disabled, QToolButton:disabled { color: #697a84; background: #edf1f3;
+                border-color: #d3dde2; }
+            QPushButton#primaryAction { color: #ffffff; background: #087677;
+                border-color: #087677; }
+            QPushButton#primaryAction:disabled { color: #697a84; background: #edf1f3; }
+            QLineEdit, QSpinBox, QComboBox { color: #24363b; background: #ffffff;
+                padding: 4px; border: 1px solid #cbd8dd; border-radius: 3px; }
+            QLineEdit:focus, QSpinBox:focus, QComboBox:focus { border-color: #087677; }
+            QTabWidget::pane { border: 1px solid #c8d4dc; background: #ffffff; }
+            QTabBar::tab { color: #405660; background: #edf2f5; padding: 7px 12px; }
+            QTabBar::tab:selected { color: #096568; background: #eaf5f3;
+                border-bottom: 2px solid #087677; }
+            QTableWidget { background: #ffffff; color: #24363b; gridline-color: #dce4e9;
+                selection-background-color: #dff1ed; selection-color: #096568; }
+            QHeaderView::section { background: #f0f5f5; color: #344c59;
+                border: 0; border-bottom: 1px solid #c8d4dc; padding: 6px; }
+            QWidget#workflowNavigation { background: #ffffff; }
+            QListWidget#workflowSteps { background: #ffffff; border: 0; padding: 0; }
+            QListWidget#workflowSteps::item { color: #526970; padding: 10px 20px;
+                border-bottom: 3px solid transparent; }
+            QListWidget#workflowSteps::item:selected { background: #eff7f6;
+                color: #096568; border-bottom: 3px solid #087677; }
+            QListWidget#workflowSteps::item:hover { background: #f0f5f5; }
+            QListWidget#evidenceSources { background: #ffffff; border: 0; }
+            QListWidget#evidenceSources::item { padding: 5px 7px; color: #24363b; }
+            QListWidget#evidenceSources::item:selected { background: #eaf5f3; color: #096568; }
+            QListWidget#evidenceSources::item:hover { background: #f0f5f5; }
+            QWidget#evidenceWorkbench, QWidget#evidenceStage { background: #f3f6f7; }
+            QWidget#evidenceControls, QWidget#evidenceReview { background: #ffffff; }
+            QLabel#evidenceHeading { font-size: 14px; font-weight: 600; }
+            QLabel#evidenceSummary { color: #526970; }
+            QLabel#stepTitle { font-size: 19px; font-weight: 600; color: #24363b; }
+            QLabel#stepHelp { color: #405660; padding-bottom: 3px; }
+            QLabel#projectCaption { color: #536771; font-size: 11px; }
+            QLineEdit#projectName { background: transparent; font-size: 14px; font-weight: 600;
+                border: 0; padding: 3px 6px; }
+            QLineEdit#projectName:focus { background: #ffffff; border: 1px solid #087677; }
+            QLabel#welcomeWorkflow { background: #e8eef1; padding: 22px; color: #344c59; }
+            QLabel#exportHeading { font-size: 17px; font-weight: 600; }
+            QLabel#welcomeTitle { font-size: 24px; font-weight: 600; }
+            QMenu { color: #24363b; background: #ffffff; border: 1px solid #cbd8dd; }
+            QMenu::item { padding: 8px 20px; }
+            QMenu::item:selected { color: #ffffff; background: #087677; }
+            QComboBox QAbstractItemView { color: #24363b; background: #ffffff;
+                selection-background-color: #087677; selection-color: #ffffff; }
+        """)
 
     def cancel(self) -> None:
         self._cancellation.set()
+        self.automatic.cancel()
         if self._measurement_session:
             self._measurement_session.cancel()
         if self._ocr_session:
             self._ocr_session.cancel()
+
+    def _automatic_output_ready(self, path: str) -> None:
+        self.output_button.setEnabled(True)
+        self.output_button.setToolTip(path)
 
     def _choose_restore(self) -> None:
         source, _ = QFileDialog.getOpenFileName(self, "选择项目 ZIP 归档", "", "ZIP (*.zip)")
@@ -286,7 +467,9 @@ class FigureProjectWindow(QMainWindow):
         self._ocr_refresh_pending = True
         self._ocr_refresh_timer.start(150)
 
-    def refresh_ocr_table(self, message: str = "关联与归一化结果已刷新") -> None:
+    def refresh_ocr_table(
+        self, message: str = "关联与归一化结果已刷新", after: Callable[[], None] | None = None
+    ) -> None:
         if self._busy or not self._workspace or self._closing:
             return
         self._ocr_refresh_timer.stop()
@@ -308,6 +491,8 @@ class FigureProjectWindow(QMainWindow):
                 self.view.ocr.result_view.show_cells(reply.value.ocr_cells)
                 self.view.normalization.result_view.show_snapshot(reply.value.normalization)
                 self._done(message)
+                if after and not self._closing and not self._cancellation.is_set():
+                    after()
             else:
                 self._done("项目已改变，未写入过期OCR关联表")
 
@@ -607,7 +792,13 @@ class FigureProjectWindow(QMainWindow):
         if self._closing:
             session.cancel()
 
-    def analyze_project(self, all_rows: bool = False) -> None:
+    def analyze_project(
+        self,
+        all_rows: bool = False,
+        *,
+        row_ids: tuple[str, ...] | None = None,
+        after: Callable[[], None] | None = None,
+    ) -> None:
         if self._busy or not self._workspace:
             return
         try:
@@ -615,10 +806,14 @@ class FigureProjectWindow(QMainWindow):
             if not isinstance(project, WBAnalysisProject):
                 raise ValueError("请先配置已审核行的定量")
             selected = self.view.selected_row()
-            row_ids = tuple(
-                p.row_id
-                for p in project.analyses
-                if all_rows or (selected and p.row_id == selected.row_id)
+            row_ids = (
+                row_ids
+                if row_ids is not None
+                else tuple(
+                    p.row_id
+                    for p in project.analyses
+                    if all_rows or (selected and p.row_id == selected.row_id)
+                )
             )
             prepared = prepare_project_analyses(
                 project, row_ids, 0 if self._saved_revision is None else self._saved_revision + 1
@@ -635,12 +830,17 @@ class FigureProjectWindow(QMainWindow):
                 return
             current = self.view.project()
             assert isinstance(current, WBAnalysisProject)
-            self._start_measurements(current, row_ids)
+            self._start_measurements(current, row_ids, after=after)
 
         self.save(after=saved)
 
     def _start_measurements(
-        self, project: WBAnalysisProject, row_ids: tuple[str, ...], *, restore: bool = False
+        self,
+        project: WBAnalysisProject,
+        row_ids: tuple[str, ...],
+        *,
+        restore: bool = False,
+        after: Callable[[], None] | None = None,
     ) -> None:
         generation = self.view.generation
         self._start()
@@ -684,16 +884,23 @@ class FigureProjectWindow(QMainWindow):
             if not restore:
                 self.view.set_project(completion.project)
                 self.view.generation += 1
-                self.save(after=lambda: self.refresh_project_table(message))
+                self.save(
+                    after=lambda: self.refresh_project_table(
+                        message,
+                        after=after if not completion.cancelled else None,
+                    )
+                )
             else:
-                self.refresh_project_table(message)
+                self.refresh_project_table(message, after=after)
 
         session.finished.connect(completed)
         session.start(project, row_ids, self._workspace, restore=restore)
         if self._closing:
             session.cancel()
 
-    def refresh_project_table(self, message: str = "项目结果表已刷新") -> None:
+    def refresh_project_table(
+        self, message: str = "项目结果表已刷新", after: Callable[[], None] | None = None
+    ) -> None:
         if self._busy or not self._workspace:
             return
         try:
@@ -715,9 +922,11 @@ class FigureProjectWindow(QMainWindow):
             self.view.analysis.show_cells(reply.value.cells)
             if isinstance(project, WBProjectOCR) and not self._closing:
                 self._busy = False
-                self.refresh_ocr_table(message)
+                self.refresh_ocr_table(message, after=after)
             else:
                 self._done(message)
+                if after and not self._closing and not self._cancellation.is_set():
+                    after()
 
         self._wb(
             WBJob("project_table", document=project, project_results=self._project_results), filled
@@ -803,6 +1012,46 @@ class FigureProjectWindow(QMainWindow):
             self._error(str(error))
 
     @property
+    def workspace_path(self) -> str:
+        return self._workspace
+
+    @property
+    def operation_busy(self) -> bool:
+        return self._busy
+
+    @property
+    def is_closing(self) -> bool:
+        return self._closing
+
+    @property
+    def cancellation(self) -> Event:
+        return self._cancellation
+
+    @property
+    def source_paths(self) -> dict[str, str]:
+        return dict(self._paths)
+
+    def end_phase(self) -> None:
+        self._busy = False
+
+    def begin_operation(self) -> None:
+        self._start()
+
+    def finish_operation(self, message: str) -> None:
+        self._done(message)
+
+    def fail_operation(self, message: str) -> None:
+        self._error(message)
+
+    def submit_tool_job(
+        self, job: WBJob, callback: Callable[[WBReply], None], *, accept_errors: bool = False
+    ) -> None:
+        self._wb(job, callback, accept_errors=accept_errors)
+
+    def submit_export_job(self, job: WBJob, callback: Callable[[WBReply], None]) -> None:
+        self._export_with_evidence(job, callback)
+
+    @property
     def resources_closed(self) -> bool:
         return self._store_closed and self._background_closed and self._restore_job is None
 
@@ -817,6 +1066,14 @@ class FigureProjectWindow(QMainWindow):
         self.documents.setEnabled(idle and bool(self._workspace))
         self.cancel_button.setEnabled(self._busy and not self._closing)
         self.view.setEnabled(idle and bool(self._workspace))
+        self.surface.setCurrentWidget(self.view if self._workspace else self.welcome)
+        self.welcome_status.setText(
+            "正在处理工作区，请稍候。" if self._busy else self.view.status.text()
+        )
+        for action, button in self.project_actions:
+            action.setEnabled(button.isEnabled())
+        for welcome_button, button in self.welcome_buttons:
+            welcome_button.setEnabled(button.isEnabled())
 
     def _start(self) -> None:
         self._busy = True
@@ -901,7 +1158,7 @@ class FigureProjectWindow(QMainWindow):
             if not rows:
                 raise ValueError("请选择有原图的行")
             pending = [
-                (r, self.view.suggestions.settings(r, project.template.crop_height)) for r in rows
+                (r, self.view.suggestions.settings(r, project.crop_height_for(r))) for r in rows
             ]
         except ValueError as error:
             self._error(str(error))
@@ -1007,21 +1264,27 @@ class FigureProjectWindow(QMainWindow):
                 if isinstance(document, DraftSnapshot) and document.tool_id == "wb-figure":
                     self.documents.addItem(document.document_id, document.document_id)
         self._done("项目工作区已就绪；批量导入原图或选择已保存项目。")
+        self.workspace_opened.emit(self._workspace)
 
     def _choose_import(self) -> None:
         paths, _ = QFileDialog.getOpenFileNames(
             self, "选择同一项目的原始 TIFF", "", "TIFF (*.tif *.tiff)"
         )
         if paths:
-            self.import_images(tuple(paths))
+            self.import_images(tuple(paths), automatic=True)
 
     def new_project(self) -> None:
         if self._busy or not self._workspace:
             return
 
         def create() -> None:
-            template = self.view.project().template
+            previous = self.view.project()
+            template = previous.template
             project = WBFigureProject(project_id=uuid4().hex, template=template)
+            if isinstance(previous, WBLayoutProject):
+                project = with_figure_layout(
+                    project, initial_composition(project), previous.layout_style
+                )
             self.view.set_project(project)
             self._project_results = ()
             self._loaded_ocr = None
@@ -1031,7 +1294,7 @@ class FigureProjectWindow(QMainWindow):
 
         self.save(after=create)
 
-    def import_images(self, paths: tuple[str, ...]) -> None:
+    def import_images(self, paths: tuple[str, ...], *, automatic: bool = False) -> None:
         if self._busy or not self._workspace:
             return
         try:
@@ -1043,6 +1306,7 @@ class FigureProjectWindow(QMainWindow):
         pending = list(paths)
         duplicates = 0
         errors: list[str] = []
+        imported_ids: list[str] = []
         generation = self.view.generation
 
         def next_image() -> None:
@@ -1056,6 +1320,13 @@ class FigureProjectWindow(QMainWindow):
                     f"导入结束；跳过 {duplicates} 个重复原图，{len(errors)} 个失败。"
                     + ("; ".join(errors[:3]) if errors else "请填写名称并复核裁剪。")
                 )
+                if (
+                    automatic
+                    and (imported_ids or errors)
+                    and not self._cancellation.is_set()
+                    and not self._closing
+                ):
+                    self.automatic.analyze(row_ids=tuple(imported_ids), import_errors=tuple(errors))
                 return
             if len(self.view.project().rows) >= 512:
                 self._done(f"项目已达 512 行；剩余 {len(pending)} 张未导入，请另建项目。")
@@ -1098,22 +1369,32 @@ class FigureProjectWindow(QMainWindow):
                             row_id=uuid4().hex,
                             source=asset,
                             filename=Path(path).name,
+                            protein=f"Source {len(current.rows) + 1:03d}",
                             width=raster.width,
                             height=raster.height,
                             bit_depth=16 if raster.bit_depth == 16 else 8,
-                            figure=current.figure_order[-1] if current.figure_order else "Fig1",
+                            figure=(
+                                f"Fig{len(current.rows) + 1}"
+                                if automatic
+                                else current.figure_order[-1]
+                                if current.figure_order
+                                else "Fig1"
+                            ),
                         )
                         self.view.set_project(
                             current.model_copy(
                                 update={
                                     "rows": (*current.rows, row),
-                                    "figure_order": current.figure_order or ("Fig1",),
+                                    "figure_order": tuple(
+                                        dict.fromkeys((*current.figure_order, row.figure))
+                                    ),
                                 }
                             )
                         )
                         self.view.generation += 1
                         generation = self.view.generation
                         self.view.install_thumbnail(raster)
+                        imported_ids.append(row.row_id)
                         next_image()
 
                     self._storage(StorageCommand("asset", asset=asset), resolved)
@@ -1142,6 +1423,9 @@ class FigureProjectWindow(QMainWindow):
         self._start()
 
         def previewed(reply: WBReply) -> None:
+            if self._closing or self._cancellation.is_set():
+                self._done("原图预览已停止")
+                return
             if not isinstance(reply.value, PreviewRaster) or reply.value.sha256 != asset.sha256:
                 self._error("原图来源不一致")
                 return
@@ -1151,7 +1435,18 @@ class FigureProjectWindow(QMainWindow):
                 "框选时请排除 Marker。"
             )
 
-        self._wb(WBJob("preview", path=self._paths[asset.sha256]), previewed)
+        self._wb(WBJob("preview", path=self._paths[asset.sha256]), previewed, accept_errors=True)
+
+    def select_initial_source(self) -> None:
+        if self._closing or self._cancellation.is_set():
+            return
+        project = self.view.project()
+        if project.rows:
+            index = next((i for i, row in enumerate(project.rows) if row.roi), 0)
+            if self.view.table.currentRow() != index:
+                self.view.table.setCurrentCell(index, 0)
+            else:
+                self.select_source(project.rows[index].row_id)
 
     def save(
         self,
@@ -1268,6 +1563,7 @@ class FigureProjectWindow(QMainWindow):
                                     analysis_project,
                                     tuple(p.row_id for p in analysis_project.analyses),
                                     restore=True,
+                                    after=self.select_initial_source,
                                 )
 
                             if isinstance(project, WBProjectOCR) and project.ocr is not None:
@@ -1276,6 +1572,7 @@ class FigureProjectWindow(QMainWindow):
                                 measurements()
                         else:
                             self._done("项目已恢复，原图资产已校验。选择一行查看原图。")
+                            self.select_initial_source()
                         return
                     asset = pending.pop(0)
 
@@ -1318,7 +1615,8 @@ class FigureProjectWindow(QMainWindow):
                     self._busy = False
                     self.refresh_project_table(
                         f"项目已恢复；{len(reply.value.errors)} 条运行证据不可用。"
-                        "历史来源见结果表。"
+                        "历史来源见结果表。",
+                        after=self.select_initial_source,
                     )
 
             self._wb(
@@ -1429,6 +1727,147 @@ class FigureProjectWindow(QMainWindow):
             )
 
         self.save(after=run)
+
+    def _choose_template_export(self) -> None:
+        destination, _ = QFileDialog.getSaveFileName(
+            self,
+            "保存新的模板文件",
+            "",
+            "WB 模板 (*.wbtemplate)",
+            options=QFileDialog.Option.DontConfirmOverwrite,
+        )
+        if destination:
+            self.export_template(destination)
+
+    def export_template(self, destination: str) -> None:
+        if self._busy or not self._workspace or self._closing:
+            return
+        try:
+            project = self.view.project()
+        except ValueError as error:
+            self._error(str(error))
+            return
+        generation = self.view.generation
+        self._start()
+        self._export_generation = generation
+
+        def exported(reply: WBReply) -> None:
+            if isinstance(reply.value, str) and not reply.error:
+                self._done("模板文件已保存；只包含所选修订的排版设置和字体。")
+            elif self._closing or self._cancellation.is_set() or generation != self.view.generation:
+                self._done("模板导出已取消或项目已修改；当前编辑保留。")
+            else:
+                self._error(reply.error or "模板导出结果无效")
+
+        self._wb(
+            WBJob(
+                "template_export",
+                document=project,
+                destination=destination,
+                sources=tuple(FigureSourcePath(sha, path) for sha, path in self._paths.items()),
+                cancellation=self._cancellation,
+            ),
+            exported,
+            accept_errors=True,
+        )
+
+    def _choose_template_import(self) -> None:
+        path, _ = QFileDialog.getOpenFileName(
+            self, "导入模板并新建项目", "", "WB 模板 (*.wbtemplate)"
+        )
+        if path:
+            self.import_template(path)
+
+    def import_template(self, path: str) -> None:
+        if self._busy or not self._workspace or self._closing:
+            return
+        generation = self.view.generation
+        self._start()
+
+        def obsolete() -> bool:
+            if self._closing or self._cancellation.is_set() or generation != self.view.generation:
+                self._done("模板导入已取消或项目已修改；当前项目保持。")
+                return True
+            return False
+
+        def parsed(reply: WBReply) -> None:
+            if obsolete():
+                return
+            if reply.error or not isinstance(reply.value, LoadedFigureTemplate):
+                self._error(reply.error or "模板读取结果无效")
+                return
+            loaded = reply.value
+
+            def current_saved() -> None:
+                if obsolete():
+                    return
+                self._busy = True
+                self._controls()
+
+                def install(asset: AssetRef | None = None, asset_path: str = "") -> None:
+                    if obsolete():
+                        return
+                    template = loaded.spec.template.model_copy(update={"font": asset})
+                    fresh: WBFigureProject = WBFigureProject(
+                        project_id=uuid4().hex, template=template
+                    )
+                    if loaded.spec.layout_style is not None:
+                        fresh = with_figure_layout(
+                            fresh, initial_composition(fresh), loaded.spec.layout_style
+                        )
+                    self._paths = {asset.sha256: asset_path} if asset is not None else {}
+                    self.view.set_project(fresh)
+                    self.view.generation += 1
+                    self._saved_revision = None
+                    self._project_results = ()
+                    self._loaded_ocr = None
+                    self._done("模板已导入并新建空项目；原项目已保存，请导入本次实验的原图。")
+
+                descriptor = loaded.spec.font
+                if descriptor is None:
+                    install()
+                    return
+
+                def imported(storage_reply: StorageReply) -> None:
+                    if obsolete():
+                        return
+                    if storage_reply.error_code or not isinstance(storage_reply.value, AssetRef):
+                        self._error(storage_reply.message or "模板字体导入失败")
+                        return
+                    asset = storage_reply.value
+
+                    def resolved(storage_reply: StorageReply) -> None:
+                        if obsolete():
+                            return
+                        if storage_reply.error_code or not isinstance(storage_reply.value, str):
+                            self._error(storage_reply.message or "模板字体路径无效")
+                            return
+                        install(asset, storage_reply.value)
+
+                    self._storage(
+                        StorageCommand("asset", asset=asset), resolved, accept_errors=True
+                    )
+
+                self._storage(
+                    StorageCommand(
+                        "import_bytes",
+                        path=descriptor.filename,
+                        data=loaded.font_data,
+                        source_sha256=descriptor.sha256,
+                    ),
+                    imported,
+                    accept_errors=True,
+                )
+
+            # Save the previous experiment before replacing its draft with an empty project.
+            self._busy = False
+            self.save(after=current_saved)
+
+        self._wb(
+            WBJob("template_read", path=path, cancellation=self._cancellation),
+            parsed,
+            accept_errors=True,
+        )
 
     def _choose_font(self) -> None:
         path, _ = QFileDialog.getOpenFileName(

@@ -10,7 +10,6 @@ from zipfile import ZipFile
 import pytest
 from bioimage_app.project_restore import restore_archive_workspace
 from platform_runtime.api import IntegrityError, StateConflict, Workspace
-from PySide6.QtWidgets import QTabWidget
 from pytestqt.qtbot import QtBot
 from wb_tool.api import (
     WBRestoredProject,
@@ -95,9 +94,7 @@ def test_ui_restore_reopen_edit_recompute_and_restore_again(
     assert window.view.history_label.text()
     capture = os.environ.get("BIOIMAGE_RESTORE_CAPTURE")
     if capture:
-        tabs = window.view.findChild(QTabWidget)
-        assert tabs
-        tabs.setCurrentWidget(window.view.analysis)
+        window.view.show_section("analysis")
         assert window.grab().save(capture)
     window.close()
     qtbot.waitUntil(lambda: window.resources_closed, timeout=20000)

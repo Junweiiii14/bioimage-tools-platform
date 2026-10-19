@@ -12,7 +12,7 @@ import tifffile
 from PIL import Image
 from PySide6.QtCore import Qt
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QFileDialog, QTabWidget
+from PySide6.QtWidgets import QFileDialog
 from pytestqt.qtbot import QtBot
 from wb_tool.api import WBNormalizedProject, render_figure
 
@@ -91,9 +91,7 @@ def test_full_tiff_png_export_real_ocr_fill_and_reopen(
     assert item(window.view.normalization.results, 0, 8).text() == "0.5"
     capture = os.environ.get("BIOIMAGE_DIRECT_IMAGE_CAPTURE")
     if capture:
-        tabs = window.view.findChild(QTabWidget)
-        assert tabs
-        tabs.setCurrentWidget(window.view.ocr)
+        window.view.show_section("ocr")
         assert window.grab().save(capture)
     window.close()
     qtbot.waitUntil(lambda: window.resources_closed, timeout=20000)

@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from wb_tool.ui.figure_view import FigureProjectView
     from wb_tool.ui.view import WBView
 
+from wb_tool.adapters.automatic import automatic_project_row
 from wb_tool.adapters.metadata_input import read_metadata_file
 from wb_tool.adapters.ocr_input import OCRImage, load_ocr_image
 from wb_tool.adapters.tiff_input import ImageInputError, LoadedTiff, load_tiff
@@ -23,6 +24,17 @@ from wb_tool.application.analysis import (
     LaneAnalysis,
     LaneAnnotation,
     analyze_annotations,
+)
+from wb_tool.application.automatic import (
+    AutomaticRowEvidence,
+    AutomaticWBResult,
+    WBAutomaticProject,
+    install_automatic_request,
+    install_automatic_result,
+    row_is_ready,
+    suggest_analysis_for_crop,
+    suggest_automatic_wb,
+    with_automatic_rows,
 )
 from wb_tool.application.crop import CropRequest
 from wb_tool.application.crop_suggestions import (
@@ -43,6 +55,22 @@ from wb_tool.application.figure_project import (
     FigureTemplate,
     WBFigureProject,
     plan_figure_layout,
+)
+from wb_tool.application.figure_template import (
+    LoadedFigureTemplate,
+    PortableFigureTemplate,
+    TemplateFont,
+)
+from wb_tool.application.laboratory_layout import (
+    FigureColumn,
+    FigureComposition,
+    FigureLayoutStyle,
+    FigureSlice,
+    LaboratoryLayout,
+    WBLayoutProject,
+    initial_composition,
+    plan_laboratory_layout,
+    with_figure_layout,
 )
 from wb_tool.application.ocr_protocol import (
     OCRConversation,
@@ -131,6 +159,7 @@ from wb_tool.application.worker_protocol import (
     worker_protocol_schema,
 )
 from wb_tool.application.worksheet import WorksheetCell, fill_worksheet, propose_worksheet
+from wb_tool.domain.automatic import AutoWBSettings, detect_automatic_geometry
 from wb_tool.domain.crop_detection import (
     CropCandidate,
     CropDetection,
@@ -159,6 +188,32 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "automatic_project_row",
+    "with_automatic_rows",
+    "AutoWBSettings",
+    "AutomaticRowEvidence",
+    "AutomaticWBResult",
+    "WBAutomaticProject",
+    "detect_automatic_geometry",
+    "install_automatic_request",
+    "install_automatic_result",
+    "row_is_ready",
+    "suggest_analysis_for_crop",
+    "suggest_automatic_wb",
+    "LoadedFigureTemplate",
+    "PortableFigureTemplate",
+    "TemplateFont",
+    "export_figure_template",
+    "read_figure_template",
+    "FigureColumn",
+    "FigureComposition",
+    "FigureLayoutStyle",
+    "FigureSlice",
+    "LaboratoryLayout",
+    "WBLayoutProject",
+    "initial_composition",
+    "plan_laboratory_layout",
+    "with_figure_layout",
     "export_figure_image",
     "RestoredProjectResults",
     "StagedProjectArchive",
@@ -469,3 +524,23 @@ def inspect_project_archive(
     from wb_tool.adapters.archive_restore import inspect_project_archive as inspect
 
     return inspect(source, cancelled=cancelled)
+
+
+def export_figure_template(
+    project: WBFigureProject,
+    sources: tuple[FigureSourcePath, ...],
+    destination: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> str:
+    from wb_tool.adapters.figure_template_io import export_figure_template as export
+
+    return export(project, sources, destination, cancelled=cancelled)
+
+
+def read_figure_template(
+    source: str, *, cancelled: Callable[[], bool] = lambda: False
+) -> LoadedFigureTemplate:
+    from wb_tool.adapters.figure_template_io import read_figure_template as read
+
+    return read(source, cancelled=cancelled)

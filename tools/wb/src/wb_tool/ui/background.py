@@ -18,6 +18,7 @@ from wb_tool.application.crop_suggestions import CropSuggestion, read_figure_pro
 from wb_tool.application.desktop_data import PreviewRaster, ProjectDerivedTables, WBJob, WBReply
 from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
 from wb_tool.application.figure_project import FigurePNG, FigureRender, WBFigureProject
+from wb_tool.application.figure_template import LoadedFigureTemplate
 from wb_tool.application.project_analysis import (
     LoadedProjectResult,
     ProjectTableSnapshot,
@@ -44,6 +45,16 @@ from wb_tool.domain.worksheet import OCRRecognition
 class _Work(QObject):
     replied = Signal(object)
 
+    def __init__(self) -> None:
+        super().__init__()
+        self._owner_thread = self.thread()
+
+    @Slot()
+    def retire(self) -> None:
+        worker_thread = self.thread()
+        self.moveToThread(self._owner_thread)
+        worker_thread.quit()
+
     @Slot(str, object)
     def execute(self, request_id: str, job: WBJob) -> None:
         try:
@@ -68,6 +79,7 @@ class _Work(QObject):
                 | WBFigureProject
                 | FigureRender
                 | FigurePNG
+                | LoadedFigureTemplate
                 | MetadataBook
                 | CropSuggestion
                 | LoadedProjectResult
@@ -80,7 +92,30 @@ class _Work(QObject):
                 | bytes
                 | str
             )
-            if job.operation == "project_evidence":
+            if job.operation == "discover_tiffs":
+                from wb_tool.adapters.automatic_export import discover_tiffs
+
+                value = discover_tiffs(job.path, cancelled=cancel)
+            elif job.operation == "automatic_row":
+                from wb_tool.adapters.automatic import automatic_project_row
+
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少自动分析项目")
+                value = automatic_project_row(job.path, job.document, job.row_id, cancelled=cancel)
+            elif job.operation == "automatic_export":
+                from wb_tool.adapters.automatic_export import export_automatic_results
+
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少自动结果项目")
+                value = export_automatic_results(
+                    job.document,
+                    job.sources,
+                    job.destination,
+                    runs=job.archive_runs or (),
+                    processing_errors=job.processing_errors,
+                    cancelled=cancel,
+                )
+            elif job.operation == "project_evidence":
                 from wb_tool.adapters.project_evidence import verify_project_evidence
 
                 if not isinstance(job.document, WBFigureProject) or job.archive_runs is None:
@@ -196,6 +231,20 @@ class _Work(QObject):
                     job.detection_settings,
                     cancelled=job.cancellation.is_set if job.cancellation else lambda: False,
                 )
+            elif job.operation in ("template_read", "template_export"):
+                from wb_tool.adapters.figure_template_io import (
+                    export_figure_template,
+                    read_figure_template,
+                )
+
+                if job.operation == "template_read":
+                    value = read_figure_template(job.path, cancelled=cancel)
+                else:
+                    if not isinstance(job.document, WBFigureProject):
+                        raise ValueError("缺少模板所属项目")
+                    value = export_figure_template(
+                        job.document, job.sources, job.destination, cancelled=cancel
+                    )
             elif job.operation == "font_digest":
                 path = Path(job.path)
                 if (
@@ -321,6 +370,7 @@ class WBBackground(QObject):
     replied = Signal(object)
     closed = Signal()
     _requested = Signal(str, object)
+    _retire_requested = Signal()
 
     def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent)
@@ -329,10 +379,12 @@ class WBBackground(QObject):
         self._work.moveToThread(self._thread)
         self._requested.connect(self._work.execute, Qt.ConnectionType.QueuedConnection)
         self._work.replied.connect(self._reply, Qt.ConnectionType.QueuedConnection)
-        self._thread.finished.connect(self._work.deleteLater)
+        self._retire_requested.connect(self._work.retire, Qt.ConnectionType.QueuedConnection)
+        self._work.destroyed.connect(self._worker_destroyed, Qt.ConnectionType.QueuedConnection)
         self._thread.finished.connect(self._thread_stopped)
         self._pending: set[str] = set()
         self._closing = False
+        self._retiring = False
         self._thread.start()
 
     def submit(self, job: WBJob) -> str:
@@ -350,18 +402,27 @@ class WBBackground(QObject):
         self._pending.discard(reply.request_id)
         self.replied.emit(reply)
         if self._closing and not self._pending:
-            self._thread.quit()
+            self._retire()
 
     def shutdown(self) -> None:
         if QThread.currentThread() != self.thread():
             raise RuntimeError("WB 后台端口只能由所属 GUI 线程关闭")
         self._closing = True
         if not self._pending:
-            self._thread.quit()
+            self._retire()
+
+    def _retire(self) -> None:
+        if not self._retiring:
+            self._retiring = True
+            self._retire_requested.emit()
 
     @Slot()
     def _thread_stopped(self) -> None:
         if not self._thread.wait(0):
             QTimer.singleShot(1, self._thread_stopped)
             return
+        self._work.deleteLater()
+
+    @Slot()
+    def _worker_destroyed(self) -> None:
         self.closed.emit()

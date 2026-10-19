@@ -99,7 +99,14 @@ class _RestoreWorker(QObject):
 
     def __init__(self, source: str, destination: str, cancellation: Event) -> None:
         super().__init__()
+        self._owner_thread = self.thread()
         self.source, self.destination, self.cancellation = source, destination, cancellation
+
+    @Slot()
+    def retire(self) -> None:
+        worker_thread = self.thread()
+        self.moveToThread(self._owner_thread)
+        worker_thread.quit()
 
     @Slot()
     def run(self) -> None:
@@ -114,6 +121,7 @@ class _RestoreWorker(QObject):
 class ArchiveRestoreJob(QObject):
     finished = Signal(object)
     _requested = Signal()
+    _retire_requested = Signal()
 
     def __init__(self, source: str, destination: str, cancellation: Event, parent: QObject) -> None:
         super().__init__(parent)
@@ -123,7 +131,8 @@ class ArchiveRestoreJob(QObject):
         self._result: ArchiveRestoreResult | None = None
         self._requested.connect(self._worker.run, Qt.ConnectionType.QueuedConnection)
         self._worker.replied.connect(self._replied, Qt.ConnectionType.QueuedConnection)
-        self._thread.finished.connect(self._worker.deleteLater)
+        self._retire_requested.connect(self._worker.retire, Qt.ConnectionType.QueuedConnection)
+        self._worker.destroyed.connect(self._worker_destroyed, Qt.ConnectionType.QueuedConnection)
         self._thread.finished.connect(self._stopped)
 
     def start(self) -> None:
@@ -133,11 +142,15 @@ class ArchiveRestoreJob(QObject):
     @Slot(object)
     def _replied(self, result: ArchiveRestoreResult) -> None:
         self._result = result
-        self._thread.quit()
+        self._retire_requested.emit()
 
     @Slot()
     def _stopped(self) -> None:
         if not self._thread.wait(0):
             QTimer.singleShot(1, self._stopped)
             return
+        self._worker.deleteLater()
+
+    @Slot()
+    def _worker_destroyed(self) -> None:
         self.finished.emit(self._result or ArchiveRestoreResult(error="恢复线程未返回结果"))

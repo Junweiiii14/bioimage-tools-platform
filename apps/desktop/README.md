@@ -1,5 +1,21 @@
 # Desktop host
 
+The default `python -m bioimage_app` entry opens the BioImage tool platform. Its static
+registry currently contains WB only. New/open/recent project actions launch the real WB
+project window and asynchronous storage; recent paths are recorded only after a successful
+workspace open. The tool's **返回工具平台** action saves valid edits, cancels/drains active
+work through its existing close lifecycle, then returns to the hub. Invalid or missing
+workspaces keep the error in the tool and are not added to recent history. `--figure-project`
+still opens WB directly; the legacy single-image window is available through `--wb-manual`.
+Project history stores at most eight local paths in Qt settings, never executable tool names.
+
+Version 0.14.0 adds schema7 laboratory segments and independent template file actions in
+the existing template settings page. Template I/O runs in the tool background thread;
+import saves the previous project, imports verified font bytes into the destination
+workspace, then opens an empty project. Cancellation, close and generation checks reject
+late replacements. Templates contain settings and fonts only; experiment row bindings,
+measurements, OCR and normalization do not cross into the new project.
+
 `bioimage_app.api` currently exposes AsyncStorage, StorageCommand and StorageReply.
 The QObject worker owns Workspace/SQLite on its own QThread. Commands are an explicit
 immutable FIFO, with request IDs, 64 pending-operation and 16 MiB document budgets.
@@ -69,3 +85,5 @@ Version 0.11.0 adds CSV choices and unified project ZIP results. After saving th
 Version 0.12.0 adds ZIP restore into a new workspace. A dedicated thread validates the archive, imports immutable assets and a single retained revision, closes SQLite, then publishes without replacing an existing destination. Completion waits for actual thread exit. Imported history is never registered as local runs; reopen revalidates copied evidence independently, edits invalidate prior values, and recomputation uses real RunSession receipts. Close/cancel and failed publication retain explicit outcomes. platform-runtime0.2.0 adds only generic initial snapshot import and an incomplete-publication guard.
 
 Version 0.13.0 adds a separate direct TIFF/PNG figure button. It saves the exact project revision before background rendering and publication; cancel, close or a later edit prevents pending output, including during the save callback. Already published images remain available. The tool validates complete pixels, provenance and DPI after writing. Display TIFFs enter the existing OCR workflow with explicit source-row binding, while quantitative import rejects known display outputs. Full portable projects still use ZIP; no platform or numerical schema changes.
+
+T-024 default launch now opens the tool platform with the real WB entry and recent workspaces. Directory import runs tool-owned lane/crop/bound suggestions, committed measurement processes and atomic result-directory export. Reopen verifies evidence and selects a source. Cancellation, errors and stale rows remain explicit. See `../../docs/contracts/wb-automatic-v1.md` and the T-024 task for validation and limitations.

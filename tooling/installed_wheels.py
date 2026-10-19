@@ -233,6 +233,17 @@ else:
     raise AssertionError('Display TIFF was admitted as a quantitative source')
 assert load_tiff('installed-fig.tif').sha256 == source.sha256
 print('Installed direct TIFF/PNG: same full pixels/provenance/DPI; OCR only, original unchanged')
+from wb_tool.api import (WBLayoutProject, FigureLayoutStyle, initial_composition,
+    with_figure_layout, export_figure_template, read_figure_template, read_figure_project,
+    render_figure)
+segmented = with_figure_layout(project, initial_composition(project), FigureLayoutStyle())
+assert isinstance(read_figure_project(segmented.model_dump_json().encode()), WBLayoutProject)
+export_figure_template(segmented, (), 'installed.wbtemplate')
+portable = read_figure_template('installed.wbtemplate')
+assert portable.spec.template == project.template and portable.font_data == b''
+assert portable.spec.layout_style == segmented.layout_style
+assert render_figure(segmented, (source_path,)).width > 0
+print('Installed schema7 render/read and portable settings-only template passed')
 from zipfile import ZipFile
 import json
 from hashlib import sha256

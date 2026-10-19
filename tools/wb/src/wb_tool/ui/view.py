@@ -3,7 +3,7 @@
 from dataclasses import replace
 from uuid import uuid4
 
-from PySide6.QtCore import QPointF, Qt, Signal
+from PySide6.QtCore import QPointF, QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QPainter, QPaintEvent, QPen, QPolygonF
 from PySide6.QtWidgets import (
     QCheckBox,
@@ -47,59 +47,78 @@ class ProfilePlot(QWidget):
 
     def paintEvent(self, event: QPaintEvent) -> None:
         painter = QPainter(self)
-        painter.fillRect(self.rect(), QColor("#f4f7fb"))
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        painter.fillRect(self.rect(), QColor("#ffffff"))
         painter.setPen(QColor("#344256"))
-        painter.drawText(12, 18, "原始均值剖面（定量极性）；横轴：泳道内像素位置")
+        font = painter.font()
+        font.setPointSize(9)
+        painter.setFont(font)
+        painter.drawText(10, 16, "信号均值 · 原始灰度单位（定量极性）")
+        painter.setPen(QPen(QColor("#087677"), 2))
+        painter.drawLine(12, 29, 30, 29)
+        painter.drawText(36, 33, "信号")
+        painter.setPen(QPen(QColor("#7d919a"), 2))
+        painter.drawLine(84, 29, 102, 29)
+        painter.drawText(108, 33, "基线")
         if len(self.values) < 2:
+            painter.setPen(QColor("#526970"))
+            painter.drawText(12, 65, "计算并核验后显示曲线")
             return
-        maximum = (
-            max(
-                (
-                    *self.values,
-                    *(
-                        value
-                        for measurement in self.measurements
-                        for value in (
-                            measurement.baseline.left_value,
-                            measurement.baseline.right_value,
-                        )
-                    ),
-                )
+        levels = (
+            *self.values,
+            *(
+                value
+                for m in self.measurements
+                for value in (m.baseline.left_value, m.baseline.right_value)
+            ),
+        )
+        low, high = min(0.0, *levels), max(levels)
+        span = high - low or 1.0
+        left, top = 62.0, 58.0
+        width, height = self.width() - left - 18, self.height() - top - 34
+
+        def point(index: int, value: float) -> QPointF:
+            return QPointF(
+                left + index * width / (len(self.values) - 1),
+                top + height - (value - low) * height / span,
             )
-            or 1.0
+
+        painter.setPen(QPen(QColor("#dce4e7"), 1))
+        painter.drawLine(QPointF(left, top), QPointF(left, top + height))
+        painter.drawLine(QPointF(left, top + height), QPointF(left + width, top + height))
+        painter.setPen(QColor("#526970"))
+        for value in (low, low + span / 2, low + span):
+            y = point(0, value).y()
+            painter.drawText(
+                QRectF(2, y - 8, left - 8, 16), Qt.AlignmentFlag.AlignRight, format(value, ".4g")
+            )
+        for index in (0, (len(self.values) - 1) // 2, len(self.values) - 1):
+            x = point(index, low).x()
+            painter.drawText(
+                QRectF(x - 20, top + height + 3, 40, 16), Qt.AlignmentFlag.AlignCenter, str(index)
+            )
+        painter.drawText(
+            QRectF(left, self.height() - 15, width, 15),
+            Qt.AlignmentFlag.AlignCenter,
+            "裁剪内行号 · 0 起算",
         )
-        points = QPolygonF(
-            [
-                QPointF(
-                    12 + i * (self.width() - 24) / (len(self.values) - 1),
-                    self.height() - 12 - value * (self.height() - 40) / maximum,
-                )
-                for i, value in enumerate(self.values)
-            ]
-        )
-        painter.setPen(QPen(QColor("#176ac6"), 2))
-        painter.drawPolyline(points)
+        painter.setPen(QPen(QColor("#087677"), 2))
+        painter.drawPolyline(QPolygonF([point(i, value) for i, value in enumerate(self.values)]))
         for measurement in self.measurements:
-            left, right = measurement.bounds.left, measurement.bounds.right
-            x0 = 12 + left * (self.width() - 24) / (len(self.values) - 1)
-            x1 = 12 + right * (self.width() - 24) / (len(self.values) - 1)
-            painter.setPen(QPen(QColor("#db4f42"), 1, Qt.PenStyle.DashLine))
-            painter.drawLine(QPointF(x0, 30), QPointF(x0, self.height() - 12))
-            painter.drawLine(QPointF(x1, 30), QPointF(x1, self.height() - 12))
-            painter.setPen(QPen(QColor("#db4f42"), 2))
+            for label, index in (("L", measurement.bounds.left), ("R", measurement.bounds.right)):
+                x = point(index, low).x()
+                painter.setPen(QPen(QColor("#79aaa4"), 1, Qt.PenStyle.DashLine))
+                painter.drawLine(QPointF(x, top), QPointF(x, top + height))
+                painter.setPen(QColor("#246a65"))
+                painter.drawText(
+                    QRectF(min(max(x - 25, left), left + width - 50), top - 20, 50, 18),
+                    Qt.AlignmentFlag.AlignCenter,
+                    f"{label} {index}",
+                )
+            painter.setPen(QPen(QColor("#7d919a"), 2))
             painter.drawLine(
-                QPointF(
-                    x0,
-                    self.height()
-                    - 12
-                    - measurement.baseline.left_value * (self.height() - 40) / maximum,
-                ),
-                QPointF(
-                    x1,
-                    self.height()
-                    - 12
-                    - measurement.baseline.right_value * (self.height() - 40) / maximum,
-                ),
+                point(measurement.bounds.left, measurement.baseline.left_value),
+                point(measurement.bounds.right, measurement.baseline.right_value),
             )
 
 

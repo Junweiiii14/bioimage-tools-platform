@@ -95,6 +95,34 @@ policy退出0（83文件），diff --check退出0。PR读取/日志成功后网�
 ## 2026-10-15 F-003最终
 
 policy退出0；技能文件/引用/脚本语法/方向列表与ImpeccableSHA/引擎/隔离context通过。REA合成分析/追踪退出0、篡改退出1符合预期；证据F-003/rea-probe-summary.json。PR #5最终ac75f6f四项SUCCESS；本地F-004为29测试22.30秒、环境烟测和规则回执通过。无产品代码修改，不重跑产品全量/独审。最终检查见F-003/validation.md。
+
+## 2026-10-15 / T-021 worktree集成
+
+产品1e6cd5ab02968dc7493b2cecc5b3625564f23b8d：dev.py check --all退出0，490测试174.80s、Ruff274文件、Pyright0、9合约、4wheel/4隔离环境通过；模板后端18+桌面8专项与Qt截图检查通过。新独立审查绑定bb5601a..1e6cd5a，55专项退出0，无可操作问题。旧schema1–6对照旧实际产物像素/完整manifest一致，schema7真实合成积分/OCR明确绑定/归一化/ZIP恢复保持。模板导入新空项目，字体在目的工作区保存；逐源一次解码按顺序释放。无测试容差/skip/类型忽略削弱；锁仅本地包版本。详细证据work/evidence/T-021/validation.md与independent-review.md。旧Qt中止/停滞仍UNKNOWN，真实准确率、大项目/DPI/最终Windows与远程CI未验收。
+
+## 2026-10-15 / F-006 当前版本展示
+
+产品1e6cd5a未改。独立合成演示已启动；实际两条后台run均succeeded，已生成PNG/模板。documents捆绑Python生成Word，默认LO渲染退出1后改Word原生导出PDF退出0，Poppler渲染7页全部已目视检查。使用报告/本机启动脚本在.local/deliveries/WB-preview-20261015-2，详细F-006任务/validation。未重跑产品全门禁，不扩张为真实科学或包态验收。
+
+## 2026-10-15 / T-022
+
+最终产品32a2d18：dev.py check --all退出0，500测试173.83s、Ruff289、Pyright0、9合约、4wheel隔离环境通过。独立代码审查17专项9.02s无发现；原生1280×900/1100×780变化图视觉ship。演示窗口已打开，真实PID41120/启动stderr空，合成数据。旧WBQuant只作外观参考，不继承旧操作；科学/DPI/最终安装包与远程CI未验收。证据work/evidence/T-022/validation.md。
+
+## 2026-10-15 / T-023 静态设计候选
+
+三张本地HTML浏览器实拍1440×900，A/B首轮、C标签对比度修复后检查；6份JPEG来源嵌入scan0missing。产品未改，不重跑T-022全门禁或声称功能验收。详情work/evidence/T-023/validation.md。
+
+## 2026-10-15 / T-023 正式A
+
+产品0d9aad94最终505/173.57s全门禁退出0，Ruff298/Pyright0/9合约/4wheel通过；独审15/8.13s；视觉两项修复resolved。一次完整测试约100项后停滞，专属pytest停止exit1；未改产品以faulthandler_timeout=30重跑通过，无超时栈，根因UNKNOWN保留。DESIGN/sidecar已更新，原生13截图元数据0missing；合成演示PID34964以进程为准。完整证据work/evidence/T-023/validation.md。
+
+- 2026-10-15 T-024自动核心子树：40定向测试通过1.31s，Pyright WB源/新测试0，Ruff通过；10真实TIFF仅本机只读探针，详见work/evidence/T-027/automatic-core-validation.md；独审/全仓由集成继续。
+
+- 2026-10-15 T-027后续：58定向2.34s通过（质量复核原始积分/Qt显示/CSV-XLSX/旧项目归档），Pyright0；不改变有效信号/归一化，schema1–7表布局不变。
+
+## T-024 / 16f3877
+
+`uv run --locked --no-sync python dev.py check --all` exit0；532/193.25s、Ruff/Pyright0/9合约/隔离安装通过。真实10图自动链与ZIP恢复通过；独立5复现exit0/5.24s，修复resolved。首次全量527/1旧schema8拒绝预期失败及显示格式预期更新均详记T-024 validation。
 - 2026-10-19 T050/main221a2df：规划文档链接/PDF blob一致性、policy、diff、handoff容量均exit0。policy扫描0产品文件不证明产品通过。PDF文本初次GBK控制台失败，UTF-8重读exit0；归档目录缺失已由main原始blob恢复。产品测试/GUI/安装/科学评分未运行，后续文档审查见T050证据。
 - T050方案fa61c29独立文档审查无阻塞，精确回执/链接/PDF/归档/diff exit0；PR16为Draft，远端检查以最终head为准。本轮仅规划，不合并或实施产品。
 - T050后续澄清：当前方案942ecaa增量独立文档审查通过，按蛋白行分别管理槽位，检查exit0；无产品测试或修改。

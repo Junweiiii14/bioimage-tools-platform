@@ -16,6 +16,7 @@ from wb_tool.application.figure_project import (
     FigureSourcePath,
     WBFigureProject,
 )
+from wb_tool.application.figure_template import LoadedFigureTemplate
 from wb_tool.application.project_analysis import (
     LoadedProjectResult,
     ProjectRowAnalysis,
@@ -47,6 +48,9 @@ class PreviewRaster:
 class WBJob:
     operation: Literal[
         "preview",
+        "discover_tiffs",
+        "automatic_row",
+        "automatic_export",
         "metadata_read",
         "ocr_preview",
         "document",
@@ -62,6 +66,8 @@ class WBJob:
         "figure_export",
         "figure_image_export",
         "font_digest",
+        "template_read",
+        "template_export",
         "crop_suggest",
         "project_result",
         "project_table",
@@ -94,6 +100,7 @@ class WBJob:
     ocr_labels: bool = False
     preview_edge: int = 2048
     archive_runs: tuple[ArchiveRunEvidence, ...] | None = None
+    processing_errors: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -112,6 +119,7 @@ class WBReply:
         | WBFigureProject
         | FigureRender
         | FigurePNG
+        | LoadedFigureTemplate
         | MetadataBook
         | CropSuggestion
         | LoadedProjectResult

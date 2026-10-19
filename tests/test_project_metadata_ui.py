@@ -10,7 +10,7 @@ import numpy as np
 import pytest
 import tifffile
 from PySide6.QtCore import QItemSelectionModel, Qt
-from PySide6.QtWidgets import QComboBox, QTabWidget
+from PySide6.QtWidgets import QComboBox
 from pytestqt.qtbot import QtBot
 from wb_tool.api import MetadataBook, WBNormalizedProject
 
@@ -96,9 +96,7 @@ def test_batch_metadata_preserves_runs_then_invalidates_changed_geometry_and_reo
     panel.select_entries(True)
     capture = os.environ.get("BIOIMAGE_METADATA_CAPTURE")
     if capture:
-        tabs = window.view.findChild(QTabWidget)
-        assert tabs is not None
-        tabs.setCurrentWidget(panel)
+        window.view.show_section("metadata")
         assert window.grab().save(capture)
     panel.apply_requested.emit()
     changed = window.view.project()

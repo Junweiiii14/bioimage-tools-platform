@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
     QDoubleSpinBox,
-    QHBoxLayout,
+    QGridLayout,
     QLabel,
     QPushButton,
     QVBoxLayout,
@@ -47,7 +47,17 @@ class CropSuggestionPanel(QWidget):
     def __init__(self) -> None:
         super().__init__()
         root = QVBoxLayout(self)
-        settings = QHBoxLayout()
+        root.setContentsMargins(10, 10, 10, 10)
+        root.setSpacing(8)
+        title = QLabel("裁剪与候选")
+        title.setObjectName("exportHeading")
+        root.addWidget(title)
+        hint = QLabel("在右侧原图框选范围，或检测候选后逐行复核。")
+        hint.setWordWrap(True)
+        root.addWidget(hint)
+        self.advanced_settings = QWidget()
+        settings = QVBoxLayout(self.advanced_settings)
+        settings.setContentsMargins(0, 0, 0, 0)
         self.polarity = QComboBox()
         self.polarity.addItems(["暗带 / 亮底", "亮带 / 暗底"])
         self.marker = QCheckBox("左侧有 Marker")
@@ -60,14 +70,18 @@ class CropSuggestionPanel(QWidget):
         self.threshold.setPrefix("SNR ≥ ")
         for widget in (self.polarity, self.marker, self.edges, self.manual, self.threshold):
             settings.addWidget(widget)
-        root.addLayout(settings)
-        actions = QHBoxLayout()
+        self.advanced_settings.hide()
+        actions = QGridLayout()
         self.run_one = QPushButton("检测当前行")
         self.run_all = QPushButton("检测全部原图")
         self.run_one.clicked.connect(lambda: self.run_requested.emit(False))
         self.run_all.clicked.connect(lambda: self.run_requested.emit(True))
         self.candidates = QComboBox()
-        self.candidates.setMinimumWidth(270)
+        self.candidates.setMinimumWidth(180)
+        self.candidates.setSizeAdjustPolicy(
+            QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
+        )
+        self.candidates.setMinimumContentsLength(12)
         self.apply = QPushButton("应用所选候选")
         self.restore = QPushButton("恢复首选候选")
         self.focus = QPushButton("聚焦膜区域")
@@ -79,20 +93,23 @@ class CropSuggestionPanel(QWidget):
         )
         self.restore.clicked.connect(lambda: self.apply_requested.emit(0))
         self.candidates.currentIndexChanged.connect(self.candidate_changed)
-        for widget in (
-            self.run_one,
-            self.run_all,
-            self.candidates,
-            self.apply,
-            self.restore,
-            self.focus,
-            self.reset_view,
-        ):
-            actions.addWidget(widget)
+        actions.addWidget(self.run_one, 0, 0)
+        actions.addWidget(self.run_all, 0, 1)
+        actions.addWidget(self.candidates, 1, 0, 1, 2)
+        actions.addWidget(self.apply, 2, 0)
+        actions.addWidget(self.restore, 2, 1)
+        actions.addWidget(self.focus, 3, 0)
+        actions.addWidget(self.reset_view, 3, 1)
+        self.apply.setObjectName("primaryAction")
+        self.advanced_toggle = QCheckBox("高级检测设置")
+        self.advanced_toggle.toggled.connect(self.advanced_settings.setVisible)
+        actions.addWidget(self.advanced_toggle, 4, 0, 1, 2)
         root.addLayout(actions)
+        root.addWidget(self.advanced_settings)
         self.details = QLabel()
         self.details.setWordWrap(True)
         root.addWidget(self.details)
+        root.addStretch()
         self._shown: tuple[str, CropSuggestion | None] | None = None
         self.show_suggestion(None, None, 60)
 
