@@ -1,5 +1,7 @@
 # Validation History
 
+- 2026-10-19 T052/536f04e文档规划：context/policy/本地链接及E0–E7检查/diff/handoff维护均0；无产品修改或产品复测，远端状态和独立规划审查未验。维护轮转1段旧日志，unresolved=0。见work/evidence/T-052/validation.md。
+
 - 2026-10-19 T051/65ff278：完整check0，801passed/549.84s，原pytest0/u32=0x00000000；native observer附加且无新异常、已知测试进程消失；全部隔离wheel/真实OCR及worker/PNG/异步关闭通过。doctor/smoke-env/verify-launch0；独审四P2关闭与两UI修复resolved/ship、documenter完成。旧192回调失败、Qt0x80000003、草稿竞态、主动停止的中间门禁和新增测试预期纠正均保留，不销Qt原生UNKNOWN；见work/evidence/T-051/validation.md。
 
 - 2026-10-19 T048/3821c64：13专项35.84s/Ruff/format/Pyright/policy0；非管理员Win11安装/卸载/重装0、七项安装GUI8.047s/外层14.2036s0/无残留开发模块，内置PS5.1自检0/缺EXE负测返回1、7721文件摘要一致；独审ship。首次外层PS5.1观察器exit=null保留为失败，v2完整0。干净Win10/物理点击/DPI/科学留出未跑；详见T048 validation。

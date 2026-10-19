@@ -1,6 +1,8 @@
 # Handoff Snapshot
 
-- 当前任务T-051已完成本机源码与隔离wheel阶段，权威状态见work/tasks/T-051-instrument-intake.md。
+- 2026-10-19 T-052规划交付：用户要求全仓优化并按最新需求持续开发，明确会话内连续推进、不设定时任务。执行计划docs/wb-execution-plan.md，状态work/tasks/T-052-repository-optimization-plan.md；下一实施从E0可信基线开始，每包另建任务。本轮仅规划文档，产品仍65ff278，原ResearchVault dirty树未改。
+
+- 最近产品任务T-051已完成本机源码与隔离wheel阶段，权威状态见work/tasks/T-051-instrument-intake.md；本轮规划任务T-052。
 - 实现树：C:/Users/70236/.codex/worktrees/t051-instrument-intake/bioimage-tools-platform；分支codex/t051-instrument-intake；产品65ff278。PR16规划已合并43d520f。
 - 仪器TIFF目录→Fig/蛋白/N→明确缩略图批量分配→确认/保存重开已接通。N含空位、不含Marker；不推定跨蛋白样本顺序；独立灰度OCR保留。
 - 最终完整check外层0：801 passed/549.84s、原pytest0/0x00000000、9导入契约及全部隔离wheel/真实OCR通过；doctor/smoke-env/启动器verify均0。
