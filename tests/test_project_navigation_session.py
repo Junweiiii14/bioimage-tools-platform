@@ -216,3 +216,33 @@ def test_discarding_unapplied_draft_does_not_also_discard_unsaved_project(
     assert window.host.has_unsaved_changes
     assert not window.host.is_closing
     window.bridge.session("reply", '{"choice":"return"}')
+
+
+def test_busy_cancel_rechecks_draft_then_unsaved_changes_before_shutdown(
+    session_window: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
+) -> None:
+    window = session_window
+    start(window, qtbot, source_at(tmp_path / "source.tif"))
+    window.host.pause_auto_save(True)
+    window.host.view.generation += 1
+    project_id = window.host.view.project().project_id
+    window.bridge.session(
+        "position", json.dumps({"projectId": project_id, "mode": "quant", "draft": True})
+    )
+    window.host.begin_operation()
+    window.close()
+    assert window.shutdown_stage == "confirm_busy"
+    window.bridge.session("reply", '{"choice":"cancel"}')
+    assert window.shutdown_stage == "cancel"
+    window.host.finish_operation("任务已取消")
+    qtbot.waitUntil(lambda: window.shutdown_stage == "confirm_draft", timeout=3000)
+    assert window.isVisible() and not window.host.is_closing
+    window.bridge.session("reply", '{"choice":"discard"}')
+    assert window.shutdown_stage == "confirm_dirty"
+    window.bridge.session("reply", '{"choice":"return"}')
+    assert window.isVisible() and window.host.has_unsaved_changes
+    window.host.pause_auto_save(True)
+    window.close()
+    assert window.shutdown_stage == "confirm_dirty"
+    window.bridge.session("reply", '{"choice":"save"}')
+    qtbot.waitUntil(lambda: window.host.resources_closed, timeout=20000)

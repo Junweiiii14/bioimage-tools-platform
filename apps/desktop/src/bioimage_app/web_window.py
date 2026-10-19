@@ -388,7 +388,10 @@ class WebWorkbenchWindow(QMainWindow):
     def _poll_session(self) -> None:
         self._check_close_failure()
         if self._stage == "cancel" and not self.host.operation_busy:
-            self._begin_shutdown()
+            # Cancellation can leave submitted results, unsaved edits, and UI drafts.
+            # Reevaluate them without losing the requested exit/project switch.
+            self._stage = "idle"
+            self._request_transition(self._intent, self._continuation)
         elif self._stage in {"cancel", "shutdown"} and time.monotonic() - self._since > 20:
             self._message = "仍在等待本次会话的后台资源退出，窗口将保持可见。"
         if self._starting and self._stage == "opening" and not self.host.operation_busy:

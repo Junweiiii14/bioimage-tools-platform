@@ -7,7 +7,7 @@ const desktopSession = (() => {
   const button=(choice,label,primary=false)=>`<button class="button ${primary?'primary':'subtle'}" data-session-reply="${choice}">${label}</button>`;
   function hasDraft(){
     if(window.groupReview?.hasDraft())return true;
-    if(manualQuant.submittedRevision!==null||state.busy)return false;
+    if(manualQuant.submittedRevision!==null)return false;
     const d=manualQuant.draft,r=row();
     if(!r)return false;
     if(manualQuant.active&&d&&(JSON.stringify(d.roi)!==JSON.stringify(r.roi)||Number(d.n)!==Number(r.lanes)))return true;
