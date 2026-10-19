@@ -742,7 +742,7 @@ def test_complete_intake_fig_is_saved_before_real_worker_and_restores_verified_r
     assert (output / "project.zip").is_file() and (output / "measurements.xlsx").is_file()
     index = json.loads((output / "index.json").read_bytes())
     assert index["complete"] is True and index["errors"] == []
-    assert len(window.bridge.snapshot()["cells"]) == 16
+    assert len(cast(list[object], window.bridge.snapshot()["cells"])) == 16
     (tmp_path / "complete-web-snapshot.json").write_text(
         json.dumps(window.bridge.snapshot(), ensure_ascii=False), encoding="utf-8"
     )
@@ -1055,4 +1055,9 @@ def test_intake_output_failure_and_cancellation_never_fabricate_completion(
         assert step.status == "cancelled"
     if fault == "worker_error":
         assert step.status == "failed" and "disk failure" in step.reason
+    if fault == "output_save":
+        request(window, "intake_export", workflowDigest=intake_workflow_digest(final))
+        assert not window.host.operation_busy
+        assert current(window) == final
+        assert list((Path(window.host.workspace_path) / "outputs").glob("WB-intake-*")) == folders
     monkeypatch.undo()

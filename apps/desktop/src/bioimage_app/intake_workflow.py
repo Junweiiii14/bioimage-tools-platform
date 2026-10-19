@@ -76,7 +76,6 @@ class IntakeWorkflowSession:
         ) or expected_digest != intake_workflow_digest(project):
             raise ValueError("输出输入已改变，请重新核对")
         self._key, self._cancelled = uuid4().hex, False
-        host.begin_operation()
         prepared = prepare_intake_outputs(project)
         step = next(s for s in prepared.workflow.steps if s.stage == "export")
         ticket: IntakeWorkflowTicket | None = None
@@ -98,6 +97,7 @@ class IntakeWorkflowSession:
             )
         if not isinstance(prepared, WBIntakeOutputProject):
             raise ValueError("输出快照准备类型无效")
+        host.begin_operation()
         self._persist(prepared, lambda: self._export(ticket))
 
     def show_figure(self, figure_id: str, expected_digest: str) -> None:
