@@ -21,6 +21,8 @@ from wb_tool.api import (
 from bioimage_app.figure_window import FigureProjectWindow
 from bioimage_app.web_quant import quant_snapshot
 
+_CROP_EDIT_CONTRACT = "legacy_crop_edit@1"
+
 
 def image_url(image: QImage) -> str | None:
     if image.isNull():
@@ -56,6 +58,7 @@ class WorkbenchBridge(QObject):
     ) -> None:
         super().__init__(parent)
         self.host = host
+        self.session_epoch = 0
         self.choose = choose
         self._previous = ""
         self._images: dict[str, str | None] = {}
@@ -204,6 +207,10 @@ class WorkbenchBridge(QObject):
             )
         return {
             "projectName": project.name,
+            "projectId": project.project_id,
+            "sessionEpoch": self.session_epoch,
+            "revision": view.generation,
+            "cropEditContract": _CROP_EDIT_CONTRACT,
             "busy": self.host.operation_busy,
             "status": self._error or view.status.text(),
             "selectedId": selected.row_id if selected else "",
@@ -304,6 +311,7 @@ class WorkbenchBridge(QObject):
                     raise ValueError("请选择Excel或CSV格式")
                 self.choose("quant_export_" + str(format_name))
             elif action == "set_lanes":
+                self._validate_crop_edit(data)
                 row = self.host.view.selected_row()
                 if (
                     row is None
@@ -317,6 +325,7 @@ class WorkbenchBridge(QObject):
                     raise ValueError("泳道数须为1–96的整数")
                 self.host.view.set_crop_lane_count(count)
             elif action in {"crop", "confirm"}:
+                self._validate_crop_edit(data)
                 row = self.host.view.selected_row()
                 if row is None or data.get("id") != row.row_id:
                     raise ValueError("当前原图已改变，请重新调整")
@@ -476,3 +485,20 @@ class WorkbenchBridge(QObject):
             self.host.replan_quant_lane(row.row_id)
         else:
             self.host.analyze_project(row_ids=(row.row_id,))
+
+    def _validate_crop_edit(self, data: dict[str, object]) -> None:
+        project = self.host.view.project()
+        row = self.host.view.selected_row()
+        if (
+            data.get("cropEditContract") != _CROP_EDIT_CONTRACT
+            or data.get("projectId") != project.project_id
+            or type(data.get("sessionEpoch")) is not int
+            or data.get("sessionEpoch") != self.session_epoch
+            or type(data.get("revision")) is not int
+            or data.get("revision") != self.host.view.generation
+            or row is None
+            or row.source is None
+            or data.get("id") != row.row_id
+            or data.get("sourceId") != row.source.sha256
+        ):
+            raise ValueError("原图身份或裁剪已改变，请重新调整并复核")

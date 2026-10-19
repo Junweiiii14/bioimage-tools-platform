@@ -71,3 +71,10 @@
 
 - [x] T-040 real-data execution:8 originals→4Fig→48 source-pixel values→supervised Excel/ZIP, saved desktop opened. First automatic1/8; corrected8/8 is reference-assisted.
 - [ ] T-040 gate investigation:600pytest passed summary but fullcheckexit1 beforewheel; UNKNOWN exit/shutdown cause.
+- [ ] T-017 ready：按用户方案7.1/7.2实现Excel/CSV元信息导入、明确文件名提取规则、可修正预览/匹配、批量参数/缩略图。随后统一归档/ZIP导入/直接TIFF成图/CSV结果及模板精修。完整首版验收见work/wb-acceptance.md。
+
+## 2026-10-19 当前WB规划
+
+- [ ] 按T050开发规划v2的M0–M5实施，先真实仪器输入/清单与来源映射，后固定N裁剪、拼图后原值定量与表格。
+- [ ] 落实已批准S1/S2及独立定量OCR需求，评估发行方式；跨蛋白顺序已确认不保证一致，只共享N；多曝光/无可靠锚点处理保持待决。
+- 上方早期基础待办只描述main集成基线；后续产品实现已有独立分支，不能据此重做或宣称产品已集成。

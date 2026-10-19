@@ -53,6 +53,10 @@ def test_web_adapter_real_import_output_and_original_coordinates(
     assert source.read_bytes() == before
     initial = host.view.project().rows[0].roi
     payload = {
+        "cropEditContract": state["cropEditContract"],
+        "projectId": state["projectId"],
+        "sessionEpoch": state["sessionEpoch"],
+        "revision": state["revision"],
         "id": row.row_id,
         "sourceId": "stale",
         "roi": {"x": 20, "y": 60, "width": 300, "height": 40},

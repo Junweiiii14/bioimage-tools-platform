@@ -3,6 +3,15 @@
 - 2026-10-16 T035：用户批准比例1.25*n，核心/网页分工完成，产品25ac71d；两指定叠加原图自动3/5泳道并直接拼图，原值裁图逐像素匹配。独审P2已修复闭环，视觉ship；最终验证见T035证据。
 
 - 2026-10-16 T033：网页优先，同源WebEngine桥由T034分工集成；独立代码/视觉发现已修，独立文档同步。高级窗口网页化未完成，产品a68000e。
+## 2026-10-14 / T-008 手工桌面闭环
+
+上一回合progress：32a2bae进程宿主。本回合WBDocument v1、纯显示DTO/后台预览与codec、Qt ROI/条带/基线/原始曲线及中文窗口/静态worker入口。实际拖选→signal10→保存/重开、关闭自动保存、新编辑拒绝旧参数、uint16原图不变、实际窗口取消关闭通过；190完整tests/9合约/4wheel5场景，追加取消后最终pytest见证据。合成抓图已查看，无数值/工作区格式改写。用户回复首版必须Fig/行名OCR与自动写表，下一阶段优先；独审/远程CI/包态验收未执行，goal active。
+
+## 2026-10-14 / T-007 进程宿主
+
+上一回合progress：e61c3e3异步存储。本回合实现QProcess/后台解码、NDJSON与stderr预算、PID存储门禁、Windows JobObject/进程组、RunSession持久化取消与终态；补提交取消检查。真实WB输入快照→进程→存储→重开信号10，旧运行不覆盖新草稿；实际孙进程强停、残帧/超限/退出/提前取消与发布取消均验证。完整门禁185tests/9合约/4wheel通过；T-007进入review（独审未执行），下一步T-008桌面GUI，goal active。
+
+## 2026-10-14 / T-007 异步存储子阶段
 
 
 ## 2026-10-14 / T-003 TIFF 输入与泳道剖面
@@ -111,3 +120,14 @@ Executed approved real dataset, published8no-overwrite named crops,4Fig images,4
 
 ## 2026-10-17 T040 deep technical audit
 Three independent readers traced crop/quant/pipeline and cross-reviewed17-section report. Source-only membrane/Marker and17boundary replays exit0, original hashes unchanged. Corrected prior vague attribution, documented script-vs-product and scientific/units/precision/coordinate/model-validation limits; no product modifications. Fullcheck not rerun for this report.
+## 2026-10-19 T-050 规划修订
+
+用户确认清单驱动的仪器原图流程。对产品a234354只读审计，核对原始PDF；从main221a2df独立文档分支创建新版规划和README入口，避免夹带未集成产品。清单/固定N/原像素定量是已确认需求，局部异常续作/独立输出目录/可选OCR发行是待审建议。代码、依赖、锁、门禁及原始PDF未改。旧main恢复快照留档。
+
+## 2026-10-19 T050 审核回复落盘
+
+根据用户回复更新第5/6/7/8节：批准局部暂停与独立结果目录，独立灰度定量OCR作为继续支持的功能。主流程不加载OCR与安装发行拆分是不同事项，后者未决；同步任务/风险/待办和交接。未改产品/PDF/依赖，旧审查不外推本轮修订。
+
+## 2026-10-20 E7 governance integration
+
+INT001 resumes authorized E7 only in this temporary historical integration tree. Merged planning main43d520f into original governance0b7, retained immutable RULE001 receipt source; loaded/read exact rules and current full scope. Main PR/CI not yet accepted. WB product development/checks remain in t051, not represented by this zero-product checkout.
