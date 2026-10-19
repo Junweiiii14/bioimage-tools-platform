@@ -45,6 +45,7 @@ from wb_tool.api import (
     WBAnalysisProject,
     WBFigureProject,
     WBIntakeProject,
+    WBIntakeWorkflowProject,
     WBJob,
     WBLayoutProject,
     WBProjectOCR,
@@ -60,6 +61,7 @@ from wb_tool.api import (
     project_assets,
     project_with_ocr,
     record_crop_suggestion,
+    recover_intake_workflow,
     source_import_labels,
     with_figure_layout,
 )
@@ -2045,6 +2047,11 @@ class FigureProjectWindow(QMainWindow):
                     self._error("项目文档无效")
                     return
                 project = reply.value
+                interrupted = False
+                if isinstance(project, WBIntakeWorkflowProject):
+                    recovered = recover_intake_workflow(project)
+                    interrupted = recovered != project
+                    project = recovered
                 assets = {asset.sha256: asset for asset in project_assets(project)}
                 primary = {asset.sha256 for asset in project_assets(project, history=False)}
                 pending = list(assets.values())
@@ -2060,6 +2067,10 @@ class FigureProjectWindow(QMainWindow):
                         self._loaded_ocr = None
                         if isinstance(project, WBIntakeProject):
                             self._done("导入清单已恢复，正在加载缩略图。")
+                            if interrupted:
+                                self.view.generation += 1
+                                self.save(after=self.load_thumbnails)
+                                return
                             self.load_thumbnails()
                         elif isinstance(project, WBRestoredProject):
                             self._restore_project_evidence(project)

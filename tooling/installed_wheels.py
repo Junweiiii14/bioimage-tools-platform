@@ -162,6 +162,12 @@ assert len(execution.cells) == 3 and len({cell.slot_id for cell in execution.cel
 assert all(cell.value is None and cell.status == 'pending' for cell in execution.cells)
 assert execution.figures[0].rows[0].source.source_id == 'selected'
 assert execution == build_intake_execution_plan(intake, expected_digest=intake_digest(intake))
+from wb_tool.api import prepare_intake_workflow, WBIntakeWorkflowProject
+pipeline = prepare_intake_workflow(intake, expected_digest=intake_digest(intake))
+pipeline_reopened = read_figure_project(pipeline.model_dump_json().encode())
+assert isinstance(pipeline_reopened, WBIntakeWorkflowProject) and pipeline_reopened == pipeline
+assert all(step.status == 'pending' for step in pipeline.workflow.steps)
+assert not pipeline.analyses and pipeline.ocr is None
 assert not any(name.startswith(('PySide6', 'sqlite3')) for name in sys.modules)
 assert not any(name.startswith(('rapidocr', 'onnxruntime', 'cv2')) for name in sys.modules)
 print('Isolated WB wheel: TIFF/analysis, crop/grid and worker; no GUI/storage dependencies')

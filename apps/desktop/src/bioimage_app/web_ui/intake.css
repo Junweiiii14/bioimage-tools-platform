@@ -19,3 +19,5 @@
 
 .intake-active .mode-indicator{left:0;right:0;width:auto!important;transform:none!important}
 .intake-fig legend .text-button{margin-left:12px}.intake-protein>.icon-button{flex-shrink:0}
+
+.intake-workflow{padding:20px 0;border-top:1px solid var(--line)}.intake-workflow h2{font-size:16px}.intake-workflow ol{list-style:none;padding:0;margin:16px 0}.intake-workflow li{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px}.intake-workflow li strong{flex:1;min-width:160px;overflow-wrap:anywhere}.intake-workflow li p{flex-basis:100%;margin:0;color:var(--warning);line-height:1.7}.intake-workflow details{font-size:12px;line-height:1.7}.intake-workflow summary{cursor:pointer}.intake-workflow>p{line-height:1.7}

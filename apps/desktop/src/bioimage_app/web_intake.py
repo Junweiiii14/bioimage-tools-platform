@@ -8,9 +8,14 @@ from wb_tool.api import (
     IntakeProtein,
     WBFigureProject,
     WBIntakeProject,
+    WBIntakeWorkflowProject,
+    WBJob,
+    WBReply,
     assign_intake_sources,
     confirm_intake,
+    intake_digest,
     replace_intake_plan,
+    return_to_intake_editing,
 )
 
 if TYPE_CHECKING:
@@ -29,6 +34,57 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
         or not isinstance(digest, str)
     ):
         raise ValueError("当前导入项目已改变，请刷新后重试")
+    if action == "intake_prepare":
+        generation = host.view.generation
+        host.begin_operation()
+
+        def prepared(reply: WBReply) -> None:
+            if host.is_closing or host.cancellation.is_set() or host.view.generation != generation:
+                host.finish_operation("执行计划准备已停止，当前草稿保留。")
+                return
+            if reply.error or not isinstance(reply.value, WBIntakeWorkflowProject):
+                host.fail_operation(reply.error or "执行计划返回无效结果")
+                return
+            snapshot = reply.value
+            host.end_phase()
+
+            def install(current: WBFigureProject) -> WBIntakeWorkflowProject:
+                if (
+                    not isinstance(current, WBIntakeProject)
+                    or current.project_id != snapshot.project_id
+                    or intake_digest(current) != digest
+                ):
+                    raise ValueError("清单已变化，执行计划不能覆盖当前草稿")
+                return WBIntakeWorkflowProject.model_validate(
+                    {**dict(snapshot), "revision": current.revision}
+                )
+
+            host.save(transform=install)
+
+        host.submit_tool_job(
+            WBJob(
+                "intake_workflow_prepare",
+                document=project,
+                data=digest.encode("ascii"),
+                cancellation=host.cancellation,
+            ),
+            prepared,
+            accept_errors=True,
+        )
+        return
+    if action == "intake_edit":
+        if not isinstance(project, WBIntakeWorkflowProject) or intake_digest(project) != digest:
+            raise ValueError("当前没有匹配的执行计划")
+
+        def edit(current: WBFigureProject) -> WBIntakeProject:
+            if not isinstance(current, WBIntakeWorkflowProject) or intake_digest(current) != digest:
+                raise ValueError("执行计划已改变")
+            return return_to_intake_editing(current)
+
+        host.save(transform=edit)
+        return
+    if isinstance(project, WBIntakeWorkflowProject):
+        raise ValueError("执行计划已准备，请先返回清单修改；执行历史不可删除")
     if action == "intake_plan":
         figures, proteins = data.get("figures"), data.get("proteins")
         if not isinstance(figures, list) or not isinstance(proteins, list):

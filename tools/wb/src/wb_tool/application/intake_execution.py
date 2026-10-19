@@ -77,7 +77,7 @@ def build_intake_execution_plan(
     """
     if not isinstance(project, WBIntakeProject):
         raise ValueError("执行计划需要已确认的仪器清单项目")
-    checked = WBIntakeProject.model_validate(dict(project))
+    checked = type(project).model_validate(dict(project))
     digest = intake_digest(checked)
     if not expected_digest or digest != expected_digest:
         raise ValueError("仪器清单已修改，请重新确认执行计划")

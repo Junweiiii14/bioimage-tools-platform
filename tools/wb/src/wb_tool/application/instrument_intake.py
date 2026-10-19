@@ -113,7 +113,7 @@ class IntakeManifest(DocumentIO):
         return self
 
 
-def _manifest_digest(project_id: str, manifest: IntakeManifest) -> str:
+def intake_manifest_digest(project_id: str, manifest: IntakeManifest) -> str:
     data = {
         "project_id": project_id,
         "intake": manifest.model_dump(mode="json", exclude={"confirmed_digest"}),
@@ -121,7 +121,7 @@ def _manifest_digest(project_id: str, manifest: IntakeManifest) -> str:
     return sha256(json.dumps(data, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()
 
 
-def _rows(manifest: IntakeManifest) -> tuple[FigureRow, ...]:
+def intake_project_rows(manifest: IntakeManifest) -> tuple[FigureRow, ...]:
     figures = {figure.figure_id: figure for figure in manifest.figures}
     sources = {source.source_id: source for source in manifest.sources}
     bindings = {binding.protein_id: binding.source_id for binding in manifest.assignments}
@@ -170,18 +170,18 @@ class WBIntakeProject(WBPartitionProject):
     def intake_projection(self) -> "WBIntakeProject":
         if _has_processing(self):
             raise ValueError("当前仪器导入阶段不能携带裁剪、审核或定量结果；请保留原项目")
-        expected = _rows(self.intake)
+        expected = intake_project_rows(self.intake)
         order = tuple(dict.fromkeys(row.figure for row in expected))
         if self.rows != expected or self.figure_order != order:
             raise ValueError("项目行与仪器清单不一致；请通过清单修改名称和分配")
         if self.intake.confirmed_digest:
-            if self.intake.confirmed_digest != _manifest_digest(self.project_id, self.intake):
+            if self.intake.confirmed_digest != intake_manifest_digest(self.project_id, self.intake):
                 raise ValueError("仪器清单已改变，原确认已过期")
-            _complete(self.intake)
+            validate_intake_complete(self.intake)
         return self
 
 
-def _complete(manifest: IntakeManifest) -> None:
+def validate_intake_complete(manifest: IntakeManifest) -> None:
     assigned = {binding.protein_id for binding in manifest.assignments}
     if not manifest.figures or not manifest.proteins:
         raise ValueError("请先填写 Fig、蛋白和样本槽位数")
@@ -206,7 +206,7 @@ def create_intake(project: WBFigureProject) -> WBIntakeProject:
 
 
 def intake_digest(project: WBIntakeProject) -> str:
-    return _manifest_digest(project.project_id, project.intake)
+    return intake_manifest_digest(project.project_id, project.intake)
 
 
 def _current(project: WBIntakeProject, expected_digest: str) -> None:
@@ -216,7 +216,7 @@ def _current(project: WBIntakeProject, expected_digest: str) -> None:
 
 
 def _updated(project: WBIntakeProject, manifest: IntakeManifest) -> WBIntakeProject:
-    rows = _rows(manifest)
+    rows = intake_project_rows(manifest)
     fields = dict(project)
     fields.update(
         intake=manifest, rows=rows, figure_order=tuple(dict.fromkeys(r.figure for r in rows))
@@ -321,7 +321,7 @@ def unassign_intake_sources(
 
 def confirm_intake(project: WBIntakeProject, *, expected_digest: str) -> WBIntakeProject:
     _current(project, expected_digest)
-    _complete(project.intake)
+    validate_intake_complete(project.intake)
     fields = dict(project.intake)
     fields["confirmed_digest"] = intake_digest(project)
     return _updated(project, IntakeManifest.model_validate(fields))

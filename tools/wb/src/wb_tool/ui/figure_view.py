@@ -44,6 +44,7 @@ from wb_tool.application.figure_project import (
     WBFigureProject,
 )
 from wb_tool.application.instrument_intake import WBIntakeProject
+from wb_tool.application.intake_workflow import WBIntakeWorkflowProject
 from wb_tool.application.laboratory_layout import (
     initial_composition,
     with_figure_layout,
@@ -1005,7 +1006,13 @@ class FigureProjectView(QWidget):
             project = WBPartitionProject.model_validate(fields)
         elif isinstance(self._project, WBAutomaticProject):
             project = with_automatic_rows(project, self._project.automatic_rows)
-        if isinstance(self._project, WBIntakeProject):
+        if isinstance(self._project, WBIntakeWorkflowProject):
+            fields = dict(project)
+            fields.update(
+                schema_version=11, intake=self._project.intake, workflow=self._project.workflow
+            )
+            project = WBIntakeWorkflowProject.model_validate(fields)
+        elif isinstance(self._project, WBIntakeProject):
             fields = dict(project)
             fields.update(schema_version=10, intake=self._project.intake)
             project = WBIntakeProject.model_validate(fields)

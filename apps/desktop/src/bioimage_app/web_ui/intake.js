@@ -110,11 +110,20 @@ window.intakeWorkspace = (() => {
   }
   function renderSummary(disabled) {
     const count = state.intake.assignments.length, total = state.intake.proteins.length;
+    const workflow = state.intake.workflow;
+    if (workflow) {
+      const names = {crop: '原值裁剪', compose: 'Fig 拼图', measure: '原像素定量', export: '结果输出'};
+      const statuses = {pending: '待处理', running: '正在处理', done: '阶段已记录', needs_review: '需要复核', failed: '失败', cancelled: '已取消', interrupted: '未完整提交'};
+      const issues = workflow.steps.filter(step => ['needs_review', 'failed', 'cancelled', 'interrupted'].includes(step.status));
+      const frozen = workflow.steps.some(step => step.attempt > 0);
+      return `<section class="intake-summary"><div><h2>执行计划已准备</h2><p>${state.intake.figures.length} 个 Fig · ${total} 个蛋白行 · ${state.intake.proteins.reduce((sum, row) => sum + (state.intake.figures.find(fig => fig.figure_id === row.figure_id)?.lane_count || 0), 0)} 个独立槽位。</p><p>按原值裁剪、完整 Fig 拼图、原像素定量、结果输出的顺序处理。当前尚未接入裁剪执行器，没有生成定量结果。</p></div><button class="button subtle" data-intake="edit" ${disabled} ${frozen ? 'disabled' : ''}>返回清单修改</button></section><section class="intake-workflow" aria-label="执行阶段"><h2>阶段与异常</h2><p class="intake-help">已记录 ${workflow.ready_count} / ${workflow.steps.length} 个阶段。${issues.length ? `${issues.length} 项需要处理，其他完整 Fig 可以继续。` : '暂无异常。裁剪完成不代表科学复核通过。'}</p><ol>${workflow.steps.slice(0, 50).map(step => `<li><span>${escapeText(names[step.stage] || step.stage)}</span><strong>${escapeText(step.stage === 'crop' ? targetName(step.target_id) : state.intake.figures.find(fig => fig.figure_id === step.target_id)?.label || state.projectName)}</strong><span>${escapeText(statuses[step.status] || step.status)}</span>${step.reason ? `<p>${escapeText(step.reason)}</p>` : ''}</li>`).join('')}</ol>${workflow.steps.length > 50 ? `<p class="intake-help">显示前 50 项，全部 ${workflow.steps.length} 项随项目保存。</p>` : ''}${issues.length ? `<details><summary>查看全部异常原因</summary><ul>${issues.map(step => `<li>${escapeText(names[step.stage] || step.stage)} · ${escapeText(step.target_id)}：${escapeText(step.reason)}</li>`).join('')}</ul></details>` : ''}</section>`;
+    }
+    if (state.intake.confirmed) return `<section class="intake-summary"><div><h2>清单与对应关系已确认</h2><p>${count} 个蛋白行已明确分配原图。准备执行计划，预建布局位置和待计算表格，原文件保持不变。</p></div><button class="button primary" data-intake="prepare" ${disabled}>准备执行计划</button></section>`;
     return `<section class="intake-summary"><div><h2>${state.intake.confirmed ? '清单与对应关系已确认' : '确认本次导入'}</h2><p>${count} / ${total} 个蛋白行已有原图。${state.intake.confirmed ? '当前完成导入分配阶段，后续裁剪流程尚未执行。' : '核对所有蛋白行的来源后确认；未使用的原图可留在图池。'}</p></div><button class="button primary" data-intake="confirm" ${disabled}>${icon('check')}确认清单与对应关系</button></section>`;
   }
   function controls() {
     if (!draft || root.hidden) return;
-    const locked = !!state.busy || !bridge || conflict;
+    const locked = !!state.busy || !bridge || conflict || !!state.intake.workflow;
     const error = planError(), assignmentError = batchError();
     $('#intake-plan-error', root).textContent = batch.length ? '提交或移除待分配关系后，可继续修改清单。' : error;
     $('[data-intake="save-plan"]', root).disabled = locked || !planDirty() || !!error || batch.length > 0;
@@ -125,7 +134,10 @@ window.intakeWorkspace = (() => {
     if (submit) submit.disabled = locked || planDirty() || !!assignmentError;
     const batchMessage = $('#intake-batch-error', root);
     if (batchMessage) batchMessage.textContent = assignmentError;
-    $('[data-intake="confirm"]', root).disabled = locked || hasDraft() || !state.intake.proteins.length || state.intake.proteins.some(protein => !state.intake.assignments.some(binding => binding.protein_id === protein.protein_id)) || !!state.intake.confirmed;
+    const confirm = $('[data-intake="confirm"]', root);
+    if (confirm) confirm.disabled = locked || hasDraft() || !state.intake.proteins.length || state.intake.proteins.some(protein => !state.intake.assignments.some(binding => binding.protein_id === protein.protein_id)) || !!state.intake.confirmed;
+    const prepare = $('[data-intake="prepare"]', root);
+    if (prepare) prepare.disabled = locked || hasDraft() || !state.intake.confirmed;
   }
   function renderActive() {
     const active = mode === 'intake' && !!state.intake;
@@ -139,7 +151,8 @@ window.intakeWorkspace = (() => {
     const caret = focused?.type === 'text' || focused?.type === 'search' ? [focused.selectionStart, focused.selectionEnd] : null;
     const scroll = root.scrollTop;
     const disabled = state.busy || !bridge || conflict ? 'disabled' : '';
-    root.innerHTML = `<div class="intake-heading"><div><h1>仪器导入与分配</h1><p>先保存 Fig 清单，再将原图分配到蛋白行。原始文件保持原名。</p></div><span class="status-badge ${state.intake.confirmed ? 'ok' : 'pending'}">${state.intake.confirmed ? '已确认' : '待确认'}</span></div>${conflict ? '<div class="intake-conflict" role="alert">项目清单已在后台变化。本地草稿已保留，请核对后使用“放弃草稿并重新载入”获取最新清单。</div>' : ''}<div class="intake-columns">${renderPlan(batch.length ? 'disabled' : disabled)}<div class="intake-allocation">${renderSources(disabled)}${renderBatch(disabled)}</div></div>${renderSummary(disabled)}`;
+    const editingDisabled = disabled || state.intake.workflow ? 'disabled' : '';
+    root.innerHTML = `<div class="intake-heading"><div><h1>仪器导入与分配</h1><p>先保存 Fig 清单，再将原图分配到蛋白行。原始文件保持原名。</p></div><span class="status-badge ${state.intake.confirmed ? 'ok' : 'pending'}">${state.intake.confirmed ? '已确认' : '待确认'}</span></div>${conflict ? '<div class="intake-conflict" role="alert">项目清单已在后台变化。本地草稿已保留，请核对后使用“放弃草稿并重新载入”获取最新清单。</div>' : ''}<div class="intake-columns">${renderPlan(batch.length ? 'disabled' : editingDisabled)}<div class="intake-allocation">${renderSources(editingDisabled)}${renderBatch(editingDisabled)}</div></div>${renderSummary(disabled)}`;
     controls(); root.scrollTop = scroll;
     const replacement = searchFocus ? $('[data-intake-search]', root) : field ? $$('[data-intake-field]', root).find(item => item.dataset.intakeField === field && item.dataset.id === id) : null;
     if (replacement) { replacement.focus({preventScroll: true}); if (caret) replacement.setSelectionRange(...caret); }
@@ -185,6 +198,8 @@ window.intakeWorkspace = (() => {
     else if (action === 'save-plan') { pending = {kind: 'plan', value: planText(draft)}; send('intake_plan', {...guard(), ...copyPlan(draft)}); }
     else if (action === 'assign') { pending = {kind: 'assign', value: batch.map(binding => ({...binding}))}; send('intake_assign', {...guard(), bindings: batch, replace, allowReuse}); }
     else if (action === 'confirm') send('intake_confirm', guard());
+    else if (action === 'prepare') send('intake_prepare', guard());
+    else if (action === 'edit') send('intake_edit', guard());
     else if (action === 'import') { if (hasDraft()) { toast('请先保存清单、提交对应关系，或放弃草稿，再添加文件夹。'); return; } send('intake_import_folder', guard()); }
     renderActive();
     if (focusAddFigure) $('[data-intake=add-fig]', root)?.focus();

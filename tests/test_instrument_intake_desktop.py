@@ -18,9 +18,11 @@ from wb_tool.api import (
     PreviewRaster,
     WBFigureProject,
     WBIntakeProject,
+    WBIntakeWorkflowProject,
     WBJob,
     WBReply,
     intake_digest,
+    prepare_intake_workflow,
 )
 
 from tooling.qt_test_lifecycle import close_and_dispose_window
@@ -94,6 +96,112 @@ def plan(window: WebWorkbenchWindow, qtbot: QtBot) -> None:
         ],
     )
     wait_saved(window, qtbot)
+
+
+def test_prepare_workflow_saves_reopens_and_returns_to_editing_without_processing(
+    intake_window: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
+) -> None:
+    window = intake_window
+    directory = tmp_path / "instrument"
+    make_source(directory / "a.tif")
+    make_source(directory / "b.tif", 2000)
+    start(window, qtbot, directory)
+    plan(window, qtbot)
+    sources = current(window).intake.sources
+    request(
+        window,
+        "intake_assign",
+        bindings=[
+            {"protein_id": "protein-a", "source_id": sources[0].source_id},
+            {"protein_id": "protein-b", "source_id": sources[1].source_id},
+        ],
+    )
+    wait_saved(window, qtbot)
+    request(window, "intake_confirm")
+    wait_saved(window, qtbot)
+    request(window, "intake_prepare")
+    wait_saved(window, qtbot)
+    prepared = current(window)
+    assert isinstance(prepared, WBIntakeWorkflowProject)
+    assert len(prepared.workflow.steps) == 5
+    assert all(step.status == "pending" for step in prepared.workflow.steps)
+    assert not prepared.analyses and prepared.ocr is None
+    assert all(row.roi is None for row in prepared.rows)
+    request(window, "intake_edit")
+    wait_saved(window, qtbot)
+    assert type(current(window)) is WBIntakeProject
+    request(window, "intake_prepare")
+    wait_saved(window, qtbot)
+    workspace = window.host.workspace_path
+    epoch = window.bridge.session_epoch
+    window.open_project(workspace)
+    qtbot.waitUntil(
+        lambda: window.bridge.session_epoch > epoch and window.shutdown_stage == "idle",
+        timeout=20000,
+    )
+    wait_saved(window, qtbot)
+    assert isinstance(current(window), WBIntakeWorkflowProject)
+    snapshot = cast(dict[str, object], window.bridge.snapshot()["intake"])
+    assert isinstance(snapshot["workflow"], dict)
+
+
+@pytest.mark.parametrize("mode", ["cancel", "edit", "save_failure"])
+def test_prepared_workflow_never_installs_after_cancel_edit_or_failed_save(
+    intake_window: WebWorkbenchWindow,
+    qtbot: QtBot,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mode: str,
+) -> None:
+    window = intake_window
+    root = tmp_path / "raw"
+    make_source(root / "a.tif")
+    make_source(root / "b.tif", 2000)
+    start(window, qtbot, root)
+    plan(window, qtbot)
+    project = current(window)
+    request(
+        window,
+        "intake_assign",
+        bindings=[
+            {"protein_id": p.protein_id, "source_id": s.source_id}
+            for p, s in zip(project.intake.proteins, project.intake.sources, strict=True)
+        ],
+    )
+    wait_saved(window, qtbot)
+    request(window, "intake_confirm")
+    wait_saved(window, qtbot)
+    before = current(window)
+    replies: list[Callable[[WBReply], None]] = []
+
+    def delayed(
+        job: WBJob, callback: Callable[[WBReply], None], *, accept_errors: bool = False
+    ) -> None:
+        assert job.operation == "intake_workflow_prepare"
+        replies.append(callback)
+
+    def failed_storage(*args: object, **kwargs: object) -> None:
+        raise OSError("模拟执行计划保存失败")
+
+    if mode == "save_failure":
+        monkeypatch.setattr(Workspace, "save_draft", failed_storage)
+    else:
+        monkeypatch.setattr(window.host, "submit_tool_job", delayed)
+    request(window, "intake_prepare")
+    if mode != "save_failure":
+        assert len(replies) == 1
+        if mode == "cancel":
+            window.host.cancel()
+        else:
+            window.host.view.generation += 1
+        prepared = prepare_intake_workflow(before, expected_digest=intake_digest(before))
+        replies[0](WBReply("late", value=prepared))
+    qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=10000)
+    assert type(current(window)) is WBIntakeProject
+    assert current(window).intake == before.intake
+    if mode == "save_failure":
+        assert "保存失败" in window.host.view.status.text()
+    monkeypatch.undo()
 
 
 def test_raw_variants_assign_and_reopen_without_algorithm(

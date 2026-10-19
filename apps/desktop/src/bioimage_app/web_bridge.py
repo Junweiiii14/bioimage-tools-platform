@@ -18,10 +18,12 @@ from wb_tool.api import (
     ProjectTableCell,
     WBAnalysisProject,
     WBIntakeProject,
+    WBIntakeWorkflowProject,
     WBLayoutProject,
     WBPartitionProject,
     confirm_quant_group,
     intake_snapshot,
+    intake_workflow_snapshot,
     quant_group_reviewed,
     row_is_ready,
 )
@@ -153,6 +155,11 @@ class WorkbenchBridge(QObject):
                 )
             intake["sources"] = sources
             intake["issues"] = list(self.host.intake.issues)
+            intake["workflow"] = (
+                intake_workflow_snapshot(project)
+                if isinstance(project, WBIntakeWorkflowProject)
+                else None
+            )
         source_counts = Counter(r.source.sha256 for r in project.rows if r.source)
         self._images = {key: value for key, value in self._images.items() if key in live_sources}
         pixmap = view.preview_label.full_pixmap
@@ -389,13 +396,26 @@ class WorkbenchBridge(QObject):
                 "intake_plan",
                 "intake_assign",
                 "intake_confirm",
+                "intake_prepare",
+                "intake_edit",
                 "intake_import_folder",
                 "open_project",
                 "retry_location",
             }:
                 raise ValueError("仪器导入项目当前仅支持清单与原图分配；后续裁剪流程尚未接通")
-            elif action in {"intake_plan", "intake_assign", "intake_confirm"}:
+            elif action in {
+                "intake_plan",
+                "intake_assign",
+                "intake_confirm",
+                "intake_prepare",
+                "intake_edit",
+            }:
                 apply_intake_command(self, action, data)
+            elif (
+                isinstance(self.host.view.project(), WBIntakeWorkflowProject)
+                and action == "intake_import_folder"
+            ):
+                raise ValueError("请先返回清单修改，再添加来源")
             elif action in {
                 "import",
                 "quant_import",

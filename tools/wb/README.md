@@ -1,5 +1,10 @@
 # WB 数值核心
 
+T055/E2新增schema11清单阶段账本，保存行crop/完整Fig compose/measure/项目export依赖、
+尝试票据、取消请求及中断恢复；账本不代替已提交数值证据。桌面后台准备执行摘要，
+未执行时可返回清单修改；真实裁剪执行器在E3接入。契约见
+`../../docs/contracts/wb-intake-workflow-v1.md`。
+
 T054/E1新增`build_intake_execution_plan`：从已确认schema10重建不可变槽位、
 安全相对路径、布局占位和pending/None表格；无I/O/OCR/定位/测量。
 派生计划不增加持久化权威，后续结果另行版本化。契约见

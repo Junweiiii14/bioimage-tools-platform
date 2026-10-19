@@ -1,5 +1,12 @@
 # Desktop host
 
+E2 adds asynchronous execution-plan preparation after intake confirmation. Schema11
+persists the stage ledger, while the web page shows the summary and explicit pending
+states. Preparation is installed only after a successful normal save; cancellation
+or a stale generation rejects its callback. Reopening interrupts unknown running
+stages and requires approval again. Unused preparation can return to schema10 for
+editing. Actual crop execution is connected in E3; this stage creates no measurements.
+
 T051 adds a separate instrument-folder intake page. All supported raw TIFF candidates
 retain their original names and relative paths, including numbered variants. Users
 enter Fig/protein identities and fixed sample-slot counts, review thumbnails and

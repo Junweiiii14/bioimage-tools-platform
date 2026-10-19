@@ -180,7 +180,12 @@ def restore_staged_project(
         else project.template
     )
     changes: dict[str, object] = {"rows": rows, "template": template}
-    from wb_tool.application.instrument_intake import IntakeManifest, WBIntakeProject, intake_digest
+    from wb_tool.application.instrument_intake import (
+        IntakeManifest,
+        WBIntakeProject,
+        intake_manifest_digest,
+    )
+    from wb_tool.application.intake_workflow import WBIntakeWorkflowProject, recover_intake_workflow
 
     if isinstance(project, WBIntakeProject):
         manifest_fields = dict(project.intake)
@@ -191,11 +196,16 @@ def restore_staged_project(
             ),
             confirmed_digest="",
         )
-        changes["intake"] = IntakeManifest.model_validate(manifest_fields)
-        remapped = WBIntakeProject.model_validate({**dict(project), **changes})
+        remapped_manifest = IntakeManifest.model_validate(manifest_fields)
+        changes["intake"] = remapped_manifest
+        remapped_digest = intake_manifest_digest(project.project_id, remapped_manifest)
         if project.intake.confirmed_digest:
-            manifest_fields["confirmed_digest"] = intake_digest(remapped)
+            manifest_fields["confirmed_digest"] = remapped_digest
             changes["intake"] = IntakeManifest.model_validate(manifest_fields)
+        if isinstance(project, WBIntakeWorkflowProject):
+            changes["workflow"] = project.workflow.model_copy(
+                update={"intake_digest": remapped_digest}
+            )
     if isinstance(project, WBProjectOCR) and project.ocr:
         changes["ocr"] = project.ocr.model_copy(update={"source": mapped(project.ocr.source)})
     sources: list[ArchiveSource] = []
@@ -227,6 +237,11 @@ def restore_staged_project(
             result=assets.get(record.result_sha256),
             error=record.error,
         )
-    return with_archive_history(
+    restored = with_archive_history(
         project.model_copy(update=changes), tuple(sources), tuple(historical.values())
+    )
+    return (
+        recover_intake_workflow(restored)
+        if isinstance(restored, WBIntakeWorkflowProject)
+        else restored
     )

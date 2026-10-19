@@ -19,6 +19,44 @@ def javascript(window: WebWorkbenchWindow, qtbot: QtBot, code: str) -> object:
     return replies[0]
 
 
+def test_prepared_workflow_summary_preserves_pending_and_edit_guard(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        "setState({intake:{...state.intake,confirmed:true,assignments:["
+        "{protein_id:'protein-a',source_id:'source-a'},"
+        "{protein_id:'protein-b',source_id:'source-b'}]}});true",
+    )
+    assert javascript(window, qtbot, "!!document.querySelector('[data-intake=prepare]')")
+    javascript(
+        window,
+        qtbot,
+        "setState({intake:{...state.intake,workflow:{ready_count:0,steps:["
+        "{stage:'crop',target_id:'protein-a',status:'pending',attempt:0,reason:''},"
+        "{stage:'crop',target_id:'protein-b',status:'pending',attempt:0,reason:''},"
+        "{stage:'compose',target_id:'fig-a',status:'pending',attempt:0,reason:''},"
+        "{stage:'measure',target_id:'fig-a',status:'pending',attempt:0,reason:''},"
+        "{stage:'export',target_id:'intake-project',status:'pending',attempt:0,reason:''}"
+        "]}}});true",
+    )
+    assert javascript(
+        window, qtbot, "document.querySelector('.intake-workflow').innerText.includes('0 / 5')"
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "Array.from(document.querySelectorAll('[data-intake-field]')).every(el=>el.disabled)",
+    )
+    assert javascript(window, qtbot, "!document.querySelector('[data-intake=edit]').disabled")
+    assert javascript(window, qtbot, "!document.querySelector('[data-intake=start]')")
+    javascript(window, qtbot, "document.querySelector('[data-intake=edit]').click();true")
+    sent = javascript(window, qtbot, "JSON.stringify(sent)")
+    assert isinstance(sent, str) and json.loads(sent)[-1]["action"] == "intake_edit"
+
+
 @pytest.fixture
 def intake_page(qtbot: QtBot, tmp_path: Path) -> Iterator[WebWorkbenchWindow]:
     window = WebWorkbenchWindow(

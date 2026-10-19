@@ -101,6 +101,22 @@ from wb_tool.application.intake_execution import (
     IntakePlannedSlot,
     build_intake_execution_plan,
 )
+from wb_tool.application.intake_workflow import (
+    IntakeWorkflowLedger,
+    IntakeWorkflowStep,
+    IntakeWorkflowTicket,
+    WBIntakeWorkflowProject,
+    approve_intake_workflow,
+    claim_intake_workflow_step,
+    finish_intake_workflow_step,
+    intake_workflow_digest,
+    intake_workflow_snapshot,
+    prepare_intake_workflow,
+    recover_intake_workflow,
+    request_intake_workflow_cancel,
+    retry_intake_workflow_step,
+    return_to_intake_editing,
+)
 from wb_tool.application.laboratory_layout import (
     DisplayFrame,
     FigureColumn,
@@ -244,6 +260,20 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "IntakeWorkflowLedger",
+    "IntakeWorkflowStep",
+    "IntakeWorkflowTicket",
+    "WBIntakeWorkflowProject",
+    "approve_intake_workflow",
+    "claim_intake_workflow_step",
+    "finish_intake_workflow_step",
+    "intake_workflow_digest",
+    "intake_workflow_snapshot",
+    "prepare_intake_workflow",
+    "recover_intake_workflow",
+    "request_intake_workflow_cancel",
+    "return_to_intake_editing",
+    "retry_intake_workflow_step",
     "IntakeExecutionPlan",
     "IntakePlannedCell",
     "IntakePlannedFigure",

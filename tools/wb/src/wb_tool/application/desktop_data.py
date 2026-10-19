@@ -53,6 +53,7 @@ class WBJob:
         "preview",
         "discover_tiffs",
         "automatic_row",
+        "intake_workflow_prepare",
         "automatic_export",
         "metadata_read",
         "ocr_preview",

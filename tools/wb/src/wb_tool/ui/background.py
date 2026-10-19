@@ -110,6 +110,16 @@ class _Work(QObject):
                 from wb_tool.adapters.automatic_export import discover_tiffs
 
                 value = discover_tiffs(job.path, cancelled=cancel, with_report=True)
+            elif job.operation == "intake_workflow_prepare":
+                from wb_tool.application.intake_workflow import prepare_intake_workflow
+
+                if not isinstance(job.document, WBFigureProject) or cancel():
+                    raise ValueError("执行计划准备已取消或项目不存在")
+                value = prepare_intake_workflow(
+                    job.document, expected_digest=job.data.decode("ascii")
+                )
+                if cancel():
+                    raise ValueError("执行计划准备已取消")
             elif job.operation == "automatic_row":
                 from wb_tool.adapters.automatic import automatic_project_row
 
