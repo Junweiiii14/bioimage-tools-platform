@@ -7,3 +7,5 @@ This file stores compressed old history that should not be part of normal startu
 - Do not use this file for current state.
 - Move stale but potentially useful history here as concise summaries.
 - Keep pointers to relevant decisions, validation entries, or source files.
+
+T050初次归档复制因archive目录尚不存在失败，随后从未修改的main基线恢复原快照并归档；无历史丢失。原快照见archive/T050-before-plan-snapshot.md。
