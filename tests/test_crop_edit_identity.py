@@ -1,7 +1,6 @@
 """A stale web edit cannot overwrite or approve a newer source crop."""
 
 import json
-from dataclasses import fields
 from pathlib import Path
 
 import numpy as np
@@ -70,9 +69,9 @@ def test_stale_crop_commands_preserve_new_draft_and_fresh_edit_works(
         bridge.request(action, json.dumps(payload))
         current = host.view.project()
         assert current == advanced, {
-            field.name: (getattr(advanced, field.name), getattr(current, field.name))
-            for field in fields(advanced)
-            if getattr(advanced, field.name) != getattr(current, field.name)
+            name: (getattr(advanced, name), getattr(current, name))
+            for name in type(advanced).model_fields
+            if getattr(advanced, name) != getattr(current, name)
         }
         assert "改变" in str(bridge.snapshot()["status"])
     bridge.request(action, json.dumps(fresh))
@@ -167,9 +166,9 @@ def test_real_page_cancels_old_drag_and_accepts_new_gesture(
         )
         current = host.view.project()
         assert current == advanced, {
-            field.name: (getattr(advanced, field.name), getattr(current, field.name))
-            for field in fields(advanced)
-            if getattr(advanced, field.name) != getattr(current, field.name)
+            name: (getattr(advanced, name), getattr(current, name))
+            for name in type(advanced).model_fields
+            if getattr(advanced, name) != getattr(current, name)
         }
         qtbot.waitUntil(lambda: not host.operation_busy, timeout=10000)
         qtbot.waitUntil(lambda: js("!state.busy") is True, timeout=10000)
