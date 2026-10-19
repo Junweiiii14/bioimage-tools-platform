@@ -12,7 +12,7 @@
 ## 交付与验证
 
 - GitHub草稿PR：https://github.com/Junweiiii14/bioimage-tools-platform/pull/16；仅文档，不合并main。
-- 历史方案942ecaa独立审查无阻塞；本次S1/S2确认与独立OCR要求修订后重新审查，见work/evidence/T-050/independent-review.md。
+- 当前方案66f0b67f315810225ae0cb9136c3216846eadd71（含S1/S2确认与独立OCR要求）增量独审无阻塞；942ecaa保留为历史审查，见work/evidence/T-050/independent-review.md。
 - 本地链接、diff、规则回执、policy及handoff容量通过；PDF原blob不变。仅治理验证，不表示产品通过。
 - GitHub检查异步运行，最终状态以PR为准，不把初版head检查套到后继。
 - 下一步：按已确认的S1/S2、独立定量OCR及跨蛋白独立槽位规划，核对真实仪器多曝光规则，再建立M0实施任务。
