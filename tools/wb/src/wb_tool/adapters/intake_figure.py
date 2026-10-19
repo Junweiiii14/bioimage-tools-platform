@@ -1,10 +1,12 @@
 """Render a complete Fig, then plan existing quantitative requests on original TIFFs."""
 
 import json
-from collections.abc import Callable
+from collections.abc import Callable, Generator
+from contextlib import contextmanager
 from hashlib import file_digest, sha256
 from io import BytesIO
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from pydantic import TypeAdapter
 
@@ -12,6 +14,7 @@ from wb_tool.adapters.tiff_input import load_tiff
 from wb_tool.application.automatic import suggest_analysis_for_crop
 from wb_tool.application.figure_project import FigureRender, FigureSourcePath
 from wb_tool.application.intake_figure import (
+    IntakeFigureEvidence,
     IntakeFigurePreparation,
     WBIntakeFigureProject,
     intake_figure_digest,
@@ -23,6 +26,9 @@ from wb_tool.application.intake_workflow import (
     validate_intake_workflow_ticket,
 )
 from wb_tool.application.project_analysis import ProjectRowAnalysis
+
+if TYPE_CHECKING:
+    from PIL import Image
 
 
 def prepare_intake_figure(
@@ -100,14 +106,15 @@ def prepare_intake_figure(
     )
 
 
-def load_intake_figure_preview(
+@contextmanager
+def open_intake_figure_image(
     project: WBIntakeFigureProject,
     figure_id: str,
     path: str,
     *,
     cancelled: Callable[[], bool] = lambda: False,
-) -> FigureRender:
-    """Read the immutable completed PNG, retaining source provenance and scaled hit boxes."""
+) -> Generator[tuple["Image.Image", IntakeFigureEvidence, dict[str, object]], None, None]:
+    """Own one bounded, verified saved display image for preview or full encoding."""
     from PIL import Image
 
     evidence = next((e for e in project.intake_figures if e.figure_id == figure_id), None)
@@ -132,6 +139,51 @@ def load_intake_figure_preview(
         manifest = TypeAdapter(dict[str, object]).validate_json(provenance)
         if manifest.get("project_id") != project.project_id:
             raise ValueError("Fig显示资产来源记录无效")
+        yield image, evidence, manifest
+    if cancelled():
+        raise ValueError("Fig显示已取消")
+
+
+def load_intake_figure_render(
+    project: WBIntakeFigureProject,
+    figure_id: str,
+    path: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> FigureRender:
+    """Reuse exact saved full pixels; the display asset never becomes quantitative."""
+    with open_intake_figure_image(project, figure_id, path, cancelled=cancelled) as (
+        image,
+        evidence,
+        manifest,
+    ):
+        manifest["export_binding"] = {
+            "policy": "intake_saved_figure@1",
+            "revision": project.revision,
+            "figure_id": figure_id,
+            "input_digest": evidence.input_digest,
+            "asset_sha256": evidence.image.sha256,
+        }
+        return FigureRender(
+            image.width, image.height, image.tobytes(), json.dumps(manifest, ensure_ascii=True)
+        )
+
+
+def load_intake_figure_preview(
+    project: WBIntakeFigureProject,
+    figure_id: str,
+    path: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> FigureRender:
+    """Read the immutable completed PNG, retaining source provenance and scaled hit boxes."""
+    from PIL import Image
+
+    with open_intake_figure_image(project, figure_id, path, cancelled=cancelled) as (
+        image,
+        evidence,
+        manifest,
+    ):
         rows = TypeAdapter(tuple[dict[str, object], ...]).validate_python(manifest.get("rows"))
         image.thumbnail((2048, 2048), Image.Resampling.LANCZOS)
         width, height = image.size

@@ -126,8 +126,9 @@ def export_intake_outputs(
     ticket: IntakeWorkflowTicket | None = None,
     cancelled: Callable[[], bool] = lambda: False,
 ) -> IntakeOutputPreparation:
-    from wb_tool.adapters.figure_export import export_figure_bundle, render_figure
+    from wb_tool.adapters.figure_export import export_figure_bundle
     from wb_tool.adapters.figure_image_export import publish_rendered_image
+    from wb_tool.adapters.intake_figure import load_intake_figure_render
     from wb_tool.adapters.laboratory_figure import render_display_segment
     from wb_tool.adapters.project_evidence import verify_project_evidence
     from wb_tool.adapters.project_export import project_csv_bytes, project_xlsx_bytes
@@ -225,8 +226,12 @@ def export_intake_outputs(
                         evidence.image,
                         cancelled,
                     )
-                    projection = intake_figure_projection(project, figure.figure_id)
-                    rendered = render_figure(projection, frozen_sources, cancelled=cancelled)
+                    rendered = load_intake_figure_render(
+                        project,
+                        figure.figure_id,
+                        frozen_paths[evidence.image.sha256],
+                        cancelled=cancelled,
+                    )
                     publish_rendered_image(
                         rendered, project.template.dpi, str(image), cancelled=cancelled
                     )
