@@ -1,10 +1,5 @@
 # Current Work Log
 
-## 2026-10-17 CI010 Linux退出SIGSEGV
-
-0d仅文档后继Linux669/146.29秒后SIGSEGV主线程noPythonframe，exit245/wheel未跑；同HEAD Windows669/346.68秒child0+wheels/dev成功。T043重开in_progress，旧成功/失败全保留；CI010只增显式GDB观察/0与17与真实SIGSEGV控制，不猜测性修Qt清理，不改产品/断言/15分钟。作者相关8项2.49秒0，双平台模块类型0；Linux控制/全检待真实执行，独审待绑定。
-
-
 ## 2026-10-17 CI011 Windows异常观察
 
 40f Linux真实669/158.32秒GDB+全wheel/dev0；Windows669/433.12秒后Aborted/AV，childc0000005。WSL同锁定环境669/398.40秒pytest0及正常关闭page/profile释放0，不支持必然泄漏假设。无CDB，仅枚举未执行官方Nuget包；新增系统API单个owned live解释器异常观察，五控制0且真实AV原码保留，相关9项2.64秒0/双平台模块类型0，正式670/独审待执行；不称产品修复。
@@ -188,3 +183,7 @@ T057 done，产品ff89867：完整Fig先持久化再真实原像素运行；843/
 ## 2026-10-20 E5完成，连续进入E6
 
 T058 done，产品8feffce：schema14稳定身份填表、冻结资产/run、新目录输出、索引CAS后完成、真实归档恢复不注册外来PID。858/623.78s、原child0、9契约/全wheel/真实OCR/check0；冻结run竞态和同步busy独审P2均resolved，最终绑定8fe无新P0–P2；UI ship/documenter No changes。823首轮类型失败1历史保留。科学/真实确认批次/干净Win10/物理DPI和main/安装版仍未验，不发布。下一项T059，详细证据work/evidence/T-058。
+
+## 2026-10-20 E6 closeout
+
+Completed ea7ed55 frozen render reuse, exact-owned widgets and full stage pagination. 862/624.64s + original child0/all wheels/real OCR/full gate0; independent scoped review/UI ship. Export20x2 thresholds passed; desktop20/phase1/cancel5 explicitly limited. Inventory4 does not resolve purecall UNKNOWN. Auto-next E7, including historical OCR late cancellation P2 discovered by separate high-risk audit. No remote mutation/new installer yet.

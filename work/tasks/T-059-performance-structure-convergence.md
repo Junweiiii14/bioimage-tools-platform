@@ -1,6 +1,6 @@
 # T-059：E6性能、结构和交互收敛
 
-- 状态：implementing；base8bf01f9（E5收尾），前置产品8feffce/858完整门禁/全wheel及绑定独审通过。有效树t051/codex/wb-e0-e7。用户授权按docs/wb-execution-plan.md连续E0–E7，不重复索批、不设定时任务。
+- 状态：done（E6本机工程范围；2026-10-20）；base8bf01f9（E5收尾），前置产品8feffce/858完整门禁/全wheel及绑定独审通过。有效树t051/codex/wb-e0-e7。用户授权按docs/wb-execution-plan.md连续E0–E7，不重复索批、不设定时任务。
 - 范围：tools/wb、apps/desktop、tests、tooling、docs、.impeccable、PRODUCT.md、DESIGN.md、AGENT_HANDOFF.md、.agent-handoff、work/tasks/T-059-performance-structure-convergence.md、work/evidence/T-059。
 - 实施前：待E5满足门禁/独审，核对HEAD与dirty，加载规则/读取模块契约；先测冻结基线再改产品。真实开发仪器批次的已确认Fig/蛋白/N及独立真值未齐，相关纵向科学验收保留，不替用户猜测；合成工程闭环及不依赖缺口的优化继续。
 - 已核实热点：automatic_export分别调用PNG/TIFF/ZIP，布局重复3次；intake_output每Fig从原图重绘TIFF并在ZIP再绘组合图，完整Fig保存PNG已有像素可复用。先按来源/实际布局入口计数和计时，不预建常驻worker或无界缓存。原值与显示保持隔离。
@@ -10,4 +10,5 @@
 - 冻结比较方法（优化前承诺）：同硬件/锁/脚本/数据，导出样本各模式20个新进程，记录原始n/p50/最近秩p95/峰RSS/解码及布局次数/体积；排除夹具建立时间，OS页缓存未清除。冷启动/各阶段/取消延迟另记真实可得观察，昂贵或缺实际批次时明确样本限制。
 - 预设通过阈值：选定旧重复渲染布局计数3→1且p50改善超过max(10%,基线相对MAD×2)；其他测量模式p95回退不超10%，峰RSS上升不超max(32MiB,基线10%)。不足改善或噪声过大如实保留，不事后放宽；可拒绝无收益优化。原值裁剪SHA/显示像素/来源/CSV科学结果必须保持冻结预期，非像素元数据变化显式版本化。
 - 验证：针对性数值/故障/真实宿主、公开wheel/反向依赖完整门禁、绑定最终提交非作者独审、UI限定独审/交接；不弱化测试/预算/容差，不改锁/依赖。工程完成不代表科学/目标机/正式发布完成。
-- 下一步：开始基线采样与最小性能实验，通过后结构/交互/所属fixture收敛，最终验证及独审再自动E7。
+- 完成：最终ea7ed55完整check0（862/624.64s、原child0、全部wheel/真实OCR）、绑定非作者审查/E6 UI ship。冻结导出两模式20样本阈值全过；桌面就绪20/阶段1场景/取消5另记限制。退出inventory4非截断，历史UNKNOWN不销账。证据见work/evidence/T-059。下一步自动E7/T060：修复补充风险审查发现的历史OCR迟到取消竞态，再集成及新隔离安装候选。
+

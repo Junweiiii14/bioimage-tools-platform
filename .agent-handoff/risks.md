@@ -102,3 +102,5 @@
 - T044历史AV/c0000005精确根因仍UNKNOWN，native-exit.md保留；后继修复真实隐藏无parent控件但不证明AV因果，Qt-only控制未复现。最终a72e710 733 passed in 525.53s、全部wheel/dev0且独审通过，仅证明本轮运行。积分13有效35复核，无积分真值/留出；恢复/最终Windows/DPI待验。旧P2不变目标丢边界已绑定独审关闭；中途失败/中止均保留，不改成功状态。
 
 - CI012真实远端Linux在OCR运行时SIGSEGV，观察非GUI线程QWidget析构；不是全用例通过后退出。精准fixture销毁缺口修正待绑定独审/远端验证，不以本机成功或受控引用环实验宣称全部原生问题已解决。
+
+- E7前置独审ea7ed55发现历史OCR迟到取消P2：project_ocr异步decode和figure_window安装只查generation，取消/关闭后仍可能替换关联；T060须受保护CAS/失败及取消回归后解决。E6最终862/624.64s原child0/check0、inventory4/nontruncated只证明本轮，不销原生UNKNOWN。
