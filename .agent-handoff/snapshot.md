@@ -1,13 +1,14 @@
 # Handoff Snapshot
 
-- 唯一状态源：work/tasks/T-060-integration-installation-acceptance.md，E7 implementing。按docs/wb-execution-plan.md连续推进，E0–E6本地实现/门禁/绑定独审完成；无再次阶段批准、无定时任务。
-- 有效主树t051-instrument-intake/codex/wb-e0-e7，当前准备合并5bb91cde6c20a00f39160cdaac5a5b627b4a3835；root独写，非作者只读审查。原ResearchVault dirty树、原图/旧结果/T047/T048/用户PID55936保留。
-- 当前产品整树apps/packages/tools/tooling/.github严格等e57949b；准备合并历史c2527d6只新增原样8-case quant_session_identity测试，实际8/3.95s0（Windows default Qt）。旧测试完整保留。非作者5bb准备态审查无P0–P2/独立字节探针0，不把多manifest准备态当actualmain规则通过。
-- 5bb完整check已结束：908pass/1fail/762s，原pytest1/u32=1、outer1、wheel未跑。失败旧latebatch测试遇真实autosave新批，失败workspace4运行的revision0→2及最终draft4引用核验见late-batch-failure.json。测试现隔离旧完成并新增合法fresh followup；最终30相关/176.96s0+Ruff/format713/Pyright0。新测试提交独审和新完整门禁待做，不能标完整绿。
-- main实际5f20960731132b68e2b010c1e0141e2761242420，已接受PR7→3→8→9→10→11。PR12/202 Windows610/wheel0，Linux15min超时UNKNOWN。3f LinuxGDB0/17/literal/fault/interrupt17/term非零控制全部成功；完整609pass1fail170.52s原1，首WebChannel15000ms超时、无wheel。新eb60fc5仅DOM/renderer诊断和显式无GPU CI环境，Windows真实channel1/9.21s0、静态/types0，最终独审/新四CI待做。
-- e7-integration辅助树当前codex/e7-integrate-10/c2527d6。已存07/202（PR12）；08/c2e5bf7（PR13准备18/32.35s0、审查0）；09/5febadf（PR14准备，产品同已审ae）；10/c2527d6（PR15准备，产品同已审9ad、19/20.01s0）。逐个等实际main接受、merge/reload、最终head独审及四服务器检查再集成。当前后继准备不得冒充接受。
-- 独立E7测试包e579 build/install/upgrade/uninstall/reinstall均0；非管理员Win11中文新目录，独立AppId/E7Test设置/快捷方式。v2/v3安装态intake14与gray7检查均actual0，私有runtime/无开发模块/无所属残留；真实PS5.1随包双自检0。两处synthetic用户数据SHA不变，旧PID55936/exe摘要不变。f12证据独审无P0–P2。桌面BioImage-WB-E7-测试版-T060含setup/manifest/readme/SHA256SUMS，setup SHA177f29d6ee46b6e5b14c3d42cebaf7a5ba9e1b282f9e5e599436372f7e70730f。
-- 所有本机Qt/CLI/安装态诊断串行；当前两树Qt均已结束，下一步primary新full独占Qt。四个本轮预览HTTP服务器已用所属exec Ctrl-C停止，用户窗口保持。远端CI/只读静态可并行。
-- 下一步：绑定新测试提交独审并执行910项新完整门禁；PR12新诊断head四服务器检查；PR13→14→15逐步actualmain；主树合最终actualmain后更新唯一T060 manifest/回执，规则加载读取、最终绑定独审/四CI/需求矩阵与交接。准备合并产品未变，若后续仍字节相同不重复构建；否则重新验受影响项。
-- 历史purecall/native/两次页面间歇/PR8/PR11超时UNKNOWN不销账。科学独立真值/样本映射、干净Win10与物理DPI125/150/200缺失，不标通过或正式发布。原生CUA用户Esc已停止，不再调用。
-
+- 唯一任务work/tasks/T-060-integration-installation-acceptance.md，E7 implementing；E0–E6本地实现/门禁/绑定独审完成。按批准计划连续推进，无重复阶段批准、无定时任务。
+- 主树t051-instrument-intake/codex/wb-e0-e7；root独写，非作者只读。原ResearchVault dirty树、原图/历史结果、T047/T048旧安装和用户PID55936保持。
+- 产品运行代码仍等installed e57949b；8e110280b4510c5bf1544bfabb9466792c1fa722完整910/705.48s，原pytest0/u32=0、inventory4/nontruncated、全部隔离wheel/真实OCR/check actual0。非作者8e绑定无P0–P2；拒绝手势只dispatch一次的测试P2已关闭。当前仅文档刷新阶段状态，需规则重载/提交审查。
+- 原5bb908pass1fail/762s、d7f909pass1fail/744.29s原child1/wheel未跑，保留fullcheck-diagnostics。latebatch测试隔离旧完成并验证合法新批；crop使用冻结身份原子就绪/单次事件，实际拒绝在waitUntil外失败，真实拒绝反例counter+1。原安全断言/时限均保持，旧native/GPU/页面间歇根因仍UNKNOWN。
+- actualmain6e8b1e665e07b78171203721ecbd6985fb52b981，PR7→3→8→9→10→11→12→13已接受。PR12eb60 Windows610/511.08s/Linux610/178.32s和全部wheel0；PR13final8cdc Windows646/640.19s/Linux646/240.28s和全部wheel0；都绑定独审/四检查。primary元数据合并1891f16后运行代码不变。
+- PR14 finalb1d2c8b827bd8eee1f8190390cdd2e8badf926c8，actualbase6e8、最终非作者无P0–P2/规则0；四CI39341804292与39341804369运行中（rules/desktop已pass）。准备态产品等已审ae14904，真实相关14Qt/18纯0，static499/types0。
+- aux e7-integration当前codex/e7-integrate-10/3748bba，准备T044/PR15，合前置最终b1（PR14尚未接受）。产品等已审9adf5d5；19相关/20.01s0、static565/types0。准备独审04f529d无P0–P2。待actualmain14接受后merge/reload/最终提交审查/四CI，再接受PR15。
+- 当前主树普通scope .规则已按6e8读取并更新架构/模块说明。旧准备SYNC008/T044历史回执存在base祖先缺口，integration context正确拒绝；保留原版本，等实际接受PR14/15有效回执合入后生成唯一T060最终manifest，不改验证器/删记录。
+- E7测试包e579 build/install/upgrade/uninstall/reinstall0，非管理员Win11中文独立目录/AppId/E7Test/快捷方式。安装态v2/v3 intake14与gray7及真实PS5.1双自检均0，私有runtime/无开发模块/无所属残留。两处synthetic用户数据SHA和旧PID55936/exe摘要不变。f12证据独审无P0–P2。
+- 桌面BioImage-WB-E7-测试版-T060有setup/manifest/readme/SHA256SUMS；setup SHA177f29d6ee46b6e5b14c3d42cebaf7a5ba9e1b282f9e5e599436372f7e70730f。文档更新不改安装二进制；最终再核运行文件等价。
+- 两树本机Qt当前均结束，继续保持Qt/CLI/包态诊断串行。四个所属预览HTTP服务已停止；不碰用户窗口，不恢复用户Esc停止的原生CUA。
+- 下一步PR14四CI→精确merge→PR15实际base重载/独审/四CI→主树合最终main、唯一T060有效manifest、最终绑定独审/产品PR四CI/main集成及交接。科学留出/明确样本映射、干净Win10、物理DPI125/150/200缺失保持未验，不标正式发布。

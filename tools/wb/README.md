@@ -7,14 +7,14 @@ See `../../docs/contracts/wb-intake-crop-v1.md` and `../../work/tasks/T-056-fixe
 
 # WB 数值核心
 
-E3/T056实施中：schema12/intake_crop@1保存固定N槽位与原图几何建议，
+E3/T056已完成宿主接入、本机工程验证及绑定独审：schema12/intake_crop@1保存固定N槽位与原图几何建议，
 无定位仍保留完整槽位，不伪造坐标/测量。显式审核后通过既有原值TIFF适配器导出，
 schema1–11读取保持；契约见`../../docs/contracts/wb-intake-crop-v1.md`。
-宿主接入和整阶段验证尚未完成，不能将纯核心测试作为E3完成。
+E4/schema13连接完整Fig后原像素定量，E5/schema14连接身份填表、新目录导出与恢复；E6复用冻结渲染。实际阶段证据与外部验收边界见`../../docs/wb-execution-acceptance.md`，不以纯核心测试代替宿主/安装验收。
 
 T055/E2新增schema11清单阶段账本，保存行crop/完整Fig compose/measure/项目export依赖、
 尝试票据、取消请求及中断恢复；账本不代替已提交数值证据。桌面后台准备执行摘要，
-未执行时可返回清单修改；真实裁剪执行器在E3接入。契约见
+未执行时可返回清单修改；真实裁剪执行器已在E3接入。契约见
 `../../docs/contracts/wb-intake-workflow-v1.md`。
 
 T054/E1新增`build_intake_execution_plan`：从已确认schema10重建不可变槽位、
@@ -24,7 +24,7 @@ T054/E1新增`build_intake_execution_plan`：从已确认schema10重建不可变
 
 T051新增`WBIntakeProject/schema10`与仪器原图池、稳定Fig/蛋白身份、固定槽位数、
 显式批量分配及确认摘要；未分配来源和原名/相对路径可保存重开。
-当前仅接通导入规划阶段，禁止把确认当作裁剪审核或产生定量；旧独立灰度OCR保留。
+T051当时仅覆盖导入规划；后续E3–E5已接通执行。清单确认仍不等于裁剪审核或产生定量；旧独立灰度OCR保留。
 公开API和兼容约束见`../../docs/contracts/wb-instrument-intake-v1.md`。
 
 T045增加完整泳道手动框选、共享原图分组、补峰/排除及schema9 Fig拼图定量。

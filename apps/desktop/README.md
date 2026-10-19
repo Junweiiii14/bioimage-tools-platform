@@ -7,7 +7,8 @@ stages. See T058/T059 for actual checks and remaining scientific/target-machine 
 E7 adds an explicit --execution-test builder profile with its own E7Test settings,
 AppId, Chinese install directory and shortcuts; existing profiles remain separate.
 --verify-intake-installation complements the independent grayscale/OCR diagnostic.
-The new package is not accepted until T060 installed evidence is recorded. Interface:
+T060 records passed local Win11 installed dual-flow/lifecycle evidence for e579;
+final main integration and external scientific/clean-target/DPI acceptance remain separate. Interface:
 ../../docs/contracts/wb-installed-diagnostics-v1.md.
 E4 adds schema13 complete-Fig evidence and original-pixel measurement to intake.
 IntakeWorkflowSession saves the complete Fig before starting its real RunSession batch;

@@ -1,7 +1,7 @@
 # 模块地图
 
 E5/T058已完成schema14 `application/intake_output.py`：稳定Fig/行/槽位填表、冻结资产/run、新目录索引与恢复输出；桌面导入索引/CAS后才完成阶段。旧schema1–13保持，科学/目标机门禁另记。
-E6/T059实施中：同操作冻结FigureRender复用PNG/TIFF/ZIP，单Fig TIFF复用已核验保存PNG全像素，组合ZIP单独布局；PNG验证上下文由预览与编码实际复用。无跨操作原值缓存，不改变定量。阶段页支持完整分页。所属纯Qt测试控件按明确登记释放，不全局GC；最终门禁与审查以任务记录为准。
+E6/T059已完成本机工程验证及绑定独审：同操作冻结FigureRender复用PNG/TIFF/ZIP，单Fig TIFF复用已核验保存PNG全像素，组合ZIP单独布局；PNG验证上下文由预览与编码实际复用。无跨操作原值缓存，不改变定量。阶段页支持完整分页。所属纯Qt测试控件按明确登记释放，不全局GC；E7集成/安装及外部验收状态见T-060和[验收索引](wb-execution-acceptance.md)。
 
 E4已完成增量：`application/intake_figure.py`提供schema13完整Fig依据、稳定身份与
 冻结测量终态合并；`adapters/intake_figure.py`生成核验PNG及只读缩放预览，定量仍从
