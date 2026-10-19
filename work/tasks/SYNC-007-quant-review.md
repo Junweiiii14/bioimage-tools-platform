@@ -1,6 +1,6 @@
 # SYNC-007：阶段 7/8 — 灰度监督、标准显示与真实图验证
 
-- 状态：preparing；E7/T060授权依赖集成，前置PR12尚未接受；待定量旧会话P2等价回移/实际main及最终门禁。
+- 状态：review；前置PR12已独审/四检查接受实际main5691ee8，当前定量会话身份及18项验证已完成，待最终actualbase/head独审和四服务器检查。
 - 原始产品快照：b32acff0dff9d6c6a84741ecc3aba8a3be4a010f；前置分支codex/stage-06-workbench，精确基线d83e1bd2dbeaea2213a99c78c6168081afdb6ef0。
 - 当前产品2e5021d已独审，完整门禁642项通过；该结论不替代本历史阶段CI或独立产品审查。
 - 额外差异仅规则校验前置变更、阶段任务/显式回执清单及真实历史回执重载（本阶段[]）；产品快照另行逐文件验证。
@@ -11,3 +11,4 @@
 ## E7 preparation
 
 原4582976按4a9基线scope .加载并读规则/任务/模块地图及网页契约。非作者实际方法探针确认quant_edit只核row/source/generation不核project/epoch，旧会话可进入安装及重算；主树0c927f5已修并独审关闭。本阶段仅回移既有quant_edit和对应手势保护（尚无quant_target或manual commands），保留前置crop契约和OCR/CAS修复。主树Qt全量运行中，本树不并发Qt或重型测试，不把准备/静态绿当最终接受。
+
