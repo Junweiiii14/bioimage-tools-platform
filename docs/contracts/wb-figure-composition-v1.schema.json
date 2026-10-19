@@ -1,0 +1,157 @@
+{
+  "$defs": {
+    "DisplayFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "center_x": {
+          "title": "Center X",
+          "type": "number"
+        },
+        "center_y": {
+          "title": "Center Y",
+          "type": "number"
+        },
+        "width": {
+          "exclusiveMinimum": 0,
+          "title": "Width",
+          "type": "number"
+        },
+        "height": {
+          "exclusiveMinimum": 0,
+          "title": "Height",
+          "type": "number"
+        },
+        "angle_degrees": {
+          "maximum": 30,
+          "minimum": -30,
+          "title": "Angle Degrees",
+          "type": "number"
+        }
+      },
+      "required": [
+        "center_x",
+        "center_y",
+        "width",
+        "height",
+        "angle_degrees"
+      ],
+      "title": "DisplayFrame",
+      "type": "object"
+    },
+    "FigureColumn": {
+      "additionalProperties": false,
+      "properties": {
+        "figure": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Figure",
+          "type": "string"
+        },
+        "column": {
+          "maximum": 12,
+          "minimum": 1,
+          "title": "Column",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "figure",
+        "column"
+      ],
+      "title": "FigureColumn",
+      "type": "object"
+    },
+    "FigureSlice": {
+      "additionalProperties": false,
+      "properties": {
+        "display_frame": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DisplayFrame"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "row_id": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Row Id",
+          "type": "string"
+        },
+        "figure": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Figure",
+          "type": "string"
+        },
+        "line": {
+          "maximum": 512,
+          "minimum": 1,
+          "title": "Line",
+          "type": "integer"
+        },
+        "position": {
+          "maximum": 96,
+          "minimum": 1,
+          "title": "Position",
+          "type": "integer"
+        },
+        "first_lane": {
+          "maximum": 96,
+          "minimum": 1,
+          "title": "First Lane",
+          "type": "integer"
+        },
+        "last_lane": {
+          "maximum": 96,
+          "minimum": 1,
+          "title": "Last Lane",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "row_id",
+        "figure",
+        "line",
+        "position",
+        "first_lane",
+        "last_lane"
+      ],
+      "title": "FigureSlice",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": 1,
+      "maximum": 1,
+      "minimum": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "slices": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/FigureSlice"
+      },
+      "maxItems": 4096,
+      "title": "Slices",
+      "type": "array"
+    },
+    "columns": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/FigureColumn"
+      },
+      "maxItems": 512,
+      "title": "Columns",
+      "type": "array"
+    }
+  },
+  "title": "FigureComposition",
+  "type": "object"
+}

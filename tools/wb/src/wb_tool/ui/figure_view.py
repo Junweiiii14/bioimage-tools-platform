@@ -63,6 +63,7 @@ from wb_tool.application.project_normalization import (
 )
 from wb_tool.application.project_ocr import WBProjectOCR, bind_project_ocr_row, project_with_ocr
 from wb_tool.application.project_restore import WBRestoredProject, with_archive_history
+from wb_tool.domain.automatic import resize_crop_for_lane_count
 from wb_tool.domain.grid import fixed_lane_grid
 from wb_tool.domain.lanes import LaneROI
 from wb_tool.ui.canvas import ImageCanvas
@@ -144,10 +145,11 @@ class FigureProjectView(QWidget):
         self._project = WBFigureProject(project_id=uuid4().hex)
         self._thumbnails: dict[str, QIcon] = {}
         self._source_preview: PreviewRaster | None = None
+        self._rendered_preview: FigureRender | None = None
         self._last_review_focus: QWidget | None = None
         self._pending_review_focus: QWidget | None = None
         self._crop_history: list[
-            tuple[str, tuple[int, int, int, int], tuple[int, int, int, int]]
+            tuple[str, tuple[int, int, int, int], tuple[int, int, int, int], int, int]
         ] = []
         self._crop_history_index = 0
         self._restoring_crop = False
@@ -978,6 +980,8 @@ class FigureProjectView(QWidget):
         return project
 
     def set_project(self, project: WBFigureProject) -> None:
+        self._rendered_preview = None
+        self.preview_label.clear_render()
         self._loading = True
         old_index = self.table.currentRow()
         selected = (
@@ -1185,6 +1189,7 @@ class FigureProjectView(QWidget):
         self.ocr.result_view.invalidate()
         self.normalization.result_view.invalidate()
         self.preview_label.clear_render()
+        self._rendered_preview = None
         self.changed.emit()
         self._overlay()
 
@@ -1443,20 +1448,35 @@ class FigureProjectView(QWidget):
         except ValueError as error:
             self.status.setText(str(error))
 
-    def _drawn(self, coords: tuple[int, int, int, int]) -> None:
+    def set_crop_lane_count(self, lane_count: int) -> None:
+        """Atomically resize original-coordinate crop and N with one undo entry."""
+        current = self.selected_row()
+        if current is None or current.roi is None:
+            raise ValueError("请先选择有裁剪框的原图")
+        if any(number > lane_count for number in current.empty_lanes):
+            raise ValueError("泳道数不能小于已标记空泳道的位置")
+        crop = resize_crop_for_lane_count(current.roi, lane_count, current.width, current.height)
+        self._drawn((crop.x0, crop.y0, crop.x1, crop.y1), lane_count=lane_count)
+
+    def _drawn(self, coords: tuple[int, int, int, int], *, lane_count: int | None = None) -> None:
         index = self.table.currentRow()
         if index < 0 or self._project.rows[index].source is None:
             return
         current = self.selected_row()
         previous_roi = current.roi if current else None
+        previous_count = current.lane_count if current else 1
+        next_count = previous_count if lane_count is None else lane_count
         if previous_roi and not self._restoring_crop:
             before = (previous_roi.x0, previous_roi.y0, previous_roi.x1, previous_roi.y1)
-            if before != coords:
+            if before != coords or previous_count != next_count:
                 self._crop_history[self._crop_history_index :] = [
-                    (self._project.rows[index].row_id, before, coords)
+                    (self._project.rows[index].row_id, before, coords, previous_count, next_count)
                 ]
                 self._crop_history_index += 1
         self._loading = True
+        count_item = self.table.item(index, 3)
+        if count_item:
+            count_item.setText(str(next_count))
         for column, value in enumerate(coords, start=4):
             item = self.table.item(index, column)
             if item:
@@ -1490,16 +1510,33 @@ class FigureProjectView(QWidget):
         target = self._crop_history_index - 1 if step < 0 else self._crop_history_index
         if not 0 <= target < len(self._crop_history):
             return
-        row_id, before, after = self._crop_history[target]
+        row_id, before, after, before_count, after_count = self._crop_history[target]
         index = next((i for i, row in enumerate(self._project.rows) if row.row_id == row_id), -1)
         if index < 0:
+            return
+        # Later metadata edits (especially empty slots) may invalidate an older N.
+        # Validate the complete target row before changing cells, selection or history.
+        try:
+            current = self.project().rows[index]
+            restored = current.model_dump()
+            restored.update(
+                roi=LaneROI(row_id, *(before if step < 0 else after)),
+                lane_count=before_count if step < 0 else after_count,
+                reviewed=False,
+            )
+            FigureRow.model_validate(restored)
+        except ValueError as error:
+            self.status.setText(f"无法恢复裁剪：{error}")
             return
         self.table.setCurrentCell(index, 0)
         if self.table.currentRow() != index:
             return
         self._restoring_crop = True
         try:
-            self._drawn(before if step < 0 else after)
+            self._drawn(
+                before if step < 0 else after,
+                lane_count=before_count if step < 0 else after_count,
+            )
             self._crop_history_index += step
         finally:
             self._restoring_crop = False
@@ -1619,7 +1656,13 @@ class FigureProjectView(QWidget):
             if item and not self.table.isRowHidden(index.row()):
                 item.setCheckState(Qt.CheckState.Checked)
 
+    @property
+    def rendered_preview(self) -> FigureRender | None:
+        """Exact current display render, including source hit regions in its manifest."""
+        return self._rendered_preview
+
     def show_render(self, rendered: FigureRender) -> None:
+        self._rendered_preview = rendered
         image = QImage(
             rendered.rgb,
             rendered.width,

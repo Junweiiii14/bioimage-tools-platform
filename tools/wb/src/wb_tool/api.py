@@ -13,6 +13,13 @@ if TYPE_CHECKING:
 from wb_tool.adapters.automatic import automatic_project_row
 from wb_tool.adapters.metadata_input import read_metadata_file
 from wb_tool.adapters.ocr_input import OCRImage, load_ocr_image
+from wb_tool.adapters.quant_export import (
+    export_wbquant_table,
+    wbquant_csv_bytes,
+    wbquant_table_rows,
+    wbquant_xlsx_bytes,
+)
+from wb_tool.adapters.quant_supervision import replan_quant_lanes
 from wb_tool.adapters.tiff_input import ImageInputError, LoadedTiff, load_tiff
 from wb_tool.application.analysis import (
     AnalysisCancelled,
@@ -62,6 +69,7 @@ from wb_tool.application.figure_template import (
     TemplateFont,
 )
 from wb_tool.application.laboratory_layout import (
+    DisplayFrame,
     FigureColumn,
     FigureComposition,
     FigureLayoutStyle,
@@ -69,6 +77,7 @@ from wb_tool.application.laboratory_layout import (
     LaboratoryLayout,
     WBLayoutProject,
     initial_composition,
+    ordered_quant_rows,
     plan_laboratory_layout,
     with_figure_layout,
 )
@@ -144,6 +153,7 @@ from wb_tool.application.project_restore import (
     project_assets,
     restore_staged_project,
 )
+from wb_tool.application.quant_supervision import install_quant_request, update_quant_lane
 from wb_tool.application.worker_protocol import (
     AcceptedFrame,
     CancelFrame,
@@ -159,7 +169,12 @@ from wb_tool.application.worker_protocol import (
     worker_protocol_schema,
 )
 from wb_tool.application.worksheet import WorksheetCell, fill_worksheet, propose_worksheet
-from wb_tool.domain.automatic import AutoWBSettings, detect_automatic_geometry
+from wb_tool.domain.automatic import (
+    AutoWBSettings,
+    CropPolicy,
+    detect_automatic_geometry,
+    resize_crop_for_lane_count,
+)
 from wb_tool.domain.crop_detection import (
     CropCandidate,
     CropDetection,
@@ -168,6 +183,12 @@ from wb_tool.domain.crop_detection import (
 )
 from wb_tool.domain.grid import fixed_lane_grid
 from wb_tool.domain.lanes import LaneProfiles, LaneROI, Polarity, compute_lane_profiles
+from wb_tool.domain.quant_supervision import (
+    QuantBandProposal,
+    QuantLaneProposal,
+    propose_quant_lane,
+    propose_quant_lanes,
+)
 from wb_tool.domain.quantify import (
     BandBounds,
     Baseline,
@@ -188,9 +209,22 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "export_wbquant_table",
+    "wbquant_table_rows",
+    "wbquant_csv_bytes",
+    "wbquant_xlsx_bytes",
+    "replan_quant_lanes",
+    "update_quant_lane",
+    "install_quant_request",
+    "propose_quant_lane",
+    "propose_quant_lanes",
+    "QuantBandProposal",
+    "QuantLaneProposal",
     "automatic_project_row",
     "with_automatic_rows",
     "AutoWBSettings",
+    "CropPolicy",
+    "resize_crop_for_lane_count",
     "AutomaticRowEvidence",
     "AutomaticWBResult",
     "WBAutomaticProject",
@@ -207,6 +241,8 @@ __all__ = [
     "read_figure_template",
     "FigureColumn",
     "FigureComposition",
+    "ordered_quant_rows",
+    "DisplayFrame",
     "FigureLayoutStyle",
     "FigureSlice",
     "LaboratoryLayout",

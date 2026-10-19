@@ -71,6 +71,11 @@ from bioimage_app.workbench_style import apply_workbench_theme
 
 
 class FigureProjectWindow(QMainWindow):
+    @property
+    def project_results(self) -> tuple[LoadedProjectResult, ...]:
+        """Verified immutable results for presentation adapters."""
+        return self._project_results
+
     closed = Signal()
     workspace_opened = Signal(str)
     measurement_progress = Signal(str)
@@ -922,6 +927,46 @@ class FigureProjectWindow(QMainWindow):
         if self._closing:
             session.cancel()
 
+    def replan_quant_lane(self, row_id: str) -> None:
+        """Re-detect changed lane geometry off the GUI thread, then commit measurements."""
+        project = self.view.project()
+        row = next((r for r in project.rows if r.row_id == row_id), None)
+        if self.operation_busy or not row or not row.source:
+            return
+        path = self.source_paths.get(row.source.sha256)
+        if not path:
+            self._error("原图资产不可用，无法重新规划泳道")
+            return
+        generation = self.view.generation
+        self._start()
+
+        def replanned(reply: WBReply) -> None:
+            if self._closing or self._cancellation.is_set():
+                self._done("泳道调整已取消")
+                return
+            if generation != self.view.generation:
+                self._done("参数已改变，旧的泳道规划未覆盖当前编辑")
+                return
+            if reply.error or not isinstance(reply.value, WBAnalysisProject):
+                self._error(reply.error or "泳道规划结果无效")
+                return
+            self.view.set_project(reply.value)
+            self.view.generation += 1
+            self._busy = False
+            self.analyze_project(row_ids=(row_id,))
+
+        self._wb(
+            WBJob(
+                "quant_replan",
+                path=path,
+                document=project,
+                row_id=row_id,
+                cancellation=self._cancellation,
+            ),
+            replanned,
+            accept_errors=True,
+        )
+
     def analyze_project(
         self,
         all_rows: bool = False,
@@ -1083,7 +1128,12 @@ class FigureProjectWindow(QMainWindow):
             self.export_project_table(destination, normalization=True)
 
     def export_project_table(
-        self, destination: str, *, ocr: bool = False, normalization: bool = False
+        self,
+        destination: str,
+        *,
+        ocr: bool = False,
+        normalization: bool = False,
+        quant: bool = False,
     ) -> None:
         if self._busy or not self._workspace:
             return
@@ -1093,7 +1143,9 @@ class FigureProjectWindow(QMainWindow):
             self._start()
             self._export_with_evidence(
                 WBJob(
-                    "project_normalization_export"
+                    "quant_export"
+                    if quant
+                    else "project_normalization_export"
                     if normalization
                     else ("project_ocr_export" if ocr else "project_export"),
                     document=project,
@@ -1870,7 +1922,11 @@ class FigureProjectWindow(QMainWindow):
             def completed(reply: WBReply) -> None:
                 if isinstance(reply.value, FigureRender):
                     self.view.show_render(reply.value)
-                    self._done("预览已生成；未审核行允许预览，正式导出须逐行确认。")
+                    self._done(
+                        "拼图已更新；可点击图片返回原图调整。"
+                        if self.automatic.crop_policy == "lane_ratio@1"
+                        else "预览已生成；未审核行允许预览，正式导出须逐行确认。"
+                    )
                 elif isinstance(reply.value, str):
                     self._done("项目归档已保存（结果缺项见归档内状态表）：" + reply.value)
                 else:

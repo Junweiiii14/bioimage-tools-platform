@@ -1,5 +1,7 @@
 # Current Work Log
 
+- 2026-10-16 T035：用户批准比例1.25*n，核心/网页分工完成，产品25ac71d；两指定叠加原图自动3/5泳道并直接拼图，原值裁图逐像素匹配。独审P2已修复闭环，视觉ship；最终验证见T035证据。
+
 - 2026-10-16 T033：网页优先，同源WebEngine桥由T034分工集成；独立代码/视觉发现已修，独立文档同步。高级窗口网页化未完成，产品a68000e。
 ## 2026-10-14 / T-008 手工桌面闭环
 
@@ -11,22 +13,6 @@
 
 ## 2026-10-14 / T-007 异步存储子阶段
 
-
-## 2026-10-13 / T-002（实施中）
-
-按用户授权启动 P0，创建独立 Qt/worker/合成样本/基准与 standalone 构建探针。基线 29 测试通过；修复 Windows 管道/DLL 加载锁冲突与 uv 启动器子进程问题后 35 测试通过。三类单图各 5 次与 20 图批次 3 次源码基准已运行；窗口、打包和包态证据待补。用户指定干净机验收后续进行。
-
-## 2026-10-13 / F-002
-
-依用户明确要求公开仓库、合并 PR #1，并启用 main ruleset 25008972。新增按范围加载规则与绑定 base/head 的回执检查，补非编码研究规范及父目录路由。29 个测试通过；GitHub 上单独缺回执时其余三个检查通过但 PR BLOCKED，补回执后四项通过。修复 Windows 输出编码，去除重复 CI，并让本地已同步环境使用 --no-sync。交付 PR #2，集成状态以 GitHub 为准；没有开始产品开发。
-
-## 2026-10-13
-
-完成原方案阅读、官方技术文档和 GitHub 技能调研，恢复 GitHub CLI 授权并建立私有仓库。建立规则、模块地图、ADR、任务/PR 模板、CI、依赖锁、边界检查、交接和 5 个技能。uv/项目 Python 及 67 个依赖可用，环境 smoke、质量门禁、14 个测试与漏洞查询通过。解决缓存路径和 uv Python DLL 启动器问题，GCC 15.2.0 编译运行通过；Windows/Linux 三项 CI 通过。已建立草稿 PR #1，没有合并或启动产品开发。未创建产品模块或算法。
-
-## 2026-10-14 / T-003 首个 WB 产品核心
-
-用户授权扩展至 WB 软件完成。冻结参考 8 文件 SHA/本地快照与数值契约，独立实现标准库剖面积分包；新增真实 import-linter、传递依赖负例和隔离 wheel 门禁。完整检查 61 测试通过。真实图像标注与 GUI/自动化闭环未完成，独审未执行。下一步图像输入与 ROI。
 
 ## 2026-10-14 / T-003 TIFF 输入与泳道剖面
 
@@ -117,6 +103,23 @@ wb-tool 0.2.0 新增 uint8/16 灰度及显式 RGB 单页 TIFF、极性与半开 
 ## 2026-10-16 T-029 已批准工作台实施
 
 按批准方案以协调树+T030/031/032子树实施自动项目入口、三模式图像工作台与上下文工具。实际10图自动输出和原图SHA一致，独立代码/视觉纠正保存上下文、撤销、结果刷新；最终取消/缩略图修复及11b1d96绑定独审通过，560全门禁+后续专项回归通过；核心交付，剩余项显式保留。真实记录见work/evidence/T-029/validation.md。
+
+## 2026-10-17 T037
+
+完成WBQuant1.4.3数值/表格对照及Fig组同源定量监督。用户明确裁图→Fig标注拼图→组定量；图框映射原图，各蛋白分段积分。最终9be19b1代码独审通过、视觉ship、文档同步。594完整门禁与后续重开专项通过，真实桌面已打开；前轮失败和局部门禁范围保留work/evidence/T-037/validation.md。
+
+## 2026-10-17 T-041 标准显示
+
+- 新显式standard_lane_ratio@1和DisplayFrame，仅显示RGB8重采样，manifest含原ROI/输出框/仿射矩阵，原生默认冻结hash保持。
+- 目标88测试、Ruff、strict Pyright通过；独审/全仓/真实8图未运行，交协调任务。详见work/tasks/T-041-standard-display.md。
+
+- T041独审P1：禁止部分泳道段携带完整行display_frame，新增重复三泳道负例；31专项通过，详见任务。
+
+## 2026-10-17 T040
+Executed approved real dataset, published8no-overwrite named crops,4Fig images,48supervised observations/Excel/ZIP and reopened real desktop. Preserved first failed automatic predictions and old integrals. Integrated display-only standard frames and source overlays, independently reviewed throughf7a6651. Detector/baseline shortcomings and fullcheck abnormalexit remain explicit; see task/evidence.
+
+## 2026-10-17 T040 deep technical audit
+Three independent readers traced crop/quant/pipeline and cross-reviewed17-section report. Source-only membrane/Marker and17boundary replays exit0, original hashes unchanged. Corrected prior vague attribution, documented script-vs-product and scientific/units/precision/coordinate/model-validation limits; no product modifications. Fullcheck not rerun for this report.
 ## 2026-10-19 T-050 规划修订
 
 用户确认清单驱动的仪器原图流程。对产品a234354只读审计，核对原始PDF；从main221a2df独立文档分支创建新版规划和README入口，避免夹带未集成产品。清单/固定N/原像素定量是已确认需求，局部异常续作/独立输出目录/可选OCR发行是待审建议。代码、依赖、锁、门禁及原始PDF未改。旧main恢复快照留档。

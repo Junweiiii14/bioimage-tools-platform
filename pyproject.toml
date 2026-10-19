@@ -43,14 +43,16 @@ bioimage-app = { workspace = true }
 [tool.ruff]
 target-version = "py312"
 line-length = 100
-extend-exclude = [".agents", ".local"]
+force-exclude = true
+extend-exclude = [".agents", ".local", "tools/wb/src/wb_tool/domain/wbquant143"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
 
 [tool.pyright]
 include = ["dev.py", "p0_probe.py", "tooling", "tests", "tools/wb", "packages", "apps"]
-exclude = [".agents", ".venv", ".local"]
+exclude = [".agents", ".venv", ".local", "tools/wb/src/wb_tool/domain/wbquant143"]
+ignore = ["tools/wb/src/wb_tool/domain/wbquant143"]
 pythonVersion = "3.12"
 typeCheckingMode = "strict"
 venvPath = "."
