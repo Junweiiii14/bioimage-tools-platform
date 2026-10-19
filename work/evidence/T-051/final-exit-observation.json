@@ -1,0 +1,10 @@
+{
+  "product_commit": "65ff278f4d11bbd089cd9df28aabaa3359b04958",
+  "pytest_summary": "801 passed in 549.84s (0:09:09)",
+  "pytest_child_exit": true,
+  "observer_attached": true,
+  "reported_native_exception_count": 0,
+  "outer_gate_exit": 0,
+  "isolated_wheels_completed": true,
+  "scope": "Windows 11 local source and isolated wheels; no installer or clean Windows acceptance"
+}

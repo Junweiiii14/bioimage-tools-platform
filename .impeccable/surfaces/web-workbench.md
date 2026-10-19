@@ -104,3 +104,10 @@ T-045（普通扩展）恢复独立完整泳道的复制/删除/清空/重选、
 11px文本和进度动画等 warning 保留，未据此改写整体设计。三项新增 JS/WebEngine 定向检查
 通过；旧会话组合回归另有超时失败，详情交主任务记录。独立 finish/documenter 与最终集成
 验证由主任务完成，本段不是独立审查通过声明。
+
+T051后继产品 `65ff278` 完成两项独审修复：未保存新增Fig/蛋白可单项撤销并恢复焦点，
+intake不再调用旧裁剪撤销；同内容候选显示短来源ID，已确认复用不会阻断无关分配。
+24项相关真实Qt/WebEngine检查通过；fresh finish reviewer对原两项评分均resolved、
+ship仅在该评分范围，documenter只读复核No changes。后继截图同三尺寸并增加recovery，
+均为合成图静态证据；最终完整门禁与原生退出范围以T051任务和validation为准。
+现有DESIGN/sidecar保持，旧漂移没有被写入新系统规则。

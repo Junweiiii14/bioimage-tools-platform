@@ -1,10 +1,5 @@
 # Current Work Log
 
-## 2026-10-17 CI007诊断平台边界
-
-bbf3cc5安全原子推送开发/阶段8，外置bundle06ac64d9验证并再验34原文件保持。Linux真实Pyright4错在诊断_processes，1021662仅补平台拒绝、绑定独审两平台类型0，相关8项0；产品仍a811全量668/508.54秒及wheel0。新清单来源1021662，等待bbf Windows结束再推后继，main不变。
-
-
 ## 2026-10-17 CI008退出阶段诊断
 
 bbf3cc5 Windows668passed/508.43秒后外层exit1、wheel未跑，无timeout；保留失败和UNKNOWN。f5b1fe4记录真实子码，f2a61b3保留pytest后故障处理，均绑定独审；相关11项/4.14秒0，首次误写测试文件exit4保留。清单来源f2a61b3含CI007/008，待安全推新候选。产品仍a811本机完整668及wheel0，原图/旧结果/34文件保持，main不变。

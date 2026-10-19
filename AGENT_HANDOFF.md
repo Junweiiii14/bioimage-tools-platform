@@ -47,6 +47,7 @@
 ## Current Pointer
 
 - Last updated: 2026-10-19
+- Current implementation: T-051 instrument intake in `C:/Users/70236/.codex/worktrees/t051-instrument-intake/bioimage-tools-platform`, branch `codex/t051-instrument-intake`, product `65ff278`. Planning PR16 merged; product final validation/status is recorded only in `work/tasks/T-051-instrument-intake.md`. Independent code and UI corrections reviewed; no new installer or changes to other checkouts.
 - T-048 offline x64 Win10 test installer delivered from existing T-045 checkout: `C:/Users/70236/.codex/worktrees/t045-wbquant/bioimage-tools-platform`, branch `codex/t045-wbquant-manual-and-fig`; product3821c64, verify actual HEAD. Separate test installation/mandatory shortcuts/private runtime; Win11 nonadmin install/uninstall/reinstall and scoped independent review passed. Desktop delivery folder `BioImage-WB-Win10-测试版-T048`; clean Win10 acceptance still not run. No new worktree, original replacement or formal release. See T-048 task, validation and snapshot; previous T047 candidate/user windows retained.
 - Candidate entry: this checkout's `Start-BioImage.ps1`; `--verify-launch` confirms its source. The desktop “BioImage WB 工作台（当前开发）” shortcut remains pointed at the earlier t021 checkout; it was not changed for T-045.
 - Earlier t021 checkout currently lacks Git/hidden handoff files; cause UNKNOWN. Original ResearchVault checkout retains dirty historical work. Do not repair, delete, synchronize or switch old trees/shortcuts based on this candidate. Main/PR integration and release are separate.
