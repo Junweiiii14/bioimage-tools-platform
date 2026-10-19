@@ -46,6 +46,16 @@ from wb_tool.domain.worksheet import OCRRecognition
 class _Work(QObject):
     replied = Signal(object)
 
+    def __init__(self) -> None:
+        super().__init__()
+        self._owner_thread = self.thread()
+
+    @Slot()
+    def retire(self) -> None:
+        worker_thread = self.thread()
+        self.moveToThread(self._owner_thread)
+        worker_thread.quit()
+
     @Slot(str, object)
     def execute(self, request_id: str, job: WBJob) -> None:
         try:
@@ -389,6 +399,7 @@ class WBBackground(QObject):
     replied = Signal(object)
     closed = Signal()
     _requested = Signal(str, object)
+    _retire_requested = Signal()
 
     def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent)
@@ -397,10 +408,12 @@ class WBBackground(QObject):
         self._work.moveToThread(self._thread)
         self._requested.connect(self._work.execute, Qt.ConnectionType.QueuedConnection)
         self._work.replied.connect(self._reply, Qt.ConnectionType.QueuedConnection)
-        self._thread.finished.connect(self._work.deleteLater)
+        self._retire_requested.connect(self._work.retire, Qt.ConnectionType.QueuedConnection)
+        self._work.destroyed.connect(self._worker_destroyed, Qt.ConnectionType.QueuedConnection)
         self._thread.finished.connect(self._thread_stopped)
         self._pending: set[str] = set()
         self._closing = False
+        self._retiring = False
         self._thread.start()
 
     def submit(self, job: WBJob) -> str:
@@ -418,18 +431,27 @@ class WBBackground(QObject):
         self._pending.discard(reply.request_id)
         self.replied.emit(reply)
         if self._closing and not self._pending:
-            self._thread.quit()
+            self._retire()
 
     def shutdown(self) -> None:
         if QThread.currentThread() != self.thread():
             raise RuntimeError("WB 后台端口只能由所属 GUI 线程关闭")
         self._closing = True
         if not self._pending:
-            self._thread.quit()
+            self._retire()
+
+    def _retire(self) -> None:
+        if not self._retiring:
+            self._retiring = True
+            self._retire_requested.emit()
 
     @Slot()
     def _thread_stopped(self) -> None:
         if not self._thread.wait(0):
             QTimer.singleShot(1, self._thread_stopped)
             return
+        self._work.deleteLater()
+
+    @Slot()
+    def _worker_destroyed(self) -> None:
         self.closed.emit()
