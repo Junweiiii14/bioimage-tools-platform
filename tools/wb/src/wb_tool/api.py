@@ -77,6 +77,22 @@ from wb_tool.application.import_labels import (
     SourceImportLabels,
     source_import_labels,
 )
+from wb_tool.application.instrument_intake import (
+    IntakeAssignment,
+    IntakeFigure,
+    IntakeManifest,
+    IntakeProtein,
+    IntakeSource,
+    WBIntakeProject,
+    assign_intake_sources,
+    confirm_intake,
+    create_intake,
+    intake_digest,
+    intake_snapshot,
+    register_intake_source,
+    replace_intake_plan,
+    unassign_intake_sources,
+)
 from wb_tool.application.laboratory_layout import (
     DisplayFrame,
     FigureColumn,
@@ -220,6 +236,20 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "IntakeAssignment",
+    "IntakeFigure",
+    "IntakeManifest",
+    "IntakeProtein",
+    "IntakeSource",
+    "WBIntakeProject",
+    "assign_intake_sources",
+    "confirm_intake",
+    "create_intake",
+    "intake_digest",
+    "intake_snapshot",
+    "register_intake_source",
+    "replace_intake_plan",
+    "unassign_intake_sources",
     "confirm_quant_group",
     "quant_group_reviewed",
     "discover_tiffs",

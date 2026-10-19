@@ -128,6 +128,10 @@ def read_figure_project(data: bytes) -> WBFigureProject:
     raw: object = json.loads(data)
     if isinstance(raw, dict):
         version = cast(dict[str, object], raw).get("schema_version")
+        if type(version) is int and version == 10:
+            from wb_tool.application.instrument_intake import WBIntakeProject
+
+            return WBIntakeProject.from_bytes(data)
         if type(version) is int and version == 9:
             from wb_tool.application.fig_quant import WBPartitionProject
 

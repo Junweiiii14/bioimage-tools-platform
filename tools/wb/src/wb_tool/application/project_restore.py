@@ -99,7 +99,11 @@ def imported_run(project: WBFigureProject, run: RunRecord) -> ImportedRun | None
 
 
 def project_assets(project: WBFigureProject, *, history: bool = True) -> tuple[AssetRef, ...]:
+    from wb_tool.application.instrument_intake import WBIntakeProject
+
     assets = [row.source for row in project.rows if row.source]
+    if isinstance(project, WBIntakeProject):
+        assets.extend(source.asset for source in project.intake.sources)
     if project.template.font:
         assets.append(project.template.font)
     if isinstance(project, WBProjectOCR) and project.ocr:
@@ -176,6 +180,22 @@ def restore_staged_project(
         else project.template
     )
     changes: dict[str, object] = {"rows": rows, "template": template}
+    from wb_tool.application.instrument_intake import IntakeManifest, WBIntakeProject, intake_digest
+
+    if isinstance(project, WBIntakeProject):
+        manifest_fields = dict(project.intake)
+        manifest_fields.update(
+            sources=tuple(
+                source.model_copy(update={"asset": mapped(source.asset)})
+                for source in project.intake.sources
+            ),
+            confirmed_digest="",
+        )
+        changes["intake"] = IntakeManifest.model_validate(manifest_fields)
+        remapped = WBIntakeProject.model_validate({**dict(project), **changes})
+        if project.intake.confirmed_digest:
+            manifest_fields["confirmed_digest"] = intake_digest(remapped)
+            changes["intake"] = IntakeManifest.model_validate(manifest_fields)
     if isinstance(project, WBProjectOCR) and project.ocr:
         changes["ocr"] = project.ocr.model_copy(update={"source": mapped(project.ocr.source)})
     sources: list[ArchiveSource] = []

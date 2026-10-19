@@ -43,6 +43,7 @@ from wb_tool.application.figure_project import (
     FigureTemplate,
     WBFigureProject,
 )
+from wb_tool.application.instrument_intake import WBIntakeProject
 from wb_tool.application.laboratory_layout import (
     initial_composition,
     with_figure_layout,
@@ -144,6 +145,7 @@ class FigureProjectView(QWidget):
         self._loading = False
         self._project = WBFigureProject(project_id=uuid4().hex)
         self._thumbnails: dict[str, QIcon] = {}
+        self._thumbnail_rasters: dict[str, PreviewRaster] = {}
         self._source_preview: PreviewRaster | None = None
         self._rendered_preview: FigureRender | None = None
         self._last_review_focus: QWidget | None = None
@@ -999,6 +1001,10 @@ class FigureProjectView(QWidget):
             project = WBPartitionProject.model_validate(fields)
         elif isinstance(self._project, WBAutomaticProject):
             project = with_automatic_rows(project, self._project.automatic_rows)
+        if isinstance(self._project, WBIntakeProject):
+            fields = dict(project)
+            fields.update(schema_version=10, intake=self._project.intake)
+            project = WBIntakeProject.model_validate(fields)
         return project
 
     def set_project(self, project: WBFigureProject) -> None:
@@ -1046,7 +1052,12 @@ class FigureProjectView(QWidget):
         self.metadata.clear_preview()
         self.laboratory_layout.restore(project)
         present = {row.source.sha256 for row in project.rows if row.source}
+        if isinstance(project, WBIntakeProject):
+            present.update(source.asset.sha256 for source in project.intake.sources)
         self._thumbnails = {key: icon for key, icon in self._thumbnails.items() if key in present}
+        self._thumbnail_rasters = {
+            key: raster for key, raster in self._thumbnail_rasters.items() if key in present
+        }
         self.ocr.restore(project)
         self.normalization.restore(project)
         self.analysis.set_source_context(None)
@@ -1164,6 +1175,10 @@ class FigureProjectView(QWidget):
     def has_thumbnail(self, sha256: str) -> bool:
         return sha256 in self._thumbnails
 
+    def thumbnail(self, source_sha: str) -> PreviewRaster | None:
+        """Return a cached display-only raster; never decode or expose source pixels here."""
+        return self._thumbnail_rasters.get(source_sha)
+
     def install_thumbnail(self, raster: PreviewRaster) -> None:
         if (
             not 1 <= raster.preview_width <= 128
@@ -1180,7 +1195,14 @@ class FigureProjectView(QWidget):
             and row.height == raster.height
             and row.bit_depth == raster.bit_depth
         ]
-        if not matches:
+        pool_match = isinstance(self._project, WBIntakeProject) and any(
+            source.asset.sha256 == raster.sha256
+            and source.width == raster.width
+            and source.height == raster.height
+            and source.bit_depth == raster.bit_depth
+            for source in self._project.intake.sources
+        )
+        if not matches and not pool_match:
             return
         icon = QIcon(
             QPixmap.fromImage(
@@ -1194,6 +1216,7 @@ class FigureProjectView(QWidget):
             )
         )
         self._thumbnails[raster.sha256] = icon
+        self._thumbnail_rasters[raster.sha256] = raster
         self._loading = True
         for i in matches:
             item = self.table.item(i, 0)
