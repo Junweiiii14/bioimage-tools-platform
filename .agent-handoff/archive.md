@@ -71,3 +71,6 @@ This file stores compressed old history that should not be part of normal startu
 - [work-log-20261019T162459728079Z.md](archive/work-log-20261019T162459728079Z.md): work log exceeded 64 KiB or 30 dated sections
 - [work-log-20261019T172925233431Z.md](archive/work-log-20261019T172925233431Z.md): work log exceeded 64 KiB or 30 dated sections
 - [work-log-20261019T183617126260Z.md](archive/work-log-20261019T183617126260Z.md): work log exceeded 64 KiB or 30 dated sections
+
+- 2026-10-20 E5收尾：validation原始227行先完整备份至 `.agent-handoff/archive/validation-20261020-e5-closeout.md`，当前索引压缩至200行以内；未删除历史失败。
+- [work-log-20261019T192501846754Z.md](archive/work-log-20261019T192501846754Z.md): work log exceeded 64 KiB or 30 dated sections

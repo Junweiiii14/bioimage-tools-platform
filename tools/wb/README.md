@@ -119,3 +119,9 @@ E4/T057新增schema13完整Fig依据、稳定行/槽位与冻结原图请求映�
 审核后原位置回存契约见 `../../docs/contracts/wb-crop-return-v1.md`。
 `return_reviewed_crop` 复用显示分段映射和原值裁剪，写后核验且不替换旧文件；
 多文件部分失败明确列出已发布文件，无完成记录，不改变定量公式或项目格式。
+
+E5/T058新增schema14和intake_output@1：`fill_intake_table`按Fig/蛋白行/固定槽位填表，
+CSV/XLSX来源审计记录稳定身份；新目录发布原值/显示裁剪、Fig、索引和恢复ZIP。
+资产及run请求/结果有界冻结并再次核验，索引导入与CAS成功后才完成输出阶段；
+取消、部分失败、未知活动阶段恢复保持真实状态，不注册外来PID为本机成功。
+旧schema1–13保持。契约见wb-intake-output-v1.md，完成证据以T058任务为准。
