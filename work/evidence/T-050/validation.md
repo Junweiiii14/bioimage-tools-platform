@@ -40,3 +40,6 @@
 - handoff容量检查：exit0，changed0/warnings0/unresolved0。
 - git diff --check：exit0。
 - 初次快照归档因目标目录不存在失败，已从main原始blob完整恢复到归档目录；不遗失旧记录。
+
+- 独立文档审查绑定fa61c29，无阻塞；已明确每Fig拼图就绪与冻结快照。后继仅记录交付状态与审查证据。
+- GitHub草稿PR #16已创建并附本聊天；远端检查以最终PR head为准，本轮不合并。
