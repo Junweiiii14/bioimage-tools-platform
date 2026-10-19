@@ -15,3 +15,9 @@
 ## 实际main
 
 已合实际main aac126e，scope .按真实基线重载并读取任务/BASE模块地图，当前唯一manifest保留T021–027及旧F006/F007等源记录。本地准备静态Ruff/format353/Pyright0，不并发Qt全量；最终冻结提交独审与新四服务器全量/隔离wheel通过后才merge，不把原产品532记录当新CI。
+
+## Windows timeout and worker retirement repair
+
+Final c849cda Windows quality39331582949/job118330834329 reached the unchanged 15 minute limit. Last test body passed test_multi_source_compute_reopen_edit_and_recompute; Python dump showed fixture windows waiting and storage workspace.close active. No native stack establishes cause: historical timeout remains UNKNOWN. Linux, desktop and rules passed; Windows cancellation is not success.
+
+Ported the independently reviewed a811ccfd retirement repair exactly for four workers and its original four tests. Before source change: 4 failed/2.21s, actual exit1, destruction occurred on worker threads. After: worker retirement plus async storage/process/project measurements 33 passed/52.57s, actual exit0, explicit offscreen, serial with other Qt. This closes concrete ownership evidence, not the historical timeout root. Ruff check0, format357 files0, Pyright0. No deadline, expected value, skip, lockfile or numeric/schema change. Final bound review and fresh four server checks required before acceptance. Raw logs remain ignored .local/sync005-retirement-{before,after}.txt and sync005-windows-timeout.txt.
