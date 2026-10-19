@@ -12,9 +12,9 @@
 ## 交付与验证
 
 - GitHub草稿PR：https://github.com/Junweiiii14/bioimage-tools-platform/pull/16；仅文档，不合并main。
-- 方案冻结fa61c2950dc7930573e3d909e6bcf5fc5e195326；独立文档审查无阻塞，见work/evidence/T-050/independent-review.md。
+- 当前方案942ecaa208376f8e264217b668710ec79c36c740；独立文档审查无阻塞，见work/evidence/T-050/independent-review.md。
 - 本地链接、diff、规则回执、policy及handoff容量通过；PDF原blob不变。仅治理验证，不表示产品通过。
 - GitHub检查异步运行，最终状态以PR为准，不把初版head检查套到后继。
 - 下一步：用户审核S1–S3，按已确认的跨蛋白独立槽位实现，核对真实仪器多曝光规则，再建立M0实施任务。
 
-- 后续澄清已确认：同Fig仅共享N，不保证跨蛋白样本顺序；以行ID+本行slot ID填表，没有映射不自动跨蛋白配对。方案审查绑定提交随本次澄清更新。
+- 后续澄清已确认：同Fig仅共享N，不保证跨蛋白样本顺序；以行ID+本行slot ID填表，没有映射不自动跨蛋白配对。增量独立审查已绑定942ecaa，无阻塞。
