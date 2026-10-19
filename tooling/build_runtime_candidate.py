@@ -75,6 +75,14 @@ def main() -> int:
         ],
         log=output / "dependencies.log",
     )
+    # This product uses QtWidgets/WebEngineWidgets, not external QML modules or
+    # development headers. Qt's QML debug object paths also exceed Inno's limit.
+    for directory in ("qml", "include"):
+        unused = site / "PySide6" / directory
+        if not unused.resolve().is_relative_to(output.resolve()):
+            raise RuntimeError("Unexpected dependency pruning path")
+        if unused.exists():
+            shutil.rmtree(unused)
     # The lock's OCR wheel supplies models; verify bytes through the public API later.
     app_icon = dist / "bioimage.ico"
     icon(app_icon)
