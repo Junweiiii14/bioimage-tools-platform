@@ -75,6 +75,7 @@ class WorkbenchBridge(QObject):
 
     def replace_host(self, host: FigureProjectWindow) -> None:
         self.session_epoch += 1
+        self.manual_commands = ManualQuantCommands(self)
         self.host.automatic.finished.disconnect(self._automatic_completed)
         self.host = host
         self.host.automatic.finished.connect(self._automatic_completed)
@@ -543,8 +544,10 @@ class WorkbenchBridge(QObject):
                 "quant_history",
                 "quant_fig",
             }:
+                self._validate_quant_session(data)
                 self.manual_commands.run(action, data)
             elif action == "return_crop":
+                self._validate_quant_session(data)
                 project = self.host.view.project()
                 row = self.host.view.selected_row()
                 if (
@@ -562,6 +565,7 @@ class WorkbenchBridge(QObject):
             elif action == "quant_target":
                 self._configure_quant_target(data)
             elif action in {"quant_review_group", "quant_reset_group"}:
+                self._validate_quant_session(data)
                 project = self.host.view.project()
                 selected = self.host.view.selected_row()
                 if (
@@ -729,7 +733,16 @@ class WorkbenchBridge(QObject):
         ):
             raise ValueError("原图身份或裁剪已改变，请重新调整并复核")
 
+    def _validate_quant_session(self, data: dict[str, object]) -> None:
+        if (
+            data.get("projectId") != self.host.view.project().project_id
+            or type(data.get("sessionEpoch")) is not int
+            or data.get("sessionEpoch") != self.session_epoch
+        ):
+            raise ValueError("项目会话已改变，请刷新后重新调整")
+
     def _configure_quant_target(self, data: dict[str, object]) -> None:
+        self._validate_quant_session(data)
         project = self.host.view.project()
         row = self.host.view.selected_row()
         if (
@@ -797,6 +810,7 @@ class WorkbenchBridge(QObject):
         self.host.analyze_manual_target(target)
 
     def _edit_quant(self, data: dict[str, object]) -> None:
+        self._validate_quant_session(data)
         from wb_tool.api import update_quant_lane
 
         project = self.host.view.project()

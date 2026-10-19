@@ -2,9 +2,9 @@
 
 // Lane geometry is a local draft. Only the durable original-pixel worker measures.
 const manualLanes = {
-  toolsOpen:false, actualZoom:1, method: 'lanes', selected: 0, dragging: null, key: null, boxes: [], measurementMode: 'peaks',
+  groupIdentity:null, toolsOpen:false, actualZoom:1, method: 'lanes', selected: 0, dragging: null, key: null, boxes: [], measurementMode: 'peaks',
   identity() {
-    return {projectId:state.projectId,id:row()?.id,sourceId:row()?.sourceId,revision:quantData()?.revision};
+    return {projectId:state.projectId,sessionEpoch:state.sessionEpoch,id:row()?.id,sourceId:row()?.sourceId,revision:quantData()?.revision};
   },
   warnings() {
     const notes=row()?.notes||'',warnings=[];
@@ -15,7 +15,7 @@ const manualLanes = {
     return warnings.map(text=>`<p class="manual-warning">${escapeText(text)}</p>`).join('');
   },
   sync() {
-    const key = [state.projectId,row()?.id,row()?.sourceId,quantData()?.revision].join(':');
+    const key = [state.projectId,state.sessionEpoch,row()?.id,row()?.sourceId,quantData()?.revision].join(':');
     if (this.key === key) return;
     this.key = key; this.dragging = null; this.selected = 0;
     this.boxes = (quantData()?.lanes || []).map(lane => ({...(lane.targetRoi || lane.roi)}));
@@ -49,6 +49,7 @@ const manualLanes = {
     }
     if(action==='automatic'){manualQuant.active=false;quantDetail=true;send('quant_fig',this.identity());return;}
     if(['new','rename','move','merge'].includes(action)) {
+      this.groupIdentity=quantIdentity();
       const title = ({new:'添加分组',rename:'修改分组与条带名称',move:'调整这排条带的分组',merge:'合并当前 Fig 的全部条带'})[action];
       openDrawer(title, `<div class="drawer-copy">${action==='move'?'<p>输入已有 Fig 可并入，输入新名称可将这一排拆为新组。测量结果保留。</p>':action==='merge'?'<p>将当前 Fig 的全部条带并入所填组名，保留各排测量结果。</p>':''}<label class="quant-field">Fig 分组名称<input id="manual-group-name" maxlength="120" value="${action==='new'||action==='merge'?'':escapeText(row()?.fig)}"></label><label class="quant-field">当前条带名称<input id="manual-protein-name" maxlength="120" value="${escapeText(row()?.protein||'条带')}"></label><button class="button primary" data-manual-group-save="${action}">保存修改</button></div>`);
       return;
@@ -121,8 +122,9 @@ document.addEventListener('click',event=>{
   if(!(event.target instanceof Element))return;
   const action=event.target.closest('[data-lane-action]');if(action)manualLanes.action(action.dataset.laneAction);
   const save=event.target.closest('[data-manual-group-save]');if(save&&!state.busy){
+    if(!sameQuantIdentity(manualLanes.groupIdentity)){closeDrawer();return toast('项目会话已改变，请重新编辑名称。');}
     const name=$('#manual-group-name').value.trim();if(!name)return toast('请输入分组名称。');
-    const action=({new:'quant_new_group',rename:'quant_rename',move:'quant_move_row',merge:'quant_merge_group'})[save.dataset.manualGroupSave];send(action,{...manualLanes.identity(),name,figure:name,protein:$('#manual-protein-name')?.value||'条带'});closeDrawer();
+    const action=({new:'quant_new_group',rename:'quant_rename',move:'quant_move_row',merge:'quant_merge_group'})[save.dataset.manualGroupSave];send(action,{...manualLanes.groupIdentity,name,figure:name,protein:$('#manual-protein-name')?.value||'条带'});closeDrawer();
   }
   const history=event.target.closest('[data-quant-history]');if(history)send('quant_history',{...manualLanes.identity(),direction:history.dataset.quantHistory});
   const band=event.target.closest('[data-manual-band]');if(band){
@@ -186,11 +188,11 @@ laneViewport.addEventListener('pointermove',event=>{
   fitImage();
 },true);
 laneViewport.addEventListener('pointerup',event=>{
-  const d=manualLanes.dragging;if(!d)return;event.stopImmediatePropagation();manualLanes.dragging=null;
+  const d=manualLanes.dragging;if(!d)return;event.stopImmediatePropagation();manualLanes.dragging=null;if(d.key!==manualLanes.key){renderQuant();return;}
   if(d.next&&d.next.width>=1&&d.next.height>=2&&manualLanes.boxes.length<96){manualLanes.boxes.push(d.next);manualLanes.selected=manualLanes.boxes.length-1;}
   renderQuant();manualLanes.render();
 },true);
-laneViewport.addEventListener('pointercancel',()=>{const d=manualLanes.dragging;if(d?.original)manualLanes.boxes[d.index]=d.original;manualLanes.dragging=null;renderQuant();},true);
+laneViewport.addEventListener('pointercancel',()=>{const d=manualLanes.dragging;if(d?.original&&d.key===manualLanes.key)manualLanes.boxes[d.index]=d.original;manualLanes.dragging=null;renderQuant();},true);
 $('#quant-lanes').addEventListener('keydown',event=>{
   const el=event.target.closest('[data-manual-lane]');if(!el||state.busy||!manualLanes.setup())return;
   const b=manualLanes.boxes[Number(el.dataset.manualLane)],step=event.shiftKey?10:1;

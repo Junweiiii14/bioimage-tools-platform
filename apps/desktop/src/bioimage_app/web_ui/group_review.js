@@ -33,7 +33,7 @@ window.groupReview = (() => {
   };
   const readyToEdit = () => !!bridge && !state.busy && selection?.rowId === state.quant?.rowId;
   const validBounds = (b, n) => b && [b.start,b.end,b.baselineStart,b.baselineEnd].every(Number.isFinite) && b.start >= 0 && b.end < n && b.start < b.end;
-  const identity = () => ({projectId: state.projectId, figure: group()?.figure, revision: state.quant?.revision});
+  const identity = () => ({...quantIdentity(), figure: group()?.figure, revision: state.quant?.revision});
   function groups() {
     const map = new Map();
     const byId = new Map(state.rows.map(r => [r.id,r]));
@@ -45,7 +45,7 @@ window.groupReview = (() => {
     return [...map];
   }
   function navigation() {
-    const key = JSON.stringify([state.projectId,state.quant?.revision,group()?.figure,search,state.quant?.reviewedGroups]);
+    const key = JSON.stringify([state.projectId,state.sessionEpoch,state.quant?.revision,group()?.figure,search,state.quant?.reviewedGroups]);
     if (key === navigationKey) return;
     navigationKey = key;
     const all = groups(), reviewed = new Set(state.quant?.reviewedGroups || []);
@@ -128,7 +128,7 @@ window.groupReview = (() => {
     if(pendingSelection&&group()?.rows.some(r=>r.rowId===pendingSelection.rowId)){
       selection=pendingSelection;pendingSelection=null;pendingFocus=true;
     }
-    const key=JSON.stringify([state.projectId,state.quant?.revision,group()?.figure,mode,tableFilter,state.quant?.table?.length,state.quant?.resultRuns,state.quant?.reviewedGroups,[...new Set(state.rows.filter(r=>r.preview).map(r=>r.sourceId))]]);
+    const key=JSON.stringify([state.projectId,state.sessionEpoch,state.quant?.revision,group()?.figure,mode,tableFilter,state.quant?.table?.length,state.quant?.resultRuns,state.quant?.reviewedGroups,[...new Set(state.rows.filter(r=>r.preview).map(r=>r.sourceId))]]);
     if(key!==contentKey){
       root.scrollTop=0;
       contentKey=key;dragging=null;draft=null;
@@ -156,7 +156,7 @@ window.groupReview = (() => {
   function apply() {
     const {lane,band}=chosen();if(!readyToEdit()||!draft||!lane)return;
     const b={...band,...draft};if(!validBounds(b,lane.profile.length))return toast('请输入有效范围：起点小于终点，且在当前泳道内。');
-    send('quant_edit',{id:selection.rowId,sourceId:state.quant.sourceId,revision:state.quant.revision,lane:selection.lane,bandId:selection.bandId,...draft});draft=null;
+    send('quant_edit',{...quantIdentity(),id:selection.rowId,sourceId:state.quant.sourceId,revision:state.quant.revision,lane:selection.lane,bandId:selection.bandId,...draft});draft=null;
   }
   document.addEventListener('click',e=>{
     const nav=e.target.closest('[data-gr-group]');if(nav){send('quant_select',{id:nav.dataset.grGroup,overview:false});return;}
@@ -189,13 +189,13 @@ window.groupReview = (() => {
     if(point&&readyToEdit()){
       const {lane,band}=chosen();if(!lane.profile.length||!validBounds({...band,...draft},lane.profile.length))return;
       e.preventDefault();const chart=$('#gr-edit-curve');chart.setPointerCapture(e.pointerId);
-      dragging={side:Number(point.dataset.grEnd),svg:chart,old:draft,band:{...band,...draft},geometry:geometry(lane,lane.bands.map(b=>b.id===band.id?{...b,...draft}:b),true),revision:state.quant.revision,projectId:state.projectId,rowId:selection.rowId};
+      dragging={side:Number(point.dataset.grEnd),svg:chart,old:draft,band:{...band,...draft},geometry:geometry(lane,lane.bands.map(b=>b.id===band.id?{...b,...draft}:b),true),revision:state.quant.revision,projectId:state.projectId,sessionEpoch:state.sessionEpoch,rowId:selection.rowId};
     }else if(svg){pan={svg,x:e.clientX,y:e.clientY,box:svg.getAttribute('viewBox').split(' ').map(Number),moved:false,rowId:e.target.dataset.grRow,lane:Number(e.target.dataset.grLane)};svg.setPointerCapture(e.pointerId);}
   });
   root.addEventListener('pointermove',e=>{
     if(pan){const {svg,box,x,y}=pan,rect=svg.getBoundingClientRect(),scale=Math.min(rect.width/box[2],rect.height/box[3]);pan.moved ||= Math.hypot(e.clientX-x,e.clientY-y)>4;if(pan.moved)svg.setAttribute('viewBox',`${box[0]-(e.clientX-x)/scale} ${box[1]-(e.clientY-y)/scale} ${box[2]} ${box[3]}`);return;}
     if(!dragging)return;
-    const d=dragging;if(state.busy||state.projectId!==d.projectId||state.quant.revision!==d.revision||selection.rowId!==d.rowId){dragging=null;draft=null;editor();return;}
+    const d=dragging;if(state.busy||state.projectId!==d.projectId||state.sessionEpoch!==d.sessionEpoch||state.quant.revision!==d.revision||selection.rowId!==d.rowId){dragging=null;draft=null;editor();return;}
     const {lane}=chosen(),G=d.geometry,rect=d.svg.getBoundingClientRect(),scale=Math.min(rect.width/G.w,rect.height/G.h),px=(e.clientX-rect.left-(rect.width-G.w*scale)/2)/scale,py=(e.clientY-rect.top-(rect.height-G.h*scale)/2)/scale;
     const max=(2**(state.rows.find(r=>r.id===selection.rowId)?.bitDepth||8))-1,x=Math.round((px-48)/(G.w-60)*(lane.profile.length-1)),y=Math.max(0,Math.min(max,G.hi-(py-12)/(G.h-36)*(G.hi-G.lo)));
     draft=d.side?{...draft,end:Math.max(d.band.start+1,Math.min(lane.profile.length-1,x)),baselineEnd:y}:{...draft,start:Math.max(0,Math.min(d.band.end-1,x)),baselineStart:y};

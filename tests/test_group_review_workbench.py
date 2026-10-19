@@ -45,7 +45,12 @@ def test_failed_review_save_never_installs_receipt(
             window.bridge.request(
                 "quant_review_group",
                 json.dumps(
-                    {"projectId": project.project_id, "figure": "Fig1", "revision": generation}
+                    {
+                        "projectId": project.project_id,
+                        "sessionEpoch": window.bridge.session_epoch,
+                        "figure": "Fig1",
+                        "revision": generation,
+                    }
                 ),
             )
             assert not quant_group_reviewed(host.view.project(), "Fig1")

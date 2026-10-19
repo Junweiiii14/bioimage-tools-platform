@@ -85,6 +85,7 @@ def test_real_page_manual_import_compute_save_reopen_without_automatic_or_compos
         assert selected.source is not None
         payload: dict[str, object] = {
             "projectId": initial.project_id,
+            "sessionEpoch": window.bridge.session_epoch,
             "id": selected.row_id,
             "sourceId": selected.source.sha256,
             "revision": window.host.view.generation,
@@ -262,6 +263,7 @@ def test_real_page_manual_import_compute_save_reopen_without_automatic_or_compos
         assert selected.source is not None
         valid_return: dict[str, object] = {
             "projectId": current.project_id,
+            "sessionEpoch": window.bridge.session_epoch,
             "id": selected.row_id,
             "sourceId": selected.source.sha256,
             "revision": window.host.view.generation,
@@ -297,6 +299,98 @@ def test_real_page_manual_import_compute_save_reopen_without_automatic_or_compos
                 page.asarray(),
                 np.repeat(profile.astype(np.uint16)[:, None], 100, axis=1)[38:62, 10:90],
             )
+        assert source.read_bytes() == original
+    finally:
+        close_and_dispose_window(
+            window, qtbot, resources_closed=lambda: window.host.resources_closed, timeout=20000
+        )
+
+
+def test_same_project_new_session_discards_manual_roi_gesture(qtbot: QtBot, tmp_path: Path) -> None:
+    originals = tmp_path / "originals"
+    originals.mkdir()
+    source = originals / "session.tif"
+    tifffile.imwrite(source, np.full((120, 400), 40000, dtype=np.uint16))
+    original = source.read_bytes()
+    settings = QSettings(str(tmp_path / "session.ini"), QSettings.Format.IniFormat)
+    settings.setValue("project_parent", str(tmp_path / "projects"))
+    window = WebWorkbenchWindow(settings=settings)
+
+    def js(script: str) -> object:
+        values: list[object] = []
+        window.web.page().runJavaScript(script, values.append)
+        qtbot.waitUntil(lambda: bool(values), timeout=10000)
+        return values[0]
+
+    try:
+        window.show()
+        window.start_from_images([source], automatic=False)
+        qtbot.waitUntil(
+            lambda: bool(window.host.view.project().rows) and not window.host.operation_busy,
+            timeout=20000,
+        )
+        qtbot.waitUntil(
+            lambda: (
+                js("typeof bridge!=='undefined' && !!bridge && !!row()?.preview && !state.busy")
+                is True
+            ),
+            timeout=20000,
+        )
+        assert js("manualLanes.method='box';switchMode('quant');true") is True
+        qtbot.waitUntil(
+            lambda: (
+                js("$('#image-transform').getBoundingClientRect().width>0 && !state.busy") is True
+            ),
+            timeout=10000,
+        )
+        start = """(()=>{const el=$('#image-viewport');
+            const r=$('#image-transform').getBoundingClientRect();
+            el.setPointerCapture=()=>{};window.sessionPoint={x:r.left+r.width*.2,y:r.top+r.height*.2,
+                dx:r.width*.4,dy:r.height*.4};
+            el.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:4,
+                clientX:sessionPoint.x,clientY:sessionPoint.y}));
+            return !!manualQuant.drawing;})()"""
+        assert js(start) is True
+        assert (
+            js(
+                "(()=>{$('#image-viewport').dispatchEvent(new PointerEvent('pointermove',"
+                "{bubbles:true,pointerId:4,clientX:sessionPoint.x+sessionPoint.dx,"
+                "clientY:sessionPoint.y+sessionPoint.dy}));return !!manualQuant.draft.roi;})()"
+            )
+            is True
+        )
+        before = window.host.view.project()
+        window.bridge.replace_host(window.host)
+        window.bridge.publish()
+        qtbot.waitUntil(
+            lambda: js("manualQuant.drawing===null && manualQuant.current().roi===null") is True,
+            timeout=10000,
+        )
+        assert (
+            js(
+                "$('#image-viewport').dispatchEvent(new PointerEvent('pointerup',"
+                "{bubbles:true,pointerId:4}));true"
+            )
+            is True
+        )
+        assert window.host.view.project() == before
+        assert not window.host.project_results
+        qtbot.waitUntil(lambda: js("!state.busy") is True, timeout=10000)
+        assert js(start) is True
+        assert (
+            js(
+                "(()=>{const el=$('#image-viewport');"
+                "el.dispatchEvent(new PointerEvent('pointermove',"
+                "{bubbles:true,pointerId:4,clientX:sessionPoint.x+sessionPoint.dx,"
+                "clientY:sessionPoint.y+sessionPoint.dy}));el.dispatchEvent(new PointerEvent("
+                "'pointerup',{bubbles:true,pointerId:4}));manualQuant.draft.n=2;"
+                "manualQuant.submit();return true;})()"
+            )
+            is True
+        )
+        qtbot.waitUntil(lambda: bool(window.host.project_results), timeout=30000)
+        qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=20000)
+        assert len(window.host.project_results[0].result.lanes) == 2
         assert source.read_bytes() == original
     finally:
         close_and_dispose_window(

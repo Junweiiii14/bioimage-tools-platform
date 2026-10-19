@@ -112,6 +112,9 @@ def test_real_page_cancels_old_drag_and_accepts_new_gesture(
         host.view.numbers["crop_height"].setValue(30)
         host.view.canvas.roi_drawn.emit((30, 30, 330, 60))
         assert host.view.project().rows[0].roi is not None, host.view.status.text()
+        qtbot.waitUntil(
+            lambda: not host.operation_busy and not host.has_unsaved_changes, timeout=10000
+        )
         window.bridge.publish()
 
         def js(script: str) -> object:
@@ -154,6 +157,9 @@ def test_real_page_cancels_old_drag_and_accepts_new_gesture(
             host.view.canvas.roi_drawn.emit((40, 40, 340, 70))
         else:
             window.bridge.replace_host(host)
+        qtbot.waitUntil(
+            lambda: not host.operation_busy and not host.has_unsaved_changes, timeout=10000
+        )
         advanced = host.view.project()
         window.bridge.publish()
         qtbot.waitUntil(lambda: js("drag===null") is True, timeout=10000)

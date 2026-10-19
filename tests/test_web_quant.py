@@ -9,6 +9,7 @@ from typing import Any, cast
 from zipfile import ZipFile
 
 import numpy as np
+import pytest
 import tifffile
 from bioimage_app.figure_window import FigureProjectWindow
 from bioimage_app.web_bridge import WorkbenchBridge
@@ -57,6 +58,8 @@ def test_same_target_bridge_keeps_generation_and_manual_parameters(qtbot: QtBot)
         "quant_edit",
         json.dumps(
             {
+                "projectId": project.project_id,
+                "sessionEpoch": bridge.session_epoch,
                 "id": "r",
                 "sourceId": project.rows[0].source.sha256 if project.rows[0].source else "",
                 "revision": 9,
@@ -155,6 +158,8 @@ def test_quant_supervision_recomputes_and_exports(qtbot: QtBot, tmp_path: Path) 
         assert not any(row.reviewed for row in host.view.project().rows)
         band = quant["lanes"][0]["bands"][0]
         payload = {
+            "projectId": host.view.project().project_id,
+            "sessionEpoch": bridge.session_epoch,
             "id": quant["rowId"],
             "sourceId": quant["sourceId"],
             "revision": quant["revision"],
@@ -252,3 +257,74 @@ def test_quant_supervision_recomputes_and_exports(qtbot: QtBot, tmp_path: Path) 
         close_and_dispose_window(
             host, qtbot, resources_closed=lambda: host.resources_closed, timeout=20000
         )
+
+
+@pytest.mark.parametrize("action", ["quant_edit", "quant_target"])
+@pytest.mark.parametrize("invalid", ["project", "epoch", "boolean_epoch", "missing_epoch"])
+def test_quant_mutations_reject_old_session_before_install(
+    qtbot: QtBot, action: str, invalid: str
+) -> None:
+    from tools.wb.tests.test_anchored_analysis import anchored_project
+
+    project = anchored_project()
+    row = project.rows[0]
+    assert row.source is not None
+
+    def forbidden(*args: object, **kwargs: object) -> None:
+        raise AssertionError("Old session reached mutation or recomputation")
+
+    def connection(callback: object) -> None:
+        pass
+
+    host = cast(
+        FigureProjectWindow,
+        SimpleNamespace(
+            view=SimpleNamespace(
+                project=lambda: project,
+                selected_row=lambda: row,
+                generation=9,
+                set_project=forbidden,
+            ),
+            automatic=SimpleNamespace(finished=SimpleNamespace(connect=connection)),
+            analyze_project=forbidden,
+            analyze_manual_target=forbidden,
+            project_results=[],
+            operation_busy=False,
+            is_closing=False,
+        ),
+    )
+
+    class SessionProbe(WorkbenchBridge):
+        def apply(self, action: str, data: dict[str, object]) -> None:
+            if action == "quant_edit":
+                self._edit_quant(data)
+            else:
+                self._configure_quant_target(data)
+
+    bridge = SessionProbe(host, lambda _: None)
+    bridge.timer.stop()
+    bridge.session_epoch = 2
+    payload: dict[str, object] = {
+        "projectId": project.project_id,
+        "sessionEpoch": 2,
+        "id": row.row_id,
+        "sourceId": row.source.sha256,
+        "revision": 9,
+        "lane": 1,
+        "baselineStart": 123,
+        "roi": {"x": 0, "y": 38, "width": 4, "height": 24},
+        "n": 1,
+        "polarity": "dark",
+        "emptyLanes": [],
+    }
+    if invalid == "project":
+        payload["projectId"] = "another-project"
+    elif invalid == "epoch":
+        payload["sessionEpoch"] = 1
+    elif invalid == "boolean_epoch":
+        payload["sessionEpoch"] = True
+    else:
+        payload.pop("sessionEpoch")
+    with pytest.raises(ValueError, match="改变"):
+        bridge.apply(action, payload)
+    assert host.view.project() is project and host.view.generation == 9

@@ -23,3 +23,5 @@ WBWindow兼容入口会话释放已按真实完成边界最小修复，三路径
 186全量886/750.61s，原child0/u32=0、inventory4非截断、全部wheel/真实OCR/check0。后继独审确认当前crop/confirm旧Web操作可覆盖新ROI，连同同源set_lanes补legacy_crop_edit@1完整身份及开始手势冻结；三条红3/5.38s，修后相关12/21.96s0，真实两种页面手势也通过于组合24pass/1fail。失败是原独立灰度页面run后30s无project_results，来源UNKNOWN，新增仅诊断trace、独立重放1/11.21s0，不弱化等待/数值。该问题继续观察，当前裁剪修复待绑定独审/完整复验。PR8最终9f四最新检查SUCCESS/绑定独审后merge461f2c0，旧26b超时保留；SYNC003等价修复76f及实际main合入e8beb7e，17真实回归运行中。新安装包未构建。
 
 当前73a4cb7裁剪身份P2绑定非作者独审关闭；两种组合间歇失败仍UNKNOWN，已补失败专用字段/页面提交诊断，完整断言/30s时限未改。最近组合25/35.29s0仅证明本次，不能关闭旧失败。SYNC003真实17/109.47s实际0及最终7ab8da1绑定独审通过，PR9实际main基线四检查中。继续当前完整门禁和独立包态，安装包尚未构建。
+
+定量编辑另发现跨会话P2（quant_edit缺project/epoch，quant_target缺epoch），真实桥接8例前7fail1pass，补严格会话和JS冻结/草稿退休后相关11/12.91s0、原兼容16/29.42s0、真实ROI旧手势丢弃及新worker1/5.83s0；包含裁剪/分组/手工泳道最终22/33.34s0。060全量为此主动停止17%/原child1/outer1，无完整pytest/wheel声明；诊断fields已修320a342并独审纯probe关闭。crop用例补公共已保存空闲前置，不减断言，两项历史间歇UNKNOWN仍保留。PR9按四检查/独审merge5e8b891，PR10最终6963a64已独审待四CI；候选尚未构建。
