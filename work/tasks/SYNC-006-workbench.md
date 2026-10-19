@@ -12,3 +12,5 @@
 
 原4a9c682按8be1原基线scope .规则和网页契约/模块文档已读。独立静态预审发现crop/confirm（以及N操作）没有完整草稿身份，旧Web编辑可覆盖新ROI；主树73a4cb7已经修复并独审关闭。本阶段仅回移对应旧API的契约和手势冻结，不复制后继完整工作台。主树0c927f5全量Qt中，本树不并发Qt或重型测试，准备阶段不宣称前置接受或本阶段通过。
 
+
+Linux202超时，根因UNKNOWN；原生取消栈诊断仅观察，保持15min/真实退出，详见work/evidence/SYNC-006/linux-timeout-native-diagnostic.md。待新最终head独审及四检查。
