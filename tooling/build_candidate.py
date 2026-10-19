@@ -24,7 +24,6 @@ def digest(path: Path) -> str:
 
 def icon(output: Path) -> None:
     from PIL import Image
-    from PySide6.QtCore import QBuffer, QByteArray, QIODevice
     from PySide6.QtGui import QImage, QPainter
     from PySide6.QtSvg import QSvgRenderer
 
@@ -34,14 +33,8 @@ def icon(output: Path) -> None:
     painter = QPainter(image)
     QSvgRenderer(str(source)).render(painter)
     painter.end()
-    data = QByteArray()
-    buffer = QBuffer(data)
-    buffer.open(QIODevice.OpenModeFlag.WriteOnly)
-    if not image.save(buffer, b"PNG"):
-        raise RuntimeError("Could not render the committed application icon")
-    import io
-
-    Image.open(io.BytesIO(bytes(data.data()))).save(
+    rgba = image.convertToFormat(QImage.Format.Format_RGBA8888)
+    Image.frombytes("RGBA", (rgba.width(), rgba.height()), bytes(rgba.constBits())).save(
         output, format="ICO", sizes=[(n, n) for n in (16, 24, 32, 48, 64, 128, 256)]
     )
 
