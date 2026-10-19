@@ -56,6 +56,12 @@ def main() -> int:
         "zero": ["raise SystemExit(0)"],
         "seventeen": ["raise SystemExit(17)"],
         "fault": ["import os,signal; os.kill(os.getpid(),signal.SIGSEGV)"],
+        "interrupt": [
+            "import os,signal; signal.signal(signal.SIGINT, lambda *_: os._exit(17)); "
+            "os.kill(os.getpid(),signal.SIGINT)"
+        ],
+        "terminate": ["import os,signal; os.kill(os.getpid(),signal.SIGTERM)"],
+        "wait": ["import time; print('CANCEL_READY',flush=True); time.sleep(60)"],
         "arguments": [
             f"import sys; raise SystemExit(0 if sys.argv[1] == {literal!r} else 19)",
             literal,
@@ -69,7 +75,14 @@ def main() -> int:
         return run_with_native_debugger(
             [sys.executable, "-I", "-c", *controls[args.control]], cwd=ROOT, env=dict(os.environ)
         )
-    for name, expected in (("zero", 0), ("seventeen", 17), ("arguments", 0), ("fault", None)):
+    for name, expected in (
+        ("zero", 0),
+        ("seventeen", 17),
+        ("arguments", 0),
+        ("fault", None),
+        ("interrupt", 17),
+        ("terminate", None),
+    ):
         result = subprocess.run(
             [sys.executable, "-m", "tooling.linux_native_run", "--control", name],
             cwd=ROOT,
@@ -82,13 +95,25 @@ def main() -> int:
         if expected is not None:
             if result.returncode != expected:
                 return 1
-        elif result.returncode == 0 or any(
-            marker not in result.stdout
-            for marker in ("NATIVE_FAULT signal=SIGSEGV", "Program terminated with signal SIGSEGV")
+        elif name == "fault" and (
+            result.returncode == 0
+            or any(
+                marker not in result.stdout
+                for marker in (
+                    "NATIVE_FAULT signal=SIGSEGV",
+                    "Program terminated with signal SIGSEGV",
+                )
+            )
+        ):
+            return 1
+        if name in {"interrupt", "terminate"} and (
+            result.returncode == 0 or "NATIVE_CANCEL signal=SIG" not in result.stdout
         ):
             return 1
     print(
-        "Native debugger controls: exit0, exit17, literal arguments, SIGSEGV verified", flush=True
+        "Native debugger controls: exit0, exit17, literal arguments, "
+        "SIGSEGV and cancellation forwarding verified",
+        flush=True,
     )
     return 0
 
