@@ -2,6 +2,8 @@
 
 当前阶段：**WB 产品开发；手工桌面闭环已实现，可导入TIFF、编辑ROI/条带/基线、后台计算和保存重开。首版必需的拼图Fig/行名OCR、结果表自动写入及完整自动化仍在开发。**
 
+**WB需求规划：** [开发规划v2（2026-10-19）](docs/wb-development-plan-v2.md)，仪器目录→Fig/蛋白/固定N清单→明确分配→裁剪→拼图→原像素定量→表格。本阶段仅历史手工核心集成，后继主流程不在本批宣称完成。
+
 最初的 [V3.0 技术方案](生物图像工具平台与全AI长期迭代技术方案.pdf) 保持原样，首次提交可追溯。
 本仓库将承载 Windows 本地桌面平台及 WB、IF、IHC 工具，采用 Python/PySide6、独立计算进程、单仓库分包的候选路线。产品选型须经 P0 打包与目标机试验后冻结。
 
@@ -40,3 +42,4 @@ uv run --locked --no-sync pre-commit install
 
 实际环境、检查状态和剩余缺口以 [环境验收记录](docs/research/environment-validation.md) 为准。
 main 已启用 GitHub rulesets：必须通过 PR 和必需检查、禁止强推与删除；规则回执机制见自动规则门禁手册。CODEOWNERS 和本地 hook 仅作补充。
+

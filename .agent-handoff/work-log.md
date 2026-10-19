@@ -81,3 +81,15 @@ wb-tool 0.2.0 新增 uint8/16 灰度及显式 RGB 单页 TIFF、极性与半开 
 
 ## 2026-10-14 / T-016 完整生成拼图与PNG OCR
 从5cf7c71创建feat/T-016-composed-figure-ocr，产品1d5ae2a新增PNG专用解码/已知预处理、完整PNG生成/来源/异步字节导入、真实OCR复核自动表、单图PNG入口。保留原图/归一化，取消与过期保存/成图不覆盖编辑；诊断发现成图错误被刷新覆盖，改为合并计时和错误保留。304全量/隔离安装通过；真实用户组合TIFF的独立PNG显示副本15token/11未确认行、源SHA保持、保存重开一致，两个Qt截图已看。T-016 review、T-017批量元信息/缩略图ready；整体Goal active，未独审/推送/发布。
+
+## 2026-10-19 T-050 规划修订
+
+用户确认清单驱动的仪器原图流程。对产品a234354只读审计，核对原始PDF；从main221a2df独立文档分支创建新版规划和README入口，避免夹带未集成产品。清单/固定N/原像素定量是已确认需求，局部异常续作/独立输出目录/可选OCR发行是待审建议。代码、依赖、锁、门禁及原始PDF未改。旧main恢复快照留档。
+
+## 2026-10-19 T050 审核回复落盘
+
+根据用户回复更新第5/6/7/8节：批准局部暂停与独立结果目录，独立灰度定量OCR作为继续支持的功能。主流程不加载OCR与安装发行拆分是不同事项，后者未决；同步任务/风险/待办和交接。未改产品/PDF/依赖，旧审查不外推本轮修订。
+
+## 2026-10-20 E7 governance integration
+
+INT001 resumes authorized E7 only in this temporary historical integration tree. Merged planning main43d520f into original governance0b7, retained immutable RULE001 receipt source; loaded/read exact rules and current full scope. Main PR/CI not yet accepted. WB product development/checks remain in t051, not represented by this zero-product checkout.
