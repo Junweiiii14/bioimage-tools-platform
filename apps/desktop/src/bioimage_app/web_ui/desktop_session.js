@@ -6,6 +6,7 @@ const desktopSession = (() => {
   const modal=()=>document.querySelector('#session-dialog');
   const button=(choice,label,primary=false)=>`<button class="button ${primary?'primary':'subtle'}" data-session-reply="${choice}">${label}</button>`;
   function hasDraft(){
+    if(window.intakeWorkspace?.hasDraft())return true;
     if(window.groupReview?.hasDraft())return true;
     if(manualQuant.submittedRevision!==null)return false;
     const d=manualQuant.draft,r=row();
@@ -19,7 +20,7 @@ const desktopSession = (() => {
   }
   function send(action,data={}){if(channel)channel.session(action,JSON.stringify(data));}
   function position(){
-    if(!channel||!state.projectId||!state.rows.length||token===null||locked)return;
+    if(!channel||!state.projectId||(!state.rows.length&&!state.intake)||token===null||locked)return;
     const r=row(),data={projectId:state.projectId,mode,rowId:r?.id||'',figure:r?.fig||'',lane:quantLane,name:state.projectName,draft:hasDraft()};
     const encoded=JSON.stringify(data);if(encoded!==lastPosition){lastPosition=encoded;send('position',data);}
   }
@@ -27,12 +28,13 @@ const desktopSession = (() => {
     renderChrome();
     const r=session.route;if(!r||r.token===undefined||r.token===token)return;
     if(r.mode==='home'){
-      token=r.token;lastPosition='';manualQuant.active=false;manualQuant.pendingImport=false;manualQuant.draft=null;manualLanes.key=null;
-      state={projectName:'新建实验项目',rows:[],cells:[],selectedId:null,busy:false,status:'就绪',outputPath:'',montage:null,quant:null,projectId:''};
+      token=r.token;lastPosition='';window.intakeWorkspace?.reset();manualQuant.active=false;manualQuant.pendingImport=false;manualQuant.draft=null;manualLanes.key=null;
+      state={projectName:'新建实验项目',rows:[],cells:[],selectedId:null,busy:false,status:'就绪',outputPath:'',montage:null,quant:null,projectId:'',intake:null};
       completedKey=null;mode='review';$('#home-view').hidden=false;$('#work-view').hidden=true;render();return;
     }
-    if(!state.rows.length||state.busy||r.projectId!==state.projectId)return;
+    if((!state.rows.length&&!state.intake)||state.busy||r.projectId!==state.projectId)return;
     token=r.token;lastPosition='';manualQuant.pendingImport=false;
+    if(state.intake){switchMode('intake');position();return;}
     const selected=state.rows.find(item=>item.id===r.rowId)||state.rows[0];state.selectedId=selected.id;
     quantLane=Number.isInteger(r.lane)&&r.lane>0&&r.lane<=selected.lanes?r.lane:1;
     quantBand=null;quantDetail=true;switchMode(['review','layout','quant','results'].includes(r.mode)?r.mode:'quant');
@@ -41,21 +43,21 @@ const desktopSession = (() => {
   }
   function sendSelection(id){if(bridge)bridge.request('select',JSON.stringify({id}));}
   function renderChrome(){
-    if(!channel)return;const active=!!session.workspace&&state.rows.length>0;
+    if(!channel)return;const active=!!session.workspace&&(state.rows.length>0||!!state.intake);
     $('#project-name').textContent=active?state.projectName:'项目首页';
-    $$('.header-actions>[data-action]').forEach(el=>el.hidden=!active);
+    $$('.header-actions>[data-action]').forEach(el=>el.hidden=!active||!!state.intake);
     $('#save-status').textContent=session.saveState||'就绪';
   }
   function renderSession(){
     renderChrome();
     $('#session-project-parent').textContent='新项目保存到：'+(session.projectParent||'文档 / BioImage / Projects');
     const recents=session.recents||[];
-    $('#session-recents').innerHTML=recents.length?recents.map((p,i)=>`<button class="session-recent" data-session="recent" data-index="${i}"><i data-icon="folder"></i><div><strong>${escapeText(p.name||'WB 项目')}</strong><p>上次停留：${({quant:'灰度定量',results:'结果',layout:'拼图排版',review:'原图裁剪'})[p.mode]||'灰度定量'}${p.figure?' · '+escapeText(p.figure):''}</p><small>${escapeText(p.path)}</small></div><span>继续工作</span><i data-icon="arrow"></i></button>`).join(''):'<p class="session-hint">打开或创建项目后，会在这里显示。</p>';
+    $('#session-recents').innerHTML=recents.length?recents.map((p,i)=>`<button class="session-recent" data-session="recent" data-index="${i}"><i data-icon="folder"></i><div><strong>${escapeText(p.name||'WB 项目')}</strong><p>上次停留：${({intake:'导入与分配',quant:'灰度定量',results:'结果',layout:'拼图排版',review:'原图裁剪'})[p.mode]||'灰度定量'}${p.figure?' · '+escapeText(p.figure):''}</p><small>${escapeText(p.path)}</small></div><span>继续工作</span><i data-icon="arrow"></i></button>`).join(''):'<p class="session-hint">打开或创建项目后，会在这里显示。</p>';
     icons($('#session-recents'));
     const stage=session.stage||'idle';locked=['confirm_busy','confirm_dirty','confirm_draft','cancel','shutdown'].includes(stage);
     if(stage==='idle'||stage==='opening'){
       if(modal().open)modal().close();
-      if(stage==='opening'&&state.rows.length){$('#home-view').hidden=true;$('#work-view').hidden=false;}
+      if(stage==='opening'&&(state.rows.length||state.intake)){$('#home-view').hidden=true;$('#work-view').hidden=false;}
       if(channel)$('#save-status').textContent=session.saveState||'就绪';return;
     }
     const exiting=session.intent==='exit';let title='',actions='';
