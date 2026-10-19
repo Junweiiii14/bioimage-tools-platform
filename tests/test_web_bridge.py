@@ -112,10 +112,12 @@ def test_local_page_channel_and_drain(qtbot: QtBot, tmp_path: Path) -> None:
     window = WebWorkbenchWindow(asset_directory=tmp_path)
     loads: list[bool] = []
     renderer_exits: list[tuple[str, int]] = []
+
+    def renderer_stopped(status: QWebEnginePage.RenderProcessTerminationStatus, code: int) -> None:
+        renderer_exits.append((str(status), code))
+
     window.web.loadFinished.connect(loads.append)
-    window.web.page().renderProcessTerminated.connect(
-        lambda status, code: renderer_exits.append((str(status), code))
-    )
+    window.web.page().renderProcessTerminated.connect(renderer_stopped)
     window.show()
     try:
         try:
