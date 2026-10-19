@@ -1,0 +1,7 @@
+# Source-repair stage preparation
+
+Originald11552c merged prepared predecessor d4f194d as6d35aec. Earlier non-author original-stage audit found no additional P0–P2 beyond quant session issue now repaired in predecessor. This is preparation, not accepted actual-main integration while PR13 pending. Original458 and prepared d4 scope . loaded/read, current task/rules/module map and source-only geometry research read. Product merge had no implementation conflict; preserved crop/quant session guards and old-source geometry/integral/ownership/storage repairs. Handoff conflicts retain both histories and archive original snapshot.
+
+Workflow conflict retains original stage8 complete diagnostics: PYTHONUNBUFFERED/FAULTHANDLER/native observers, verbose60s Python dump and unchanged15-minute deadline. Prior predecessor has the same verbose60 option; no duplicate env key or relaxed timeout/test/answer/exit behavior. Historical CI001–009 exact failures and audits remain, including unexplained Windows exit after passing tests; no current pass erases them.
+
+Locked all-groups sync0; Ruff check0, format494files0, Pyright0. Local Qt/full not run while primary0c927f5 full active. Seven inherited new crop/quant identity tests prepared but await real verification; no local green claim. Actual-main reload, final bound review and four required server checks still mandatory. No raw inputs, private images, original dirty tree, historical results or old installations changed. Scientific correspondence, clean target Windows/physical DPI and old native UNKNOWN remain open.
