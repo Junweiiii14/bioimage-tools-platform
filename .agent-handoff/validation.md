@@ -1,5 +1,7 @@
 # Validation History
 
+- 2026-10-19 T048/3821c64：13专项35.84s/Ruff/format/Pyright/policy0；非管理员Win11安装/卸载/重装0、七项安装GUI8.047s/外层14.2036s0/无残留开发模块，内置PS5.1自检0/缺EXE负测返回1、7721文件摘要一致；独审ship。首次外层PS5.1观察器exit=null保留为失败，v2完整0。干净Win10/物理点击/DPI/科学留出未跑；详见T048 validation。
+
 - 2026-10-19 T047/6b643a3：规则context scope . exit0；node --check ignored预览最终脚本exit0；IAB约965×863核对导入直达、最近项目恢复结果/Fig1F、错误目录禁止误开/新建恢复、保存失败、计算取消与退出、后台退出失败保留窗口、安装入口演示。截图.local/t047-preview。未改产品，未跑T047测试/全检/真实退出复现/安装/移动端/DPI，等待UI预览审批；旧T046结果不用于本任务通过结论。
 
 - 2026-10-18 T045最终f18589a：747passed/517.90秒，原child0/u32=0x00000000/外层0，全部隔离wheel/9导入合约/静态通过。独审原5项+Space全部resolved，兼容反例独立14项6.28秒0；真实33Fig106运行/重开106、CSV/XLSX33组135行545数值/拒绝覆盖0。先前停止/746通过1旧schema反例失败保留；未销原生UNKNOWN。详见work/evidence/T-045/validation.md。
