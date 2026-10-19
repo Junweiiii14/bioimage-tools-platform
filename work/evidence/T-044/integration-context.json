@@ -2,11 +2,6 @@
   "schema": 1,
   "task": "T-044",
   "base_commit": "5febadf14465bf3ad2edcc079e332044839b3afb",
-  "source_head": "9adf5d5ca310554ae19d948306fb3baabb5dd663",
-  "historical_receipts": {
-    "work/evidence/SYNC-005/rules-context.json": "e6af4cc1fc8a8a768ad606ec920b1c919a1985d1",
-    "work/evidence/SYNC-006/rules-context.json": "c0a380408928d8faa54732be46d49ed347159022",
-    "work/evidence/SYNC-007/rules-context.json": "138625c86ce5edbd9d6fef7ba96e8159429fba95",
-    "work/evidence/SYNC-008/rules-context.json": "aec5165cab533d51c9b181419507cbf30d92ac54"
-  }
+  "source_head": "400d0a8ccda3750d6211dd3e80a1d1228f9e77d1",
+  "historical_receipts": {}
 }
