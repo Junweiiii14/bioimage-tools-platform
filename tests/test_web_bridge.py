@@ -192,7 +192,22 @@ def test_existing_web_project_appends_files_and_folder(
         window.bridge.request("select", json.dumps({"id": rows[0].row_id}))
         qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=15000)
         for index in (0, 1):
-            window.bridge.request("confirm", json.dumps({"id": rows[index].row_id}))
+            snapshot = window.bridge.snapshot()
+            source = rows[index].source
+            assert source is not None
+            window.bridge.request(
+                "confirm",
+                json.dumps(
+                    {
+                        "cropEditContract": snapshot["cropEditContract"],
+                        "projectId": snapshot["projectId"],
+                        "sessionEpoch": snapshot["sessionEpoch"],
+                        "revision": snapshot["revision"],
+                        "id": rows[index].row_id,
+                        "sourceId": source.sha256,
+                    }
+                ),
+            )
             qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=15000)
             assert window.host.view.project().rows[index].reviewed
             selected = window.host.view.selected_row()
