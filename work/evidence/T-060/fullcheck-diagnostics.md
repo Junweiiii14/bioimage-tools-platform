@@ -15,3 +15,6 @@ Ten import-linter fixture cases failed because their child inherited UTF-8 stdou
 After accepted main advanced to P0 e09ba014, scope . was reloaded before this fixture edit (.local/t060-context-maine09.txt). All changed BASE root/workflow/architecture/module-map rules read; current rules remain unchanged. Historical P0 scope is not an authorization limit on the later explicit E0–E7 user request.
 
 Completed b105 run:10failed/873passed/10warnings/738.49s, actual outer1; all failures import fixture decode, wheel not run. Session inventory4/nontruncated, pytest_exitstatus1. Raw .local/t060-fullcheck-b105.txt. No native watcher active, so no native exception capture claim. Earlier standalone failure remains unknown despite full-run pass.
+
+
+Product18648752c9fe939c930be961dfa50473a400e2b3 completed correctly observed full check0:886passed/750.61s, actual original pytest0/u32=0, inventory4/nontruncated/pytest_exitstatus0, all isolated wheels including original-pixel/old-schema/literal-XLSX/desktop-close and real PP-OCRv6/static OCR/PNG passed. .local/t060-fullcheck-186.txt; correct BIOIMAGE_NATIVE_STACKS/BIOIMAGE_WINDOWS_FAULTS active, NATIVE_EXCEPTION_ATTACHED pid31652. This baseline predates the subsequently independently discovered crop identity defect; it is NOT validation of its later fix, nor closure of historical native UNKNOWN.

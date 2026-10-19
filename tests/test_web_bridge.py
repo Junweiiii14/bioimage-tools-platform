@@ -17,6 +17,15 @@ from wb_tool.api import FolderDiscoveryReport
 from tooling.qt_test_lifecycle import close_and_dispose_window
 
 
+def crop_identity(bridge: WorkbenchBridge) -> dict[str, object]:
+    snapshot = bridge.snapshot()
+    selected = bridge.host.view.selected_row()
+    assert selected is not None and selected.source is not None
+    return {
+        key: snapshot[key] for key in ("cropEditContract", "projectId", "sessionEpoch", "revision")
+    } | {"id": selected.row_id, "sourceId": selected.source.sha256}
+
+
 def test_idle_publish_and_progress_do_not_rebuild_project_snapshot(
     bridge: WorkbenchBridge, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -152,6 +161,7 @@ def test_web_adapter_real_import_output_and_original_coordinates(
     assert source.read_bytes() == before
     initial = host.view.project().rows[0].roi
     payload = {
+        **crop_identity(bridge),
         "id": row.row_id,
         "sourceId": "stale",
         "roi": {"x": 20, "y": 60, "width": 300, "height": 40},
@@ -288,7 +298,9 @@ def test_existing_web_project_appends_files_and_folder(
         window.bridge.request("select", json.dumps({"id": rows[0].row_id}))
         qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=15000)
         for index in (0, 1):
-            window.bridge.request("confirm", json.dumps({"id": rows[index].row_id}))
+            window.bridge.request(
+                "confirm", json.dumps({**crop_identity(window.bridge), "id": rows[index].row_id})
+            )
             qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=15000)
             assert window.host.view.project().rows[index].reviewed
             selected = window.host.view.selected_row()
@@ -392,7 +404,10 @@ def test_ratio_crop_no_confirmation_montage_and_lane_resize(
     qtbot.waitUntil(lambda: not host.operation_busy, timeout=15000)
     assert row.source is not None
     bridge.request(
-        "set_lanes", json.dumps({"id": row.row_id, "sourceId": row.source.sha256, "n": 4})
+        "set_lanes",
+        json.dumps(
+            {**crop_identity(bridge), "id": row.row_id, "sourceId": row.source.sha256, "n": 4}
+        ),
     )
     changed = host.view.project().rows[0]
     assert changed.roi is not None and changed.lane_count == 4

@@ -36,6 +36,8 @@ from bioimage_app.web_intake import apply_intake_command
 from bioimage_app.web_manual_quant import ManualQuantCommands
 from bioimage_app.web_quant import quant_snapshot
 
+_CROP_EDIT_CONTRACT = "legacy_crop_edit@1"
+
 
 def image_url(image: QImage) -> str | None:
     if image.isNull():
@@ -349,6 +351,7 @@ class WorkbenchBridge(QObject):
             )
         return {
             "sessionEpoch": self.session_epoch,
+            "cropEditContract": _CROP_EDIT_CONTRACT,
             "sourcePreviews": {
                 key: value for key, value in self._images.items() if source_counts[key] > 1
             },
@@ -635,6 +638,7 @@ class WorkbenchBridge(QObject):
                     raise ValueError("请选择Excel或CSV格式")
                 self.choose("quant_export_" + str(format_name))
             elif action == "set_lanes":
+                self._validate_crop_edit(data)
                 row = self.host.view.selected_row()
                 if (
                     row is None
@@ -648,6 +652,7 @@ class WorkbenchBridge(QObject):
                     raise ValueError("泳道数须为1–96的整数")
                 self.host.view.set_crop_lane_count(count)
             elif action in {"crop", "confirm"}:
+                self._validate_crop_edit(data)
                 row = self.host.view.selected_row()
                 if row is None or data.get("id") != row.row_id:
                     raise ValueError("当前原图已改变，请重新调整")
@@ -706,6 +711,23 @@ class WorkbenchBridge(QObject):
         except (ValueError, TypeError) as error:
             self._error = str(error)
         self.publish()
+
+    def _validate_crop_edit(self, data: dict[str, object]) -> None:
+        project = self.host.view.project()
+        row = self.host.view.selected_row()
+        if (
+            data.get("cropEditContract") != _CROP_EDIT_CONTRACT
+            or data.get("projectId") != project.project_id
+            or type(data.get("sessionEpoch")) is not int
+            or data.get("sessionEpoch") != self.session_epoch
+            or type(data.get("revision")) is not int
+            or data.get("revision") != self.host.view.generation
+            or row is None
+            or row.source is None
+            or data.get("id") != row.row_id
+            or data.get("sourceId") != row.source.sha256
+        ):
+            raise ValueError("原图身份或裁剪已改变，请重新调整并复核")
 
     def _configure_quant_target(self, data: dict[str, object]) -> None:
         project = self.host.view.project()
