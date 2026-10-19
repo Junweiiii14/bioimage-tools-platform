@@ -1,0 +1,5 @@
+# Automation stage preparation
+
+Original8be1c56 prepared with frozen predecessor6963a64, merge6c0cbc9. PR10 still pending Windows: no accepted actual-main or stage acceptance claim. Original ef17 scope . loaded before edit; all current rules already read, new module map/schema7–8 and automatic-flow contract read. After predecessor merge scope . loaded again against6963; BASE module map and task output read. Handoff conflicts retain both sides; original snapshot archived. No new product implementation beyond integrating prior fixes.
+
+Locked all-groups sync actual0; Ruff check0, format353files0, Pyright0. Local Qt/full/heavy Git tests NOT RUN while primary0c927f5 full Qt is active. Non-author original-stage audit reported no new P0–P2, with explicit raw measurement versus analysis-copy distinction, versioned automation/schema and human_reviewed=false, missing/weak states not zero, cancellation/source/generation guards and new output roots; this does not replace actual-main/final-head review and four server gates. Scientific truth/target Windows/DPI and historical native UNKNOWN remain open. Original inputs/history/old installations untouched.

@@ -155,6 +155,8 @@ def test_quant_supervision_recomputes_and_exports(qtbot: QtBot, tmp_path: Path) 
         assert not any(row.reviewed for row in host.view.project().rows)
         band = quant["lanes"][0]["bands"][0]
         payload = {
+            "projectId": host.view.project().project_id,
+            "sessionEpoch": bridge.session_epoch,
             "id": quant["rowId"],
             "sourceId": quant["sourceId"],
             "revision": quant["revision"],

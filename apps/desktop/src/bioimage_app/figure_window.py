@@ -853,6 +853,9 @@ class FigureProjectWindow(QMainWindow):
         def completed(completion: ProjectOCRCompletion) -> None:
             self._ocr_session = None
             session.deleteLater()
+            if self._closing or self._cancellation.is_set():
+                self._done("OCR已停止，之前关联保留；已提交运行仍保留在历史。")
+                return
             if generation != self.view.generation:
                 self._done("项目已修改，OCR结果仅保留在历史，未覆盖编辑。")
                 return
@@ -862,6 +865,13 @@ class FigureProjectWindow(QMainWindow):
                     self.view.ocr.note.setText("OCR结果不可用：" + completion.error)
 
                 def previewed(reply: WBReply) -> None:
+                    if (
+                        self._closing
+                        or self._cancellation.is_set()
+                        or generation != self.view.generation
+                    ):
+                        self._done("OCR载入已停止，当前编辑保留。")
+                        return
                     if isinstance(reply.value, PreviewRaster):
                         self.view.ocr.set_preview(reply.value)
                     self._busy = False
@@ -882,24 +892,45 @@ class FigureProjectWindow(QMainWindow):
                 loaded = completion.loaded
 
                 def installed(reply: WBReply) -> None:
+                    if self._closing or self._cancellation.is_set():
+                        self._done("OCR已停止，之前关联保留；已提交运行仍保留在历史。")
+                        return
                     if generation != self.view.generation:
                         self._done("项目已修改，OCR建议未覆盖编辑")
                         return
                     if not isinstance(reply.value, WBProjectOCR):
                         self._error("OCR建议生成失败")
                         return
-                    self._loaded_ocr = loaded
-                    self.view.set_project(reply.value)
-                    self.view.generation += 1
+                    candidate = reply.value
                     self._busy = False
 
                     def saved() -> None:
+                        self._loaded_ocr = loaded
                         if self._closing:
                             self._done("OCR识别已保存")
                         else:
                             self.refresh_ocr_table("OCR完成；请校正名称、关联原图并确认。")
 
-                    self.save(after=saved)
+                    def install(current: WBFigureProject) -> WBProjectOCR:
+                        if (
+                            not isinstance(current, WBProjectOCR)
+                            or current.project_id != project.project_id
+                            or current.ocr != project.ocr
+                        ):
+                            raise ValueError("OCR来源或关联已改变，候选不能覆盖当前草稿")
+                        return type(candidate).model_validate(
+                            {**dict(candidate), "revision": current.revision}
+                        )
+
+                    self.save(
+                        after=saved,
+                        transform=install,
+                        install_guard=lambda: (
+                            not self._closing
+                            and not self._cancellation.is_set()
+                            and generation == self.view.generation
+                        ),
+                    )
 
                 self._wb(
                     WBJob("project_ocr_install", document=project, project_ocr_result=loaded),
@@ -1769,13 +1800,21 @@ class FigureProjectWindow(QMainWindow):
             else:
                 self.select_source(project.rows[index].row_id)
 
-    def save(self, after: Callable[[], None] | None = None) -> None:
+    def save(
+        self,
+        after: Callable[[], None] | None = None,
+        *,
+        transform: Callable[[WBFigureProject], WBFigureProject] | None = None,
+        install_guard: Callable[[], bool] | None = None,
+    ) -> None:
         if self._busy or not self._workspace:
             return
         try:
             project = self.view.project(
                 0 if self._saved_revision is None else self._saved_revision + 1
             )
+            if transform is not None:
+                project = transform(project)
         except ValueError as error:
             self._error(str(error))
             return
@@ -1783,6 +1822,9 @@ class FigureProjectWindow(QMainWindow):
         self._start()
 
         def encoded(reply: WBReply) -> None:
+            if install_guard is not None and not install_guard():
+                self._done("操作已停止；当前草稿保留，未提交新修订。")
+                return
             if not isinstance(reply.value, bytes):
                 self._error("项目编码无效")
                 return
@@ -1790,10 +1832,18 @@ class FigureProjectWindow(QMainWindow):
             def saved(reply: StorageReply) -> None:
                 self._saved_revision = project.revision
                 self._saved_generation = generation
+                if install_guard is not None and not install_guard():
+                    # Preserve committed history while retaining the prior draft.
+                    self.view.generation += 1
+                    self._done("新修订已写入历史；已停止安装，当前草稿保留，请保存或继续编辑。")
+                    return
                 if generation != self.view.generation:
                     self._done("旧修订已保存，当前编辑保留；请重新执行操作")
                     return
                 self.view.set_project(project)
+                if transform is not None:
+                    self.view.generation += 1
+                    self._saved_generation = self.view.generation
                 if self.documents.findData(project.project_id) < 0:
                     self.documents.addItem(project.name, project.project_id)
                 self._busy = False

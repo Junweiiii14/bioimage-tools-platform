@@ -1,0 +1,21 @@
+# E7 WB core dependency validation
+
+Actual predecessor main: e09ba01412edd8e718d39e2ae0ed36a65b8d817a (PR3 merged after four required server checks and bound non-author review). Original branch dd929960c4886e882d282490fd9ed59fdc8d2e50; merged main a1aeedb. Scope . context loaded/read before integration and again against actual main after merge; all historical receipts retained through explicit manifest.
+
+Windows local auxiliary environment: uv sync --locked --all-groups actual0. Initial static invocation before syncing the P0-only environment produced missing-product-import type errors (1957), not an accepted check. After the locked environment sync: Ruff check0, Ruff format0, Pyright0 errors. No lock/dependency edit or expectation change. Product source/tests remain identical to dd92996; only main planning/governance history, current task/evidence and conflict-resolved handoff/README change.
+
+Local full pytest/Qt/wheels NOT RUN in this batch: primary product Qt full check is active and local Qt is serial. Four exact-base/head server checks and bound non-author review are required before merge. Prior 192-test product record is historical and does not substitute this batch CI. Scientific truth, original native-exit UNKNOWN, clean Windows/physical DPI remain pending. Original inputs/history/old installations untouched.
+
+
+## Lifecycle repair after independent review
+
+The initial frozen f99 source was byte-identical to original dd92996, and server full208/153.53s Windows,208/20.58s Linux plus isolated wheels/four checks passed. Independent review still found retained completed sessions, so no merge occurred. Regression on original window:3failed/6deselected/23.54s/actual1, all three cases timed out waiting for the completed session QObject to become invalid (.local/sync002-retirement-before.txt).
+
+Minimal correction takes the completed current session reference, clears the current slot, then deleteLater after RunSession's completion boundary (OS exit, decoder stopped, persisted outcome). No early thread/process deletion, changed numerical behavior or gate relaxation. Three iterations each for success, actual worker failure7 and cancellation verify deleted session objects before window close, expected current result10 only on success, all three durable records and no fabricated successful result. Combined existing desktop and run-session tests15passed/14.70s/actual0 (.local/sync002-retirement-after.txt); Ruff/format/Pyright0. New test first triggered Ruff loop-variable binding lint, fixed by binding expected count; no ignore/timeout/expected state weakened. Final bound review/server checks still required.
+
+
+## Windows server timeout; diagnostic-only followup
+
+Final product26b3d74 was independently reviewed with P2 closed. Linux foundation, desktop environment and rules-context succeeded; Windows quality39324409100/job118306402305 hit the unchanged15-minute limit and was CANCELLED at2026-10-19T21:18:41Z. Last pytest output at21:06:20 was72 dots/[34%]; no active test name or stack, no complete pytest count/child exit/wheel claim. Raw.local/sync002-server-26b-timeout.txt retained. No evidence identifies the newly repaired lifecycle as cause; earlier f99 full208/153.53s0 does not close this timeout.
+
+Only foundation PYTEST_ADDOPTS is added: verbose test names and faulthandler_timeout=60. This emits Python stacks while a test is still running; it does not cancel or extend it. Workflow15-minute timeout, all tests/expected values/skips/locks/exit handling and four required checks unchanged. Scope . was freshly loaded at e09 before editing; current rules same, changed BASE root/architecture/module-map previously read against this exact base. No blind green rerun: diagnostic head must receive independent review and fresh four exact-head checks. Source defect repair and timeout explanation remain separate.

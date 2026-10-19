@@ -154,3 +154,36 @@ def test_native_fault_observation_preserves_the_real_child_exit(
     assert "NATIVE_EXCEPTION_ATTACHED" in observed
     assert "NATIVE_EXCEPTION 0xc0000005" in observed
     assert "Observed child exit=3221225477 u32=0xc0000005" in observed
+
+
+@pytest.mark.parametrize("child_encoding", ["utf-8", "gbk"])
+def test_unicode_forwarding_preserves_failure_with_gbk_parent(
+    tmp_path: Path, child_encoding: str
+) -> None:
+    harness = """
+import os, sys
+from pathlib import Path
+from tooling.hang_watch import run_with_native_watch
+sys.stdout.reconfigure(encoding='gbk', errors='strict')
+environment = {**os.environ, 'PYTHONIOENCODING': sys.argv[1]}
+original_environment = dict(environment)
+code = run_with_native_watch(
+    [sys.executable, '-c', "import sys; print('中文 العربية 😀', flush=True); sys.exit(17)"],
+    cwd=Path(sys.argv[2]), env=environment, idle_seconds=5,
+)
+assert environment == original_environment
+raise SystemExit(code)
+"""
+    result = subprocess.run(
+        [sys.executable, "-c", harness, child_encoding, str(tmp_path)],
+        cwd=Path(__file__).resolve().parents[1],
+        env={**os.environ, "PYTHONIOENCODING": "gbk"},
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        timeout=20,
+        check=False,
+    )
+    assert result.returncode == 17, result.stderr
+    assert "中文 العربية 😀" in result.stdout
+    assert "Observed child exit=17 u32=0x00000011" in result.stdout

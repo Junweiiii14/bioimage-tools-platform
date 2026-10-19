@@ -198,3 +198,7 @@ CI009产品57fd7ea正式check --all实际exit0：669passed/497.77秒，Observed 
 
 - T044最终本地交付：a72e7102891df287e3484f20f3724612779b53f5：733 passed in 525.53s、pytest child/全部wheel/dev实际0。最终正常Web8原图/8回存/保存重开/关闭0；8图产物独审0。API延迟依赖修复独审11项3.31秒0+隔离导入/发现0，无阻断。裁图回归1/8→8/8，积分13有效35复核不是准确率。详见work/evidence/T-044/final-delivery.md。下一步外置最终备份、阶段9草稿PR/日志/远端检查；main不直接合并。
 - CI012：3e5 Linux29%SIGSEGV/Windows733+wheels成功；925 Linux28%SIGSEGV/Windows因新push取消；c5 Linux735passed133.44秒/wheels/dev0，Windows记录时仍跑。独审ab1/1.96秒关闭P2、c5 5/9.96秒0。后继测试专用自有窗口helper作者67/157.28秒0、全类型/静态0，总736，最终实际CI见PR15/issue6；产品a72未改。
+- 2026-10-19 T050/main221a2df：规划文档链接/PDF blob一致性、policy、diff、handoff容量均exit0。policy扫描0产品文件不证明产品通过。PDF文本初次GBK控制台失败，UTF-8重读exit0；归档目录缺失已由main原始blob恢复。产品测试/GUI/安装/科学评分未运行，后续文档审查见T050证据。
+- T050方案fa61c29独立文档审查无阻塞，精确回执/链接/PDF/归档/diff exit0；PR16为Draft，远端检查以最终head为准。本轮仅规划，不合并或实施产品。
+- T050后续澄清：当前方案942ecaa增量独立文档审查通过，按蛋白行分别管理槽位，检查exit0；无产品测试或修改。
+- T050方案66f0b67：S1/S2批准与独立OCR功能保留的增量独审无阻塞；回执/diff/链接/PDF/容量exit0。无产品或安装验证。

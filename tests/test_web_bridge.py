@@ -127,6 +127,10 @@ def test_web_adapter_real_import_output_and_original_coordinates(
     assert source.read_bytes() == before
     initial = host.view.project().rows[0].roi
     payload = {
+        "cropEditContract": state["cropEditContract"],
+        "projectId": state["projectId"],
+        "sessionEpoch": state["sessionEpoch"],
+        "revision": state["revision"],
         "id": row.row_id,
         "sourceId": "stale",
         "roi": {"x": 20, "y": 60, "width": 300, "height": 40},
@@ -263,7 +267,22 @@ def test_existing_web_project_appends_files_and_folder(
         window.bridge.request("select", json.dumps({"id": rows[0].row_id}))
         qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=15000)
         for index in (0, 1):
-            window.bridge.request("confirm", json.dumps({"id": rows[index].row_id}))
+            snapshot = window.bridge.snapshot()
+            source = rows[index].source
+            assert source is not None
+            window.bridge.request(
+                "confirm",
+                json.dumps(
+                    {
+                        "cropEditContract": snapshot["cropEditContract"],
+                        "projectId": snapshot["projectId"],
+                        "sessionEpoch": snapshot["sessionEpoch"],
+                        "revision": snapshot["revision"],
+                        "id": rows[index].row_id,
+                        "sourceId": source.sha256,
+                    }
+                ),
+            )
             qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=15000)
             assert window.host.view.project().rows[index].reviewed
             selected = window.host.view.selected_row()
@@ -359,7 +378,18 @@ def test_ratio_crop_no_confirmation_montage_and_lane_resize(
     qtbot.waitUntil(lambda: not host.operation_busy, timeout=15000)
     assert row.source is not None
     bridge.request(
-        "set_lanes", json.dumps({"id": row.row_id, "sourceId": row.source.sha256, "n": 4})
+        "set_lanes",
+        json.dumps(
+            {
+                "cropEditContract": bridge.snapshot()["cropEditContract"],
+                "projectId": bridge.snapshot()["projectId"],
+                "sessionEpoch": bridge.snapshot()["sessionEpoch"],
+                "revision": bridge.snapshot()["revision"],
+                "id": row.row_id,
+                "sourceId": row.source.sha256,
+                "n": 4,
+            }
+        ),
     )
     changed = host.view.project().rows[0]
     assert changed.roi is not None and changed.lane_count == 4
