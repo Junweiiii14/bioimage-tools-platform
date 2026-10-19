@@ -163,6 +163,9 @@ class ProjectOCRSession(QObject):
         self._read_result(reply.value)
 
     def _read_result(self, run: RunRecord) -> None:
+        if self._cancelled:
+            self._finish(ProjectOCRCompletion(state="cancelled"))
+            return
         if run.result is None:
             raise ValueError("OCR已提交资产缺失")
 
@@ -182,6 +185,9 @@ class ProjectOCRSession(QObject):
         self._storage(StorageCommand("read", asset=run.result), read)
 
     def _finish(self, completion: ProjectOCRCompletion) -> None:
+        # A committed run is retained, but cancellation can win during decoding.
+        if self._cancelled and not completion.error:
+            completion = ProjectOCRCompletion(state="cancelled")
         self._store.replied.disconnect(self._storage_reply)
         self._background.replied.disconnect(self._wb_reply)
         self.finished.emit(completion)
