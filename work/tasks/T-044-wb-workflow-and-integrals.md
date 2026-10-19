@@ -1,6 +1,6 @@
 # T-044：积分边界、文件夹/同Fig工作流与独立灰度分析
 
-- 状态：review；2026-10-18用户明确要求规划后执行，最终全库审查冗杂/无效代码。
+- 状态：preparing；E7/T060授权实际main依赖集成；2026-10-18产品与CI历史保留，下述历史review不替代最终集成验收。
 - 基线：d11552c32b87538e33ef3bfbe70fb3797e3f403e；同一活动树，新分支codex/t044-wb-workflow-and-integrals。原.impeccable/questions与历史dirty树/原图/旧结果保留。
 - 前轮当前事实：d11552c远端run39030621380两平台670和全部wheel/最终check成功，规则/桌面成功；历史间歇退出根因UNKNOWN，不以通过销账。
 
@@ -242,3 +242,7 @@ CI012同类fixture：另外三处项目/自动窗口只关闭未destroy的精确
 ## CI012系统化测试窗口管理收尾
 
 同类确定名单内Web/平台/共享fixture统一到测试专用close_and_dispose_window，只处理调用者明确拥有窗口、保留原异步退休判据及所有业务断言；新真实Qt等待失败不得安排销毁回归，全套736。作者67项157.28秒0，全项目类型/Ruff/格式525文件0。c5 Linux735/133.44秒和全部wheel/dev已成功，Windows仍运行；925 Linux真实SIGSEGV、Windows取消分别保留。下一步本批绑定独审→最后外置备份/推送→最终736远端门禁；不改产品、不复跑真实图或截图，不再无故文档提交重启CI。见ci012-fixture-lifetime.md，实际最终状态以PR15/issue6和.local/t044/github-delivery.json为准。
+
+## E7集成准备
+
+原f42f069按原d115基线scope .加载，任务历史/当前规则/模块及standalone量化契约已读。将合准备前置ae14904而不宣称实际main接受，保留前置crop/quant身份及UTF8诊断/OCR-CAS/资源修复；本阶段新quant_target和return_crop也须核严格会话，手工ROI草稿冻结同一epoch。当前只有既有支持的两个入口，不回移后继manual分组工具。原图/旧结果/历史dirty树不动，不调用Esc停止的原生CUA。主树E7源0c900全量及全部wheel0，新隔离候选构建已0且安装中，不能外推本历史PR最终检查。
