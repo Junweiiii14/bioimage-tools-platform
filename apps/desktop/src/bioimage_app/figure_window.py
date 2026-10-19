@@ -884,6 +884,9 @@ class FigureProjectWindow(QMainWindow):
         def completed(completion: ProjectOCRCompletion) -> None:
             self._ocr_session = None
             session.deleteLater()
+            if self._closing or self._cancellation.is_set():
+                self._done("OCR已停止，之前关联保留；已提交运行仍保留在历史。")
+                return
             if generation != self.view.generation:
                 self._done("项目已修改，OCR结果仅保留在历史，未覆盖编辑。")
                 return
@@ -893,6 +896,13 @@ class FigureProjectWindow(QMainWindow):
                     self.view.ocr.note.setText("OCR结果不可用：" + completion.error)
 
                 def previewed(reply: WBReply) -> None:
+                    if (
+                        self._closing
+                        or self._cancellation.is_set()
+                        or generation != self.view.generation
+                    ):
+                        self._done("OCR载入已停止，当前编辑保留。")
+                        return
                     if isinstance(reply.value, PreviewRaster):
                         self.view.ocr.set_preview(reply.value)
                     self._busy = False
@@ -913,24 +923,45 @@ class FigureProjectWindow(QMainWindow):
                 loaded = completion.loaded
 
                 def installed(reply: WBReply) -> None:
+                    if self._closing or self._cancellation.is_set():
+                        self._done("OCR已停止，之前关联保留；已提交运行仍保留在历史。")
+                        return
                     if generation != self.view.generation:
                         self._done("项目已修改，OCR建议未覆盖编辑")
                         return
                     if not isinstance(reply.value, WBProjectOCR):
                         self._error("OCR建议生成失败")
                         return
-                    self._loaded_ocr = loaded
-                    self.view.set_project(reply.value)
-                    self.view.generation += 1
+                    candidate = reply.value
                     self._busy = False
 
                     def saved() -> None:
+                        self._loaded_ocr = loaded
                         if self._closing:
                             self._done("OCR识别已保存")
                         else:
                             self.refresh_ocr_table("OCR完成；请校正名称、关联原图并确认。")
 
-                    self.save(after=saved)
+                    def install(current: WBFigureProject) -> WBProjectOCR:
+                        if (
+                            not isinstance(current, WBProjectOCR)
+                            or current.project_id != project.project_id
+                            or current.ocr != project.ocr
+                        ):
+                            raise ValueError("OCR来源或关联已改变，候选不能覆盖当前草稿")
+                        return type(candidate).model_validate(
+                            {**dict(candidate), "revision": current.revision}
+                        )
+
+                    self.save(
+                        after=saved,
+                        transform=install,
+                        install_guard=lambda: (
+                            not self._closing
+                            and not self._cancellation.is_set()
+                            and generation == self.view.generation
+                        ),
+                    )
 
                 self._wb(
                     WBJob("project_ocr_install", document=project, project_ocr_result=loaded),
@@ -2032,7 +2063,7 @@ class FigureProjectWindow(QMainWindow):
 
         def encoded(reply: WBReply) -> None:
             if install_guard is not None and not install_guard():
-                self._done("执行计划准备已停止；当前清单保留，未提交新修订。")
+                self._done("操作已停止；当前草稿保留，未提交新修订。")
                 return
             if not isinstance(reply.value, bytes):
                 self._error("项目编码无效")
@@ -2045,9 +2076,7 @@ class FigureProjectWindow(QMainWindow):
                     # CAS already committed. Retain that history and mark the
                     # current draft unsaved instead of installing a cancelled result.
                     self.view.generation += 1
-                    self._done(
-                        "执行计划已写入历史；已停止安装，当前清单草稿保留，请保存或继续编辑。"
-                    )
+                    self._done("新修订已写入历史；已停止安装，当前草稿保留，请保存或继续编辑。")
                     return
                 if generation != self.view.generation:
                     self._done("旧修订已保存，当前编辑保留；请重新执行操作")

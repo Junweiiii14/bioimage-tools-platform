@@ -1,6 +1,6 @@
 # Handoff Snapshot
 
-- 当前任务唯一状态源：work/tasks/T-059-performance-structure-convergence.md，E6 done，下一步E7/T060。E0–E6本机源码阶段已验证/独审通过。
+- 当前任务唯一状态源：work/tasks/T-060-integration-installation-acceptance.md，E7 implementing；前置E6 done。E0–E6本机源码阶段已验证/独审通过。
 - 有效树：C:/Users/70236/.codex/worktrees/t051-instrument-intake/bioimage-tools-platform；分支codex/wb-e0-e7；E5最终产品8feffce，E4最终产品ff89867。ResearchVault原目录是历史dirty树，不修改。
 - 用户授权按docs/wb-execution-plan.md连续E0–E7，每阶段验证和绑定最终提交的非作者独审后自动推进，无需重新批准、不设定时任务。
 - E4/schema13完整Fig先持久化再真实原像素测量，活动票据冻结输入，终态合并已核验run；取消/保存失败/迟到不推进。手动分段保持，显示像素不定量。
@@ -15,4 +15,5 @@
 - E3最终32da9f4/832/553.10s及全部wheel0，E1/808和E2/822证据见T054–T056；历史不重复抄入当前状态。
 - 真实独立科学真值/仪器留出、干净Win10/物理DPI仍缺；不依赖项继续。main只合规划PR16（43d520f），历史产品PR未合；本轮无新安装包/发布。
 - 原图、历史结果、旧树/候选、用户窗口/快捷方式保持；浏览器仅合成视觉fixture，不是科学或Qt证据。原生Computer Use曾被用户Esc停止，不再操作原生应用。
+
 
