@@ -43,7 +43,9 @@ def test_legacy_multiformat_has_one_render_and_same_full_pixels_and_provenance(
         assert png.info["wb_provenance"] == expected.manifest_json
     with tifffile.TiffFile(output / "figure.tif") as tiff:
         assert tiff.asarray().tobytes() == expected.rgb
-        assert tiff.pages[0].description == expected.manifest_json
+        page = tiff.pages[0]
+        assert isinstance(page, tifffile.TiffPage)
+        assert page.description == expected.manifest_json
     with ZipFile(output / "project.zip") as archive:
         assert archive.read("figure.png") == (output / "figure.png").read_bytes()
         assert archive.read("manifest.json").decode() == expected.manifest_json
@@ -85,7 +87,9 @@ def test_intake_tiff_reuses_exact_saved_fig_pixels_and_keeps_one_combined_layout
             old_provenance = json.loads(png.info["wb_provenance"])
         with tifffile.TiffFile(destination) as tiff:
             assert tiff.asarray().tobytes() == expected
-            provenance = json.loads(tiff.pages[0].description)
+            page = tiff.pages[0]
+            assert isinstance(page, tifffile.TiffPage)
+            provenance = json.loads(page.description)
         binding = provenance.pop("export_binding")
         assert provenance == old_provenance
         assert binding == {
@@ -98,7 +102,8 @@ def test_intake_tiff_reuses_exact_saved_fig_pixels_and_keeps_one_combined_layout
         for row in figure.rows:
             crop = next(e for e in project.intake_crops if e.row_id == row.row_id)
             assert crop.raw_crop is not None
-            np.testing.assert_array_equal(
-                tifffile.imread(output / row.raw_crop_path),
-                tifffile.imread(paths[crop.raw_crop.sha256]),
-            )
+            with (
+                tifffile.TiffFile(output / row.raw_crop_path) as actual,
+                tifffile.TiffFile(paths[crop.raw_crop.sha256]) as original,
+            ):
+                np.testing.assert_array_equal(actual.asarray(), original.asarray())
