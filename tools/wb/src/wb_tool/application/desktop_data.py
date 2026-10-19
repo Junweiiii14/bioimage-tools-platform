@@ -60,6 +60,7 @@ class WBJob:
         "intake_crop_propose",
         "intake_crop_export",
         "intake_figure_prepare",
+        "intake_figure_preview",
         "automatic_export",
         "metadata_read",
         "ocr_preview",

@@ -336,6 +336,14 @@ def intake_workflow_snapshot(project: WBIntakeWorkflowProject) -> dict[str, obje
         "digest": intake_workflow_digest(project),
         "stages_finished": all(s.status == "done" for s in project.workflow.steps),
         "ready_count": sum(s.status == "done" for s in project.workflow.steps),
+        "pending_ready": sum(
+            s.status == "pending"
+            and s.stage != "export"
+            and _prerequisites(
+                project, s, {(p.stage, p.target_id): p.status for p in project.workflow.steps}
+            )
+            for s in project.workflow.steps
+        ),
     }
 
 
@@ -347,5 +355,6 @@ def return_to_intake_editing(project: WBIntakeWorkflowProject) -> WBIntakeProjec
     fields = dict(project)
     fields.pop("workflow")
     fields.pop("intake_crops", None)
+    fields.pop("intake_figures", None)
     fields["schema_version"] = 10
     return WBIntakeProject.model_validate(fields)

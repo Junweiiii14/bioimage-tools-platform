@@ -1,6 +1,6 @@
 """Typed command boundary for the instrument planning page."""
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Literal, cast
 
 from wb_tool.api import (
     IntakeAssignment,
@@ -9,6 +9,7 @@ from wb_tool.api import (
     LaneROI,
     WBFigureProject,
     WBIntakeCropProject,
+    WBIntakeFigureProject,
     WBIntakeProject,
     WBIntakeWorkflowProject,
     WBJob,
@@ -90,8 +91,22 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
             raise ValueError("请核对当前裁剪执行摘要")
         host.intake_workflow.start(workflow_digest)
         return
-    if action in {"intake_crop_review", "intake_crop_retry"}:
-        workflow_digest, row_id = data.get("workflowDigest"), data.get("rowId")
+    if action == "intake_view_figure":
+        workflow_digest, figure_id = data.get("workflowDigest"), data.get("figureId")
+        if (
+            not isinstance(project, WBIntakeFigureProject)
+            or not isinstance(figure_id, str)
+            or not isinstance(workflow_digest, str)
+            or intake_digest(project) != digest
+        ):
+            raise ValueError("请选择当前清单中已保存的Fig")
+        host.intake_workflow.show_figure(figure_id, workflow_digest)
+        return
+    if action in {"intake_crop_review", "intake_crop_retry", "intake_stage_retry"}:
+        workflow_digest, row_id = (
+            data.get("workflowDigest"),
+            data.get("rowId", data.get("targetId")),
+        )
         if not isinstance(project, WBIntakeCropProject) or not isinstance(row_id, str):
             raise ValueError("请选择当前固定N裁剪行")
         if (
@@ -116,9 +131,14 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
                 expected_digest=workflow_digest,
             )
         else:
+            stage = data.get("stage") if action == "intake_stage_retry" else "crop"
+            if stage not in {"crop", "compose", "measure"}:
+                raise ValueError("此阶段尚未接通重试")
+            if stage != "crop" and not isinstance(project, WBIntakeFigureProject):
+                raise ValueError("此项目没有完整Fig阶段")
             retried = retry_intake_workflow_step(
                 project,
-                "crop",
+                cast(Literal["crop", "compose", "measure"], stage),
                 row_id,
                 expected_digest=workflow_digest,
             )
@@ -132,9 +152,7 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
                 or intake_workflow_digest(current) != workflow_digest
             ):
                 raise ValueError("当前裁剪输入已改变，原草稿保留")
-            return WBIntakeCropProject.model_validate(
-                {**dict(updated), "revision": current.revision}
-            )
+            return type(updated).model_validate({**dict(updated), "revision": current.revision})
 
         generation = host.view.generation
         host.save(

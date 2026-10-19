@@ -1771,3 +1771,8 @@ class FigureProjectView(QWidget):
             QImage.Format.Format_RGB888,
         ).copy()
         self.preview_label.set_render(QPixmap.fromImage(image))
+
+    def clear_render(self) -> None:
+        """Retire only the display; do not change source geometry or draft generation."""
+        self._rendered_preview = None
+        self.preview_label.clear_render()

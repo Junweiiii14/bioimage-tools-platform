@@ -1428,6 +1428,44 @@ class FigureProjectWindow(QMainWindow):
         """Remember a path returned by the verified storage asset resolver."""
         self._paths[asset.sha256] = path
 
+    def create_measurement_session(self) -> ProjectMeasurementSession:
+        if self._measurement_session is not None:
+            raise ValueError("当前测量尚未退出，不能重复创建")
+        session = ProjectMeasurementSession(self._store, self._background, self)
+        self._measurement_session = session
+        session.progress.connect(self.view.status.setText)
+        session.progress.connect(self.measurement_progress)
+        session.counts.connect(self._quant_counts)
+        return session
+
+    def retire_measurement_session(self, session: ProjectMeasurementSession) -> None:
+        if self._measurement_session is session:
+            self._measurement_session = None
+        session.deleteLater()
+
+    def retain_project_results(self, results: tuple[LoadedProjectResult, ...]) -> None:
+        project = self.view.project()
+        if not isinstance(project, WBAnalysisProject):
+            raise ValueError("结果需要当前项目定量请求")
+        candidates = {r.row_id: r for r in (*self._project_results, *results)}
+        retained: list[LoadedProjectResult] = []
+        size = 0
+        for plan in project.analyses:
+            result = candidates.get(plan.row_id)
+            if (
+                result
+                and plan.run
+                and plan.run.result
+                and (
+                    result.run_id == plan.run.run_id
+                    and result.asset_sha256 == plan.run.result.sha256
+                )
+            ):
+                size += plan.run.result.size_bytes
+                if size <= 64 * 1024 * 1024:
+                    retained.append(result)
+        self._project_results = tuple(retained)
+
     def submit_export_job(self, job: WBJob, callback: Callable[[WBReply], None]) -> None:
         self._export_with_evidence(job, callback)
 
@@ -2081,12 +2119,23 @@ class FigureProjectWindow(QMainWindow):
                         self._project_results = ()
                         self._loaded_ocr = None
                         if isinstance(project, WBIntakeProject):
-                            self._done("导入清单已恢复，正在加载缩略图。")
+
+                            def intake_loaded() -> None:
+                                current = self.view.project()
+                                if isinstance(current, WBRestoredProject) and current.analyses:
+                                    self._start()
+                                    self._restore_project_evidence(
+                                        current, after=self.load_thumbnails
+                                    )
+                                else:
+                                    self.load_thumbnails()
+
+                            self._done("导入清单已恢复，正在核验运行与缩略图。")
                             if interrupted:
                                 self.view.generation += 1
-                                self.save(after=self.load_thumbnails)
+                                self.save(after=intake_loaded)
                                 return
-                            self.load_thumbnails()
+                            intake_loaded()
                         elif isinstance(project, WBRestoredProject):
                             self._restore_project_evidence(project)
                         elif isinstance(project, WBAnalysisProject):
@@ -2132,7 +2181,9 @@ class FigureProjectWindow(QMainWindow):
 
         self._storage(StorageCommand("load", document_id=document_id), loaded)
 
-    def _restore_project_evidence(self, project: WBRestoredProject) -> None:
+    def _restore_project_evidence(
+        self, project: WBRestoredProject, *, after: Callable[[], None] | None = None
+    ) -> None:
         def collected(evidence: tuple[ArchiveRunEvidence, ...]) -> None:
             self._archive_session = None
             if self._closing or self._cancellation.is_set():
@@ -2150,7 +2201,7 @@ class FigureProjectWindow(QMainWindow):
                     self.refresh_project_table(
                         f"项目已恢复；{len(reply.value.errors)} 条运行证据不可用。"
                         "历史来源见结果表。",
-                        after=self.select_initial_source,
+                        after=after or self.select_initial_source,
                     )
 
             self._wb(

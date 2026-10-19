@@ -1,5 +1,6 @@
 """Complete Fig prerequisites and analytic original-pixel oracles, independent of display."""
 
+import json
 from dataclasses import replace
 from hashlib import sha256
 from pathlib import Path
@@ -12,6 +13,8 @@ from pydantic import TypeAdapter
 from tool_contracts.api import AssetRef, RunRecord
 from wb_tool.api import (
     AnalysisResult,
+    FigureComposition,
+    FigureSlice,
     FigureSourcePath,
     IntakeAssignment,
     IntakeFigure,
@@ -37,6 +40,7 @@ from wb_tool.api import (
     intake_digest,
     intake_figure_projection,
     intake_workflow_digest,
+    load_intake_figure_preview,
     load_tiff,
     prepare_intake_crops,
     prepare_intake_figure,
@@ -53,6 +57,7 @@ from wb_tool.api import (
     request_intake_workflow_cancel,
     restore_staged_project,
     review_intake_crop,
+    with_figure_layout,
 )
 
 
@@ -300,3 +305,77 @@ def test_original_triangle_integrals_do_not_depend_on_display_and_finish_require
             ),
             (),
         )
+
+
+def test_large_saved_fig_preview_scales_display_hit_regions_but_retains_original_coordinates(
+    tmp_path: Path,
+) -> None:
+    p, sources = ready_fig(tmp_path)
+    p = type(p).model_validate(
+        {**dict(p), "layout_style": p.layout_style.model_copy(update={"lane_unit": 1200})}
+    )
+    path = tmp_path / "wide.png"
+    p = compose(p, sources, path)
+    before = path.read_bytes()
+    preview = load_intake_figure_preview(p, "a", str(path))
+    assert max(preview.width, preview.height) == 2048
+    manifest = json.loads(preview.manifest_json)
+    assert manifest["preview_binding"]["asset_sha256"] == p.intake_figures[0].image.sha256
+    assert manifest["preview_binding"]["scale_x"] < 1
+    assert {record["row_id"] for record in manifest["rows"]} == {"a1", "a2"}
+    for record in manifest["rows"]:
+        assert record["roi"] == {
+            "x0": 0,
+            "y0": 10,
+            "x1": 120,
+            "y1": 60,
+        }
+        box = record["preview_output_box"]
+        matrix = record["preview_source_to_output"]
+        cx = matrix[0][0] * 60 + matrix[0][1] * 35 + matrix[0][2]
+        cy = matrix[1][0] * 60 + matrix[1][1] * 35 + matrix[1][2]
+        assert 0 <= box[0] < cx < box[2] <= preview.width
+        assert 0 <= box[1] < cy < box[3] <= preview.height
+    assert path.read_bytes() == before
+
+
+def test_explicit_segmented_layout_is_retained_without_changing_quantitative_targets(
+    tmp_path: Path,
+) -> None:
+    p, sources = ready_fig(tmp_path)
+    slices = tuple(
+        FigureSlice(
+            row_id=row_id,
+            figure="Fig A",
+            line=line,
+            position=position,
+            first_lane=first,
+            last_lane=last,
+        )
+        for line, row_id in enumerate(("a1", "a2"), 1)
+        for position, first, last in ((1, 1, 1), (2, 2, 3))
+    )
+    custom = with_figure_layout(
+        p,
+        FigureComposition(
+            slices=(*slices, *[part for part in p.composition.slices if part.figure == "Fig B"]),
+            columns=p.composition.columns,
+        ),
+    )
+    assert isinstance(custom, WBIntakeFigureProject)
+    original = compose(p, sources, tmp_path / "whole.png")
+    segmented = compose(custom, sources, tmp_path / "segmented.png")
+    assert tuple(plan.request for plan in original.analyses) == tuple(
+        plan.request for plan in segmented.analyses
+    )
+    assert segmented.composition == custom.composition
+    with Image.open(tmp_path / "segmented.png") as image:
+        records = json.loads(image.info["wb_provenance"])["rows"]
+    assert [r["row_id"] for r in records] == ["a1", "a1", "a2", "a2"]
+    assert [r["source_lane_range"] for r in records] == [[1, 1], [2, 3], [1, 1], [2, 3]]
+    assert [(r["roi"]["x0"], r["roi"]["x1"]) for r in records] == [
+        (0, 40),
+        (40, 120),
+        (0, 40),
+        (40, 120),
+    ]

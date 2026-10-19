@@ -33,6 +33,7 @@ class ProjectBatchCompletion:
     results: tuple[LoadedProjectResult, ...]
     errors: tuple[str, ...]
     cancelled: bool
+    committed: tuple[ProjectRowAnalysis, ...] = ()
 
 
 class ProjectMeasurementSession(QObject):
@@ -51,6 +52,8 @@ class ProjectMeasurementSession(QObject):
         self._cancelled = False
         self._started = False
         self._restore = False
+        self._defer_install = False
+        self._committed: list[ProjectRowAnalysis] = []
         self._pending: list[ProjectRowAnalysis] = []
         self._results: list[LoadedProjectResult] = []
         self._errors: list[str] = []
@@ -67,12 +70,14 @@ class ProjectMeasurementSession(QObject):
         workspace: str,
         *,
         restore: bool = False,
+        defer_install: bool = False,
     ) -> None:
         if self._started:
             raise RuntimeError("项目运行会话不能重复启动")
         self._started = True
         self._project = self._frozen = project
         self._workspace, self._restore = workspace, restore
+        self._defer_install = defer_install
         self._pending = [p for p in project.analyses if p.row_id in row_ids]
         self._total = len(self._pending)
         self._next()
@@ -202,16 +207,27 @@ class ProjectMeasurementSession(QObject):
         try:
             if completion.error or completion.record is None:
                 raise ValueError(completion.error or "运行未提交")
-            self._project = record_project_run(
-                self._project, plan.row_id, plan.request, completion.record
-            )
-            updated = next(p for p in self._project.analyses if p.row_id == plan.row_id)
+            if self._defer_install:
+                # A running intake ticket freezes the entire project. Collect verified
+                # terminal outputs without changing that input snapshot mid-attempt.
+                if completion.record.document_id != self._frozen.project_id:
+                    raise ValueError("运行不属于冻结项目")
+                updated = ProjectRowAnalysis.model_validate(
+                    {**dict(plan), "run": completion.record}
+                )
+            else:
+                self._project = record_project_run(
+                    self._project, plan.row_id, plan.request, completion.record
+                )
+                updated = next(p for p in self._project.analyses if p.row_id == plan.row_id)
             self._read_result(updated)
         except (ValueError, RuntimeError) as error:
             self._failed(str(error))
 
     def _read_result(self, plan: ProjectRowAnalysis) -> None:
         if plan.run is None or plan.run.state != "succeeded" or plan.run.result is None:
+            if self._defer_install and plan.run is not None:
+                self._committed.append(plan)
             if not self._restore and plan.run is not None:
                 self._errors.append(f"{self._current_label}：{plan.run.reason or plan.run.state}")
             self._row_finished()
@@ -228,6 +244,8 @@ class ProjectMeasurementSession(QObject):
                 if not isinstance(result.value, LoadedProjectResult):
                     raise ValueError("已提交结果解码失败")
                 self._results.append(result.value)
+                if self._defer_install:
+                    self._committed.append(plan)
                 self._row_finished()
                 self._next()
 
@@ -255,6 +273,10 @@ class ProjectMeasurementSession(QObject):
         self._background.replied.disconnect(self._wb_reply)
         self.finished.emit(
             ProjectBatchCompletion(
-                self._project, tuple(self._results), tuple(self._errors), self._cancelled
+                self._project,
+                tuple(self._results),
+                tuple(self._errors),
+                self._cancelled,
+                tuple(self._committed),
             )
         )

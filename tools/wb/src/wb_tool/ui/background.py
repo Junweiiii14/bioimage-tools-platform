@@ -137,12 +137,23 @@ class _Work(QObject):
                     raise ValueError("裁剪执行准备已取消或项目不存在")
                 if intake_workflow_digest(job.document) != job.data.decode("ascii"):
                     raise ValueError("执行摘要已变化，请重新核对")
-                prepared = prepare_intake_crops(job.document)
+                from wb_tool.application.intake_figure import prepare_intake_figures
+
+                prepared = prepare_intake_figures(prepare_intake_crops(job.document))
                 value = approve_intake_workflow(
                     prepared, expected_digest=intake_workflow_digest(prepared)
                 )
                 if cancel():
                     raise ValueError("裁剪执行准备已取消")
+            elif job.operation == "intake_figure_preview":
+                from wb_tool.adapters.intake_figure import load_intake_figure_preview
+                from wb_tool.application.intake_figure import WBIntakeFigureProject
+
+                if not isinstance(job.document, WBIntakeFigureProject):
+                    raise ValueError("缺少当前Fig显示项目")
+                value = load_intake_figure_preview(
+                    job.document, job.row_id, job.path, cancelled=cancel
+                )
             elif job.operation == "intake_figure_prepare":
                 from wb_tool.adapters.intake_figure import prepare_intake_figure
                 from wb_tool.application.intake_figure import WBIntakeFigureProject

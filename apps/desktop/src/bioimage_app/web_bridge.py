@@ -18,6 +18,7 @@ from wb_tool.api import (
     ProjectTableCell,
     WBAnalysisProject,
     WBIntakeCropProject,
+    WBIntakeFigureProject,
     WBIntakeProject,
     WBIntakeWorkflowProject,
     WBLayoutProject,
@@ -157,6 +158,12 @@ class WorkbenchBridge(QObject):
             intake["sources"] = sources
             intake["issues"] = list(self.host.intake.issues)
             intake["cropEnabled"] = isinstance(project, WBIntakeCropProject)
+            intake["figureEnabled"] = isinstance(project, WBIntakeFigureProject)
+            intake["figuresReady"] = (
+                [e.model_dump(mode="json") for e in project.intake_figures]
+                if isinstance(project, WBIntakeFigureProject)
+                else []
+            )
             intake["crops"] = (
                 [e.model_dump(mode="json") for e in project.intake_crops]
                 if isinstance(project, WBIntakeCropProject)
@@ -179,22 +186,38 @@ class WorkbenchBridge(QObject):
         montage = None
         if rendered and not pixmap.isNull():
             manifest = json.loads(rendered.manifest_json)
-            if (
-                manifest.get("project_id") == project.project_id
-                and manifest.get("revision") == project.revision
+            binding = manifest.get("preview_binding", {})
+            intake_preview = isinstance(project, WBIntakeFigureProject) and (
+                binding.get("revision") == project.revision
+                and any(
+                    e.figure_id == binding.get("figure_id")
+                    and e.input_digest == binding.get("input_digest")
+                    and e.image.sha256 == binding.get("asset_sha256")
+                    for e in project.intake_figures
+                )
+            )
+            if manifest.get("project_id") == project.project_id and (
+                manifest.get("revision") == project.revision or intake_preview
             ):
+                if intake_preview and intake is not None:
+                    intake["displayFigureId"] = binding.get("figure_id")
                 montage = self._montage
                 montage_width, montage_height = rendered.width, rendered.height
                 for item in manifest.get("rows", []):
-                    box = item.get("output_box")
+                    box = item.get("preview_output_box", item.get("output_box"))
                     if box and item.get("source_sha256"):
                         peers = [
-                            r["output_box"]
+                            r.get("preview_output_box", r["output_box"])
                             for r in manifest.get("rows", [])
                             if r.get("figure") == item.get("figure") and r.get("output_box")
                         ]
-                        label = project.template.label_width
-                        border = project.template.border
+                        sx, sy = (
+                            (binding.get("scale_x", 1), binding.get("scale_y", 1))
+                            if intake_preview
+                            else (1, 1)
+                        )
+                        label = project.template.label_width * sx
+                        border = project.template.border * min(sx, sy)
                         heading = (
                             project.layout_style.heading_size
                             if isinstance(project, WBLayoutProject)
@@ -208,7 +231,10 @@ class WorkbenchBridge(QObject):
                         )
                         gy = max(
                             0,
-                            min(b[1] for b in peers) - border - heading - project.template.row_gap,
+                            min(b[1] for b in peers)
+                            - border
+                            - heading * sy
+                            - project.template.row_gap * sy,
                         )
                         gr = min(
                             rendered.width,
@@ -218,13 +244,15 @@ class WorkbenchBridge(QObject):
                         )
                         gb = min(
                             rendered.height,
-                            max(b[3] for b in peers) + border + project.template.row_gap,
+                            max(b[3] for b in peers) + border + project.template.row_gap * sy,
                         )
                         regions.append(
                             {
                                 "rowId": item["row_id"],
                                 "sourceLaneRange": item.get("source_lane_range"),
-                                "sourceToOutput": item.get("source_to_output"),
+                                "sourceToOutput": item.get(
+                                    "preview_source_to_output", item.get("source_to_output")
+                                ),
                                 "groupBounds": {
                                     "x": gx,
                                     "y": gy,
@@ -248,7 +276,32 @@ class WorkbenchBridge(QObject):
                         )
         cells = [cell_state(c) for c in view.analysis.result_view.cells]
         rows: list[dict[str, object]] = []
+        crop_steps = (
+            {s.target_id: s.status for s in project.workflow.steps if s.stage == "crop"}
+            if isinstance(project, WBIntakeWorkflowProject)
+            else {}
+        )
+        crop_assets: set[str] = (
+            {e.row_id for e in project.intake_crops if e.raw_crop is not None}
+            if isinstance(project, WBIntakeCropProject)
+            else set()
+        )
         for row in project.rows:
+            crop_status = (
+                "ready"
+                if row.roi and row_is_ready(project, row)
+                else "pending"
+                if row.roi
+                else "failed"
+            )
+            if isinstance(project, WBIntakeCropProject):
+                crop_status = (
+                    "ready"
+                    if row.row_id in crop_assets and crop_steps.get(row.row_id) == "done"
+                    else "failed"
+                    if crop_steps.get(row.row_id) == "failed"
+                    else "pending"
+                )
             results = [cell for cell in cells if cell["rowId"] == row.row_id]
             reasons = list(dict.fromkeys(str(cell["reason"]) for cell in results if cell["reason"]))
             roi = row.roi
@@ -269,11 +322,7 @@ class WorkbenchBridge(QObject):
                     "lanes": row.lane_count,
                     "emptyLanes": list(row.empty_lanes),
                     "reviewed": row.reviewed,
-                    "cropStatus": "ready"
-                    if row.roi and row_is_ready(project, row)
-                    else "pending"
-                    if row.roi
-                    else "failed",
+                    "cropStatus": crop_status,
                     "preview": self._images.get(row.source.sha256)
                     if row.source and source_counts[row.source.sha256] == 1
                     else None,
@@ -408,12 +457,14 @@ class WorkbenchBridge(QObject):
                 "intake_run",
                 "intake_crop_review",
                 "intake_crop_retry",
+                "intake_stage_retry",
+                "intake_view_figure",
                 "select",
                 "intake_import_folder",
                 "open_project",
                 "retry_location",
             }:
-                raise ValueError("仪器导入项目当前仅支持清单与原图分配；后续裁剪流程尚未接通")
+                raise ValueError("仪器清单项目请使用阶段执行、原图复核和已保存Fig入口")
             elif action in {
                 "intake_plan",
                 "intake_assign",
@@ -423,6 +474,8 @@ class WorkbenchBridge(QObject):
                 "intake_run",
                 "intake_crop_review",
                 "intake_crop_retry",
+                "intake_stage_retry",
+                "intake_view_figure",
             }:
                 apply_intake_command(self, action, data)
             elif (

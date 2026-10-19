@@ -96,7 +96,8 @@ def test_crop_review_uses_fixed_n_draft_and_acknowledges_only_saved_snapshot(
         qtbot,
         """
       ({...state,selectedId:'protein-a',rows:[{id:'protein-a',sourceId:'sha',name:'raw.tif',
-        fig:'Fig 1',protein:'Actin',width:180,height:90,lanes:6,roi:null,results:[]}],
+        fig:'Fig 1',protein:'Actin',
+        width:180,height:90,lanes:6,roi:null,results:[]}],
         intake:{...state.intake,confirmed:true,cropEnabled:true,crops:[{row_id:'protein-a',
           crop:null,reviewed:false,raw_crop:null,reason:'空图未定位'}],workflow:{digest:'wf1',
           ready_count:0,steps:[{stage:'crop',target_id:'protein-a',status:'needs_review',attempt:1,reason:'空图未定位'}]}}})
@@ -146,6 +147,98 @@ def test_crop_review_uses_fixed_n_draft_and_acknowledges_only_saved_snapshot(
     assert javascript(window, qtbot, "mode==='review'")
     bridge_snapshot(window, qtbot, "({...state,sessionEpoch:state.sessionEpoch+1})")
     assert javascript(window, qtbot, "mode==='intake'")
+
+
+def test_intake_fig_routes_preserve_saved_preview_results_and_source_identity(
+    intake_page: WebWorkbenchWindow,
+    qtbot: QtBot,
+) -> None:
+    window = intake_page
+    bridge_snapshot(
+        window,
+        qtbot,
+        """({...state,rows:[
+      {id:'protein-a',name:'a.tiff',fig:'Fig 1',protein:'Actin',
+        width:180,height:90,lanes:6,roi:{x:10,y:10,width:120,height:30}},
+      {id:'protein-b',name:'b.tiff',fig:'Fig 1',protein:'Actin',
+        width:180,height:90,lanes:6,roi:{x:20,y:20,width:120,height:30}}],
+      cells:[{rowId:'protein-a',fig:'Fig 1',protein:'Actin',
+          lane:1,value:400,rawIntegral:400,status:'valid',reason:''},
+        {rowId:'protein-b',fig:'Fig 1',protein:'Actin',
+          lane:1,value:null,rawIntegral:800,status:'quality_review',reason:'背景待复核'},
+        {rowId:'protein-b',fig:'Fig 1',protein:'Actin',
+          lane:2,value:null,rawIntegral:null,status:'not_detected',reason:'尚未建立边界'}],
+      intake:{...state.intake,confirmed:true,cropEnabled:true,figureEnabled:true,
+        figuresReady:[{figure_id:'fig-a',row_ids:['protein-a','protein-b']}],crops:[],
+        workflow:{digest:'wf-fig',pending_ready:0,ready_count:4,steps:[
+          {stage:'crop',target_id:'protein-a',status:'done',attempt:1},
+          {stage:'crop',target_id:'protein-b',status:'done',attempt:1},
+          {stage:'compose',target_id:'fig-a',status:'done',attempt:1},
+          {stage:'measure',target_id:'fig-a',status:'done',attempt:1},
+          {stage:'export',target_id:'intake-project',status:'pending',attempt:0}]}}})""",
+    )
+    assert javascript(window, qtbot, "document.querySelector('[data-intake=run]').disabled")
+    javascript(window, qtbot, "document.querySelector('[data-intake=view-figure]').click();true")
+    assert javascript(window, qtbot, "mode==='layout'")
+    sent = javascript(window, qtbot, "JSON.stringify(sent)")
+    assert isinstance(sent, str)
+    assert json.loads(sent)[-1]["action"] == "intake_view_figure"
+    assert json.loads(sent)[-1]["payload"]["figureId"] == "fig-a"
+    bridge_snapshot(
+        window,
+        qtbot,
+        """({...state,intake:{...state.intake,displayFigureId:'fig-a'},
+      montage:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jvXkAAAAASUVORK5CYII=',
+      montageWidth:200,montageHeight:120,montageRegions:[
+        {rowId:'protein-b',x:10,y:50,width:120,height:30}]})""",
+    )
+    assert javascript(window, qtbot, "mode==='layout'")
+    assert javascript(
+        window, qtbot, "!document.querySelector('[data-edit-row=protein-b]').disabled"
+    )
+    javascript(window, qtbot, "document.querySelector('[data-edit-row=protein-b]').click();true")
+    assert javascript(window, qtbot, "mode==='review'&&state.selectedId==='protein-b'")
+    javascript(window, qtbot, "switchMode('results');true")
+    bridge_snapshot(window, qtbot, "({...state,status:'记录保持'})")
+    assert javascript(window, qtbot, "mode==='results'")
+    assert javascript(
+        window, qtbot, "document.querySelector('#results-body').innerText.includes('未检测到')"
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('#results-body tr:nth-child(2) td:nth-child(3)').innerText==='—'",
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('#results-body tr:nth-child(2) td:nth-child(4)').innerText==='800'",
+    )
+    assert javascript(
+        window, qtbot, "document.querySelector('#results-body').innerText.includes('第 2 行')"
+    )
+    javascript(
+        window, qtbot, "document.querySelector('#results-body tr:nth-child(2) button').click();true"
+    )
+    assert javascript(window, qtbot, "state.selectedId==='protein-b'&&mode==='review'")
+
+    bridge_snapshot(
+        window,
+        qtbot,
+        """({...state,intake:{...state.intake,workflow:{...state.intake.workflow,
+      digest:'wf-retry',steps:state.intake.workflow.steps.map(s=>s.stage==='measure'?{...s,status:'failed',reason:'运行未完成'}:s)}}})""",
+    )
+    javascript(
+        window,
+        qtbot,
+        "switchMode('intake');document.querySelector('[data-intake=retry-stage]').click();true",
+    )
+    sent = javascript(window, qtbot, "JSON.stringify(sent)")
+    assert isinstance(sent, str)
+    retry = json.loads(sent)[-1]
+    assert retry["action"] == "intake_stage_retry"
+    assert retry["payload"]["stage"] == "measure" and retry["payload"]["targetId"] == "fig-a"
+    assert retry["payload"]["workflowDigest"] == "wf-retry"
 
 
 @pytest.fixture

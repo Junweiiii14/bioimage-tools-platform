@@ -19,7 +19,7 @@ window.intakeWorkspace = (() => {
   let key = '', baseDigest = '', basePlan = '', draft = null, batch = [], selected = new Set();
   let conflict = false, pending = null, replace = false, allowReuse = false, filter = '';
   const cropDrafts = new Map(), cropPending = new Map();
-  let cropSavedRow = null, cropFocusAction = null;
+  let cropSavedRow = null, cropFocusAction = null, chosenFigureId = null;
   const copyPlan = intake => ({
     figures: intake.figures.map(item => ({...item})),
     proteins: intake.proteins.map(item => ({...item}))
@@ -41,7 +41,7 @@ window.intakeWorkspace = (() => {
   function reset() {
     cropDrafts.clear(); cropPending.clear();
     cropSavedRow = null;
-    cropFocusAction = null;
+    cropFocusAction = null; chosenFigureId = null;
     renderedWorkflow = null; focusAction = null; live.textContent = '';
     key = ''; baseDigest = ''; basePlan = ''; draft = null; batch = []; selected.clear();
     conflict = false; pending = null; replace = false; allowReuse = false; filter = '';
@@ -133,8 +133,8 @@ window.intakeWorkspace = (() => {
     $('#inspector-title').textContent = '原图裁剪复核';
     $('#review-badge').textContent = evidence?.raw_crop ? '原值已保存' : '待核对';
     $('#review-badge').className = 'status-badge '+(evidence?.raw_crop?'ok':'pending');
-    $('#inspector-content').innerHTML = `<section class="inspect-section"><h3>${r?escapeText(targetName(r.id)):'请选择蛋白行'}</h3><p>在原图上拖出范围，或调整建议框。${r?.lanes||0} 个槽位包含无信号空位，不含 Marker；本行独立定位。</p>${dataPair('固定槽位数',r?.lanes||0)}${dataPair('原值裁剪',evidence?.raw_crop?'已保存':'尚未生成')}<p class="row-reason">${escapeText(draft?.conflict?'后台输入已改变，草稿保留；放弃后重新核对。':evidence?.reason||'请先运行固定N定位，取得该行处理状态。')}</p><p>确认整行范围将按固定 N 等宽分割。无信号不等于未上样，也不作为零值。</p></section>`;
-    $('#inspector-action').innerHTML = `<button class="button primary full" data-intake-crop-action="confirm" ${state.busy||!r?.roi||!evidence||!reviewable||draft?.conflict?'disabled':''}>确认此范围与固定槽位</button><button class="button subtle full" data-intake-crop-action="run" ${state.busy||hasDraft()?'disabled':''}>继续定位与裁剪</button><button class="text-button" data-intake-crop-action="discard" ${state.busy||!draft?'disabled':''}>放弃本行裁剪草稿</button><button class="text-button" data-intake-crop-action="back">返回清单与异常</button>`;
+    $('#inspector-content').innerHTML = `<section class="inspect-section"><h3>${r?escapeText(targetName(r.id)):'请选择蛋白行'}</h3><p>${reviewable?'在原图上拖出范围，或调整建议框。':'本行用于原图回溯；已保存的原值裁剪与历史保持。'}${r?.lanes||0} 个槽位包含无信号空位，不含 Marker；本行独立定位。</p>${dataPair('固定槽位数',r?.lanes||0)}${dataPair('原值裁剪',evidence?.raw_crop?'已保存':'尚未生成')}<p class="row-reason">${escapeText(draft?.conflict?'后台输入已改变，草稿保留；放弃后重新核对。':evidence?.reason||'请先运行固定N定位，取得该行处理状态。')}</p><p>确认整行范围将按固定 N 等宽分割。无信号不等于未上样，也不作为零值。</p></section>`;
+    $('#inspector-action').innerHTML = `<button class="button primary full" data-intake-crop-action="confirm" ${state.busy||!r?.roi||!evidence||!reviewable||draft?.conflict?'disabled':''}>确认此范围与固定槽位</button><button class="button subtle full" data-intake-crop-action="run" ${state.busy||hasDraft()||!runnable()?'disabled':''}>继续处理批次</button><button class="text-button" data-intake-crop-action="discard" ${state.busy||!draft?'disabled':''}>放弃本行裁剪草稿</button><button class="text-button" data-intake-crop-action="back">返回清单与异常</button>`;
     const focus = cropSavedRow === r?.id ? 'run' : cropFocusAction;
     cropSavedRow = null;
     if (focus) {
@@ -145,11 +145,45 @@ window.intakeWorkspace = (() => {
     if (cropPending.size && state.status && live.textContent !== state.status) live.textContent = state.status;
   }
   function cropActions(step) {
-    if (!state.intake.cropEnabled || step.stage !== 'crop') return '';
+    if (!state.intake.cropEnabled) return '';
+    if(step.stage!=='crop'){
+      if(!state.intake.figureEnabled||!['compose','measure'].includes(step.stage))return '';
+      const saved=state.intake.figuresReady?.some(f=>f.figure_id===step.target_id);
+      const retry=['needs_review','failed','cancelled','interrupted'].includes(step.status);
+      return `<span class="intake-stage-actions">${saved?`<button class="text-button" data-intake="view-figure" data-id="${escapeText(step.target_id)}" ${state.busy||hasDraft()?'disabled':''}>查看本 Fig</button>`:''}${step.stage==='measure'&&step.status==='done'?'<button class="text-button" data-intake="view-results">查看测量记录</button>':''}${retry?`<button class="text-button" data-intake="retry-stage" data-stage="${step.stage}" data-id="${escapeText(step.target_id)}" ${state.busy||hasDraft()?'disabled':''}>重试本 Fig</button>`:''}</span>`;
+    }
     const reviewable = ['needs_review','failed','cancelled','interrupted'].includes(step.status);
     return `<span class="intake-stage-actions"><button class="text-button" data-intake="review-crop" data-id="${escapeText(step.target_id)}" ${state.busy?'disabled':''}>查看原图${reviewable?'并复核':''}</button>${reviewable?`<button class="text-button" data-intake="retry-crop" data-id="${escapeText(step.target_id)}" ${state.busy||hasDraft()?'disabled':''}>重试本行</button>`:''}</span>`;
   }
 
+  const allowedModes = () => ['intake', ...(state.intake?.cropEnabled?['review']:[]), ...(state.intake?.figureEnabled?['layout','results']:[])];
+  const runnable = () => (state.intake?.workflow?.pending_ready ?? state.intake?.workflow?.steps.filter(s=>s.stage==='crop'&&s.status==='pending').length ?? 0)>0;
+  function requestFigure() {
+    const figures=state.intake?.figuresReady||[];
+    const selected=figures.find(f=>f.figure_id===chosenFigureId)||figures.find(f=>f.row_ids.includes(row()?.id))||figures[0];
+    if(selected&&!state.busy)send('intake_view_figure',{...cropGuard(),figureId:selected.figure_id});
+  }
+  function renderFigureInspector() {
+    if(!state.intake?.figureEnabled||!['layout','results'].includes(mode))return false;
+    const figureId=state.intake.displayFigureId||chosenFigureId;
+    const fig=state.intake.figures.find(f=>f.figure_id===figureId);
+    const members=state.intake.proteins.filter(p=>p.figure_id===figureId);
+    $('#inspector-title').textContent=mode==='layout'?'已保存的 Fig':'原像素测量记录';
+    $('#review-badge').textContent=mode==='layout'?(state.montage?'显示成图':'等待成图'):'数值与状态分列';
+    $('#review-badge').className='status-badge';
+    $('#inspector-content').innerHTML=mode==='layout'?`<section class="inspect-section"><h3>${escapeText(fig?.label||'选择已完成的 Fig')}</h3><p>图像来自已保存的完整 Fig。显示缩放与重采样不进入定量；点击图块或下方蛋白行可回到原图。</p>${members.map(p=>`<button class="text-button full" data-intake-crop-action="source" data-id="${escapeText(p.protein_id)}" ${state.busy?'disabled':''}>${escapeText(targetName(p.protein_id))}</button>`).join('')}</section><section class="inspect-section"><h3>其他已保存成图</h3>${(state.intake.figuresReady||[]).map(f=>`<button class="text-button full" data-intake-crop-action="figure" data-id="${escapeText(f.figure_id)}" ${state.busy?'disabled':''}>${escapeText(state.intake.figures.find(x=>x.figure_id===f.figure_id)?.label||f.figure_id)}</button>`).join('')||'<p>完整 Fig 原值裁剪完成后，继续处理即可成图。</p>'}</section>`:`<section class="inspect-section"><h3>结果与原图一一对应</h3><p>按 Fig、蛋白行身份和固定槽位显示。点击蛋白行返回原图；同名蛋白仍是独立行。</p><p>有效信号与待复核的原始积分分列。未检测、失败或未计算保留为空，不写为 0。</p><p>成图与运行完成不表示科学准确率已经验收。</p></section>`;
+    $('#inspector-action').innerHTML=`${mode==='layout'?'<button class="button primary full" data-intake-crop-action="results">查看测量记录</button>':''}<button class="button subtle full" data-intake-crop-action="back">返回阶段与异常</button>`;
+    return true;
+  }
+  function renderIntakeResults() {
+    const labels={valid:'有效',quality_review:'质量待复核',not_detected:'未检测到',invalid:'无效',excluded:'已排除',not_run:'待计算',unconfigured:'待配置',pending_review:'待复核',failed:'失败',cancelled:'已取消',interrupted:'未完整提交',result_unavailable:'结果不可用',missing_source:'缺少原图',stale:'输入已变化'};
+    $('.result-intro h3').textContent='原像素测量记录';
+    $('.result-intro p').textContent='完整 Fig 保存后计算 · 缺失和失败留空 · 原始积分不等于有效信号';
+    $('.results-scroll thead').innerHTML='<tr><th>Fig / 蛋白行</th><th>固定槽位</th><th>有效信号</th><th>原始积分</th><th>状态</th></tr>';
+    $('#results-body').innerHTML=state.cells.slice(0,200).map(c=>`<tr><td><button class="text-button full" data-intake-crop-action="source" data-id="${escapeText(c.rowId)}" ${state.busy?'disabled':''}>${escapeText(targetName(c.rowId))}</button></td><td>${c.lane}</td><td>${number(c.value)}</td><td>${number(c.rawIntegral)}</td><td><span class="result-state">${escapeText(labels[c.status]||'待处理')}</span>${c.reason?`<small>${escapeText(c.reason)}</small>`:''}</td></tr>`).join('')||'<tr><td colspan="5">尚无测量记录；请先复核原图，再继续处理完整 Fig。</td></tr>';
+    $('#result-count').textContent=`${state.cells.length} 个固定槽位记录${state.cells.length>200?' · 当前显示前 200 项':''}`;
+    $('.table-footer>span:last-child').textContent='输出包在结果输出阶段生成';
+  }
   function planError() {
     if (!draft?.figures.length) return '先添加一个 Fig。';
     if (draft.figures.some(fig => !fig.label.trim())) return '请填写每个 Fig 的名称。';
@@ -211,7 +245,7 @@ window.intakeWorkspace = (() => {
       const statuses = {pending: '待处理', running: '正在处理', done: '阶段已记录', needs_review: '需要复核', failed: '失败', cancelled: '已取消', interrupted: '未完整提交'};
       const issues = workflow.steps.filter(step => ['needs_review', 'failed', 'cancelled', 'interrupted'].includes(step.status));
       const frozen = workflow.steps.some(step => step.attempt > 0);
-      return `<section class="intake-summary"><div><h2>执行计划已准备</h2><p>${state.intake.figures.length} 个 Fig · ${total} 个蛋白行 · ${state.intake.proteins.reduce((sum, row) => sum + (state.intake.figures.find(fig => fig.figure_id === row.figure_id)?.lane_count || 0), 0)} 个独立槽位。</p><p>按原值裁剪、完整 Fig 拼图、原像素定量、结果输出的顺序处理。先核对原图定位，再保存原值裁剪；尚未生成定量结果。</p></div><div class="intake-stage-actions"><button class="button primary" data-intake="run" ${disabled} ${hasDraft()||!workflow.steps.some(s=>s.stage==='crop'&&s.status==='pending')?'disabled':''}>定位与裁剪</button><button class="button subtle" data-intake="edit" ${disabled} ${frozen ? 'disabled' : ''}>返回清单修改</button></div></section><section class="intake-workflow" aria-label="执行阶段"><h2>阶段与异常</h2><p class="intake-help">已记录 ${workflow.ready_count} / ${workflow.steps.length} 个阶段。${issues.length ? `${issues.length} 项需要处理，其他完整 Fig 可以继续。` : '暂无异常。裁剪完成不代表科学复核通过。'}</p><ol>${workflow.steps.slice(0, 50).map(step => `<li><span>${escapeText(names[step.stage] || step.stage)}</span><strong>${escapeText(step.stage === 'crop' ? targetName(step.target_id) : state.intake.figures.find(fig => fig.figure_id === step.target_id)?.label || state.projectName)}</strong><span>${escapeText(statuses[step.status] || step.status)}</span>${cropActions(step)}${step.reason ? `<p>${escapeText(step.reason)}</p>` : ''}</li>`).join('')}</ol>${workflow.steps.length > 50 ? `<p class="intake-help">显示前 50 项，全部 ${workflow.steps.length} 项随项目保存。</p>` : ''}${issues.length ? `<details><summary>查看全部异常原因</summary><ul>${issues.map(step => `<li>${escapeText(names[step.stage] || step.stage)} · ${escapeText(step.target_id)}：${escapeText(step.reason)}${cropActions(step)}</li>`).join('')}</ul></details>` : ''}</section>`;
+      return `<section class="intake-summary"><div><h2>执行计划已准备</h2><p>${state.intake.figures.length} 个 Fig · ${total} 个蛋白行 · ${state.intake.proteins.reduce((sum, row) => sum + (state.intake.figures.find(fig => fig.figure_id === row.figure_id)?.lane_count || 0), 0)} 个独立槽位。</p><p>按原值裁剪、完整 Fig 拼图、原像素定量、结果输出的顺序处理。${state.intake.figureEnabled?'完整 Fig 保存后才计算原像素；数值和质量结论分别保留。':'先核对原图定位，再保存原值裁剪；尚未生成定量结果。'}</p></div><div class="intake-stage-actions"><button class="button primary" data-intake="run" ${disabled} ${hasDraft()||!runnable()?'disabled':''}>${state.intake.figureEnabled?'继续处理':'定位与裁剪'}</button><button class="button subtle" data-intake="edit" ${disabled} ${frozen ? 'disabled' : ''}>返回清单修改</button></div></section><section class="intake-workflow" aria-label="执行阶段"><h2>阶段与异常</h2><p class="intake-help">已记录 ${workflow.ready_count} / ${workflow.steps.length} 个阶段。${issues.length ? `${issues.length} 项需要处理，其他完整 Fig 可以继续。` : '暂无异常。裁剪完成不代表科学复核通过。'}</p><ol>${workflow.steps.slice(0, 50).map(step => `<li><span>${escapeText(names[step.stage] || step.stage)}</span><strong>${escapeText(step.stage === 'crop' ? targetName(step.target_id) : state.intake.figures.find(fig => fig.figure_id === step.target_id)?.label || state.projectName)}</strong><span>${escapeText(statuses[step.status] || step.status)}</span>${cropActions(step)}${step.reason ? `<p>${escapeText(step.reason)}</p>` : ''}</li>`).join('')}</ol>${workflow.steps.length > 50 ? `<p class="intake-help">显示前 50 项，全部 ${workflow.steps.length} 项随项目保存。</p>` : ''}${issues.length ? `<details><summary>查看全部异常原因</summary><ul>${issues.map(step => `<li>${escapeText(names[step.stage] || step.stage)} · ${escapeText(step.target_id)}：${escapeText(step.reason)}${cropActions(step)}</li>`).join('')}</ul></details>` : ''}</section>`;
     }
     if (state.intake.confirmed) return `<section class="intake-summary"><div><h2>清单与对应关系已确认</h2><p>${count} 个蛋白行已明确分配原图。准备执行计划，预建布局位置和待计算表格，原文件保持不变。</p></div><button class="button primary" data-intake="prepare" ${disabled}>准备执行计划</button></section>`;
     return `<section class="intake-summary"><div><h2>${state.intake.confirmed ? '清单与对应关系已确认' : '确认本次导入'}</h2><p>${count} / ${total} 个蛋白行已有原图。${state.intake.confirmed ? '当前完成导入分配阶段，后续裁剪流程尚未执行。' : '核对所有蛋白行的来源后确认；未使用的原图可留在图池。'}</p></div><button class="button primary" data-intake="confirm" ${disabled}>${icon('check')}确认清单与对应关系</button></section>`;
@@ -238,7 +272,7 @@ window.intakeWorkspace = (() => {
     const active = mode === 'intake' && !!state.intake;
     root.hidden = !active;
     document.body.classList.toggle('intake-active', active);
-    $$('.mode-tab').forEach(item => item.hidden = state.intake ? !['intake', ...(state.intake.cropEnabled?['review']:[])].includes(item.dataset.mode) : item.dataset.mode === 'intake');
+    $$('.mode-tab').forEach(item => item.hidden = state.intake ? !allowedModes().includes(item.dataset.mode) : item.dataset.mode === 'intake');
     document.body.classList.toggle('intake-crop-active', !!state.intake?.cropEnabled && mode === 'review');
     if (!active) return false;
     const focused = root.contains(document.activeElement) ? document.activeElement : null;
@@ -313,6 +347,9 @@ window.intakeWorkspace = (() => {
     else if (action === 'confirm') send('intake_confirm', guard());
     else if (action === 'run') { if(!hasDraft())send('intake_run', cropGuard()); }
     else if (action === 'review-crop') { select(item.dataset.id); switchMode('review'); const target=$('#crop-overlay').hidden?$('#image-viewport'):$('#crop-overlay'); if(target.id==='image-viewport')target.setAttribute('tabindex','-1'); target.focus(); live.textContent='已打开本行原图，请核对固定槽位范围。'; }
+    else if(action==='view-figure'){chosenFigureId=item.dataset.id;switchMode('layout');}
+    else if(action==='view-results')switchMode('results');
+    else if(action==='retry-stage')send('intake_stage_retry',{...cropGuard(),stage:item.dataset.stage,targetId:item.dataset.id});
     else if (action === 'retry-crop') send('intake_crop_retry', {...cropGuard(), rowId:item.dataset.id});
     else if (action === 'prepare') send('intake_prepare', guard());
     else if (action === 'edit') send('intake_edit', guard());
@@ -326,6 +363,9 @@ window.intakeWorkspace = (() => {
     if (!button || button.disabled || !state.intake?.cropEnabled) return;
     const action = button.dataset.intakeCropAction, r = row();
     if (action === 'back') { switchMode('intake'); return; }
+    if(action==='results'){switchMode('results');return;}
+    if(action==='source'&&!state.busy){select(button.dataset.id);switchMode('review');return;}
+    if(action==='figure'&&!state.busy){chosenFigureId=button.dataset.id;switchMode('layout');return;}
     if (!r || state.busy) return;
     if (action === 'confirm' && r.roi && !cropDrafts.get(r.id)?.conflict) {
       cropPending.set(r.id,{roi:{...r.roi},digest:state.intake.workflow.digest});
@@ -336,5 +376,5 @@ window.intakeWorkspace = (() => {
       cropDrafts.delete(r.id); cropPending.delete(r.id); syncCrops(); render();
     }
   });
-  return {sync, renderActive, hasDraft, reset, stageCrop, undoCrop, renderCropInspector, cropEditable};
+  return {sync, renderActive, hasDraft, reset, stageCrop, undoCrop, renderCropInspector, cropEditable, allowedModes, requestFigure, renderFigureInspector, renderIntakeResults};
 })();

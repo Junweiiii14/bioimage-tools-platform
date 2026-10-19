@@ -9,16 +9,20 @@ from typing import cast
 import numpy as np
 import pytest
 import tifffile
+from bioimage_app.project_measurements import ProjectMeasurementSession
+from bioimage_app.storage import StorageReply
 from bioimage_app.web_window import WebWorkbenchWindow
 from platform_runtime.api import Workspace
 from PySide6.QtCore import QSettings
 from pytestqt.qtbot import QtBot
-from tool_contracts.api import AssetRef
+from tool_contracts.api import AssetRef, DraftSnapshot, RunRecord
 from wb_tool.api import (
     FigureTemplate,
     PreviewRaster,
+    ProjectRowAnalysis,
     WBFigureProject,
     WBIntakeCropProject,
+    WBIntakeFigureProject,
     WBIntakeProject,
     WBIntakeWorkflowProject,
     WBJob,
@@ -306,6 +310,10 @@ def test_fixed_n_crop_run_review_original_asset_and_reopen(
     proposed = current(window)
     assert isinstance(proposed, WBIntakeCropProject)
     assert len(proposed.intake_crops) == 2
+    assert all(
+        r["cropStatus"] == "pending"
+        for r in cast(list[dict[str, object]], window.bridge.snapshot()["rows"])
+    )
     assert all(len(e.slots) == 8 and e.crop is None for e in proposed.intake_crops)
     assert all(s.status == "needs_review" for s in proposed.workflow.steps if s.stage == "crop")
     assert not proposed.analyses and not proposed.automatic_rows
@@ -333,6 +341,11 @@ def test_fixed_n_crop_run_review_original_asset_and_reopen(
     assert next(s for s in finished.workflow.steps if s.target_id == "protein-a").status == "done"
     assert all(s.status == "pending" for s in finished.workflow.steps if s.stage != "crop")
     assert not finished.analyses
+    statuses = {
+        r["id"]: r["cropStatus"]
+        for r in cast(list[dict[str, object]], window.bridge.snapshot()["rows"])
+    }
+    assert statuses == {"protein-a": "ready", "protein-b": "pending"}
     previous_host, epoch = window.host, window.bridge.session_epoch
     project_id = finished.project_id
     window.open_project(window.host.workspace_path)
@@ -346,7 +359,7 @@ def test_fixed_n_crop_run_review_original_asset_and_reopen(
         timeout=20000,
     )
     wait_saved(window, qtbot)
-    assert current(window).schema_version == 12
+    assert current(window).schema_version == 13
     assert current(window).rows[0].lane_count == 8
 
 
@@ -477,7 +490,7 @@ def test_raw_variants_assign_and_reopen_without_algorithm(
     assert expected.rows[0].source == sources[1].asset
     assert all(row.roi is None and not row.reviewed for row in expected.rows)
     window.bridge.request("reanalyze")
-    assert "尚未接通" in str(window.bridge.snapshot()["status"])
+    assert "阶段执行" in str(window.bridge.snapshot()["status"])
     path = window.host.workspace_path
     window.open_project(path)
     qtbot.waitUntil(
@@ -643,4 +656,249 @@ def test_font_assets_never_enter_thumbnail_decoder(
     monkeypatch.setattr(window.host, "_wb", decoder)
     window.host.load_thumbnails()
     assert not window.host.operation_busy and jobs == []
+    monkeypatch.undo()
+
+
+def reviewed_intake_fig(window: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path) -> None:
+    root = tmp_path / "raw"
+    make_source(root / "a.tif")
+    make_source(root / "b.tif", 2000)
+    start(window, qtbot, root)
+    plan(window, qtbot)
+    before = current(window)
+    request(
+        window,
+        "intake_assign",
+        bindings=[
+            {"protein_id": p.protein_id, "source_id": s.source_id}
+            for p, s in zip(before.intake.proteins, before.intake.sources, strict=True)
+        ],
+    )
+    wait_saved(window, qtbot)
+    request(window, "intake_confirm")
+    wait_saved(window, qtbot)
+    request(window, "intake_prepare")
+    wait_saved(window, qtbot)
+    prepared = current(window)
+    assert isinstance(prepared, WBIntakeWorkflowProject)
+    request(window, "intake_run", workflowDigest=intake_workflow_digest(prepared))
+    wait_saved(window, qtbot)
+    for row_id in ("protein-a", "protein-b"):
+        pending = current(window)
+        assert isinstance(pending, WBIntakeFigureProject)
+        request(
+            window,
+            "intake_crop_review",
+            rowId=row_id,
+            workflowDigest=intake_workflow_digest(pending),
+            roi={"x": 12, "y": 10, "width": 120, "height": 40},
+        )
+        wait_saved(window, qtbot)
+
+
+def test_complete_intake_fig_is_saved_before_real_worker_and_restores_verified_runs(
+    intake_window: WebWorkbenchWindow,
+    qtbot: QtBot,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    window = intake_window
+    reviewed_intake_fig(window, qtbot, tmp_path)
+    snapshots: list[dict[str, object]] = []
+    original_prepare = Workspace.prepare_run
+
+    def record_prepare(
+        store: Workspace, document_id: str, revision: int | None = None
+    ) -> RunRecord:
+        snapshot = store.load_draft(document_id, revision)
+        snapshots.append(json.loads(store.read_asset(snapshot.asset)))
+        return original_prepare(store, document_id, revision)
+
+    monkeypatch.setattr(Workspace, "prepare_run", record_prepare)
+    reviewed = current(window)
+    assert isinstance(reviewed, WBIntakeFigureProject)
+    request(window, "intake_run", workflowDigest=intake_workflow_digest(reviewed))
+    wait_saved(window, qtbot)
+    finished = current(window)
+    assert isinstance(finished, WBIntakeFigureProject)
+    assert len(finished.intake_figures) == 1, window.host.view.status.text()
+    assert len(snapshots) == 2, window.host.view.status.text()
+    for frozen in snapshots:
+        steps = cast(list[dict[str, object]], cast(dict[str, object], frozen["workflow"])["steps"])
+        assert next(s for s in steps if s["stage"] == "compose")["status"] == "done"
+        assert next(s for s in steps if s["stage"] == "measure")["status"] == "running"
+        assert frozen["intake_figures"]
+    assert next(s for s in finished.workflow.steps if s.stage == "measure").status == "done", (
+        window.host.view.status.text()
+    )
+    assert next(s for s in finished.workflow.steps if s.stage == "export").status == "pending"
+    assert len(finished.analyses) == 2 and len(window.host.project_results) == 2
+    assert all(
+        p.run and p.run.state == "succeeded" and p.run.pid and p.run.pid > 0
+        for p in finished.analyses
+    )
+    assert all(p.request.revision == p.run.revision for p in finished.analyses if p.run)
+    assert all(
+        b.status == "not_detected" and b.measurement is None
+        for result in window.host.project_results
+        for lane in result.result.lanes
+        for b in lane.bands
+    )
+    png = Path(window.host.workspace_path) / finished.intake_figures[0].image.relative_path
+    assert png.read_bytes().startswith(b"\x89PNG")
+    request(
+        window,
+        "intake_view_figure",
+        figureId="fig-a",
+        workflowDigest=intake_workflow_digest(finished),
+    )
+    wait_saved(window, qtbot)
+    snapshot = window.bridge.snapshot()
+    assert snapshot["montage"]
+    regions = cast(list[dict[str, object]], snapshot["montageRegions"])
+    assert [r["rowId"] for r in regions] == ["protein-a", "protein-b"]
+    assert all(r["sourceRoi"] == {"x": 12, "y": 10, "width": 120, "height": 40} for r in regions)
+    assert current(window).revision == finished.revision
+    previous_host, epoch = window.host, window.bridge.session_epoch
+    window.open_project(window.host.workspace_path)
+    qtbot.waitUntil(
+        lambda: (
+            window.host is not previous_host
+            and window.bridge.session_epoch > epoch
+            and window.shutdown_stage == "idle"
+        ),
+        timeout=20000,
+    )
+    wait_saved(window, qtbot)
+    restored = current(window)
+    assert isinstance(restored, WBIntakeFigureProject)
+    assert len(window.host.project_results) == 2
+    assert tuple(p.run for p in restored.analyses) == tuple(p.run for p in finished.analyses)
+    assert not restored.workflow.approved
+    monkeypatch.undo()
+
+
+@pytest.mark.parametrize("fault", ["compose_save", "measure_claim_save", "late_compose_cancel"])
+def test_intake_fig_failed_save_or_cancel_never_starts_measurement(
+    intake_window: WebWorkbenchWindow,
+    qtbot: QtBot,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    fault: str,
+) -> None:
+    window = intake_window
+    reviewed_intake_fig(window, qtbot, tmp_path)
+    original_save = Workspace.save_draft
+    original_submit = window.host.submit_tool_job
+    replies: list[tuple[Callable[[WBReply], None], WBReply]] = []
+    run_count: list[str] = []
+    original_prepare = Workspace.prepare_run
+
+    def prepare(store: Workspace, document_id: str, revision: int | None = None) -> RunRecord:
+        run_count.append(document_id)
+        return original_prepare(store, document_id, revision)
+
+    def save(
+        store: Workspace,
+        document_id: str,
+        tool_id: str,
+        revision: int,
+        data: bytes,
+        *,
+        expected_previous_revision: int | None = None,
+    ) -> DraftSnapshot:
+        raw = json.loads(data)
+        stages = {s["stage"]: s["status"] for s in raw.get("workflow", {}).get("steps", [])}
+        if fault == "compose_save" and stages.get("compose") == "done":
+            raise OSError("injected compose output save failure")
+        if fault == "measure_claim_save" and stages.get("measure") == "running":
+            raise OSError("injected measure claim save failure")
+        return original_save(
+            store,
+            document_id,
+            tool_id,
+            revision,
+            data,
+            expected_previous_revision=expected_previous_revision,
+        )
+
+    def submit(
+        job: WBJob, callback: Callable[[WBReply], None], *, accept_errors: bool = False
+    ) -> None:
+        if fault == "late_compose_cancel" and job.operation == "intake_figure_prepare":
+            original_submit(
+                job, lambda reply: replies.append((callback, reply)), accept_errors=accept_errors
+            )
+        else:
+            original_submit(job, callback, accept_errors=accept_errors)
+
+    monkeypatch.setattr(Workspace, "prepare_run", prepare)
+    monkeypatch.setattr(Workspace, "save_draft", save)
+    monkeypatch.setattr(window.host, "submit_tool_job", submit)
+    project = current(window)
+    assert isinstance(project, WBIntakeFigureProject)
+    request(window, "intake_run", workflowDigest=intake_workflow_digest(project))
+    if fault == "late_compose_cancel":
+        qtbot.waitUntil(lambda: bool(replies), timeout=20000)
+        callback, reply = replies.pop()
+        assert not reply.error
+        window.host.cancel()
+        callback(reply)
+        wait_saved(window, qtbot)
+    else:
+        qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=20000)
+    stopped = current(window)
+    assert isinstance(stopped, WBIntakeFigureProject)
+    assert not run_count
+    assert all(p.run is None for p in stopped.analyses)
+    assert next(s for s in stopped.workflow.steps if s.stage == "measure").status != "done"
+    if fault == "late_compose_cancel":
+        assert not stopped.intake_figures and not stopped.analyses
+        assert next(s for s in stopped.workflow.steps if s.stage == "compose").status == "cancelled"
+    elif fault == "compose_save":
+        assert not stopped.intake_figures
+    else:
+        assert len(stopped.intake_figures) == 1
+    monkeypatch.undo()
+
+
+def test_cancelled_intake_measurement_does_not_launch_next_source(
+    intake_window: WebWorkbenchWindow,
+    qtbot: QtBot,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    window = intake_window
+    reviewed_intake_fig(window, qtbot, tmp_path)
+    held: list[tuple[ProjectMeasurementSession, ProjectRowAnalysis, RunRecord, StorageReply]] = []
+    launch = cast(
+        Callable[[ProjectMeasurementSession, ProjectRowAnalysis, RunRecord, StorageReply], None],
+        ProjectMeasurementSession.__dict__["_launch"],
+    )
+
+    def hold(
+        session: ProjectMeasurementSession,
+        plan: ProjectRowAnalysis,
+        run: RunRecord,
+        reply: StorageReply,
+    ) -> None:
+        held.append((session, plan, run, reply))
+
+    monkeypatch.setattr(ProjectMeasurementSession, "_launch", hold)
+    before = current(window)
+    assert isinstance(before, WBIntakeFigureProject)
+    request(window, "intake_run", workflowDigest=intake_workflow_digest(before))
+    qtbot.waitUntil(lambda: len(held) == 1, timeout=20000)
+    assert window.host.operation_busy
+    window.host.cancel()
+    launch(*held[0])
+    wait_saved(window, qtbot)
+    cancelled = current(window)
+    assert isinstance(cancelled, WBIntakeFigureProject)
+    assert len(held) == 1
+    assert next(s for s in cancelled.workflow.steps if s.stage == "measure").status == "cancelled"
+    assert len(cancelled.intake_figures) == 1
+    assert not window.host.project_results
+    assert all(p.run is None or p.run.state != "succeeded" for p in cancelled.analyses)
+    assert not window.host.has_unsaved_changes
     monkeypatch.undo()
