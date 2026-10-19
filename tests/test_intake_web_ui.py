@@ -605,3 +605,69 @@ def test_existing_confirmed_reuse_does_not_block_unrelated_assignment(
         )
         is False
     )
+
+
+def test_stage_pages_reach_late_output_and_survive_busy_refresh(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    bridge_snapshot(
+        window,
+        qtbot,
+        """({...state,intake:{...state.intake,confirmed:true,
+      cropEnabled:true,figureEnabled:true,outputEnabled:true,
+      proteins:Array.from({length:101},(_,i)=>({protein_id:'page-'+i,figure_id:'fig-a',label:'AKT'})),
+      workflow:{digest:'wf-pages',pending_ready:0,ready_count:103,steps:[
+        ...Array.from({length:101},(_,i)=>({stage:'crop',target_id:'page-'+i,status:'done',attempt:1})),
+        {stage:'compose',target_id:'fig-a',status:'done',attempt:1},
+        {stage:'measure',target_id:'fig-a',status:'done',attempt:1},
+        {stage:'export',target_id:state.projectId,status:'failed',reason:'最后输出失败保留',attempt:1}]}}})""",
+    )
+    javascript(window, qtbot, "switchMode('intake');true")
+    assert (
+        javascript(window, qtbot, "document.querySelectorAll('.intake-workflow ol>li').length")
+        == 50
+    )
+    assert javascript(
+        window, qtbot, "document.querySelector('[data-intake=previous-stages]').disabled"
+    )
+    javascript(window, qtbot, "document.querySelector('[data-intake=next-stages]').click();true")
+    assert javascript(window, qtbot, "document.querySelector('.intake-workflow ol').start") == 51
+    assert javascript(window, qtbot, "document.activeElement.id==='intake-stages-heading'")
+    bridge_snapshot(window, qtbot, "({...state,busy:true,status:'后台保存中'})")
+    assert javascript(window, qtbot, "document.querySelector('.intake-workflow ol').start") == 51
+    assert javascript(window, qtbot, "document.activeElement.id==='intake-stages-heading'")
+    sent_before = javascript(window, qtbot, "JSON.stringify(sent)")
+    javascript(window, qtbot, "document.querySelector('[data-intake=next-stages]').click();true")
+    assert (
+        javascript(window, qtbot, "document.querySelectorAll('.intake-workflow ol>li').length") == 4
+    )
+    assert javascript(window, qtbot, "document.querySelector('[data-intake=next-stages]').disabled")
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('.intake-workflow ol').innerText.includes('最后输出失败保留')",
+    )
+    assert javascript(window, qtbot, "JSON.stringify(sent)") == sent_before
+    assert javascript(window, qtbot, "document.querySelector('[data-intake=retry-stage]').disabled")
+    bridge_snapshot(window, qtbot, "({...state,busy:false})")
+    javascript(window, qtbot, "document.querySelector('[data-intake=retry-stage]').click();true")
+    sent = javascript(window, qtbot, "JSON.stringify(sent)")
+    assert isinstance(sent, str)
+    retry = json.loads(sent)[-1]
+    assert retry["action"] == "intake_stage_retry"
+    assert (
+        retry["payload"]["stage"] == "export" and retry["payload"]["workflowDigest"] == "wf-pages"
+    )
+    bridge_snapshot(
+        window,
+        qtbot,
+        "({...state,intake:{...state.intake,workflow:{...state.intake.workflow,steps:state.intake.workflow.steps.slice(0,1)}}})",
+    )
+    assert javascript(window, qtbot, "document.querySelector('.intake-workflow ol').start") == 1
+    assert (
+        javascript(
+            window, qtbot, "document.querySelectorAll('nav[aria-label=阶段列表分页]').length"
+        )
+        == 0
+    )

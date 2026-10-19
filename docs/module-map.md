@@ -1,6 +1,9 @@
 # 模块地图
 
-E4候选增量：`application/intake_figure.py`提供schema13完整Fig依据、稳定身份与
+E5/T058已完成schema14 `application/intake_output.py`：稳定Fig/行/槽位填表、冻结资产/run、新目录索引与恢复输出；桌面导入索引/CAS后才完成阶段。旧schema1–13保持，科学/目标机门禁另记。
+E6/T059实施中：同操作冻结FigureRender复用PNG/TIFF/ZIP，单Fig TIFF复用已核验保存PNG全像素，组合ZIP单独布局；PNG验证上下文由预览与编码实际复用。无跨操作原值缓存，不改变定量。阶段页支持完整分页。所属纯Qt测试控件按明确登记释放，不全局GC；最终门禁与审查以任务记录为准。
+
+E4已完成增量：`application/intake_figure.py`提供schema13完整Fig依据、稳定身份与
 冻结测量终态合并；`adapters/intake_figure.py`生成核验PNG及只读缩放预览，定量仍从
 原图坐标规划。桌面`intake_workflow.py`持久化成图后连接真实RunSession，
 `project_measurement_session.py`可延迟合并已验证结果；旧单独调用默认行为保留。
@@ -32,7 +35,7 @@ T045增量：`tools/wb/application/{standalone_quant,manual_groups,fig_quant}.py
 | `packages/desktop_sdk/` | ToolView、Qt 生命周期、宿主 UI 端口 | 规划；pytest-qt |
 | `packages/imaging_core/` | 原始图像、坐标和纯技术运算 | 规划；位深/几何/性质 |
 | `packages/imaging_ui/` | 真实复用需求出现后的画布适配 | 规划，不预建 |
-| `tools/wb/` | `wb_tool.api` 数值/单图文档v1/v2/严格协议、Qt画布/曲线/工作表、本地OCR与表格 | 已建0.19.0；schema7分段/模板，8自动候选，9独立Fig定量，10仪器导入清单；旧schema1–9读取保留，10禁止夹带处理结果 |
+| `tools/wb/` | `wb_tool.api` 数值/单图文档v1/v2/严格协议、Qt画布/曲线/工作表、本地OCR与表格 | 已建0.19.0；schema7分段/模板、8自动候选、9独立Fig定量、10清单、11阶段计划、12固定N裁剪、13完整Fig/原像素运行、14身份输出；旧1–13读取保留，10仍禁止夹带处理结果 |
 | `tools/if_intensity/` | 第二工具验证平台边界 | 规划，WB 最小闭环后 |
 | `tools/if_count/`, `tools/ihc_area/` | 各自独立的实验语义 | 后续规划 |
 
