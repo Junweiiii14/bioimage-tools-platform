@@ -1,12 +1,8 @@
 # Handoff Snapshot
 
-- 更新：2026-10-14；Codex；bioimage-tools-platform。
-- 当前任务唯一状态源：`work/tasks/T-002-p0-validation.md`。
-- 授权：P0 本机验证与便携包；干净 Windows 无 Python 验收后续。不扩展 T-001/WB 或归档项目。
-- 分支 `feat/T-002-p0-validation`；PR #3 草稿，未合并。基线 main `221a2df`。
-- 已完成：35 测试、Ruff、Pyright strict；源码原生窗口实操；standalone 构建；ZIP 330 文件解压哈希；包态固定样本、取消/强停/崩溃恢复基准。构建源提交 `293c6c0632e2`，应用 183.5MiB；完整 ZIP（含固定大图集）794MiB。
-- 未完成：用户物理 Esc 停止 Computer Use。本轮没有继续桌面工具；包态原生加载/ROI/按钮、GUI 大图峰值与交互 p95、125/200% 进程缩放未测。干净机和跨显示器亦待后续，独立审查未进行。不能宣称完整本机 P0 通过或栈冻结。
-- 下一步：用户继续时恢复 T-002，仅补上述未完成验收。重新读取 Computer Use 文档，重新选择窗口，不复用 handle；不要重做已通过的源码或完整编译，除非相关代码变化。
-- 包：`../deliverables/BioimageP0-Windows-x64-293c6c0.zip`；已解压到 `../deliverables/P0独立验收/BioimageP0-293c6c0`。GUI PID 40464 启动后留给用户控制，后续须核对进程现状。
-- 证据：`work/evidence/T-002/validation.md`（含 ZIP SHA、包态基准、限制）；脚本：`tooling/p0/README.md`。最小环境启动已完成、实际 DLL 来源已记录，但不等于干净机。
-- 构建日志/XML 在 `.local/p0/build-293c6c0632e2`。首轮宽泛构建主动中止在 `.local/p0/build-d81350859588`；缓存未删除。二进制与原图不进 Git。
+- 当前阶段集成唯一任务：work/tasks/SYNC-001-p0.md；临时e7-integration/codex/e7-integrate-02，仅root写入。当前源码为P0历史快照，不是最新WB产品。
+- 主产品任务T060在t051/codex/wb-e0-e7。用户E0–E7连续授权有效；本批P0源代码集成不取代主产品任务，不操作Esc停止的原生应用。
+- PR7治理head69a7849已通过独审和四项服务器必需检查，于2026-10-20合入main7730bcd6。规划PR16亦已合；早期交接的“未合”保留为历史。
+- 本批继续原PR3，原head66e0240/原基线0b7；已merge最新main7730bcd6，当前SYNC001规则与唯一manifest必须重载到该实际base。历史T002等回执保留来源，不删除/重命名manifest绕过门禁。
+- merge中的decisions/README/snapshot冲突按两侧真实事实合并；P0旧快照先归档archive/SYNC001-before-e7-integration-snapshot.md。科学/包态/干净Win10/DPI缺项不改成通过。
+- 下一步：准确context、静态/纯验证、绑定最终head独审、更新原PR3到main基线并运行四项必需检查，通过后用merge集成（不可squash/rebase破坏来源祖先）。本机primary Qt全量正在运行，本树不并行Qt。

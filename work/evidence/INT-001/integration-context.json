@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "task": "INT-001",
+  "base_commit": "43d520f49507f12995eb3220beab9fd78f4adda7",
+  "source_head": "af8be3fff90257d2f2e33be41f07b67e6a688f99",
+  "historical_receipts": {
+    "work/evidence/RULE-001/rules-context.json": "0b786cb5aa0770eaf546d452e6a7a72469015756"
+  }
+}
