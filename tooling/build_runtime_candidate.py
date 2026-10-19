@@ -83,6 +83,24 @@ def main() -> int:
             raise RuntimeError("Unexpected dependency pruning path")
         if unused.exists():
             shutil.rmtree(unused)
+    # The locked Qt wheel redistributes MSVC. Put that same runtime beside
+    # python.exe too: OCR workers must not depend on Qt having been imported or
+    # a system-wide Visual C++ installation. Never harvest DLLs from System32.
+    redistributables = sorted((site / "PySide6").glob("*140*.dll"))
+    required = {
+        "msvcp140.dll",
+        "msvcp140_1.dll",
+        "msvcp140_2.dll",
+        "vcruntime140.dll",
+        "vcruntime140_1.dll",
+    }
+    if not required.issubset({path.name.lower() for path in redistributables}):
+        raise RuntimeError("Locked Qt wheel is missing required MSVC redistributables")
+    for library in redistributables:
+        shutil.copyfile(library, runtime / library.name)
+    shutil.copyfile(ROOT / "tooling/windows_test_readme.txt", dist / "安装与使用说明.txt")
+    shutil.copyfile(ROOT / "tooling/windows_test_selfcheck.ps1", dist / "selfcheck.ps1")
+    shutil.copyfile(ROOT / "tooling/windows_test_selfcheck.cmd", dist / "测试版环境自检.cmd")
     # The lock's OCR wheel supplies models; verify bytes through the public API later.
     app_icon = dist / "bioimage.ico"
     icon(app_icon)
@@ -138,6 +156,10 @@ def main() -> int:
         "runtime_python_sha256": digest(runtime / "python.exe"),
         "launcher_sha256": digest(executable),
         "compile_exit": 0,
+        "release_channel": "test-only",
+        "minimum_windows": "10.0.17763",
+        "architecture": "x86_64",
+        "msvc_runtime": {p.name: digest(runtime / p.name) for p in redistributables},
         "wheels": {p.name: digest(p) for p in wheels.glob("*.whl")},
     }
     manifest_path = output / "build-manifest.json"
@@ -149,7 +171,7 @@ def main() -> int:
             "/DAppSource=" + str(dist),
             "/DBuildCommit=" + commit[:12],
             "/DInstallerOutput=" + str(output),
-            str(ROOT / "tooling/windows_candidate.iss"),
+            str(ROOT / "tooling/windows_test.iss"),
         ],
         log=output / "installer.log",
     )
