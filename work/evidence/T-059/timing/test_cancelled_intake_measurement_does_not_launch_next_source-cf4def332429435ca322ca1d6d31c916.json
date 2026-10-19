@@ -1,0 +1,64 @@
+{
+  "test": "tests/test_instrument_intake_desktop.py::test_cancelled_intake_measurement_does_not_launch_next_source",
+  "poll_resolution_seconds": 0.01,
+  "phases": [
+    {
+      "stage": "crop",
+      "target_id": "protein-a",
+      "attempt": 1,
+      "observed_seconds": 0.0518339000409469,
+      "terminal": "needs_review"
+    },
+    {
+      "stage": "crop",
+      "target_id": "protein-b",
+      "attempt": 1,
+      "observed_seconds": 0.06251640000846237,
+      "terminal": "needs_review"
+    },
+    {
+      "stage": "crop",
+      "target_id": "protein-a",
+      "attempt": 2,
+      "observed_seconds": 0.11197980004362762,
+      "terminal": "done"
+    },
+    {
+      "stage": "crop",
+      "target_id": "protein-b",
+      "attempt": 2,
+      "observed_seconds": 0.11450440000044182,
+      "terminal": "done"
+    },
+    {
+      "stage": "compose",
+      "target_id": "fig-a",
+      "attempt": 1,
+      "observed_seconds": 0.15010430000256747,
+      "terminal": "done"
+    },
+    {
+      "stage": "measure",
+      "target_id": "fig-a",
+      "attempt": 1,
+      "observed_seconds": 0.2067043999559246,
+      "terminal": "cancelled"
+    }
+  ],
+  "cancellations": [
+    {
+      "scope": "owned_process_tree",
+      "seconds": 0.008911199984140694,
+      "grace_ms": 5000,
+      "pid": 40036,
+      "exit_code": 1,
+      "cancel_requested": true,
+      "error": ""
+    },
+    {
+      "scope": "intake_controller_to_saved_idle",
+      "seconds": 0.14151979994494468
+    }
+  ],
+  "limitations": "Observed committed stage transitions with a 10ms GUI timer; may miss very short stages. One synthetic two-source real-worker scenario, not actual instrument performance or a percentile population. Controller cancellation holds the next worker before launch; process-tree cancellation uses a separate synthetic stubborn subprocess with explicit unchanged grace."
+}

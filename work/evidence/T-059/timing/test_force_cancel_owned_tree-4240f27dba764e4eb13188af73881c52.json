@@ -1,0 +1,17 @@
+{
+  "test": "tests/test_process_runner.py::test_force_cancel_owned_tree",
+  "poll_resolution_seconds": 0.01,
+  "phases": [],
+  "cancellations": [
+    {
+      "scope": "owned_process_tree",
+      "seconds": 0.0644433000124991,
+      "grace_ms": 50,
+      "pid": 57848,
+      "exit_code": 1,
+      "cancel_requested": true,
+      "error": ""
+    }
+  ],
+  "limitations": "Observed committed stage transitions with a 10ms GUI timer; may miss very short stages. One synthetic two-source real-worker scenario, not actual instrument performance or a percentile population. Controller cancellation holds the next worker before launch; process-tree cancellation uses a separate synthetic stubborn subprocess with explicit unchanged grace."
+}
