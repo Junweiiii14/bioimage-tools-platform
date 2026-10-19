@@ -105,7 +105,14 @@ def verify_intake_installation(report_path: Path) -> int:
         record()
         try:
             app = QApplication(["BioImage E7 intake diagnostic"])
-            app.setQuitOnLastWindowClosed(False)
+        except BaseException:
+            errors.append(traceback.format_exc())
+            phase = "failed"
+            record()
+            return 1
+        app.setQuitOnLastWindowClosed(False)
+        window = None
+        try:
             from bioimage_app.web_window import WebWorkbenchWindow
 
             window = WebWorkbenchWindow(settings=settings)
@@ -113,10 +120,14 @@ def verify_intake_installation(report_path: Path) -> int:
             window.start_from_images([sources], intake=True)
         except BaseException:
             errors.append(traceback.format_exc())
+        if window is None:
+            errors.append("Window construction failed; owned shutdown cannot be confirmed")
             phase = "failed"
             record()
             return 1
-        phase = "import"
+        # Once construction succeeded, even a show/import exception must drain
+        # this owned host and delete its window before removing the corpus.
+        phase = "close" if errors else "import"
 
         def current() -> WBIntakeProject:
             project = window.host.view.project()
@@ -411,6 +422,8 @@ def verify_intake_installation(report_path: Path) -> int:
         timer = QTimer(app)
         timer.timeout.connect(poll)
         timer.start(25)
+        if errors:
+            window.close()
         code = app.exec()
         timer.stop()
         if code or not closed or required - set(checks):
