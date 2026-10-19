@@ -9,3 +9,7 @@
 浏览器版本通过本地demo.json展示真实历史预览，只维护交互草稿；不会冒充新的计算/导出。桌面通过bridge执行真实计算。当前仅主工作区视觉同源，不能宣称所有高级窗口已网页化。原生默认入口仍保留。
 
 现有项目在新窗口打开；同窗口已有workspace时明确拒绝另一个项目，避免丢弃当前草稿。独立安装包体积/干净Windows及完整屏幕阅读器验收尚未覆盖。
+
+## 原图编辑契约 legacy_crop_edit@1
+
+本阶段crop/confirm需要契约标记、projectId、严格整数sessionEpoch/revision、行id和sourceId；revision为界面generation，旧/缺身份拒绝且不写入。此历史宿主在同一窗口不替换后端（已有workspace再打开被拒绝），sessionEpoch初始化0代表该bridge实例；后继支持替换时须递增会话。手势开始冻结身份，快照变化清手势，移动/释放/取消重查；键盘使用当前快照，旧ROI不补新代次。无项目schema/算法变化。
