@@ -1,5 +1,9 @@
 # Validation History
 
+- 2026-10-20 E2最终b4b519f：首轮822后0xc0000409/purecall失败保留；只读inventory诊断复验822/566.49s、child0、9契约及全部隔离wheel/真实OCR/check0。独立复核可进入E3，原生风险开放；owned探针1/9.68s的host/view/page/profile失效，不据此销历史。详见T055。
+
+- 2026-10-20 E2/b4b519f：作者核心8/2.13s、desktop+frontend17/15.42s、Pyright/Ruff/Node0；独立核心15/2.61s与三项P2关闭、界面原焦点/live P2 resolved/ship仅评分范围、documenter No changes。完整门禁在跑尚不计通过；见work/evidence/T-055。
+
 - 2026-10-19 T052/536f04e文档规划：context/policy/本地链接及E0–E7检查/diff/handoff维护均0；无产品修改或产品复测，远端状态和独立规划审查未验。维护轮转1段旧日志，unresolved=0。见work/evidence/T-052/validation.md。
 
 - 2026-10-19 T051/65ff278：完整check0，801passed/549.84s，原pytest0/u32=0x00000000；native observer附加且无新异常、已知测试进程消失；全部隔离wheel/真实OCR及worker/PNG/异步关闭通过。doctor/smoke-env/verify-launch0；独审四P2关闭与两UI修复resolved/ship、documenter完成。旧192回调失败、Qt0x80000003、草稿竞态、主动停止的中间门禁和新增测试预期纠正均保留，不销Qt原生UNKNOWN；见work/evidence/T-051/validation.md。

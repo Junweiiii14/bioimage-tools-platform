@@ -1,5 +1,7 @@
 # Risks, Blockers, And Unknowns
 
+- 2026-10-20 E2/b4b519f首次全门禁822断言通过后原pytest0xc0000409；精确栈主线程abort→purecall→QObject析构→PySide destroyQCoreApplication→Py_FinalizeEx。wheel未执行，E2未完成。定向17项+只读对象清单0/root_count0不能排除parentless QObject或全量时序；全量inventory诊断复验在跑，来源UNKNOWN，不用重跑成功抹失败。见T055 validation。
+
 - T051首轮192px缩略图超128预算导致Python回调失败与busy悬挂，关闭后PID56832在Qt6WebEngineCore.dll出现0x80000003。128px与异常预览拒绝、取消心跳修正后最终801测试/全部wheel及原生观察退出0，无新异常；这不证明Chromium内部断点精确根因已完全解决。未重建安装包；真实仪器/干净Windows/DPI不由本轮推出。
 
 - T048离线测试安装包在非管理员Win11通过，不代表干净Win10通过。目标x64、版本未知；最低1809/build17763由安装器声明并限制。没有可用干净Win10/VM，仍需目标机环境自检与实际试用；不发布正式版。首次PS5.1观察器退出码null属于失败证据，后继v2外层0；保留原记录。详情T048 validation。

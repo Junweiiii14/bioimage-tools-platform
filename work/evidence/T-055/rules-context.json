@@ -5,6 +5,7 @@
   "scopes": [
     ".agent-handoff",
     ".impeccable",
+    "AGENT_HANDOFF.md",
     "DESIGN.md",
     "PRODUCT.md",
     "apps/desktop",
