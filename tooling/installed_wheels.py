@@ -155,6 +155,13 @@ restored_intake = read_figure_project(intake.model_dump_json().encode())
 assert isinstance(restored_intake, WBIntakeProject) and restored_intake == intake
 assert len(restored_intake.intake.sources) == 2 and project_assets(restored_intake) == (source_ref,)
 assert restored_intake.rows[0].roi is None and not restored_intake.rows[0].reviewed
+from wb_tool.api import build_intake_execution_plan
+execution = build_intake_execution_plan(restored_intake,
+    expected_digest=intake_digest(restored_intake))
+assert len(execution.cells) == 3 and len({cell.slot_id for cell in execution.cells}) == 3
+assert all(cell.value is None and cell.status == 'pending' for cell in execution.cells)
+assert execution.figures[0].rows[0].source.source_id == 'selected'
+assert execution == build_intake_execution_plan(intake, expected_digest=intake_digest(intake))
 assert not any(name.startswith(('PySide6', 'sqlite3')) for name in sys.modules)
 assert not any(name.startswith(('rapidocr', 'onnxruntime', 'cv2')) for name in sys.modules)
 print('Isolated WB wheel: TIFF/analysis, crop/grid and worker; no GUI/storage dependencies')

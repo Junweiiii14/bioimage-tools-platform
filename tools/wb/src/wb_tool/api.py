@@ -93,6 +93,14 @@ from wb_tool.application.instrument_intake import (
     replace_intake_plan,
     unassign_intake_sources,
 )
+from wb_tool.application.intake_execution import (
+    IntakeExecutionPlan,
+    IntakePlannedCell,
+    IntakePlannedFigure,
+    IntakePlannedRow,
+    IntakePlannedSlot,
+    build_intake_execution_plan,
+)
 from wb_tool.application.laboratory_layout import (
     DisplayFrame,
     FigureColumn,
@@ -236,6 +244,12 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "IntakeExecutionPlan",
+    "IntakePlannedCell",
+    "IntakePlannedFigure",
+    "IntakePlannedRow",
+    "IntakePlannedSlot",
+    "build_intake_execution_plan",
     "IntakeAssignment",
     "IntakeFigure",
     "IntakeManifest",
