@@ -26,3 +26,7 @@
 完整门禁v2的pytest768项664.24秒通过，隔离wheel仍在执行；该次pytest基于90ae加载，新增取消回归另有53a2030证据。最终源码检查、最终安装产物/摘要/退出、桌面/开始菜单快捷方式及独审第二项仍待完成。干净Windows、原生按钮/DPI没有验收结论。
 
 编译v3实际exit1、386.687秒，Nuitka报告只有onnxruntime元数据而未收录动态后端包。配方显式加入onnxruntime包后重建，不删减OCR。完整门禁v2全部结束exit0（768pytest及全部隔离wheel），最终53a2030门禁v3正在运行。独审复核已关闭草稿P1，安装实证仍待完成。
+
+最终源码完整门禁v3已结束：769passed659.96秒，所有隔离wheel、真实OCR worker及PNG OCR检查、dev/check最终exit0。产品及科学代码对应53a2030，后继6325623仅增加显式ONNX后端打包与文档。完整编译v4仍在C阶段，未安装。
+
+安装v4成功但验收未通过：桌面/开始菜单/卸载及EXE哈希核对通过；真实OCR worker因RapidOCR延迟导入模块未收录而failure，已显式收录完整rapidocr。初始化自检normal/offscreen均exit3且报告空白，UNKNOWN；增加显式诊断检查点与异常持久记录。不宣称可用安装通过，不启动交付。控制器SYSTEMROOT大小写错误单独保留，非产品错误。

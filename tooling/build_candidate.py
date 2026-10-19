@@ -84,6 +84,7 @@ def main() -> int:
         "--include-package=platform_runtime",
         "--include-package=tool_contracts",
         # RapidOCR selects its inference backend dynamically at runtime.
+        "--include-package=rapidocr",
         "--include-package=onnxruntime",
         "--include-package-data=rapidocr",
         "--include-distribution-metadata=rapidocr",

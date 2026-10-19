@@ -1,6 +1,6 @@
 # T-047 项目入口、退出生命周期与 Windows 安装版
 
-- 状态：implementation；用户已明确“通过，按预览开发”。入口、生命周期、并行候选安装版按批准方案实施。
+- 状态：verification/build；实现与最终源码门禁通过，完整候选编译进行中，尚未安装验收。用户再次明确继续编译/安装，通过后启动，原版保持。
 - 日期：2026-10-19。
 - 候选工作区：现有 t045-wbquant，分支 codex/t045-wbquant-manual-and-fig；基线 6b643a3957852a87827f85912544ea36da3b712f。不新增 worktree，不改历史工作区、快捷方式、原图或已有项目。
 - 用户确认：新灰度项目导入后进入灰度页；已有项目恢复上次页面及 Fig；同时支持软件项目文件夹与普通 TIFF 文件夹；最终安装包包含桌面和开始菜单图标。已报告关闭 × 无响应与窗口消失后后台残留。计算中退出及未保存修改的提示流程先纳入预览审核。
@@ -39,3 +39,8 @@
 - 完整门禁v2最终exit0：768passed664.24秒及全部隔离wheel通过。最终53a2030门禁v3仍进行中。
 - 编译v3实际exit1、386.687秒：动态加载ONNX后端未自动收录，Nuitka拒绝只带onnxruntime元数据。配方显式include-package=onnxruntime后重建；不是删减OCR。独审已明确关闭草稿P1，安装实证项仍待完成。
 - Impeccable documenter完成，只更新PRODUCT与既有surface实现记录，DESIGN及sidecar保持；未把预览或源码检查写成安装通过。
+- 最终完整门禁v3：769passed659.96秒，全部隔离wheel、OCR实际worker及PNG输入检查、dev/check均exit0。编译v4产品6325623仍在C阶段，保留已有目标文件；尚无成功安装包。MSVC警告对应运行库已确认存在于锁定PySide6/shiboken分发中，后续仍须核对最终dist与包态worker。
+- 安装前核对独立候选安装目录及独立AppId均不存在；原图/原桌面快捷方式摘要和进程基线保留ignored报告。包态临时目录自检及独立OCR worker控制器已准备，仅使用合成图，待完整产物后运行。不把程序能打开当作安装通过。
+- 编译/安装v4均exit0，安装包317863800字节，SHA256 b3d6f58fed96d1f3133276fe8cdb60818ac475bdb18a021c12752e7dd9608fb6；仅独立候选目录和AppId，桌面/开始菜单/卸载入口核对。安装EXE与dist一致，但包态验收失败，未交付启动。
+- 实际OCR worker failure(analysis_invalid)/ModuleNotFoundError：RapidOCR.main由__getattr__/import_module延迟导入，原配方只收录root及data，需显式include-package=rapidocr。控制器首轮另有SYSTEMROOT字典大小写错误，已更正并保留旧报告，不把控制器失败写成产品失败。
+- 包态GUI自检正常/离屏均exit3、初始化报告空白，精确根因UNKNOWN。只记录线程清理提示；补字体目录不能解决。新增显式诊断bootstrap检查点/异常记录，以定位初始化阶段；源码自检v5与类型复验。运行库已在最终dist根目录核对，未修改系统。
