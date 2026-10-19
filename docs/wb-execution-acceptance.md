@@ -5,8 +5,8 @@
 | 阶段 | 落地行为 | 提交与证据 | 当前边界 |
 |---|---|---|---|
 | E0 | 核对有效入口、四产品包、依赖、远端缺口与基准 | T-053，[基线](execution-baseline.md)、[验证](../work/evidence/T-053/validation.md)、[独审](../work/evidence/T-053/independent-review.md) | 历史工作树/原安装保留 |
-| E1 | 确认清单生成稳定Fig/蛋白行/槽位计划；失效与空表状态明确，规划不调用OCR | f975809，[验证](../work/evidence/T-054/validation.md)、[独审](../work/evidence/T-054/independent-review.md) | schema11；同名/重排/来源与N变化不以显示位置串值 |
-| E2 | 持久化阶段票据、串行调度、异常定位与取消；坏Fig不阻塞其他就绪Fig | b4b519f，[验证](../work/evidence/T-055/validation.md)、[独审](../work/evidence/T-055/independent-review.md) | 首次全量purecall保留UNKNOWN，后继通过不抹记录 |
+| E1 | 确认清单生成稳定Fig/蛋白行/槽位计划；失效与空表状态明确，规划不调用OCR | f975809，[验证](../work/evidence/T-054/validation.md)、[独审](../work/evidence/T-054/independent-review.md) | 基于schema10纯派生；同名/重排/来源与N变化不以显示位置串值 |
+| E2 | 持久化阶段票据、串行调度、异常定位与取消；坏Fig不阻塞其他就绪Fig | b4b519f，[验证](../work/evidence/T-055/validation.md)、[独审](../work/evidence/T-055/independent-review.md) | schema11；首次全量purecall保留UNKNOWN，后继通过不抹记录 |
 | E3 | 固定N槽位、原坐标/来源/复核证据、原值TIFF；缺弱信号进入待复核 | 32da9f4，[验证](../work/evidence/T-056/validation.md)、[独审](../work/evidence/T-056/independent-review.md) | schema12；合成精确像素通过，独立真实定位真值未验 |
 | E4 | 完整Fig提交后才启动原像素定量；布局占位与分析输入分离 | ff89867，[验证](../work/evidence/T-057/validation.md)、[独审](../work/evidence/T-057/independent-review.md) | schema13；显示变换不进入原值计算 |
 | E5 | 按稳定身份填表；原值/显示/表格/来源/归档输出新目录；导入历史后可恢复输出 | 8feffce，[验证](../work/evidence/T-058/validation.md)、[独审](../work/evidence/T-058/independent-review.md) | schema14；缺失/失败不伪零，半成品重跑而非虚构算法断点 |
