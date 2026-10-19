@@ -89,7 +89,14 @@ class _StorageWorker(QObject):
 
     def __init__(self) -> None:
         super().__init__()
+        self._owner_thread = self.thread()
         self._workspace: Workspace | None = None
+
+    @Slot()
+    def retire(self) -> None:
+        worker_thread = self.thread()
+        self.moveToThread(self._owner_thread)
+        worker_thread.quit()
 
     @Slot(str, object)
     def execute(self, request_id: str, command: StorageCommand) -> None:
@@ -200,6 +207,7 @@ class AsyncStorage(QObject):
     replied = Signal(object)
     closed = Signal()
     _requested = Signal(str, object)
+    _retire_requested = Signal()
 
     def __init__(self, parent: QObject | None = None, *, max_pending: int = 64) -> None:
         super().__init__(parent)
@@ -213,7 +221,8 @@ class AsyncStorage(QObject):
         self._worker.moveToThread(self._thread)
         self._requested.connect(self._worker.execute, Qt.ConnectionType.QueuedConnection)
         self._worker.replied.connect(self._deliver, Qt.ConnectionType.QueuedConnection)
-        self._thread.finished.connect(self._worker.deleteLater)
+        self._retire_requested.connect(self._worker.retire, Qt.ConnectionType.QueuedConnection)
+        self._worker.destroyed.connect(self._worker_destroyed, Qt.ConnectionType.QueuedConnection)
         self._thread.finished.connect(self._thread_stopped)
         self._thread.start()
 
@@ -256,7 +265,7 @@ class AsyncStorage(QObject):
         self._pending.remove(reply.request_id)
         self.replied.emit(reply)
         if reply.request_id == self._closing_id:
-            self._thread.quit()
+            self._retire_requested.emit()
 
     @Slot()
     def _thread_stopped(self) -> None:
@@ -264,4 +273,10 @@ class AsyncStorage(QObject):
         if not self._thread.wait(0):
             QTimer.singleShot(1, self._thread_stopped)
             return
+        # Destruction on a worker thread can invert Qt's object lock and the GIL.
+        # Retirement moved the drained worker here before stopping that thread.
+        self._worker.deleteLater()
+
+    @Slot()
+    def _worker_destroyed(self) -> None:
         self.closed.emit()

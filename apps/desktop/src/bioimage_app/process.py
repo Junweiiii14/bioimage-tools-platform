@@ -44,6 +44,7 @@ class _Decoder(QObject):
 
     def __init__(self, codec: ProcessCodec) -> None:
         super().__init__()
+        self._owner_thread = self.thread()
         self._codec = codec
         self._buffer = b""
         self._total = 0
@@ -108,6 +109,12 @@ class _Decoder(QObject):
             self._fail("worker_truncated_frame")
         self.drained.emit()
 
+    @Slot()
+    def retire(self) -> None:
+        worker_thread = self.thread()
+        self.moveToThread(self._owner_thread)
+        worker_thread.quit()
+
 
 class ProcessRunner(QObject):
     """Single use; keep alive through finished. Authorize request only after PID persistence.
@@ -122,6 +129,7 @@ class ProcessRunner(QObject):
     _chunk = Signal(bytes)
     _eof = Signal()
     _cancel = Signal()
+    _retire_requested = Signal()
 
     def __init__(self, codec: ProcessCodec, parent: QObject | None = None) -> None:
         super().__init__(parent)
@@ -139,8 +147,9 @@ class ProcessRunner(QObject):
         self._decoder.received.connect(self._event, Qt.ConnectionType.QueuedConnection)
         self._decoder.write.connect(self._write, Qt.ConnectionType.QueuedConnection)
         self._decoder.failed.connect(self._fail, Qt.ConnectionType.QueuedConnection)
-        self._decoder.drained.connect(self._thread.quit)
-        self._thread.finished.connect(self._decoder.deleteLater)
+        self._decoder.drained.connect(self._retire_decoder)
+        self._retire_requested.connect(self._decoder.retire, Qt.ConnectionType.QueuedConnection)
+        self._decoder.destroyed.connect(self._decoder_destroyed, Qt.ConnectionType.QueuedConnection)
         self._thread.finished.connect(self._decoder_stopped)
         self._process.started.connect(self._started)
         self._process.readyReadStandardOutput.connect(self._stdout)
@@ -317,10 +326,18 @@ class ProcessRunner(QObject):
         self._tree_timer.start()
 
     @Slot()
+    def _retire_decoder(self) -> None:
+        self._retire_requested.emit()
+
+    @Slot()
     def _decoder_stopped(self) -> None:
         if not self._thread.wait(0):
             QTimer.singleShot(1, self._decoder_stopped)
             return
+        self._decoder.deleteLater()
+
+    @Slot()
+    def _decoder_destroyed(self) -> None:
         self._decoder_done = True
         self._complete()
 
