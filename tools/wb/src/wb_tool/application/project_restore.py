@@ -107,6 +107,10 @@ def project_assets(project: WBFigureProject, *, history: bool = True) -> tuple[A
         assets.extend(source.asset for source in project.intake.sources)
     if isinstance(project, WBIntakeCropProject):
         assets.extend(e.raw_crop for e in project.intake_crops if e.raw_crop is not None)
+    from wb_tool.application.intake_figure import WBIntakeFigureProject
+
+    if isinstance(project, WBIntakeFigureProject):
+        assets.extend(e.image for e in project.intake_figures)
     if project.template.font:
         assets.append(project.template.font)
     if isinstance(project, WBProjectOCR) and project.ocr:
@@ -195,6 +199,13 @@ def restore_staged_project(
         changes["intake_crops"] = tuple(
             e.model_copy(update={"raw_crop": mapped(e.raw_crop)}) if e.raw_crop is not None else e
             for e in project.intake_crops
+        )
+
+    from wb_tool.application.intake_figure import WBIntakeFigureProject
+
+    if isinstance(project, WBIntakeFigureProject):
+        changes["intake_figures"] = tuple(
+            e.model_copy(update={"image": mapped(e.image)}) for e in project.intake_figures
         )
 
     if isinstance(project, WBIntakeProject):

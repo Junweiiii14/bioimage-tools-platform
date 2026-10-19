@@ -246,7 +246,7 @@ def review_intake_crop(
         geometry_policy="explicit_original_roi@1",
         reason="人工明确确认原图范围；槽位信号状态待原像素测量，不推断未上样",
     )
-    return WBIntakeCropProject.model_validate(
+    return type(project).model_validate(
         {
             **dict(reset),
             "rows": tuple(
@@ -270,7 +270,7 @@ def record_intake_crop_proposal(
         raise ValueError("缺少固定N裁剪项目")
     if finished.workflow.cancel_requested:
         return finished
-    return WBIntakeCropProject.model_validate(
+    return type(project).model_validate(
         {
             **dict(finished),
             "intake_crops": (
@@ -292,7 +292,7 @@ def complete_intake_crop(
         raise ValueError("缺少固定N裁剪项目")
     if finished.workflow.cancel_requested:
         return finished
-    return WBIntakeCropProject.model_validate(
+    return type(project).model_validate(
         {
             **dict(finished),
             "intake_crops": tuple(
@@ -327,7 +327,7 @@ def fail_intake_crop(
         ),
         reason=reason,
     )
-    return WBIntakeCropProject.model_validate(
+    return type(project).model_validate(
         {
             **dict(finished),
             "intake_crops": (

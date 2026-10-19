@@ -1017,6 +1017,10 @@ class FigureProjectView(QWidget):
 
             if isinstance(self._project, WBIntakeCropProject):
                 fields["intake_crops"] = self._project.intake_crops
+            from wb_tool.application.intake_figure import WBIntakeFigureProject
+
+            if isinstance(self._project, WBIntakeFigureProject):
+                fields["intake_figures"] = self._project.intake_figures
             project = type(self._project).model_validate(fields)
         elif isinstance(self._project, WBIntakeProject):
             fields = dict(project)

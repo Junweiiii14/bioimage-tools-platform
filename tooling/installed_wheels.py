@@ -170,6 +170,12 @@ crop_pipeline = prepare_intake_crops(pipeline)
 assert isinstance(crop_pipeline, WBIntakeCropProject) and crop_pipeline.schema_version == 12
 assert read_figure_project(crop_pipeline.model_dump_json().encode()) == crop_pipeline
 assert not crop_pipeline.intake_crops and not crop_pipeline.analyses
+from wb_tool.api import prepare_intake_figures, WBIntakeFigureProject
+figure_pipeline = prepare_intake_figures(crop_pipeline)
+figure_roundtrip = read_figure_project(figure_pipeline.model_dump_json().encode())
+assert isinstance(figure_roundtrip, WBIntakeFigureProject)
+assert not figure_pipeline.intake_figures and not figure_pipeline.analyses
+
 assert isinstance(pipeline_reopened, WBIntakeWorkflowProject) and pipeline_reopened == pipeline
 assert all(step.status == 'pending' for step in pipeline.workflow.steps)
 assert not pipeline.analyses and pipeline.ocr is None

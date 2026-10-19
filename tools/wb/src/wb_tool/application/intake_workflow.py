@@ -245,6 +245,19 @@ def finish_intake_workflow_step(
     *,
     reason: str = "",
 ) -> WBIntakeWorkflowProject:
+    return _replace_ledger(
+        project, steps=completed_intake_steps(project, ticket, outcome, reason=reason)
+    )
+
+
+def completed_intake_steps(
+    project: WBIntakeWorkflowProject,
+    ticket: IntakeWorkflowTicket,
+    outcome: StepOutcome,
+    *,
+    reason: str = "",
+) -> tuple[IntakeWorkflowStep, ...]:
+    """Validate frozen inputs before atomically merging a terminal state and its outputs."""
     if outcome not in {"done", "needs_review", "failed", "cancelled"}:
         raise ValueError("执行器只能返回明确阶段终态")
     active = validate_intake_workflow_ticket(project, ticket)
@@ -253,9 +266,7 @@ def finish_intake_workflow_step(
     finished = IntakeWorkflowStep.model_validate(
         {**dict(active), "status": outcome, "reason": reason}
     )
-    return _replace_ledger(
-        project, steps=tuple(finished if s == active else s for s in project.workflow.steps)
-    )
+    return tuple(finished if s == active else s for s in project.workflow.steps)
 
 
 def validate_intake_workflow_ticket(

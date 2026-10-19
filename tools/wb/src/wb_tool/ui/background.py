@@ -21,6 +21,7 @@ from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_w
 from wb_tool.application.figure_project import FigurePNG, FigureRender, WBFigureProject
 from wb_tool.application.figure_template import LoadedFigureTemplate
 from wb_tool.application.intake_crop import IntakeCropEvidence, IntakeCropFile
+from wb_tool.application.intake_figure import IntakeFigurePreparation
 from wb_tool.application.project_analysis import (
     LoadedProjectResult,
     ProjectTableSnapshot,
@@ -93,6 +94,7 @@ class _Work(QObject):
                 | CropSuggestion
                 | IntakeCropEvidence
                 | IntakeCropFile
+                | IntakeFigurePreparation
                 | LoadedProjectResult
                 | ProjectTableSnapshot
                 | LoadedProjectOCR
@@ -141,6 +143,20 @@ class _Work(QObject):
                 )
                 if cancel():
                     raise ValueError("裁剪执行准备已取消")
+            elif job.operation == "intake_figure_prepare":
+                from wb_tool.adapters.intake_figure import prepare_intake_figure
+                from wb_tool.application.intake_figure import WBIntakeFigureProject
+                from wb_tool.application.intake_workflow import IntakeWorkflowTicket
+
+                if not isinstance(job.document, WBIntakeFigureProject):
+                    raise ValueError("缺少当前完整Fig项目")
+                value = prepare_intake_figure(
+                    job.document,
+                    IntakeWorkflowTicket.model_validate_json(job.data),
+                    job.sources,
+                    job.destination,
+                    cancelled=cancel,
+                )
             elif job.operation in {"intake_crop_propose", "intake_crop_export"}:
                 from wb_tool.adapters.intake_crop import export_intake_crop, propose_intake_crop
                 from wb_tool.application.intake_crop import WBIntakeCropProject
