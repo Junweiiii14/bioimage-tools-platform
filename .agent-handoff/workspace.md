@@ -9,7 +9,7 @@
 
 ## Main Entry Points
 
-正式桌面产品入口不存在。WB 纯数值包公开入口 wb_tool.api，说明 tools/wb/README.md。P0 探针入口为 p0_probe.py，复现见 tooling/p0/README.md；开发入口为 dev.py。使用本项目 .venv 或 uv，避免系统 Python 商店别名。
+源码桌面入口为 `uv run --locked --no-sync python -m bioimage_app`，多源项目可加 `--figure-project`。WB公开入口wb_tool.api，说明tools/wb/README.md；宿主公开入口bioimage_app.api。P0探针为p0_probe.py，开发检查为dev.py。使用本项目.venv或uv；最终Windows包仍待验收。
 
 规则入口 `dev.py context --task <ID> --scope <目录> --record`，生成当前规则版本回执；`.github/workflows/rules-context.yml` 在 PR 校验。完整安装后本地命令加 `uv run --locked --no-sync` 保持桌面/构建依赖。
 

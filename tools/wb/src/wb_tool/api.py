@@ -1,13 +1,16 @@
 """Versioned public WB API; importing this module has no runtime side effects."""
 
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from PySide6.QtWidgets import QWidget
 
-    from wb_tool.ui.background import WBBackground
+    from wb_tool.ui.background import WBBackground as WBBackground
+    from wb_tool.ui.figure_view import FigureProjectView
     from wb_tool.ui.view import WBView
 
+from wb_tool.adapters.ocr_input import OCRImage, load_ocr_image
 from wb_tool.adapters.tiff_input import ImageInputError, LoadedTiff, load_tiff
 from wb_tool.application.analysis import (
     AnalysisCancelled,
@@ -20,8 +23,78 @@ from wb_tool.application.analysis import (
     LaneAnnotation,
     analyze_annotations,
 )
-from wb_tool.application.desktop_data import PreviewRaster, WBJob, WBReply
-from wb_tool.application.document import WBDocument
+from wb_tool.application.crop import CropRequest
+from wb_tool.application.crop_suggestions import (
+    CropSuggestion,
+    WBReviewProject,
+    apply_crop_suggestion,
+    project_with_suggestions,
+    read_figure_project,
+    record_crop_suggestion,
+)
+from wb_tool.application.desktop_data import PreviewRaster, ProjectDerivedTables, WBJob, WBReply
+from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
+from wb_tool.application.figure_project import (
+    FigurePNG,
+    FigureRender,
+    FigureRow,
+    FigureSourcePath,
+    FigureTemplate,
+    WBFigureProject,
+    plan_figure_layout,
+)
+from wb_tool.application.ocr_protocol import (
+    OCRConversation,
+    OCRRequest,
+    OCRResultFrame,
+    OCRStartFrame,
+    encode_ocr_frame,
+    ocr_protocol_schema,
+    parse_ocr_frame,
+)
+from wb_tool.application.project_analysis import (
+    LoadedProjectResult,
+    ProjectRowAnalysis,
+    ProjectTableCell,
+    ProjectTableSnapshot,
+    WBAnalysisProject,
+    analysis_is_current,
+    fill_project_table,
+    make_row_analysis,
+    prepare_project_analyses,
+    project_with_analyses,
+    read_project_result,
+    record_project_run,
+    set_row_analysis,
+    update_row_analysis_request,
+)
+from wb_tool.application.project_normalization import (
+    ControlMode,
+    NormalizationPlan,
+    NormalizationSnapshot,
+    NormalizationSource,
+    NormalizedCell,
+    ReferenceKind,
+    SamplePair,
+    WBNormalizedProject,
+    fill_project_normalization,
+    make_normalization_plan,
+    normalization_is_current,
+    project_with_normalizations,
+)
+from wb_tool.application.project_ocr import (
+    LoadedProjectOCR,
+    ProjectOCRLink,
+    ProjectOCRRow,
+    ProjectOCRState,
+    WBProjectOCR,
+    bind_project_ocr_row,
+    fill_project_ocr_table,
+    install_project_recognition,
+    ocr_link_is_current,
+    project_with_ocr,
+    read_project_ocr_result,
+)
 from wb_tool.application.worker_protocol import (
     AcceptedFrame,
     CancelFrame,
@@ -36,6 +109,14 @@ from wb_tool.application.worker_protocol import (
     parse_worker_frame,
     worker_protocol_schema,
 )
+from wb_tool.application.worksheet import WorksheetCell, fill_worksheet, propose_worksheet
+from wb_tool.domain.crop_detection import (
+    CropCandidate,
+    CropDetection,
+    CropDetectionSettings,
+    detect_crop_candidates,
+)
+from wb_tool.domain.grid import fixed_lane_grid
 from wb_tool.domain.lanes import LaneProfiles, LaneROI, Polarity, compute_lane_profiles
 from wb_tool.domain.quantify import (
     BandBounds,
@@ -44,8 +125,110 @@ from wb_tool.domain.quantify import (
     QuantificationError,
     integrate_profile,
 )
+from wb_tool.domain.worksheet import (
+    FigureSuggestion,
+    MeasurementBinding,
+    OCRRecognition,
+    TextBounds,
+    TextToken,
+    Worksheet,
+    WorksheetColumn,
+    WorksheetRow,
+    suggest_figures,
+)
 
 __all__ = [
+    "ProjectDerivedTables",
+    "ControlMode",
+    "NormalizationPlan",
+    "NormalizationSnapshot",
+    "NormalizationSource",
+    "NormalizedCell",
+    "ReferenceKind",
+    "SamplePair",
+    "WBNormalizedProject",
+    "fill_project_normalization",
+    "make_normalization_plan",
+    "normalization_is_current",
+    "project_with_normalizations",
+    "export_project_normalization",
+    "export_project_ocr_table",
+    "LoadedProjectOCR",
+    "ProjectOCRLink",
+    "ProjectOCRRow",
+    "ProjectOCRState",
+    "WBProjectOCR",
+    "bind_project_ocr_row",
+    "fill_project_ocr_table",
+    "install_project_recognition",
+    "ocr_link_is_current",
+    "project_with_ocr",
+    "read_project_ocr_result",
+    "export_project_table",
+    "ProjectRowAnalysis",
+    "WBAnalysisProject",
+    "LoadedProjectResult",
+    "ProjectTableCell",
+    "ProjectTableSnapshot",
+    "analysis_is_current",
+    "project_with_analyses",
+    "make_row_analysis",
+    "set_row_analysis",
+    "update_row_analysis_request",
+    "prepare_project_analyses",
+    "record_project_run",
+    "read_project_result",
+    "fill_project_table",
+    "CropSuggestion",
+    "WBReviewProject",
+    "apply_crop_suggestion",
+    "project_with_suggestions",
+    "read_figure_project",
+    "record_crop_suggestion",
+    "CropCandidate",
+    "CropDetection",
+    "CropDetectionSettings",
+    "detect_crop_candidates",
+    "suggest_crops",
+    "FigureTemplate",
+    "FigureRow",
+    "WBFigureProject",
+    "FigureRender",
+    "FigurePNG",
+    "OCRImage",
+    "load_ocr_image",
+    "FigureSourcePath",
+    "plan_figure_layout",
+    "create_figure_project_view",
+    "render_figure",
+    "export_figure_bundle",
+    "CropRequest",
+    "export_crop",
+    "fixed_lane_grid",
+    "WBWorksheetDocument",
+    "read_wb_document",
+    "OCRRequest",
+    "OCRStartFrame",
+    "OCRResultFrame",
+    "OCRConversation",
+    "encode_ocr_frame",
+    "parse_ocr_frame",
+    "ocr_protocol_schema",
+    "run_ocr_worker",
+    "FigureSuggestion",
+    "MeasurementBinding",
+    "OCRRecognition",
+    "TextBounds",
+    "TextToken",
+    "Worksheet",
+    "WorksheetColumn",
+    "WorksheetRow",
+    "WorksheetCell",
+    "fill_worksheet",
+    "suggest_figures",
+    "recognize_figure",
+    "propose_worksheet",
+    "export_worksheet",
     "WBDocument",
     "PreviewRaster",
     "WBJob",
@@ -89,6 +272,46 @@ __all__ = [
 ]
 
 
+def suggest_crops(
+    source: str,
+    source_sha256: str,
+    row_id: str,
+    revision: int,
+    settings: CropDetectionSettings,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> CropSuggestion:
+    from wb_tool.adapters.crop_suggestions import suggest_crops as suggest
+
+    return suggest(source, source_sha256, row_id, revision, settings, cancelled=cancelled)
+
+
+def create_figure_project_view(parent: "QWidget | None" = None) -> "FigureProjectView":
+    from wb_tool.ui.figure_view import FigureProjectView
+
+    return FigureProjectView(parent)
+
+
+def render_figure(
+    project: WBFigureProject, sources: tuple[FigureSourcePath, ...], *, require_review: bool = True
+) -> FigureRender:
+    from wb_tool.adapters.figure_export import render_figure as render
+
+    return render(project, sources, require_review=require_review)
+
+
+def export_figure_bundle(
+    project: WBFigureProject,
+    sources: tuple[FigureSourcePath, ...],
+    destination: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> str:
+    from wb_tool.adapters.figure_export import export_figure_bundle as export
+
+    return export(project, sources, destination, cancelled=cancelled)
+
+
 def create_wb_view(parent: "QWidget | None" = None) -> "WBView":
     from wb_tool.ui.view import WBView
 
@@ -105,3 +328,64 @@ def run_wb_worker() -> int:
     from wb_tool.worker import main
 
     return main()
+
+
+def run_ocr_worker() -> int:
+    from wb_tool.adapters.ocr_worker import main
+
+    return main()
+
+
+def recognize_figure(
+    source: str,
+    expected_sha256: str,
+    *,
+    cancelled: Callable[[], bool] | None = None,
+) -> OCRRecognition:
+    from wb_tool.adapters.ocr import recognize_figure as recognize
+
+    return recognize(source, expected_sha256, cancelled=cancelled)
+
+
+def export_worksheet(worksheet: Worksheet, result: AnalysisResult, destination: str) -> str:
+    from wb_tool.adapters.worksheet_export import export_worksheet as export
+
+    return str(export(worksheet, result, destination))
+
+
+def export_project_table(
+    project: WBFigureProject, results: tuple[LoadedProjectResult, ...], destination: str
+) -> str:
+    from wb_tool.adapters.project_export import export_project_table as export
+
+    return str(export(project, results, destination))
+
+
+def export_project_ocr_table(
+    project: WBProjectOCR,
+    results: tuple[LoadedProjectResult, ...],
+    loaded: LoadedProjectOCR | None,
+    destination: str,
+) -> str:
+    from wb_tool.adapters.project_ocr_export import export_project_ocr_table as export
+
+    return str(export(project, results, loaded, destination))
+
+
+def export_project_normalization(
+    project: WBNormalizedProject,
+    results: tuple[LoadedProjectResult, ...],
+    loaded: LoadedProjectOCR | None,
+    destination: str,
+    *,
+    ocr_labels: bool = False,
+) -> str:
+    from wb_tool.adapters.normalization_export import export_project_normalization as export
+
+    return str(export(project, results, loaded, destination, ocr_labels=ocr_labels))
+
+
+def export_crop(source: str, request: CropRequest, destination: str) -> str:
+    from wb_tool.adapters.crop_export import export_crop as export
+
+    return export(source, request, destination)

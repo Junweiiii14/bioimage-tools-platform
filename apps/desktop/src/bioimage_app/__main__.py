@@ -17,14 +17,40 @@ def main() -> int:
         from wb_tool.api import run_wb_worker
 
         return run_wb_worker()
+    if sys.argv[1:] == ["--worker", "wb_ocr"]:
+        from wb_tool.api import run_ocr_worker
+
+        return run_ocr_worker()
+    from pathlib import Path
+
+    from PySide6.QtCore import QStandardPaths
     from PySide6.QtWidgets import QApplication
 
+    from bioimage_app.diagnostics import DesktopDiagnostics
+    from bioimage_app.figure_window import FigureProjectWindow
     from bioimage_app.wb_window import WBWindow
 
     app = QApplication(sys.argv)
-    window = WBWindow()
+    app.setApplicationName("BioImageTools")
+    diagnostics: DesktopDiagnostics | None = None
+    try:
+        diagnostics = DesktopDiagnostics(
+            Path(
+                QStandardPaths.writableLocation(
+                    QStandardPaths.StandardLocation.AppLocalDataLocation
+                )
+            )
+            / "logs"
+        )
+    except OSError:
+        print("无法创建本地诊断日志；继续启动。", file=sys.stderr)
+    window = FigureProjectWindow() if sys.argv[1:] == ["--figure-project"] else WBWindow()
     window.show()
-    return app.exec()
+    try:
+        return app.exec()
+    finally:
+        if diagnostics is not None:
+            diagnostics.close()
 
 
 if __name__ == "__main__":

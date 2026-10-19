@@ -1,6 +1,7 @@
 """Strict, versioned wire envelope; stdlib dataclass fields remain canonical."""
 
 import json
+from collections.abc import Callable
 from math import isfinite
 from typing import Annotated, Literal, Self, cast
 
@@ -19,6 +20,13 @@ class FrameSizeError(ValueError):
 class WireModel(BaseModel):
     model_config = ConfigDict(strict=True, frozen=True, extra="forbid", allow_inf_nan=False)
     protocol_version: Literal[1]
+
+    @property
+    def kind_name(self) -> str:
+        value: object = getattr(self, "kind", None)
+        if not isinstance(value, str):
+            raise ValueError("消息缺少合法 kind")
+        return value
 
     @field_validator("protocol_version", "sequence", mode="before", check_fields=False)
     @classmethod
@@ -181,7 +189,7 @@ WorkerFrame = Annotated[
 _FRAMES = TypeAdapter(WorkerFrame)
 
 
-def _unique_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
+def unique_json_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
     values: dict[str, object] = {}
     for key, value in pairs:
         if key in values:
@@ -193,7 +201,7 @@ def _unique_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
 def parse_worker_frame(data: bytes) -> WorkerFrame:
     if len(data) > MAX_FRAME_BYTES:
         raise FrameSizeError("消息超过协议帧上限")
-    raw = cast(object, json.loads(data, object_pairs_hook=_unique_object))
+    raw = cast(object, json.loads(data, object_pairs_hook=unique_json_object))
     if isinstance(raw, dict):
         result = cast(dict[str, object], raw).get("result")
         if isinstance(result, dict):
@@ -214,11 +222,18 @@ def worker_protocol_schema() -> dict[str, object]:
     return _FRAMES.json_schema()
 
 
-class WorkerConversation:
+class WireConversation:
     """Host-side identity/order gate, without claiming persistence or process termination."""
 
-    def __init__(self, start: StartFrame) -> None:
+    def __init__(
+        self,
+        start: IdentifiedFrame,
+        parser: Callable[[bytes], WireModel],
+        matches: Callable[[WireModel], bool],
+    ) -> None:
         self.start = start
+        self._parser = parser
+        self._matches = matches
         self.stage = 0
         self.cancel_pending = False
 
@@ -235,8 +250,8 @@ class WorkerConversation:
             request_id=self.start.request_id,
         )
 
-    def accept(self, data: bytes) -> WorkerFrame:
-        frame = parse_worker_frame(data)
+    def accept(self, data: bytes) -> WireModel:
+        frame = self._parser(data)
         if self.stage == 0 and isinstance(frame, HelloFrame):
             self.stage = 1
             return frame
@@ -252,13 +267,22 @@ class WorkerConversation:
         if self.stage == 1 and isinstance(frame, AcceptedFrame):
             self.stage = 2
             return frame
-        if self.stage == 2 and isinstance(frame, ResultFrame | FailureFrame | CancelledFrame):
+        if self.stage == 2 and frame.kind_name in ("result", "failure", "cancelled"):
             if isinstance(frame, CancelledFrame) and not self.cancel_pending:
                 raise ValueError("未请求取消的会话不能接受取消确认")
-            if isinstance(frame, ResultFrame) and (
-                self.cancel_pending or frame.result.request != self.start.request
-            ):
+            if frame.kind_name == "result" and (self.cancel_pending or not self._matches(frame)):
                 raise ValueError("取消后的结果或过期草稿结果不得接受")
             self.stage = 3
             return frame
         raise ValueError("消息乱序、重复或会话已经结束")
+
+
+class WorkerConversation(WireConversation):
+    def __init__(self, start: StartFrame) -> None:
+        def matches(frame: WireModel) -> bool:
+            return isinstance(frame, ResultFrame) and frame.result.request == start.request
+
+        super().__init__(start, parse_worker_frame, matches)
+
+    def accept(self, data: bytes) -> WorkerFrame:
+        return cast(WorkerFrame, super().accept(data))
