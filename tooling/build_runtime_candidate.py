@@ -121,6 +121,7 @@ def main() -> int:
             "-municode",
             "-mwindows",
             "-static-libgcc",
+            '-DRELEASE_CHANNEL=L"win10-test"',
             str(ROOT / "tooling/windows_candidate_launcher.c"),
             str(resource_object),
             "-o",

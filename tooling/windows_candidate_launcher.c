@@ -10,6 +10,9 @@
 #include <wchar.h>
 
 #define CAPACITY 32768
+#ifndef RELEASE_CHANNEL
+#define RELEASE_CHANNEL L"candidate"
+#endif
 
 static BOOL append(wchar_t *command, size_t *length, wchar_t value) {
     if (*length + 1 >= CAPACITY) return FALSE;
@@ -60,7 +63,7 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE previous, PWSTR line, int show
     for (int index = 1; index < count; index++)
         if (!argument(command, &length, arguments[index])) goto failed;
     LocalFree(arguments); arguments = NULL;
-    if (!SetEnvironmentVariableW(L"BIOIMAGE_RELEASE_CHANNEL", L"candidate")) goto failed;
+    if (!SetEnvironmentVariableW(L"BIOIMAGE_RELEASE_CHANNEL", RELEASE_CHANNEL)) goto failed;
     job = CreateJobObjectW(NULL, NULL);
     if (!job) goto failed;
     JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits = {0};

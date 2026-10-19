@@ -69,13 +69,15 @@ class WebWorkbenchWindow(QMainWindow):
         self, *, asset_directory: Path | None = None, settings: QSettings | None = None
     ) -> None:
         super().__init__()
-        candidate = os.environ.get("BIOIMAGE_RELEASE_CHANNEL") == "candidate"
+        channel = os.environ.get("BIOIMAGE_RELEASE_CHANNEL")
+        candidate = channel in {"candidate", "win10-test"}
         self.setWindowTitle("BioImage WB · 候选版" if candidate else "BioImage · WB 工作台")
         self.setWindowIcon(QIcon(str(Path(__file__).with_name("web_ui") / "bioimage.svg")))
         self.resize(1440, 940)
-        self.settings = settings or QSettings(
-            "BioImageTools", "Candidate" if candidate else "Platform"
+        settings_name = {"candidate": "Candidate", "win10-test": "Win10Test"}.get(
+            channel or "", "Platform"
         )
+        self.settings = settings or QSettings("BioImageTools", settings_name)
         self.navigation = ProjectNavigation(self.settings)
         self._stage = "idle"
         self._message = ""

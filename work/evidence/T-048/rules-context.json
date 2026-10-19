@@ -3,7 +3,8 @@
   "task": "T-048",
   "base_commit": "edfc8507663b03ddef609c01fdba01eb3f32b53d",
   "scopes": [
-    "."
+    ".",
+    "apps/desktop"
   ],
   "rules": {
     "AGENTS.md": "3c5ce28cf9b92099025bd50db0821e94c90b5759dfb32d19e510da1774c4941f",

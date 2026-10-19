@@ -1,5 +1,13 @@
 # Desktop host
 
+T048's runtime builder now emits a separate Windows x64 test installer (minimum
+Windows 10 1809), with mandatory desktop/Start menu/uninstall entries and app-local
+MSVC redistributables from the locked Qt wheel. Its `win10-test` channel uses the
+`Win10Test` settings namespace; T047's candidate and the original remain separate.
+The native launcher keeps the existing candidate window label. An optional Start
+menu environment check uses synthetic images and writes distinct local reports.
+This is a test distribution, not a formal release or proof of clean Win10 acceptance.
+
 T047 adds the approved project start screen and a local versioned navigation record.
 New independent grayscale imports are saved and open the quantification page. Existing
 projects restore valid page/row/Fig/lane selections. Recent entries are actual projects,
