@@ -17,3 +17,5 @@
 ## 定量会话身份 v2
 
 本阶段新增quant_edit必须在原row/source/generation检查前核对projectId及严格整数sessionEpoch；旧请求缺字段须刷新。定量拖动冻结项目/会话/草稿/行/来源/泳道/条带，状态或选中目标改变时释放不提交旧几何。新set_lanes沿legacy_crop_edit@1保护，不引入后继quant_target/manual命令。无schema/算法变化。
+
+T044新增quant_target及return_crop沿用严格项目/会话校验；手工ROI草稿键含epoch，绘框开始冻结身份，旧move/cancel不写新会话。只有本阶段已有功能，无后继manual分组命令。

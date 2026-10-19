@@ -57,6 +57,8 @@ def test_same_target_bridge_keeps_generation_and_manual_parameters(qtbot: QtBot)
         "quant_edit",
         json.dumps(
             {
+                "projectId": project.project_id,
+                "sessionEpoch": bridge.session_epoch,
                 "id": "r",
                 "sourceId": project.rows[0].source.sha256 if project.rows[0].source else "",
                 "revision": 9,

@@ -303,6 +303,7 @@ class WorkbenchBridge(QObject):
             elif action == "quant_edit":
                 self._edit_quant(data)
             elif action == "return_crop":
+                self._validate_quant_session(data)
                 project = self.host.view.project()
                 row = self.host.view.selected_row()
                 if (
@@ -423,6 +424,7 @@ class WorkbenchBridge(QObject):
         self.publish()
 
     def _configure_quant_target(self, data: dict[str, object]) -> None:
+        self._validate_quant_session(data)
         project = self.host.view.project()
         row = self.host.view.selected_row()
         if (

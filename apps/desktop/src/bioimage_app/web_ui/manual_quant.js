@@ -14,7 +14,7 @@ const manualQuant = {
   current() {
     const source = row(), quant = quantData();
     if (!source) return null;
-    const key = [state.projectId, source.id, source.sourceId, quant?.revision].join(':');
+    const key = [state.projectId, state.sessionEpoch, source.id, source.sourceId, quant?.revision].join(':');
     if (this.draft?.key !== key) {
       this.draft = {
         key, roi: source.roi ? {...source.roi} : null,
@@ -33,7 +33,7 @@ const manualQuant = {
     } else if (!state.busy) {
       this.submittedRevision = null;
     }
-    if (this.drawing && this.drawing.id !== row()?.id) this.drawing = null;
+    if (this.drawing && !sameQuantIdentity(this.drawing.identity)) this.drawing = null;
     if (this.profileBinding && this.profileBinding !== [state.projectId, row()?.id, row()?.sourceId].join(':')) this.closeProfiles();
   },
 
@@ -98,7 +98,7 @@ const manualQuant = {
     if (draft.roi.width < n || draft.roi.height < 2 || draft.roi.height > 4096) return toast('区域须容纳全部泳道，高度须为 2–4096 原图像素。');
     this.submittedRevision = quant?.revision;
     send('quant_target', {
-      projectId: state.projectId, id: source.id, sourceId: source.sourceId,
+      ...quantIdentity(),
       revision: quant?.revision, roi: draft.roi, n, polarity: draft.polarity, emptyLanes, resetBounds
     });
   },
@@ -252,14 +252,16 @@ manualQuantViewport.addEventListener('pointerdown', event => {
   const rect = $('#image-transform').getBoundingClientRect();
   if (event.clientX < rect.left || event.clientX >= rect.right || event.clientY < rect.top || event.clientY >= rect.bottom) return;
   const start = manualQuant.point(event, rect, source);
-  manualQuant.drawing = {id: source.id, rect, start, previous: manualQuant.current().roi};
+  manualQuant.drawing = {identity:quantIdentity(),id: source.id, rect, start, previous: manualQuant.current().roi};
   event.preventDefault();
   manualQuantViewport.setPointerCapture(event.pointerId);
 });
 
 manualQuantViewport.addEventListener('pointermove', event => {
   const drawing = manualQuant.drawing, source = row();
-  if (!drawing || !source || source.id !== drawing.id || state.busy) return;
+  if (!drawing) return;
+  if (!sameQuantIdentity(drawing.identity)) {manualQuant.drawing=null;renderQuant();return;}
+  if (!source || source.id !== drawing.id || state.busy) return;
   const end = manualQuant.point(event, drawing.rect, source);
   manualQuant.current().roi = {
     x: Math.min(drawing.start.x, end.x), y: Math.min(drawing.start.y, end.y),
@@ -277,7 +279,7 @@ manualQuantViewport.addEventListener('pointerup', () => {
 
 manualQuantViewport.addEventListener('pointercancel', () => {
   if (!manualQuant.drawing) return;
-  manualQuant.current().roi = manualQuant.drawing.previous;
+  if(sameQuantIdentity(manualQuant.drawing.identity)) manualQuant.current().roi = manualQuant.drawing.previous;
   manualQuant.drawing = null;
   renderQuant();
 });

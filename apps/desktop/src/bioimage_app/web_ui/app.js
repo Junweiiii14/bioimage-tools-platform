@@ -181,7 +181,7 @@ function action(name,element){
  case 'advanced':advanced(element.dataset.section);break;
  case 'inspect':openDrawer($('#inspector-title').textContent,$('#inspector-content').innerHTML+$('#inspector-action').innerHTML);$('#drawer').dataset.inspector='true';break;
  case 'close-drawer':closeDrawer();break;
- case 'return_crop':{const r=row();if(bridge&&r&&!state.busy)send(name,{projectId:state.projectId,id:r.id,sourceId:r.sourceId,revision:state.revision,locate:element.dataset.locate==='true'});else if(!bridge)toast('请在桌面工作台回存原图裁剪。');break;}
+ case 'return_crop':{const r=row();if(bridge&&r&&!state.busy)send(name,{...quantIdentity(),revision:state.revision,locate:element.dataset.locate==='true'});else if(!bridge)toast('请在桌面工作台回存原图裁剪。');break;}
  case 'return-layout':if(state.busy)return;closeDrawer();switchMode('layout');break;
  case 'lanes-minus':setLanes(row()?.lanes-1);break;
  case 'lanes-plus':setLanes(row()?.lanes+1);break;

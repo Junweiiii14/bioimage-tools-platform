@@ -84,6 +84,7 @@ def test_real_page_manual_import_compute_save_reopen_without_automatic_or_compos
         assert selected.source is not None
         payload: dict[str, object] = {
             "projectId": initial.project_id,
+            "sessionEpoch": window.bridge.session_epoch,
             "id": selected.row_id,
             "sourceId": selected.source.sha256,
             "revision": window.host.view.generation,
@@ -231,6 +232,7 @@ def test_real_page_manual_import_compute_save_reopen_without_automatic_or_compos
         assert selected.source is not None
         valid_return: dict[str, object] = {
             "projectId": current.project_id,
+            "sessionEpoch": window.bridge.session_epoch,
             "id": selected.row_id,
             "sourceId": selected.source.sha256,
             "revision": window.host.view.generation,
