@@ -14,6 +14,7 @@ import pytest
 import tifffile
 from bioimage_app.api import create_figure_project_window
 from PIL import Image, ImageDraw, ImageFont
+from platform_runtime.api import Workspace
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 from pytestqt.qtbot import QtBot
@@ -249,26 +250,70 @@ def test_result_damage_isolated_and_stale_geometry_does_not_fill(
     assert isinstance(remaining, WBAnalysisProject) and len(remaining.analyses) == 1
 
 
+@pytest.mark.parametrize("auto_followup", [False, True])
 def test_late_batch_cannot_replace_edited_draft(
-    qtbot: QtBot, tmp_path: Path, windows: Callable[[], "FigureProjectWindow"]
+    qtbot: QtBot,
+    tmp_path: Path,
+    windows: Callable[[], "FigureProjectWindow"],
+    auto_followup: bool,
 ) -> None:
     window = windows()
     setup(qtbot, tmp_path, window)
     second_id = window.view.project().rows[1].row_id
+    frozen_revisions: list[int] = []
 
     def edited(message: str) -> None:
         if second_id in message:
+            frozen_revisions.append(window.view.project().revision)
             item(window.view.table, 0, 2).setText("edited while running")
+            # Observe this batch's rejection before a separate valid autosave/recompute.
+            window.pause_auto_save(True)
 
     window.measurement_progress.connect(edited)
     window.analyze_project(True)
-    qtbot.waitUntil(window.import_button.isEnabled, timeout=20000)
+    qtbot.waitUntil(lambda: not window.operation_busy, timeout=20000)
+    assert not window.import_button.isEnabled()  # Paused controls do not indicate a busy worker.
     project = window.view.project()
     assert isinstance(project, WBAnalysisProject)
     assert project.rows[0].protein == "edited while running"
     assert all(p.run is None for p in project.analyses)
     assert "未覆盖" in window.view.status.text()
     assert window.view.analysis.results.rowCount() == 0
+    assert frozen_revisions and len(set(frozen_revisions)) == 1
+    frozen_revision = frozen_revisions[0]
+    window.measurement_progress.disconnect(edited)
+    if auto_followup:
+        window.pause_auto_save(False)
+
+        def fresh_results_saved() -> bool:
+            current = window.view.project()
+            return (
+                not window.operation_busy
+                and not window.has_unsaved_changes
+                and isinstance(current, WBAnalysisProject)
+                and all(plan.run is not None for plan in current.analyses)
+            )
+
+        qtbot.waitUntil(fresh_results_saved, timeout=20000)
+        current = window.view.project()
+        assert isinstance(current, WBAnalysisProject)
+        assert current.rows[0].protein == "edited while running"
+        references = tuple(plan.run for plan in current.analyses)
+        assert len(references) == 2
+        assert all(
+            run and run.state == "succeeded" and run.pid and run.revision > frozen_revision
+            for run in references
+        )
+        window.close()
+        qtbot.waitUntil(lambda: window.resources_closed, timeout=20000)
+        with Workspace.open(tmp_path / "workspace") as store:
+            history = store.list_runs(current.project_id)
+        assert len(history) == 4
+        current_ids = {run.run_id for run in references if run}
+        old = tuple(run for run in history if run.run_id not in current_ids)
+        assert len(old) == 2
+        assert all(run.state == "succeeded" and run.revision == frozen_revision for run in old)
+        assert all(run in history for run in references)
 
 
 def test_real_project_ocr_bind_fill_export_reopen_and_cancel(

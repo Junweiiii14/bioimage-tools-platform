@@ -47,7 +47,7 @@
 ## Current Pointer
 
 - Last updated: 2026-10-20
-- Current implementation: E0–E6 locally completed with bound reviews; E7/T-060 implementing in t051/codex/wb-e0-e7. Product e57949b; predecessor full900/check0 plus focused diagnostic correction3/0. New isolated E7 installed dual-flow and PS5.1 selfcheck0; lifecycle/reintegration/final CI pending. Accepted main aac126e; PR11 e478 new CI, PR12–15 prepared. See task/snapshot; historical native UNKNOWN and scientific/clean Win10/DPI gaps remain. No reapproval or automation.
+- Current implementation: E0–E6 locally completed; E7/T-060 implementing. Prepared5bb product tree strictly equals reviewed/installed e579; 909-item full failed908/1 (late-batch test observed a legitimate fresh autosave batch); isolated boundary plus fresh followup30 checks pass, new full pending. Accepted main5f20960 through PR11; PR12 Windows610/wheels passed, Linux timeout then WebChannel startup failure; diagnostics-only head pending; PR13–15 prepared. E7 isolated installed dual-flow/PS5.1/uninstall-reinstall and candidate evidence review passed. See task/snapshot; old native UNKNOWN/scientific/clean Win10/DPI remain. No automation or stage reapproval.
 - T-048 offline x64 Win10 test installer delivered from existing T-045 checkout: `C:/Users/70236/.codex/worktrees/t045-wbquant/bioimage-tools-platform`, branch `codex/t045-wbquant-manual-and-fig`; product3821c64, verify actual HEAD. Separate test installation/mandatory shortcuts/private runtime; Win11 nonadmin install/uninstall/reinstall and scoped independent review passed. Desktop delivery folder `BioImage-WB-Win10-测试版-T048`; clean Win10 acceptance still not run. No new worktree, original replacement or formal release. See T-048 task, validation and snapshot; previous T047 candidate/user windows retained.
 - Candidate entry: this checkout's `Start-BioImage.ps1`; `--verify-launch` confirms its source. The desktop “BioImage WB 工作台（当前开发）” shortcut remains pointed at the earlier t021 checkout; it was not changed for T-045.
 - Earlier t021 checkout currently lacks Git/hidden handoff files; cause UNKNOWN. Original ResearchVault checkout retains dirty historical work. Do not repair, delete, synchronize or switch old trees/shortcuts based on this candidate. Main/PR integration and release are separate.
@@ -71,5 +71,7 @@ For non-trivial work, update the relevant files before final response:
 - Update `.agent-handoff/decisions.md` when a durable decision was made.
 - Update `.agent-handoff/backlog.md` and `.agent-handoff/risks.md` when follow-ups, blockers, risks, or unknowns changed.
 - Run the handoff maintenance check and resolve hard-limit findings before final response.
+
+
 
 

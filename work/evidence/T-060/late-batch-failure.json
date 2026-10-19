@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "source_commit": "5bb91cde6c20a00f39160cdaac5a5b627b4a3835",
+  "full_result": {
+    "failed": 1,
+    "passed": 908,
+    "seconds": 762.0,
+    "original_exit": 1,
+    "outer_exit": 1,
+    "wheels": "not run"
+  },
+  "failure": "test_late_batch_cannot_replace_edited_draft: expected no run after old completion; latest draft has later fresh run references",
+  "current_draft_revision": 4,
+  "current_proteins": [
+    "edited while running",
+    "AKT"
+  ],
+  "current_refs": [
+    {
+      "id": "6a529d8b0c274b089c7295c2fe3cbf26",
+      "revision": 2
+    },
+    {
+      "id": "9d80bd143bb64ba483376f253633b6a0",
+      "revision": 2
+    }
+  ],
+  "history": [
+    {
+      "id": "9d80bd143bb64ba483376f253633b6a0",
+      "revision": 2,
+      "state": "succeeded",
+      "pid": 19616
+    },
+    {
+      "id": "6a529d8b0c274b089c7295c2fe3cbf26",
+      "revision": 2,
+      "state": "succeeded",
+      "pid": 57724
+    },
+    {
+      "id": "58abbf03839644558f18f8620334ef6f",
+      "revision": 0,
+      "state": "succeeded",
+      "pid": 20516
+    },
+    {
+      "id": "7207e3bb40b041c5b5ca61b082fe3be2",
+      "revision": 0,
+      "state": "succeeded",
+      "pid": 58012
+    }
+  ],
+  "log_sha256": "3373dc5e615307548acc1461ecf830247e4f3bfa56ad467b10aeacb96127084f"
+}
