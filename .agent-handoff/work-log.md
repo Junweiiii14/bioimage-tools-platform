@@ -1,12 +1,5 @@
 # Current Work Log
 
-## 2026-10-14 / T-009桌面接入后用户暂停
-新增OCR进程/共用顺序身份门禁、WBWorksheetDocument v2、Qt名称确认与显式绑定/自动表、后台导出和宿主RunSession接入。同图真实OCR至保存重开/导出单测通过；改动未提交，HEAD184d018。用户要求暂停后停止实施。跨源拼图、OCR-first、新协议反例、完整验证尚未完成；Goal API返回null，未重建目标。
-
-## 2026-10-14 / T-009 OCR/表格后端
-
-上一回合progress：34831e4手工GUI。本回合只读核对旧OCR/worksheet/导出并记录SHA；选同RapidOCR3.9.2/PP-OCRv6，实际CPU识别六标签和两个Fig正确、三模型hash相同。新增模型加载前守卫/分块/坐标/取消、未确认空间建议、显式绑定写值及字面XLSX无覆盖发布；矩形145/95×21解析值3045/1995自动写入，缺失/排除/真零分开。199tests/9合约/4wheel5场景通过，独立读表Unicode/数值通过。T-009仍implementing，OCR worker/Qt表/持久化与整体目标继续，独审待办。
-
 ## 2026-10-14 / T-008 手工桌面闭环
 
 上一回合progress：32a2bae进程宿主。本回合WBDocument v1、纯显示DTO/后台预览与codec、Qt ROI/条带/基线/原始曲线及中文窗口/静态worker入口。实际拖选→signal10→保存/重开、关闭自动保存、新编辑拒绝旧参数、uint16原图不变、实际窗口取消关闭通过；190完整tests/9合约/4wheel5场景，追加取消后最终pytest见证据。合成抓图已查看，无数值/工作区格式改写。用户回复首版必须Fig/行名OCR与自动写表，下一阶段优先；独审/远程CI/包态验收未执行，goal active。
