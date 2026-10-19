@@ -1,3 +1,11 @@
+E3 adds schema12 fixed-N crop review to the existing intake page. IntakeWorkflowSession
+persists each owned claim before its WBBackground job, imports a verified original-value
+TIFF from its owned temporary directory, and installs the terminal state by guarded CAS.
+Uncertain detection keeps every planned slot and requires original-coordinate review;
+no measurement is started. Same-project channel updates retain the review page and local
+geometry drafts; failed saves retain drafts, and session changes retire them. See
+`../../docs/contracts/wb-intake-crop-v1.md` and T-056 for evidence and remaining limits.
+
 # Desktop host
 
 E2 adds asynchronous execution-plan preparation after intake confirmation. Schema11

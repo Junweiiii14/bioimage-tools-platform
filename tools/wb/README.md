@@ -1,3 +1,10 @@
+E3 implements `intake_crop@1` / schema12, preserving explicit N and stable slot IDs even
+when original geometry is unlocated. Automatic proposals remain unreviewed; an explicit
+original-coordinate rectangle confirms fixed-N segmentation. Reviewed crops export the
+original TIFF samples through an owned active ticket, with no overwrite or premature
+measurement. Source geometry thresholds and quantitative algorithms are unchanged.
+See `../../docs/contracts/wb-intake-crop-v1.md` and `../../work/tasks/T-056-fixed-slot-cropping.md`.
+
 # WB 数值核心
 
 E3/T056实施中：schema12/intake_crop@1保存固定N槽位与原图几何建议，

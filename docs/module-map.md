@@ -1,5 +1,10 @@
 # 模块地图
 
+E3增量：`application/intake_crop.py`提供schema12完整固定槽位/原图复核证据，
+`adapters/intake_crop.py`只读分配原图并发布原值TIFF；桌面`intake_workflow.py`
+串行连接已持久化票据、后台执行、所属临时资产导入与CAS；`web_intake.py`及
+`web_ui/intake.js`管理明确复核和可保留草稿。不提前定量。当前验证见T-056。
+
 2026-10-19当前增量：`application/instrument_intake.py`提供schema10原图池、明确Fig/蛋白/N清单与确认；`bioimage_app/instrument_intake.py`异步导入，`web_intake.py`与`web_ui/intake.js`承接分配交互。确认仅表示来源对应，不产生ROI或结果。下表版本来自各包pyproject，不表示全部功能已集成main；运行/安装/证据地图见[execution-baseline.md](execution-baseline.md)。
 
 T045增量：`tools/wb/application/{standalone_quant,manual_groups,fig_quant}.py`负责明确

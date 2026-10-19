@@ -1,10 +1,5 @@
 # Current Work Log
 
-## 2026-10-17 CI008退出阶段诊断
-
-bbf3cc5 Windows668passed/508.43秒后外层exit1、wheel未跑，无timeout；保留失败和UNKNOWN。f5b1fe4记录真实子码，f2a61b3保留pytest后故障处理，均绑定独审；相关11项/4.14秒0，首次误写测试文件exit4保留。清单来源f2a61b3含CI007/008，待安全推新候选。产品仍a811本机完整668及wheel0，原图/旧结果/34文件保持，main不变。
-
-
 ## 2026-10-17 CI009原子初始化与维护说明
 
 1bb远端Linux668/183.03秒+wheels0，Windows1failed667passed516.76秒/child1，create执行6.125秒后正常回执；非本轮native崩溃。57fd7ea显式单事务初始化，不改同步/schema/v1/旧库读或5秒等待。旧真实红例，作者45项11.05秒0/独审45项8.31秒0，本机20新目录median56.76→27.38ms但非CI保证；669完整check/497.77秒+全部隔离wheel实际exit0，child0；新远端待验。8原图正常工作台8run保存重开关闭0，8几何/48值状态保持。维护计划按用户要求补通俗维护流程，最终汇报待全检/阶段同步。
@@ -191,3 +186,7 @@ a72e7102891df287e3484f20f3724612779b53f5：733 passed in 525.53s、pytest child/
 ## 2026-10-19 T051 main规划集成
 
 PR16四项必需检查通过，匹配cdf4b7d后合并43d520f。产品基线a234354与main存在历史文档冲突，保留产品分支完整历史，README添加新版规划入口；T050证据、规划和原main快照并入。新任务T051实现导入/清单/缩略图分配，不改变OCR功能。产品原快照归档T051-product-before-intake.md。
+
+## 2026-10-20 E3完成，连续进入E4
+
+产品32da9f4，T056 done：固定N槽位/原值TIFF/真实宿主复核与CAS，独审发现票据导出及桥接强退review的P2均按新提交复验关闭。完整check0：832/553.10s、原child0、9契约、全部wheel/真实离线OCR；21桌面前端18.93s，UI限定ship/documenter No changes。旧purecall UNKNOWN与344/truncated inventory转E6，不消账；真实科学/目标环境仍未验。下一项T057 E4。
