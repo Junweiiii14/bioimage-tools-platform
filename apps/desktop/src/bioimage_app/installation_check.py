@@ -130,6 +130,7 @@ def verify_installation(report_path: Path) -> int:
                         raise ValueError("Synthetic original reference is missing")
                     target = {
                         "projectId": project.project_id,
+                        "sessionEpoch": snapshot["sessionEpoch"],
                         "id": project.rows[0].row_id,
                         "sourceId": original.sha256,
                         "revision": quant["revision"],
