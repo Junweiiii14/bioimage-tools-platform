@@ -1,0 +1,7 @@
+# Legacy manual host session ownership repair
+
+The SYNC002 non-author audit found a completed RunSession retained by its WBWindow parent after _completed only cleared the current reference. Current primary compatibility WBWindow used the same lifecycle. Real original-stage success/failure/cancel regressions each timed out on isValid(session),3failed/23.54s/actual1. Stage corrected desktop+run-session15passed/14.70s0, independently bound26b3d74 P2 closed; source/Qt ownership proof is recorded in that stage.
+
+Primary applies the same minimal correction to the current _completed handler including its OCR branch: save current session, clear active slot, schedule deleteLater after the real completion boundary. No process/thread is deleted early; terminal OS/decoder/storage arbitration unchanged. Same three paths pass on primary:3passed/9.84s0 (.local/t060-retirement-after.txt). Existing desktop, RunSession and host regressions including these:22passed/44.87s/actual0 (.local/t060-retirement-compatibility.txt). Current result10 only on success, actual failure7, three cancelled/succeeded/interrupted persisted records and no failed/cancelled result asset. All old assertions/deadlines/grace/locks remain.
+
+The same regression body is retained in the historical stage so future actual-main merges can verify the common source; no whole current product file is imported into an older phase. Current Ruff/format/Pyright and bound final primary review/full check are required separately.
