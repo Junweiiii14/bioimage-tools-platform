@@ -20,6 +20,7 @@ from wb_tool.application.desktop_data import PreviewRaster, ProjectDerivedTables
 from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
 from wb_tool.application.figure_project import FigurePNG, FigureRender, WBFigureProject
 from wb_tool.application.figure_template import LoadedFigureTemplate
+from wb_tool.application.intake_crop import IntakeCropEvidence, IntakeCropFile
 from wb_tool.application.project_analysis import (
     LoadedProjectResult,
     ProjectTableSnapshot,
@@ -90,6 +91,8 @@ class _Work(QObject):
                 | LoadedFigureTemplate
                 | MetadataBook
                 | CropSuggestion
+                | IntakeCropEvidence
+                | IntakeCropFile
                 | LoadedProjectResult
                 | ProjectTableSnapshot
                 | LoadedProjectOCR
@@ -120,6 +123,44 @@ class _Work(QObject):
                 )
                 if cancel():
                     raise ValueError("执行计划准备已取消")
+            elif job.operation == "intake_crop_prepare":
+                from wb_tool.application.intake_crop import prepare_intake_crops
+                from wb_tool.application.intake_workflow import (
+                    WBIntakeWorkflowProject,
+                    approve_intake_workflow,
+                    intake_workflow_digest,
+                )
+
+                if not isinstance(job.document, WBIntakeWorkflowProject) or cancel():
+                    raise ValueError("裁剪执行准备已取消或项目不存在")
+                if intake_workflow_digest(job.document) != job.data.decode("ascii"):
+                    raise ValueError("执行摘要已变化，请重新核对")
+                prepared = prepare_intake_crops(job.document)
+                value = approve_intake_workflow(
+                    prepared, expected_digest=intake_workflow_digest(prepared)
+                )
+                if cancel():
+                    raise ValueError("裁剪执行准备已取消")
+            elif job.operation in {"intake_crop_propose", "intake_crop_export"}:
+                from wb_tool.adapters.intake_crop import export_intake_crop, propose_intake_crop
+                from wb_tool.application.intake_crop import WBIntakeCropProject
+                from wb_tool.application.intake_workflow import IntakeWorkflowTicket
+
+                if not isinstance(job.document, WBIntakeCropProject):
+                    raise ValueError("缺少固定N裁剪项目")
+                if job.operation == "intake_crop_propose":
+                    value = propose_intake_crop(
+                        job.path, job.document, job.row_id, cancelled=cancel
+                    )
+                else:
+                    value = export_intake_crop(
+                        job.path,
+                        job.document,
+                        job.row_id,
+                        job.destination,
+                        ticket=IntakeWorkflowTicket.model_validate_json(job.data),
+                        cancelled=cancel,
+                    )
             elif job.operation == "automatic_row":
                 from wb_tool.adapters.automatic import automatic_project_row
 

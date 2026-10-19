@@ -67,6 +67,7 @@ from wb_tool.api import (
 )
 
 from bioimage_app.instrument_intake import InstrumentIntakeSession
+from bioimage_app.intake_workflow import IntakeWorkflowSession
 from bioimage_app.project_archive import ProjectArchiveSession
 from bioimage_app.project_entry import default_project_parent
 from bioimage_app.project_measurements import ProjectBatchCompletion, ProjectMeasurementSession
@@ -134,6 +135,7 @@ class FigureProjectWindow(QMainWindow):
         self._pending_project_automatic = True
         self._pending_project_intake = False
         self.intake = InstrumentIntakeSession(self)
+        self.intake_workflow = IntakeWorkflowSession(self)
         self._auto_save = QTimer(self)
         self._auto_save.setSingleShot(True)
         self._auto_save.setInterval(700)
@@ -493,6 +495,7 @@ class FigureProjectWindow(QMainWindow):
         self._ocr_refresh_timer.stop()
         self._ocr_refresh_pending = False
         self.automatic.cancel()
+        self.intake_workflow.cancel()
         if self._measurement_session:
             self._measurement_session.cancel()
         if self._ocr_session:

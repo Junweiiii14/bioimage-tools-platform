@@ -18,6 +18,7 @@ from wb_tool.application.figure_project import (
     WBFigureProject,
 )
 from wb_tool.application.figure_template import LoadedFigureTemplate
+from wb_tool.application.intake_crop import IntakeCropEvidence, IntakeCropFile
 from wb_tool.application.project_analysis import (
     LoadedProjectResult,
     ProjectRowAnalysis,
@@ -54,6 +55,9 @@ class WBJob:
         "discover_tiffs",
         "automatic_row",
         "intake_workflow_prepare",
+        "intake_crop_prepare",
+        "intake_crop_propose",
+        "intake_crop_export",
         "automatic_export",
         "metadata_read",
         "ocr_preview",
@@ -137,6 +141,8 @@ class WBReply:
         | LoadedFigureTemplate
         | MetadataBook
         | CropSuggestion
+        | IntakeCropEvidence
+        | IntakeCropFile
         | LoadedProjectResult
         | ProjectTableSnapshot
         | LoadedProjectOCR

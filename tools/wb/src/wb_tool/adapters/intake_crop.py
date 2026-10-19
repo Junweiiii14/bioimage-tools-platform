@@ -1,12 +1,15 @@
 """Assigned-source-only fixed N detection and verified original-sample export."""
 
 from collections.abc import Callable
+from hashlib import file_digest
+from pathlib import Path
 
 from wb_tool.adapters.crop_export import export_crop
 from wb_tool.adapters.tiff_input import load_tiff
 from wb_tool.application.crop import CropRequest
 from wb_tool.application.intake_crop import (
     IntakeCropEvidence,
+    IntakeCropFile,
     WBIntakeCropProject,
     make_intake_crop_evidence,
 )
@@ -53,7 +56,7 @@ def export_intake_crop(
     *,
     ticket: IntakeWorkflowTicket,
     cancelled: Callable[[], bool] = lambda: False,
-) -> str:
+) -> IntakeCropFile:
     validate_intake_workflow_ticket(project, ticket)
     if ticket.stage != "crop" or ticket.target_id != row_id:
         raise ValueError("原值裁剪必须属于当前活动裁剪票据")
@@ -62,9 +65,15 @@ def export_intake_crop(
     evidence = next((e for e in project.intake_crops if e.row_id == row_id), None)
     if evidence is None or not evidence.reviewed or evidence.crop is None:
         raise ValueError("请先明确核对并审核原图裁剪范围")
-    return export_crop(
+    path_out = export_crop(
         path,
         CropRequest(evidence.source_sha256, project.revision, evidence.crop),
         destination,
         cancelled=cancelled,
     )
+    target = Path(path_out)
+    with target.open("rb") as stream:
+        digest = file_digest(stream, "sha256").hexdigest()
+    if cancelled():
+        raise ValueError("原值裁剪已取消，临时产物不安装")
+    return IntakeCropFile(path=path_out, sha256=digest, size_bytes=target.stat().st_size)

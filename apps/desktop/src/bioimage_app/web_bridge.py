@@ -17,6 +17,7 @@ from wb_tool.api import (
     ManualQuantTarget,
     ProjectTableCell,
     WBAnalysisProject,
+    WBIntakeCropProject,
     WBIntakeProject,
     WBIntakeWorkflowProject,
     WBLayoutProject,
@@ -155,6 +156,12 @@ class WorkbenchBridge(QObject):
                 )
             intake["sources"] = sources
             intake["issues"] = list(self.host.intake.issues)
+            intake["cropEnabled"] = isinstance(project, WBIntakeCropProject)
+            intake["crops"] = (
+                [e.model_dump(mode="json") for e in project.intake_crops]
+                if isinstance(project, WBIntakeCropProject)
+                else []
+            )
             intake["workflow"] = (
                 intake_workflow_snapshot(project)
                 if isinstance(project, WBIntakeWorkflowProject)
@@ -398,6 +405,10 @@ class WorkbenchBridge(QObject):
                 "intake_confirm",
                 "intake_prepare",
                 "intake_edit",
+                "intake_run",
+                "intake_crop_review",
+                "intake_crop_retry",
+                "select",
                 "intake_import_folder",
                 "open_project",
                 "retry_location",
@@ -409,6 +420,9 @@ class WorkbenchBridge(QObject):
                 "intake_confirm",
                 "intake_prepare",
                 "intake_edit",
+                "intake_run",
+                "intake_crop_review",
+                "intake_crop_retry",
             }:
                 apply_intake_command(self, action, data)
             elif (

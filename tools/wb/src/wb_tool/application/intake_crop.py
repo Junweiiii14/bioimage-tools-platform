@@ -29,6 +29,12 @@ class IntakeCropSlot(DocumentIO):
     signal: Literal["unlocated", "undetermined", "detected", "weak", "not_detected"] = "unlocated"
 
 
+class IntakeCropFile(DocumentIO):
+    path: str = Field(min_length=1, max_length=32768)
+    sha256: str = Field(pattern="^[0-9a-f]{64}$")
+    size_bytes: int = Field(gt=0, le=512 * 1024 * 1024)
+
+
 class IntakeCropEvidence(DocumentIO):
     model_config = ConfigDict(revalidate_instances="always")
     policy: Literal["intake_crop@1"] = "intake_crop@1"
@@ -292,6 +298,41 @@ def complete_intake_crop(
             "intake_crops": tuple(
                 e.model_copy(update={"raw_crop": raw_crop}) if e.row_id == ticket.target_id else e
                 for e in project.intake_crops
+            ),
+        }
+    )
+
+
+def fail_intake_crop(
+    project: WBIntakeCropProject, ticket: IntakeWorkflowTicket, reason: str
+) -> WBIntakeCropProject:
+    if ticket.stage != "crop":
+        raise ValueError("裁剪失败回复须属于当前裁剪阶段")
+    finished = finish_intake_workflow_step(project, ticket, "failed", reason=reason)
+    if not isinstance(finished, WBIntakeCropProject):
+        raise ValueError("缺少固定N裁剪项目")
+    if finished.workflow.cancel_requested:
+        return finished
+    row = next(r for r in project.rows if r.row_id == ticket.target_id)
+    if row.source is None:
+        raise ValueError("裁剪原图缺失")
+    evidence = IntakeCropEvidence(
+        row_id=row.row_id,
+        source_sha256=row.source.sha256,
+        source_revision=project.revision,
+        lane_count=row.lane_count,
+        slots=tuple(
+            IntakeCropSlot(slot_id=s.slot_id, position=s.position)
+            for s in planned_intake_slots(project.project_id, row.row_id, row.lane_count)
+        ),
+        reason=reason,
+    )
+    return WBIntakeCropProject.model_validate(
+        {
+            **dict(finished),
+            "intake_crops": (
+                *[e for e in project.intake_crops if e.row_id != row.row_id],
+                evidence,
             ),
         }
     )

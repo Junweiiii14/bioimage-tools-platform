@@ -6,7 +6,9 @@ from wb_tool.api import (
     IntakeAssignment,
     IntakeFigure,
     IntakeProtein,
+    LaneROI,
     WBFigureProject,
+    WBIntakeCropProject,
     WBIntakeProject,
     WBIntakeWorkflowProject,
     WBJob,
@@ -14,8 +16,11 @@ from wb_tool.api import (
     assign_intake_sources,
     confirm_intake,
     intake_digest,
+    intake_workflow_digest,
     replace_intake_plan,
+    retry_intake_workflow_step,
     return_to_intake_editing,
+    review_intake_crop,
 )
 
 if TYPE_CHECKING:
@@ -77,6 +82,68 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
             ),
             prepared,
             accept_errors=True,
+        )
+        return
+    if action == "intake_run":
+        workflow_digest = data.get("workflowDigest")
+        if not isinstance(workflow_digest, str) or intake_digest(project) != digest:
+            raise ValueError("请核对当前裁剪执行摘要")
+        host.intake_workflow.start(workflow_digest)
+        return
+    if action in {"intake_crop_review", "intake_crop_retry"}:
+        workflow_digest, row_id = data.get("workflowDigest"), data.get("rowId")
+        if not isinstance(project, WBIntakeCropProject) or not isinstance(row_id, str):
+            raise ValueError("请选择当前固定N裁剪行")
+        if (
+            not isinstance(workflow_digest, str)
+            or workflow_digest != intake_workflow_digest(project)
+            or intake_digest(project) != digest
+        ):
+            raise ValueError("裁剪草稿已变化，请重新核对")
+        if action == "intake_crop_review":
+            roi = data.get("roi")
+            if not isinstance(roi, dict):
+                raise ValueError("请在原图上明确框选裁剪范围")
+            fields = cast(dict[str, object], roi)
+            values = tuple(fields.get(k) for k in ("x", "y", "width", "height"))
+            if any(type(v) is not int for v in values):
+                raise ValueError("裁剪范围须为原图整数像素")
+            x, y, width, height = cast(tuple[int, int, int, int], values)
+            updated = review_intake_crop(
+                project,
+                row_id,
+                LaneROI(row_id, x, y, x + width, y + height),
+                expected_digest=workflow_digest,
+            )
+        else:
+            retried = retry_intake_workflow_step(
+                project,
+                "crop",
+                row_id,
+                expected_digest=workflow_digest,
+            )
+            if not isinstance(retried, WBIntakeCropProject):
+                raise ValueError("固定N裁剪项目类型无效")
+            updated = retried
+
+        def install_review(current: WBFigureProject) -> WBIntakeCropProject:
+            if (
+                not isinstance(current, WBIntakeCropProject)
+                or intake_workflow_digest(current) != workflow_digest
+            ):
+                raise ValueError("当前裁剪输入已改变，原草稿保留")
+            return WBIntakeCropProject.model_validate(
+                {**dict(updated), "revision": current.revision}
+            )
+
+        generation = host.view.generation
+        host.save(
+            transform=install_review,
+            install_guard=lambda: (
+                not host.is_closing
+                and not host.cancellation.is_set()
+                and host.view.generation == generation
+            ),
         )
         return
     if action == "intake_edit":

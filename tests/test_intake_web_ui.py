@@ -73,6 +73,62 @@ def test_prepared_workflow_summary_preserves_pending_and_edit_guard(
     assert javascript(window, qtbot, "document.activeElement.dataset.intakeField==='fig-label'")
 
 
+def test_crop_review_uses_fixed_n_draft_and_acknowledges_only_saved_snapshot(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        """
+      setState({selectedId:'protein-a',rows:[{id:'protein-a',sourceId:'sha',name:'raw.tif',
+        fig:'Fig 1',protein:'Actin',width:180,height:90,lanes:6,roi:null,results:[]}],
+        intake:{...state.intake,confirmed:true,cropEnabled:true,crops:[{row_id:'protein-a',
+          crop:null,reviewed:false,raw_crop:null,reason:'空图未定位'}],workflow:{digest:'wf1',
+          ready_count:0,steps:[{stage:'crop',target_id:'protein-a',status:'needs_review',attempt:1,reason:'空图未定位'}]}}});
+      document.querySelector('[data-intake=review-crop]').click();true
+    """,
+    )
+    assert javascript(window, qtbot, "mode==='review'")
+    assert javascript(window, qtbot, "!document.querySelector('[data-lane-count]')")
+    javascript(window, qtbot, "commitCrop({x:20,y:20,width:120,height:16},null);true")
+    assert javascript(window, qtbot, "intakeWorkspace.hasDraft()&&row().lanes===6")
+    javascript(window, qtbot, "setState({rows:[{...row(),roi:null}]});true")
+    assert javascript(window, qtbot, "row().roi.x===20&&row().roi.width===120")
+    javascript(
+        window,
+        qtbot,
+        """
+      document.querySelector('[data-intake-crop-action=confirm]').focus();
+      document.querySelector('[data-intake-crop-action=confirm]').click();true
+    """,
+    )
+    sent = javascript(window, qtbot, "JSON.stringify(sent)")
+    assert isinstance(sent, str)
+    command = json.loads(sent)[-1]
+    assert command["action"] == "intake_crop_review"
+    assert command["payload"]["workflowDigest"] == "wf1"
+    assert command["payload"]["rowId"] == "protein-a"
+    javascript(window, qtbot, "setState({busy:true,status:'正在保存'});true")
+    assert javascript(window, qtbot, "document.activeElement.id==='inspector-title'")
+    javascript(window, qtbot, "setState({busy:false,status:'保存失败'});true")
+    assert javascript(window, qtbot, "intakeWorkspace.hasDraft()")
+    assert javascript(window, qtbot, "document.activeElement.dataset.intakeCropAction==='confirm'")
+    javascript(
+        window,
+        qtbot,
+        """
+      setState({rows:[{...row(),roi:{x:20,y:20,width:120,height:16},draft:false}],
+        intake:{...state.intake,crops:[{...state.intake.crops[0],reviewed:true,
+          crop:{lane_id:'protein-a',x0:20,y0:20,x1:140,y1:36}}],
+          workflow:{...state.intake.workflow,digest:'wf2',steps:[{stage:'crop',target_id:'protein-a',status:'pending',attempt:1,reason:''}]}}});true
+    """,
+    )
+    assert javascript(window, qtbot, "!intakeWorkspace.hasDraft()")
+    assert javascript(window, qtbot, "document.activeElement.dataset.intakeCropAction==='run'")
+    assert javascript(window, qtbot, "row().lanes===6")
+
+
 @pytest.fixture
 def intake_page(qtbot: QtBot, tmp_path: Path) -> Iterator[WebWorkbenchWindow]:
     window = WebWorkbenchWindow(

@@ -96,9 +96,11 @@ from wb_tool.application.instrument_intake import (
 )
 from wb_tool.application.intake_crop import (
     IntakeCropEvidence,
+    IntakeCropFile,
     IntakeCropSlot,
     WBIntakeCropProject,
     complete_intake_crop,
+    fail_intake_crop,
     prepare_intake_crops,
     record_intake_crop_proposal,
     review_intake_crop,
@@ -271,9 +273,11 @@ from wb_tool.domain.worksheet import (
 
 __all__ = [
     "IntakeCropEvidence",
+    "IntakeCropFile",
     "IntakeCropSlot",
     "WBIntakeCropProject",
     "complete_intake_crop",
+    "fail_intake_crop",
     "export_intake_crop",
     "prepare_intake_crops",
     "propose_intake_crop",

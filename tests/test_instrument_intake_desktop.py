@@ -18,12 +18,15 @@ from wb_tool.api import (
     FigureTemplate,
     PreviewRaster,
     WBFigureProject,
+    WBIntakeCropProject,
     WBIntakeProject,
     WBIntakeWorkflowProject,
     WBJob,
     WBReply,
     intake_digest,
+    intake_workflow_digest,
     prepare_intake_workflow,
+    propose_intake_crop,
 )
 
 from tooling.qt_test_lifecycle import close_and_dispose_window
@@ -271,6 +274,155 @@ def test_prepare_cancel_during_storage_commit_preserves_draft_and_committed_hist
     wait_saved(window, qtbot)
     assert current(window).revision == before.revision + 2
     assert not window.host.has_unsaved_changes
+
+
+def test_fixed_n_crop_run_review_original_asset_and_reopen(
+    intake_window: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
+) -> None:
+    window = intake_window
+    root = tmp_path / "raw"
+    make_source(root / "a.tif")
+    make_source(root / "b.tif", 2000)
+    start(window, qtbot, root)
+    plan(window, qtbot)
+    before = current(window)
+    request(
+        window,
+        "intake_assign",
+        bindings=[
+            {"protein_id": p.protein_id, "source_id": s.source_id}
+            for p, s in zip(before.intake.proteins, before.intake.sources, strict=True)
+        ],
+    )
+    wait_saved(window, qtbot)
+    request(window, "intake_confirm")
+    wait_saved(window, qtbot)
+    request(window, "intake_prepare")
+    wait_saved(window, qtbot)
+    prepared = current(window)
+    assert isinstance(prepared, WBIntakeWorkflowProject)
+    request(window, "intake_run", workflowDigest=intake_workflow_digest(prepared))
+    wait_saved(window, qtbot)
+    proposed = current(window)
+    assert isinstance(proposed, WBIntakeCropProject)
+    assert len(proposed.intake_crops) == 2
+    assert all(len(e.slots) == 8 and e.crop is None for e in proposed.intake_crops)
+    assert all(s.status == "needs_review" for s in proposed.workflow.steps if s.stage == "crop")
+    assert not proposed.analyses and not proposed.automatic_rows
+    request(
+        window,
+        "intake_crop_review",
+        rowId="protein-a",
+        workflowDigest=intake_workflow_digest(proposed),
+        roi={"x": 12, "y": 10, "width": 120, "height": 40},
+    )
+    wait_saved(window, qtbot)
+    reviewed = current(window)
+    assert isinstance(reviewed, WBIntakeCropProject)
+    request(window, "intake_run", workflowDigest=intake_workflow_digest(reviewed))
+    wait_saved(window, qtbot)
+    finished = current(window)
+    assert isinstance(finished, WBIntakeCropProject)
+    evidence = next(e for e in finished.intake_crops if e.row_id == "protein-a")
+    assert evidence.raw_crop is not None and evidence.reviewed
+    raw_path = Path(window.host.workspace_path) / evidence.raw_crop.relative_path
+    with tifffile.TiffFile(raw_path) as exported:
+        page = exported.pages[0]
+        assert isinstance(page, tifffile.TiffPage)
+        assert np.array_equal(page.asarray(), np.full((40, 120), 1000, dtype=np.uint16))
+    assert next(s for s in finished.workflow.steps if s.target_id == "protein-a").status == "done"
+    assert all(s.status == "pending" for s in finished.workflow.steps if s.stage != "crop")
+    assert not finished.analyses
+    window.open_project(window.host.workspace_path)
+    wait_saved(window, qtbot)
+    assert current(window).schema_version == 12
+    assert current(window).rows[0].lane_count == 8
+
+
+@pytest.mark.parametrize("mode", ["cancel_reply", "running_save_failure"])
+def test_intake_crop_cancel_and_failed_claim_save_never_advance(
+    intake_window: WebWorkbenchWindow,
+    qtbot: QtBot,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mode: str,
+) -> None:
+    window = intake_window
+    root = tmp_path / "raw"
+    make_source(root / "a.tif")
+    make_source(root / "b.tif", 2000)
+    start(window, qtbot, root)
+    plan(window, qtbot)
+    p = current(window)
+    request(
+        window,
+        "intake_assign",
+        bindings=[
+            {"protein_id": r.protein_id, "source_id": s.source_id}
+            for r, s in zip(p.intake.proteins, p.intake.sources, strict=True)
+        ],
+    )
+    wait_saved(window, qtbot)
+    request(window, "intake_confirm")
+    wait_saved(window, qtbot)
+    request(window, "intake_prepare")
+    wait_saved(window, qtbot)
+    prepared = current(window)
+    assert isinstance(prepared, WBIntakeWorkflowProject)
+    original_job, original_save = window.host.submit_tool_job, Workspace.save_draft
+    captured: list[tuple[WBJob, Callable[[WBReply], None]]] = []
+
+    def jobs(
+        job: WBJob, callback: Callable[[WBReply], None], *, accept_errors: bool = False
+    ) -> None:
+        if job.operation == "intake_crop_propose":
+            captured.append((job, callback))
+        else:
+            original_job(job, callback, accept_errors=accept_errors)
+
+    def save(
+        self: Workspace,
+        document_id: str,
+        tool_id: str,
+        revision: int,
+        data: bytes,
+        *,
+        expected_previous_revision: int | None,
+    ) -> object:
+        if b'"status":"running"' in data:
+            raise OSError("模拟裁剪活动票据保存失败")
+        return original_save(
+            self,
+            document_id,
+            tool_id,
+            revision,
+            data,
+            expected_previous_revision=expected_previous_revision,
+        )
+
+    monkeypatch.setattr(window.host, "submit_tool_job", jobs)
+    if mode == "running_save_failure":
+        monkeypatch.setattr(Workspace, "save_draft", save)
+    request(window, "intake_run", workflowDigest=intake_workflow_digest(prepared))
+    if mode == "cancel_reply":
+        qtbot.waitUntil(lambda: bool(captured), timeout=10000)
+        job, callback = captured[0]
+        assert isinstance(job.document, WBIntakeCropProject)
+        late = propose_intake_crop(job.path, job.document, job.row_id)
+        window.host.cancel()
+        callback(WBReply("late", value=late))
+    qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=10000)
+    current_project = current(window)
+    assert isinstance(current_project, WBIntakeCropProject)
+    assert not current_project.intake_crops and not current_project.analyses
+    crops = [s for s in current_project.workflow.steps if s.stage == "crop"]
+    if mode == "cancel_reply":
+        assert [s.status for s in crops] == ["cancelled", "pending"]
+        assert len(captured) == 1
+    else:
+        assert not captured and all(s.attempt == 0 and s.status == "pending" for s in crops)
+        assert "票据保存失败" in window.host.view.status.text()
+    monkeypatch.undo()
 
 
 def test_raw_variants_assign_and_reopen_without_algorithm(
