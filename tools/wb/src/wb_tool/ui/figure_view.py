@@ -897,9 +897,9 @@ class FigureProjectView(QWidget):
             # The original selection path commits valid dirty annotation edits first.
             self.table.setCurrentCell(index, 0)
 
-    def _text(self, row: int, column: int) -> str:
+    def _text(self, row: int, column: int, *, strip: bool = True) -> str:
         item = self.table.item(row, column)
-        return item.text().strip() if item else ""
+        return (item.text().strip() if strip else item.text()) if item else ""
 
     def project(
         self, revision: int | None = None, *, include_layout: bool = True
@@ -918,8 +918,8 @@ class FigureProjectView(QWidget):
                     width=original.width,
                     height=original.height,
                     bit_depth=original.bit_depth,
-                    figure=self._text(i, 1),
-                    protein=self._text(i, 2),
+                    figure=self._text(i, 1, strip=not isinstance(self._project, WBIntakeProject)),
+                    protein=self._text(i, 2, strip=not isinstance(self._project, WBIntakeProject)),
                     lane_count=int(self._text(i, 3)),
                     empty_lanes=tuple(
                         int(n.strip()) for n in self._text(i, 8).split(",") if n.strip()
@@ -937,6 +937,10 @@ class FigureProjectView(QWidget):
             font=self._project.template.font,
         )
         order = tuple(s.strip() for s in self.figure_order.text().split(",") if s.strip())
+        if isinstance(self._project, WBIntakeProject):
+            if self.figure_order.text() != ", ".join(self._project.figure_order):
+                raise ValueError("请通过仪器清单修改 Fig 顺序")
+            order = self._project.figure_order
         project = WBFigureProject(
             project_id=self._project.project_id,
             name=self.name.text().strip(),

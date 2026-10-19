@@ -193,3 +193,78 @@ def test_invalid_slot_count_cannot_submit_and_new_session_retires_draft(
     assert javascript(
         window, qtbot, "!!document.querySelector('[name=session-workflow][value=quant]')"
     )
+
+
+def test_accidental_new_entries_can_be_removed_without_losing_other_edits_or_sending_crop_undo(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        "let label=document.querySelector('[data-intake-field=fig-label]');"
+        "label.value='Edited Fig';"
+        "label.dispatchEvent(new Event('input',{bubbles:true}));"
+        "document.querySelector('[data-intake=add-fig]').click();"
+        "document.querySelector('[data-intake=remove-new-fig]').click();"
+        "document.querySelector('[data-intake=add-protein]').click();"
+        "document.querySelector('[data-intake=remove-new-protein]').click();true",
+    )
+    assert (
+        javascript(
+            window, qtbot, "document.querySelectorAll('[data-intake-field=fig-label]').length"
+        )
+        == 1
+    )
+    assert (
+        javascript(window, qtbot, "document.querySelectorAll('[data-intake-field=protein]').length")
+        == 2
+    )
+    assert (
+        javascript(window, qtbot, "document.querySelector('[data-intake-field=fig-label]').value")
+        == "Edited Fig"
+    )
+    assert (
+        javascript(window, qtbot, "document.querySelector('[data-intake=save-plan]').disabled")
+        is False
+    )
+    assert javascript(window, qtbot, "document.activeElement.dataset.intake") == "add-protein"
+    javascript(
+        window,
+        qtbot,
+        "document.activeElement.dispatchEvent(new KeyboardEvent('keydown',"
+        "{key:'z',ctrlKey:true,bubbles:true}));"
+        "document.activeElement.dispatchEvent(new KeyboardEvent('keydown',"
+        "{key:'z',metaKey:true,shiftKey:true,bubbles:true}));true",
+    )
+    assert (
+        javascript(window, qtbot, "sent.some(item=>['undo','redo'].includes(item.action))") is False
+    )
+
+
+def test_existing_confirmed_reuse_does_not_block_unrelated_assignment(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        "setState({intake:{...state.intake,digest:'reused',proteins:[...state.intake.proteins,"
+        "{protein_id:'protein-c',figure_id:'fig-a',label:'Other'}],assignments:["
+        "{protein_id:'protein-a',source_id:'source-a',reuse_confirmed:true},"
+        "{protein_id:'protein-b',source_id:'source-a',reuse_confirmed:true}]}});"
+        "document.querySelector('[data-intake-source=source-b]').click();"
+        "document.querySelector('[data-intake=stage]').click();"
+        "let target=document.querySelector('[data-intake-target]');target.value='protein-c';"
+        "target.dispatchEvent(new Event('change',{bubbles:true}));true",
+    )
+    assert (
+        javascript(window, qtbot, "document.querySelector('[data-intake=assign]').disabled")
+        is False
+    )
+    assert (
+        javascript(
+            window, qtbot, "document.querySelector('[data-intake-permission=reuse]').checked"
+        )
+        is False
+    )

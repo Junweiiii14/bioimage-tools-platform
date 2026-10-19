@@ -18,3 +18,4 @@
 .intake-import-issues{padding:12px 14px;margin-top:16px;background:var(--warning-bg);color:var(--warning);font-size:12px;line-height:1.7;border-radius:6px}.intake-import-issues summary{cursor:pointer}.intake-import-issues li{overflow-wrap:anywhere}.intake-import-issues ul{padding-left:20px}
 
 .intake-active .mode-indicator{left:0;right:0;width:auto!important;transform:none!important}
+.intake-fig legend .text-button{margin-left:12px}.intake-protein>.icon-button{flex-shrink:0}

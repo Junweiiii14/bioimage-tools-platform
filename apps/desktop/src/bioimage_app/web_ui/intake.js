@@ -70,9 +70,15 @@ window.intakeWorkspace = (() => {
     if (new Set(batch.map(binding => binding.protein_id)).size !== batch.length) return '同一个蛋白行不能接收多张原图，请分别选择目标。';
     if (!replace && batch.some(binding => state.intake.assignments.some(item => item.protein_id === binding.protein_id && item.source_id !== binding.source_id))) return '目标已有原图；核对后勾选“替换目标已有分配”。';
     if (!allowReuse) {
-      const final = new Map(state.intake.assignments.map(item => [item.protein_id, item.source_id]));
-      batch.forEach(item => final.set(item.protein_id, item.source_id));
-      if (new Set(final.values()).size !== final.size) return '同一原图用于多个蛋白行；核对后勾选“允许原图复用”。';
+      const final = new Map(state.intake.assignments.map(item => [item.protein_id, item]));
+      batch.forEach(item => {
+        const previous = final.get(item.protein_id);
+        final.set(item.protein_id, {...item, reuse_confirmed: previous?.source_id === item.source_id && previous.reuse_confirmed});
+      });
+      const content = id => source(id)?.asset?.sha256 || id;
+      const counts = new Map();
+      final.forEach(item => counts.set(content(item.source_id), (counts.get(content(item.source_id)) || 0) + 1));
+      if ([...final.values()].some(item => counts.get(content(item.source_id)) > 1 && !item.reuse_confirmed)) return '同一原图用于多个蛋白行；核对后勾选“允许原图复用”。';
     }
     return '';
   }
@@ -81,9 +87,9 @@ window.intakeWorkspace = (() => {
     return `<section class="intake-plan" aria-labelledby="intake-plan-title">
       <div class="intake-section-heading"><h2 id="intake-plan-title">Fig 与蛋白清单</h2><button class="text-button" data-intake="add-fig" ${disabled}>${icon('plus')}添加 Fig</button></div>
       <p class="intake-help">槽位数包含没有信号的空位，不含 Marker。同 Fig 仅共享数量，不默认样本顺序相同。</p>
-      <div class="intake-fig-list">${draft.figures.map((fig, index) => `<fieldset class="intake-fig"><legend>Fig ${index + 1}</legend>
+      <div class="intake-fig-list">${draft.figures.map((fig, index) => `<fieldset class="intake-fig"><legend>Fig ${index + 1}${state.intake.figures.some(item => item.figure_id === fig.figure_id) ? '' : `<button class="text-button" data-intake="remove-new-fig" data-id="${escapeText(fig.figure_id)}" ${disabled}>撤销新增 Fig</button>`}</legend>
         <div class="intake-fig-fields"><label>Fig 名称<input data-intake-field="fig-label" data-id="${escapeText(fig.figure_id)}" maxlength="120" value="${escapeText(fig.label)}" ${disabled}></label><label>样本槽位数<input data-intake-field="lanes" data-id="${escapeText(fig.figure_id)}" type="number" min="1" max="96" step="1" value="${escapeText(fig.lane_count)}" ${disabled}></label></div>
-        <div class="intake-protein-label">蛋白名称</div>${draft.proteins.filter(protein => protein.figure_id === fig.figure_id).map((protein, proteinIndex) => `<div class="intake-protein"><span>${proteinIndex + 1}</span><input aria-label="${escapeText(fig.label || 'Fig')} 第 ${proteinIndex + 1} 行蛋白名称" data-intake-field="protein" data-id="${escapeText(protein.protein_id)}" maxlength="120" value="${escapeText(protein.label)}" ${disabled}><span class="intake-binding-state">${state.intake.assignments.some(item => item.protein_id === protein.protein_id) ? '已分配' : '待分配'}</span></div>`).join('')}
+        <div class="intake-protein-label">蛋白名称</div>${draft.proteins.filter(protein => protein.figure_id === fig.figure_id).map((protein, proteinIndex) => `<div class="intake-protein"><span>${proteinIndex + 1}</span><input aria-label="${escapeText(fig.label || 'Fig')} 第 ${proteinIndex + 1} 行蛋白名称" data-intake-field="protein" data-id="${escapeText(protein.protein_id)}" maxlength="120" value="${escapeText(protein.label)}" ${disabled}><span class="intake-binding-state">${state.intake.assignments.some(item => item.protein_id === protein.protein_id) ? '已分配' : '待分配'}</span>${state.intake.proteins.some(item => item.protein_id === protein.protein_id) ? '' : `<button class="icon-button" data-intake="remove-new-protein" data-id="${escapeText(protein.protein_id)}" aria-label="撤销 ${escapeText(fig.label || 'Fig')} 第 ${proteinIndex + 1} 行新增蛋白" ${disabled}>${icon('close')}</button>`}</div>`).join('')}
         <button class="text-button" data-intake="add-protein" data-id="${escapeText(fig.figure_id)}" ${disabled}>${icon('plus')}添加蛋白行</button>
       </fieldset>`).join('') || '<p class="intake-empty">添加 Fig，填写蛋白名称和每张图的样本槽位数。</p>'}</div>
       <p id="intake-plan-error" class="intake-error" role="status"></p>
@@ -94,7 +100,7 @@ window.intakeWorkspace = (() => {
     const sources = state.intake.sources.filter(item => `${item.original_name} ${item.relative_path}`.toLowerCase().includes(filter.toLowerCase()));
     return `<section class="intake-pool" aria-labelledby="intake-pool-title"><div class="intake-section-heading"><div><h2 id="intake-pool-title">仪器原图</h2><p>${state.intake.sources.length} 张原图 · ${state.intake.sources.filter(item => !assigned(item.source_id).length).length} 张尚未分配</p></div><button class="button subtle" data-intake="import" ${disabled}>${icon('folder')}添加文件夹</button></div>
       ${state.intake.issues?.length ? `<details class="intake-import-issues"><summary>${state.intake.issues.length} 个文件未能导入 · 查看原因</summary><ul>${state.intake.issues.map(issue => `<li>${escapeText(issue)}</li>`).join('')}</ul><p>成功读取的原图仍可继续分配。</p></details>` : ''}<div class="intake-pool-toolbar"><label class="search-field">${icon('search')}<input type="search" data-intake-search value="${escapeText(filter)}" aria-label="查找仪器原文件名或相对路径" placeholder="查找原文件名或相对路径"></label><button class="button subtle" data-intake="stage" ${disabled}>加入分配表<span id="intake-selection-count"></span></button></div>
-      <div class="intake-source-grid">${sources.map(item => `<label class="intake-source ${selected.has(item.source_id) ? 'selected' : ''}"><div class="intake-source-image">${item.preview ? `<img src="${escapeText(item.preview)}" alt="${escapeText(item.original_name)} 的原图缩略图">` : '<span>缩略图尚未载入</span>'}<input type="checkbox" data-intake-source="${escapeText(item.source_id)}" aria-label="选择 ${escapeText(item.relative_path || item.original_name)}" ${selected.has(item.source_id) ? 'checked' : ''} ${disabled}></div><strong>${escapeText(item.original_name)}</strong><small title="${escapeText(item.relative_path)}">${escapeText(item.relative_path || item.original_name)}</small><span class="intake-source-size">${item.width} × ${item.height} · ${item.bit_depth} 位${item.asset?.sha256 ? ' · ' + escapeText(item.asset.sha256.slice(-8)) : ''}</span><span class="intake-source-binding">${assigned(item.source_id).map(binding => escapeText(targetName(binding.protein_id))).join('；') || '待分配'}</span></label>`).join('') || `<p class="intake-empty">${state.intake.sources.length ? '没有匹配的原文件名。' : state.busy ? '正在读取仪器文件夹，已读取的原图会陆续显示。' : '添加仪器直接导出的 TIFF 文件夹，原文件名与原图保持不变。'}</p>`}</div>
+      <div class="intake-source-grid">${sources.map(item => `<label class="intake-source ${selected.has(item.source_id) ? 'selected' : ''}"><div class="intake-source-image">${item.preview ? `<img src="${escapeText(item.preview)}" alt="${escapeText(item.original_name)} 的原图缩略图">` : '<span>缩略图尚未载入</span>'}<input type="checkbox" data-intake-source="${escapeText(item.source_id)}" aria-label="选择 ${escapeText(item.relative_path || item.original_name)}" ${selected.has(item.source_id) ? 'checked' : ''} ${disabled}></div><strong>${escapeText(item.original_name)}</strong><small title="${escapeText(item.relative_path)}">${escapeText(item.relative_path || item.original_name)}</small><span class="intake-source-size">${item.width} × ${item.height} · ${item.bit_depth} 位${item.source_id ? ' · 来源 ' + escapeText(item.source_id.slice(-8)) : ''}</span><span class="intake-source-binding">${assigned(item.source_id).map(binding => escapeText(targetName(binding.protein_id))).join('；') || '待分配'}</span></label>`).join('') || `<p class="intake-empty">${state.intake.sources.length ? '没有匹配的原文件名。' : state.busy ? '正在读取仪器文件夹，已读取的原图会陆续显示。' : '添加仪器直接导出的 TIFF 文件夹，原文件名与原图保持不变。'}</p>`}</div>
     </section>`;
   }
   function renderBatch(disabled) {
@@ -160,11 +166,19 @@ window.intakeWorkspace = (() => {
     const item = event.target.closest('[data-intake]');
     if (!item || item.disabled) return;
     const action = item.dataset.intake;
+    let focusFigure = null, focusAddFigure = false;
     if (action === 'add-fig') {
       const figure_id = uid(); draft.figures.push({figure_id, label: '', lane_count: null});
       draft.proteins.push({protein_id: uid(), figure_id, label: ''});
     } else if (action === 'add-protein') draft.proteins.push({protein_id: uid(), figure_id: item.dataset.id, label: ''});
-    else if (action === 'reload') { draft = copyPlan(state.intake); basePlan = planText(state.intake); baseDigest = state.intake.digest; batch = []; selected.clear(); conflict = false; pending = null; }
+    else if (action === 'remove-new-fig' && !state.intake.figures.some(fig => fig.figure_id === item.dataset.id)) {
+      draft.figures = draft.figures.filter(fig => fig.figure_id !== item.dataset.id);
+      draft.proteins = draft.proteins.filter(protein => protein.figure_id !== item.dataset.id);
+      focusAddFigure = true;
+    } else if (action === 'remove-new-protein' && !state.intake.proteins.some(protein => protein.protein_id === item.dataset.id)) {
+      focusFigure = draft.proteins.find(protein => protein.protein_id === item.dataset.id)?.figure_id;
+      draft.proteins = draft.proteins.filter(protein => protein.protein_id !== item.dataset.id);
+    } else if (action === 'reload') { draft = copyPlan(state.intake); basePlan = planText(state.intake); baseDigest = state.intake.digest; batch = []; selected.clear(); conflict = false; pending = null; }
     else if (action === 'stage') { for (const source_id of selected) if (!batch.some(binding => binding.source_id === source_id)) batch.push({source_id, protein_id: ''}); selected.clear(); }
     else if (action === 'duplicate') batch.splice(Number(item.dataset.index) + 1, 0, {source_id: batch[Number(item.dataset.index)].source_id, protein_id: ''});
     else if (action === 'remove-binding') batch.splice(Number(item.dataset.index), 1);
@@ -173,6 +187,8 @@ window.intakeWorkspace = (() => {
     else if (action === 'confirm') send('intake_confirm', guard());
     else if (action === 'import') { if (hasDraft()) { toast('请先保存清单、提交对应关系，或放弃草稿，再添加文件夹。'); return; } send('intake_import_folder', guard()); }
     renderActive();
+    if (focusAddFigure) $('[data-intake=add-fig]', root)?.focus();
+    if (focusFigure) $$('[data-intake=add-protein]', root).find(button => button.dataset.id === focusFigure)?.focus();
   });
   return {sync, renderActive, hasDraft, reset};
 })();

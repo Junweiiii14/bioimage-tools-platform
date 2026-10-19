@@ -3,6 +3,8 @@
 import pytest
 from pytestqt.qtbot import QtBot
 from wb_tool.api import (
+    IntakeFigure,
+    IntakeProtein,
     PreviewRaster,
     WBFigureProject,
     WBIntakeProject,
@@ -10,9 +12,10 @@ from wb_tool.api import (
     create_figure_project_view,
     intake_digest,
     read_figure_project,
+    replace_intake_plan,
 )
 
-from tools.wb.tests.test_instrument_intake import assigned, source
+from tools.wb.tests.test_instrument_intake import assigned, planned, source
 
 
 def test_host_view_save_retains_pool_confirmation_and_display_thumbnails(qtbot: QtBot) -> None:
@@ -54,3 +57,26 @@ def test_legacy_row_edit_cannot_change_intake_mapping(qtbot: QtBot) -> None:
         view.project()
     view.set_project(project)
     assert view.project().rows == project.rows
+
+
+@pytest.mark.parametrize(
+    "figure,protein", [(" Fig 1 ", "AKT"), ("Fig 1", "AKT "), ("Fig 1, repeat", "AKT")]
+)
+def test_intake_labels_roundtrip_without_legacy_string_reparsing(
+    qtbot: QtBot, figure: str, protein: str
+) -> None:
+    project = planned()
+    project = replace_intake_plan(
+        project,
+        (IntakeFigure(figure_id="fig-id", label=figure, lane_count=8),),
+        (IntakeProtein(protein_id="p1", figure_id="fig-id", label=protein),),
+        expected_digest=intake_digest(project),
+    )
+    view = create_figure_project_view()
+    qtbot.addWidget(view)
+    view.set_project(project)
+    restored = read_figure_project(view.project(revision=4).model_dump_json().encode())
+    assert isinstance(restored, WBIntakeProject)
+    assert restored.intake == project.intake
+    assert restored.rows[0].figure == figure and restored.rows[0].protein == protein
+    assert restored.figure_order == (figure,)

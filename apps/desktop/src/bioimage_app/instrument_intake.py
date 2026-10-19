@@ -1,5 +1,6 @@
 """Cancellable instrument import; scientific identities are assigned by the user."""
 
+import os
 from pathlib import Path
 from threading import Event
 from typing import TYPE_CHECKING
@@ -98,6 +99,7 @@ class InstrumentIntakeSession:
         def next_image() -> None:
             nonlocal skipped
             if not current() or not pending:
+                completed = current()
                 suffix = (
                     "已取消；已导入项保留。" if not current() else "请填写 Fig 清单并分配原图。"
                 )
@@ -105,6 +107,8 @@ class InstrumentIntakeSession:
                     f"原图导入：{imported_count} 张，重复 {skipped} 张，"
                     f"失败 {len(self.issues)} 张。" + suffix
                 )
+                if completed and imported_count:
+                    host.save()
                 return
             project = host.view.project()
             if not isinstance(project, WBIntakeProject):
@@ -141,8 +145,18 @@ class InstrumentIntakeSession:
                 if not isinstance(project, WBIntakeProject):
                     next_image()
                     return
+                selected_path = os.path.normcase(str(path.absolute()))
                 if any(
-                    source.relative_path == relative and source.asset.sha256 == raster.sha256
+                    source.asset.sha256 == raster.sha256
+                    and os.path.normcase(
+                        host.source_origins.lookup(
+                            host.workspace_path,
+                            project.project_id,
+                            source.source_id,
+                            source.asset.sha256,
+                        )
+                    )
+                    == selected_path
                     for source in project.intake.sources
                 ):
                     skipped += 1
@@ -194,6 +208,13 @@ class InstrumentIntakeSession:
                         host.view.generation += 1
                         generation = host.view.generation
                         host.view.install_thumbnail(raster)
+                        host.source_origins.remember(
+                            host.workspace_path,
+                            project.project_id,
+                            source.source_id,
+                            source.asset.sha256,
+                            str(path),
+                        )
                         imported_count += 1
                         next_image()
 

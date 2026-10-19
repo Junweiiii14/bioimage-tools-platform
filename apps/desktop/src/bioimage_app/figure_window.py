@@ -587,10 +587,15 @@ class FigureProjectWindow(QMainWindow):
             self._error(str(error))
             return
         generation = self.view.generation
+        originals = {row.source.sha256: row.source for row in project.rows if row.source}
+        if isinstance(project, WBIntakeProject):
+            originals.update(
+                (source.asset.sha256, source.asset) for source in project.intake.sources
+            )
         sources = {
-            asset.sha256: self._paths.get(asset.sha256, "")
-            for asset in project_assets(project, history=False)
-            if not self.view.has_thumbnail(asset.sha256)
+            digest: self._paths.get(digest, "")
+            for digest in originals
+            if not self.view.has_thumbnail(digest)
         }
         pending = list(sources.items())
         errors: list[str] = []

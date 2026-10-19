@@ -1,5 +1,17 @@
 # Desktop host
 
+T051 adds a separate instrument-folder intake page. All supported raw TIFF candidates
+retain their original names and relative paths, including numbered variants. Users
+enter Fig/protein identities and fixed sample-slot counts, review thumbnails and
+submit explicit batch assignments. Schema10 saves the entire source pool and the
+confirmed mapping; adding sources or changing the plan invalidates confirmation.
+Only a verified repeat of the same local path and content is skipped. Distinct
+exports remain independent candidates even when their bytes match. Append imports
+are saved after completion; failed confirmation saves remain unconfirmed.
+This stage performs no automatic cropping or quantification. Independent grayscale
+projects keep their existing OCR workflow. See
+`../../docs/contracts/wb-instrument-intake-v1.md` for the current stage boundary.
+
 T048's runtime builder now emits a separate Windows x64 test installer (minimum
 Windows 10 1809), with mandatory desktop/Start menu/uninstall entries and app-local
 MSVC redistributables from the locked Qt wheel. Its `win10-test` channel uses the

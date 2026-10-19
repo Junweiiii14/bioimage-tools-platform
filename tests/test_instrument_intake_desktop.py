@@ -12,7 +12,16 @@ from bioimage_app.web_window import WebWorkbenchWindow
 from platform_runtime.api import Workspace
 from PySide6.QtCore import QSettings
 from pytestqt.qtbot import QtBot
-from wb_tool.api import PreviewRaster, WBIntakeProject, WBJob, WBReply, intake_digest
+from tool_contracts.api import AssetRef
+from wb_tool.api import (
+    FigureTemplate,
+    PreviewRaster,
+    WBFigureProject,
+    WBIntakeProject,
+    WBJob,
+    WBReply,
+    intake_digest,
+)
 
 from tooling.qt_test_lifecycle import close_and_dispose_window
 
@@ -237,4 +246,61 @@ def test_invalid_thumbnail_reply_finishes_without_importing_or_leaking_busy_stat
     assert current(window) == before
     assert len(window.host.intake.issues) == 1
     assert "128" in window.host.intake.issues[0]
+    monkeypatch.undo()
+
+
+def test_distinct_export_folders_keep_same_named_same_content_candidates(
+    intake_window: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
+) -> None:
+    window = intake_window
+    first = make_source(tmp_path / "export-a" / "Image001.tif")
+    second = make_source(tmp_path / "export-b" / "Image001.tif")
+    assert first.read_bytes() == second.read_bytes()
+    start(window, qtbot, first.parent)
+    window.host.intake.import_folder(second.parent)
+    wait_saved(window, qtbot)
+    sources = current(window).intake.sources
+    assert len(sources) == 2 and sources[0].source_id != sources[1].source_id
+    assert sources[0].asset.sha256 == sources[1].asset.sha256
+    assert sources[0].asset.size_bytes == sources[1].asset.size_bytes
+    window.host.intake.import_folder(second.parent)
+    qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=10000)
+    assert current(window).intake.sources == sources
+    path = window.host.workspace_path
+    window.open_project(path)
+    qtbot.waitUntil(
+        lambda: window.bridge.session_epoch == 1 and window.shutdown_stage == "idle", timeout=20000
+    )
+    assert current(window).intake.sources == sources
+    window.host.intake.import_folder(first.parent)
+    qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=10000)
+    assert current(window).intake.sources == sources
+
+
+def test_font_assets_never_enter_thumbnail_decoder(
+    intake_window: WebWorkbenchWindow,
+    qtbot: QtBot,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    window = intake_window
+    root = tmp_path / "raw"
+    make_source(root / "first.tif")
+    start(window, qtbot, root)
+    font = AssetRef(
+        asset_id="font", relative_path="assets/font.ttf", sha256="f" * 64, size_bytes=20
+    )
+    window.host.view.set_project(
+        WBFigureProject(project_id="font-only", template=FigureTemplate(font=font))
+    )
+    jobs: list[WBJob] = []
+
+    def decoder(
+        job: WBJob, callback: Callable[[WBReply], None], *, accept_errors: bool = False
+    ) -> None:
+        jobs.append(job)
+
+    monkeypatch.setattr(window.host, "_wb", decoder)
+    window.host.load_thumbnails()
+    assert not window.host.operation_busy and jobs == []
     monkeypatch.undo()

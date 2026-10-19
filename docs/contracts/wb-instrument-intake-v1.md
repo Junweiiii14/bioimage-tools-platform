@@ -14,6 +14,8 @@ T-051 新增 `WBIntakeProject/schema_version=10`，其 `IntakeManifest/schema_ve
 - `IntakeSource(source_id,asset,original_name,relative_path,width,height,bit_depth)`
   保存原文件名、安全相对路径和不可变资产引用。相同原名、相对路径或内容摘要都不充当
   唯一候选身份；不同候选可共用像素资产，未分配候选同样随项目保存与重开。
+  仅本地来源记忆能证明原绝对路径及内容均相同时才跳过再次选择；来源记忆不进入归档。
+  不同导出目录的同名同内容图仍保留独立来源 ID，界面显示该 ID 的短后缀以便区分。
 - `IntakeAssignment(protein_id,source_id,reuse_confirmed=False)` 是显式关联。相同内容
   用于多个蛋白须明确传 `allow_reuse=True`，相关关联记录 `reuse_confirmed=True`；
   不能通过新增同 SHA 别名或输入布尔标记绕过复用确认。
@@ -39,6 +41,7 @@ source pool和同 ID关联；删除已分配蛋白前必须显式解除关联。
 实际修改标签、N、顺序、来源或分配撤销确认。`confirm_intake` 只确认对应关系，
 不设置 `FigureRow.reviewed`，不生成 ROI、定量请求或 OCR。
 读取时验证清单、关联、确认摘要与行投影一致，禁止经旧表格绕过清单修改。
+合法标签的首尾空格及 Fig 名中逗号按清单原样往返，不经旧排序文本重新解析。
 
 `intake_snapshot` 返回 JSON 可序列化的 snake_case 字段，含 `digest`、`confirmed`、
 `project_id`、figures/proteins/sources/assignments；不包含缩略图或原始像素。
