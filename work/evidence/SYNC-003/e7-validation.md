@@ -1,0 +1,15 @@
+# E7 OCR-stage preparation
+
+Prepared originald7dbee5 with frozen predecessor26b3d74, merge95a866e. This is NOT accepted actual-main integration while PR8 Windows CI is pending. Scope . rules read against26b, unchanged rule fingerprints checked; module map, recovery and old OCR/public module contract read. Original stage snapshot archived before current pointer replacement. Predecessor completed-session fix retained in the OCR-capable WBWindow signature; exact real-process regression carried forward.
+
+Non-author old-stage preaudit found two P2 cases (pure frozen AST probes reproduced both): OCR late decode/install still replaces canceled association, and save callback runs export after cancellation/close. Current primary already repairs these; this branch ports equivalent guards without copying the later whole product. OCR candidate is transformed to target revision off the old current project, CAS precedes installation; post-CAS cancellation preserves history, marks current draft unsaved and does not install candidate. Save gives close/cancel priority over followup; no algorithm/schema/dependency/default changes.
+
+The current primary 13 real OCR race/save-failure tests are adapted to this historical API, with a locally owned window fixture that closes/disposes only its created windows. Old host lacks operation_busy/has_unsaved_changes public properties: wait uses its visible import-control enabled state; primary-only unsaved-badge assertion is absent, while exact old current association, close/reopen persisted old association and committed candidate/run history assertions remain. Four added save encode/CAS-after x cancel/close tests reject any followup XLSX and preserve original bytes/history. No existing test, timeouts, tolerances, skip, locks or contracts weakened.
+
+Locked all-groups sync0; Ruff format, focused types0. Initial new-test import-order lint corrected mechanically, no ignore. Local Qt/full/wheel NOT RUN: primary frozen full Qt run active, all local Qt remains serial. Real regression/full server checks, final actual-main receipt/manifest and bound final review required before any acceptance/merge.
+
+## Actual predecessor and real regression
+
+PR8 accepted461f2c067ede0e4cba251257af13dbbd8920c98f after bound review and latest four SUCCESS checks (quality39327183579/rules39327183522;211 tests both OS; all wheels). Merged as e8beb7e; actual-main scope . receipt/explicit manifest reloaded and output read. Prepared repair76fef31b1a9f7b5b20ba006853561f657879e2fc received non-author review against95a866e: both P2 closed, no new P0–P2, three pure AST branches checked, no reviewer Qt claim.
+
+Windows local `uv run --locked --no-sync python -m pytest tests/test_ocr_late_installation.py -q`:17passed/109.47s, actual process exit0, raw.local/sync003-ocr-real-after.txt. Primary Qt was idle; local Qt remained serial. This historical tree has no root conftest and invocation did not explicitly set QT_QPA_PLATFORM: default Windows Qt platform, not an offscreen or physical-input/DPI acceptance claim. All windows are test-owned. Final actual-head bound review, frozen rule validation and four server checks still required.

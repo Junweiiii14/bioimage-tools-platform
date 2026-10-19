@@ -3,6 +3,7 @@
 import gc
 import json
 import os
+import sys
 from collections.abc import Callable, Iterator
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -12,7 +13,7 @@ from zipfile import ZipFile
 import numpy as np
 import pytest
 import tifffile
-from bioimage_app.api import create_wb_window
+from bioimage_app.api import ProcessRunner, RunCompletion, RunSession, create_wb_window
 from PIL import Image, ImageDraw, ImageFont
 
 if TYPE_CHECKING:
@@ -23,6 +24,7 @@ from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QPushButton, QTableWidget
 from pytest import MonkeyPatch
 from pytestqt.qtbot import QtBot
+from shiboken6 import isValid
 from wb_tool.api import (
     AnalysisRequest,
     BandAnnotation,
@@ -498,3 +500,82 @@ def test_close_waits_for_nonblocking_thread_join(qtbot: QtBot, monkeypatch: Monk
     background.shutdown()
     qtbot.waitUntil(lambda: bool(emitted), timeout=10000)
     assert emitted[0] >= 3
+
+
+@pytest.mark.parametrize("outcome", ["success", "failure", "cancel"])
+def test_completed_runs_release_owned_sessions_before_window_close(
+    qtbot: QtBot,
+    tmp_path: Path,
+    make_window: Callable[[], "WBWindow"],
+    monkeypatch: MonkeyPatch,
+    outcome: str,
+) -> None:
+    source = tmp_path / "repeated-original.tif"
+    tifffile.imwrite(source, np.array([[245], [235], [245]], dtype=np.uint8))
+    workspace = tmp_path / "repeated-workspace"
+    window = make_window()
+    window.show()
+    window.open_workspace(str(workspace), create=True)
+    qtbot.waitUntil(window.import_button.isEnabled, timeout=10000)
+    window.import_image(str(source))
+    qtbot.waitUntil(lambda: window.view.raster is not None, timeout=10000)
+    raster = window.view.raster
+    assert raster is not None
+    request = AnalysisRequest(
+        raster.sha256,
+        0,
+        "dark",
+        (LaneAnnotation(LaneROI("L", 0, 0, 1, 3), (BandAnnotation("B", BandBounds(0, 2)),)),),
+    )
+    window.view.set_image(raster, request)
+    observed: list[RunSession] = []
+    completions: list[RunCompletion] = []
+    original_session_start = RunSession.start
+
+    def observe_session(
+        session: RunSession, command: tuple[str, ...], cwd: str, request: bytes
+    ) -> None:
+        observed.append(session)
+        session.completed.connect(completions.append)
+        original_session_start(session, command, cwd, request)
+
+    monkeypatch.setattr(RunSession, "start", observe_session)
+    original_start = ProcessRunner.start
+    if outcome == "failure":
+
+        def fail_worker(
+            runner: ProcessRunner, command: tuple[str, ...], cwd: str, request: bytes
+        ) -> None:
+            original_start(
+                runner, (sys.executable, "-I", "-c", "raise SystemExit(7)"), cwd, request
+            )
+
+        monkeypatch.setattr(ProcessRunner, "start", fail_worker)
+    for iteration in range(3):
+        window.analyze()
+        qtbot.waitUntil(lambda expected=iteration + 1: len(observed) == expected, timeout=10000)
+        if outcome == "cancel":
+            window.cancel()
+        qtbot.waitUntil(window.view.analyze_button.isEnabled, timeout=15000)
+        qtbot.waitUntil(lambda expected=iteration + 1: len(completions) == expected, timeout=15000)
+        qtbot.waitUntil(lambda: not isValid(observed[-1]), timeout=5000)
+        assert not window.findChildren(RunSession)
+        assert completions[-1].record is not None
+        if outcome == "failure":
+            assert completions[-1].outcome.exit_code == 7
+        if outcome == "success":
+            qtbot.waitUntil(lambda: window.view.results.rowCount() == 1, timeout=10000)
+            value = window.view.results.item(0, 2)
+            assert value is not None and value.text() == "10"
+        else:
+            assert window.view.results.rowCount() == 0
+    window.close()
+    qtbot.waitUntil(lambda: window.resources_closed, timeout=15000)
+    with Workspace.open(workspace) as store:
+        runs = store.list_runs()
+        assert len(runs) == 3
+        expected_state = {"success": "succeeded", "failure": "interrupted", "cancel": "cancelled"}[
+            outcome
+        ]
+        assert all(run.state == expected_state and run.pid is not None for run in runs)
+        assert all((run.result is not None) == (outcome == "success") for run in runs)

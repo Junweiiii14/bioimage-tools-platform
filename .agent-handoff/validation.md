@@ -181,3 +181,7 @@ CI009产品57fd7ea正式check --all实际exit0：669passed/497.77秒，Observed 
 ## 2026-10-17 CI010 Linux退出SIGSEGV
 
 0d仅文档后继Linux669/146.29秒后SIGSEGV主线程noPythonframe，exit245/wheel未跑；同HEAD Windows669/346.68秒child0+wheels/dev成功。T043重开in_progress，旧成功/失败全保留；CI010只增显式GDB观察/0与17与真实SIGSEGV控制，不猜测性修Qt清理，不改产品/断言/15分钟。作者相关8项2.49秒0，双平台模块类型0；Linux控制/全检待真实执行，独审待绑定。
+- 2026-10-19 T050/main221a2df：规划文档链接/PDF blob一致性、policy、diff、handoff容量均exit0。policy扫描0产品文件不证明产品通过。PDF文本初次GBK控制台失败，UTF-8重读exit0；归档目录缺失已由main原始blob恢复。产品测试/GUI/安装/科学评分未运行，后续文档审查见T050证据。
+- T050方案fa61c29独立文档审查无阻塞，精确回执/链接/PDF/归档/diff exit0；PR16为Draft，远端检查以最终head为准。本轮仅规划，不合并或实施产品。
+- T050后续澄清：当前方案942ecaa增量独立文档审查通过，按蛋白行分别管理槽位，检查exit0；无产品测试或修改。
+- T050方案66f0b67：S1/S2批准与独立OCR功能保留的增量独审无阻塞；回执/diff/链接/PDF/容量exit0。无产品或安装验证。
