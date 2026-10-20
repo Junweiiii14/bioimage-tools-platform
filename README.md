@@ -1,13 +1,13 @@
 # 生物图像工具平台
 
-当前增量按[采集组主流程与交付计划](docs/wb-grouped-intake-plan.md)推进：采集组网格、Fig级N、来源选择和草稿接入已有自动化主链，再完成快捷键、算法盘点及新离线测试版。用户已确认执行；当前任务见[交接入口](AGENT_HANDOFF.md)。该计划的待办不表示已经完成。
+当前按[采集组交付计划](docs/wb-grouped-intake-plan.md)持续实施。采集组网格、Fig级N、来源草稿和执行后裁剪修订已分PR合main；统一快捷键与执行后分组失效矩阵已绑定独审，后继集成、新三目录全链和新离线测试版仍在推进。[迭代/契约/证据导航](docs/iterations.md)、[GitHub交付跟踪](https://github.com/Junweiiii14/bioimage-tools-platform/issues/25)与[交接入口](AGENT_HANDOFF.md)记录当前进展，计划待办不能视为已通过。
 
 当前WB需求以[开发规划v2](docs/wb-development-plan-v2.md)为准，实施见[E0–E7执行计划](docs/wb-execution-plan.md)：清单、固定N原值裁剪、拼图后原像素定量、稳定槽表格、导出与恢复。E0–E7工程实现、独审及主线集成已完成；两平台910项完整门禁及全部隔离wheel通过，独立测试安装候选在本机Win11通过双流程和生命周期验证，独立灰度与OCR保留。科学留出、明确样本配对、干净目标Win10和物理DPI仍待验，不代表正式发布。详见[验收索引](docs/wb-execution-acceptance.md)和T060证据。
 
 当前阶段：**WB 工作台开发。已接入原图自动识别、裁图、灰度复核、拼图、导出与保存重开；8张真实原图裁图回归已通过，科学泛化、积分真值与最终发布验收仍未完成。** 实际门禁状态以当前任务和验证记录为准。
 
 最初的 [V3.0 技术方案](生物图像工具平台与全AI长期迭代技术方案.pdf) 保持原样，首次提交可追溯。
-本仓库将承载 Windows 本地桌面平台及 WB、IF、IHC 工具，采用 Python/PySide6、独立计算进程、单仓库分包的候选路线。产品选型须经 P0 打包与目标机试验后冻结。
+当前WB采用Windows本地Python/PySide6、独立计算进程及单仓库分包；IF/IHC保留为后续单独任务。目标机验收缺口单列，已授权WB技术栈继续完成工程交付。
 
 ## 从这里开始
 
@@ -17,6 +17,7 @@
 4. [开发环境](docs/runbooks/development.md)、[工具与技能来源](docs/research/skills-and-plugins.md)。
 5. [贡献流程](CONTRIBUTING.md)、[AI 开发流程](docs/ai-workflow.md)、[发布与恢复](docs/runbooks/release.md)。
 6. [自动规则门禁](docs/runbooks/rule-enforcement.md)、[调研与非编码能力](docs/research-protocol.md)。
+7. [WB算法入口与消费者](docs/wb-algorithm-inventory.md)、[迭代索引](docs/iterations.md)、[离线测试版里程碑](https://github.com/Junweiiii14/bioimage-tools-platform/milestone/1)。
 
 ## 可执行的基础检查
 
