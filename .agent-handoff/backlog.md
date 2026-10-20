@@ -102,3 +102,5 @@
 - [x] CI012明确所属fixture销毁及等待失败保护已绑定独审，后继PR15两平台769项、PR17两平台910项及全部wheel/四检查通过。原LinuxSIGSEGV/其他native根因UNKNOWN与原始失败保留，不因当前成功销账。
 
 
+
+- [ ] T061：N/目标/19参考有效性待图册集中确认，未来独立科学留出待补；旧build/bytecode和部分桌面说明残余被自动审批阻止，未完全清理，见local-version-cleanup.json。

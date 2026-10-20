@@ -55,6 +55,7 @@ class WBJob:
     operation: Literal[
         "preview",
         "discover_tiffs",
+        "intake_discover",
         "automatic_row",
         "intake_workflow_prepare",
         "intake_crop_prepare",

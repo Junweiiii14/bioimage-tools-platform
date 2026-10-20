@@ -117,6 +117,17 @@ class _Work(QObject):
                 from wb_tool.adapters.automatic_export import discover_tiffs
 
                 value = discover_tiffs(job.path, cancelled=cancel, with_report=True)
+            elif job.operation == "intake_discover":
+                from wb_tool.adapters.export_discovery import discover_exports
+                from wb_tool.application.instrument_intake import WBIntakeProject
+
+                if not isinstance(job.document, WBIntakeProject):
+                    raise ValueError("识别建议需要仪器来源清单")
+                value = (
+                    discover_exports(job.document, job.sources, cancelled=cancel)
+                    .model_dump_json()
+                    .encode("utf-8")
+                )
             elif job.operation == "intake_workflow_prepare":
                 from wb_tool.application.intake_workflow import prepare_intake_workflow
 

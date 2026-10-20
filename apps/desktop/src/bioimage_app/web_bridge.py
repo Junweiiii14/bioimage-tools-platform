@@ -465,6 +465,8 @@ class WorkbenchBridge(QObject):
             ):
                 raise ValueError("当前任务仍在处理中，请稍候或取消")
             elif isinstance(self.host.view.project(), WBIntakeProject) and action not in {
+                "intake_discover",
+                "intake_accept_discovery",
                 "intake_plan",
                 "intake_assign",
                 "intake_confirm",
@@ -483,6 +485,8 @@ class WorkbenchBridge(QObject):
             }:
                 raise ValueError("仪器清单项目请使用阶段执行、原图复核和已保存Fig入口")
             elif action in {
+                "intake_discover",
+                "intake_accept_discovery",
                 "intake_plan",
                 "intake_assign",
                 "intake_confirm",

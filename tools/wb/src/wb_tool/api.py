@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 
 from wb_tool.adapters.automatic import automatic_project_row
 from wb_tool.adapters.automatic_export import discover_tiffs
+from wb_tool.adapters.export_discovery import discover_exports
 from wb_tool.adapters.intake_crop import export_intake_crop, propose_intake_crop
 from wb_tool.adapters.intake_figure import load_intake_figure_preview, prepare_intake_figure
 from wb_tool.adapters.intake_output import export_intake_outputs
@@ -58,6 +59,12 @@ from wb_tool.application.crop_suggestions import (
     record_crop_suggestion,
 )
 from wb_tool.application.desktop_data import PreviewRaster, ProjectDerivedTables, WBJob, WBReply
+from wb_tool.application.discovery import (
+    ExportDiscovery,
+    ExportObservation,
+    ExportSelection,
+    SignalRegion,
+)
 from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
 from wb_tool.application.fig_quant import WBPartitionProject
 from wb_tool.application.figure_project import (
@@ -87,9 +94,11 @@ from wb_tool.application.instrument_intake import (
     IntakeProtein,
     IntakeSource,
     WBIntakeProject,
+    accept_export_selections,
     assign_intake_sources,
     confirm_intake,
     create_intake,
+    install_export_discovery,
     intake_digest,
     intake_snapshot,
     register_intake_source,
@@ -296,6 +305,13 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "ExportDiscovery",
+    "ExportObservation",
+    "ExportSelection",
+    "SignalRegion",
+    "discover_exports",
+    "install_export_discovery",
+    "accept_export_selections",
     "export_intake_outputs",
     "IntakeOutputEvidence",
     "IntakeOutputPreparation",

@@ -111,3 +111,7 @@ intake不再调用旧裁剪撤销；同内容候选显示短来源ID，已确认
 ship仅在该评分范围，documenter只读复核No changes。后继截图同三尺寸并增加recovery，
 均为合成图静态证据；最终完整门禁与原生退出范围以T051任务和validation为准。
 现有DESIGN/sidecar保持，旧漂移没有被写入新系统规则。
+
+## T-061 导出组集中复核（普通扩展）
+
+在仪器清单前集中显示原图角色、三联预览与条带/N候选；用户勾选来源并填写Fig、蛋白和确认N，目标可选候选或留待原图框选。候选不是确认/分配/定量，人工成品不自动成为真值。复用intake-workflow、stage-actions、按钮/输入/select/details及原图审核入口；intake.css、全局配色、字体、token和设计sidecar无变化。文档核对基于710836e，机械检测一次[]；截图/实际流程验证以T061证据为准，不外推科学验收。预存sidecar漂移未修复。

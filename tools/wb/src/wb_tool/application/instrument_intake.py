@@ -4,11 +4,12 @@ import json
 from collections import Counter
 from hashlib import sha256
 from pathlib import PurePosixPath
-from typing import Literal
+from typing import Literal, cast
 
-from pydantic import Field, model_validator
+from pydantic import Field, SerializerFunctionWrapHandler, model_serializer, model_validator
 from tool_contracts.api import AssetRef
 
+from wb_tool.application.discovery import ExportDiscovery, ExportSelection
 from wb_tool.application.document import DocumentIO
 from wb_tool.application.fig_quant import WBPartitionProject
 from wb_tool.application.figure_project import FigureRow, WBFigureProject
@@ -70,18 +71,35 @@ class IntakeAssignment(DocumentIO):
 
 
 class IntakeManifest(DocumentIO):
-    schema_version: int = Field(default=1, ge=1, le=1)
+    schema_version: int = Field(default=1, ge=1, le=2)
+    discovery: ExportDiscovery | None = None
     figures: tuple[IntakeFigure, ...] = Field(default=(), max_length=512)
     proteins: tuple[IntakeProtein, ...] = Field(default=(), max_length=512)
     sources: tuple[IntakeSource, ...] = Field(default=(), max_length=512)
     assignments: tuple[IntakeAssignment, ...] = Field(default=(), max_length=512)
     confirmed_digest: str = Field(default="", pattern="^(?:[0-9a-f]{64})?$")
 
+    @model_serializer(mode="wrap")
+    def serialize_manifest(self, handler: SerializerFunctionWrapHandler) -> dict[str, object]:
+        fields = cast(dict[str, object], handler(self))
+        if self.schema_version == 1:
+            fields.pop("discovery", None)
+        return fields
+
     @model_validator(mode="after")
     def identities(self) -> "IntakeManifest":
         figures = {figure.figure_id: figure for figure in self.figures}
         proteins = {protein.protein_id: protein for protein in self.proteins}
         sources = {source.source_id: source for source in self.sources}
+        if self.schema_version == 1 and self.discovery is not None:
+            raise ValueError("识别建议必须使用清单格式v2")
+        if self.discovery is not None:
+            for item in self.discovery.observations:
+                source = sources.get(item.source_id)
+                if source is None or source.asset.sha256 != item.sha256:
+                    raise ValueError("识别建议不匹配当前原图来源")
+                if any(r.x1 > source.width or r.y1 > source.height for r in item.regions):
+                    raise ValueError("识别区域超出原图")
         if (
             len(figures) != len(self.figures)
             or len(proteins) != len(self.proteins)
@@ -336,3 +354,55 @@ def intake_snapshot(project: WBIntakeProject) -> dict[str, object]:
         project_id=project.project_id,
     )
     return data
+
+
+def install_export_discovery(
+    project: WBIntakeProject, discovery: ExportDiscovery, *, expected_digest: str
+) -> WBIntakeProject:
+    """Save unconfirmed observations without changing assignments, N or crop review."""
+    _current(project, expected_digest)
+    if project.schema_version != 10:
+        raise ValueError("请先返回清单修改再识别来源")
+    fields = dict(project.intake)
+    fields.update(schema_version=2, discovery=discovery, confirmed_digest="")
+    return _updated(project, IntakeManifest.model_validate(fields))
+
+
+def accept_export_selections(
+    project: WBIntakeProject, selections: tuple[ExportSelection, ...], *, expected_digest: str
+) -> WBIntakeProject:
+    """Explicit consolidated confirmation starts a new plan, never replaces old rows."""
+    _current(project, expected_digest)
+    if project.schema_version != 10 or project.intake.figures or project.intake.assignments:
+        raise ValueError("集中建立仅用于空清单；已有清单请使用原图分配入口")
+    if project.intake.discovery is None or not selections:
+        raise ValueError("请先识别原图并填写待确认项")
+    discovery = ExportDiscovery.model_validate(
+        {**dict(project.intake.discovery), "selections": selections}
+    )
+    figures: dict[str, IntakeFigure] = {}
+    proteins: list[IntakeProtein] = []
+    assignments: list[IntakeAssignment] = []
+    for item in selections:
+        figure_id = "fig-" + sha256(item.figure_label.casefold().encode()).hexdigest()[:24]
+        figure = IntakeFigure(
+            figure_id=figure_id, label=item.figure_label, lane_count=item.lane_count
+        )
+        if figure_id in figures and figures[figure_id] != figure:
+            raise ValueError("同一Fig必须明确使用相同的名称和N")
+        figures[figure_id] = figure
+        protein_id = "row-" + sha256(item.source_id.encode()).hexdigest()[:24]
+        proteins.append(
+            IntakeProtein(protein_id=protein_id, figure_id=figure_id, label=item.protein_label)
+        )
+        assignments.append(IntakeAssignment(protein_id=protein_id, source_id=item.source_id))
+    fields = dict(project.intake)
+    fields.update(
+        schema_version=2,
+        discovery=discovery,
+        figures=tuple(figures.values()),
+        proteins=tuple(proteins),
+        assignments=tuple(assignments),
+        confirmed_digest="",
+    )
+    return _updated(project, IntakeManifest.model_validate(fields))

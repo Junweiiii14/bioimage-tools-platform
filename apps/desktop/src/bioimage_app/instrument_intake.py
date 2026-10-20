@@ -9,11 +9,14 @@ from uuid import uuid4
 from PySide6.QtCore import QThread
 from tool_contracts.api import AssetRef
 from wb_tool.api import (
+    ExportDiscovery,
+    FigureSourcePath,
     IntakeSource,
     PreviewRaster,
     WBIntakeProject,
     WBJob,
     WBReply,
+    install_export_discovery,
     intake_digest,
     register_intake_source,
 )
@@ -49,6 +52,83 @@ class InstrumentIntakeSession:
     @property
     def scanning(self) -> bool:
         return self._scan_job is not None
+
+    def discover(self, expected_digest: str) -> None:
+        """Resolve immutable assets off the GUI thread and install only a current reply."""
+        host = self.host
+        project = host.view.project()
+        if host.operation_busy or host.is_closing or not host.workspace_path:
+            return
+        if not isinstance(project, WBIntakeProject) or project.schema_version != 10:
+            raise ValueError("请先返回仪器清单再识别原图")
+        if not project.intake.sources or intake_digest(project) != expected_digest:
+            raise ValueError("原图池已变化，请刷新后识别")
+        generation, identity = host.view.generation, (host.workspace_path, project.project_id)
+        pending = list({s.asset.sha256: s.asset for s in project.intake.sources}.values())
+        sources: list[FigureSourcePath] = []
+        host.begin_operation()
+
+        def current() -> bool:
+            return (
+                not host.is_closing
+                and not host.cancellation.is_set()
+                and host.view.generation == generation
+                and identity == (host.workspace_path, host.view.project_identity)
+            )
+
+        def next_source() -> None:
+            if not current():
+                host.finish_operation("识别已停止，当前清单保留。")
+                return
+            if pending:
+                asset = pending.pop(0)
+
+                def resolved(reply: StorageReply) -> None:
+                    if not current():
+                        host.finish_operation("旧识别回复未安装。")
+                    elif reply.error_code or not isinstance(reply.value, str):
+                        host.fail_operation(reply.message or "原图资产无法解析")
+                    else:
+                        sources.append(FigureSourcePath(asset.sha256, reply.value))
+                        next_source()
+
+                host.submit_storage_job(
+                    StorageCommand("asset", asset=asset), resolved, accept_errors=True
+                )
+                return
+            host.submit_tool_job(
+                WBJob(
+                    "intake_discover",
+                    document=project,
+                    sources=tuple(sources),
+                    cancellation=host.cancellation,
+                ),
+                completed,
+                accept_errors=True,
+            )
+
+        def completed(reply: WBReply) -> None:
+            if not current():
+                host.finish_operation("旧识别回复未安装，当前草稿保留。")
+                return
+            if reply.error or not isinstance(reply.value, bytes):
+                host.fail_operation(reply.error or "识别返回无效结果")
+                return
+            try:
+                discovery = ExportDiscovery.from_bytes(reply.value)
+            except ValueError as error:
+                host.fail_operation(str(error))
+                return
+            host.end_phase()
+
+            def install(active: object) -> WBIntakeProject:
+                if not isinstance(active, WBIntakeProject):
+                    raise ValueError("当前项目已改变")
+                return install_export_discovery(active, discovery, expected_digest=expected_digest)
+
+            host.save(transform=install, install_guard=current)
+
+        next_source()
 
     def import_folder(self, root: Path) -> None:
         host = self.host
