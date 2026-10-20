@@ -6,3 +6,5 @@
 - 规划范围：docs、work、.agent-handoff、AGENT_HANDOFF.md；本轮不修改产品/测试/依赖，不构建或替换T069安装包。
 - 基线：main/HEAD 6916b3a816b9a547ffdedf032a9dba82ce119c9d；活动树wb-grouped-intake，规划分支codex/fig-sequence-plan。原图/历史/旧树未提交改动保留。
 - 方案：[已批准方案](../../docs/wb-fig-sequence-automation-plan.md)。四项澄清和用户批准均已取得；新的wb-fig-sequence工作树承接规划文件，旧规划树及其未提交状态保持原样。原规划范围/基线描述保留为当时事实。
+
+2026-10-21执行补充澄清：用户明确当前真实池只给19个仪器采集组编号，28参考组保留单列、不占蛋白顺序。完整原始组身份和位置保留，顺序投影仅遍历采集组；不由名称推断实验配对。

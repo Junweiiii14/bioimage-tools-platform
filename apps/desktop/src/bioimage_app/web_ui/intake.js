@@ -10,8 +10,10 @@ window.intakeWorkspace = (() => {
   const progress = document.createElement('section');
   progress.id = 'intake-batch-progress';progress.hidden = true;
   progress.setAttribute('aria-label','整批处理进度');root.before(progress);
-  let followed = '', browsing = false, composing = false;
+  let followed = '', browsing = false, composing = false, navigating = false;
   const batchPolicy = () => state.intake?.workflow?.policy === 'intake_workflow@3';
+  const batchReason = value => /crop_policy|automatic_geometry|membrane_not_found|no_reliable_membrane/.test(value||'') ? '未能确定完整裁剪范围，请在对应原图框选包含全部样本槽位的整行范围，保存后继续。' : value || '';
+  function noteBrowse(){if(batchPolicy()&&state.intake?.automation?.follow&&!navigating){browsing=true;renderProgress();}}
   const phaseNames = {crop:'原图裁剪',compose:'完整 Fig 拼图',measure:'原像素定量',export:'结果输出',complete:'统一结果'};
   const live = document.createElement('div');
   live.className = 'sr-only';
@@ -54,7 +56,7 @@ window.intakeWorkspace = (() => {
     cropDrafts.clear(); cropPending.clear();
     cropSavedRow = null;
     cropFocusAction = null; chosenFigureId = null; resultPage = 0; stagePage = 0;
-    renderedWorkflow = null; focusAction = null; live.textContent = '';
+    renderedWorkflow = null; focusAction = null; live.textContent = '';navigating=false;
     key = ''; baseDigest = ''; basePlan = ''; draft = null; batch = []; selected.clear();
     conflict = false; pending = null; replace = false; allowReuse = false; filter = '';
   }
@@ -165,11 +167,12 @@ window.intakeWorkspace = (() => {
     $('#inspector-title').textContent = '原图裁剪复核';
     $('#review-badge').textContent = evidence?.raw_crop ? '原值已保存' : '待核对';
     $('#review-badge').className = 'status-badge '+(evidence?.raw_crop?'ok':'pending');
-    $('#inspector-content').innerHTML = `<section class="inspect-section"><h3>${r?escapeText(targetName(r.id)):'请选择蛋白行'}</h3><p>${reviewable?'在原图上拖出范围，或调整建议框。':'本行用于原图回溯；已保存的原值裁剪与历史保持。'}${r?.lanes||0} 个槽位包含无信号空位，不含 Marker；本行独立定位。</p>${dataPair('固定槽位数',r?.lanes||0)}${dataPair('原值裁剪',evidence?.raw_crop?'已保存':'尚未生成')}<p class="row-reason">${escapeText(draft?.conflict?'后台输入已改变，草稿保留；放弃后重新核对。':evidence?.reason||'请先运行固定N定位，取得该行处理状态。')}</p><p>确认整行范围将按固定 N 等宽分割。无信号不等于未上样，也不作为零值。</p></section>`;
+    $('#inspector-content').innerHTML = `<section class="inspect-section"><h3>${r?escapeText(targetName(r.id)):'请选择蛋白行'}</h3><p>${reviewable?'在原图上拖出范围，或调整建议框。':'本行用于原图回溯；已保存的原值裁剪与历史保持。'}${r?.lanes||0} 个槽位包含无信号空位，不含 Marker；本行独立定位。</p>${dataPair('固定槽位数',r?.lanes||0)}${dataPair('原值裁剪',evidence?.raw_crop?'已保存':'尚未生成')}<p class="row-reason">${escapeText(draft?.conflict?'后台输入已改变，草稿保留；放弃后重新核对。':(batchPolicy()?batchReason(evidence?.reason):evidence?.reason)||'请先运行固定N定位，取得该行处理状态。')}</p><p>确认整行范围将按固定 N 等宽分割。无信号不等于未上样，也不作为零值。</p></section>`;
+    if(batchPolicy()&&evidence?.reason&&batchReason(evidence.reason)!==evidence.reason)$('#inspector-content').insertAdjacentHTML('beforeend',`<details class="inspect-section"><summary>处理详情</summary><p class="row-reason">${escapeText(evidence.reason)}</p></details>`);
     if (correcting) $('#inspector-content').insertAdjacentHTML('beforeend','<p class="row-reason">保存修正会使本行裁剪、本 Fig 拼图与测量、当前输出过期；其他 Fig 和历史文件保留。</p>');
     $('#inspector-action').innerHTML = `<button class="button primary full" data-intake-crop-action="confirm" ${state.busy||!r?.roi||!evidence||!reviewable||draft?.conflict||(correcting||step?.status==='pending')&&!draft?'disabled':''}>${correcting?'保存修正，标记本 Fig 待重算':'确认此范围与固定槽位'}</button><button class="button subtle full" data-intake-crop-action="run" ${state.busy||hasDraft()||!runnable()?'disabled':''}>继续处理批次</button><button class="text-button" data-intake-crop-action="discard" ${state.busy||!draft?'disabled':''}>放弃本行裁剪草稿</button><button class="text-button" data-intake-crop-action="back">返回清单与异常</button>`;
     if (batchPolicy()) {
-      $('[data-intake-crop-action="confirm"]').hidden = true;
+      const saveOnly=$('[data-intake-crop-action="confirm"]');saveOnly.textContent='仅保存范围';saveOnly.className='text-button';
       const resume=$('[data-intake-crop-action="run"]');
       resume.textContent='保存范围并继续自动处理';resume.className='button primary full';
       resume.disabled=!!state.busy||!r?.roi||!evidence||!reviewable||!!draft?.conflict||!!cropPending.size;
@@ -221,7 +224,7 @@ window.intakeWorkspace = (() => {
     if(progress.hidden)return;
     const focus=document.activeElement?.dataset.batchAction;
     const steps=state.intake.workflow.steps;
-    progress.innerHTML=`<div><strong>${escapeText(a?.complete?'处理完成':phaseNames[a?.phase]||'等待继续')}</strong><span>${escapeText(a?.phase==='crop'?targetName(a.targetId):state.intake.figures.find(f=>f.figure_id===a?.targetId)?.label||'')}</span><p role="status">${escapeText(a?.reason|| (state.busy?'正在处理并保存当前阶段':a?.complete?'全部阶段与结果目录已保存':'已暂停；核对当前对象后继续'))}</p></div><ol>${['crop','compose','measure','export'].map(stage=>{const items=steps.filter(s=>s.stage===stage),retained=items.filter(s=>s.status==='done'&&a?.retained?.some(r=>r.stage===stage&&r.targetId===s.target_id)).length;return `<li ${a?.phase===stage?'aria-current="step"':''}>${phaseNames[stage]} <strong>${items.filter(s=>s.status==='done').length}/${items.length}</strong>${retained?`<small>保留/复用 ${retained}</small>`:''}</li>`;}).join('')}</ol><div><button class="text-button" data-batch-action="follow">${browsing?'跟随当前阶段':'暂停自动切页'}</button><button class="button primary" data-batch-action="resume" ${state.busy||a?.complete||!bridge?'disabled':''}>继续自动处理</button></div>`;
+    progress.innerHTML=`<div><strong>${escapeText(a?.complete?'处理完成':phaseNames[a?.phase]||'等待继续')}</strong><span>${escapeText(a?.phase==='crop'?targetName(a.targetId):state.intake.figures.find(f=>f.figure_id===a?.targetId)?.label||'')}</span><p role="status">${escapeText(batchReason(a?.reason)|| (state.busy?'正在处理并保存当前阶段':a?.complete?'全部阶段与结果目录已保存':'已暂停；核对当前对象后继续'))}</p>${a?.reason&&batchReason(a.reason)!==a.reason?`<details><summary>处理详情</summary><p>${escapeText(a.reason)}</p></details>`:''}</div><ol>${['crop','compose','measure','export'].map(stage=>{const items=steps.filter(s=>s.stage===stage),retained=items.filter(s=>s.status==='done'&&a?.retained?.some(r=>r.stage===stage&&r.targetId===s.target_id)).length;return `<li ${a?.phase===stage?'aria-current="step"':''}>${phaseNames[stage]} <strong>${items.filter(s=>s.status==='done').length}/${items.length}</strong>${retained?`<small>保留/复用 ${retained}</small>`:''}</li>`;}).join('')}</ol><div><button class="text-button" data-batch-action="follow">${browsing?'跟随当前阶段':'暂停自动切页'}</button><button class="button primary" data-batch-action="resume" ${state.busy||a?.complete||!bridge?'disabled':''}>继续自动处理</button></div>`;
     if(focus)progress.querySelector(`[data-batch-action="${focus}"]`)?.focus({preventScroll:true});
   }
   function followBatch() {
@@ -232,9 +235,12 @@ window.intakeWorkspace = (() => {
     const next=a.complete?'results':a.phase==='crop'?'review':a.phase==='compose'?'layout':a.phase==='measure'?'quant':null;
     if(!next)return;
     followed=event;
-    if(a.phase==='crop'&&state.rows.some(r=>r.id===a.targetId)&&state.selectedId!==a.targetId)select(a.targetId);
-    if(a.phase==='compose')chosenFigureId=a.targetId;
-    if(mode!==next)switchMode(next);
+    navigating=true;
+    try{
+      if(a.phase==='crop'&&state.rows.some(r=>r.id===a.targetId)&&state.selectedId!==a.targetId)select(a.targetId);
+      if(a.phase==='compose')chosenFigureId=a.targetId;
+      if(mode!==next)switchMode(next);
+    }finally{navigating=false;}
   }
   progress.addEventListener('click',event=>{
     const action=event.target.closest('[data-batch-action]')?.dataset.batchAction;
@@ -562,5 +568,5 @@ window.intakeWorkspace = (() => {
       cropDrafts.delete(r.id); cropPending.delete(r.id); syncCrops(); render();
     }
   });
-  return {sync, renderActive, hasDraft, reset, stageCrop, undoCrop, renderCropInspector, cropEditable, allowedModes, requestFigure, renderFigureInspector, renderIntakeResults, followBatch};
+  return {sync, renderActive, hasDraft, reset, stageCrop, undoCrop, renderCropInspector, cropEditable, allowedModes, requestFigure, renderFigureInspector, renderIntakeResults, followBatch, noteBrowse};
 })();

@@ -1484,7 +1484,7 @@ def test_sequence_real_page_two_figs_pause_continue_stage_barriers_and_reopen(
     assert all(p.read_bytes() == content for p, content in originals.items())
 
 
-@pytest.mark.parametrize("failure", ["stale", "cas-failed"])
+@pytest.mark.parametrize("failure", ["stale", "cas-failed", "cancel-encode"])
 def test_sequence_start_never_launches_before_exact_cas_commit(
     intake_window: WebWorkbenchWindow,
     qtbot: QtBot,
@@ -1520,6 +1520,7 @@ def test_sequence_start_never_launches_before_exact_cas_commit(
         (IntakeSequenceProtein(entry_id="a", figure_id="f", label="A"),),
     )
     jobs: list[str] = []
+    captured: list[tuple[WBJob, Callable[[WBReply], None]]] = []
     original_job = window.host.submit_tool_job
     original_save = Workspace.save_draft
 
@@ -1527,6 +1528,9 @@ def test_sequence_start_never_launches_before_exact_cas_commit(
         job: WBJob, callback: Callable[[WBReply], None], *, accept_errors: bool = False
     ) -> None:
         jobs.append(job.operation)
+        if failure == "cancel-encode" and job.operation == "encode":
+            captured.append((job, callback))
+            return
         original_job(job, callback, accept_errors=accept_errors)
 
     def failed_save(
@@ -1559,6 +1563,10 @@ def test_sequence_start_never_launches_before_exact_cas_commit(
         requestId="one",
         digest="stale" if failure == "stale" else intake_digest(p),
     )
+    if failure == "cancel-encode":
+        assert len(captured) == 1
+        window.host.cancel()
+        captured[0][1](WBReply("late-encode", value=b"cancelled payload must not be committed"))
     wait_saved(window, qtbot)
     assert current(window).model_dump_json() == initial
     assert not any(

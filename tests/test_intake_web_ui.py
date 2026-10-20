@@ -1267,3 +1267,109 @@ def test_export_suggestions_require_explicit_n_and_target_choice(
         "setState({intake:{...state.intake,..." + json.dumps(acknowledged) + "}});true",
     )
     assert javascript(window, qtbot, "window.intakeWorkspace.hasDraft()") is False
+
+
+def test_sequence_reference_section_does_not_consume_protein_order(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    w = intake_page
+    javascript(
+        w,
+        qtbot,
+        """
+      setState({intake:{...state.intake,figures:[],proteins:[],
+      sources:[...state.intake.sources,{...state.intake.sources[0],source_id:'reference',
+        original_name:'manual.tif',relative_path:'manual/result.tif'}],
+      grouped_draft:{schema_version:2,figures:[],sequence:[],excluded_group_ids:[],
+      reference_group_ids:['ref'],groups:['a','ref','b'].map(k=>({group_id:k,
+      source_ids:[k==='ref'?'reference':'source-'+k],figure_id:null,protein_label:'',
+      selected_source_id:null,region_index:null,reuse_confirmed:false}))}}});true
+    """,
+    )
+    assert javascript(w, qtbot, "document.querySelector('[data-group-action=reload]').disabled")
+    javascript(
+        w,
+        qtbot,
+        """
+      document.querySelector('[data-group-action=add-fig]').click();
+      const n=document.querySelector('[data-group-field=lanes]');n.value='4';
+      n.dispatchEvent(new Event('input',{bubbles:true}));
+      const p=document.querySelector('[data-group-field=proteins]');
+      p.value='Alpha'+String.fromCharCode(10)+'Beta';
+      p.dispatchEvent(new Event('input',{bubbles:true}));
+      document.querySelectorAll('[data-group-source]')[0].click();
+      document.querySelectorAll('[data-group-source]')[1].click();true
+    """,
+    )
+    assert javascript(w, qtbot, "document.querySelectorAll('[data-sequence-binding]').length") == 2
+    assert javascript(
+        w,
+        qtbot,
+        "document.querySelectorAll('[data-sequence-binding]')[1].textContent.includes('Beta')",
+    )
+    assert javascript(
+        w,
+        qtbot,
+        "document.querySelector('.sequence-references').textContent.includes('不占蛋白顺序')",
+    )
+    assert (
+        javascript(
+            w, qtbot, "document.querySelectorAll('.sequence-references [data-group-source]').length"
+        )
+        == 0
+    )
+    assert javascript(
+        w,
+        qtbot,
+        "document.querySelector('[data-group-action=reload]').textContent.includes('放弃修改')",
+    )
+    javascript(w, qtbot, "document.querySelector('[data-group-action=start]').click();true")
+    raw = javascript(w, qtbot, "JSON.stringify(sent.at(-1).payload.grouping)")
+    assert isinstance(raw, str)
+    grouping = json.loads(raw)
+    assert [g["protein_label"] for g in grouping["groups"]] == ["Alpha", "", "Beta"]
+    assert grouping["reference_group_ids"] == ["ref"] and grouping["excluded_group_ids"] == []
+
+
+def test_manual_browsing_keeps_page_and_selection_until_follow_is_requested(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    w = intake_page
+    javascript(
+        w,
+        qtbot,
+        """
+      setState({busy:true,rows:['a','b'].map(k=>({id:'protein-'+k,name:k,fig:'Fig 1',
+      lanes:6,width:180,height:90,roi:null})),intake:{...state.intake,
+      confirmed:true,cropEnabled:true,figureEnabled:true,crops:[],
+      automation:{key:'batch',follow:true,phase:'crop',targetId:'protein-a',paused:false,complete:false},
+      workflow:{policy:'intake_workflow@3',digest:'wf',editing:false,steps:[
+      {stage:'crop',target_id:'protein-a',status:'running'}]}}});
+      document.querySelector('[data-mode=layout]').click();true
+    """,
+    )
+    assert javascript(w, qtbot, "mode==='layout'")
+    javascript(
+        w,
+        qtbot,
+        """
+      document.querySelector('[data-row=protein-b]').focus();
+      document.querySelector('[data-row=protein-b]').click();
+      setState({intake:{...state.intake,automation:{...state.intake.automation,
+        phase:'measure',targetId:'fig-a'}}});true
+    """,
+    )
+    assert javascript(
+        w,
+        qtbot,
+        "mode==='layout' && row().id==='protein-b' && "
+        "document.activeElement.dataset.row==='protein-b'",
+    )
+    javascript(w, qtbot, "document.querySelector('[data-batch-action=follow]').click();true")
+    assert javascript(w, qtbot, "mode==='quant'")
+    javascript(
+        w,
+        qtbot,
+        "setState({intake:{...state.intake,automation:{...state.intake.automation,phase:'complete',complete:true}}});true",
+    )
+    assert javascript(w, qtbot, "mode==='results'")

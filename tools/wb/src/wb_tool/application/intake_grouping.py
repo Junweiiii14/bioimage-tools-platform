@@ -71,6 +71,7 @@ class IntakeGrouping(DocumentIO):
     groups: tuple[IntakeAcquisitionGroup, ...] = Field(default=(), max_length=512)
     sequence: tuple[IntakeSequenceProtein, ...] | None = Field(default=None, max_length=512)
     excluded_group_ids: tuple[str, ...] = Field(default=(), max_length=512)
+    reference_group_ids: tuple[str, ...] = Field(default=(), max_length=512)
 
     @model_serializer(mode="wrap")
     def serialize_grouping(self, handler: SerializerFunctionWrapHandler) -> dict[str, object]:
@@ -78,6 +79,10 @@ class IntakeGrouping(DocumentIO):
         if self.schema_version == 1:
             fields.pop("sequence", None)
             fields.pop("excluded_group_ids", None)
+            fields.pop("reference_group_ids", None)
+        elif not self.reference_group_ids:
+            # Preserve the exact previously emitted v2 wire and intake digest.
+            fields.pop("reference_group_ids", None)
         return fields
 
     @model_validator(mode="after")
@@ -98,7 +103,7 @@ class IntakeGrouping(DocumentIO):
         if len(labels) != len(set(labels)):
             raise ValueError("Fig显示名不能重复")
         if self.schema_version == 1:
-            if self.sequence is not None or self.excluded_group_ids:
+            if self.sequence is not None or self.excluded_group_ids or self.reference_group_ids:
                 raise ValueError("蛋白顺序配置必须使用采集组格式v2")
             return self
         if self.sequence is None:
@@ -113,14 +118,26 @@ class IntakeGrouping(DocumentIO):
         if ordered != self.sequence:
             raise ValueError("蛋白顺序必须遵循顶部Fig顺序")
         entries = [p for p in self.sequence if p.label.strip()]
-        for index, group in enumerate(self.groups):
+        references = set(self.reference_group_ids)
+        if len(references) != len(self.reference_group_ids) or not references.issubset(
+            {g.group_id for g in self.groups}
+        ):
+            raise ValueError("参考组身份重复或不在当前来源中")
+        eligible = [g for g in self.groups if g.group_id not in references]
+        for index, group in enumerate(eligible):
             entry = entries[index] if index < len(entries) else None
             if (group.figure_id, group.protein_label) != (
                 entry.figure_id if entry else None,
                 entry.label.strip() if entry else "",
             ):
                 raise ValueError("采集组对应必须匹配Fig蛋白顺序投影")
-        unused = {g.group_id for g in self.groups if g.figure_id is None}
+        if any(
+            g.figure_id is not None or g.protein_label
+            for g in self.groups
+            if g.group_id in references
+        ):
+            raise ValueError("参考结果不占蛋白顺序，不能归入执行Fig")
+        unused = {g.group_id for g in eligible if g.figure_id is None}
         if len(set(self.excluded_group_ids)) != len(self.excluded_group_ids) or not set(
             self.excluded_group_ids
         ).issubset(unused):
@@ -134,6 +151,7 @@ def configure_intake_sequence(
     sequence: tuple[IntakeSequenceProtein, ...],
     *,
     excluded_group_ids: tuple[str, ...] = (),
+    reference_group_ids: tuple[str, ...] | None = None,
 ) -> IntakeGrouping:
     """Project ordered names onto stable acquisition identities, retaining source choices."""
     if any(p.figure_id not in {f.figure_id for f in figures} for p in sequence):
@@ -141,8 +159,18 @@ def configure_intake_sequence(
     sequence = tuple(p for f in figures for p in sequence if p.figure_id == f.figure_id)
     entries = [p for p in sequence if p.label.strip()]
     groups: list[IntakeAcquisitionGroup] = []
-    for index, group in enumerate(grouping.groups):
-        entry = entries[index] if index < len(entries) else None
+    references = set(
+        grouping.reference_group_ids if reference_group_ids is None else reference_group_ids
+    )
+    if not references.issubset({g.group_id for g in grouping.groups}):
+        raise ValueError("参考组不在当前来源中")
+    index = 0
+    for group in grouping.groups:
+        entry = (
+            entries[index] if group.group_id not in references and index < len(entries) else None
+        )
+        if group.group_id not in references:
+            index += 1
         figure_id = entry.figure_id if entry else None
         label = entry.label.strip() if entry else ""
         changed = group.figure_id != figure_id
@@ -162,6 +190,7 @@ def configure_intake_sequence(
         groups=tuple(groups),
         sequence=sequence,
         excluded_group_ids=excluded_group_ids,
+        reference_group_ids=tuple(g.group_id for g in grouping.groups if g.group_id in references),
     )
 
 
@@ -169,13 +198,14 @@ def validate_intake_sequence(grouping: IntakeGrouping) -> None:
     if grouping.schema_version != 2:
         return
     entries = [p for p in grouping.sequence or () if p.label.strip()]
-    if len(entries) > len(grouping.groups):
-        raise ValueError(f"蛋白条目缺少{len(entries) - len(grouping.groups)}个采集组")
+    eligible = [g for g in grouping.groups if g.group_id not in grouping.reference_group_ids]
+    if len(entries) > len(eligible):
+        raise ValueError(f"蛋白条目缺少{len(entries) - len(eligible)}个采集组")
     for figure in grouping.figures:
         if not any(p.figure_id == figure.figure_id for p in entries):
             raise ValueError(f"{figure.label or '未命名Fig'}至少需要一个蛋白名称")
         if not figure.label.strip() or figure.lane_count is None:
             raise ValueError("请填写每个Fig名称与Fig级N")
-    unused = {g.group_id for g in grouping.groups if g.figure_id is None}
+    unused = {g.group_id for g in eligible if g.figure_id is None}
     if unused != set(grouping.excluded_group_ids):
         raise ValueError(f"请明确确认{len(unused)}个剩余采集组不纳入本次")

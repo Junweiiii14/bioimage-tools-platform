@@ -6,18 +6,23 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 from wb_tool.api import (
+    ExportDiscovery,
+    ExportObservation,
     IntakeAcquisitionGroup,
     IntakeDraftFigure,
     IntakeGrouping,
     IntakeSequenceProtein,
+    IntakeSource,
     WBIntakeCropProject,
     WBIntakeProject,
     approve_intake_workflow,
+    begin_intake_group_revision,
     claim_intake_workflow_step,
     configure_intake_sequence,
     confirm_intake,
     continue_intake_sequence,
     finish_intake_workflow_step,
+    install_export_discovery,
     intake_digest,
     intake_grouping,
     intake_workflow_digest,
@@ -25,12 +30,86 @@ from wb_tool.api import (
     prepare_intake_crops,
     prepare_intake_sequence,
     read_figure_project,
+    register_intake_source,
     retry_intake_workflow_step,
     save_intake_grouping,
 )
 
 from .test_intake_grouping import pool
 from .test_intake_workflow import workflow
+
+
+def test_interleaved_reference_groups_do_not_consume_sequence_and_cannot_hide_raw_sources() -> None:
+    project = pool()
+    original = project.intake.sources[0]
+    reference = IntakeSource.model_validate(
+        {
+            **dict(original),
+            "source_id": "ref",
+            "original_name": "result.tif",
+            "relative_path": "manual/result.tif",
+        }
+    )
+    project = register_intake_source(project, reference, expected_digest=intake_digest(project))
+    project = type(project).model_validate(
+        {
+            **dict(project),
+            "intake": project.intake.model_copy(
+                update={
+                    "sources": (project.intake.sources[0], reference, *project.intake.sources[1:-1])
+                }
+            ),
+        }
+    )
+    discovered = install_export_discovery(
+        project,
+        ExportDiscovery(
+            observations=tuple(
+                ExportObservation(
+                    source_id=s.source_id,
+                    sha256=s.asset.sha256,
+                    group_id="0" * 24,
+                    role="reference" if s.source_id == "ref" else "signal",
+                )
+                for s in project.intake.sources
+            )
+        ),
+        expected_digest=intake_digest(project),
+    )
+    grouping = intake_grouping(discovered)
+    assert len(grouping.groups) == 3 and grouping.reference_group_ids == (
+        grouping.groups[1].group_id,
+    )
+    chosen = type(grouping).model_validate(
+        {
+            **dict(grouping),
+            "groups": tuple(
+                g.model_copy(update={"selected_source_id": g.source_ids[0]})
+                if g.group_id not in grouping.reference_group_ids
+                else g
+                for g in grouping.groups
+            ),
+        }
+    )
+    configured = configure_intake_sequence(
+        chosen,
+        (IntakeDraftFigure(figure_id="f", label="Fig", lane_count=4),),
+        (
+            IntakeSequenceProtein(entry_id="a", figure_id="f", label="A"),
+            IntakeSequenceProtein(entry_id="b", figure_id="f", label="B"),
+        ),
+    )
+    assert [g.protein_label for g in configured.groups] == ["A", "", "B"]
+    saved = prepare_intake_sequence(
+        discovered, configured, expected_digest=intake_digest(discovered)
+    )
+    assert len(saved.rows) == 2 and saved.intake.grouping == configured
+    assert read_figure_project(saved.model_dump_json().encode()) == saved
+    forged = configure_intake_sequence(
+        grouping, (), (), reference_group_ids=(grouping.groups[0].group_id,)
+    )
+    with pytest.raises(ValueError, match="参考识别证据"):
+        save_intake_grouping(discovered, forged, expected_digest=intake_digest(discovered))
 
 
 def test_one_submission_is_pure_and_compiles_exact_sequence_before_any_attempt() -> None:
@@ -70,6 +149,26 @@ def test_continue_requires_human_crop_review_and_retries_only_one_blocked_item()
     assert [s.status for s in retried.workflow.steps] == ["pending"] * len(retried.workflow.steps)
     assert not retried.workflow.approved
     assert retried.workflow.steps[0].attempt == 1
+
+
+def test_one_submission_confirms_an_explicit_sequence_revision_without_mutating_history() -> None:
+    project = pool()
+    grouping = configuration(project, ("A", "B"))
+    prepared = prepare_intake_sequence(project, grouping, expected_digest=intake_digest(project))
+    history = prepared.model_dump_json()
+    editing = begin_intake_group_revision(prepared, expected_digest=intake_digest(prepared))
+    renamed = configure_intake_sequence(
+        grouping,
+        (grouping.figures[0].model_copy(update={"label": "Renamed"}),),
+        grouping.sequence or (),
+    )
+    revised = prepare_intake_sequence(editing, renamed, expected_digest=intake_digest(editing))
+    assert not revised.workflow.editing and revised.workflow.policy == "intake_workflow@3"
+    assert revised.intake.figures[0].label == "Renamed"
+    assert prepared.model_dump_json() == history
+    assert [(g.group_id, g.selected_source_id) for g in renamed.groups] == [
+        (g.group_id, g.selected_source_id) for g in grouping.groups
+    ]
 
 
 def configuration(project: WBIntakeProject, labels: tuple[str, ...]) -> IntakeGrouping:
@@ -205,7 +304,7 @@ def batch_workflow():
 
 def test_batch_barriers_require_all_crops_then_all_figures_before_measurement() -> None:
     project = batch_workflow()
-    observed = []
+    observed: list[tuple[str, str]] = []
     for _ in range(7):
         if len(observed) < 2:
             assert (

@@ -62,7 +62,7 @@ window.workbenchActions = (() => {
     if(!click(el?.querySelectorAll('[data-group-source]')[index]))return false;focusCard(id);return true;
   }));
   handlers.set('source.clear',()=>grouped()&&groupClick('[data-group-action=unpick]'));
-  handlers.set('workflow.continue',()=>project()&&!window.desktopSession.hasDraft()&&click(button('[data-intake=run], [data-intake-crop-action=run]')));
+  handlers.set('workflow.continue',()=>project()&&(click(button('[data-group-action=start], [data-intake-crop-action=run], [data-batch-action=resume]'))||!window.desktopSession.hasDraft()&&click(button('[data-intake=run]'))));
   handlers.set('edit.undo',()=>project()&&['review','layout','results'].includes(mode)&&!$('[data-action=undo]').disabled&&(action('undo'),true));
   handlers.set('edit.redo',()=>project()&&['review','layout','results'].includes(mode)&&!$('[data-action=redo]').disabled&&(action('redo'),true));
   handlers.set('shortcuts.settings',()=>{open();return true;});
@@ -119,7 +119,7 @@ window.workbenchActions = (() => {
     else if(next.error&&dialog.open){message=next.error;renderSettings();}
     decorate();
   }
-  const targets={ 'project.save':'[data-session=save]','project.open':'[data-session=open]', 'group.all':'[data-group-action=select-visible]','group.assign':'[data-group-action=assign]','workflow.continue':'[data-intake=run], [data-intake-crop-action=run]','edit.undo':'[data-action=undo]','edit.redo':'[data-action=redo]','shortcuts.settings':'[data-action=shortcut-settings]'};
+  const targets={ 'project.save':'[data-session=save]','project.open':'[data-session=open]', 'group.all':'[data-group-action=select-visible]','group.assign':'[data-group-action=assign]','workflow.continue':'[data-group-action=start], [data-intake=run], [data-intake-crop-action=run], [data-batch-action=resume]','edit.undo':'[data-action=undo]','edit.redo':'[data-action=redo]','shortcuts.settings':'[data-action=shortcut-settings]'};
   function decorate(){
     if(!catalog)return;
     syncIdentity();

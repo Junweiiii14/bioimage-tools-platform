@@ -1,6 +1,7 @@
 """Explicit instrument intake plans, without inferred labels or quantitative operations."""
 
 import json
+import re
 from collections import Counter
 from hashlib import sha256
 from pathlib import PurePosixPath
@@ -161,6 +162,18 @@ class IntakeManifest(DocumentIO):
                     raise ValueError("识别建议不匹配当前原图来源")
                 if any(r.x1 > source.width or r.y1 > source.height for r in item.regions):
                     raise ValueError("识别区域超出原图")
+        if self.grouping is not None and self.grouping.reference_group_ids:
+            observations = (
+                {o.source_id: o for o in self.discovery.observations} if self.discovery else {}
+            )
+            for group in self.grouping.groups:
+                if group.group_id in self.grouping.reference_group_ids and any(
+                    (observation := observations.get(sid)) is None
+                    or observation.role != "reference"
+                    or observation.error
+                    for sid in group.source_ids
+                ):
+                    raise ValueError("单列参考组必须有本组全部来源的有效参考识别证据")
         if (
             len(figures) != len(self.figures)
             or len(proteins) != len(self.proteins)
@@ -442,8 +455,41 @@ def intake_snapshot(project: WBIntakeProject) -> dict[str, object]:
         project_id=project.project_id,
     )
     if project.intake.grouping is not None or not project.intake.proteins:
-        data["grouped_draft"] = intake_grouping(project).model_dump(mode="json")
+        grouping = intake_grouping(project)
+        data["grouped_draft"] = grouping.model_dump(mode="json")
+        data["reference_group_candidates"] = list(_reference_groups(project, grouping.groups))
     return data
+
+
+def intake_needs_reference_discovery(project: WBIntakeProject) -> bool:
+    """Only a new instrument-export pool is automatically classified before editing."""
+    return bool(
+        project.schema_version == 10
+        and project.intake.discovery is None
+        and project.intake.grouping is None
+        and not project.intake.proteins
+        and any(re.search(r"_\d{6}", s.original_name) for s in project.intake.sources)
+    )
+
+
+def _reference_groups(
+    project: WBIntakeProject, groups: tuple[IntakeAcquisitionGroup, ...]
+) -> tuple[str, ...]:
+    observations = (
+        {o.source_id: o for o in project.intake.discovery.observations}
+        if project.intake.discovery
+        else {}
+    )
+    return tuple(
+        g.group_id
+        for g in groups
+        if all(
+            (observation := observations.get(sid)) is not None
+            and observation.role == "reference"
+            and not observation.error
+            for sid in g.source_ids
+        )
+    )
 
 
 def intake_grouping(project: WBIntakeProject) -> IntakeGrouping:
@@ -469,17 +515,24 @@ def intake_grouping(project: WBIntakeProject) -> IntakeGrouping:
                 {**dict(groups[index]), "source_ids": (*groups[index].source_ids, *ids)}
             )
     if grouping is None:
-        return IntakeGrouping(schema_version=2, groups=tuple(groups), sequence=())
+        return IntakeGrouping(
+            schema_version=2,
+            groups=tuple(groups),
+            sequence=(),
+            reference_group_ids=_reference_groups(project, tuple(groups)),
+        )
     expanded = IntakeGrouping(figures=grouping.figures, groups=tuple(groups))
     if grouping.schema_version == 1:
         return expanded
     mapped_count = sum(bool(p.label.strip()) for p in grouping.sequence or ())
-    unused = {g.group_id for g in groups[mapped_count:]}
+    eligible = [g for g in groups if g.group_id not in grouping.reference_group_ids]
+    unused = {g.group_id for g in eligible[mapped_count:]}
     return configure_intake_sequence(
         expanded,
         grouping.figures,
         grouping.sequence or (),
         excluded_group_ids=tuple(g for g in grouping.excluded_group_ids if g in unused),
+        reference_group_ids=grouping.reference_group_ids,
     )
 
 

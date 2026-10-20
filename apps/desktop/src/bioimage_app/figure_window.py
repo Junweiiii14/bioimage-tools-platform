@@ -2123,7 +2123,7 @@ class FigureProjectWindow(QMainWindow):
                 saved,
             )
 
-        self._wb(WBJob("encode", document=project), encoded)
+        self.submit_tool_job(WBJob("encode", document=project), encoded)
 
     def _choose_document(self, index: int) -> None:
         document_id = self.documents.itemData(index)

@@ -646,15 +646,22 @@ class IntakeWorkflowSession:
         key, generation = self._key, host.view.generation
         host.begin_operation()
 
+        def stopped() -> bool:
+            if not self._obsolete(key, generation):
+                return False
+            if key == self._key:
+                host.finish_operation("旧Fig显示已停止，已保存成图与历史保留。")
+            return True
+
         def shown(reply: WBReply) -> None:
-            if self._obsolete(key, generation):
+            if stopped():
                 return
             if not self._cancelled and not reply.error and isinstance(reply.value, FigureRender):
                 host.view.show_render(reply.value)
             self._advance()
 
         def loaded(reply: StorageReply) -> None:
-            if self._obsolete(key, generation):
+            if stopped():
                 return
             if self._cancelled or reply.error_code or not isinstance(reply.value, str):
                 self._advance()
