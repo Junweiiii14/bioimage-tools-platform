@@ -21,3 +21,5 @@ PR27 0b712f3：Windows951项/594.53s、wheel/OCR及检查成功；Linux在下一
 取证583d411：manual run39425695652实际成功；外部watchdog仅向核对父链inferior发SIGINT，实际gdb17/完整采样/无截断，controller0；原目标1通过/5.10s、gdb0/deadlineFalse，未复现挂起。独审指出诊断事件跳过desktop-environment仍会提供同名skipped必需context；已改为diagnostic-unused-*名称，只在普通事件保留原必需名称，不接受诊断作为门禁成功。根因仍UNKNOWN，下一假设为原同文件前驱影响。
 
 独审第二项：外部SIGINT后20秒宽限仍挂起，旧实现虽所属killpg/wait并打印原始-9，却重新抛TimeoutExpired使CLI1而非约定124。已显式捕获宽限耗尽、打印NATIVE_CAPTURE_GRACE_EXPIRED，仍在finally完成所属清理并保留debugger_exit，main按expired返回124。非成功状态未改变，产品/用例断言/期限未改。Ruff/Pyright实际0；最终绑定独审/远端结果另记。
+
+1e066db prefix manual39426106338/job118638966621：外部取消对照仍gdb17、线程1/截断0、CAPTURE_COMPLETE且controller0；原同文件前五项→目标6 passed/7.42s、gdb0/deadlineFalse，未复现。普通PR实际contexts为foundation (windows-latest)、foundation (ubuntu-latest)、desktop-environment、rules-context；诊断skipped名称为表达式文本，均不精确匹配这四名称。583普通运行因提交names修复被原concurrency取消（非再次15分钟挂起），Linux原始日志.local/t068-normal-583d411-cancelled-linux.log保留。目标/前驱局部通过不销原0b超时，最终新head完整检查仍必需。
