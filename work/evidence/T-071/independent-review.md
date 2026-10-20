@@ -23,3 +23,9 @@
 - UI非作者t071_finish_reviewer绑定同一c935：ship（限定原三项及相关新增范围）。自主浏览/选源焦点保护、中文暂停说明/折叠原诊断、明确放弃重载均resolved；参考单列和快捷键继续/仅保存静态路由resolved。三张有效Qt配置图1440/1024/390，加五张同源DOM IAB1280图（grid/references/review/quant/results）逐一审阅。重复配置命名图不计网格证据；layout无有效绘制图，不在ship范围；新增快捷键未独立动态按键，未运行第二detector/Qt。证据本地.impeccable/review/final，私图不入库。
 
 - 最后修复后documenter t071_documenter仅补web-workbench surface的行为和证据边界；既有DESIGN/sidecar/PRODUCT保持，普通Operate延伸不引入新设计体系，不顺带修复旧漂移。brief diff检查0，未运行第二detector/Qt。
+
+## 安装诊断取证修复 20c106f
+
+- 非作者t064_independent_review绑定7e6568300e5eded27001b25c01f35bc451310224→20c106f6e34523bfb39c00d687b7c1faccbb8fc9：Accepted，无可证实P0–P2。
+- 冻结AST原样提取observed/traced_save及实际host.save/_storage_reply，18纯控制/1.67s实际0（.local/t071-diagnostic-20c106f/run_review.py）。编码/存储前不观测，CAS/guard/代际/取消不伪造事件；成功安装后先观测再原after一次；异常不吞，patch正常/异常均恢复。精确集合拒绝缺项/外来或重复target凑数，屏障违规仍失败。
+- 时限120/150秒、25ms轮询、真实网页导航/worker/原像素/输出/重开/关闭要求不变；生产调度、CI和其他UI无diff。未运行Qt/worker/完整门禁。初版独立.local探针nested-with AST定位错误收集exit2，仅修该探针遍历后通过；无产品/门禁变化。
