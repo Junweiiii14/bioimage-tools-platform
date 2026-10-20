@@ -1,8 +1,8 @@
 # Handoff Snapshot
 
-- 当前任务：work/tasks/T-065-intake-crop-revision.md；总规划T063；完整计划docs/wb-grouped-intake-plan.md。
+- 当前任务：work/tasks/T-066-workbench-shortcuts.md；总规划T063；完整计划docs/wb-grouped-intake-plan.md。前置PR23 Windows一项失败在T065分支处理。
 - 用户已确认P0–P8执行，普通实现自主，仅无法消解的数据歧义集中问；当前已退出Plan模式。
-- 活动树C:/Users/70236/.codex/worktrees/wb-grouped-intake/bioimage-tools-platform，codex/intake-crop-revision，起点main f3fb2ff；不要从历史ResearchVault树开发。
+- 活动树C:/Users/70236/.codex/worktrees/wb-grouped-intake/bioimage-tools-platform，当前codex/workbench-shortcuts；T065用codex/intake-crop-revision，切换前保留提交。不要从历史ResearchVault树开发。
 - 新树依赖uv sync --locked --all-groups实际0、锁文件不变，T064规则已按main1625ae5重载；P0 PR21四检查已合。
 - t051树T062原型和交接未提交改动保留原位。桌面已批准无侧栏采集组网格，组内图片并排平等，批量归Fig、组蛋白名、单选裁剪源、Fig级N。
 - 本轮三指定目录95个TIFF/76唯一内容、19个三图采集组/19唯一裁剪参考；N初步建议及限制见计划，不沿用旧82/21。

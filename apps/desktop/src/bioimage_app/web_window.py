@@ -23,6 +23,7 @@ from wb_tool.api import WBIntakeProject
 
 from bioimage_app.figure_window import FigureProjectWindow
 from bioimage_app.project_navigation import MODES, ProjectNavigation
+from bioimage_app.shortcuts import WorkbenchShortcuts
 from bioimage_app.source_origins import SourceOrigins
 from bioimage_app.web_bridge import WorkbenchBridge
 
@@ -81,6 +82,7 @@ class WebWorkbenchWindow(QMainWindow):
             "wb-execution-test": "E7Test",
         }.get(channel or "", "Platform")
         self.settings = settings or QSettings("BioImageTools", settings_name)
+        self.shortcuts = WorkbenchShortcuts(self.settings)
         self.navigation = ProjectNavigation(self.settings)
         self._stage = "idle"
         self._message = ""
@@ -358,6 +360,8 @@ class WebWorkbenchWindow(QMainWindow):
     @Slot(str, str)
     def _session_request(self, action: str, payload: str) -> None:
         try:
+            if action == "shortcuts" and len(payload) > 32768:
+                raise ValueError("快捷键设置超出容量预算")
             raw: object = json.loads(payload)
             if not isinstance(raw, dict):
                 raise ValueError("操作参数无效")
@@ -394,6 +398,11 @@ class WebWorkbenchWindow(QMainWindow):
                 self._request_transition("new", lambda: self.choose("new_intake_folder"))
             elif action == "folder":
                 self.choose("quant_import_folder")
+            elif action == "shortcuts":
+                receipt = data.get("requestId")
+                if not isinstance(receipt, str) or not receipt or len(receipt) > 80:
+                    raise ValueError("快捷键保存身份无效")
+                self.shortcuts.update(data.get("bindings"), receipt)
             elif action == "save":
                 self.host.save()
             elif action == "location":
@@ -478,6 +487,7 @@ class WebWorkbenchWindow(QMainWindow):
                 "intent": self._intent,
                 "route": self._route,
                 "recents": self.navigation.recent(),
+                "shortcuts": self.shortcuts.snapshot(),
                 "workspace": self.host.workspace_path,
                 "saveState": "处理中"
                 if self.host.operation_busy

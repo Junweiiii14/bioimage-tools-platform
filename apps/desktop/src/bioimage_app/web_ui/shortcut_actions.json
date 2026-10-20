@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "actions": [
+    {"id":"project.save","label":"保存当前草稿或项目","scope":"project","default":"Ctrl+S"},
+    {"id":"project.open","label":"打开已有项目","scope":"global","default":"Ctrl+O"},
+    {"id":"view.intake","label":"导入与分配","scope":"project","default":"Ctrl+1"},
+    {"id":"view.review","label":"原图裁剪","scope":"project","default":"Ctrl+2"},
+    {"id":"view.layout","label":"拼图排版","scope":"project","default":"Ctrl+3"},
+    {"id":"view.quant","label":"独立灰度定量","scope":"project","default":"Ctrl+4"},
+    {"id":"view.results","label":"查看结果","scope":"project","default":"Ctrl+5"},
+    {"id":"group.previous","label":"上一采集组或原图","scope":"project","default":"Alt+ArrowUp"},
+    {"id":"group.next","label":"下一采集组或原图","scope":"project","default":"Alt+ArrowDown"},
+    {"id":"group.toggle","label":"选中或取消当前采集组","scope":"intake","default":"Ctrl+Shift+Space"},
+    {"id":"group.all","label":"选择当前显示采集组","scope":"intake","default":"Ctrl+Shift+A"},
+    {"id":"group.assign","label":"将所选组归入指定 Fig","scope":"intake","default":"Ctrl+Shift+G"},
+    {"id":"source.zoom","label":"放大当前组的裁剪原图","scope":"intake","default":"Ctrl+Shift+P"},
+    {"id":"source.first","label":"选择当前组第1张裁剪源","scope":"intake","default":"Alt+1"},
+    {"id":"source.second","label":"选择当前组第2张裁剪源","scope":"intake","default":"Alt+2"},
+    {"id":"source.third","label":"选择当前组第3张裁剪源","scope":"intake","default":"Alt+3"},
+    {"id":"source.clear","label":"取消当前组裁剪源","scope":"intake","default":"Alt+0"},
+    {"id":"workflow.continue","label":"继续当前批次处理","scope":"workflow","default":"Ctrl+Enter"},
+    {"id":"edit.undo","label":"撤销图上调整","scope":"image","default":"Ctrl+Z"},
+    {"id":"edit.redo","label":"重做图上调整","scope":"image","default":"Ctrl+Shift+Z"},
+    {"id":"shortcuts.settings","label":"配置快捷键","scope":"global","default":"Ctrl+Shift+K"}
+  ],
+  "reserved": ["Ctrl+A","Ctrl+C","Ctrl+V","Ctrl+X","Ctrl+Y","Alt+F4","Ctrl+W","Ctrl+R","Ctrl+F4","Ctrl+Alt+Delete"]
+}
