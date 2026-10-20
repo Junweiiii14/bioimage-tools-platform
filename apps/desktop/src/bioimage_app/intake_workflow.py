@@ -19,6 +19,7 @@ from wb_tool.api import (
     WBIntakeCropProject,
     WBIntakeFigureProject,
     WBIntakeOutputProject,
+    WBIntakeProject,
     WBIntakeWorkflowProject,
     WBJob,
     WBReply,
@@ -57,6 +58,78 @@ class IntakeWorkflowSession:
         self._output_context: tuple[str, str] | None = None
         self._output_path = ""
         self._output_committed = False
+        self._parent_context: tuple[str, str] | None = None
+        self._output_parent = ""
+        self._batch_context: tuple[str, str] | None = None
+        self._batch_key = ""
+        self._retained_steps: set[tuple[str, str]] = set()
+        self._retained_runs: set[str] = set()
+
+    def output_parent(self, project: WBFigureProject) -> str:
+        if self._parent_context == (self.host.workspace_path, project.project_id):
+            return self._output_parent
+        return str(Path(self.host.workspace_path) / "outputs")
+
+    def choose_output_parent(self, project: WBFigureProject, parent: str) -> None:
+        self._parent_context = self.host.workspace_path, project.project_id
+        self._output_parent = parent
+
+    @property
+    def presentation_key(self) -> tuple[object, ...]:
+        return self._parent_context, self._output_parent, self._batch_context, self._batch_key
+
+    def batch_snapshot(self, project: WBIntakeProject) -> dict[str, object] | None:
+        if (
+            not isinstance(project, WBIntakeWorkflowProject)
+            or project.workflow.policy != "intake_workflow@3"
+        ):
+            return None
+        order = {"crop": 0, "compose": 1, "measure": 2, "export": 3}
+        remaining = sorted(
+            (s for s in project.workflow.steps if s.status != "done"),
+            key=lambda s: order[s.stage],
+        )
+        active = next((s for s in remaining if s.status == "running"), None)
+        blocked = next(
+            (
+                s
+                for s in remaining
+                if s.status in {"needs_review", "failed", "cancelled", "interrupted"}
+            ),
+            None,
+        )
+        current = active or blocked or (remaining[0] if remaining else None)
+        follows = self._batch_context == (self.host.workspace_path, project.project_id)
+        retained: set[tuple[str, str]] = self._retained_steps.copy() if follows else set()
+        if follows and isinstance(project, WBIntakeFigureProject):
+            for fig in project.intake.figures:
+                ids = {
+                    p.protein_id for p in project.intake.proteins if p.figure_id == fig.figure_id
+                }
+                analyses = [p for p in project.analyses if p.row_id in ids]
+                if (
+                    analyses
+                    and len(analyses) == len(ids)
+                    and all(p.run and p.run.run_id in self._retained_runs for p in analyses)
+                ):
+                    retained.add(("measure", fig.figure_id))
+        output_complete = isinstance(project, WBIntakeOutputProject) and any(
+            e.complete and e.input_digest == intake_output_digest(project)
+            for e in project.intake_outputs
+        )
+        return {
+            "key": self._batch_key if follows else "",
+            "follow": bool(follows and not self._cancelled and not project.workflow.editing),
+            "phase": current.stage if current else "complete",
+            "targetId": current.target_id if current else "",
+            "paused": bool(blocked or (not self.host.operation_busy and remaining)),
+            "reason": blocked.reason if blocked else "",
+            "complete": bool(not remaining and output_complete),
+            "retained": [
+                {"stage": stage, "targetId": target} for stage, target in sorted(retained)
+            ],
+            "outputParent": self.output_parent(project),
+        }
 
     def cancel(self) -> None:
         self._cancelled = True
@@ -177,6 +250,13 @@ class IntakeWorkflowSession:
             raise ValueError("执行摘要已改变，请刷新后重试")
         self._key, self._cancelled = uuid4().hex, False
         key, generation = self._key, host.view.generation
+        if project.workflow.policy == "intake_workflow@3":
+            self._batch_context = host.workspace_path, project.project_id
+            self._batch_key = self._key
+            self._retained_steps = {
+                (s.stage, s.target_id) for s in project.workflow.steps if s.status == "done"
+            }
+            self._retained_runs = {p.run.run_id for p in project.analyses if p.run}
         host.begin_operation()
 
         def prepared(reply: WBReply) -> None:
@@ -539,11 +619,68 @@ class IntakeWorkflowSession:
                     current = marked
                     self._cancelled = True
                 updated = complete_intake_figure(current, ticket, published, reply.value)
-                self._persist(updated, self._advance, terminal_cancel=self._cancelled)
+                self._persist(
+                    updated,
+                    lambda: self._present_and_advance(ticket.target_id),
+                    terminal_cancel=self._cancelled,
+                )
             except ValueError as error:
                 self._failed_stage(ticket, str(error))
 
         next_source()
+
+    def _present_and_advance(self, figure_id: str) -> None:
+        """Present the committed Fig without replacing the batch session identity."""
+        host = self.host
+        project = host.view.project()
+        if (
+            not isinstance(project, WBIntakeFigureProject)
+            or project.workflow.policy != "intake_workflow@3"
+        ):
+            self._advance()
+            return
+        evidence = next((e for e in project.intake_figures if e.figure_id == figure_id), None)
+        if evidence is None or self._cancelled or host.is_closing:
+            self._advance()
+            return
+        key, generation = self._key, host.view.generation
+        host.begin_operation()
+
+        def stopped() -> bool:
+            if not self._obsolete(key, generation):
+                return False
+            if key == self._key:
+                host.finish_operation("旧Fig显示已停止，已保存成图与历史保留。")
+            return True
+
+        def shown(reply: WBReply) -> None:
+            if stopped():
+                return
+            if not self._cancelled and not reply.error and isinstance(reply.value, FigureRender):
+                host.view.show_render(reply.value)
+            self._advance()
+
+        def loaded(reply: StorageReply) -> None:
+            if stopped():
+                return
+            if self._cancelled or reply.error_code or not isinstance(reply.value, str):
+                self._advance()
+                return
+            host.submit_tool_job(
+                WBJob(
+                    "intake_figure_preview",
+                    document=project,
+                    row_id=figure_id,
+                    path=reply.value,
+                    cancellation=host.cancellation,
+                ),
+                shown,
+                accept_errors=True,
+            )
+
+        host.submit_storage_job(
+            StorageCommand("asset", asset=evidence.image), loaded, accept_errors=True
+        )
 
     def _export(self, ticket: IntakeWorkflowTicket | None) -> None:
         host = self.host
@@ -552,7 +689,7 @@ class IntakeWorkflowSession:
             host.fail_operation("缺少当前身份输出项目")
             return
         key, generation = self._key, host.view.generation
-        parent = Path(host.workspace_path) / "outputs"
+        parent = Path(self.output_parent(project))
         try:
             parent.mkdir(exist_ok=True)
         except OSError as error:

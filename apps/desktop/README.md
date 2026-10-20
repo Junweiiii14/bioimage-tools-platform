@@ -31,6 +31,16 @@ geometry drafts; failed saves retain drafts, and session changes retire them. Se
 
 # Desktop host
 
+T071 adds the versioned Fig sequence editor and a single guarded start/continue
+path. New batches use `intake_workflow@3`: all crops, then all complete Figs,
+then original-pixel measurements, then a committed output. The live batch snapshot
+drives page navigation; drafts, IME, dialogs and explicit browsing protect focus.
+`--fig-sequence-test` builds an isolated FigSequenceTest distribution, preserving
+GroupedIntakeTest. `--verify-sequence-installation <new-report.json>` operates the
+shipped two-Fig page, reviews both crops and checks real workers, stage barriers,
+navigation, output, reopening and owned shutdown. This synthetic diagnostic is
+engineering evidence; actual T071 acceptance remains in its task/evidence files.
+
 T069 adds `--grouped-intake-test`, an isolated GroupedIntakeTest distribution with
 its own AppId, settings, Chinese install directory and shortcuts. The explicit
 `--verify-grouped-intake-installation <new-report.json>` reuses the real intake

@@ -46,8 +46,8 @@
 
 ## Current Pointer
 
-- 当前交付：[T-069](work/tasks/T-069-grouped-intake-offline.md)，总计划[T-063](work/tasks/T-063-grouped-intake-delivery-plan.md)与[采集组计划](docs/wb-grouped-intake-plan.md)；新候选及边界见[交付记录](docs/wb-grouped-intake-delivery.md)。
-- 活动树：`C:/Users/70236/.codex/worktrees/wb-grouped-intake/bioimage-tools-platform`；产品/安装冻结main6080867，收尾分支codex/grouped-intake-delivery；启动时重新核验。
+- 当前实施：[T-071](work/tasks/T-071-fig-sequence-automation.md)；用户2026-10-20已批准[T070方案](docs/wb-fig-sequence-automation-plan.md)并授权持续至独审、PR和新离线包。完整方案已登记active目标。
+- 活动树：`C:/Users/70236/.codex/worktrees/wb-fig-sequence/bioimage-tools-platform`，codex/fig-sequence-automation，基线main6916b3a。旧wb-grouped-intake/codex/fig-sequence-plan的所有未提交规划与其他树保留；T069安装仍冻结6080867，见交付记录。
 - E0–E7及T061已经工程集成，见[验收索引](docs/wb-execution-acceptance.md)与任务。干净Win10/物理DPI/科学留出仍独立待验，不宣称正式发布。
 - t051树T062原型与交接未提交资料保留，桌面批准原型为BioImage-导入分组交互原型/index.html。历史ResearchVault树不作为当前开发入口。
 - 当前状态与下一步：`.agent-handoff/snapshot.md`；风险：`.agent-handoff/risks.md`；长期待办：`.agent-handoff/backlog.md`。

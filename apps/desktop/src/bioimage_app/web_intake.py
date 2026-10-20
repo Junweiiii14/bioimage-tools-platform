@@ -1,6 +1,7 @@
 """Typed command boundary for the instrument planning page."""
 
 import json
+from pathlib import Path
 from typing import TYPE_CHECKING, Literal, cast
 
 from wb_tool.api import (
@@ -23,8 +24,10 @@ from wb_tool.api import (
     begin_intake_group_revision,
     confirm_intake,
     confirm_intake_group_revision,
+    continue_intake_sequence,
     intake_digest,
     intake_workflow_digest,
+    prepare_intake_sequence,
     replace_intake_plan,
     retry_intake_workflow_step,
     return_to_intake_editing,
@@ -53,9 +56,85 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
     if (
         isinstance(project, WBIntakeWorkflowProject)
         and project.workflow.editing
-        and action not in {"intake_grouping", "intake_confirm", "intake_preview"}
+        and action
+        not in {
+            "intake_grouping",
+            "intake_confirm",
+            "intake_preview",
+            "intake_sequence_start",
+            "intake_choose_output",
+        }
     ):
         raise ValueError("分组编辑中请先保存并确认清单，再继续执行")
+    if action == "intake_choose_output":
+        from PySide6.QtWidgets import QFileDialog
+
+        if intake_digest(project) != digest:
+            raise ValueError("项目已变化，请刷新后选择输出位置")
+        parent = QFileDialog.getExistingDirectory(
+            host,
+            "选择本次结果保存位置（自动创建独立子目录）",
+            host.intake_workflow.output_parent(project),
+        )
+        if parent:
+            if not Path(parent).is_dir():
+                raise ValueError("输出位置不是可用文件夹")
+            host.intake_workflow.choose_output_parent(project, parent)
+        return
+    if action == "intake_sequence_start":
+        raw, request_id = data.get("grouping"), data.get("requestId")
+        if (
+            not isinstance(raw, dict)
+            or not isinstance(request_id, str)
+            or not request_id
+            or len(request_id) > 80
+            or type(data.get("allowReuse", False)) is not bool
+        ):
+            raise ValueError("请提交当前顺序配置和启动请求身份")
+        grouping = IntakeGrouping.model_validate_json(json.dumps(raw, ensure_ascii=False))
+        if isinstance(project, WBIntakeWorkflowProject) and not project.workflow.editing:
+            raise ValueError("已有执行计划请继续处理；修改顺序须先进入分组修订")
+        generation, epoch = host.view.generation, bridge.session_epoch
+        bridge.sequence_response = {
+            "projectId": project.project_id,
+            "epoch": epoch,
+            "requestId": request_id,
+            "status": "pending",
+        }
+
+        def compile_sequence(current: WBFigureProject) -> WBIntakeWorkflowProject:
+            if not isinstance(current, WBIntakeProject):
+                raise ValueError("当前导入项目已变化")
+            return prepare_intake_sequence(
+                current,
+                grouping,
+                expected_digest=digest,
+                allow_reuse=data.get("allowReuse", False) is True,
+            )
+
+        def started() -> None:
+            current = host.view.project()
+            if (
+                not isinstance(current, WBIntakeWorkflowProject)
+                or bridge.session_epoch != epoch
+                or host.is_closing
+                or host.cancellation.is_set()
+            ):
+                return
+            bridge.sequence_response = {**bridge.sequence_response, "status": "started"}
+            host.intake_workflow.start(intake_workflow_digest(current))
+
+        host.save(
+            transform=compile_sequence,
+            after=started,
+            install_guard=lambda: (
+                not host.is_closing
+                and not host.cancellation.is_set()
+                and host.view.generation == generation
+                and bridge.session_epoch == epoch
+            ),
+        )
+        return
     if action == "intake_discover":
         host.intake.discover(digest)
         return
@@ -180,6 +259,45 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
             ),
             prepared,
             accept_errors=True,
+        )
+        return
+    if action == "intake_sequence_continue":
+        workflow_digest = data.get("workflowDigest")
+        if (
+            not isinstance(project, WBIntakeCropProject)
+            or not isinstance(workflow_digest, str)
+            or intake_digest(project) != digest
+        ):
+            raise ValueError("请核对当前整批执行摘要")
+        crop = None
+        if data.get("roi") is not None:
+            roi, row_id = data.get("roi"), data.get("rowId")
+            if not isinstance(roi, dict) or not isinstance(row_id, str):
+                raise ValueError("请在对应原图核对裁剪范围")
+            fields = cast(dict[str, object], roi)
+            values = tuple(fields.get(k) for k in ("x", "y", "width", "height"))
+            if any(type(v) is not int for v in values):
+                raise ValueError("裁剪范围须为原图整数像素")
+            x, y, width, height = cast(tuple[int, int, int, int], values)
+            crop = LaneROI(row_id, x, y, x + width, y + height)
+
+        def resume(current: WBFigureProject) -> WBIntakeCropProject:
+            if not isinstance(current, WBIntakeCropProject) or intake_digest(current) != digest:
+                raise ValueError("当前输入已改变，修正草稿保留")
+            return continue_intake_sequence(current, expected_digest=workflow_digest, crop=crop)
+
+        generation, epoch = host.view.generation, bridge.session_epoch
+        host.save(
+            transform=resume,
+            after=lambda: host.intake_workflow.start(
+                intake_workflow_digest(cast(WBIntakeWorkflowProject, host.view.project()))
+            ),
+            install_guard=lambda: (
+                not host.is_closing
+                and not host.cancellation.is_set()
+                and host.view.generation == generation
+                and bridge.session_epoch == epoch
+            ),
         )
         return
     if action == "intake_run":

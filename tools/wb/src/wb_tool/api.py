@@ -101,6 +101,7 @@ from wb_tool.application.instrument_intake import (
     install_export_discovery,
     intake_digest,
     intake_grouping,
+    intake_needs_reference_discovery,
     intake_snapshot,
     register_intake_source,
     replace_intake_plan,
@@ -142,6 +143,8 @@ from wb_tool.application.intake_grouping import (
     IntakeAcquisitionGroup,
     IntakeDraftFigure,
     IntakeGrouping,
+    IntakeSequenceProtein,
+    configure_intake_sequence,
 )
 from wb_tool.application.intake_output import (
     IntakeOutputEvidence,
@@ -159,6 +162,7 @@ from wb_tool.application.intake_revision import (
     revise_completed_intake_crop,
     revise_intake_grouping,
 )
+from wb_tool.application.intake_sequence import continue_intake_sequence, prepare_intake_sequence
 from wb_tool.application.intake_workflow import (
     IntakeWorkflowLedger,
     IntakeWorkflowStep,
@@ -324,6 +328,11 @@ __all__ = [
     "IntakeAcquisitionGroup",
     "IntakeDraftFigure",
     "IntakeGrouping",
+    "IntakeSequenceProtein",
+    "configure_intake_sequence",
+    "prepare_intake_sequence",
+    "continue_intake_sequence",
+    "intake_needs_reference_discovery",
     "intake_grouping",
     "save_intake_grouping",
     "ExportDiscovery",

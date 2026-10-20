@@ -89,6 +89,7 @@ class WorkbenchBridge(QObject):
         self._montage = None
         self._error = ""
         self._completed_key = ""
+        self.sequence_response = {}
         self._quant_overview = None
         self._pending_source = None
         self.timer.start()
@@ -112,6 +113,7 @@ class WorkbenchBridge(QObject):
         self._montage: str | None = None
         self._error = ""
         self._completed_key = ""
+        self.sequence_response: dict[str, object] = {}
         self._quant_overview: tuple[str, str] | None = None
         self._pending_source: tuple[str, str] | None = None
         self.manual_commands = ManualQuantCommands(self)
@@ -185,6 +187,22 @@ class WorkbenchBridge(QObject):
                         )
                     intake["zoom"] = {"sourceId": source_id, "preview": self._intake_zoom}
             intake["issues"] = list(self.host.intake.issues)
+            intake["outputParent"] = self.host.intake_workflow.output_parent(project)
+            intake["automation"] = self.host.intake_workflow.batch_snapshot(project)
+            if (
+                self.sequence_response.get("projectId") == project.project_id
+                and self.sequence_response.get("epoch") == self.session_epoch
+            ):
+                response = dict(self.sequence_response)
+                if response.get("status") == "pending" and not self.host.operation_busy:
+                    response["status"] = (
+                        "saved"
+                        if isinstance(project, WBIntakeWorkflowProject)
+                        and project.workflow.policy == "intake_workflow@3"
+                        and not project.workflow.editing
+                        else "failed"
+                    )
+                intake["sequenceResponse"] = response
             intake["cropEnabled"] = isinstance(project, WBIntakeCropProject)
             intake["figureEnabled"] = isinstance(project, WBIntakeFigureProject)
             intake["outputEnabled"] = isinstance(project, WBIntakeOutputProject)
@@ -451,6 +469,8 @@ class WorkbenchBridge(QObject):
                 self.host.retry_location_button.isHidden(),
                 self.host.automatic.last_output_path,
                 self.host.automatic.discovery_report,
+                self.host.intake_workflow.presentation_key,
+                tuple(self.sequence_response.items()),
                 self._completed_key,
                 self._error,
             )
@@ -466,11 +486,18 @@ class WorkbenchBridge(QObject):
 
     @Slot(str, str)
     def request(self, action: str, payload: str = "{}") -> None:
+        data: dict[str, object] = {}
         try:
             limit = (
                 262144
                 if action
-                in {"intake_plan", "intake_assign", "intake_grouping", "intake_accept_discovery"}
+                in {
+                    "intake_plan",
+                    "intake_assign",
+                    "intake_grouping",
+                    "intake_accept_discovery",
+                    "intake_sequence_start",
+                }
                 else 32768
                 if action == "quant_target"
                 else 4096
@@ -491,6 +518,8 @@ class WorkbenchBridge(QObject):
             ):
                 raise ValueError("当前任务仍在处理中，请稍候或取消")
             elif isinstance(self.host.view.project(), WBIntakeProject) and action not in {
+                "intake_sequence_start",
+                "intake_choose_output",
                 "intake_grouping",
                 "intake_preview",
                 "intake_discover",
@@ -501,6 +530,7 @@ class WorkbenchBridge(QObject):
                 "intake_prepare",
                 "intake_edit",
                 "intake_run",
+                "intake_sequence_continue",
                 "intake_crop_review",
                 "intake_crop_revise",
                 "intake_crop_retry",
@@ -514,6 +544,8 @@ class WorkbenchBridge(QObject):
             }:
                 raise ValueError("仪器清单项目请使用阶段执行、原图复核和已保存Fig入口")
             elif action in {
+                "intake_sequence_start",
+                "intake_choose_output",
                 "intake_grouping",
                 "intake_preview",
                 "intake_discover",
@@ -524,6 +556,7 @@ class WorkbenchBridge(QObject):
                 "intake_prepare",
                 "intake_edit",
                 "intake_run",
+                "intake_sequence_continue",
                 "intake_crop_review",
                 "intake_crop_revise",
                 "intake_crop_retry",
@@ -750,6 +783,13 @@ class WorkbenchBridge(QObject):
             self._error = ""
         except (ValueError, TypeError) as error:
             self._error = str(error)
+            if action == "intake_sequence_start":
+                self.sequence_response = {
+                    "projectId": data.get("projectId"),
+                    "epoch": data.get("sessionEpoch"),
+                    "requestId": data.get("requestId"),
+                    "status": "failed",
+                }
         self.publish()
 
     def _validate_crop_edit(self, data: dict[str, object]) -> None:

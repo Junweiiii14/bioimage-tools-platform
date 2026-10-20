@@ -2123,7 +2123,7 @@ class FigureProjectWindow(QMainWindow):
                 saved,
             )
 
-        self._wb(WBJob("encode", document=project), encoded)
+        self.submit_tool_job(WBJob("encode", document=project), encoded)
 
     def _choose_document(self, index: int) -> None:
         document_id = self.documents.itemData(index)
@@ -2613,8 +2613,12 @@ class FigureProjectWindow(QMainWindow):
             self.save()
             return
         self._shutting = True
-        self._store.shutdown()
-        self._background.shutdown()
+        # Retire one owned port at a time. Moving the image worker back to
+        # the GUI must finish before storage close emits its queued Python reply.
+        if self._background_closed:
+            self._store.shutdown()
+        else:
+            self._background.shutdown()
 
     def _store_stopped(self) -> None:
         self._store_closed = True
@@ -2622,6 +2626,8 @@ class FigureProjectWindow(QMainWindow):
 
     def _background_stopped(self) -> None:
         self._background_closed = True
+        if self._shutting:
+            self._store.shutdown()
         self._both_stopped()
 
     def _both_stopped(self) -> None:

@@ -463,6 +463,10 @@ def test_grouped_draft_and_original_preview_save_reopen_with_real_storage(
     start(window, qtbot, root)
     snapshot = cast(dict[str, object], window.bridge.snapshot()["intake"])
     draft = cast(dict[str, object], snapshot["grouped_draft"])
+    # Explicit legacy draft: new projects now expose the versioned sequence editor.
+    draft["schema_version"] = 1
+    draft.pop("sequence", None)
+    draft.pop("excluded_group_ids", None)
     groups = cast(list[dict[str, object]], draft["groups"])
     assert len(groups) == 1 and len(cast(list[str], groups[0]["source_ids"])) == 2
     draft["figures"] = [{"figure_id": "fig", "label": "Fig 1", "lane_count": None}]
@@ -522,6 +526,9 @@ def test_executed_grouping_incomplete_revision_is_durable_and_blocks_execution(
         dict[str, object],
         cast(dict[str, object], window.bridge.snapshot()["intake"])["grouped_draft"],
     )
+    draft["schema_version"] = 1
+    draft.pop("sequence", None)
+    draft.pop("excluded_group_ids", None)
     groups = cast(list[dict[str, object]], draft["groups"])
     draft["figures"] = [{"figure_id": "fig", "label": "Fig 1", "lane_count": 4}]
     groups[0].update(
@@ -1314,3 +1321,260 @@ def test_export_discovery_real_worker_save_and_reopen(
     wait_saved(window, qtbot)
     restored = current(window).intake.discovery
     assert restored is not None and restored.selections[0].source_id == signal_record.source_id
+
+
+def test_sequence_real_page_two_figs_pause_continue_stage_barriers_and_reopen(
+    intake_window: WebWorkbenchWindow,
+    qtbot: QtBot,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    window = intake_window
+    root = tmp_path / "sequence-raw"
+    a = make_source(root / "A_123456 (1).tif")
+    b = make_source(root / "B_123456 (1).tif", 2000)
+    originals = {p: p.read_bytes() for p in (a, b)}
+    start(window, qtbot, root)
+
+    def js(code: str) -> object:
+        replies: list[object] = []
+        window.web.page().runJavaScript(code, replies.append)
+        qtbot.waitUntil(lambda: bool(replies), timeout=10000)
+        return replies[0]
+
+    qtbot.waitUntil(
+        lambda: (
+            js(
+                "!!document.querySelector('[data-group-action=add-fig]') && "
+                "!document.querySelector('[data-group-action=add-fig]').disabled"
+            )
+            is True
+        ),
+        timeout=10000,
+    )
+    snapshots: list[dict[str, object]] = []
+    original_save = Workspace.save_draft
+
+    def record_save(
+        store: Workspace,
+        document_id: str,
+        tool_id: str,
+        revision: int,
+        data: bytes,
+        *,
+        expected_previous_revision: int | None,
+    ) -> object:
+        result = original_save(
+            store,
+            document_id,
+            tool_id,
+            revision,
+            data,
+            expected_previous_revision=expected_previous_revision,
+        )
+        snapshots.append(json.loads(data))
+        return result
+
+    monkeypatch.setattr(Workspace, "save_draft", record_save)
+    assert (
+        js("""
+      window.sequenceModes=[];window.sequenceSwitch=switchMode;
+      switchMode=function(next){const result=sequenceSwitch(next);
+        sequenceModes.push(mode);return result;};
+      window.fillSequence=(el,value)=>{el.value=value;
+        el.dispatchEvent(new Event('input',{bubbles:true}));};
+      document.querySelector('[data-group-action=add-fig]').click();
+      fillSequence(document.querySelector('[data-group-field=fig-label]'),'First');
+      fillSequence(document.querySelector('[data-group-field=lanes]'),'4');
+      fillSequence(document.querySelector('[data-group-field=proteins]'),'Alpha');
+      document.querySelector('[data-group-action=add-fig]').click();
+      fillSequence(document.querySelectorAll('[data-group-field=fig-label]')[1],'Second');
+      fillSequence(document.querySelectorAll('[data-group-field=lanes]')[1],'5');
+      fillSequence(document.querySelectorAll('[data-group-field=proteins]')[1],'Beta');
+      document.querySelectorAll('[data-group-source]')[0].click();
+      document.querySelectorAll('[data-group-source]')[1].click();
+      !document.querySelector('[data-group-action=start]').disabled
+    """)
+        is True
+    )
+    js("document.querySelector('[data-group-action=start]').click();true")
+    wait_saved(window, qtbot)
+    paused = current(window)
+    assert isinstance(paused, WBIntakeCropProject), window.host.view.status.text()
+    assert paused.workflow.policy == "intake_workflow@3"
+    assert [s.status for s in paused.workflow.steps if s.stage == "crop"] == [
+        "needs_review",
+        "pending",
+    ]
+    assert all(s.attempt == 0 for s in paused.workflow.steps if s.stage != "crop")
+    qtbot.waitUntil(
+        lambda: (
+            js(
+                "mode==='review' && !state.busy && "
+                "state.intake.workflow.steps.some(s=>s.status==='needs_review')"
+            )
+            is True
+        ),
+        timeout=10000,
+    )
+    assert js("row().id") == paused.rows[0].row_id
+    for index in (0, 1):
+        qtbot.waitUntil(lambda: js("!state.busy") is True, timeout=10000)
+        assert (
+            js("""
+          commitCrop({x:12,y:10,width:120,height:40},row().roi);
+          !document.querySelector('[data-intake-crop-action=run]').disabled
+        """)
+            is True
+        ), window.host.view.status.text()
+        js("document.querySelector('[data-intake-crop-action=run]').click();true")
+        wait_saved(window, qtbot)
+        if index == 0:
+            halfway = current(window)
+            assert isinstance(halfway, WBIntakeCropProject)
+            assert [s.status for s in halfway.workflow.steps if s.stage == "crop"] == [
+                "done",
+                "needs_review",
+            ]
+            assert all(s.attempt == 0 for s in halfway.workflow.steps if s.stage != "crop")
+            qtbot.waitUntil(
+                lambda halfway=halfway: js("row().id") == halfway.rows[1].row_id, timeout=10000
+            )
+    finished = current(window)
+    assert isinstance(finished, WBIntakeOutputProject), window.host.view.status.text()
+    assert all(s.status == "done" for s in finished.workflow.steps), window.host.view.status.text()
+    assert len(finished.intake_figures) == 2 and len(finished.analyses) == 2
+    assert all(a.run and a.run.pid and a.run.state == "succeeded" for a in finished.analyses)
+    assert len(finished.intake_outputs) == 1 and finished.intake_outputs[0].complete
+    qtbot.waitUntil(lambda: js("mode==='results'") is True, timeout=10000)
+    modes = js("JSON.stringify(sequenceModes)")
+    assert isinstance(modes, str)
+    visited = json.loads(modes)
+    assert all(m in visited for m in ("review", "layout", "quant", "results")), visited
+    for snapshot in snapshots:
+        ledger = cast(dict[str, object], snapshot.get("workflow", {}))
+        steps = cast(list[dict[str, object]], ledger.get("steps", []))
+        for step in steps:
+            if step["status"] == "running" and step["stage"] in ("compose", "measure"):
+                required = ("crop",) if step["stage"] == "compose" else ("crop", "compose")
+                assert all(s["status"] == "done" for s in steps if s["stage"] in required)
+    assert any(s.get("workflow") for s in snapshots)
+    output = Path(finished.intake_outputs[0].destination)
+    old_zip = (output / "project.zip").read_bytes()
+    old_host = window.host
+    window.open_project(window.host.workspace_path)
+    qtbot.waitUntil(
+        lambda: window.host is not old_host and window.shutdown_stage == "idle", timeout=20000
+    )
+    wait_saved(window, qtbot)
+    reopened = current(window)
+    assert isinstance(reopened, WBIntakeOutputProject)
+    assert reopened.intake_outputs == finished.intake_outputs
+    assert [s.attempt for s in reopened.workflow.steps] == [
+        s.attempt for s in finished.workflow.steps
+    ]
+    assert (
+        cast(
+            dict[str, object],
+            cast(dict[str, object], window.bridge.snapshot()["intake"])["automation"],
+        )["follow"]
+        is False
+    )
+    assert (output / "project.zip").read_bytes() == old_zip
+    assert all(p.read_bytes() == content for p, content in originals.items())
+
+
+@pytest.mark.parametrize("failure", ["stale", "cas-failed", "cancel-encode"])
+def test_sequence_start_never_launches_before_exact_cas_commit(
+    intake_window: WebWorkbenchWindow,
+    qtbot: QtBot,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    failure: str,
+) -> None:
+    from wb_tool.api import (
+        IntakeDraftFigure,
+        IntakeSequenceProtein,
+        configure_intake_sequence,
+        intake_grouping,
+    )
+
+    window = intake_window
+    make_source(tmp_path / "raw" / "A_123456.tif")
+    start(window, qtbot, tmp_path / "raw")
+    p = current(window)
+    initial = p.model_dump_json()
+    grouping = intake_grouping(p)
+    grouping = type(grouping).model_validate(
+        {
+            **dict(grouping),
+            "groups": tuple(
+                g.model_copy(update={"selected_source_id": g.source_ids[0]})
+                for g in grouping.groups
+            ),
+        }
+    )
+    grouping = configure_intake_sequence(
+        grouping,
+        (IntakeDraftFigure(figure_id="f", label="Fig", lane_count=4),),
+        (IntakeSequenceProtein(entry_id="a", figure_id="f", label="A"),),
+    )
+    jobs: list[str] = []
+    captured: list[tuple[WBJob, Callable[[WBReply], None]]] = []
+    original_job = window.host.submit_tool_job
+    original_save = Workspace.save_draft
+
+    def submitted(
+        job: WBJob, callback: Callable[[WBReply], None], *, accept_errors: bool = False
+    ) -> None:
+        jobs.append(job.operation)
+        if failure == "cancel-encode" and job.operation == "encode":
+            captured.append((job, callback))
+            return
+        original_job(job, callback, accept_errors=accept_errors)
+
+    def failed_save(
+        store: Workspace,
+        document_id: str,
+        tool_id: str,
+        revision: int,
+        data: bytes,
+        *,
+        expected_previous_revision: int | None,
+    ) -> object:
+        if b'"workflow"' in data:
+            raise OSError("synthetic CAS save failure")
+        return original_save(
+            store,
+            document_id,
+            tool_id,
+            revision,
+            data,
+            expected_previous_revision=expected_previous_revision,
+        )
+
+    monkeypatch.setattr(window.host, "submit_tool_job", submitted)
+    if failure == "cas-failed":
+        monkeypatch.setattr(Workspace, "save_draft", failed_save)
+    request(
+        window,
+        "intake_sequence_start",
+        grouping=grouping.model_dump(mode="json"),
+        requestId="one",
+        digest="stale" if failure == "stale" else intake_digest(p),
+    )
+    if failure == "cancel-encode":
+        assert len(captured) == 1
+        window.host.cancel()
+        captured[0][1](WBReply("late-encode", value=b"cancelled payload must not be committed"))
+    wait_saved(window, qtbot)
+    assert current(window).model_dump_json() == initial
+    assert not any(
+        name in jobs
+        for name in ("intake_crop_prepare", "intake_crop_propose", "intake_crop_export")
+    )
+    response = cast(
+        dict[str, object],
+        cast(dict[str, object], window.bridge.snapshot()["intake"])["sequenceResponse"],
+    )
+    assert response["status"] == "failed" and response["requestId"] == "one"

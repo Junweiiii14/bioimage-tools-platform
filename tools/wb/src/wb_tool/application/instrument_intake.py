@@ -1,6 +1,7 @@
 """Explicit instrument intake plans, without inferred labels or quantitative operations."""
 
 import json
+import re
 from collections import Counter
 from hashlib import sha256
 from pathlib import PurePosixPath
@@ -17,6 +18,8 @@ from wb_tool.application.intake_grouping import (
     IntakeAcquisitionGroup,
     IntakeGrouping,
     acquisition_key,
+    configure_intake_sequence,
+    validate_intake_sequence,
 )
 
 
@@ -116,7 +119,7 @@ def grouping_plan(
 
 
 class IntakeManifest(DocumentIO):
-    schema_version: int = Field(default=1, ge=1, le=3)
+    schema_version: int = Field(default=1, ge=1, le=4)
     discovery: ExportDiscovery | None = None
     grouping: IntakeGrouping | None = None
     figures: tuple[IntakeFigure, ...] = Field(default=(), max_length=512)
@@ -142,8 +145,9 @@ class IntakeManifest(DocumentIO):
         if self.schema_version == 1 and self.discovery is not None:
             raise ValueError("识别建议必须使用清单格式v2")
         if self.grouping is not None:
-            if self.schema_version != 3:
-                raise ValueError("采集组草稿必须使用清单格式v3")
+            required_version = 4 if self.grouping.schema_version == 2 else 3
+            if self.schema_version != required_version:
+                raise ValueError(f"采集组草稿必须使用清单格式v{required_version}")
             if any(
                 sid not in sources for group in self.grouping.groups for sid in group.source_ids
             ):
@@ -158,6 +162,18 @@ class IntakeManifest(DocumentIO):
                     raise ValueError("识别建议不匹配当前原图来源")
                 if any(r.x1 > source.width or r.y1 > source.height for r in item.regions):
                     raise ValueError("识别区域超出原图")
+        if self.grouping is not None and self.grouping.reference_group_ids:
+            observations = (
+                {o.source_id: o for o in self.discovery.observations} if self.discovery else {}
+            )
+            for group in self.grouping.groups:
+                if group.group_id in self.grouping.reference_group_ids and any(
+                    (observation := observations.get(sid)) is None
+                    or observation.role != "reference"
+                    or observation.error
+                    for sid in group.source_ids
+                ):
+                    raise ValueError("单列参考组必须有本组全部来源的有效参考识别证据")
         if (
             len(figures) != len(self.figures)
             or len(proteins) != len(self.proteins)
@@ -270,6 +286,7 @@ def validate_intake_complete(manifest: IntakeManifest) -> None:
     ):
         raise ValueError("所选来源现为参考成品或读取失败，请重新核对原图后确认")
     if manifest.grouping is not None:
+        validate_intake_sequence(manifest.grouping)
         figures = {figure.figure_id: figure for figure in manifest.grouping.figures}
         for group in manifest.grouping.groups:
             if group.figure_id is None:
@@ -438,8 +455,41 @@ def intake_snapshot(project: WBIntakeProject) -> dict[str, object]:
         project_id=project.project_id,
     )
     if project.intake.grouping is not None or not project.intake.proteins:
-        data["grouped_draft"] = intake_grouping(project).model_dump(mode="json")
+        grouping = intake_grouping(project)
+        data["grouped_draft"] = grouping.model_dump(mode="json")
+        data["reference_group_candidates"] = list(_reference_groups(project, grouping.groups))
     return data
+
+
+def intake_needs_reference_discovery(project: WBIntakeProject) -> bool:
+    """Only a new instrument-export pool is automatically classified before editing."""
+    return bool(
+        project.schema_version == 10
+        and project.intake.discovery is None
+        and project.intake.grouping is None
+        and not project.intake.proteins
+        and any(re.search(r"_\d{6}", s.original_name) for s in project.intake.sources)
+    )
+
+
+def _reference_groups(
+    project: WBIntakeProject, groups: tuple[IntakeAcquisitionGroup, ...]
+) -> tuple[str, ...]:
+    observations = (
+        {o.source_id: o for o in project.intake.discovery.observations}
+        if project.intake.discovery
+        else {}
+    )
+    return tuple(
+        g.group_id
+        for g in groups
+        if all(
+            (observation := observations.get(sid)) is not None
+            and observation.role == "reference"
+            and not observation.error
+            for sid in g.source_ids
+        )
+    )
 
 
 def intake_grouping(project: WBIntakeProject) -> IntakeGrouping:
@@ -464,7 +514,26 @@ def intake_grouping(project: WBIntakeProject) -> IntakeGrouping:
             groups[index] = IntakeAcquisitionGroup.model_validate(
                 {**dict(groups[index]), "source_ids": (*groups[index].source_ids, *ids)}
             )
-    return IntakeGrouping(figures=grouping.figures if grouping else (), groups=tuple(groups))
+    if grouping is None:
+        return IntakeGrouping(
+            schema_version=2,
+            groups=tuple(groups),
+            sequence=(),
+            reference_group_ids=_reference_groups(project, tuple(groups)),
+        )
+    expanded = IntakeGrouping(figures=grouping.figures, groups=tuple(groups))
+    if grouping.schema_version == 1:
+        return expanded
+    mapped_count = sum(bool(p.label.strip()) for p in grouping.sequence or ())
+    eligible = [g for g in groups if g.group_id not in grouping.reference_group_ids]
+    unused = {g.group_id for g in eligible[mapped_count:]}
+    return configure_intake_sequence(
+        expanded,
+        grouping.figures,
+        grouping.sequence or (),
+        excluded_group_ids=tuple(g for g in grouping.excluded_group_ids if g in unused),
+        reference_group_ids=grouping.reference_group_ids,
+    )
 
 
 def save_intake_grouping(
@@ -565,13 +634,13 @@ def save_intake_grouping(
                     region_index=group.region_index,
                 )
             )
-    grouping = IntakeGrouping(figures=grouping.figures, groups=tuple(groups))
+    grouping = IntakeGrouping.model_validate({**dict(grouping), "groups": tuple(groups)})
     if grouping == project.intake.grouping:
         return project
     figures_plan, proteins, bindings = grouping_plan(grouping)
     fields = dict(project.intake)
     fields.update(
-        schema_version=3,
+        schema_version=4 if grouping.schema_version == 2 else 3,
         grouping=grouping,
         figures=figures_plan,
         proteins=proteins,
@@ -599,11 +668,14 @@ def install_export_discovery(
         confirmed_digest="",
     )
     if project.intake.grouping is not None:
-        fields["grouping"] = IntakeGrouping(
-            figures=project.intake.grouping.figures,
-            groups=tuple(
-                g.model_copy(update={"region_index": None}) for g in project.intake.grouping.groups
-            ),
+        fields["grouping"] = IntakeGrouping.model_validate(
+            {
+                **dict(project.intake.grouping),
+                "groups": tuple(
+                    g.model_copy(update={"region_index": None})
+                    for g in project.intake.grouping.groups
+                ),
+            }
         )
     return _updated(project, IntakeManifest.model_validate(fields))
 

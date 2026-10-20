@@ -19,6 +19,7 @@ from wb_tool.api import (
     WBReply,
     install_export_discovery,
     intake_digest,
+    intake_needs_reference_discovery,
     register_intake_source,
 )
 
@@ -257,7 +258,19 @@ class InstrumentIntakeSession:
                     f"失败 {len(self.issues)} 张。" + suffix
                 )
                 if completed and imported_count:
-                    host.save()
+
+                    def classify_new_pool() -> None:
+                        active = host.view.project()
+                        if (
+                            not host.is_closing
+                            and not host.cancellation.is_set()
+                            and identity == (host.workspace_path, host.view.project_identity)
+                            and isinstance(active, WBIntakeProject)
+                            and intake_needs_reference_discovery(active)
+                        ):
+                            self.discover(intake_digest(active))
+
+                    host.save(after=classify_new_pool)
                 return
             project = host.view.project()
             if not isinstance(project, WBIntakeProject):
