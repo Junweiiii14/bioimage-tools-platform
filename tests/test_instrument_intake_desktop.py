@@ -737,15 +737,23 @@ def test_invalid_thumbnail_reply_finishes_without_importing_or_leaking_busy_stat
     monkeypatch.undo()
 
 
+@pytest.mark.parametrize("together", [False, True])
 def test_distinct_export_folders_keep_same_named_same_content_candidates(
-    intake_window: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
+    intake_window: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path, together: bool
 ) -> None:
     window = intake_window
     first = make_source(tmp_path / "a" / "export" / "Image001.tif")
     second = make_source(tmp_path / "b" / "export" / "Image001.tif")
     assert first.read_bytes() == second.read_bytes()
-    start(window, qtbot, first.parent)
-    window.host.intake.import_folder(second.parent)
+    if together:
+        window.start_from_images([first.parent, second.parent], intake=True)
+        qtbot.waitUntil(
+            lambda: window.shutdown_stage == "idle" and bool(window.host.workspace_path),
+            timeout=20000,
+        )
+    else:
+        start(window, qtbot, first.parent)
+        window.host.intake.import_folder(second.parent)
     wait_saved(window, qtbot)
     sources = current(window).intake.sources
     assert len(sources) == 2 and sources[0].source_id != sources[1].source_id
@@ -774,6 +782,19 @@ def test_distinct_export_folders_keep_same_named_same_content_candidates(
     window.host.intake.import_folder(first.parent)
     qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=10000)
     assert current(window).intake.sources == sources
+
+
+def test_intake_rejects_outside_root_before_starting_an_operation(
+    intake_window: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
+) -> None:
+    window = intake_window
+    first = make_source(tmp_path / "selected" / "a.tif")
+    outside = make_source(tmp_path / "outside" / "b.tif")
+    start(window, qtbot, first.parent)
+    saved = current(window)
+    with pytest.raises(ValueError, match="不属于"):
+        window.host.intake.import_paths((outside,), first.parent)
+    assert not window.host.operation_busy and current(window) == saved
 
 
 def test_font_assets_never_enter_thumbnail_decoder(
