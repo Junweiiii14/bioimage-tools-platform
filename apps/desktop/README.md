@@ -228,3 +228,6 @@ closing the shell cancels/drains/saves through the existing host lifecycle. The 
 rejects foreign navigation and requests outside its asset root (except image data URLs and
 Qt's WebChannel resource). Each shell uses an off-the-record profile. Existing default
 platform/native routes remain available. This is a developer entry, not a packaged release.
+
+
+T067执行计划页可明确进入采集组修改；编辑中禁止继续处理，保存并确认后按失效范围继续。原Storage/CAS和历史结果保留，见 ../../docs/contracts/wb-intake-group-revision-v1.md。

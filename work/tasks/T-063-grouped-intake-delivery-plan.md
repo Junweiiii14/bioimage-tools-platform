@@ -1,6 +1,6 @@
 # T-063 采集组主流程与离线交付规划
 
-- 状态：执行中；当前完成专用受管工作树与基线核验，P0完成，PR21四必需检查通过并合main1625ae5；完整计划后继任务继续。
+- 状态：执行中；P0 PR21、P1/P2 PR22已四检查合main2044aaf；T065裁剪修订PR23等待新CI，T066快捷键已绑定独审，T067执行后分组失效待独审。P5–P8及新离线交付尚未完成。
 - 授权：用户2026-10-20确认完整P0–P8计划并要求持续推进至独审、PR集成、新离线测试版；普通实现自主处理，只集中询问无法消解的数据歧义。
 - 基线：main / HEAD `f3fb2ffe315af84980159745e5e6d5241b15a8c7`，分支 `codex/wb-grouped-intake`。
 - 活动树：`C:/Users/70236/.codex/worktrees/wb-grouped-intake/bioimage-tools-platform`。t051树T062未提交资料保留原位；不在历史ResearchVault树开发。

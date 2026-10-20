@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "task": "T-067",
+  "base_commit": "2044aafaa49afb76711530ff95e559dfe0cf2298",
+  "scopes": [
+    ".agent-handoff",
+    ".impeccable/surfaces",
+    "PRODUCT.md",
+    "apps/desktop",
+    "docs/contracts",
+    "docs/module-map.md",
+    "tests",
+    "tools/wb",
+    "work"
+  ],
+  "rules": {
+    "AGENTS.md": "3c5ce28cf9b92099025bd50db0821e94c90b5759dfb32d19e510da1774c4941f",
+    "docs/ai-workflow.md": "8003be926d828df9eaf0398d77f463a9472316be021467e7f22fb63132063f70",
+    "docs/architecture.md": "dabf3823b44d4af2f372fd5dc244747cb3cd7ff56abcfd13cf007721b8a0dbbd",
+    "docs/coding-standards.md": "40fe9541a84163e6df6be9d2a57b836b9703471440f412bd16456f1ef0382d71",
+    "docs/module-map.md": "4fe4418d14d07733974dd9eb1f23633ceb2c8af9730b713c456d373b69cb66d9",
+    "docs/research-protocol.md": "b1ab0f9bf291e50f5872e01147f7af2671fdc5885bf2f065c804c5f4a240aa51",
+    "docs/runbooks/rule-enforcement.md": "43c1aafc0003f1901c4c35f4aa896cd520cf79dc96856019e11c1b095fc5c090"
+  },
+  "base_rules": {
+    "AGENTS.md": "3c5ce28cf9b92099025bd50db0821e94c90b5759dfb32d19e510da1774c4941f",
+    "docs/ai-workflow.md": "8003be926d828df9eaf0398d77f463a9472316be021467e7f22fb63132063f70",
+    "docs/architecture.md": "dabf3823b44d4af2f372fd5dc244747cb3cd7ff56abcfd13cf007721b8a0dbbd",
+    "docs/coding-standards.md": "40fe9541a84163e6df6be9d2a57b836b9703471440f412bd16456f1ef0382d71",
+    "docs/module-map.md": "4fe4418d14d07733974dd9eb1f23633ceb2c8af9730b713c456d373b69cb66d9",
+    "docs/research-protocol.md": "b1ab0f9bf291e50f5872e01147f7af2671fdc5885bf2f065c804c5f4a240aa51",
+    "docs/runbooks/rule-enforcement.md": "43c1aafc0003f1901c4c35f4aa896cd520cf79dc96856019e11c1b095fc5c090"
+  }
+}

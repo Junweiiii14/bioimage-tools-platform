@@ -33,6 +33,52 @@ def bridge_snapshot(window: WebWorkbenchWindow, qtbot: QtBot, expression: str) -
     )
 
 
+def test_executed_group_revision_returns_to_grid_with_explicit_editing_guard(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        """
+      setState({intake:{...state.intake,grouped_draft:{schema_version:1,
+        figures:[{figure_id:'fig-a',label:'Fig 1',lane_count:6}],groups:[
+        {group_id:'protein-a',source_ids:['source-a'],figure_id:'fig-a',
+         protein_label:'P',selected_source_id:'source-a',region_index:null,reuse_confirmed:false}]},
+        workflow:{editing:false,ready_count:1,pending_ready:0,steps:[
+          {stage:'crop',target_id:'protein-a',status:'done',attempt:1,reason:''}]}}});true
+    """,
+    )
+    assert javascript(window, qtbot, "!document.querySelector('[data-intake=edit]').disabled")
+    javascript(window, qtbot, "document.querySelector('[data-intake=edit]').click();true")
+    assert javascript(window, qtbot, "sent.at(-1).action==='intake_edit'")
+    javascript(
+        window,
+        qtbot,
+        """
+      setState({intake:{...state.intake,confirmed:false,
+        workflow:{...state.intake.workflow,editing:true}}});true
+    """,
+    )
+    assert javascript(window, qtbot, "document.body.classList.contains('grouped-intake-active')")
+    assert javascript(window, qtbot, "document.activeElement.matches('#intake-workspace h1')")
+    assert javascript(window, qtbot, "document.querySelector('#intake-workspace').scrollTop===0")
+    assert javascript(
+        window, qtbot, "!document.querySelector('[data-group-field=protein]').disabled"
+    )
+    assert javascript(
+        window, qtbot, "document.querySelector('[data-group-action=import]').disabled"
+    )
+    javascript(window, qtbot, "document.querySelector('[data-group-action=unpick]').click();true")
+    javascript(window, qtbot, "document.querySelector('[data-group-action=save]').click();true")
+    assert javascript(
+        window,
+        qtbot,
+        "sent.at(-1).action==='intake_grouping' && "
+        "sent.at(-1).payload.grouping.groups[0].selected_source_id===null",
+    )
+
+
 def test_prepared_workflow_summary_preserves_pending_and_edit_guard(
     intake_page: WebWorkbenchWindow, qtbot: QtBot
 ) -> None:

@@ -20,7 +20,9 @@ from wb_tool.api import (
     WBReply,
     accept_export_selections,
     assign_intake_sources,
+    begin_intake_group_revision,
     confirm_intake,
+    confirm_intake_group_revision,
     intake_digest,
     intake_workflow_digest,
     replace_intake_plan,
@@ -28,6 +30,7 @@ from wb_tool.api import (
     return_to_intake_editing,
     review_intake_crop,
     revise_completed_intake_crop,
+    revise_intake_grouping,
     save_intake_grouping,
 )
 
@@ -47,6 +50,12 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
         or not isinstance(digest, str)
     ):
         raise ValueError("当前导入项目已改变，请刷新后重试")
+    if (
+        isinstance(project, WBIntakeWorkflowProject)
+        and project.workflow.editing
+        and action not in {"intake_grouping", "intake_confirm", "intake_preview"}
+    ):
+        raise ValueError("分组编辑中请先保存并确认清单，再继续执行")
     if action == "intake_discover":
         host.intake.discover(digest)
         return
@@ -70,6 +79,13 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
         def grouped(current: WBFigureProject) -> WBIntakeProject:
             if not isinstance(current, WBIntakeProject):
                 raise ValueError("当前导入项目已改变")
+            if isinstance(current, WBIntakeWorkflowProject):
+                return revise_intake_grouping(
+                    current,
+                    grouping,
+                    expected_digest=digest,
+                    allow_reuse=data.get("allowReuse", False) is True,
+                )
             return save_intake_grouping(
                 current,
                 grouping,
@@ -86,6 +102,17 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
                 and bridge.session_epoch == epoch
             ),
         )
+        return
+    if isinstance(project, WBIntakeWorkflowProject) and project.workflow.editing:
+        if action != "intake_confirm":
+            raise ValueError("分组编辑中请先保存并确认清单，再继续执行")
+
+        def confirm_revision(current: WBFigureProject) -> WBIntakeWorkflowProject:
+            if not isinstance(current, WBIntakeWorkflowProject):
+                raise ValueError("执行清单已改变")
+            return confirm_intake_group_revision(current, expected_digest=digest)
+
+        host.save(transform=confirm_revision)
         return
     if action == "intake_accept_discovery":
         selections = data.get("selections")
@@ -259,7 +286,11 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
         def edit(current: WBFigureProject) -> WBIntakeProject:
             if not isinstance(current, WBIntakeWorkflowProject) or intake_digest(current) != digest:
                 raise ValueError("执行计划已改变")
-            return return_to_intake_editing(current)
+            return (
+                begin_intake_group_revision(current, expected_digest=digest)
+                if current.intake.grouping is not None
+                else return_to_intake_editing(current)
+            )
 
         host.save(transform=edit)
         return

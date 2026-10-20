@@ -242,6 +242,32 @@ def complete_intake_figure(
         height=prepared.height,
     )
     ids = set(evidence.row_ids)
+    previous = {p.row_id: p for p in project.analyses}
+    merged = tuple(
+        old
+        if (
+            project.workflow.policy == "intake_workflow@2"
+            and (old := previous.get(plan.row_id)) is not None
+            and _current_intake_plan(project, old)
+            and old.crop == plan.crop
+            and old.empty_lanes == plan.empty_lanes
+            and replace(old.request, revision=plan.request.revision) == plan.request
+            and old.run is not None
+            and old.run.state == "succeeded"
+            and old.run.result is not None
+        )
+        else plan
+        for plan in prepared.analyses
+    )
+    # A new display label/order does not create a new numerical run. Keep the actual
+    # run and prior attempt identity only when every frozen numerical input agrees.
+    if all(p.run is not None for p in merged):
+        steps = tuple(
+            s.model_copy(update={"status": "done", "reason": ""})
+            if s.stage == "measure" and s.target_id == ticket.target_id and s.attempt > 0
+            else s
+            for s in steps
+        )
     return type(project).model_validate(
         {
             **dict(project),
@@ -252,7 +278,7 @@ def complete_intake_figure(
                 *[e for e in project.intake_figures if e.figure_id != ticket.target_id],
                 evidence,
             ),
-            "analyses": (*[p for p in project.analyses if p.row_id not in ids], *prepared.analyses),
+            "analyses": (*[p for p in project.analyses if p.row_id not in ids], *merged),
         }
     )
 

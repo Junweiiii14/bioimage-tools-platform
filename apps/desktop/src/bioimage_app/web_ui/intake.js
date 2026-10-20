@@ -311,20 +311,20 @@ window.intakeWorkspace = (() => {
       const names = {crop: '原值裁剪', compose: 'Fig 拼图', measure: '原像素定量', export: '结果输出'};
       const statuses = {pending: '待处理', running: '正在处理', done: '阶段已记录', needs_review: '需要复核', failed: '失败', cancelled: '已取消', interrupted: '未完整提交'};
       const issues = workflow.steps.filter(step => ['needs_review', 'failed', 'cancelled', 'interrupted'].includes(step.status));
-      const frozen = workflow.steps.some(step => step.attempt > 0);
+      const frozen = workflow.steps.some(step => step.attempt > 0) && !state.intake.grouped_draft;
       const pageSize=50, pages=Math.max(1,Math.ceil(workflow.steps.length/pageSize));
       stagePage=Math.max(0,Math.min(stagePage,pages-1));
       const start=stagePage*pageSize;
       const navigation=pages>1?`<nav class="intake-stage-actions" aria-label="阶段列表分页"><button class="text-button" data-intake="previous-stages" ${stagePage===0?'disabled':''}>上一页阶段</button><span role="status">第 ${stagePage+1} / ${pages} 页 · ${start+1}–${Math.min(start+pageSize,workflow.steps.length)} / ${workflow.steps.length} 个阶段</span><button class="text-button" data-intake="next-stages" ${stagePage===pages-1?'disabled':''}>下一页阶段</button></nav>`:'';
 
-      return `<section class="intake-summary"><div><h2>执行计划已准备</h2><p>${state.intake.figures.length} 个 Fig · ${total} 个蛋白行 · ${state.intake.proteins.reduce((sum, row) => sum + (state.intake.figures.find(fig => fig.figure_id === row.figure_id)?.lane_count || 0), 0)} 个独立槽位。</p><p>按原值裁剪、完整 Fig 拼图、原像素定量、结果输出的顺序处理。${state.intake.figureEnabled?'完整 Fig 保存后才计算原像素；数值和质量结论分别保留。':'先核对原图定位，再保存原值裁剪；尚未生成定量结果。'}</p></div><div class="intake-stage-actions"><button class="button primary" data-intake="run" ${disabled} ${hasDraft()||!runnable()?'disabled':''}>${state.intake.figureEnabled?'继续处理':'定位与裁剪'}</button><button class="button subtle" data-intake="edit" ${disabled} ${frozen ? 'disabled' : ''}>返回清单修改</button></div></section>${outputInfo()}<section class="intake-workflow" aria-label="执行阶段"><h2 id="intake-stages-heading" tabindex="-1">阶段与异常</h2><p class="intake-help">已记录 ${workflow.ready_count} / ${workflow.steps.length} 个阶段。${issues.length ? `${issues.length} 项需要处理，其他完整 Fig 可以继续。` : '暂无异常。裁剪完成不代表科学复核通过。'}</p>${navigation}<ol start="${start+1}">${workflow.steps.slice(start, start+pageSize).map(step => `<li><span>${escapeText(names[step.stage] || step.stage)}</span><strong>${escapeText(step.stage === 'crop' ? targetName(step.target_id) : state.intake.figures.find(fig => fig.figure_id === step.target_id)?.label || state.projectName)}</strong><span>${escapeText(statuses[step.status] || step.status)}</span>${cropActions(step)}${step.reason ? `<p>${escapeText(step.reason)}</p>` : ''}</li>`).join('')}</ol>${issues.length ? `<details><summary>查看全部异常原因</summary><ul>${issues.map(step => `<li>${escapeText(names[step.stage] || step.stage)} · ${escapeText(step.target_id)}：${escapeText(step.reason)}${cropActions(step)}</li>`).join('')}</ul></details>` : ''}</section>`;
+      return `<section class="intake-summary"><div><h2>执行计划已准备</h2><p>${state.intake.figures.length} 个 Fig · ${total} 个蛋白行 · ${state.intake.proteins.reduce((sum, row) => sum + (state.intake.figures.find(fig => fig.figure_id === row.figure_id)?.lane_count || 0), 0)} 个独立槽位。</p><p>按原值裁剪、完整 Fig 拼图、原像素定量、结果输出的顺序处理。${state.intake.figureEnabled?'完整 Fig 保存后才计算原像素；数值和质量结论分别保留。':'先核对原图定位，再保存原值裁剪；尚未生成定量结果。'}</p></div><div class="intake-stage-actions"><button class="button primary" data-intake="run" ${disabled} ${hasDraft()||!runnable()?'disabled':''}>${state.intake.figureEnabled?'继续处理':'定位与裁剪'}</button><button class="button subtle" data-intake="edit" ${disabled} ${frozen ? 'disabled' : ''}>${state.intake.grouped_draft?'修改分组与对应关系':'返回清单修改'}</button></div></section>${outputInfo()}<section class="intake-workflow" aria-label="执行阶段"><h2 id="intake-stages-heading" tabindex="-1">阶段与异常</h2><p class="intake-help">已记录 ${workflow.ready_count} / ${workflow.steps.length} 个阶段。${issues.length ? `${issues.length} 项需要处理，其他完整 Fig 可以继续。` : '暂无异常。裁剪完成不代表科学复核通过。'}</p>${navigation}<ol start="${start+1}">${workflow.steps.slice(start, start+pageSize).map(step => `<li><span>${escapeText(names[step.stage] || step.stage)}</span><strong>${escapeText(step.stage === 'crop' ? targetName(step.target_id) : state.intake.figures.find(fig => fig.figure_id === step.target_id)?.label || state.projectName)}</strong><span>${escapeText(statuses[step.status] || step.status)}</span>${cropActions(step)}${step.reason ? `<p>${escapeText(step.reason)}</p>` : ''}</li>`).join('')}</ol>${issues.length ? `<details><summary>查看全部异常原因</summary><ul>${issues.map(step => `<li>${escapeText(names[step.stage] || step.stage)} · ${escapeText(step.target_id)}：${escapeText(step.reason)}${cropActions(step)}</li>`).join('')}</ul></details>` : ''}</section>`;
     }
     if (state.intake.confirmed) return `<section class="intake-summary"><div><h2>清单与对应关系已确认</h2><p>${count} 个蛋白行已明确分配原图。准备执行计划，预建布局位置和待计算表格，原文件保持不变。</p></div><button class="button primary" data-intake="prepare" ${disabled}>准备执行计划</button></section>`;
     return `<section class="intake-summary"><div><h2>${state.intake.confirmed ? '清单与对应关系已确认' : '确认本次导入'}</h2><p>${count} / ${total} 个蛋白行已有原图。${state.intake.confirmed ? '当前完成导入分配阶段，后续裁剪流程尚未执行。' : '核对所有蛋白行的来源后确认；未使用的原图可留在图池。'}</p></div><button class="button primary" data-intake="confirm" ${disabled}>${icon('check')}确认清单与对应关系</button></section>`;
   }
   function controls() {
     if (!draft || root.hidden) return;
-    const locked = !!state.busy || !bridge || conflict || !!state.intake.workflow;
+    const locked = !!state.busy || !bridge || conflict || (!!state.intake.workflow && !state.intake.workflow.editing);
     const error = planError(), assignmentError = batchError();
     $('#intake-plan-error', root).textContent = batch.length ? '提交或移除待分配关系后，可继续修改清单。' : error;
     $('[data-intake="save-plan"]', root).disabled = locked || !planDirty() || !!error || batch.length > 0;
@@ -344,15 +344,26 @@ window.intakeWorkspace = (() => {
     const active = mode === 'intake' && !!state.intake;
     root.hidden = !active;
     document.body.classList.toggle('intake-active', active);
-    document.body.classList.toggle('grouped-intake-active', active && !!state.intake?.grouped_draft && !state.intake.workflow);
+    document.body.classList.toggle('grouped-intake-active', active && !!state.intake?.grouped_draft && (!state.intake.workflow || state.intake.workflow.editing));
     $$('.mode-tab').forEach(item => item.hidden = state.intake ? !allowedModes().includes(item.dataset.mode) : item.dataset.mode === 'intake');
     document.body.classList.toggle('intake-crop-active', !!state.intake?.cropEnabled && mode === 'review');
     if (!active) return false;
-    if (!state.intake.workflow && state.intake.grouped_draft) return window.intakeGroups.render(root);
+    if ((!state.intake.workflow || state.intake.workflow.editing) && state.intake.grouped_draft) {
+      const returned = renderedWorkflow === true;
+      renderedWorkflow = false;
+      const rendered = window.intakeGroups.render(root);
+      if (returned) {
+        root.scrollTop = 0;
+        const heading = root.querySelector('h1');
+        heading?.setAttribute('tabindex','-1');heading?.focus({preventScroll:true});
+        live.textContent = '已进入分组修改。保存草稿并重新确认后才能继续处理。';
+      }
+      return rendered;
+    }
     const focused = root.contains(document.activeElement) ? document.activeElement : null;
     const action = focused?.dataset.intake;
     const stageHeadingFocus = focused?.id === 'intake-stages-heading';
-    const workflow = !!state.intake.workflow;
+    const workflow = !!state.intake.workflow && !state.intake.workflow.editing;
     const transitioned = renderedWorkflow !== null && workflow !== renderedWorkflow;
     renderedWorkflow = workflow;
     const field = focused?.dataset.intakeField, id = focused?.dataset.id;
@@ -383,7 +394,7 @@ window.intakeWorkspace = (() => {
 
   window.intakeGroups.bind(root);
   root.addEventListener('input', event => {
-    if (state.intake?.grouped_draft && !state.intake.workflow) return;
+    if (state.intake?.grouped_draft && (!state.intake.workflow || state.intake.workflow.editing)) return;
     const field = event.target.dataset.intakeField, id = event.target.dataset.id;
     if (field?.startsWith('discovery-')) {
       const c=discoveryChoices.get(id); if(!c)return;
@@ -398,7 +409,7 @@ window.intakeWorkspace = (() => {
     controls();
   });
   root.addEventListener('change', event => {
-    if (state.intake?.grouped_draft && !state.intake.workflow) return;
+    if (state.intake?.grouped_draft && (!state.intake.workflow || state.intake.workflow.editing)) return;
     const item = event.target;
     if (item.dataset.discoveryInclude) { discoveryChoices.get(item.dataset.discoveryInclude).include=item.checked; discoveryDirty=true; }
     if (item.dataset.intakeSource) { if (item.checked) selected.add(item.dataset.intakeSource); else selected.delete(item.dataset.intakeSource); item.closest('.intake-source').classList.toggle('selected', item.checked); }

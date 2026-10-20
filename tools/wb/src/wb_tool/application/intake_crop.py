@@ -216,6 +216,8 @@ def review_intake_crop(
     project: WBIntakeCropProject, row_id: str, crop: LaneROI, *, expected_digest: str
 ) -> WBIntakeCropProject:
     """Explicitly confirm an original rectangle, then require a fresh owned crop attempt."""
+    if project.workflow.editing:
+        raise ValueError("分组编辑中不能同时修正裁剪")
     if expected_digest != intake_workflow_digest(project):
         raise ValueError("裁剪草稿已变化，请重新核对")
     row = next((r for r in project.rows if r.row_id == row_id), None)
