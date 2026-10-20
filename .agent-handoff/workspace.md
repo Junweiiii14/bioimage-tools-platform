@@ -9,7 +9,7 @@
 
 ## Main Entry Points
 
-源码桌面入口为 `uv run --locked --no-sync python -m bioimage_app`，多源项目可加 `--figure-project`。WB公开入口wb_tool.api，说明tools/wb/README.md；宿主公开入口bioimage_app.api。P0探针为p0_probe.py，开发检查为dev.py。使用本项目.venv或uv；最终Windows包仍待验收。
+当前活动检出为 `C:/Users/70236/.codex/worktrees/t021-coordination/bioimage-tools-platform`；原 ResearchVault 主目录仍为保留未提交成果的历史树，不用于启动当前产品。桌面快捷方式“BioImage WB 工作台（当前开发）”固定调用活动树 `Start-BioImage.ps1`。源码命令 `uv run --locked --no-sync python -m bioimage_app`、历史 `--figure-project` / `--platform` 均进入绿色 WebWorkbenchWindow。旧原生窗口仅显式 `--legacy-*` 兼容诊断使用。WB公开入口wb_tool.api，说明tools/wb/README.md；宿主公开入口bioimage_app.api。P0探针为p0_probe.py，开发检查为dev.py。使用对应检出的.venv，禁止从历史树启动并当作当前产品；最终Windows包仍待验收。
 
 规则入口 `dev.py context --task <ID> --scope <目录> --record`，生成当前规则版本回执；`.github/workflows/rules-context.yml` 在 PR 校验。完整安装后本地命令加 `uv run --locked --no-sync` 保持桌面/构建依赖。
 

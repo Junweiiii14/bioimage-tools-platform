@@ -4,7 +4,8 @@ import gc
 import json
 import os
 import sys
-from collections.abc import Callable, Iterator
+import threading
+from collections.abc import Callable, Iterator, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING
 from xml.etree import ElementTree
@@ -13,11 +14,17 @@ from zipfile import ZipFile
 import numpy as np
 import pytest
 import tifffile
-from bioimage_app.api import ProcessRunner, RunCompletion, RunSession, create_wb_window
+from bioimage_app.api import (
+    ProcessRunner,
+    RunCompletion,
+    RunSession,
+    create_figure_project_window,
+    create_wb_window,
+)
 from PIL import Image, ImageDraw, ImageFont
 
 if TYPE_CHECKING:
-    from bioimage_app.api import WBWindow
+    from bioimage_app.api import FigureProjectWindow, WBWindow
 from platform_runtime.api import Workspace
 from PySide6.QtCore import QPoint, Qt, QThread
 from PySide6.QtTest import QTest
@@ -40,6 +47,8 @@ from wb_tool.api import (
     load_tiff,
     read_wb_document,
 )
+
+from tooling.qt_test_lifecycle import close_and_dispose_window
 
 
 def cell_text(table: QTableWidget, row: int, column: int) -> str:
@@ -320,6 +329,18 @@ def test_actual_ocr_desktop_table_save_reopen_export(
     assert cell_text(reopened.view.worksheet.table, 0, 3) == "—"
 
 
+def _dispose_owned_windows(
+    windows: Sequence["WBWindow | FigureProjectWindow"], qtbot: QtBot
+) -> None:
+    for window in windows:
+        close_and_dispose_window(
+            window,
+            qtbot,
+            resources_closed=lambda window=window: window.resources_closed,
+            timeout=15000,
+        )
+
+
 @pytest.fixture
 def make_window(qtbot: QtBot) -> Iterator[Callable[[], "WBWindow"]]:
     windows: list[WBWindow] = []
@@ -330,10 +351,37 @@ def make_window(qtbot: QtBot) -> Iterator[Callable[[], "WBWindow"]]:
         return window
 
     yield make
-    for window in windows:
-        if not window.resources_closed:
-            window.close()
-            qtbot.waitUntil(lambda window=window: window.resources_closed, timeout=15000)
+    _dispose_owned_windows(windows, qtbot)
+
+
+@pytest.mark.parametrize("create_window", [create_wb_window, create_figure_project_window])
+def test_owned_fixture_windows_are_destroyed_on_gui_before_worker_collection(
+    qtbot: QtBot, create_window: Callable[[], "WBWindow | FigureProjectWindow"]
+) -> None:
+    window = create_window()
+    destroyed_threads: list[int] = []
+
+    def record_destroyed(*_args: object) -> None:
+        destroyed_threads.append(threading.get_ident())
+
+    window.destroyed.connect(record_destroyed, Qt.ConnectionType.DirectConnection)
+    # A retained reference cycle may be collected by the next allocating worker.
+    # Teardown must dispose its native widgets before releasing these references.
+    holder: dict[str, object] = {"window": window}
+    holder["cycle"] = holder
+    try:
+        _dispose_owned_windows([window], qtbot)
+        assert not isValid(window)
+        assert destroyed_threads == [threading.get_ident()]
+        del holder
+        collector = threading.Thread(target=gc.collect)
+        collector.start()
+        collector.join(timeout=10)
+        assert not collector.is_alive()
+        assert destroyed_threads == [threading.get_ident()]
+    finally:
+        if isValid(window):
+            _dispose_owned_windows([window], qtbot)
 
 
 def test_desktop_draw_compute_save_reopen(

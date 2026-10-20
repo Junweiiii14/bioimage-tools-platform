@@ -1,5 +1,9 @@
 # Task Backlog
 
+- [ ] T043：统一当前工作台入口、CI006最近668完整门禁/绑定独审、治理44完整门禁及八阶段整理独审完成；最终树全门禁、阶段草稿PR远端状态和日志补充见T043任务。原生间歇挂起/交互验收仍保留，不重复启动旧树。
+
+- [ ] T-042：已实现短膜/倾斜、Marker/自主N和版本化积分边界，并接入原绿色网页工作台；8图旧1/8→新8/8，参考仅评分，48槽7有效41复核。产品独审已完成；完整门禁未归因挂起尚未解决；详见work/tasks/T-042-source-only-repair.md。
+
 - [ ] T040科学自动化缺口优先：短膜检测、完整亮膜倾角、Marker/周期槽N、逐lane原像素定位，以及防止自动bounds/封底切穿主峰。先冻结独立真实holdout，再报告条件/样本量；本次参考辅助8/8不是自动准确率。
 - [ ] T040实际执行/标准显示已完成，完整门禁和桌面最终重开收尾中，详见任务。
 
@@ -71,6 +75,9 @@
 
 - [x] T-040 real-data execution:8 originals→4Fig→48 source-pixel values→supervised Excel/ZIP, saved desktop opened. First automatic1/8; corrected8/8 is reference-assisted.
 - [ ] T-040 gate investigation:600pytest passed summary but fullcheckexit1 beforewheel; UNKNOWN exit/shutdown cause.
+
+- [x] T043本轮：固定入口、证实的关闭挂起/新库事务修复、669完整本地和Windows/Linux远端检查、阶段草稿同步与原改动保护完成。
+- [ ] 后续按真实base逐阶段审查集成；历史UNKNOWN退出、独立留出科学/积分真值、恢复演练、干净Windows候选包/交互验收继续保留，不因本轮全绿取消。
 - [ ] T-017 ready：按用户方案7.1/7.2实现Excel/CSV元信息导入、明确文件名提取规则、可修正预览/匹配、批量参数/缩略图。随后统一归档/ZIP导入/直接TIFF成图/CSV结果及模板精修。完整首版验收见work/wb-acceptance.md。
 
 ## 2026-10-19 当前WB规划

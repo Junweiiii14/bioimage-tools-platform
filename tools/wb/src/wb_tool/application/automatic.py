@@ -15,7 +15,12 @@ from wb_tool.application.analysis import (
 )
 from wb_tool.application.document import DocumentIO
 from wb_tool.application.figure_project import FigureRow, WBFigureProject
-from wb_tool.application.laboratory_layout import WBLayoutProject, preserve_automatic_composition
+from wb_tool.application.laboratory_layout import (
+    DisplayFrame,
+    WBLayoutProject,
+    preserve_automatic_composition,
+    with_figure_layout,
+)
 from wb_tool.application.project_analysis import ProjectRowAnalysis
 from wb_tool.domain.automatic import AutoWBSettings, QuantPolicy, detect_automatic_geometry
 from wb_tool.domain.crop_detection import (
@@ -38,7 +43,9 @@ class AutomaticWBResult:
     detection: CropDetection
     requests: tuple[AnalysisRequest, ...]
     warnings: tuple[str, ...]
-    algorithm_id: Literal["automatic_wb_proposals@1"] = "automatic_wb_proposals@1"
+    algorithm_id: Literal["automatic_wb_proposals@1", "automatic_wb_proposals@2"] = (
+        "automatic_wb_proposals@1"
+    )
 
     @property
     def estimated_lane_count(self) -> int:
@@ -55,6 +62,7 @@ def suggest_analysis_for_crop(
     empty_lanes: tuple[int, ...] = (),
     min_snr: float = 4.0,
     quant_policy: QuantPolicy = "legacy_bounds@1",
+    lane_rois: tuple[LaneROI, ...] = (),
     cancelled: Callable[[], bool] = lambda: False,
 ) -> AnalysisRequest:
     """Suggest closed bounds on detection copies; measurement uses untouched original pixels.
@@ -64,10 +72,23 @@ def suggest_analysis_for_crop(
     """
     AutoWBSettings(polarity=polarity, lane_count=lane_count, min_snr=min_snr)
     lanes: list[LaneAnnotation] = []
-    if quant_policy == "wbquant_1_4_3@1":
+    geometry = (
+        tuple(replace(roi, lane_id=f"{crop.lane_id}:{i:02d}") for i, roi in enumerate(lane_rois, 1))
+        if lane_rois
+        else fixed_lane_grid(crop, lane_count)
+    )
+    if len(geometry) != lane_count:
+        raise ValueError("检测泳道数与请求不一致")
+    if quant_policy in ("wbquant_1_4_3@1", "background_support@1"):
+        from wb_tool.domain.background_bounds import propose_background_lanes
         from wb_tool.domain.quant_supervision import propose_quant_lanes
 
-        proposals = propose_quant_lanes(image.pixels, fixed_lane_grid(crop, lane_count), polarity)
+        propose = (
+            propose_background_lanes
+            if quant_policy == "background_support@1"
+            else propose_quant_lanes
+        )
+        proposals = propose(image.pixels, geometry, polarity)
         for index, proposal in enumerate(proposals, 1):
             check_detection_cancelled(cancelled)
             lanes.append(
@@ -88,7 +109,7 @@ def suggest_analysis_for_crop(
         return AnalysisRequest(
             image.sha256, revision, polarity, tuple(lanes), "independent_lanes@1", quant_policy
         )
-    for index, roi in enumerate(fixed_lane_grid(crop, lane_count), 1):
+    for index, roi in enumerate(geometry, 1):
         check_detection_cancelled(cancelled)
         profile = np.asarray(compute_lane_profiles(image.pixels, roi, polarity).quantitative)
         smooth = smooth_detection(profile, 1)
@@ -117,7 +138,7 @@ def suggest_analysis_for_crop(
         revision,
         polarity,
         tuple(lanes),
-        "fixed_grid@1",
+        "independent_lanes@1" if lane_rois else "fixed_grid@1",
         quant_policy,
     )
 
@@ -148,6 +169,7 @@ def suggest_automatic_wb(
             polarity=settings.polarity,
             min_snr=settings.min_snr,
             quant_policy=settings.quant_policy,
+            lane_rois=c.lane_rois,
             cancelled=cancelled,
         )
         for c in detection.candidates
@@ -160,6 +182,9 @@ def suggest_automatic_wb(
         detection,
         requests,
         (*detection.flags, "automatic_bounds_unreviewed"),
+        "automatic_wb_proposals@2"
+        if settings.crop_policy == "source_geometry@2"
+        else "automatic_wb_proposals@1",
     )
 
 
@@ -173,7 +198,9 @@ class AutomaticRowEvidence(DocumentIO):
     settings: AutoWBSettings
     request: AnalysisRequest
     warnings: tuple[str, ...] = Field(default=(), max_length=64)
-    algorithm_id: Literal["automatic_wb_proposals@1"] = "automatic_wb_proposals@1"
+    algorithm_id: Literal["automatic_wb_proposals@1", "automatic_wb_proposals@2"] = (
+        "automatic_wb_proposals@1"
+    )
     human_reviewed: Literal[False] = False
 
     @model_validator(mode="after")
@@ -254,9 +281,35 @@ def install_automatic_result(
             for i, lane in enumerate(request.lanes, 1)
         ),
     )
-    return install_automatic_request(
+    installed = install_automatic_request(
         project, row_id, crop, request, result.settings, result.warnings, empty
     )
+    frame = result.detection.candidates[candidate_index].display_frame
+    segments = [s for s in installed.composition.slices if s.row_id == row_id]
+    if frame is not None and len(segments) == 1:
+        display = DisplayFrame(
+            center_x=frame.center_x,
+            center_y=frame.center_y,
+            width=frame.width,
+            height=frame.height,
+            angle_degrees=frame.angle_degrees,
+        )
+        composition = installed.composition.model_copy(
+            update={
+                "slices": tuple(
+                    s.model_copy(update={"display_frame": display}) if s.row_id == row_id else s
+                    for s in installed.composition.slices
+                )
+            }
+        )
+        style = installed.layout_style.model_copy(
+            update={"display_policy": "standard_lane_ratio@1"}
+        )
+        updated = with_figure_layout(installed, composition, style)
+        return WBAutomaticProject.model_validate(
+            {name: getattr(updated, name) for name in type(updated).model_fields}
+        )
+    return installed
 
 
 def install_automatic_request(
@@ -292,6 +345,9 @@ def install_automatic_request(
         settings=settings,
         request=request,
         warnings=warnings,
+        algorithm_id="automatic_wb_proposals@2"
+        if settings.crop_policy == "source_geometry@2"
+        else "automatic_wb_proposals@1",
     )
     plan = ProjectRowAnalysis(row_id=row_id, crop=crop, empty_lanes=empty, request=request)
     fields = {name: getattr(project, name) for name in type(project).model_fields}
@@ -304,7 +360,9 @@ def install_automatic_request(
         analyses=tuple(p for p in plans if p.row_id != row_id) + (plan,),
     )
     upgraded = WBAutomaticProject.model_validate(fields)
-    composition = preserve_automatic_composition(upgraded, row_id)
+    composition = preserve_automatic_composition(
+        upgraded, row_id, geometry_changed=row.roi != crop or row.lane_count != count
+    )
     if (
         isinstance(project, WBLayoutProject)
         and project.composition.slices

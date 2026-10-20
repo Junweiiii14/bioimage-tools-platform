@@ -22,6 +22,12 @@ uv run --locked --no-sync pre-commit install
 
 ## 命令职责
 
+本地 `check --all` 的 pytest 与隔离 wheel Qt 验证强制使用 `offscreen`，与 CI 的
+Qt 平台一致；未跳过兼容界面或改变测试断言。直接 pytest 也默认离屏，只有显式设置
+`QT_QPA_PLATFORM=windows` 才用于可见的交互诊断。测试期间不得把遗留窗口当作当前产品
+工作台展示。日常产品入口为 `Start-BioImage.ps1` 或 `python -m bioimage_app`，两者均进入
+当前绿色工作台；保留旧检出目录时不要在其中启动日常产品。
+
 | 命令 | 已实现范围 |
 |---|---|
 | `doctor` | Python 精确版本、基本检查工具版本 |
