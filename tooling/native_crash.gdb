@@ -8,6 +8,7 @@ handle all nostop noprint pass
 handle SIGSEGV SIGABRT SIGBUS SIGILL SIGFPE SIGINT SIGTERM stop print pass
 python
 import gdb
+import os
 
 faults = {"SIGSEGV", "SIGABRT", "SIGBUS", "SIGILL", "SIGFPE"}
 cancellations = {"SIGINT", "SIGTERM"}
@@ -20,12 +21,15 @@ def capture_fault(event):
     try:
         selected = gdb.selected_thread()
         threads = [selected] + [t for t in gdb.selected_inferior().threads() if t != selected]
-        for thread in threads[:64]:
+        captured = threads if os.environ.get("BIOIMAGE_NATIVE_DIAGNOSTIC") == "1" else threads[:64]
+        print("NATIVE_THREADS total=" + str(len(threads)) + " truncated=" + str(len(threads) - len(captured)), flush=True)
+        for thread in captured:
             thread.switch()
             print("NATIVE_THREAD " + str(thread.num), flush=True)
             gdb.execute("bt 24")
         selected.switch()
         gdb.execute("info sharedlibrary")
+        print("NATIVE_CAPTURE_COMPLETE signal=" + event.stop_signal, flush=True)
     finally:
         # Observation must forward the original signal even when stack collection fails.
         gdb.execute("handle SIGSEGV SIGABRT SIGBUS SIGILL SIGFPE SIGINT SIGTERM nostop print pass")

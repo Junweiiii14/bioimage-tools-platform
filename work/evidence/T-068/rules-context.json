@@ -4,9 +4,11 @@
   "base_commit": "c0ac071d735a09268628e43da5091598a1aca8e7",
   "scopes": [
     ".agent-handoff",
+    ".github",
     "README.md",
     "docs",
     "tests",
+    "tooling",
     "tools/wb",
     "work"
   ],

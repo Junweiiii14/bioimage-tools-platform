@@ -4,14 +4,21 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      native-case:
+        description: 'Isolated Linux native evidence (normal checks remain required)'
+        type: choice
+        default: normal
+        options: [normal, target, prefix]
 permissions:
   contents: read
 concurrency:
-  group: quality-${{ github.ref }}
+  group: quality-${{ github.ref }}${{ github.event_name == 'workflow_dispatch' && inputs.native-case != 'normal' && '-native-case' || '' }}
   cancel-in-progress: true
 jobs:
   foundation:
-    name: foundation (${{ matrix.os }})
+    if: github.event_name != 'workflow_dispatch' || inputs.native-case == 'normal'
+    name: ${{ github.event_name == 'workflow_dispatch' && inputs.native-case != 'normal' && 'diagnostic-unused-foundation' || format('foundation ({0})', matrix.os) }}
     strategy:
       fail-fast: false
       matrix:
@@ -59,6 +66,8 @@ jobs:
           TEMP: ${{ runner.temp }}
           TMP: ${{ runner.temp }}
   desktop-environment:
+    if: github.event_name != 'workflow_dispatch' || inputs.native-case == 'normal'
+    name: ${{ github.event_name == 'workflow_dispatch' && inputs.native-case != 'normal' && 'diagnostic-unused-desktop' || 'desktop-environment' }}
     runs-on: windows-latest
     timeout-minutes: 20
     steps:
@@ -71,3 +80,30 @@ jobs:
           enable-cache: true
       - run: uv sync --locked --group desktop
       - run: uv run --locked --group desktop python dev.py smoke-env
+  native-case:
+    if: github.event_name == 'workflow_dispatch' && inputs.native-case != 'normal'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      QT_QPA_PLATFORM: offscreen
+      QTWEBENGINE_CHROMIUM_FLAGS: --disable-gpu
+      PYTHONUNBUFFERED: '1'
+      PYTHONFAULTHANDLER: '1'
+      PYTEST_ADDOPTS: '-vv -o faulthandler_timeout=60'
+      NATIVE_CASE: ${{ inputs.native-case }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9 # v7
+        with:
+          version: '0.13.0'
+          enable-cache: true
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libegl1 libopengl0 libxkbcommon0 gdb
+      - run: uv sync --locked --group desktop
+      - name: Verify external owned cancellation and native capture
+        run: uv run --locked --no-sync python -m tooling.linux_native_case --case control
+      - name: Observe unchanged original test case
+        run: uv run --locked --no-sync python -m tooling.linux_native_case --case "$NATIVE_CASE"
