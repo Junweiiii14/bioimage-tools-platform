@@ -1,11 +1,13 @@
 """Typed command boundary for the instrument planning page."""
 
+import json
 from typing import TYPE_CHECKING, Literal, cast
 
 from wb_tool.api import (
     ExportSelection,
     IntakeAssignment,
     IntakeFigure,
+    IntakeGrouping,
     IntakeProtein,
     LaneROI,
     WBFigureProject,
@@ -25,6 +27,7 @@ from wb_tool.api import (
     retry_intake_workflow_step,
     return_to_intake_editing,
     review_intake_crop,
+    save_intake_grouping,
 )
 
 if TYPE_CHECKING:
@@ -45,6 +48,43 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
         raise ValueError("当前导入项目已改变，请刷新后重试")
     if action == "intake_discover":
         host.intake.discover(digest)
+        return
+    if action == "intake_preview":
+        source_id = data.get("sourceId")
+        if not isinstance(source_id, str):
+            raise ValueError("请选择原图来源")
+        host.intake.preview_source(source_id, digest)
+        return
+    if action == "intake_grouping":
+        if (
+            not isinstance(data.get("grouping"), dict)
+            or type(data.get("allowReuse", False)) is not bool
+        ):
+            raise ValueError("请提交当前采集组草稿与明确复用选择")
+        grouping = IntakeGrouping.model_validate_json(
+            json.dumps(data["grouping"], ensure_ascii=False)
+        )
+        generation, epoch = host.view.generation, bridge.session_epoch
+
+        def grouped(current: WBFigureProject) -> WBIntakeProject:
+            if not isinstance(current, WBIntakeProject):
+                raise ValueError("当前导入项目已改变")
+            return save_intake_grouping(
+                current,
+                grouping,
+                expected_digest=digest,
+                allow_reuse=data.get("allowReuse", False) is True,
+            )
+
+        host.save(
+            transform=grouped,
+            install_guard=lambda: (
+                not host.is_closing
+                and not host.cancellation.is_set()
+                and host.view.generation == generation
+                and bridge.session_epoch == epoch
+            ),
+        )
         return
     if action == "intake_accept_discovery":
         selections = data.get("selections")

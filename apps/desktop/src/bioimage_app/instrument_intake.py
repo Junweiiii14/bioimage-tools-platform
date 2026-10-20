@@ -1,6 +1,7 @@
 """Cancellable instrument import; scientific identities are assigned by the user."""
 
 import os
+from hashlib import sha256
 from pathlib import Path
 from threading import Event
 from typing import TYPE_CHECKING
@@ -48,10 +49,68 @@ class InstrumentIntakeSession:
         self.host = host
         self.issues: list[str] = []
         self._scan_job: InstrumentFolderJob | None = None
+        self.group_preview: tuple[str, PreviewRaster] | None = None
 
     @property
     def scanning(self) -> bool:
         return self._scan_job is not None
+
+    def preview_source(self, source_id: str, expected_digest: str) -> None:
+        """One bounded original-source display preview; never installed as a thumbnail or ROI."""
+        host = self.host
+        project = host.view.project()
+        if host.operation_busy or host.is_closing:
+            return
+        if not isinstance(project, WBIntakeProject) or intake_digest(project) != expected_digest:
+            raise ValueError("当前原图池已变化")
+        source = next((s for s in project.intake.sources if s.source_id == source_id), None)
+        if source is None:
+            raise ValueError("原图来源不存在")
+        generation, identity = host.view.generation, (host.workspace_path, project.project_id)
+        host.begin_operation()
+
+        def current() -> bool:
+            return (
+                not host.is_closing
+                and not host.cancellation.is_set()
+                and host.view.generation == generation
+                and identity == (host.workspace_path, host.view.project_identity)
+            )
+
+        def previewed(reply: WBReply) -> None:
+            if not current():
+                host.finish_operation("旧图像预览未安装。")
+                return
+            raster = reply.value
+            if reply.error or not isinstance(raster, PreviewRaster):
+                host.fail_operation(reply.error or "图像预览返回无效结果")
+                return
+            if (
+                (raster.sha256, raster.width, raster.height, raster.bit_depth)
+                != (source.asset.sha256, source.width, source.height, source.bit_depth)
+                or not (1 <= raster.preview_width <= 2048 and 1 <= raster.preview_height <= 2048)
+                or len(raster.pixels) != raster.preview_width * raster.preview_height
+            ):
+                host.fail_operation("图像预览与原始来源不匹配")
+                return
+            self.group_preview = source_id, raster
+            host.finish_operation("原图显示预览已加载，原始像素保持。")
+
+        def resolved(reply: StorageReply) -> None:
+            if not current():
+                host.finish_operation("旧图像预览请求已停止。")
+            elif reply.error_code or not isinstance(reply.value, str):
+                host.fail_operation(reply.message or "原图资产无法解析")
+            else:
+                host.submit_tool_job(
+                    WBJob("preview", path=reply.value, preview_edge=2048),
+                    previewed,
+                    accept_errors=True,
+                )
+
+        host.submit_storage_job(
+            StorageCommand("asset", asset=source.asset), resolved, accept_errors=True
+        )
 
     def discover(self, expected_digest: str) -> None:
         """Resolve immutable assets off the GUI thread and install only a current reply."""
@@ -200,7 +259,11 @@ class InstrumentIntakeSession:
                 next_image()
                 return
             path = pending.pop(0)
-            relative = path.relative_to(root).as_posix()
+            root_key = sha256(os.path.normcase(str(root.resolve())).encode("utf-8")).hexdigest()[
+                :16
+            ]
+            namespace = f"{root.name or 'root'}~batch2-{root_key}"
+            relative = namespace + "/" + path.relative_to(root).as_posix()
             host.view.status.setText(f"正在读取 {relative}；剩余 {len(pending)} 张")
 
             def previewed(reply: WBReply) -> None:

@@ -3,21 +3,13 @@
 import re
 from collections.abc import Callable
 from hashlib import sha256
-from pathlib import PurePosixPath
 
 from wb_tool.adapters.tiff_input import load_tiff
 from wb_tool.application.discovery import ExportDiscovery, ExportObservation, SignalRegion
 from wb_tool.application.figure_project import FigureSourcePath
 from wb_tool.application.instrument_intake import WBIntakeProject
+from wb_tool.application.intake_grouping import acquisition_key as export_group
 from wb_tool.domain.export_detection import ExportFeatures, guided_signal_regions, inspect_export
-
-
-def export_group(relative_path: str) -> str:
-    """Acquisition identifiers are hints, not protein or sample identities."""
-    path = PurePosixPath(relative_path)
-    stem = re.sub(r"\s*\([123]\)$", "", path.stem)
-    stem = re.sub(r"_(merge|sample|white)_?\(16bit\)$", "", stem, flags=re.I)
-    return (path.parent / stem).as_posix()
 
 
 def discover_exports(

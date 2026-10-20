@@ -100,9 +100,11 @@ from wb_tool.application.instrument_intake import (
     create_intake,
     install_export_discovery,
     intake_digest,
+    intake_grouping,
     intake_snapshot,
     register_intake_source,
     replace_intake_plan,
+    save_intake_grouping,
     unassign_intake_sources,
 )
 from wb_tool.application.intake_crop import (
@@ -135,6 +137,11 @@ from wb_tool.application.intake_figure import (
     intake_figure_rows,
     prepare_intake_figures,
     prepare_intake_measurement_revision,
+)
+from wb_tool.application.intake_grouping import (
+    IntakeAcquisitionGroup,
+    IntakeDraftFigure,
+    IntakeGrouping,
 )
 from wb_tool.application.intake_output import (
     IntakeOutputEvidence,
@@ -305,6 +312,11 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "IntakeAcquisitionGroup",
+    "IntakeDraftFigure",
+    "IntakeGrouping",
+    "intake_grouping",
+    "save_intake_grouping",
     "ExportDiscovery",
     "ExportObservation",
     "ExportSelection",

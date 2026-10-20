@@ -9,6 +9,8 @@ See `../../docs/contracts/wb-intake-crop-v1.md` and `../../work/tasks/T-056-fixe
 
 # WB 数值核心
 
+T064清单v3支持采集组草稿，未知N/未选源可持久化，完整组投影到原有稳定执行身份；原清单v1/v2 wire shape和历史编辑入口保留。公开契约见 `../../docs/contracts/wb-intake-grouping-v1.md`；实现/验收状态见任务，不把草稿保存等同科学确认。
+
 E3/T056已完成宿主接入、本机工程验证及绑定独审：schema12/intake_crop@1保存固定N槽位与原图几何建议，
 无定位仍保留完整槽位，不伪造坐标/测量。显式审核后通过既有原值TIFF适配器导出，
 schema1–11读取保持；契约见`../../docs/contracts/wb-intake-crop-v1.md`。

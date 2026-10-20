@@ -2,6 +2,8 @@ T061在WB原包内增加export_detection/discovery与清单v2证据，桌面inta
 
 # 模块地图
 
+T064当前增量在WB包内增加 `application/intake_grouping.py` 和清单v3采集组草稿，桌面 `web_ui/intake_groups.js` 对应已批准网格；派生完整行接既有E0–E7主链，不另建平台实验抽象。状态/验证见T064任务，[契约](contracts/wb-intake-grouping-v1.md)。
+
 E5/T058已完成schema14 `application/intake_output.py`：稳定Fig/行/槽位填表、冻结资产/run、新目录索引与恢复输出；桌面导入索引/CAS后才完成阶段。旧schema1–13保持，科学/目标机门禁另记。
 E6/T059已完成本机工程验证及绑定独审：同操作冻结FigureRender复用PNG/TIFF/ZIP，单Fig TIFF复用已核验保存PNG全像素，组合ZIP单独布局；PNG验证上下文由预览与编码实际复用。无跨操作原值缓存，不改变定量。阶段页支持完整分页。所属纯Qt测试控件按明确登记释放，不全局GC；E7集成/安装及外部验收状态见T-060和[验收索引](wb-execution-acceptance.md)。
 

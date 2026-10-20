@@ -13,6 +13,11 @@ from wb_tool.application.discovery import ExportDiscovery, ExportSelection
 from wb_tool.application.document import DocumentIO
 from wb_tool.application.fig_quant import WBPartitionProject
 from wb_tool.application.figure_project import FigureRow, WBFigureProject
+from wb_tool.application.intake_grouping import (
+    IntakeAcquisitionGroup,
+    IntakeGrouping,
+    acquisition_key,
+)
 
 
 def _label(value: str) -> None:
@@ -70,9 +75,50 @@ class IntakeAssignment(DocumentIO):
     reuse_confirmed: bool = False
 
 
+def grouping_plan(
+    grouping: IntakeGrouping,
+) -> tuple[tuple[IntakeFigure, ...], tuple[IntakeProtein, ...], tuple[IntakeAssignment, ...]]:
+    """Derive only complete rows; the incomplete draft remains the sole editing authority."""
+    figures: list[IntakeFigure] = []
+    proteins: list[IntakeProtein] = []
+    assignments: list[IntakeAssignment] = []
+    for figure in grouping.figures:
+        if not figure.label.strip() or figure.lane_count is None:
+            continue
+        ready = [
+            group
+            for group in grouping.groups
+            if group.figure_id == figure.figure_id
+            and group.protein_label.strip()
+            and group.selected_source_id is not None
+        ]
+        if not ready:
+            continue
+        figures.append(
+            IntakeFigure(
+                figure_id=figure.figure_id, label=figure.label, lane_count=figure.lane_count
+            )
+        )
+        for group in ready:
+            proteins.append(
+                IntakeProtein(
+                    protein_id=group.group_id, figure_id=figure.figure_id, label=group.protein_label
+                )
+            )
+            assignments.append(
+                IntakeAssignment(
+                    protein_id=group.group_id,
+                    source_id=cast(str, group.selected_source_id),
+                    reuse_confirmed=group.reuse_confirmed,
+                )
+            )
+    return tuple(figures), tuple(proteins), tuple(assignments)
+
+
 class IntakeManifest(DocumentIO):
-    schema_version: int = Field(default=1, ge=1, le=2)
+    schema_version: int = Field(default=1, ge=1, le=3)
     discovery: ExportDiscovery | None = None
+    grouping: IntakeGrouping | None = None
     figures: tuple[IntakeFigure, ...] = Field(default=(), max_length=512)
     proteins: tuple[IntakeProtein, ...] = Field(default=(), max_length=512)
     sources: tuple[IntakeSource, ...] = Field(default=(), max_length=512)
@@ -84,6 +130,8 @@ class IntakeManifest(DocumentIO):
         fields = cast(dict[str, object], handler(self))
         if self.schema_version == 1:
             fields.pop("discovery", None)
+        if self.schema_version < 3:
+            fields.pop("grouping", None)
         return fields
 
     @model_validator(mode="after")
@@ -93,6 +141,16 @@ class IntakeManifest(DocumentIO):
         sources = {source.source_id: source for source in self.sources}
         if self.schema_version == 1 and self.discovery is not None:
             raise ValueError("识别建议必须使用清单格式v2")
+        if self.grouping is not None:
+            if self.schema_version != 3:
+                raise ValueError("采集组草稿必须使用清单格式v3")
+            if any(
+                sid not in sources for group in self.grouping.groups for sid in group.source_ids
+            ):
+                raise ValueError("采集组引用不存在的来源")
+            expected = grouping_plan(self.grouping)
+            if (self.figures, self.proteins, self.assignments) != expected:
+                raise ValueError("执行清单必须匹配采集组草稿投影")
         if self.discovery is not None:
             for item in self.discovery.observations:
                 source = sources.get(item.source_id)
@@ -200,6 +258,32 @@ class WBIntakeProject(WBPartitionProject):
 
 
 def validate_intake_complete(manifest: IntakeManifest) -> None:
+    observations = (
+        {item.source_id: item for item in manifest.discovery.observations}
+        if manifest.discovery
+        else {}
+    )
+    if any(
+        (observation := observations.get(binding.source_id)) is not None
+        and (observation.role == "reference" or observation.error)
+        for binding in manifest.assignments
+    ):
+        raise ValueError("所选来源现为参考成品或读取失败，请重新核对原图后确认")
+    if manifest.grouping is not None:
+        figures = {figure.figure_id: figure for figure in manifest.grouping.figures}
+        for group in manifest.grouping.groups:
+            if group.figure_id is None:
+                if group.selected_source_id is not None:
+                    raise ValueError("已选裁剪原图仍未归入Fig")
+                continue
+            figure = figures[group.figure_id]
+            if not (
+                figure.label.strip()
+                and figure.lane_count is not None
+                and group.protein_label.strip()
+                and group.selected_source_id is not None
+            ):
+                raise ValueError("请补齐已归Fig采集组的蛋白、裁剪原图与Fig级N")
     assigned = {binding.protein_id for binding in manifest.assignments}
     if not manifest.figures or not manifest.proteins:
         raise ValueError("请先填写 Fig、蛋白和样本槽位数")
@@ -353,7 +437,152 @@ def intake_snapshot(project: WBIntakeProject) -> dict[str, object]:
         confirmed=bool(project.intake.confirmed_digest),
         project_id=project.project_id,
     )
+    if project.intake.grouping is not None or not project.intake.proteins:
+        data["grouped_draft"] = intake_grouping(project).model_dump(mode="json")
     return data
+
+
+def intake_grouping(project: WBIntakeProject) -> IntakeGrouping:
+    """Offer conservative filename/directory groups without decoding or choosing a source."""
+    type(project).model_validate(dict(project))
+    grouping = project.intake.grouping
+    if grouping is None and project.intake.proteins:
+        raise ValueError("旧行式项目保留原编辑入口，不能猜测采集组归属")
+    groups = list(grouping.groups if grouping else ())
+    included = {sid for group in groups for sid in group.source_ids}
+    buckets: dict[str, list[str]] = {}
+    for source in project.intake.sources:
+        if source.source_id not in included:
+            key = acquisition_key(source.relative_path)
+            buckets.setdefault(key, []).append(source.source_id)
+    for key, ids in buckets.items():
+        group_id = "group-" + sha256((project.project_id + ":" + key).encode()).hexdigest()[:32]
+        index = next((i for i, group in enumerate(groups) if group.group_id == group_id), None)
+        if index is None:
+            groups.append(IntakeAcquisitionGroup(group_id=group_id, source_ids=tuple(ids)))
+        else:
+            groups[index] = IntakeAcquisitionGroup.model_validate(
+                {**dict(groups[index]), "source_ids": (*groups[index].source_ids, *ids)}
+            )
+    return IntakeGrouping(figures=grouping.figures if grouping else (), groups=tuple(groups))
+
+
+def save_intake_grouping(
+    project: WBIntakeProject,
+    grouping: IntakeGrouping,
+    *,
+    expected_digest: str,
+    allow_reuse: bool = False,
+) -> WBIntakeProject:
+    """Atomically persist incomplete choices and their validated execution projection."""
+    _current(project, expected_digest)
+    if project.schema_version != 10:
+        raise ValueError("执行修订须先另存编辑副本，不能覆盖阶段历史")
+    if project.intake.grouping is None and project.intake.proteins:
+        raise ValueError("旧行式项目请沿用原编辑入口")
+    grouping = IntakeGrouping.model_validate(dict(grouping))
+    sources = {source.source_id: source for source in project.intake.sources}
+    if {sid for group in grouping.groups for sid in group.source_ids} != sources.keys():
+        raise ValueError("采集组草稿必须保留全部来源，包括未选择图像")
+    previous = (
+        {group.group_id: group for group in project.intake.grouping.groups}
+        if project.intake.grouping
+        else {}
+    )
+    figures = {figure.figure_id: figure for figure in grouping.figures}
+    old_figures = (
+        {figure.figure_id: figure for figure in project.intake.grouping.figures}
+        if project.intake.grouping
+        else {}
+    )
+    counts = Counter(
+        sources[group.selected_source_id].asset.sha256
+        for group in grouping.groups
+        if group.selected_source_id is not None
+    )
+    groups: list[IntakeAcquisitionGroup] = []
+    selections: list[ExportSelection] = []
+    observations = (
+        {item.source_id: item for item in project.intake.discovery.observations}
+        if project.intake.discovery
+        else {}
+    )
+    for group in grouping.groups:
+        old = previous.get(group.group_id)
+        region_index = group.region_index
+        if old is not None and (
+            old.selected_source_id != group.selected_source_id
+            or (
+                old_figures.get(old.figure_id or "")
+                and figures.get(group.figure_id or "")
+                and old_figures[cast(str, old.figure_id)].lane_count
+                != figures[cast(str, group.figure_id)].lane_count
+            )
+        ):
+            region_index = None
+        reused = (
+            group.selected_source_id is not None
+            and counts[sources[group.selected_source_id].asset.sha256] > 1
+        )
+        confirmed_reuse = bool(
+            reused
+            and (
+                allow_reuse
+                or (
+                    old
+                    and old.selected_source_id == group.selected_source_id
+                    and old.reuse_confirmed
+                )
+            )
+        )
+        if reused and not confirmed_reuse:
+            raise ValueError("相同原图内容用于多个蛋白须明确确认复用")
+        group = IntakeAcquisitionGroup.model_validate(
+            {**dict(group), "region_index": region_index, "reuse_confirmed": confirmed_reuse}
+        )
+        groups.append(group)
+        observation = observations.get(group.selected_source_id or "")
+        if observation and (observation.role == "reference" or observation.error):
+            raise ValueError("当前选择是参考成品或读取失败来源，请核对原图")
+        if group.region_index is not None and (
+            observation is None or group.region_index >= len(observation.regions)
+        ):
+            raise ValueError("目标区域不匹配当前原图建议")
+        figure = figures.get(group.figure_id or "")
+        if (
+            observation
+            and figure
+            and figure.lane_count is not None
+            and figure.label.strip()
+            and group.protein_label.strip()
+        ):
+            selections.append(
+                ExportSelection(
+                    source_id=observation.source_id,
+                    figure_label=figure.label,
+                    protein_label=group.protein_label,
+                    lane_count=figure.lane_count,
+                    region_index=group.region_index,
+                )
+            )
+    grouping = IntakeGrouping(figures=grouping.figures, groups=tuple(groups))
+    if grouping == project.intake.grouping:
+        return project
+    figures_plan, proteins, bindings = grouping_plan(grouping)
+    fields = dict(project.intake)
+    fields.update(
+        schema_version=3,
+        grouping=grouping,
+        figures=figures_plan,
+        proteins=proteins,
+        assignments=bindings,
+        confirmed_digest="",
+    )
+    if project.intake.discovery is not None:
+        fields["discovery"] = ExportDiscovery.model_validate(
+            {**dict(project.intake.discovery), "selections": tuple(selections)}
+        )
+    return _updated(project, IntakeManifest.model_validate(fields))
 
 
 def install_export_discovery(
@@ -364,7 +593,11 @@ def install_export_discovery(
     if project.schema_version != 10:
         raise ValueError("请先返回清单修改再识别来源")
     fields = dict(project.intake)
-    fields.update(schema_version=2, discovery=discovery, confirmed_digest="")
+    fields.update(
+        schema_version=max(2, project.intake.schema_version),
+        discovery=discovery,
+        confirmed_digest="",
+    )
     return _updated(project, IntakeManifest.model_validate(fields))
 
 
