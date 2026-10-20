@@ -9,7 +9,7 @@
 
 ## Narrow change and acceptance
 
-Foundation jobs set TEMP/TMP to GitHub runner.temp and print resolved Python tempfile.gettempdir() and UV_CACHE_DIR after dependency installation. On Windows the intended effect is to place isolated environments on the cache volume and avoid cross-volume full copies. Linux TMPDIR may take precedence; actual diagnostic output is authoritative. No product/test/tooling runtime, dependency/lock, native observer, exit propagation, assertion, timeout or required check changes. Original15-minute budget remains.
+Foundation diagnostic and full-check steps set TEMP/TMP to GitHub runner.temp and print resolved Python tempfile.gettempdir() and UV_CACHE_DIR after dependency installation. On Windows the intended effect is to place isolated environments on the cache volume and avoid cross-volume full copies. Linux TMPDIR may take precedence; actual diagnostic output is authoritative. No product/test/tooling runtime, dependency/lock, native observer, exit propagation, assertion, timeout or required check changes. Original15-minute budget remains.
 
 Before merge: final-commit non-author review, frozen rules and all four required CI checks. Inspect actual Windows temporary/wheel/cache paths and hardlink warnings, and require complete check --all exit0 after cleanup; absence of warnings alone is insufficient. No local Qt rerun or installer rebuild is warranted for this CI-environment-only change. New CI result is pending at this commit.
 
@@ -21,3 +21,7 @@ Official rationale: [uv cache filesystem performance](https://docs.astral.sh/uv/
 - `.local/sync008-main-3b-windows-failure.txt` SHA256 `dd558f35c93fc9b30b750378a4fa38ed4d83f2a5bfbfbc9091de8458a85b0412`.
 - `.local/t060-closeout-windows-306-ci.txt` SHA256 `f8d41c50750292278dcd50f55bdf6db22065e16102aa1558183301ecc889509a`.
 - `.local/t060-closeout-linux-306-ci.txt` SHA256 `428f9e82d4194a3ffc6feb9e3c8a256fdc52c1b2c0978af71a08b63eb682b32a`.
+
+## Configuration validation correction
+
+Initial364c2d1 quality39350159287 failed before creating any jobs (no test or wheel execution); rules39350164339 passed. The initial job-level env used runner.temp where GitHub context availability forbids runner. Corrected to step-level env on the diagnostic and full-check steps, where runner is supported; setup/native preflight steps retain their original environment. See the official context availability table linked above. This is a configuration failure, not a test success; final successor-head review and all four CI checks remain mandatory.
