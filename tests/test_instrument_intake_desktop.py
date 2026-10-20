@@ -890,6 +890,47 @@ def test_complete_intake_fig_is_saved_before_real_worker_and_restores_verified_r
         close_and_dispose_window(
             fresh, qtbot, resources_closed=lambda: fresh.host.resources_closed, timeout=20000
         )
+    previous_revision = repeated.revision
+    historical = repeated.model_dump_json()
+    request(
+        window,
+        "intake_crop_revise",
+        rowId="protein-a",
+        workflowDigest=intake_workflow_digest(repeated),
+        roi={"x": 14, "y": 12, "width": 118, "height": 38},
+    )
+    wait_saved(window, qtbot)
+    corrected = current(window)
+    assert isinstance(corrected, WBIntakeOutputProject)
+    assert not corrected.analyses and not corrected.intake_figures
+    assert corrected.intake_outputs == repeated.intake_outputs
+    assert corrected.revision > previous_revision
+    assert window.host.intake_workflow.output_snapshot(corrected)["current"] is False
+    assert (output / "project.zip").read_bytes() == old_zip
+    old_replies: list[StorageReply] = []
+    window.host.submit_storage_job(
+        StorageCommand("load", document_id=corrected.project_id, revision=previous_revision),
+        old_replies.append,
+    )
+    qtbot.waitUntil(lambda: bool(old_replies), timeout=10000)
+    assert old_replies[0].error_code is None
+    assert read_figure_project(old_replies[0].data).model_dump_json() == historical
+    previous_host, epoch = window.host, window.bridge.session_epoch
+    window.open_project(window.host.workspace_path)
+    qtbot.waitUntil(
+        lambda: (
+            window.host is not previous_host
+            and window.bridge.session_epoch > epoch
+            and window.shutdown_stage == "idle"
+        ),
+        timeout=20000,
+    )
+    wait_saved(window, qtbot)
+    reopened = current(window)
+    assert isinstance(reopened, WBIntakeOutputProject)
+    assert reopened.intake_outputs == corrected.intake_outputs
+    assert not reopened.analyses and not reopened.intake_figures
+    assert window.host.intake_workflow.output_snapshot(reopened)["current"] is False
     monkeypatch.undo()
 
 

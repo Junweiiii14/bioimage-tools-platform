@@ -27,6 +27,7 @@ from wb_tool.api import (
     retry_intake_workflow_step,
     return_to_intake_editing,
     review_intake_crop,
+    revise_completed_intake_crop,
     save_intake_grouping,
 )
 
@@ -177,7 +178,12 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
             raise ValueError("请选择当前清单中已保存的Fig")
         host.intake_workflow.show_figure(figure_id, workflow_digest)
         return
-    if action in {"intake_crop_review", "intake_crop_retry", "intake_stage_retry"}:
+    if action in {
+        "intake_crop_review",
+        "intake_crop_revise",
+        "intake_crop_retry",
+        "intake_stage_retry",
+    }:
         workflow_digest, row_id = (
             data.get("workflowDigest"),
             data.get("rowId", data.get("targetId")),
@@ -190,7 +196,7 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
             or intake_digest(project) != digest
         ):
             raise ValueError("裁剪草稿已变化，请重新核对")
-        if action == "intake_crop_review":
+        if action in {"intake_crop_review", "intake_crop_revise"}:
             roi = data.get("roi")
             if not isinstance(roi, dict):
                 raise ValueError("请在原图上明确框选裁剪范围")
@@ -199,7 +205,12 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
             if any(type(v) is not int for v in values):
                 raise ValueError("裁剪范围须为原图整数像素")
             x, y, width, height = cast(tuple[int, int, int, int], values)
-            updated = review_intake_crop(
+            review = (
+                revise_completed_intake_crop
+                if action == "intake_crop_revise"
+                else review_intake_crop
+            )
+            updated = review(
                 project,
                 row_id,
                 LaneROI(row_id, x, y, x + width, y + height),

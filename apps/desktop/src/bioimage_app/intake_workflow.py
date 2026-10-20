@@ -29,6 +29,7 @@ from wb_tool.api import (
     complete_intake_measurement,
     fail_intake_crop,
     finish_intake_workflow_step,
+    intake_output_digest,
     intake_workflow_digest,
     prepare_intake_measurement_revision,
     prepare_intake_outputs,
@@ -61,10 +62,22 @@ class IntakeWorkflowSession:
         self._cancelled = True
 
     def output_snapshot(self, project: WBIntakeOutputProject) -> dict[str, object]:
-        if self._output_context == (self.host.workspace_path, project.project_id):
-            return {"path": self._output_path, "committed": self._output_committed}
+        current = intake_output_digest(project)
         last = project.intake_outputs[-1] if project.intake_outputs else None
-        return {"path": last.destination if last else "", "committed": bool(last)}
+        if self._output_context == (self.host.workspace_path, project.project_id):
+            last = next(
+                (e for e in project.intake_outputs if e.destination == self._output_path), None
+            )
+            return {
+                "path": self._output_path,
+                "committed": self._output_committed,
+                "current": bool(last and last.input_digest == current),
+            }
+        return {
+            "path": last.destination if last else "",
+            "committed": bool(last),
+            "current": bool(last and last.input_digest == current),
+        }
 
     def publish_snapshot(self, expected_digest: str) -> None:
         host = self.host

@@ -598,6 +598,13 @@ def install_export_discovery(
         discovery=discovery,
         confirmed_digest="",
     )
+    if project.intake.grouping is not None:
+        fields["grouping"] = IntakeGrouping(
+            figures=project.intake.grouping.figures,
+            groups=tuple(
+                g.model_copy(update={"region_index": None}) for g in project.intake.grouping.groups
+            ),
+        )
     return _updated(project, IntakeManifest.model_validate(fields))
 
 

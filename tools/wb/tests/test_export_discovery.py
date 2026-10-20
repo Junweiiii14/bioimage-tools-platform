@@ -9,6 +9,8 @@ from tool_contracts.api import AssetRef
 from wb_tool.api import (
     ExportSelection,
     FigureSourcePath,
+    IntakeDraftFigure,
+    IntakeGrouping,
     IntakeSource,
     WBFigureProject,
     WBIntakeProject,
@@ -18,12 +20,14 @@ from wb_tool.api import (
     discover_exports,
     install_export_discovery,
     intake_digest,
+    intake_grouping,
     load_tiff,
     prepare_intake_crops,
     prepare_intake_workflow,
     propose_intake_crop,
     read_figure_project,
     register_intake_source,
+    save_intake_grouping,
 )
 
 
@@ -100,6 +104,53 @@ def test_roles_geometry_and_roundtrip_keep_original_samples(tmp_path: Path, bits
     assert not evidence.reviewed and len(evidence.slots) == 4
     assert evidence.crop is not None and evidence.crop.x0 == region.x0
     assert [Path(p.path).read_bytes() for p in paths] == before
+
+
+def test_grouped_target_selection_reaches_original_crop_and_fresh_detection_clears_choice(
+    tmp_path: Path,
+) -> None:
+    project, paths = sources(tmp_path)
+    report = discover_exports(project, paths)
+    project = install_export_discovery(project, report, expected_digest=intake_digest(project))
+    initial = intake_grouping(project)
+    group = initial.groups[0].model_copy(
+        update={
+            "figure_id": "fig",
+            "protein_label": "Explicit P",
+            "selected_source_id": "s1",
+        }
+    )
+    draft = IntakeGrouping(
+        figures=(IntakeDraftFigure(figure_id="fig", label="Fig", lane_count=4),), groups=(group,)
+    )
+    saved = save_intake_grouping(project, draft, expected_digest=intake_digest(project))
+    selected = IntakeGrouping(
+        figures=draft.figures, groups=(group.model_copy(update={"region_index": 0}),)
+    )
+    saved = save_intake_grouping(saved, selected, expected_digest=intake_digest(saved))
+    assert saved.intake.discovery is not None
+    assert saved.intake.discovery.selections[0].region_index == 0
+    confirmed = confirm_intake(saved, expected_digest=intake_digest(saved))
+    crops = prepare_intake_crops(
+        prepare_intake_workflow(confirmed, expected_digest=intake_digest(confirmed))
+    )
+    evidence = propose_intake_crop(paths[0].path, crops, group.group_id)
+    target = report.observations[0].regions[0]
+    assert evidence.crop is not None and not evidence.reviewed
+    assert (evidence.crop.x0, evidence.crop.y0, evidence.crop.x1, evidence.crop.y1) == (
+        target.x0,
+        target.y0,
+        target.x1,
+        target.y1,
+    )
+    assert (
+        evidence.detection is not None
+        and evidence.detection.algorithm_id == "export_signal_regions@1"
+    )
+    refreshed = install_export_discovery(saved, report, expected_digest=intake_digest(saved))
+    assert refreshed.intake.grouping is not None
+    assert refreshed.intake.grouping.groups[0].region_index is None
+    assert not refreshed.intake.confirmed_digest
 
 
 def test_cancel_and_stale_suggestions_never_install(tmp_path: Path) -> None:
