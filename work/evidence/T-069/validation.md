@@ -25,3 +25,19 @@ T068文档独审绑定e482302→8e6d4c07fb41708f2557e939d1b7247d9e5e1ff5：无�
 导入宿主整文件29通过/60.33s，实际进程0，包含正常/取消/坏预览/CAS/分组草稿/执行修订/同名根与输出恢复；Qt context-lost/shared-image stderr保留，不等于断言或进程失败，也不外推解决历史native UNKNOWN。
 
 T067/PR26最终head1259c5d53af83db7db5f301db5e3e03c4e883f09四检查SUCCESS，Windows951/510.35s、child0/u32=0；Linux951/371.30s、debugger0，全部隔离wheel与真实OCR完成。2026-10-20T12:21:16Z精确正常合main c0ac071d735a09268628e43da5091598a1aca8e7。T068纯文档PR27已开/附加，规则检查0，未将进行中四CI写为成功。
+
+## P7正式真实链、人工修正与受控恢复
+
+三目录全部19组源图/参考已本地对照，原图114文件摘要保持。第二次controller错误要求首次保存前存在持久化grouping（实际由公开intake_grouping提供虚拟旧态），自身断言失败；保留失败报告，不改产品或断言预期来掩盖。
+
+20261020-202440真实宿主完成95 TIFF/76内容扫描、19三图组/74槽、19个真实worker结果、原值裁剪/拼图/填表与首个完整新输出、first-project revision131。首次修正实际选中4A，产品正确使该Fig待执行且其余17行保留；controller硬编码期待1G而失败，实际1/116.094s、所属资源关闭。这是控制器身份断言错误，首次结果和失败报告保留。
+
+20261020-202843从同一已保存项目恢复：先核验旧索引及218成员全部SHA，再按真实稳定身份确认4A待执行，保留其余17行，只重新执行4A两行；发布第二独立目录219成员，保存revision141并重开。report.json phase=passed/errors=[]，controller实际0/60.11s。不是重跑全部管线来覆盖失败；旧项目、旧输出、失败日志保持。两个输出ID/摘要不同，历史成员不变。
+
+这些是已见、参考辅助的开发回归，不能作为独立科学真值/准确率/留出或生物配对证据。早期/重开截屏拍于异步更新前，不作为已加载UI视觉验收。完整本地报告、SQLite、清单、私图及日志仅在忽略的.local/t069-real-chain和t069-real-evidence。
+
+## 冻结完整本地门禁
+
+HEAD 3f7340845da39adf938b29a183b258d6460ad572，干净工作树，Windows/Python3.12.14；2026-10-20T20:30:40+08→20:45:41+08。命令uv run --locked --no-sync python dev.py check --all。PYTHONIOENCODING=utf-8/PYTHONUNBUFFERED=1/PYTHONFAULTHANDLER=1，QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu，PYTEST_ADDOPTS=-vv -o faulthandler_timeout=60，BIOIMAGE_NATIVE_STACKS=1/BIOIMAGE_WINDOWS_FAULTS=1。
+
+Ruff/764文件格式/Pyright/import contracts通过；955 passed/800.04s，Observed child exit=0/u32=0；独立wheel全部安装/公开API及真实OCR完成；最外层实际exit_code=0。原始全日志.local/t069-fullcheck-3f73408.log、原始退出与起止.local/t069-fullcheck-3f73408-process.json。冻结期间未改源码、未另启Qt。一次完成，不把pytest摘要代替整命令退出；不外推目标Win10/DPI/科学留出或未构建安装包。
