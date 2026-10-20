@@ -10,6 +10,33 @@ from hashlib import sha256
 from pathlib import Path
 from typing import cast
 
+SHORTCUT_PROBE_SCRIPT = """(()=>{
+  if(!window.__intakeDiagnosticKeys){
+    window.__intakeDiagnosticKeys=[];
+    window.addEventListener('keydown',event=>{
+      const entries=window.__intakeDiagnosticKeys;
+      if(entries.length<12)entries.push({key:event.key,code:event.code,
+        ctrl:event.ctrlKey,shift:event.shiftKey,repeat:event.repeat,
+        composing:event.isComposing,busy:state.busy,focused:document.hasFocus(),
+        target:event.target?.tagName,modal:!!document.querySelector('dialog[open]'),
+        drawer:!document.querySelector('#drawer').hidden});
+    },true);
+  }
+  const snapshot={project_id:state.projectId,session_epoch:state.sessionEpoch,
+    busy:!!state.busy,focused:document.hasFocus(),
+    loaded:!!window.workbenchActions?.loaded(),
+    composing:!!window.workbenchActions?.isComposing(),
+    modal:!!document.querySelector('dialog[open]'),
+    drawer:!document.querySelector('#drawer').hidden,
+    editable:!!document.activeElement?.closest?.(
+      'input,textarea,select,[contenteditable]:not([contenteditable=false])'),
+    dialog_open:!!document.querySelector('#shortcuts-dialog[open]'),
+    keys:window.__intakeDiagnosticKeys};
+  snapshot.ready=snapshot.focused&&snapshot.loaded&&!snapshot.busy&&
+    !snapshot.composing&&!snapshot.modal&&!snapshot.drawer&&!snapshot.editable;
+  return JSON.stringify(snapshot);
+})()"""
+
 
 def verify_intake_installation(report_path: Path, *, grouped: bool = False) -> int:
     import numpy as np
@@ -47,6 +74,8 @@ def verify_intake_installation(report_path: Path, *, grouped: bool = False) -> i
         checks: list[str] = []
         errors: list[str] = []
         phase = "bootstrap"
+        failed_phase = ""
+        shortcut_probe: dict[str, object] = {}
         workspace = ""
         epoch = 0
         saved_runs: tuple[RunRecord, ...] = ()
@@ -85,6 +114,8 @@ def verify_intake_installation(report_path: Path, *, grouped: bool = False) -> i
                     "schema": 1,
                     "diagnostic": "grouped_intake_installed@1" if grouped else "intake_installed@1",
                     "phase": phase,
+                    "failed_phase": failed_phase,
+                    "shortcut_probe": shortcut_probe,
                     "checks": checks,
                     "errors": errors,
                     "elapsed": time.monotonic() - started,
@@ -158,9 +189,38 @@ def verify_intake_installation(report_path: Path, *, grouped: bool = False) -> i
             js_pending = False
             dom_ready = value is True
 
+        def shortcut_observed(value: object) -> None:
+            nonlocal js_pending, dom_ready, shortcut_probe
+            js_pending = False
+            if not isinstance(value, str):
+                shortcut_probe = {"transport_type": type(value).__name__}
+                dom_ready = False
+                return
+            try:
+                decoded: object = json.loads(value)
+            except ValueError:
+                shortcut_probe = {"transport_error": "Invalid JSON probe"}
+                dom_ready = False
+                return
+            if not isinstance(decoded, dict):
+                shortcut_probe = {"transport_error": "Probe must be an object"}
+                dom_ready = False
+                return
+            shortcut_probe = cast(dict[str, object], decoded)
+            if phase == "shortcut-open":
+                dom_ready = shortcut_probe.get("dialog_open") is True
+            elif phase == "shortcut-focus":
+                dom_ready = (
+                    shortcut_probe.get("ready") is True
+                    and shortcut_probe.get("project_id") == current().project_id
+                    and shortcut_probe.get("session_epoch") == window.bridge.session_epoch
+                )
+            else:
+                dom_ready = False
+
         def poll() -> None:
             nonlocal phase, workspace, epoch, saved_runs, saved_outputs, original_zip
-            nonlocal js_pending, closed, dom_ready
+            nonlocal js_pending, closed, dom_ready, failed_phase
             try:
                 elapsed = time.monotonic() - started
                 if elapsed > 150:
@@ -177,6 +237,7 @@ def verify_intake_installation(report_path: Path, *, grouped: bool = False) -> i
                     return
                 if elapsed > 120 and phase != "close":
                     errors.append("Diagnostic exceeded 120 seconds")
+                    failed_phase = phase
                     phase = "close"
                     record()
                     window.close()
@@ -496,9 +557,8 @@ def verify_intake_installation(report_path: Path, *, grouped: bool = False) -> i
                         js_pending = True
                         window.web.page().runJavaScript(
                             "(()=>{document.body.tabIndex=-1;document.body.focus();"
-                            "return document.hasFocus() && "
-                            "!!window.workbenchActions?.loaded();})()",
-                            received,
+                            "return " + SHORTCUT_PROBE_SCRIPT + ";})()",
+                            shortcut_observed,
                         )
                 elif phase == "shortcut-open":
                     if dom_ready:
@@ -509,13 +569,14 @@ def verify_intake_installation(report_path: Path, *, grouped: bool = False) -> i
                             "f.focus();f.dispatchEvent(new KeyboardEvent('keydown',"
                             "{key:'s',code:'KeyS',ctrlKey:true,shiftKey:true,bubbles:true,"
                             "cancelable:true}));document.querySelector("
-                            "'[data-shortcut-command=save]').click();return true;})()"
+                            "'[data-shortcut-command=save]').click();return "
+                            + SHORTCUT_PROBE_SCRIPT
+                            + ";})()",
+                            shortcut_observed,
                         )
                     elif not js_pending:
                         js_pending = True
-                        window.web.page().runJavaScript(
-                            "!!document.querySelector('#shortcuts-dialog[open]')", received
-                        )
+                        window.web.page().runJavaScript(SHORTCUT_PROBE_SCRIPT, shortcut_observed)
                 elif phase == "shortcut-save":
                     if window.shortcuts.bindings["project.save"] == "Ctrl+Shift+S":
                         from bioimage_app.shortcuts import WorkbenchShortcuts
@@ -531,6 +592,7 @@ def verify_intake_installation(report_path: Path, *, grouped: bool = False) -> i
                 record()
             except (ValueError, OSError, RuntimeError, KeyError, TypeError) as error:
                 errors.append(str(error))
+                failed_phase = phase
                 phase = "close"
                 record()
                 window.close()

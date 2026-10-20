@@ -101,7 +101,7 @@ def observe(command: list[str], *, seconds: int) -> tuple[int, bool, str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--case", choices=("control", "target", "prefix"), required=True)
+    parser.add_argument("--case", choices=("control", "target", "prefix", "suite"), required=True)
     args = parser.parse_args()
     if sys.platform != "linux":
         parser.error("Linux only")
@@ -132,6 +132,9 @@ def main() -> int:
             )
             else 1
         )
+    if args.case == "suite":
+        code, expired, _ = observe([sys.executable, "-m", "pytest", "-q"], seconds=660)
+        return 124 if expired else code
     cases = [TARGET]
     if args.case == "prefix":
         cases = [f"tests/test_web_bridge.py::{name}" for name in PREFIX] + cases

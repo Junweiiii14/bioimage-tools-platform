@@ -9,7 +9,7 @@ on:
         description: 'Isolated Linux native evidence (normal checks remain required)'
         type: choice
         default: normal
-        options: [normal, target, prefix]
+        options: [normal, target, prefix, suite]
 permissions:
   contents: read
 concurrency:
@@ -83,7 +83,7 @@ jobs:
   native-case:
     if: github.event_name == 'workflow_dispatch' && inputs.native-case != 'normal'
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 15
     env:
       QT_QPA_PLATFORM: offscreen
       QTWEBENGINE_CHROMIUM_FLAGS: --disable-gpu
@@ -106,4 +106,6 @@ jobs:
       - name: Verify external owned cancellation and native capture
         run: uv run --locked --no-sync python -m tooling.linux_native_case --case control
       - name: Observe unchanged original test case
-        run: uv run --locked --no-sync python -m tooling.linux_native_case --case "$NATIVE_CASE"
+        run: |
+          ulimit -c 0
+          uv run --locked --no-sync python -m tooling.linux_native_case --case "$NATIVE_CASE"

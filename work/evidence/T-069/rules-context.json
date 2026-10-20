@@ -4,6 +4,7 @@
   "base_commit": "5729cb81581370339fcc5c86cda1cb20264e8c5c",
   "scopes": [
     ".agent-handoff",
+    ".github",
     "apps/desktop",
     "docs",
     "tests",

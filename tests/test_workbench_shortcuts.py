@@ -4,14 +4,15 @@ import json
 from pathlib import Path
 
 import pytest
+from bioimage_app.installation_check_intake import SHORTCUT_PROBE_SCRIPT
 from bioimage_app.shortcuts import WorkbenchShortcuts
 from bioimage_app.web_window import WebWorkbenchWindow
 from PySide6.QtCore import QSettings, Qt
 from PySide6.QtTest import QTest
 from pytestqt.qtbot import QtBot
 
+from tests.test_intake_web_ui import bridge_snapshot, javascript
 from tests.test_intake_web_ui import intake_page as intake_page
-from tests.test_intake_web_ui import javascript
 from tooling.qt_test_lifecycle import close_and_dispose_window
 
 
@@ -69,6 +70,43 @@ def grouped_page(window: WebWorkbenchWindow, qtbot: QtBot) -> None:
     window.activateWindow()
     window.web.setFocus()
     qtbot.waitUntil(lambda: javascript(window, qtbot, "document.hasFocus()") is True)
+
+
+def test_diagnostic_waits_for_rendered_idle_before_one_real_shortcut(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    grouped_page(window, qtbot)
+    bridge_snapshot(window, qtbot, "({...state,busy:true})")
+    raw = javascript(window, qtbot, SHORTCUT_PROBE_SCRIPT)
+    assert isinstance(raw, str)
+    probe = json.loads(raw)
+    assert isinstance(probe, dict)
+    # These were the old diagnostic's entire ready conditions.
+    assert probe["focused"] is True and probe["loaded"] is True
+    assert probe["busy"] is True and probe["ready"] is False
+    target = window.web.focusProxy()
+    assert target is not None
+    modifiers = Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier
+    QTest.keyClick(target, Qt.Key.Key_K, modifiers)
+    qtbot.waitUntil(lambda: javascript(window, qtbot, "__intakeDiagnosticKeys.length>0") is True)
+    assert javascript(window, qtbot, "!document.querySelector('#shortcuts-dialog').open")
+    assert javascript(
+        window, qtbot, "__intakeDiagnosticKeys.some(e=>e.key.toLowerCase()==='k'&&e.busy)"
+    )
+    bridge_snapshot(window, qtbot, "({...state,busy:false})")
+    raw = javascript(window, qtbot, SHORTCUT_PROBE_SCRIPT)
+    assert isinstance(raw, str)
+    probe = json.loads(raw)
+    assert isinstance(probe, dict) and probe["ready"] is True
+    # Arrival of the idle snapshot cannot replay an already rejected native key.
+    assert javascript(window, qtbot, "!document.querySelector('#shortcuts-dialog').open")
+    QTest.keyClick(target, Qt.Key.Key_K, modifiers)
+    qtbot.waitUntil(
+        lambda: (
+            javascript(window, qtbot, "document.querySelector('#shortcuts-dialog').open") is True
+        )
+    )
 
 
 def test_real_key_saves_group_draft_once_through_the_button_action(
