@@ -1,6 +1,6 @@
 # T-065 目标区域接入与执行后裁剪修正
 
-- 状态：产品708d2d7已获原非作者实现接受及界面原文案修复ship；PR23四检查待验。接续T064，完整交付计划见docs/wb-grouped-intake-plan.md。
+- 状态：产品708d2d7已获原非作者实现接受及界面原文案修复ship；PR23 Windows929pass/1fail，重开测试过早满足中间idle条件，正在修正精确完成等待。接续T064，完整交付计划见docs/wb-grouped-intake-plan.md。
 - 基线：T064产品cdbe9dd、文档eb8d392；PR22四检查SUCCESS，已于2026-10-20T10:37:45Z合main2044aaf；本分支合入前置main且产品无新diff，规则已按新main重载。
 - 范围：tools/wb、apps/desktop、tests、docs/contracts、work、.agent-handoff、PRODUCT.md、.impeccable/surfaces。
 - 授权：用户已确认持续实现/独审/PR/离线候选；普通选择自主；原图、项目历史修订及已完成结果不覆盖。
