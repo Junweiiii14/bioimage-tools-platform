@@ -2,7 +2,7 @@
 
 from contextlib import suppress
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import QItemSelectionModel, Qt, Signal
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QComboBox,
@@ -143,8 +143,13 @@ class LaboratoryLayoutPanel(QWidget):
     def _select_segment(self, index: int) -> None:
         if self._loading or not 0 <= index < self.table.rowCount():
             return
-        self.table.setCurrentCell(index, 0)
-        self.table.selectRow(index)
+        # The compact selector names one segment even while a modifier is held.
+        self.table.setCurrentCell(
+            index,
+            0,
+            QItemSelectionModel.SelectionFlag.ClearAndSelect
+            | QItemSelectionModel.SelectionFlag.Rows,
+        )
         self._show_segment(index)
 
     def _table_selected(self, row: int, *_args: object) -> None:

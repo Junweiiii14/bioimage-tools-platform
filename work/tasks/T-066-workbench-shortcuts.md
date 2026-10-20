@@ -1,7 +1,7 @@
 # T-066 统一工作台动作与可配置快捷键
 
 - 状态：实现/原非作者独审完成，待本PR四检查集成。前置PR23已四检查合main e842c6c，当前已合入并重载规则；运行代码与已接受ce7b039无diff。
-- 范围：apps/desktop、tests、docs/contracts、work、.agent-handoff、PRODUCT.md、.impeccable/surfaces。
+- 范围：apps/desktop、tools/wb、tests、docs/contracts、work、.agent-handoff、PRODUCT.md、.impeccable/surfaces。
 - 授权：用户确认完整计划，自主实现普通选择，持续独审/PR/新离线测试版；原图、历史结果和其他工作树dirty保持。
 - 目标：固定动作ID与同一可执行状态，键盘调用和按钮共享行为；覆盖页面切换、采集组选取/归Fig/原图放大/裁剪源选择、保存、阶段继续、撤销/重做。自定义绑定、冲突检测、作用域、禁用/恢复默认及持久化，设置通过文件菜单可达。
 - 约束：中文IME组合、输入框/contenteditable、原生/网页弹窗、失焦和忙态保护；不绕过禁用按钮，不在Web/Qt重复触发；不因保存项目而丢弃未应用草稿。快捷键只改变操作入口，不改变科学参数/算法或历史文件。
@@ -15,3 +15,5 @@
 - 初审实现P2明确错误恢复按钮误被dialog保护阻断、界面fix按钮焦点/列表滚动丢失，均已修；9/6.88s实际0，待修正head复验。documenter No changes针对既有体系。T065窄CI等待修正a263fee已获非作者无行动项/冻结1项实际0，已推PR23服务器新检查。
 
 修正head ce7b039 已获原实现独审resolved/4项实际0和原UI finish ship。文档收尾不改变运行实现；待前置PR23 CI/合并后重载基线与本PR集成。
+
+PR24/5019b92 两平台均在旧紧凑排版分段用例失败（938通过/1失败，实际进程1，wheel未执行）。新真实快捷键用例后Qt保留Ctrl/Shift修饰状态，程序化setCurrentCell与selectRow使目标行未选中，分段明确报未选择。独审以单个真实快捷键前驱复现1通过/1失败，再仅运行时替换为ClearAndSelect|Rows，保持修饰状态和原分段预期后2通过/实际0。范围扩至tools/wb：只使紧凑选择器明确选择目标整行，不更改高级表格手动多选、分段几何或数值/旧测试预期；用既有真实快捷键与原分段用例顺序回归，绑定新提交复验。
