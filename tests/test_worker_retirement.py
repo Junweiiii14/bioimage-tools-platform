@@ -4,15 +4,66 @@ from pathlib import Path
 from threading import Event
 from typing import cast
 
+from bioimage_app.api import create_figure_project_window
 from bioimage_app.process import ProcessCodec, ProcessEvent, ProcessOutcome, ProcessRunner
 from bioimage_app.project_restore import ArchiveRestoreJob, ArchiveRestoreResult
 from bioimage_app.storage import AsyncStorage, StorageCommand
 from PySide6.QtCore import QObject, Qt, QThread, Slot
-from pytest import mark
+from pytest import MonkeyPatch, mark
 from pytestqt.qtbot import QtBot
 from shiboken6 import isValid
 from wb_tool.api import WBJob
 from wb_tool.ui.background import WBBackground
+
+
+def test_host_keeps_storage_available_until_background_is_destroyed(
+    qtbot: QtBot, monkeypatch: MonkeyPatch
+) -> None:
+    window = create_figure_project_window()
+    store = cast(AsyncStorage, owned_worker(window, "_store"))
+    background = cast(WBBackground, owned_worker(window, "_background"))
+    worker = owned_worker(background, "_work")
+    background_shutdown = background.shutdown
+    requested: list[bool] = []
+    replies: list[object] = []
+    store.replied.connect(replies.append)
+    monkeypatch.setattr(background, "shutdown", lambda: requested.append(True))
+    try:
+        window.close()
+        assert requested and not window.resources_closed
+        # Closing the backing store before the still-owned image worker retires
+        # makes its assets unavailable and overlaps two QObject retirement paths.
+        store.submit(StorageCommand("documents"))
+        qtbot.waitUntil(lambda: bool(replies), timeout=10000)
+        assert isValid(worker)
+    finally:
+        background_shutdown()
+        qtbot.waitUntil(lambda: window.resources_closed, timeout=10000)
+        window.deleteLater()
+        qtbot.waitUntil(lambda: not isValid(window), timeout=10000)
+
+
+def test_already_closed_background_does_not_close_storage_before_host(
+    qtbot: QtBot,
+) -> None:
+    window = create_figure_project_window()
+    store = cast(AsyncStorage, owned_worker(window, "_store"))
+    background = cast(WBBackground, owned_worker(window, "_background"))
+    stopped: list[bool] = []
+    replies: list[object] = []
+    background.closed.connect(lambda: stopped.append(True))
+    store.replied.connect(replies.append)
+    try:
+        background.shutdown()
+        qtbot.waitUntil(lambda: bool(stopped), timeout=10000)
+        assert not window.resources_closed
+        store.submit(StorageCommand("documents"))
+        qtbot.waitUntil(lambda: bool(replies), timeout=10000)
+    finally:
+        window.close()
+        qtbot.waitUntil(lambda: window.resources_closed, timeout=10000)
+        window.deleteLater()
+        qtbot.waitUntil(lambda: not isValid(window), timeout=10000)
 
 
 class DestructionProbe(QObject):

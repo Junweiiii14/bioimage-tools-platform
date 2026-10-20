@@ -25,3 +25,5 @@
 
 - 冻结c935产品/7e文档的首个完整check --all：静态/类型/9依赖契约通过，pytest 976通过/1失败、849.93s，整命令实际1，后续wheel未跑；不以976项替代全门禁成功。唯一失败为新增序列安装诊断没有看到每个短暂running状态。PR30首Linux同一失败：976通过/1失败、399.97s，inferior01/debugger1，后续wheel未跑。原日志.local/t071-final-fullcheck.log、t071-ci-ubuntu-first.log保留。
 - 诊断根因已确认：bridge.stateChanged节流/合并快照，不保证每次成功持久保存都发布。两平台都已完整输出、两个真实worker和review/layout/quant/results真实页面成立，但短暂阶段样本不全，诊断应失败。修复仅诊断观察：包装实际host.save成功回调，先观察已安装的持久修订再调用原有after，失败/CAS/取消不伪造事件；网页导航仍由真实JS独立检查。阶段要求从数量加强为与最终账本全部(stage,target)集合精确相等，记录revision及committed-save-callback来源，不删断言、不加重试/延迟、不改生产调度/门禁。局部真实-I诊断11.83s实际0；新字典推断类型初次1错误，显式dict[str,object]后Pyright0，无忽略。
+
+- 二次本机完整977/845.63s、原child0/u32=0、全部wheel/真实OCR及整命令0；Linuxcb2完整977/395.52s/debugger0/wheel/check0。cb2仅比本机开始20c多两份Markdown/8行，没有在执行期间改产品、测试或门禁。Windowscb2在第5个既有归档关闭用例原生挂起，job20分钟CANCELLED、pytest退出未知，API日志404，live247行片段已保留；未合并。最窄所属端口顺序修正与23项定向0见windows-close-order.md，需要新冻结全门禁/CI。

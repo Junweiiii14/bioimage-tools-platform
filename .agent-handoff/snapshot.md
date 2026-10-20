@@ -9,3 +9,5 @@
 - T069已安装候选和桌面交付仍冻结6080867，旧原图/项目/历史/安装及其他树保留；私图不入Git/外部API。旧native UNKNOWN、干净Win10/物理DPI/科学留出缺口继续保留，不升级依赖、不扩工具、不正式Release。
 
 - PR30首全门禁本机849.93s/Linux399.97s均976通过+1失败，新增诊断从节流快照漏短暂阶段；已改观察已提交save回调/加强逐目标集合，局部-I11.83s0。下一步增量独审、新完整门禁与四CI；未交付。
+
+- 当前PR30/cb2的本机与Linux全977/wheel/check0；Windows第5个旧归档close用例native挂起，20分钟CANCELLED/原pytest退出未知，API日志404，live247行片段本地保留。新修正单宿主先WB worker destroyed/closed再storage.shutdown，提前closed只记状态，23定向66.80s0；下一步绑定新提交独审、必要完整门禁/四CI，尚无新包。
