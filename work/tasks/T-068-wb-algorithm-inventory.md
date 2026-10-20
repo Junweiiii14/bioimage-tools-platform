@@ -10,3 +10,5 @@
 
 - 已完成草稿：docs/wb-algorithm-inventory.md的14链路消费者/坐标/版本/失败/测试与保留决定；只读90模块/69顶层私有函数扫描0无消费者候选/0相同函数体候选，限制明确，未新增产品删除。README/迭代证据导航已更新；GitHub里程碑1、Issue25与PR21–24归类已完成，依赖PR4/5/20独立分流，历史Issue6/26远端分支保留。
 - 当前验证：policy0，绑定8e6d4c非作者无必要纠正项/无可证实P0–P2；独立扫描90/69/双空0、冻结文档45链接missing0/退出0，14链路/GitHub事实核对相符。前置集成后文档内容保持；P7/P8在T069继续，未声称新安装或科学验收完成。
+
+- CI取证追加（2026-10-20）：PR27 Linux在test_local_page_channel_and_drain关闭阶段挂起并被15分钟服务器期限取消；Windows951项及wheel/OCR通过。根因UNKNOWN，不改Qt销毁策略/断言/超时/依赖。范围追加tooling、.github：仅手动诊断事件隔离原必需jobs和concurrency，原PR/push门禁保持；所属inferior外部SIGINT取原生栈，先验证外部控制再跑原目标，必要时原同文件前五项→目标。新诊断代码须独立审查，正常四检查仍须通过。
