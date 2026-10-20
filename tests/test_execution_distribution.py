@@ -16,6 +16,7 @@ from tooling.qt_test_lifecycle import close_and_dispose_window
         ("candidate", "Candidate"),
         ("win10-test", "Win10Test"),
         ("wb-execution-test", "E7Test"),
+        ("wb-grouped-intake-test", "GroupedIntakeTest"),
         ("unknown", "Platform"),
     ],
 )

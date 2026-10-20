@@ -1,13 +1,12 @@
 # Handoff Snapshot
 
-- 当前任务：work/tasks/T-068-wb-algorithm-inventory.md；总规划T063及docs/wb-grouped-intake-plan.md。T067冻结1211d70独审接受/UI ship、文档e482302，待PR24合main后重载回执建本增量PR；原T067相对main规则检查因2条前置receipt未合而失败，不能删回执解决。
-- 用户已确认P0–P8执行，普通实现自主，仅无法消解的数据歧义集中问；当前已退出Plan模式。
-- 活动树C:/Users/70236/.codex/worktrees/wb-grouped-intake/bioimage-tools-platform，当前codex/wb-algorithm-inventory；T067用codex/intake-group-revisions，T066用codex/workbench-shortcuts。不要从历史ResearchVault树开发。
-- 新树依赖uv sync --locked --all-groups实际0、锁文件不变，T064规则已按main1625ae5重载；P0 PR21四检查已合。
-- t051树T062原型和交接未提交改动保留原位。桌面已批准无侧栏采集组网格，组内图片并排平等，批量归Fig、组蛋白名、单选裁剪源、Fig级N。
-- 本轮三指定目录95个TIFF/76唯一内容、19个三图采集组/19唯一裁剪参考；N初步建议及限制见计划，不沿用旧82/21。
-- PR19实时MERGED，四必需检查SUCCESS，merge f3fb2ff；E0–E7/T061复用，不重建引擎。
-- PR22分组主链已合；PR23原图目标/裁剪修订最终7f46334已四检查、两平台930项/wheel/OCR后合main e842c6c。旧Windows两轮测试失败/Linux关闭超时保留work/evidence/T-065/pr23-ci.md，不宣称原生UNKNOWN修复。
-- T066快捷键ce7b039原独审resolved/UI ship，已合入最新main并重载规则（尚未将本增量合main），运行代码无diff；PR24待集成。T067新workflow@2独审冻结9+1项0、原@1兼容双脚本0，无新可证实P0–P2；原两项UI修复ship。后续P5盘点/P6导航/P7真实链与一次冻结本地全门禁/P8新离线安装交付尚未完成。
-- T068盘点90模块/69私有顶层函数，无可直接退役或相同AST函数候选，不改产品数值/锁/CI；清单/消费者证据与迭代导航已写，3文档链接存在/policy0。GitHub当前交付Issue25/里程碑1、PR21–24归类完成，依赖PR4/5/20不自动升级/合并；历史Issue6保留。
-- 私图不上Git/外部API，原图/项目/历史结果不覆盖。旧原生UNKNOWN、目标Win10/DPI/科学留出与清理审批拒绝残余保留。
+- 当前任务：work/tasks/T-069-grouped-intake-offline.md；总计划T063及docs/wb-grouped-intake-plan.md，目标保持active，完整P0–P8授权持续有效，当前为执行模式。
+- 活动树C:/Users/70236/.codex/worktrees/wb-grouped-intake/bioimage-tools-platform，开发codex/grouped-intake-offline；T068用codex/wb-algorithm-inventory。历史ResearchVault和t051 dirty/原型不动。
+- PR21–24/26均绑定独审及四检查后正常合main c0ac071。采集组网格/主链、明确裁剪修订、可配置快捷键、执行后分组失效均已集成。T068盘点90模块/69私有函数未发现可安全直接删除项；About/导航/Issue25/里程碑1已整理，依赖PR4/5/20未混升。
+- PR27最终0a96d60四检查SUCCESS，Windows951/467.54s child0、Linux951/287.23s debugger0，全部wheel/OCR，精确合main5729cb8。手动所属inferior取证d2790a3绑定独审两项resolved；外部control实际17且采样完整，原单项1/5.10s、前驱6/7.42s均0未复现。旧0b关闭挂起根因UNKNOWN保留，不据假设改Qt销毁。
+- T069产品745d043独立GroupedIntakeTest安装通道/设置/AppId及真实分组自检已独审；fb95c91修复多根导入首根混用，6项冻结反例独审0；定向29项0。
+- 三指定目录95 TIFF/76内容/19三图组，114原文件摘要保持；19参考辅助开发回归，不冒充科学真值。真实首输出完成后控制器错认4A为1G而失败，原日志/旧输出保留；同项目受控恢复只重执行4A两行、独立新输出并保存重开actual0/60.11s。非作者只读0/8.06s：38原值裁剪一致、17行保留、旧218成员/新219成员SHA匹配；见T069 evidence。
+- 干净冻结3f73408完整本地check --all一次actual0，955/800.04s/child0、全部隔离wheel和真实OCR完成；原始日志和外层进程JSON在.local。当前未构建/安装新离线包，不宣告交付。
+- PR28首轮b99：Windows954/1失败（grouped诊断120秒缺快捷键）、Linuxgrouped通过后旧fixture关闭卡StorageWorker.retire并取消。5e1f6c3诊断等待DOM身份/空闲及原guard、window捕获/失败阶段，15项40.62s0；非作者冻结两项15.80s0/真实CLI17checks，原具体CI原因UNKNOWN。手动suite660秒原生取证新增，普通jobs/concurrency恒等/原15分钟保持，绑定独审接受；见T069/pr28-ci.md。
+- 下一步：推送已审增量最终head，正式四CI及manual suite取证；必要时据原生证据修复，不盲改Qt生命周期。之后精确集成、冻结main构建/安装/双流程与PS5.1自检、SHA/manifest/桌面交付。当前尚无新安装包。
+- 原图/参考/项目/历史结果/旧安装/其他树保留。私图、模型、产物不入Git或外部API。原生UNKNOWN、干净Win10/物理DPI与科学留出缺口保留，旧缓存递归删除审批拒绝不绕过。

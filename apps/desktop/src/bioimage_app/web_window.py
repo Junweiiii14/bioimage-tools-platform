@@ -72,7 +72,12 @@ class WebWorkbenchWindow(QMainWindow):
     ) -> None:
         super().__init__()
         channel = os.environ.get("BIOIMAGE_RELEASE_CHANNEL")
-        candidate = channel in {"candidate", "win10-test", "wb-execution-test"}
+        candidate = channel in {
+            "candidate",
+            "win10-test",
+            "wb-execution-test",
+            "wb-grouped-intake-test",
+        }
         self.setWindowTitle("BioImage WB · 候选版" if candidate else "BioImage · WB 工作台")
         self.setWindowIcon(QIcon(str(Path(__file__).with_name("web_ui") / "bioimage.svg")))
         self.resize(1440, 940)
@@ -80,6 +85,7 @@ class WebWorkbenchWindow(QMainWindow):
             "candidate": "Candidate",
             "win10-test": "Win10Test",
             "wb-execution-test": "E7Test",
+            "wb-grouped-intake-test": "GroupedIntakeTest",
         }.get(channel or "", "Platform")
         self.settings = settings or QSettings("BioImageTools", settings_name)
         self.shortcuts = WorkbenchShortcuts(self.settings)

@@ -213,17 +213,27 @@ class InstrumentIntakeSession:
         job.finished.connect(scanned)
         job.start()
 
-    def import_paths(self, paths: tuple[Path, ...], root: Path) -> None:
+    def import_paths(self, paths: tuple[Path, ...], root: Path | tuple[Path, ...]) -> None:
         host = self.host
         if host.operation_busy or host.is_closing or not host.workspace_path:
             return
         project = host.view.project()
         if not isinstance(project, WBIntakeProject):
             raise ValueError("当前项目不是仪器导入清单")
+        roots = (root,) if isinstance(root, Path) else root
+        selected_roots = sorted(
+            {p.resolve() for p in roots}, key=lambda p: len(p.parts), reverse=True
+        )
+        pending: list[tuple[Path, Path]] = []
+        for path in paths:
+            resolved = path.resolve()
+            source_root = next((r for r in selected_roots if resolved.is_relative_to(r)), None)
+            if source_root is None or resolved == source_root:
+                raise ValueError("原图不属于所选导入文件夹，请重新核对来源")
+            pending.append((resolved, source_root))
         host.begin_operation()
         identity = (host.workspace_path, project.project_id)
         generation = host.view.generation
-        pending = list(paths)
         self.issues = []
         imported_count = skipped = 0
 
@@ -258,12 +268,10 @@ class InstrumentIntakeSession:
                 pending.clear()
                 next_image()
                 return
-            path = pending.pop(0)
-            root_key = sha256(os.path.normcase(str(root.resolve())).encode("utf-8")).hexdigest()[
-                :16
-            ]
-            namespace = f"{root.name or 'root'}~batch2-{root_key}"
-            relative = namespace + "/" + path.relative_to(root).as_posix()
+            path, source_root = pending.pop(0)
+            root_key = sha256(os.path.normcase(str(source_root)).encode("utf-8")).hexdigest()[:16]
+            namespace = f"{source_root.name or 'root'}~batch2-{root_key}"
+            relative = namespace + "/" + path.relative_to(source_root).as_posix()
             host.view.status.setText(f"正在读取 {relative}；剩余 {len(pending)} 张")
 
             def previewed(reply: WBReply) -> None:

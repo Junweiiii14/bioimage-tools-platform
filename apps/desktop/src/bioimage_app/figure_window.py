@@ -468,7 +468,12 @@ class FigureProjectWindow(QMainWindow):
                             self._done("创建后已取消；项目可稍后继续。")
                             return
                         if intake:
-                            self.intake.import_paths(selection.paths, paths[0].resolve())
+                            self.intake.import_paths(
+                                selection.paths,
+                                tuple(
+                                    p.resolve() if p.is_dir() else p.resolve().parent for p in paths
+                                ),
+                            )
                         else:
                             self.import_images(
                                 tuple(str(p) for p in selection.paths), automatic=automatic

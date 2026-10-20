@@ -31,6 +31,15 @@ geometry drafts; failed saves retain drafts, and session changes retire them. Se
 
 # Desktop host
 
+T069 adds `--grouped-intake-test`, an isolated GroupedIntakeTest distribution with
+its own AppId, settings, Chinese install directory and shortcuts. The explicit
+`--verify-grouped-intake-installation <new-report.json>` reuses the real intake
+worker/output/reopen diagnostic after incomplete/complete group drafts and verifies
+the shipped configurable shortcut settings. Old diagnostics/distributions remain
+separate. Multi-root intake assigns each file to its selected root before beginning
+the operation, preserving batch identity and rejecting outside-root paths. Actual
+candidate acceptance and remaining target-machine/scientific gaps are in T069.
+
 T066使用固定动作目录和当前发行通道QSettings提供可配置快捷键；文件菜单可进入设置，键盘与按钮共用操作，保护输入/IME/弹窗/忙态。详情 `../../docs/contracts/workbench-shortcuts-v1.md`，不改变科学数据或原灰度/OCR能力。
 
 T065网格增加目标区域选择及原坐标显示框；已完成裁剪可明确保存修正，宿主CAS生成新修订，所属Fig当前结果失效、旧输出显示为历史。见 `../../docs/contracts/wb-intake-revision-v1.md`，不覆写原图或发布目录。
