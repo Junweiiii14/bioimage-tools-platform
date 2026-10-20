@@ -1,6 +1,6 @@
 # T-060：E7 集成、包态与交付验收
 
-- 状态：review；E0–E6实现/绑定独审完成，E7产品e579及910项完整本机门禁/全部wheel、独立安装候选工程验证通过。历史依赖PR15已按最终独审/四CI接受main842918a；已合实际基线并重载13历史来源集成清单，待最终提交独审/冻结规则/产品PR四CI及main接受。原起点base5e3459a/E6产品ea7ed55及其862/624.64s证据保留。
+- 状态：done（工程实施、本机候选与主线集成）；最终产品368079078180eea067079f542a523df0094e99ac已绑定非作者独审/冻结规则及四必需检查，PR17于2026-10-20T00:29:51Z合main0f358ac2983540b1bae98b1e6340280207e135fe。Windows910/666.50s、Linux910/353.99s及全部wheel/真实OCR/check0；独立e579安装工程验证通过。科学留出/样本配对、干净目标Win10与物理DPI未验，正式发布未执行。原起点及全部失败证据保留。
 - 授权：按docs/wb-execution-plan.md连续推进，无阶段重复批准、无定时任务。有效t051/codex/wb-e0-e7；root sole writer，非作者只读独审。原ResearchVault dirty树、旧候选/安装/原图/历史结果/用户窗口保持。
 - 范围：apps/desktop、tools/wb、tooling、tests、docs、README.md、AGENT_HANDOFF.md、.agent-handoff、work/tasks、work/evidence、.github（仅实际CI诊断必要时单独说明/独审，不改规则以绕过失败）。scope .加载全部当前与BASE规则。
 - 首项：补充当前存活高风险链独审已绑定ea7ed55/base536f04e，发现历史OCR迟到取消P2。ProjectOCRSession异步解码后不查取消，宿主完成/安装只查generation；先改草稿再保存使失败/取消可能替换关联。修session完成与host完成/安装/CAS前后保护；真实已提交RunRecord不撤销，保存失败/取消保留当前旧关联。覆盖decode/install/关闭/encode前/CAS在途/保存失败/后续显式重试及过期generation。
@@ -10,7 +10,7 @@
 - 安装验收：本机非管理员Win11新候选安装、卸载/重装、中文路径、独立入口/设置、原资产与旧安装保护；私有实际runtime运行新清单批量主链（保存/真实worker/稳定槽表/新目录输出/重开/重复不覆盖）与独立灰度/OCR两条流程、所属进程关闭、离线模型，精确进程退出和文件摘要。不调用用户Esc停止的原生Computer Use；离屏工程不外推物理输入/DPI。
 - 待验边界：独立真实仪器真值/样本对应、干净目标Win10与125/150/200%DPI缺失时保留未验；继续不依赖的候选/集成工作，不标正式发布完成。历史纯虚调用UNKNOWN保留，不据本轮成功销账。
 - 验证：针对性真实Qt/故障测试、全量check和隔离wheel、非作者当前提交风险复审；Qt测试/探针/安装态串行。记录每次命令/退出码/环境/提交与失败，未跑明确未跑；必要实验先冻结预期，不弱化断言/容差/时限。
-- 下一步：最终actualbase/finalHEAD规则核验和非作者独审→产品PR四CI/main接受→工程收尾记录与交接。历史依赖链/实际main重载已完成；OCR/CAS、E0–E6、910完整本机门禁与安装候选已完成。原始失败和外部验收边界保留；精确事实见final-integration.md及snapshot。
+- 后续：工程实施已完成；取得独立仪器真值/明确样本配对及目标机/物理DPI条件后开展对应外部验收。科学含义不自行猜测，原始失败不销账；正式发布另按授权。当前只整理工程收尾记录，不设定时任务。
 
 ## 当前进展
 
@@ -39,3 +39,5 @@ Post-reinstall installed v3 dual-flow actual0: intake controller14.8269492s, gra
 PR14旧b1 Windows699/644.74s+全wheel0，Linux15m16s超时停repeated WB close，实际native栈未捕获/rootUNKNOWN。仅窄移植后继已审CI012测试窗口所属销毁，真实red2/2.76s→16/32.60s0，原20轮/10s/GC与产品不动；最终2fbe9cb独审/冻结规则0，新四CI39343775888/39343775941运行。不得沿用旧Windows绿标新head通过。
 
 PR14 final2f四CI/绑定独审通过：Win702/584.67s、Linux702/249.75s及全部wheel/check0，精确merge3b7716d（00:00:48Z）。主树合180a464，测试helper唯一冲突保留E7已完整验证的关闭提示处理版；相对8e产品/测试/诊断运行文件空diff。actualbase3b的普通scope规则及BASE已重载读取。PR15 final330e329实际基线独审/规则0，四CI39345152689/39345152630中；其接受后才生成T060最终集成清单。
+
+2026-10-20 CI收尾：main0f的910/762.24s及wheel功能通过后清理遭15分钟取消，整命令未通过；旧main3b702/590.48s后原退出0xc0000005/wheel未跑，原因UNKNOWN。原306四CI通过不销旧失败。仅foundation TEMP/TMP同盘与实际路径诊断实验，保留时限/测试/退出检查；新head待绑定独审及四CI。详见work/evidence/T-060/ci-temp-filesystem.md。

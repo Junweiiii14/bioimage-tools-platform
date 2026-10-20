@@ -96,3 +96,5 @@ T050初次归档复制因archive目录尚不存在失败，随后从未修改的
 - [work-log-20261019T215756640775Z.md](archive/work-log-20261019T215756640775Z.md): work log exceeded 64 KiB or 30 dated sections
 - [work-log-20261019T223601894112Z.md](archive/work-log-20261019T223601894112Z.md): work log exceeded 64 KiB or 30 dated sections
 - [work-log-20261019T233751637061Z.md](archive/work-log-20261019T233751637061Z.md): work log exceeded 64 KiB or 30 dated sections
+- [validation-20261020-e7-closeout.md](archive/validation-20261020-e7-closeout.md): verbatim previous validation index archived before E7 current-state replacement; SHA256 verified.
+- [work-log-20261020T003317636819Z.md](archive/work-log-20261020T003317636819Z.md): work log exceeded 64 KiB or 30 dated sections
