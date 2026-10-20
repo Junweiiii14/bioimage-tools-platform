@@ -14,7 +14,7 @@ ocr = ["rapidocr==3.9.2", "onnxruntime==1.31.0", "opencv-python==5.0.0.93", "pil
 tool-contracts = { workspace = true }
 
 [build-system]
-requires = ["uv_build==0.13.0"]
+requires = ["uv_build==0.13.1"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
