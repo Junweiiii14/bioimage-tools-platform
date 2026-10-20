@@ -1,6 +1,6 @@
 # T-063 采集组主流程与离线交付规划
 
-- 状态：执行中；P0/采集组/裁剪修订/快捷键/分组失效/算法盘点PR21–24/26/27均四检查合main5729cb8。T069独立发行/诊断/多根修复已绑定独审，真实三目录正式链及一次修正/新输出/重开通过只读独审；冻结3f73408本地955项、wheel/OCR及完整命令实际0。最终产品PR、构建安装及新离线交付尚未完成。
+- 状态：本轮P0–P8本机工程交付完成。分阶段产品PR21–24/26–28均四检查集成至main6080867；真实三目录主链/人工修正/新输出/重开、冻结检查、独立离线候选安装/双流程/PS5.1/SHA/manifest及绑定交付独审通过，细节与边界见[T069](T-069-grouped-intake-offline.md)和[交付记录](../../docs/wb-grouped-intake-delivery.md)。历史原生UNKNOWN、干净Win10/物理DPI与独立科学留出继续保留，不自动正式发布或扩其他工具。
 - 授权：用户2026-10-20确认完整P0–P8计划并要求持续推进至独审、PR集成、新离线测试版；普通实现自主处理，只集中询问无法消解的数据歧义。
 - 基线：main / HEAD `f3fb2ffe315af84980159745e5e6d5241b15a8c7`，分支 `codex/wb-grouped-intake`。
 - 活动树：`C:/Users/70236/.codex/worktrees/wb-grouped-intake/bioimage-tools-platform`。t051树T062未提交资料保留原位；不在历史ResearchVault树开发。

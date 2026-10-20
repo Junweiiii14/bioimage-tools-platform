@@ -1,5 +1,7 @@
 # Risks, Blockers, And Unknowns
 
+- 2026-10-20 T069本机工程交付完成：main6080867构建/安装/双流程/PS5.1与非作者交付独审通过。PR27旧Linux关闭挂起、PR28首轮Windows快捷键诊断超时与另一Linux fixture关闭挂起仍UNKNOWN；后继两平台956及手动956成功不能证明原生根因已修复。首安装观察器null退出码按失败保留，持有句柄并经0/17控制后新报告实际0。干净Win10、物理按钮/多DPI、独立科学真值/留出仍未验；95图/19组为已见参考辅助开发回归，不报准确率或科学泛化。当前交付索引docs/wb-grouped-intake-delivery.md；原失败见work/evidence/T-069/pr28-ci.md与validation.md。
+
 - 2026-10-20 E2/b4b519f首次全门禁822断言通过后原pytest0xc0000409；精确栈主线程abort→purecall→QObject析构→PySide destroyQCoreApplication→Py_FinalizeEx，首轮wheel未执行。同产品诊断复验822/566.49s及全部wheel/check0，独审解除E2阻断。全量inventory344/truncated包含旧无父视图/OCR面板，转E6精确所属销毁；E2所属host/view/page/profile探针均失效，profile假设未复现。来源UNKNOWN，不用复验成功抹失败。见T055 validation。
 
 - T051首轮192px缩略图超128预算导致Python回调失败与busy悬挂，关闭后PID56832在Qt6WebEngineCore.dll出现0x80000003。128px与异常预览拒绝、取消心跳修正后最终801测试/全部wheel及原生观察退出0，无新异常；这不证明Chromium内部断点精确根因已完全解决。未重建安装包；真实仪器/干净Windows/DPI不由本轮推出。
