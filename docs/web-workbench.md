@@ -10,12 +10,13 @@
 
 现有项目在新窗口打开；同窗口已有workspace时明确拒绝另一个项目，避免丢弃当前草稿。独立安装包体积/干净Windows及完整屏幕阅读器验收尚未覆盖。
 
-## 原图编辑契约 legacy_crop_edit@1
 
-本阶段crop/confirm需要契约标记、projectId、严格整数sessionEpoch/revision、行id和sourceId；revision为界面generation，旧/缺身份拒绝且不写入。此历史宿主在同一窗口不替换后端（已有workspace再打开被拒绝），sessionEpoch初始化0代表该bridge实例；后继支持替换时须递增会话。手势开始冻结身份，快照变化清手势，移动/释放/取消重查；键盘使用当前快照，旧ROI不补新代次。无项目schema/算法变化。
+## 原图裁剪编辑契约 `legacy_crop_edit@1`
 
-## 定量会话身份 v2
+快照提供 `cropEditContract`。非仪器清单的 `crop`、`confirm` 和 `set_lanes` 请求必须带同一契约标记、`projectId`、严格整数 `sessionEpoch`、`revision`、行 `id` 与 `sourceId`。其中 `revision` 是当前界面草稿 generation，不是持久化项目修订。项目/会话/草稿/来源任一改变，旧请求拒绝且不修改 ROI、审核或 N；缺少新身份的旧页面须刷新。原有项目 schema、数值公式和原图坐标不变，仪器清单仍走独立类型/digest 校验。
 
-本阶段新增quant_edit必须在原row/source/generation检查前核对projectId及严格整数sessionEpoch；旧请求缺字段须刷新。定量拖动冻结项目/会话/草稿/行/来源/泳道/条带，状态或选中目标改变时释放不提交旧几何。新set_lanes沿legacy_crop_edit@1保护，不引入后继quant_target/manual命令。无schema/算法变化。
+拖动开始冻结完整身份；快照身份改变立即放弃手势，移动/释放也再次核对，不能给旧几何补上新代次。键盘与泳道数操作使用当前可见快照。取消旧手势不把旧 ROI 写回新草稿；新空闲手势仍可提交。该规则只保证编辑对应性，不把审核操作视为实验真值。
 
-T044新增quant_target及return_crop沿用严格项目/会话校验；手工ROI草稿键含epoch，绘框开始冻结身份，旧move/cancel不写新会话。只有本阶段已有功能，无后继manual分组命令。
+## 定量编辑会话契约 v2
+
+quant_edit、quant_target、手工分组/峰/历史命令、分组审核/重置与return_crop在已有行/来源/草稿检查之外，必须携带当前projectId及严格整数sessionEpoch；旧页面缺字段须刷新，同项目重开也不能复用旧请求。页面草稿键包含会话，泳道/积分拖动开始冻结身份，状态切换清除手势，释放再次校验，避免给旧几何补新身份。分组审核草稿与手工泳道草稿随会话变化重建。持久化schema和算法不变。

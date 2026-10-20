@@ -1,0 +1,114 @@
+{
+  "environment": "Windows-11-10.0.26200-SP0",
+  "commit": "cf1196e55c4187c08def25502384f4475322de76",
+  "n": 20,
+  "samples": [
+    {
+      "ready_seconds": 3.17568,
+      "whole_process_seconds": 3.733884699991904,
+      "peak_rss_bytes": 327954432
+    },
+    {
+      "ready_seconds": 2.8276235,
+      "whole_process_seconds": 3.2655514999642037,
+      "peak_rss_bytes": 329875456
+    },
+    {
+      "ready_seconds": 2.6906236,
+      "whole_process_seconds": 3.1185399999958463,
+      "peak_rss_bytes": 327839744
+    },
+    {
+      "ready_seconds": 3.0846875,
+      "whole_process_seconds": 3.579082100011874,
+      "peak_rss_bytes": 331902976
+    },
+    {
+      "ready_seconds": 2.660156,
+      "whole_process_seconds": 3.0700101000256836,
+      "peak_rss_bytes": 329105408
+    },
+    {
+      "ready_seconds": 3.0642822,
+      "whole_process_seconds": 3.5859813999850303,
+      "peak_rss_bytes": 330915840
+    },
+    {
+      "ready_seconds": 3.0772581,
+      "whole_process_seconds": 3.422179600049276,
+      "peak_rss_bytes": 332066816
+    },
+    {
+      "ready_seconds": 3.2065934,
+      "whole_process_seconds": 3.6833252999931574,
+      "peak_rss_bytes": 328937472
+    },
+    {
+      "ready_seconds": 2.6489524,
+      "whole_process_seconds": 3.008603799971752,
+      "peak_rss_bytes": 329867264
+    },
+    {
+      "ready_seconds": 2.9896544,
+      "whole_process_seconds": 3.4662472999771126,
+      "peak_rss_bytes": 332963840
+    },
+    {
+      "ready_seconds": 3.0779217,
+      "whole_process_seconds": 3.5820273000281304,
+      "peak_rss_bytes": 328736768
+    },
+    {
+      "ready_seconds": 2.5620138,
+      "whole_process_seconds": 2.9645701000117697,
+      "peak_rss_bytes": 333565952
+    },
+    {
+      "ready_seconds": 2.8828743,
+      "whole_process_seconds": 3.356960999954026,
+      "peak_rss_bytes": 329302016
+    },
+    {
+      "ready_seconds": 2.7874684,
+      "whole_process_seconds": 3.161556200007908,
+      "peak_rss_bytes": 332460032
+    },
+    {
+      "ready_seconds": 2.7869337,
+      "whole_process_seconds": 3.163599699968472,
+      "peak_rss_bytes": 331939840
+    },
+    {
+      "ready_seconds": 2.8364811,
+      "whole_process_seconds": 3.2418779999716207,
+      "peak_rss_bytes": 332550144
+    },
+    {
+      "ready_seconds": 2.7392203,
+      "whole_process_seconds": 3.212237500003539,
+      "peak_rss_bytes": 330506240
+    },
+    {
+      "ready_seconds": 3.0367685,
+      "whole_process_seconds": 3.525702100014314,
+      "peak_rss_bytes": 329117696
+    },
+    {
+      "ready_seconds": 2.9742449,
+      "whole_process_seconds": 3.393392900004983,
+      "peak_rss_bytes": 331816960
+    },
+    {
+      "ready_seconds": 3.1213332,
+      "whole_process_seconds": 3.6469730000244454,
+      "peak_rss_bytes": 330944512
+    }
+  ],
+  "ready_seconds": {
+    "n": 20,
+    "median": 2.9285596,
+    "p95": 3.17568,
+    "max": 3.2065934
+  },
+  "limitations": "Offscreen fresh interpreter to real DOM/WebChannel home readiness, including process creation, default numerical thread limits. Isolated settings, excludes normal diagnostics log startup. Not native paint/input/DPI; OS caches not flushed. GUI-process RSS only, excludes renderer children. Every child normally closes resources and deletes its owned window before exit."
+}

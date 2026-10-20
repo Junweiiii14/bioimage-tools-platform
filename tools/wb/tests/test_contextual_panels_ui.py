@@ -18,12 +18,15 @@ from wb_tool.ui.normalization import NormalizationPanel
 from wb_tool.ui.project_metadata import ProjectMetadataPanel
 from wb_tool.ui.project_ocr import ProjectOCRPanel
 
+from tools.wb.tests.owned_widgets import WidgetOwner
 from tools.wb.tests.test_project_metadata import project
 
 
-def test_metadata_preview_is_explicit_and_switching_method_invalidates_it(qtbot: QtBot) -> None:
+def test_metadata_preview_is_explicit_and_switching_method_invalidates_it(
+    qtbot: QtBot, owned_widgets: WidgetOwner
+) -> None:
     panel = ProjectMetadataPanel()
-    qtbot.addWidget(panel)
+    owned_widgets(panel)
     original = project()
     panel.common["protein"].setText("p-AKT")
     panel.build_preview("common", original, ("r0",))
@@ -41,9 +44,11 @@ def test_metadata_preview_is_explicit_and_switching_method_invalidates_it(qtbot:
     assert not panel.input_scroll.isHidden()
 
 
-def test_compact_layout_edits_and_advanced_table_share_geometry(qtbot: QtBot) -> None:
+def test_compact_layout_edits_and_advanced_table_share_geometry(
+    qtbot: QtBot, owned_widgets: WidgetOwner
+) -> None:
     panel = LaboratoryLayoutPanel()
-    qtbot.addWidget(panel)
+    owned_widgets(panel)
     original = project()
     layout = with_figure_layout(original, initial_composition(original), FigureLayoutStyle())
     panel.restore(layout)
@@ -65,9 +70,11 @@ def test_compact_layout_edits_and_advanced_table_share_geometry(qtbot: QtBot) ->
     assert original.rows == layout.rows
 
 
-def test_ocr_context_keeps_manual_correction_and_explicit_binding(qtbot: QtBot) -> None:
+def test_ocr_context_keeps_manual_correction_and_explicit_binding(
+    qtbot: QtBot, owned_widgets: WidgetOwner
+) -> None:
     panel = ProjectOCRPanel()
-    qtbot.addWidget(panel)
+    owned_widgets(panel)
     original = project()
     assert panel.run_button.isHidden() and panel.labels_panel.isHidden()
     source = original.rows[0].source
@@ -97,9 +104,11 @@ def test_ocr_context_keeps_manual_correction_and_explicit_binding(qtbot: QtBot) 
     assert panel.state() == current
 
 
-def test_normalization_stages_preserve_unconfirmed_pairing(qtbot: QtBot) -> None:
+def test_normalization_stages_preserve_unconfirmed_pairing(
+    qtbot: QtBot, owned_widgets: WidgetOwner
+) -> None:
     panel = NormalizationPanel()
-    qtbot.addWidget(panel)
+    owned_widgets(panel)
     original = project()
     panel.restore(original.model_copy(update={"rows": ()}))
     assert not panel.create_button.isEnabled()

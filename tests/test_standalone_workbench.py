@@ -10,6 +10,7 @@ import tifffile
 from bioimage_app.web_window import WebWorkbenchWindow
 from PySide6.QtCore import QSettings
 from PySide6.QtWidgets import QFileDialog
+from pytestqt.exceptions import TimeoutError as QtTimeoutError
 from pytestqt.qtbot import QtBot
 from wb_tool.api import WBAnalysisProject
 
@@ -123,12 +124,33 @@ def test_real_page_manual_import_compute_save_reopen_without_automatic_or_compos
                     const input = document.querySelector('[data-manual-quant-field=' + key + ']');
                     input.value = value; input.dispatchEvent(new Event('input', {{bubbles:true}}));
                 }}
+                window.manualRunTrace = {{busy:state.busy, revision:state.quant?.revision,
+                    projectId:state.projectId, draft:structuredClone(manualQuant.draft),
+                    disabled:document.querySelector('[data-manual-quant-run]').disabled}};
                 document.querySelector('[data-manual-quant-run]').click(); return true;
             }})()"""
             )
             is True
         )
-        qtbot.waitUntil(lambda: bool(window.host.project_results), timeout=30000)
+        try:
+            qtbot.waitUntil(lambda: bool(window.host.project_results), timeout=30000)
+        except QtTimeoutError:
+            print(
+                "MANUAL_RUN_TRACE",
+                js(
+                    "JSON.stringify({before:window.manualRunTrace, "
+                    "busy:state.busy, revision:state.quant?.revision, "
+                    "draft:manualQuant.draft, submitted:manualQuant.submittedRevision, "
+                    "disabled:document.querySelector('[data-manual-quant-run]')?.disabled})"
+                ),
+            )
+            print(
+                "MANUAL_HOST_STATUS",
+                window.host.view.status.text(),
+                window.host.view.generation,
+                window.bridge.snapshot()["status"],
+            )
+            raise
         qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=20000)
         project = window.host.view.project()
         assert isinstance(project, WBAnalysisProject)
@@ -139,6 +161,14 @@ def test_real_page_manual_import_compute_save_reopen_without_automatic_or_compos
             lane.bands[0].signal for lane in window.host.project_results[0].result.lanes
         ] == pytest.approx([20000, 20000])
         assert window.bridge.snapshot()["montage"] is None
+        qtbot.waitUntil(lambda: js("document.querySelectorAll('.gr-curve').length") == 2)
+        qtbot.waitUntil(
+            lambda: (
+                js("!state.busy&&!document.querySelector('[data-gr-action=manual]').disabled")
+                is True
+            )
+        )
+        assert js("document.querySelector('[data-gr-action=manual]').click(); true") is True
         qtbot.waitUntil(
             lambda: (
                 js(
@@ -199,10 +229,11 @@ def test_real_page_manual_import_compute_save_reopen_without_automatic_or_compos
         # Native dialog close is queued. Its late event must not restore the
         # quantification inspector over the results page and hide quality reasons.
         qtbot.wait(100)
-        assert js("document.querySelector('#inspector-title').textContent") == "输出结果"
+        assert js("document.querySelector('#gr-workspace h1').textContent") == "灰度分析"
         assert (
             js(
-                "document.querySelector('#inspector-content').textContent.includes('原始积分不等于有效信号')"
+                "document.querySelector('.gr-table-note').textContent"
+                ".includes('显示原始积分不等于判定为有效信号')"
             )
             is True
         )
@@ -268,6 +299,98 @@ def test_real_page_manual_import_compute_save_reopen_without_automatic_or_compos
                 page.asarray(),
                 np.repeat(profile.astype(np.uint16)[:, None], 100, axis=1)[38:62, 10:90],
             )
+        assert source.read_bytes() == original
+    finally:
+        close_and_dispose_window(
+            window, qtbot, resources_closed=lambda: window.host.resources_closed, timeout=20000
+        )
+
+
+def test_same_project_new_session_discards_manual_roi_gesture(qtbot: QtBot, tmp_path: Path) -> None:
+    originals = tmp_path / "originals"
+    originals.mkdir()
+    source = originals / "session.tif"
+    tifffile.imwrite(source, np.full((120, 400), 40000, dtype=np.uint16))
+    original = source.read_bytes()
+    settings = QSettings(str(tmp_path / "session.ini"), QSettings.Format.IniFormat)
+    settings.setValue("project_parent", str(tmp_path / "projects"))
+    window = WebWorkbenchWindow(settings=settings)
+
+    def js(script: str) -> object:
+        values: list[object] = []
+        window.web.page().runJavaScript(script, values.append)
+        qtbot.waitUntil(lambda: bool(values), timeout=10000)
+        return values[0]
+
+    try:
+        window.show()
+        window.start_from_images([source], automatic=False)
+        qtbot.waitUntil(
+            lambda: bool(window.host.view.project().rows) and not window.host.operation_busy,
+            timeout=20000,
+        )
+        qtbot.waitUntil(
+            lambda: (
+                js("typeof bridge!=='undefined' && !!bridge && !!row()?.preview && !state.busy")
+                is True
+            ),
+            timeout=20000,
+        )
+        assert js("manualLanes.method='box';switchMode('quant');true") is True
+        qtbot.waitUntil(
+            lambda: (
+                js("$('#image-transform').getBoundingClientRect().width>0 && !state.busy") is True
+            ),
+            timeout=10000,
+        )
+        start = """(()=>{const el=$('#image-viewport');
+            const r=$('#image-transform').getBoundingClientRect();
+            el.setPointerCapture=()=>{};window.sessionPoint={x:r.left+r.width*.2,y:r.top+r.height*.2,
+                dx:r.width*.4,dy:r.height*.4};
+            el.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:4,
+                clientX:sessionPoint.x,clientY:sessionPoint.y}));
+            return !!manualQuant.drawing;})()"""
+        assert js(start) is True
+        assert (
+            js(
+                "(()=>{$('#image-viewport').dispatchEvent(new PointerEvent('pointermove',"
+                "{bubbles:true,pointerId:4,clientX:sessionPoint.x+sessionPoint.dx,"
+                "clientY:sessionPoint.y+sessionPoint.dy}));return !!manualQuant.draft.roi;})()"
+            )
+            is True
+        )
+        before = window.host.view.project()
+        window.bridge.replace_host(window.host)
+        window.bridge.publish()
+        qtbot.waitUntil(
+            lambda: js("manualQuant.drawing===null && manualQuant.current().roi===null") is True,
+            timeout=10000,
+        )
+        assert (
+            js(
+                "$('#image-viewport').dispatchEvent(new PointerEvent('pointerup',"
+                "{bubbles:true,pointerId:4}));true"
+            )
+            is True
+        )
+        assert window.host.view.project() == before
+        assert not window.host.project_results
+        qtbot.waitUntil(lambda: js("!state.busy") is True, timeout=10000)
+        assert js(start) is True
+        assert (
+            js(
+                "(()=>{const el=$('#image-viewport');"
+                "el.dispatchEvent(new PointerEvent('pointermove',"
+                "{bubbles:true,pointerId:4,clientX:sessionPoint.x+sessionPoint.dx,"
+                "clientY:sessionPoint.y+sessionPoint.dy}));el.dispatchEvent(new PointerEvent("
+                "'pointerup',{bubbles:true,pointerId:4}));manualQuant.draft.n=2;"
+                "manualQuant.submit();return true;})()"
+            )
+            is True
+        )
+        qtbot.waitUntil(lambda: bool(window.host.project_results), timeout=30000)
+        qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=20000)
+        assert len(window.host.project_results[0].result.lanes) == 2
         assert source.read_bytes() == original
     finally:
         close_and_dispose_window(

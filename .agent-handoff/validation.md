@@ -1,7 +1,12 @@
-# Validation History
+# Validation Index
 
-- 2026-10-18 da00768完整704passed/483.01秒、原child0、全部隔离wheel/最终check实际0，独审6项2.08秒0；原生AV未复现不销账。后继独立灰度当前本地41相关34.78秒0，全项目Pyright/Ruff格式491文件/9导入契约/Node0；真实发货页面入口/正常worker/不调用自动或compose/位置失败重选/全泳道弹框/键盘基线/保存重开已验。后继绑定独审/完整检查/8图/视觉待做。新二次背景反例36750→25158，故不接仅扩大上限v2，保留现有2背景不足。细节work/evidence/T-044/standalone-quant.md。
+本文件仅保存当前核验指针；此前完整原始记录已先归档到[validation-20261020-e5-closeout.md](archive/validation-20261020-e5-closeout.md)，内容保留不覆盖。
 
+- E5/T058产品8feffce：完整check0，858/623.78s、原child0/u32=0、9契约/全部隔离wheel/schema14/无PIL/真实离线OCR/桌面异步关闭0。代码独审两P2已resolved/最终绑定8fe无新P0–P2，UI ship，documenter No changes。见work/evidence/T-058。
+- E4/T057产品ff89867：843/579.73s、原child0/全部wheel0；df轮顶层PIL的wheel失败1保留，ff延迟导入复验0。见work/evidence/T-057。
+- E3/T056产品32da9f4：832/553.10s及全部wheel0。E2首次822后0xc0000409/purecall UNKNOWN保留；同产品诊断复验及后续E3–E5成功不销账。inventory344/truncated不等于344泄漏。见T055–T056。
+- main当前仅规划PR16集成43d520f，历史产品PR待E7；真实科学/确认批次/干净Win10/物理DPI与新安装包未验，不把源码或合成证明外推为最终产品交付。
+- E6/T059最终ea7ed55：862/624.64s、原child0/u32=0、9契约/全部隔离wheel/真实OCR/桌面关闭/check0；冻结导出20×2阈值全过、就绪20及阶段/取消有限样本，绑定E6独审/UI ship；inventory4/nontruncated不销UNKNOWN。详见work/evidence/T-059。E7全链风险补审发现历史OCR迟到取消P2，待T060修复。
 - 2026-10-18 662d767绑定独审5项0.37秒0；实际View两个自有原生观察进程actual0/noAV，显式parent/view无效后仍11无parent控件。后继补隐藏控件父归属，隔离生命周期旧红1failed/2.27秒、新绿连诊断6项2.21秒0，工作流/保存重开/定量重算12项18.09秒0、相关Pyright/Ruff/格式0。共享Qt试验caplog teardown KeyError保留，正式用独立进程未忽略错误。原生AV根因UNKNOWN，后继完整检查/绑定独审待做。
 
 - 2026-10-18 efec471 check --all带退出清单/native observer：700passed/1failed、488.11秒，原child/外层1，wheel未跑；未复现AV。失败trace证实全局4208根超128根预算，新测试对象未入截断报告。测试隔离真实Qt根/来源表并补根/节点/容量反例，作者5项0.46秒0、相关Pyright/Ruff/格式0；后继完整检查/绑定独审待做。不是产品退出修复。独立三角峰解析36750在35%首次支持、准确36750，诊断原型0，无参考像素/产品注入；候选v2未实施。

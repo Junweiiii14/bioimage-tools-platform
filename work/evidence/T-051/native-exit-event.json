@@ -1,0 +1,65 @@
+{
+  "time": "2026-10-19T22:51:14.4085469+08:00",
+  "data": [
+    {
+      "name": "AppName",
+      "value": "python.exe"
+    },
+    {
+      "name": "AppVersion",
+      "value": "3.12.14150.1013"
+    },
+    {
+      "name": "AppTimeStamp",
+      "value": "6a8da072"
+    },
+    {
+      "name": "ModuleName",
+      "value": "Qt6WebEngineCore.dll"
+    },
+    {
+      "name": "ModuleVersion",
+      "value": "6.140.0.0"
+    },
+    {
+      "name": "ModuleTimeStamp",
+      "value": "6ab90e52"
+    },
+    {
+      "name": "ExceptionCode",
+      "value": "80000003"
+    },
+    {
+      "name": "FaultingOffset",
+      "value": "0000000006237b45"
+    },
+    {
+      "name": "ProcessId",
+      "value": "0xde00"
+    },
+    {
+      "name": "ProcessCreationTime",
+      "value": "0x1dd5fd903105075"
+    },
+    {
+      "name": "AppPath",
+      "value": "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12.14-windows-x86_64-none\\python.exe"
+    },
+    {
+      "name": "ModulePath",
+      "value": "C:\\Users\\70236\\.codex\\worktrees\\t051-instrument-intake\\bioimage-tools-platform\\.venv\\Lib\\site-packages\\PySide6\\Qt6WebEngineCore.dll"
+    },
+    {
+      "name": "IntegratorReportId",
+      "value": "04a37c32-710a-4605-91f0-d18697da27c6"
+    },
+    {
+      "name": "PackageFullName",
+      "value": null
+    },
+    {
+      "name": "PackageRelativeAppId",
+      "value": null
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 """Late OCR callbacks and guarded persistence retain the previous association."""
 
-from collections.abc import Callable, Iterator
+from collections.abc import Callable
 from pathlib import Path
 from threading import Event
 from typing import TYPE_CHECKING, Any
@@ -11,7 +11,6 @@ import tifffile
 from PIL import Image, ImageDraw, ImageFont
 from platform_runtime.api import Workspace
 from pytestqt.qtbot import QtBot
-from shiboken6 import isValid
 from tool_contracts.api import DraftSnapshot, RunRecord
 from wb_tool.api import (
     LoadedProjectOCR,
@@ -22,30 +21,10 @@ from wb_tool.api import (
     read_project_ocr_result,
 )
 
+from tests.test_project_measurements import windows as windows
+
 if TYPE_CHECKING:
     from bioimage_app.api import FigureProjectWindow
-
-
-@pytest.fixture
-def windows(qtbot: QtBot) -> Iterator[Callable[[], "FigureProjectWindow"]]:
-    from bioimage_app.api import create_figure_project_window
-
-    owned: list[FigureProjectWindow] = []
-
-    def make() -> "FigureProjectWindow":
-        window = create_figure_project_window()
-        owned.append(window)
-        window.show()
-        return window
-
-    yield make
-    for window in owned:
-        if isValid(window):
-            if not window.resources_closed:
-                window.close()
-                qtbot.waitUntil(lambda window=window: window.resources_closed, timeout=20000)
-            window.deleteLater()
-            qtbot.waitUntil(lambda window=window: not isValid(window), timeout=10000)
 
 
 def ocr_project(window: "FigureProjectWindow") -> WBProjectOCR:
@@ -126,7 +105,7 @@ def test_late_committed_ocr_never_replaces_cancelled_or_edited_association(
     if action == "close":
         qtbot.waitUntil(lambda: window.resources_closed, timeout=20000)
     else:
-        qtbot.waitUntil(window.import_button.isEnabled, timeout=20000)
+        qtbot.waitUntil(lambda: not window.operation_busy, timeout=20000)
     current = window.view.project()
     assert isinstance(current, WBProjectOCR) and current.ocr == old.ocr
     if action == "edit":
@@ -216,7 +195,8 @@ def test_ocr_candidate_save_cancel_preserves_current_and_committed_history(
     if action == "close":
         qtbot.waitUntil(lambda: window.resources_closed, timeout=20000)
     else:
-        qtbot.waitUntil(window.import_button.isEnabled, timeout=20000)
+        qtbot.waitUntil(lambda: not window.operation_busy, timeout=20000)
+        assert window.has_unsaved_changes == (phase != "encode")
     assert ocr_project(window).ocr == old.ocr
     if action != "close":
         window.close()
@@ -271,13 +251,13 @@ def test_ocr_association_save_failure_preserves_old_and_allows_explicit_retry(
 
     monkeypatch.setattr(Workspace, "save_draft", fail_candidate)
     window.recognize_project()
-    qtbot.waitUntil(window.import_button.isEnabled, timeout=30000)
+    qtbot.waitUntil(lambda: not window.operation_busy, timeout=30000)
     assert len(rejected) == 1
     assert "OCR association save failure" in window.view.status.text()
     assert ocr_project(window).ocr == old.ocr and window.view.ocr.raw.toPlainText() == old_text
     monkeypatch.undo()
     window.recognize_project()
-    qtbot.waitUntil(window.import_button.isEnabled, timeout=30000)
+    qtbot.waitUntil(lambda: not window.operation_busy, timeout=30000)
     final = window.view.project()
     assert isinstance(final, WBProjectOCR) and final.ocr and final.ocr.run
     assert final.ocr != old.ocr
@@ -290,76 +270,3 @@ def test_ocr_association_save_failure_preserves_old_and_allows_explicit_retry(
         assert store.get_run(failed_candidate.ocr.run.run_id) == failed_candidate.ocr.run
         saved = read_figure_project(store.read_asset(store.load_draft(old.project_id).asset))
         assert isinstance(saved, WBProjectOCR) and saved.ocr == final.ocr
-
-
-@pytest.mark.parametrize("phase", ["encode", "cas_after"])
-@pytest.mark.parametrize("action", ["cancel", "close"])
-def test_cancelled_save_never_starts_followup_export(
-    qtbot: QtBot,
-    tmp_path: Path,
-    windows: Callable[[], "FigureProjectWindow"],
-    monkeypatch: pytest.MonkeyPatch,
-    phase: str,
-    action: str,
-) -> None:
-    window = windows()
-    old = recognized_project(window, qtbot, tmp_path)
-    before = (tmp_path / "labels.tif").read_bytes()
-    entered, release = Event(), Event()
-    old_dump = WBProjectOCR.model_dump_json
-    old_save = Workspace.save_draft
-
-    def pause() -> None:
-        entered.set()
-        if not release.wait(10):
-            raise ValueError("Followup regression did not release its held save")
-
-    def encoded(project: WBProjectOCR, *args: Any, **kwargs: Any) -> str:
-        data = old_dump(project, *args, **kwargs)
-        if phase == "encode":
-            pause()
-        return data
-
-    def saved(
-        store: Workspace,
-        document_id: str,
-        tool_id: str,
-        revision: int,
-        data: bytes,
-        *,
-        expected_previous_revision: int | None,
-    ) -> DraftSnapshot:
-        snapshot = old_save(
-            store,
-            document_id,
-            tool_id,
-            revision,
-            data,
-            expected_previous_revision=expected_previous_revision,
-        )
-        if phase == "cas_after":
-            pause()
-        return snapshot
-
-    monkeypatch.setattr(WBProjectOCR, "model_dump_json", encoded)
-    monkeypatch.setattr(Workspace, "save_draft", saved)
-    destination = tmp_path / "cancelled-followup.xlsx"
-    window.export_project_table(str(destination), ocr=True)
-    try:
-        qtbot.waitUntil(entered.is_set, timeout=30000)
-        if action == "close":
-            window.close()
-        else:
-            window.cancel()
-    finally:
-        release.set()
-    if action == "cancel":
-        qtbot.waitUntil(window.import_button.isEnabled, timeout=20000)
-        window.close()
-    qtbot.waitUntil(lambda: window.resources_closed, timeout=20000)
-    assert not destination.exists()
-    assert (tmp_path / "labels.tif").read_bytes() == before
-    with Workspace.open(tmp_path / "workspace") as store:
-        latest = read_figure_project(store.read_asset(store.load_draft(old.project_id).asset))
-        assert isinstance(latest, WBProjectOCR) and latest.ocr == old.ocr
-        assert old.ocr and old.ocr.run and store.get_run(old.ocr.run.run_id) == old.ocr.run

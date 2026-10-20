@@ -66,7 +66,13 @@ def test_first_folder_import_filters_before_creating_project_and_records_choices
         qtbot.waitUntil(
             lambda: js("Boolean(typeof bridge !== 'undefined' && bridge)") is True, timeout=15000
         )
-        assert js("document.querySelector('[data-action=import_folder]').click(); true") is True
+        assert (
+            js(
+                "document.querySelector('[name=session-workflow][value=review]').checked=true;"
+                "document.querySelector('[data-action=import_folder]').click(); true"
+            )
+            is True
+        )
         qtbot.waitUntil(
             lambda: (
                 bool(window.host.automatic.last_output_path)

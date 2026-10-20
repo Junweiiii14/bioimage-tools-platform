@@ -12,6 +12,7 @@ from zipfile import ZIP_DEFLATED, ZipFile
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, PngImagePlugin
+from pydantic import TypeAdapter
 
 from wb_tool.adapters.archive_io import ArchiveWriter
 from wb_tool.adapters.crop_export import export_crop
@@ -43,6 +44,34 @@ def render_figure(
     require_review: bool = True,
     cancelled: Callable[[], bool] = lambda: False,
 ) -> FigureRender:
+    from wb_tool.application.intake_output import WBIntakeOutputProject, intake_archive_projection
+
+    if isinstance(project, WBIntakeOutputProject):
+        projection = intake_archive_projection(project)
+        rendered = render_figure(
+            projection, sources, require_review=require_review, cancelled=cancelled
+        )
+        manifest = json.loads(rendered.manifest_json)
+        indices = {row.row_id: i for i, row in enumerate(project.rows, 1)}
+        for record in manifest["rows"]:
+            if record.get("crop_file"):
+                record["crop_file"] = f"crops/{indices[str(record['row_id'])]:04d}.tif"
+        manifest["project"] = project.model_dump(mode="json")
+        displayed = {row.row_id for row in projection.rows}
+        manifest["unrendered_rows"] = [
+            {
+                "row_id": row.row_id,
+                "source_sha256": row.source.sha256 if row.source else None,
+                "status": "incomplete_figure",
+                "reason": "所属Fig尚缺完整已保存成图依据",
+            }
+            for row in project.rows
+            if row.row_id not in displayed
+        ]
+        return FigureRender(
+            rendered.width, rendered.height, rendered.rgb, json.dumps(manifest, ensure_ascii=True)
+        )
+
     from wb_tool.application.automatic import WBAutomaticProject, row_is_ready
     from wb_tool.application.laboratory_layout import WBLayoutProject
 
@@ -256,6 +285,14 @@ def export_figure_bundle(
     cancelled: Callable[[], bool] = lambda: False,
     runs: tuple[ArchiveRunEvidence, ...] = (),
 ) -> str:
+    target = _bundle_target(destination)
+    rendered = render_figure(project, sources, cancelled=cancelled)
+    return publish_rendered_bundle(
+        project, sources, str(target), rendered, cancelled=cancelled, runs=runs
+    )
+
+
+def _bundle_target(destination: str) -> Path:
     target = Path(destination).absolute()
     if target.suffix.lower() != ".zip":
         raise ValueError("请选择新的 ZIP 拼图归档")
@@ -263,7 +300,31 @@ def export_figure_bundle(
         raise FileExistsError("目标已存在，请选择新文件")
     if any(p.is_symlink() or p.is_junction() for p in (target.parent, *target.parent.parents)):
         raise ValueError("导出目录不能经过符号链接或 junction")
-    rendered = render_figure(project, sources, cancelled=cancelled)
+    return target
+
+
+def publish_rendered_bundle(
+    project: WBFigureProject,
+    sources: tuple[FigureSourcePath, ...],
+    destination: str,
+    rendered: FigureRender,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+    runs: tuple[ArchiveRunEvidence, ...] = (),
+) -> str:
+    """Encode one same-operation frozen render; retain raw asset/run verification."""
+    target = _bundle_target(destination)
+    if len(rendered.manifest_json.encode()) > 16 * 1024 * 1024:
+        raise ValueError("拼图来源记录超过16MiB")
+    manifest = TypeAdapter(dict[str, object]).validate_json(rendered.manifest_json)
+    if (
+        manifest.get("project_id") != project.project_id
+        or manifest.get("revision") != project.revision
+        or not (0 < rendered.width <= 32768 and 0 < rendered.height <= 32768)
+        or rendered.width * rendered.height > 32_000_000
+        or len(rendered.rgb) != rendered.width * rendered.height * 3
+    ):
+        raise ValueError("冻结拼图与当前项目或像素预算不一致")
     paths = _paths(sources)
     stage = target.parent / (".wb-figure-" + uuid4().hex + ".tmp")
     try:

@@ -1,4 +1,95 @@
+E5/schema14 now freezes assets and run evidence, fills stable Fig/row/slot tables, writes
+new output roots and imports the verified index before committing done. Reopening and
+archive recovery retain imported history rather than inventing local runs. E6 reuses
+same-operation frozen full renders, keeps original pixels separate and paginates all
+stages. See T058/T059 for actual checks and remaining scientific/target-machine gaps.
+
+E7 adds an explicit --execution-test builder profile with its own E7Test settings,
+AppId, Chinese install directory and shortcuts; existing profiles remain separate.
+--verify-intake-installation complements the independent grayscale/OCR diagnostic.
+T060 records passed local Win11 installed dual-flow/lifecycle evidence for e579;
+final main integration and external scientific/clean-target/DPI acceptance remain separate. Interface:
+../../docs/contracts/wb-installed-diagnostics-v1.md.
+E4 adds schema13 complete-Fig evidence and original-pixel measurement to intake.
+IntakeWorkflowSession saves the complete Fig before starting its real RunSession batch;
+deferred installation merges only verified committed results with the terminal stage.
+Saved PNG previews use separate bounded display transforms and keep original source ROIs.
+Results and per-Fig source links retain stable row identities, including duplicate labels;
+measurement pages expose every fixed slot in batches of 200. Export-stage integration completed in E5; actual final status is recorded in T058. See T-057 and `../../docs/contracts/wb-intake-figure-v1.md` for actual checks
+and limits; this is a Windows desktop workflow, not a standalone mobile web delivery.
+
+E3 adds schema12 fixed-N crop review to the existing intake page. IntakeWorkflowSession
+persists each owned claim before its WBBackground job, imports a verified original-value
+TIFF from its owned temporary directory, and installs the terminal state by guarded CAS.
+Uncertain detection keeps every planned slot and requires original-coordinate review;
+no measurement is started. Same-project channel updates retain the review page and local
+geometry drafts; failed saves retain drafts, and session changes retire them. See
+`../../docs/contracts/wb-intake-crop-v1.md` and T-056 for evidence and remaining limits.
+
 # Desktop host
+
+E2 adds asynchronous execution-plan preparation after intake confirmation. Schema11
+persists the stage ledger, while the web page shows the summary and explicit pending
+states. Preparation is installed only after a successful normal save; cancellation
+or a stale generation rejects its callback. Reopening interrupts unknown running
+stages and requires approval again. Unused preparation can return to schema10 for
+editing. Actual crop execution is connected in E3; this stage creates no measurements.
+
+T051 adds a separate instrument-folder intake page. All supported raw TIFF candidates
+retain their original names and relative paths, including numbered variants. Users
+enter Fig/protein identities and fixed sample-slot counts, review thumbnails and
+submit explicit batch assignments. Schema10 saves the entire source pool and the
+confirmed mapping; adding sources or changing the plan invalidates confirmation.
+Only a verified repeat of the same local path and content is skipped. Distinct
+exports remain independent candidates even when their bytes match. Append imports
+are saved after completion; failed confirmation saves remain unconfirmed.
+This stage performs no automatic cropping or quantification. Independent grayscale
+projects keep their existing OCR workflow. See
+`../../docs/contracts/wb-instrument-intake-v1.md` for the current stage boundary.
+
+T048's runtime builder now emits a separate Windows x64 test installer (minimum
+Windows 10 1809), with mandatory desktop/Start menu/uninstall entries and app-local
+MSVC redistributables from the locked Qt wheel. Its `win10-test` channel uses the
+`Win10Test` settings namespace; T047's candidate and the original remain separate.
+The native launcher keeps the existing candidate window label. An optional Start
+menu environment check uses synthetic images and writes distinct local reports.
+This is a test distribution, not a formal release or proof of clean Win10 acceptance.
+
+T047 adds the approved project start screen and a local versioned navigation record.
+New independent grayscale imports are saved and open the quantification page. Existing
+projects restore valid page/row/Fig/lane selections. Recent entries are actual projects,
+not demonstration links. A per-window session epoch rejects queued messages from a
+retired host. Closing a project reuses the same web window with a fresh native host.
+Scientific document schemas and completed measurements are unchanged.
+
+The visible shell coordinates close, cancellation, save/discard and recovery. Unapplied
+curve/lane drafts are distinct from unsaved project changes. Save failure keeps the
+window visible and does not automatically retry the final save. Only the owned host
+shuts down; other application instances are not terminated. The file menu and left
+exit action use the same route as the native window close button.
+
+The accepted T047 Windows candidate uses `python -m tooling.build_runtime_candidate
+--iscc <verified compiler> --gcc <verified compiler>` from a clean checkout. It bundles
+the same private CPython 3.12.14, locked production dependencies and four installed
+product wheels. A native launcher uses the private interpreter with isolated imports,
+forwards arguments/standard streams, waits for its exit and owns only its process tree.
+The Inno installer has independent identity/directories/shortcuts and retains project
+folders on uninstall. No external Python/uv is required. Build outputs, models and private
+data are not committed. Unused Qt QML/development headers are excluded; the application
+uses QtWidgets/WebEngineWidgets. The earlier `build_candidate.py` full-AOT experiment
+did not pass installed startup/OCR validation and is not the delivered candidate.
+`--verify-installation <new-report.json>` explicitly tests synthetic TIFF import, two-lane
+durable worker results, offline OCR, save failure/reopen/cancellation and resource shutdown;
+its report never replaces an
+existing file. Passing this diagnostic does not establish scientific accuracy or clean
+Windows/DPI acceptance. See the T047 task for actual build/validation status.
+
+T045 extends the same workbench with WBQuant-style independent full-lane copying,
+group reselection that retains completed runs, peak inclusion and bounded session
+undo/redo. Fig-sheet detection runs in the existing background service, followed by
+the normal durable measurement workers. Schema9 survives native view reconstruction;
+its source-sheet group view does not require a newly composed montage. See
+`../../docs/contracts/wb-fig-quant-v1.md` and the T045 task for actual validation.
 
 The default `python -m bioimage_app` entry opens the current green WB web workbench.
 For daily Windows use, `Start-BioImage.ps1` runs Python in isolated mode and verifies

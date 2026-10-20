@@ -78,6 +78,7 @@
           "enum": [
             "legacy_bounds@1",
             "wbquant_1_4_3@1",
+            "peak_envelope@1",
             "background_support@1",
             "anchored_background@1"
           ],
@@ -127,7 +128,8 @@
           "enum": [
             "dtype_limits_review@1",
             "background_support_review@1",
-            "anchored_background_review@1"
+            "anchored_background_review@1",
+            "peak_envelope_review@1"
           ],
           "title": "Quality Policy",
           "type": "string"
@@ -547,6 +549,11 @@
           "title": "Bands",
           "type": "array"
         },
+        "context_expansion_percent": {
+          "default": 0,
+          "title": "Context Expansion Percent",
+          "type": "integer"
+        },
         "roi": {
           "$ref": "#/$defs/LaneROI"
         },
@@ -560,11 +567,6 @@
             }
           ],
           "default": null
-        },
-        "context_expansion_percent": {
-          "default": 0,
-          "title": "Context Expansion Percent",
-          "type": "integer"
         }
       },
       "required": [

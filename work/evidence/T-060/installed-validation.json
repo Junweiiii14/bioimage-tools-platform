@@ -1,0 +1,162 @@
+{
+  "schema": 1,
+  "product_commit": "e57949bab3356ce99d5ee374c42352a15d569d95",
+  "platform": "Windows 11 x64, non-elevated",
+  "profile": "wb-execution-test",
+  "distribution_id": "BioImageTools.WB.E7Test",
+  "setup_sha256": "177f29d6ee46b6e5b14c3d42cebaf7a5ba9e1b282f9e5e599436372f7e70730f",
+  "probes": [
+    {
+      "flow": "intake",
+      "version": "v2",
+      "phase": "passed",
+      "exit": 0,
+      "controller_seconds": 17.7911177,
+      "checks": [
+        "confirmed-stable-intake",
+        "fixed-eight-slot-review",
+        "durable-real-workers",
+        "original-pixel-crops",
+        "missing-is-not-zero",
+        "complete-output",
+        "saved-project-reopen",
+        "repeat-export-no-overwrite",
+        "originals-unchanged",
+        "archive-imported-history",
+        "archive-resume-output",
+        "real-dom-webchannel",
+        "owned-resources-closed",
+        "owned-window-deleted"
+      ],
+      "owned_pids": [
+        8528,
+        58148,
+        16988,
+        21812,
+        54500,
+        55372,
+        23720,
+        57128
+      ],
+      "remaining_owned": [],
+      "forbidden_modules": [],
+      "report_sha256": "9677BBB6A3C782C91437423723E9C50F243470ED694C855AFF8816A05E679DEB",
+      "process_observation_sha256": "ADDC9BD0345C1E0F4CB1D828F63A7BF3376E03B370534F7342FCA00DF8A47F40"
+    },
+    {
+      "flow": "gray",
+      "version": "v2",
+      "phase": "passed",
+      "exit": 0,
+      "controller_seconds": 12.742801,
+      "checks": [
+        "durable-worker",
+        "offline-ocr",
+        "save-failure-visible",
+        "saved-project-reopen",
+        "busy-exit-confirmation",
+        "post-cancel-draft-confirmation",
+        "post-cancel-dirty-confirmation"
+      ],
+      "owned_pids": [
+        37836,
+        7412,
+        31588,
+        18848,
+        5684,
+        22152
+      ],
+      "remaining_owned": [],
+      "forbidden_modules": [],
+      "report_sha256": "F5A4B113B1155F7A508C8E6C24D3B520C913F1A2A3341782D1F533C7136B943C",
+      "process_observation_sha256": "6E8DBABEEA7DBC0E9BDDA3C8077FDB1FEC3EA0B3C1087E13D2A4D85F017E654B"
+    },
+    {
+      "flow": "intake",
+      "version": "v3",
+      "phase": "passed",
+      "exit": 0,
+      "controller_seconds": 14.8269492,
+      "checks": [
+        "confirmed-stable-intake",
+        "fixed-eight-slot-review",
+        "durable-real-workers",
+        "original-pixel-crops",
+        "missing-is-not-zero",
+        "complete-output",
+        "saved-project-reopen",
+        "repeat-export-no-overwrite",
+        "originals-unchanged",
+        "archive-imported-history",
+        "archive-resume-output",
+        "real-dom-webchannel",
+        "owned-resources-closed",
+        "owned-window-deleted"
+      ],
+      "owned_pids": [
+        31464,
+        44252,
+        18336,
+        24104,
+        54236,
+        52432,
+        12280,
+        57968
+      ],
+      "remaining_owned": [],
+      "forbidden_modules": [],
+      "report_sha256": "EC07BB0E871B0B8E2DAAB49728217226DE06927077955BE59AC2F51394AEEF5F",
+      "process_observation_sha256": "CF72309F0CFD6A2A06205C25741BBE71D2F2B6D3DBBEE0026400C8E42310AEA9"
+    },
+    {
+      "flow": "gray",
+      "version": "v3",
+      "phase": "passed",
+      "exit": 0,
+      "controller_seconds": 11.9931818,
+      "checks": [
+        "durable-worker",
+        "offline-ocr",
+        "save-failure-visible",
+        "saved-project-reopen",
+        "busy-exit-confirmation",
+        "post-cancel-draft-confirmation",
+        "post-cancel-dirty-confirmation"
+      ],
+      "owned_pids": [
+        45324,
+        10992,
+        844,
+        31520,
+        58052,
+        44320
+      ],
+      "remaining_owned": [],
+      "forbidden_modules": [],
+      "report_sha256": "2BF766C8437B3AE9C421E84DF7E66B482902B4D14D01E54ADD49D66D816F9C34",
+      "process_observation_sha256": "D101C8672E4E435C7A61B5DD8CDB344CEB0E82831B5ABA141B1437BED32BF9B0"
+    }
+  ],
+  "pending": [
+    "clean target Windows 10",
+    "physical 125/150/200 percent DPI and input",
+    "independent scientific holdout and explicit sample mapping",
+    "actual-main final integration gates"
+  ],
+  "lifecycle": {
+    "uninstall_exit": 0,
+    "reinstall_exit": 0,
+    "registered_files_removed": true,
+    "user_data_preserved": true,
+    "internal_sentinel_sha256": "8BA966222AB954E42F9C6BC61DDA7B19918AEE136A1DFD0C8A34C5C396D52B10",
+    "external_sentinel_sha256": "ECFD3B8A01AE194D9B7A0E3AB5C6CEB5EDA47E8CC527B6B8A28D0F7B7DF80217",
+    "old_candidate_pid": 55936,
+    "old_candidate_unchanged": true,
+    "observation_sha256": "B3DD9CFE3151229331A7135BBD5C5A52E1763D2DC4501E4FE9B8B313E63E5D9C"
+  },
+  "ps51_selfcheck": {
+    "exit": 0,
+    "both_flow_reports_passed": true,
+    "log_sha256": "BF7F292478A0D21EB6CABF6CD6FB2930D8B3FD7BE649629D76085B877B58929B"
+  }
+}

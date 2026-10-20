@@ -22,7 +22,11 @@ from wb_tool.domain.grid import fixed_lane_grid
 from wb_tool.domain.lanes import LaneROI, Polarity
 
 QuantPolicy = Literal[
-    "legacy_bounds@1", "wbquant_1_4_3@1", "background_support@1", "anchored_background@1"
+    "legacy_bounds@1",
+    "wbquant_1_4_3@1",
+    "peak_envelope@1",
+    "background_support@1",
+    "anchored_background@1",
 ]
 
 CropPolicy = Literal["legacy_fixed_height@1", "lane_ratio@1", "source_geometry@2"]
@@ -62,6 +66,7 @@ class AutoWBSettings:
         if self.quant_policy not in (
             "legacy_bounds@1",
             "wbquant_1_4_3@1",
+            "peak_envelope@1",
             "background_support@1",
             "anchored_background@1",
         ):

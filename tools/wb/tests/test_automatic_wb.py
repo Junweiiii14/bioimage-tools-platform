@@ -6,6 +6,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 import tifffile
+from pytestqt.qtbot import QtBot
 from tool_contracts.api import AssetRef
 from wb_tool.api import (
     AutoWBSettings,
@@ -27,6 +28,8 @@ from wb_tool.api import (
     suggest_automatic_wb,
     with_automatic_rows,
 )
+
+from tools.wb.tests.owned_widgets import WidgetOwner
 
 
 def source(tmp_path: Path, light: bool = False) -> Path:
@@ -266,7 +269,7 @@ def test_quality_review_raw_integral_separate_from_valid_output(tmp_path: Path) 
     assert "原始积分（待复核）" not in project_table_rows(legacy, ())[1][4]
 
 
-def test_raw_integral_ui_separates_quality_review(qtbot: object) -> None:
+def test_raw_integral_ui_separates_quality_review(qtbot: QtBot, owned_widgets: WidgetOwner) -> None:
     from PySide6.QtWidgets import QApplication, QTableWidget
     from wb_tool.api import ProjectTableCell
     from wb_tool.ui.project_analysis import ProjectAnalysisPanel
@@ -295,6 +298,8 @@ def test_raw_integral_ui_separates_quality_review(qtbot: object) -> None:
     )
     table = ProjectResultsView()
     panel = ProjectAnalysisPanel()
+    owned_widgets(table)
+    owned_widgets(panel)
     try:
         table.show_cells((cell,))
         assert item_text(table.table, 3) == ""

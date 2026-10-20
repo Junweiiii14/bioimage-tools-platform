@@ -12,6 +12,9 @@ if TYPE_CHECKING:
 
 from wb_tool.adapters.automatic import automatic_project_row
 from wb_tool.adapters.automatic_export import discover_tiffs
+from wb_tool.adapters.intake_crop import export_intake_crop, propose_intake_crop
+from wb_tool.adapters.intake_figure import load_intake_figure_preview, prepare_intake_figure
+from wb_tool.adapters.intake_output import export_intake_outputs
 from wb_tool.adapters.metadata_input import read_metadata_file
 from wb_tool.adapters.ocr_input import OCRImage, load_ocr_image
 from wb_tool.adapters.quant_export import (
@@ -56,6 +59,7 @@ from wb_tool.application.crop_suggestions import (
 )
 from wb_tool.application.desktop_data import PreviewRaster, ProjectDerivedTables, WBJob, WBReply
 from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
+from wb_tool.application.fig_quant import WBPartitionProject
 from wb_tool.application.figure_project import (
     FigurePNG,
     FigureRender,
@@ -70,10 +74,84 @@ from wb_tool.application.figure_template import (
     PortableFigureTemplate,
     TemplateFont,
 )
+from wb_tool.application.group_review import confirm_quant_group, quant_group_reviewed
 from wb_tool.application.import_labels import (
     FolderDiscoveryReport,
     SourceImportLabels,
     source_import_labels,
+)
+from wb_tool.application.instrument_intake import (
+    IntakeAssignment,
+    IntakeFigure,
+    IntakeManifest,
+    IntakeProtein,
+    IntakeSource,
+    WBIntakeProject,
+    assign_intake_sources,
+    confirm_intake,
+    create_intake,
+    intake_digest,
+    intake_snapshot,
+    register_intake_source,
+    replace_intake_plan,
+    unassign_intake_sources,
+)
+from wb_tool.application.intake_crop import (
+    IntakeCropEvidence,
+    IntakeCropFile,
+    IntakeCropSlot,
+    WBIntakeCropProject,
+    complete_intake_crop,
+    fail_intake_crop,
+    prepare_intake_crops,
+    record_intake_crop_proposal,
+    review_intake_crop,
+)
+from wb_tool.application.intake_execution import (
+    IntakeExecutionPlan,
+    IntakePlannedCell,
+    IntakePlannedFigure,
+    IntakePlannedRow,
+    IntakePlannedSlot,
+    build_intake_execution_plan,
+)
+from wb_tool.application.intake_figure import (
+    IntakeFigureEvidence,
+    IntakeFigurePreparation,
+    WBIntakeFigureProject,
+    complete_intake_figure,
+    complete_intake_measurement,
+    intake_figure_digest,
+    intake_figure_projection,
+    intake_figure_rows,
+    prepare_intake_figures,
+    prepare_intake_measurement_revision,
+)
+from wb_tool.application.intake_output import (
+    IntakeOutputEvidence,
+    IntakeOutputPreparation,
+    IntakeResultCell,
+    WBIntakeOutputProject,
+    fill_intake_table,
+    intake_output_digest,
+    prepare_intake_outputs,
+    record_intake_output,
+)
+from wb_tool.application.intake_workflow import (
+    IntakeWorkflowLedger,
+    IntakeWorkflowStep,
+    IntakeWorkflowTicket,
+    WBIntakeWorkflowProject,
+    approve_intake_workflow,
+    claim_intake_workflow_step,
+    finish_intake_workflow_step,
+    intake_workflow_digest,
+    intake_workflow_snapshot,
+    prepare_intake_workflow,
+    recover_intake_workflow,
+    request_intake_workflow_cancel,
+    retry_intake_workflow_step,
+    return_to_intake_editing,
 )
 from wb_tool.application.laboratory_layout import (
     DisplayFrame,
@@ -88,6 +166,7 @@ from wb_tool.application.laboratory_layout import (
     plan_laboratory_layout,
     with_figure_layout,
 )
+from wb_tool.application.manual_groups import add_manual_group, edit_quant_band
 from wb_tool.application.ocr_protocol import (
     OCRConversation,
     OCRRequest,
@@ -217,10 +296,82 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "export_intake_outputs",
+    "IntakeOutputEvidence",
+    "IntakeOutputPreparation",
+    "IntakeResultCell",
+    "WBIntakeOutputProject",
+    "fill_intake_table",
+    "intake_output_digest",
+    "prepare_intake_outputs",
+    "record_intake_output",
+    "load_intake_figure_preview",
+    "IntakeFigureEvidence",
+    "IntakeFigurePreparation",
+    "WBIntakeFigureProject",
+    "complete_intake_figure",
+    "complete_intake_measurement",
+    "intake_figure_digest",
+    "intake_figure_projection",
+    "intake_figure_rows",
+    "prepare_intake_figures",
+    "prepare_intake_measurement_revision",
+    "prepare_intake_figure",
+    "IntakeCropEvidence",
+    "IntakeCropFile",
+    "IntakeCropSlot",
+    "WBIntakeCropProject",
+    "complete_intake_crop",
+    "fail_intake_crop",
+    "export_intake_crop",
+    "prepare_intake_crops",
+    "propose_intake_crop",
+    "record_intake_crop_proposal",
+    "review_intake_crop",
+    "IntakeWorkflowLedger",
+    "IntakeWorkflowStep",
+    "IntakeWorkflowTicket",
+    "WBIntakeWorkflowProject",
+    "approve_intake_workflow",
+    "claim_intake_workflow_step",
+    "finish_intake_workflow_step",
+    "intake_workflow_digest",
+    "intake_workflow_snapshot",
+    "prepare_intake_workflow",
+    "recover_intake_workflow",
+    "request_intake_workflow_cancel",
+    "return_to_intake_editing",
+    "retry_intake_workflow_step",
+    "IntakeExecutionPlan",
+    "IntakePlannedCell",
+    "IntakePlannedFigure",
+    "IntakePlannedRow",
+    "IntakePlannedSlot",
+    "build_intake_execution_plan",
+    "IntakeAssignment",
+    "IntakeFigure",
+    "IntakeManifest",
+    "IntakeProtein",
+    "IntakeSource",
+    "WBIntakeProject",
+    "assign_intake_sources",
+    "confirm_intake",
+    "create_intake",
+    "intake_digest",
+    "intake_snapshot",
+    "register_intake_source",
+    "replace_intake_plan",
+    "unassign_intake_sources",
+    "confirm_quant_group",
+    "quant_group_reviewed",
     "discover_tiffs",
     "ReturnedCrop",
     "return_reviewed_crop",
     "ManualQuantTarget",
+    "add_manual_group",
+    "edit_quant_band",
+    "WBPartitionProject",
+    "prepare_fig_quantification",
     "configure_manual_quantification",
     "export_wbquant_table",
     "wbquant_table_rows",
@@ -507,6 +658,18 @@ def recognize_figure(
     from wb_tool.adapters.ocr import recognize_figure as recognize
 
     return recognize(source, expected_sha256, cancelled=cancelled)
+
+
+def prepare_fig_quantification(
+    source: str,
+    project: WBFigureProject,
+    row_id: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> WBPartitionProject:
+    from wb_tool.adapters.fig_quant import prepare_fig_quantification as prepare
+
+    return prepare(source, project, row_id, cancelled=cancelled)
 
 
 def export_worksheet(worksheet: Worksheet, result: AnalysisResult, destination: str) -> str:

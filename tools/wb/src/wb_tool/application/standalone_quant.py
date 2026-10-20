@@ -2,8 +2,14 @@
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Literal
 
-from wb_tool.application.analysis import QuantitativeImage
+from wb_tool.application.analysis import (
+    AnalysisRequest,
+    BandAnnotation,
+    LaneAnnotation,
+    QuantitativeImage,
+)
 from wb_tool.application.automatic import WBAutomaticProject, suggest_analysis_for_crop
 from wb_tool.application.figure_project import FigureRow, WBFigureProject
 from wb_tool.application.laboratory_layout import (
@@ -30,8 +36,27 @@ class ManualQuantTarget:
     polarity: Polarity
     empty_lanes: tuple[int, ...] = ()
     reset_bounds: bool = False
+    lane_rois: tuple[LaneROI, ...] = ()
+    measurement_mode: Literal["peaks", "smear"] = "peaks"
 
     def __post_init__(self) -> None:
+        if self.measurement_mode not in ("peaks", "smear"):
+            raise ValueError("未知泳道测量模式")
+        if self.measurement_mode == "smear" and not self.lane_rois:
+            raise ValueError("整段拖尾需要明确的独立泳道框")
+        if type(self.lane_rois) is not tuple:
+            raise ValueError("独立泳道须为不可变元组")
+        if self.lane_rois and len(self.lane_rois) != self.lane_count:
+            raise ValueError("独立泳道数量不一致")
+        for index, lane in enumerate(self.lane_rois):
+            if any(type(v) is not int for v in (lane.x0, lane.y0, lane.x1, lane.y1)) or not (
+                self.roi.x0 <= lane.x0 < lane.x1 <= self.roi.x1
+                and self.roi.y0 <= lane.y0 < lane.y1 <= self.roi.y1
+                and lane.y1 - lane.y0 >= 2
+            ):
+                raise ValueError("独立泳道须在测量范围内，使用整数原图坐标")
+            if index and self.lane_rois[index - 1].x1 > lane.x0:
+                raise ValueError("泳道不能重叠，须按从左到右排列")
         if type(self.reset_bounds) is not bool:
             raise ValueError("重置边界须为明确布尔值")
         if type(self.revision) is not int or self.revision < 0:
@@ -98,18 +123,47 @@ def configure_manual_quantification(
         and row.lane_count == target.lane_count
         and row.empty_lanes == target.empty_lanes
         and old_plan.request.polarity == target.polarity
+        and old_plan.request.geometry_policy
+        == ("independent_lanes@1" if target.lane_rois else "anchored_context@1")
+        and old_plan.request.quant_policy
+        in (
+            ("wbquant_1_4_3@1", "peak_envelope@1")
+            if target.lane_rois
+            else ("anchored_background@1",)
+        )
+        and (
+            not target.lane_rois
+            or all(
+                lane.roi == roi
+                or any(
+                    f"original_roi:{roi.x0},{roi.y0},{roi.x1},{roi.y1}; " in note
+                    for band in lane.bands
+                    for note in band.detection_notes
+                )
+                for lane, roi in zip(old_plan.request.lanes, target.lane_rois, strict=True)
+            )
+        )
+        and all(
+            any("whole_lane_smear@1" in b.detection_notes for b in lane.bands)
+            == (target.measurement_mode == "smear")
+            for lane in old_plan.request.lanes
+        )
     ):
         # Re-measuring an unchanged target must retain manually adjusted bounds.
         return project
-    request = suggest_analysis_for_crop(
-        image,
-        crop=target.roi,
-        lane_count=target.lane_count,
-        revision=target.revision,
-        polarity=target.polarity,
-        empty_lanes=target.empty_lanes,
-        quant_policy="anchored_background@1",
-        cancelled=cancelled,
+    request = (
+        explicit_lane_request(image, target, cancelled=cancelled)
+        if target.lane_rois
+        else suggest_analysis_for_crop(
+            image,
+            crop=target.roi,
+            lane_count=target.lane_count,
+            revision=target.revision,
+            polarity=target.polarity,
+            empty_lanes=target.empty_lanes,
+            quant_policy="anchored_background@1",
+            cancelled=cancelled,
+        )
     )
     composition = (
         project.composition if isinstance(project, WBLayoutProject) else FigureComposition()
@@ -142,4 +196,77 @@ def configure_manual_quantification(
             empty_lanes=target.empty_lanes,
             request=request,
         ),
+    )
+
+
+def explicit_lane_request(
+    image: QuantitativeImage,
+    target: ManualQuantTarget,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> AnalysisRequest:
+    """WBQuant multi-peak selection or full-height smear, on original pixels."""
+    from dataclasses import replace
+
+    from wb_tool.domain.quant_supervision import (
+        propose_quant_lane,
+        propose_quant_lanes,
+        propose_smear_lane,
+    )
+
+    rois = tuple(
+        replace(roi, lane_id=f"{target.roi.lane_id}:{i:02d}")
+        for i, roi in enumerate(target.lane_rois, 1)
+    )
+    if target.measurement_mode == "smear":
+        proposals = tuple(propose_smear_lane(image.pixels, roi, target.polarity) for roi in rois)
+        lanes = tuple(
+            LaneAnnotation(
+                proposal.roi,
+                (
+                    BandAnnotation(
+                        "target",
+                        proposal.bands[0].bounds,
+                        included=i not in target.empty_lanes,
+                        detection_notes=proposal.bands[0].notes,
+                    ),
+                ),
+            )
+            for i, proposal in enumerate(proposals, 1)
+        )
+    else:
+        shapes = {(roi.width, roi.y1 - roi.y0) for roi in rois}
+        proposals = (
+            propose_quant_lanes(image.pixels, rois, target.polarity, complete_peaks=True)
+            if len(shapes) == 1
+            else tuple(
+                propose_quant_lane(image.pixels, roi, target.polarity, complete_peaks=True)
+                for roi in rois
+            )
+        )
+        lanes = tuple(
+            LaneAnnotation(
+                proposal.roi,
+                tuple(
+                    BandAnnotation(
+                        "target" if j == 1 else f"target-{j}",
+                        band.bounds,
+                        band.baseline,
+                        i not in target.empty_lanes,
+                        (*band.notes, "explicit_lanes@1"),
+                    )
+                    for j, band in enumerate(proposal.bands, 1)
+                ),
+            )
+            for i, proposal in enumerate(proposals, 1)
+        )
+    if cancelled():
+        raise ValueError("独立灰度配置已取消")
+    return AnalysisRequest(
+        image.sha256,
+        target.revision,
+        target.polarity,
+        lanes,
+        "independent_lanes@1",
+        "wbquant_1_4_3@1" if target.measurement_mode == "smear" else "peak_envelope@1",
     )

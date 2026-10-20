@@ -5,10 +5,13 @@ from pathlib import Path
 from pytestqt.qtbot import QtBot
 from wb_tool.api import DisplayFrame, WBLayoutProject, create_figure_project_view
 
+from tools.wb.tests.owned_widgets import WidgetOwner
 from tools.wb.tests.test_standard_display import mixed_resolution
 
 
-def test_view_roundtrip_retains_standard_style_and_frames(qtbot: QtBot, tmp_path: Path) -> None:
+def test_view_roundtrip_retains_standard_style_and_frames(
+    qtbot: QtBot, owned_widgets: WidgetOwner, tmp_path: Path
+) -> None:
     project, _ = mixed_resolution(tmp_path)
     slices = list(project.composition.slices)
     frame = DisplayFrame(center_x=18, center_y=15, width=20, height=8, angle_degrees=15)
@@ -17,7 +20,7 @@ def test_view_roundtrip_retains_standard_style_and_frames(qtbot: QtBot, tmp_path
         update={"composition": project.composition.model_copy(update={"slices": tuple(slices)})}
     )
     view = create_figure_project_view()
-    qtbot.addWidget(view)
+    owned_widgets(view)
     view.set_project(project)
     current = view.project()
     assert isinstance(current, WBLayoutProject)
@@ -39,7 +42,7 @@ def test_view_roundtrip_retains_standard_style_and_frames(qtbot: QtBot, tmp_path
 
 
 def test_crop_edits_clear_only_changed_frame_and_undo_restores(
-    qtbot: QtBot, tmp_path: Path
+    qtbot: QtBot, owned_widgets: WidgetOwner, tmp_path: Path
 ) -> None:
     project, _ = mixed_resolution(tmp_path)
     frame = DisplayFrame(center_x=18, center_y=15, width=20, height=8, angle_degrees=15)
@@ -51,7 +54,7 @@ def test_crop_edits_clear_only_changed_frame_and_undo_restores(
         update={"composition": project.composition.model_copy(update={"slices": slices})}
     )
     view = create_figure_project_view()
-    qtbot.addWidget(view)
+    owned_widgets(view)
     view.set_project(project)
     view.table.setCurrentCell(0, 0)
     roi = project.rows[0].roi

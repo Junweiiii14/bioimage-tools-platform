@@ -206,14 +206,15 @@ def with_figure_layout(
     composition: FigureComposition,
     style: FigureLayoutStyle | None = None,
 ) -> WBLayoutProject:
-    from wb_tool.application.automatic import WBAutomaticProject
-
     fields = {name: getattr(project, name) for name in type(project).model_fields}
-    automatic = isinstance(project, WBAutomaticProject)
-    fields.update(schema_version=8 if automatic else 7, composition=composition)
+    fields.update(
+        schema_version=project.schema_version if isinstance(project, WBLayoutProject) else 7,
+        composition=composition,
+    )
     if style is not None:
         fields["layout_style"] = style
-    return (WBAutomaticProject if automatic else WBLayoutProject).model_validate(fields)
+    cls = type(project) if isinstance(project, WBLayoutProject) else WBLayoutProject
+    return cls.model_validate(fields)
 
 
 @dataclass(frozen=True)

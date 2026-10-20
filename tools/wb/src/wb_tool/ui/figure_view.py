@@ -43,6 +43,8 @@ from wb_tool.application.figure_project import (
     FigureTemplate,
     WBFigureProject,
 )
+from wb_tool.application.instrument_intake import WBIntakeProject
+from wb_tool.application.intake_workflow import WBIntakeWorkflowProject
 from wb_tool.application.laboratory_layout import (
     initial_composition,
     with_figure_layout,
@@ -144,6 +146,7 @@ class FigureProjectView(QWidget):
         self._loading = False
         self._project = WBFigureProject(project_id=uuid4().hex)
         self._thumbnails: dict[str, QIcon] = {}
+        self._thumbnail_rasters: dict[str, PreviewRaster] = {}
         self._source_preview: PreviewRaster | None = None
         self._rendered_preview: FigureRender | None = None
         self._last_review_focus: QWidget | None = None
@@ -895,9 +898,9 @@ class FigureProjectView(QWidget):
             # The original selection path commits valid dirty annotation edits first.
             self.table.setCurrentCell(index, 0)
 
-    def _text(self, row: int, column: int) -> str:
+    def _text(self, row: int, column: int, *, strip: bool = True) -> str:
         item = self.table.item(row, column)
-        return item.text().strip() if item else ""
+        return (item.text().strip() if strip else item.text()) if item else ""
 
     def project(
         self, revision: int | None = None, *, include_layout: bool = True
@@ -916,8 +919,8 @@ class FigureProjectView(QWidget):
                     width=original.width,
                     height=original.height,
                     bit_depth=original.bit_depth,
-                    figure=self._text(i, 1),
-                    protein=self._text(i, 2),
+                    figure=self._text(i, 1, strip=not isinstance(self._project, WBIntakeProject)),
+                    protein=self._text(i, 2, strip=not isinstance(self._project, WBIntakeProject)),
                     lane_count=int(self._text(i, 3)),
                     empty_lanes=tuple(
                         int(n.strip()) for n in self._text(i, 8).split(",") if n.strip()
@@ -935,6 +938,10 @@ class FigureProjectView(QWidget):
             font=self._project.template.font,
         )
         order = tuple(s.strip() for s in self.figure_order.text().split(",") if s.strip())
+        if isinstance(self._project, WBIntakeProject):
+            if self.figure_order.text() != ", ".join(self._project.figure_order):
+                raise ValueError("请通过仪器清单修改 Fig 顺序")
+            order = self._project.figure_order
         project = WBFigureProject(
             project_id=self._project.project_id,
             name=self.name.text().strip(),
@@ -987,9 +994,42 @@ class FigureProjectView(QWidget):
                 project, self._project.archive_sources, self._project.imported_runs
             )
         from wb_tool.application.automatic import WBAutomaticProject, with_automatic_rows
+        from wb_tool.application.fig_quant import WBPartitionProject
 
-        if isinstance(self._project, WBAutomaticProject):
+        if isinstance(self._project, WBPartitionProject):
+            fields = {name: getattr(project, name) for name in type(project).model_fields}
+            fields.update(
+                schema_version=9,
+                automatic_rows=self._project.automatic_rows,
+                partition_sources=self._project.partition_sources,
+            )
+            project = WBPartitionProject.model_validate(fields)
+        elif isinstance(self._project, WBAutomaticProject):
             project = with_automatic_rows(project, self._project.automatic_rows)
+        if isinstance(self._project, WBIntakeWorkflowProject):
+            fields = dict(project)
+            fields.update(
+                schema_version=self._project.schema_version,
+                intake=self._project.intake,
+                workflow=self._project.workflow,
+            )
+            from wb_tool.application.intake_crop import WBIntakeCropProject
+
+            if isinstance(self._project, WBIntakeCropProject):
+                fields["intake_crops"] = self._project.intake_crops
+            from wb_tool.application.intake_figure import WBIntakeFigureProject
+
+            if isinstance(self._project, WBIntakeFigureProject):
+                fields["intake_figures"] = self._project.intake_figures
+            from wb_tool.application.intake_output import WBIntakeOutputProject
+
+            if isinstance(self._project, WBIntakeOutputProject):
+                fields["intake_outputs"] = self._project.intake_outputs
+            project = type(self._project).model_validate(fields)
+        elif isinstance(self._project, WBIntakeProject):
+            fields = dict(project)
+            fields.update(schema_version=10, intake=self._project.intake)
+            project = WBIntakeProject.model_validate(fields)
         return project
 
     def set_project(self, project: WBFigureProject) -> None:
@@ -1037,7 +1077,12 @@ class FigureProjectView(QWidget):
         self.metadata.clear_preview()
         self.laboratory_layout.restore(project)
         present = {row.source.sha256 for row in project.rows if row.source}
+        if isinstance(project, WBIntakeProject):
+            present.update(source.asset.sha256 for source in project.intake.sources)
         self._thumbnails = {key: icon for key, icon in self._thumbnails.items() if key in present}
+        self._thumbnail_rasters = {
+            key: raster for key, raster in self._thumbnail_rasters.items() if key in present
+        }
         self.ocr.restore(project)
         self.normalization.restore(project)
         self.analysis.set_source_context(None)
@@ -1155,6 +1200,10 @@ class FigureProjectView(QWidget):
     def has_thumbnail(self, sha256: str) -> bool:
         return sha256 in self._thumbnails
 
+    def thumbnail(self, source_sha: str) -> PreviewRaster | None:
+        """Return a cached display-only raster; never decode or expose source pixels here."""
+        return self._thumbnail_rasters.get(source_sha)
+
     def install_thumbnail(self, raster: PreviewRaster) -> None:
         if (
             not 1 <= raster.preview_width <= 128
@@ -1171,7 +1220,14 @@ class FigureProjectView(QWidget):
             and row.height == raster.height
             and row.bit_depth == raster.bit_depth
         ]
-        if not matches:
+        pool_match = isinstance(self._project, WBIntakeProject) and any(
+            source.asset.sha256 == raster.sha256
+            and source.width == raster.width
+            and source.height == raster.height
+            and source.bit_depth == raster.bit_depth
+            for source in self._project.intake.sources
+        )
+        if not matches and not pool_match:
             return
         icon = QIcon(
             QPixmap.fromImage(
@@ -1185,6 +1241,7 @@ class FigureProjectView(QWidget):
             )
         )
         self._thumbnails[raster.sha256] = icon
+        self._thumbnail_rasters[raster.sha256] = raster
         self._loading = True
         for i in matches:
             item = self.table.item(i, 0)
@@ -1234,11 +1291,17 @@ class FigureProjectView(QWidget):
                 self._refresh_analysis_sources()
                 return
             self._refresh_analysis_sources()
-            self._source_preview = None
-            self.canvas.set_image(PreviewRaster("", 0, 0, 0, 0, b"", 0, ()))
-            self.canvas.set_lanes(())
-            self.canvas.set_regions(())
-            self.analysis.clear_source_preview()
+            source = self._project.rows[row].source
+            if (
+                not self._source_preview
+                or not source
+                or self._source_preview.sha256 != source.sha256
+            ):
+                self._source_preview = None
+                self.canvas.set_image(PreviewRaster("", 0, 0, 0, 0, b"", 0, ()))
+                self.canvas.set_lanes(())
+                self.canvas.set_regions(())
+                self.analysis.clear_source_preview()
             self.show_analysis(row)
             self._overlay()
             self.source_requested.emit(self._project.rows[row].row_id)
@@ -1349,6 +1412,20 @@ class FigureProjectView(QWidget):
     def selected_row(self) -> FigureRow | None:
         index = self.table.currentRow()
         return self.project().rows[index] if 0 <= index < len(self._project.rows) else None
+
+    @property
+    def presentation_key(self) -> tuple[int, int, int]:
+        """Cheap invalidation token; never reconstruct a project just to poll it.
+
+        Native edits increment generation; model installations replace the frozen
+        project. Selection is separate because it changes visible profiles.
+        """
+        return id(self._project), self.generation, self.table.currentRow()
+
+    @property
+    def project_identity(self) -> str:
+        """Immutable document identity; native editing cannot change it."""
+        return self._project.project_id
 
     @property
     def source_preview(self) -> PreviewRaster | None:
@@ -1698,3 +1775,8 @@ class FigureProjectView(QWidget):
             QImage.Format.Format_RGB888,
         ).copy()
         self.preview_label.set_render(QPixmap.fromImage(image))
+
+    def clear_render(self) -> None:
+        """Retire only the display; do not change source geometry or draft generation."""
+        self._rendered_preview = None
+        self.preview_label.clear_render()

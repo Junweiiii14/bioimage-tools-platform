@@ -1,0 +1,57 @@
+{
+  "test": "tests/test_instrument_intake_desktop.py::test_complete_intake_fig_is_saved_before_real_worker_and_restores_verified_runs",
+  "poll_resolution_seconds": 0.01,
+  "phases": [
+    {
+      "stage": "crop",
+      "target_id": "protein-a",
+      "attempt": 1,
+      "observed_seconds": 0.06762320001143962,
+      "terminal": "needs_review"
+    },
+    {
+      "stage": "crop",
+      "target_id": "protein-b",
+      "attempt": 1,
+      "observed_seconds": 0.056066000019200146,
+      "terminal": "needs_review"
+    },
+    {
+      "stage": "crop",
+      "target_id": "protein-a",
+      "attempt": 2,
+      "observed_seconds": 0.10615160001907498,
+      "terminal": "done"
+    },
+    {
+      "stage": "crop",
+      "target_id": "protein-b",
+      "attempt": 2,
+      "observed_seconds": 0.1148912999778986,
+      "terminal": "done"
+    },
+    {
+      "stage": "compose",
+      "target_id": "fig-a",
+      "attempt": 1,
+      "observed_seconds": 0.2453201999887824,
+      "terminal": "done"
+    },
+    {
+      "stage": "measure",
+      "target_id": "fig-a",
+      "attempt": 1,
+      "observed_seconds": 3.0255527999834158,
+      "terminal": "done"
+    },
+    {
+      "stage": "export",
+      "target_id": "8c5f11b0268948e5a036cdb4bc4ef090",
+      "attempt": 1,
+      "observed_seconds": 0.5112930000177585,
+      "terminal": "done"
+    }
+  ],
+  "cancellations": [],
+  "limitations": "Observed committed stage transitions with a 10ms GUI timer; may miss very short stages. One synthetic two-source real-worker scenario, not actual instrument performance or a percentile population. Controller cancellation holds the next worker before launch; process-tree cancellation uses a separate synthetic stubborn subprocess with explicit unchanged grace."
+}

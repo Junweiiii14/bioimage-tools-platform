@@ -8,6 +8,7 @@ This file stores compressed old history that should not be part of normal startu
 - Move stale but potentially useful history here as concise summaries.
 - Keep pointers to relevant decisions, validation entries, or source files.
 
+
 ## Rotated Records
 - [work-log-20261015T082420238818Z.md](archive/work-log-20261015T082420238818Z.md): work log exceeded 64 KiB or 30 dated sections
 - [work-log-20261015T091217179005Z.md](archive/work-log-20261015T091217179005Z.md): work log exceeded 64 KiB or 30 dated sections
@@ -58,6 +59,30 @@ This file stores compressed old history that should not be part of normal startu
 - [work-log-20261018T063657627251Z.md](archive/work-log-20261018T063657627251Z.md): work log exceeded 64 KiB or 30 dated sections
 - [work-log-20261018T064800309973Z.md](archive/work-log-20261018T064800309973Z.md): work log exceeded 64 KiB or 30 dated sections
 - [work-log-20261018T070523392426Z.md](archive/work-log-20261018T070523392426Z.md): work log exceeded 64 KiB or 30 dated sections
+- [work-log-20261018T111200671873Z.md](archive/work-log-20261018T111200671873Z.md): work log exceeded 64 KiB or 30 dated sections
+- [work-log-20261018T113219608071Z.md](archive/work-log-20261018T113219608071Z.md): work log exceeded 64 KiB or 30 dated sections
+- [work-log-20261018T151131450376Z.md](archive/work-log-20261018T151131450376Z.md): work log exceeded 64 KiB or 30 dated sections
+- [work-log-20261019T021541013993Z.md](archive/work-log-20261019T021541013993Z.md): work log exceeded 64 KiB or 30 dated sections
+- [work-log-20261019T070724708758Z.md](archive/work-log-20261019T070724708758Z.md): work log exceeded 64 KiB or 30 dated sections
+- [work-log-20261019T094246133614Z.md](archive/work-log-20261019T094246133614Z.md): work log exceeded 64 KiB or 30 dated sections
+- [work-log-20261019T094310360715Z.md](archive/work-log-20261019T094310360715Z.md): work log exceeded 64 KiB or 30 dated sections
+- [work-log-20261019T145202514097Z.md](archive/work-log-20261019T145202514097Z.md): work log exceeded 64 KiB or 30 dated sections
+- [work-log-20261019T151842248255Z.md](archive/work-log-20261019T151842248255Z.md): work log exceeded 64 KiB or 30 dated sections
+- [work-log-20261019T153107702875Z.md](archive/work-log-20261019T153107702875Z.md): work log exceeded 64 KiB or 30 dated sections
+- [work-log-20261019T162459728079Z.md](archive/work-log-20261019T162459728079Z.md): work log exceeded 64 KiB or 30 dated sections
+- [work-log-20261019T172925233431Z.md](archive/work-log-20261019T172925233431Z.md): work log exceeded 64 KiB or 30 dated sections
+- [work-log-20261019T183617126260Z.md](archive/work-log-20261019T183617126260Z.md): work log exceeded 64 KiB or 30 dated sections
+
+- 2026-10-20 E5收尾：validation原始227行先完整备份至 `.agent-handoff/archive/validation-20261020-e5-closeout.md`，当前索引压缩至200行以内；未删除历史失败。
+- [work-log-20261019T192501846754Z.md](archive/work-log-20261019T192501846754Z.md): work log exceeded 64 KiB or 30 dated sections
+- [work-log-20261019T200915753365Z.md](archive/work-log-20261019T200915753365Z.md): work log exceeded 64 KiB or 30 dated sections
+
+T050初次归档复制因archive目录尚不存在失败，随后从未修改的main基线恢复原快照并归档；无历史丢失。原快照见archive/T050-before-plan-snapshot.md。
+- 2026-10-20 INT001集成前T050快照：archive/INT001-before-integration-snapshot.md（先保存后更新当前状态）。
+- INT001合入时main当前快照：archive/INT001-at-merge-snapshot.md；实际合入事实见T060/SYNC阶段证据。
+- [work-log-20261019T204531813868Z.md](archive/work-log-20261019T204531813868Z.md): work log exceeded 64 KiB or 30 dated sections
+
+- `archive/T060-before-crop-identity-snapshot.md`: E7裁剪身份修复前恢复状态原文。
 T050初次归档复制因archive目录尚不存在失败，随后从未修改的main基线恢复原快照并归档；无历史丢失。原快照见archive/T050-before-plan-snapshot.md。
 - 2026-10-20 INT001集成前T050快照：archive/INT001-before-integration-snapshot.md（先保存后更新当前状态）。
 - 2026-10-20 E7 P0合main前快照：archive/SYNC001-before-e7-integration-snapshot.md。
@@ -69,3 +94,5 @@ T050初次归档复制因archive目录尚不存在失败，随后从未修改的
 ## Rotated Records
 - [work-log-20261019T214639050994Z.md](archive/work-log-20261019T214639050994Z.md): work log exceeded 64 KiB or 30 dated sections
 - [work-log-20261019T215756640775Z.md](archive/work-log-20261019T215756640775Z.md): work log exceeded 64 KiB or 30 dated sections
+- [work-log-20261019T223601894112Z.md](archive/work-log-20261019T223601894112Z.md): work log exceeded 64 KiB or 30 dated sections
+- [work-log-20261019T233751637061Z.md](archive/work-log-20261019T233751637061Z.md): work log exceeded 64 KiB or 30 dated sections

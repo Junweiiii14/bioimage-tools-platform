@@ -185,7 +185,8 @@ class ProjectOCRSession(QObject):
         self._storage(StorageCommand("read", asset=run.result), read)
 
     def _finish(self, completion: ProjectOCRCompletion) -> None:
-        # A committed run is retained, but cancellation can win during decoding.
+        # A durable succeeded run remains history, but cancellation can still
+        # win while its asset is being read/decoded. Never install that result.
         if self._cancelled and not completion.error:
             completion = ProjectOCRCompletion(state="cancelled")
         self._store.replied.disconnect(self._storage_reply)

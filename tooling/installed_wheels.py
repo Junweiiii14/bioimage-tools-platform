@@ -129,6 +129,63 @@ with Path('installed-results.csv').open(encoding='utf-8-sig', newline='') as str
     exported = list(csv.DictReader(stream))
 assert len(exported) == 3 and all(row['积分'] == '' for row in exported)
 assert exported[0]['蛋白'] == 'text:AKT' and project_runs(metadata_updated) == ()
+from tool_contracts.api import AssetRef
+from wb_tool.api import (
+    IntakeFigure, IntakeProtein, IntakeSource, IntakeAssignment, WBIntakeProject,
+    create_intake, replace_intake_plan, register_intake_source, assign_intake_sources,
+    confirm_intake, intake_digest, read_figure_project, project_assets,
+)
+intake = create_intake(WBFigureProject(project_id='installed-intake'))
+intake = replace_intake_plan(intake,
+    (IntakeFigure(figure_id='fig', label='Fig 1', lane_count=3),),
+    (IntakeProtein(protein_id='protein', figure_id='fig', label='AKT'),),
+    expected_digest=intake_digest(intake))
+source_ref = AssetRef(asset_id='source', relative_path='assets/original.tif',
+    sha256=image.sha256, size_bytes=Path('analytic.tif').stat().st_size)
+for source_id, relative in (('selected', 'instrument/analytic.tif'),
+                            ('unassigned', 'another/analytic.tif')):
+    intake = register_intake_source(intake, IntakeSource(source_id=source_id, asset=source_ref,
+        original_name='analytic.tif', relative_path=relative, width=1, height=3, bit_depth=8),
+        expected_digest=intake_digest(intake))
+intake = assign_intake_sources(intake,
+    (IntakeAssignment(protein_id='protein', source_id='selected'),),
+    expected_digest=intake_digest(intake))
+intake = confirm_intake(intake, expected_digest=intake_digest(intake))
+restored_intake = read_figure_project(intake.model_dump_json().encode())
+assert isinstance(restored_intake, WBIntakeProject) and restored_intake == intake
+assert len(restored_intake.intake.sources) == 2 and project_assets(restored_intake) == (source_ref,)
+assert restored_intake.rows[0].roi is None and not restored_intake.rows[0].reviewed
+from wb_tool.api import build_intake_execution_plan
+execution = build_intake_execution_plan(restored_intake,
+    expected_digest=intake_digest(restored_intake))
+assert len(execution.cells) == 3 and len({cell.slot_id for cell in execution.cells}) == 3
+assert all(cell.value is None and cell.status == 'pending' for cell in execution.cells)
+assert execution.figures[0].rows[0].source.source_id == 'selected'
+assert execution == build_intake_execution_plan(intake, expected_digest=intake_digest(intake))
+from wb_tool.api import prepare_intake_workflow, WBIntakeWorkflowProject
+pipeline = prepare_intake_workflow(intake, expected_digest=intake_digest(intake))
+pipeline_reopened = read_figure_project(pipeline.model_dump_json().encode())
+from wb_tool.api import prepare_intake_crops, WBIntakeCropProject
+crop_pipeline = prepare_intake_crops(pipeline)
+assert isinstance(crop_pipeline, WBIntakeCropProject) and crop_pipeline.schema_version == 12
+assert read_figure_project(crop_pipeline.model_dump_json().encode()) == crop_pipeline
+assert not crop_pipeline.intake_crops and not crop_pipeline.analyses
+from wb_tool.api import prepare_intake_figures, WBIntakeFigureProject
+figure_pipeline = prepare_intake_figures(crop_pipeline)
+figure_roundtrip = read_figure_project(figure_pipeline.model_dump_json().encode())
+assert isinstance(figure_roundtrip, WBIntakeFigureProject)
+assert not figure_pipeline.intake_figures and not figure_pipeline.analyses
+from wb_tool.api import prepare_intake_outputs, WBIntakeOutputProject, fill_intake_table
+output_pipeline = prepare_intake_outputs(figure_pipeline)
+output_reopened = read_figure_project(output_pipeline.model_dump_json().encode())
+assert isinstance(output_reopened, WBIntakeOutputProject)
+assert not output_pipeline.intake_outputs
+assert len(fill_intake_table(output_pipeline, ())) == 3
+assert not any(name == 'PIL' or name.startswith('PIL.') for name in sys.modules)
+
+assert isinstance(pipeline_reopened, WBIntakeWorkflowProject) and pipeline_reopened == pipeline
+assert all(step.status == 'pending' for step in pipeline.workflow.steps)
+assert not pipeline.analyses and pipeline.ocr is None
 assert not any(name.startswith(('PySide6', 'sqlite3')) for name in sys.modules)
 assert not any(name.startswith(('rapidocr', 'onnxruntime', 'cv2')) for name in sys.modules)
 print('Isolated WB wheel: TIFF/analysis, crop/grid and worker; no GUI/storage dependencies')

@@ -17,6 +17,40 @@ from wb_tool.api import FolderDiscoveryReport
 from tooling.qt_test_lifecycle import close_and_dispose_window
 
 
+def crop_identity(bridge: WorkbenchBridge) -> dict[str, object]:
+    snapshot = bridge.snapshot()
+    selected = bridge.host.view.selected_row()
+    assert selected is not None and selected.source is not None
+    return {
+        key: snapshot[key] for key in ("cropEditContract", "projectId", "sessionEpoch", "revision")
+    } | {"id": selected.row_id, "sourceId": selected.source.sha256}
+
+
+def test_idle_publish_and_progress_do_not_rebuild_project_snapshot(
+    bridge: WorkbenchBridge, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    bridge.publish()
+    calls: list[str] = []
+    progress: list[str] = []
+    original = bridge.snapshot
+
+    def snapshot() -> dict[str, object]:
+        calls.append("snapshot")
+        return original()
+
+    monkeypatch.setattr(bridge, "snapshot", snapshot)
+    bridge.progressChanged.connect(progress.append)
+    for index in range(8):
+        bridge.host.view.status.setText(f"正在计算 {index}")
+        bridge.host.quant_progress = {"phase": "measure", "finished": index, "total": 10}
+        bridge.publish()
+    assert calls == []
+    assert len(progress) == 8
+    bridge.host.view.generation += 1
+    bridge.publish()
+    assert calls == ["snapshot"]
+
+
 def test_folder_report_is_visible_and_only_current_variant_can_be_added(
     bridge: WorkbenchBridge, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -127,10 +161,7 @@ def test_web_adapter_real_import_output_and_original_coordinates(
     assert source.read_bytes() == before
     initial = host.view.project().rows[0].roi
     payload = {
-        "cropEditContract": state["cropEditContract"],
-        "projectId": state["projectId"],
-        "sessionEpoch": state["sessionEpoch"],
-        "revision": state["revision"],
+        **crop_identity(bridge),
         "id": row.row_id,
         "sourceId": "stale",
         "roi": {"x": 20, "y": 60, "width": 300, "height": 40},
@@ -297,21 +328,8 @@ def test_existing_web_project_appends_files_and_folder(
         window.bridge.request("select", json.dumps({"id": rows[0].row_id}))
         qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=15000)
         for index in (0, 1):
-            snapshot = window.bridge.snapshot()
-            source = rows[index].source
-            assert source is not None
             window.bridge.request(
-                "confirm",
-                json.dumps(
-                    {
-                        "cropEditContract": snapshot["cropEditContract"],
-                        "projectId": snapshot["projectId"],
-                        "sessionEpoch": snapshot["sessionEpoch"],
-                        "revision": snapshot["revision"],
-                        "id": rows[index].row_id,
-                        "sourceId": source.sha256,
-                    }
-                ),
+                "confirm", json.dumps({**crop_identity(window.bridge), "id": rows[index].row_id})
             )
             qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=15000)
             assert window.host.view.project().rows[index].reviewed
@@ -326,7 +344,9 @@ def test_existing_web_project_appends_files_and_folder(
         gc.collect()
 
 
-def test_web_close_reopen_restores_saved_project(qtbot: QtBot, tmp_path: Path) -> None:
+def test_web_close_reopen_restores_saved_project(
+    qtbot: QtBot, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     from bioimage_app.web_window import WebWorkbenchWindow
     from PySide6.QtCore import QSettings
 
@@ -365,8 +385,14 @@ def test_web_close_reopen_restores_saved_project(qtbot: QtBot, tmp_path: Path) -
         assert restored.rows == original_project.rows
         assert reopened.host.view.analysis.result_view.cells
         assert reopened.host.view.source_preview is not None
+        # Same-window opening is supported now. Cancelling its chooser keeps this project.
+        from PySide6.QtWidgets import QFileDialog
+
+        def cancel_directory(*args: object) -> str:
+            return ""
+
+        monkeypatch.setattr(QFileDialog, "getExistingDirectory", cancel_directory)
         reopened.bridge.request("open_project", "{}")
-        assert "新开一个工作台窗口" in str(reopened.bridge.snapshot()["status"])
         assert reopened.host.workspace_path == workspace
         assert reopened.host.view.project().project_id == original_project.project_id
     finally:
@@ -410,15 +436,7 @@ def test_ratio_crop_no_confirmation_montage_and_lane_resize(
     bridge.request(
         "set_lanes",
         json.dumps(
-            {
-                "cropEditContract": bridge.snapshot()["cropEditContract"],
-                "projectId": bridge.snapshot()["projectId"],
-                "sessionEpoch": bridge.snapshot()["sessionEpoch"],
-                "revision": bridge.snapshot()["revision"],
-                "id": row.row_id,
-                "sourceId": row.source.sha256,
-                "n": 4,
-            }
+            {**crop_identity(bridge), "id": row.row_id, "sourceId": row.source.sha256, "n": 4}
         ),
     )
     changed = host.view.project().rows[0]

@@ -1,4 +1,35 @@
+E3 implements `intake_crop@1` / schema12, preserving explicit N and stable slot IDs even
+when original geometry is unlocated. Automatic proposals remain unreviewed; an explicit
+original-coordinate rectangle confirms fixed-N segmentation. Reviewed crops export the
+original TIFF samples through an owned active ticket, with no overwrite or premature
+measurement. Source geometry thresholds and quantitative algorithms are unchanged.
+See `../../docs/contracts/wb-intake-crop-v1.md` and `../../work/tasks/T-056-fixed-slot-cropping.md`.
+
 # WB 数值核心
+
+E3/T056已完成宿主接入、本机工程验证及绑定独审：schema12/intake_crop@1保存固定N槽位与原图几何建议，
+无定位仍保留完整槽位，不伪造坐标/测量。显式审核后通过既有原值TIFF适配器导出，
+schema1–11读取保持；契约见`../../docs/contracts/wb-intake-crop-v1.md`。
+E4/schema13连接完整Fig后原像素定量，E5/schema14连接身份填表、新目录导出与恢复；E6复用冻结渲染。实际阶段证据与外部验收边界见`../../docs/wb-execution-acceptance.md`，不以纯核心测试代替宿主/安装验收。
+
+T055/E2新增schema11清单阶段账本，保存行crop/完整Fig compose/measure/项目export依赖、
+尝试票据、取消请求及中断恢复；账本不代替已提交数值证据。桌面后台准备执行摘要，
+未执行时可返回清单修改；真实裁剪执行器已在E3接入。契约见
+`../../docs/contracts/wb-intake-workflow-v1.md`。
+
+T054/E1新增`build_intake_execution_plan`：从已确认schema10重建不可变槽位、
+安全相对路径、布局占位和pending/None表格；无I/O/OCR/定位/测量。
+派生计划不增加持久化权威，后续结果另行版本化。契约见
+`../../docs/contracts/wb-intake-execution-v1.md`。
+
+T051新增`WBIntakeProject/schema10`与仪器原图池、稳定Fig/蛋白身份、固定槽位数、
+显式批量分配及确认摘要；未分配来源和原名/相对路径可保存重开。
+T051当时仅覆盖导入规划；后续E3–E5已接通执行。清单确认仍不等于裁剪审核或产生定量；旧独立灰度OCR保留。
+公开API和兼容约束见`../../docs/contracts/wb-instrument-intake-v1.md`。
+
+T045增加完整泳道手动框选、共享原图分组、补峰/排除及schema9 Fig拼图定量。
+`WBPartitionProject`保留原图OCR与版本化机器建议；普通WBQuant多峰和UB整段共用
+已有积分。新契约`../../docs/contracts/wb-fig-quant-v1.md`，验证状态以T045任务为准。
 
 公开入口 `wb_tool.api`；包版本0.19.0，实现定量/手工Qt闭环、OCR复核、结果表、归一化、批量元信息、统一归档和明确分段版式。
 数值契约与参考来源见 `../../docs/contracts/wb-reference-v1.md`。
@@ -79,6 +110,18 @@ T-044当前阶段：folder_sources@1目录头信息筛选已知派生图和明�
 
 T-044新增当前网页工作台默认anchored_context@1/anchored_background@1，固定原目标、逐步扩展最多25%背景上下文；保存目标/采样原坐标与比例，手动几何编辑清除旧边界并从目标重新规划。旧策略和已有请求不会静默升级，旧序列化字节保持，三份机器schema增加显式版本化扩展。原始profile_integral@1/位深风险保持，背景不足不强判有效。详见wb-anchored-context-v1.md与T044实际验证。
 
+E4/T057新增schema13完整Fig依据、稳定行/槽位与冻结原图请求映射，
+`prepare_intake_figure`生成并核验显示PNG，`complete_intake_figure`原子完成成图及计划；
+`complete_intake_measurement`只接受同冻结请求/真实运行/已验证结果。缩放预览另存
+显示变换，原PNG/原ROI不变。手动分段保留且不改变定量输入。桌面接通真实worker；
+最终全门禁状态见T057，不由API存在推出科学/发布完成。契约见wb-intake-figure-v1.md。
+
 审核后原位置回存契约见 `../../docs/contracts/wb-crop-return-v1.md`。
 `return_reviewed_crop` 复用显示分段映射和原值裁剪，写后核验且不替换旧文件；
 多文件部分失败明确列出已发布文件，无完成记录，不改变定量公式或项目格式。
+
+E5/T058新增schema14和intake_output@1：`fill_intake_table`按Fig/蛋白行/固定槽位填表，
+CSV/XLSX来源审计记录稳定身份；新目录发布原值/显示裁剪、Fig、索引和恢复ZIP。
+资产及run请求/结果有界冻结并再次核验，索引导入与CAS成功后才完成输出阶段；
+取消、部分失败、未知活动阶段恢复保持真实状态，不注册外来PID为本机成功。
+旧schema1–13保持。契约见wb-intake-output-v1.md，完成证据以T058任务为准。

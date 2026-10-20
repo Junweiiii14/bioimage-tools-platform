@@ -3,6 +3,7 @@
 import base64
 import json
 import math
+from collections import Counter
 from collections.abc import Callable
 from hashlib import sha256
 from typing import cast
@@ -16,11 +17,23 @@ from wb_tool.api import (
     ManualQuantTarget,
     ProjectTableCell,
     WBAnalysisProject,
+    WBIntakeCropProject,
+    WBIntakeFigureProject,
+    WBIntakeOutputProject,
+    WBIntakeProject,
+    WBIntakeWorkflowProject,
     WBLayoutProject,
+    WBPartitionProject,
+    confirm_quant_group,
+    intake_snapshot,
+    intake_workflow_snapshot,
+    quant_group_reviewed,
     row_is_ready,
 )
 
 from bioimage_app.figure_window import FigureProjectWindow
+from bioimage_app.web_intake import apply_intake_command
+from bioimage_app.web_manual_quant import ManualQuantCommands
 from bioimage_app.web_quant import quant_snapshot
 
 _CROP_EDIT_CONTRACT = "legacy_crop_edit@1"
@@ -51,6 +64,32 @@ def cell_state(cell: ProjectTableCell) -> dict[str, object]:
 
 class WorkbenchBridge(QObject):
     stateChanged = Signal(str)
+    progressChanged = Signal(str)
+    sessionRequested = Signal(str, str)
+    sessionStateChanged = Signal(str)
+
+    @Slot(str, str)
+    def session(self, action: str, payload: str = "{}") -> None:
+        if len(payload) <= 8192:
+            self.sessionRequested.emit(action, payload)
+
+    def replace_host(self, host: FigureProjectWindow) -> None:
+        self.session_epoch += 1
+        self.manual_commands = ManualQuantCommands(self)
+        self.host.automatic.finished.disconnect(self._automatic_completed)
+        self.host = host
+        self.host.automatic.finished.connect(self._automatic_completed)
+        self._previous = ""
+        self._previous_progress = ""
+        self._published_key = None
+        self._images.clear()
+        self._montage_key = 0
+        self._montage = None
+        self._error = ""
+        self._completed_key = ""
+        self._quant_overview = None
+        self._pending_source = None
+        self.timer.start()
 
     def __init__(
         self,
@@ -60,15 +99,18 @@ class WorkbenchBridge(QObject):
     ) -> None:
         super().__init__(parent)
         self.host = host
-        self.session_epoch = 0
         self.choose = choose
+        self.session_epoch = 0
         self._previous = ""
+        self._published_key: tuple[object, ...] | None = None
         self._images: dict[str, str | None] = {}
         self._montage_key = 0
         self._montage: str | None = None
         self._error = ""
         self._completed_key = ""
         self._quant_overview: tuple[str, str] | None = None
+        self._pending_source: tuple[str, str] | None = None
+        self.manual_commands = ManualQuantCommands(self)
         self.host.automatic.finished.connect(self._automatic_completed)
         self.timer = QTimer(self)
         self.timer.setInterval(180)
@@ -81,7 +123,8 @@ class WorkbenchBridge(QObject):
     def snapshot(self) -> dict[str, object]:
         view = self.host.view
         project = view.project()
-        selected = view.selected_row()
+        selected_index = view.table.currentRow()
+        selected = project.rows[selected_index] if 0 <= selected_index < len(project.rows) else None
         preview = view.source_preview
         if preview and preview.sha256 not in self._images:
             image = QImage(
@@ -93,6 +136,60 @@ class WorkbenchBridge(QObject):
             )
             self._images[preview.sha256] = image_url(image)
         live_sources = {r.source.sha256 for r in project.rows if r.source}
+        intake = None
+        if isinstance(project, WBIntakeProject):
+            live_sources.update(source.asset.sha256 for source in project.intake.sources)
+            intake = intake_snapshot(project)
+            sources: list[dict[str, object]] = []
+            for source in project.intake.sources:
+                raster = view.thumbnail(source.asset.sha256)
+                if raster and source.asset.sha256 not in self._images:
+                    self._images[source.asset.sha256] = image_url(
+                        QImage(
+                            raster.pixels,
+                            raster.preview_width,
+                            raster.preview_height,
+                            raster.preview_width,
+                            QImage.Format.Format_Grayscale8,
+                        )
+                    )
+                sources.append(
+                    {
+                        **source.model_dump(mode="json"),
+                        "preview": self._images.get(source.asset.sha256),
+                    }
+                )
+            intake["sources"] = sources
+            intake["issues"] = list(self.host.intake.issues)
+            intake["cropEnabled"] = isinstance(project, WBIntakeCropProject)
+            intake["figureEnabled"] = isinstance(project, WBIntakeFigureProject)
+            intake["outputEnabled"] = isinstance(project, WBIntakeOutputProject)
+            intake["outputs"] = (
+                [e.model_dump(mode="json") for e in project.intake_outputs]
+                if isinstance(project, WBIntakeOutputProject)
+                else []
+            )
+            intake["output"] = (
+                self.host.intake_workflow.output_snapshot(project)
+                if isinstance(project, WBIntakeOutputProject)
+                else None
+            )
+            intake["figuresReady"] = (
+                [e.model_dump(mode="json") for e in project.intake_figures]
+                if isinstance(project, WBIntakeFigureProject)
+                else []
+            )
+            intake["crops"] = (
+                [e.model_dump(mode="json") for e in project.intake_crops]
+                if isinstance(project, WBIntakeCropProject)
+                else []
+            )
+            intake["workflow"] = (
+                intake_workflow_snapshot(project)
+                if isinstance(project, WBIntakeWorkflowProject)
+                else None
+            )
+        source_counts = Counter(r.source.sha256 for r in project.rows if r.source)
         self._images = {key: value for key, value in self._images.items() if key in live_sources}
         pixmap = view.preview_label.full_pixmap
         if pixmap.cacheKey() != self._montage_key:
@@ -104,22 +201,38 @@ class WorkbenchBridge(QObject):
         montage = None
         if rendered and not pixmap.isNull():
             manifest = json.loads(rendered.manifest_json)
-            if (
-                manifest.get("project_id") == project.project_id
-                and manifest.get("revision") == project.revision
+            binding = manifest.get("preview_binding", {})
+            intake_preview = isinstance(project, WBIntakeFigureProject) and (
+                binding.get("revision") == project.revision
+                and any(
+                    e.figure_id == binding.get("figure_id")
+                    and e.input_digest == binding.get("input_digest")
+                    and e.image.sha256 == binding.get("asset_sha256")
+                    for e in project.intake_figures
+                )
+            )
+            if manifest.get("project_id") == project.project_id and (
+                manifest.get("revision") == project.revision or intake_preview
             ):
+                if intake_preview and intake is not None:
+                    intake["displayFigureId"] = binding.get("figure_id")
                 montage = self._montage
                 montage_width, montage_height = rendered.width, rendered.height
                 for item in manifest.get("rows", []):
-                    box = item.get("output_box")
+                    box = item.get("preview_output_box", item.get("output_box"))
                     if box and item.get("source_sha256"):
                         peers = [
-                            r["output_box"]
+                            r.get("preview_output_box", r["output_box"])
                             for r in manifest.get("rows", [])
                             if r.get("figure") == item.get("figure") and r.get("output_box")
                         ]
-                        label = project.template.label_width
-                        border = project.template.border
+                        sx, sy = (
+                            (binding.get("scale_x", 1), binding.get("scale_y", 1))
+                            if intake_preview
+                            else (1, 1)
+                        )
+                        label = project.template.label_width * sx
+                        border = project.template.border * min(sx, sy)
                         heading = (
                             project.layout_style.heading_size
                             if isinstance(project, WBLayoutProject)
@@ -133,7 +246,10 @@ class WorkbenchBridge(QObject):
                         )
                         gy = max(
                             0,
-                            min(b[1] for b in peers) - border - heading - project.template.row_gap,
+                            min(b[1] for b in peers)
+                            - border
+                            - heading * sy
+                            - project.template.row_gap * sy,
                         )
                         gr = min(
                             rendered.width,
@@ -143,13 +259,15 @@ class WorkbenchBridge(QObject):
                         )
                         gb = min(
                             rendered.height,
-                            max(b[3] for b in peers) + border + project.template.row_gap,
+                            max(b[3] for b in peers) + border + project.template.row_gap * sy,
                         )
                         regions.append(
                             {
                                 "rowId": item["row_id"],
                                 "sourceLaneRange": item.get("source_lane_range"),
-                                "sourceToOutput": item.get("source_to_output"),
+                                "sourceToOutput": item.get(
+                                    "preview_source_to_output", item.get("source_to_output")
+                                ),
                                 "groupBounds": {
                                     "x": gx,
                                     "y": gy,
@@ -173,7 +291,32 @@ class WorkbenchBridge(QObject):
                         )
         cells = [cell_state(c) for c in view.analysis.result_view.cells]
         rows: list[dict[str, object]] = []
+        crop_steps = (
+            {s.target_id: s.status for s in project.workflow.steps if s.stage == "crop"}
+            if isinstance(project, WBIntakeWorkflowProject)
+            else {}
+        )
+        crop_assets: set[str] = (
+            {e.row_id for e in project.intake_crops if e.raw_crop is not None}
+            if isinstance(project, WBIntakeCropProject)
+            else set()
+        )
         for row in project.rows:
+            crop_status = (
+                "ready"
+                if row.roi and row_is_ready(project, row)
+                else "pending"
+                if row.roi
+                else "failed"
+            )
+            if isinstance(project, WBIntakeCropProject):
+                crop_status = (
+                    "ready"
+                    if row.row_id in crop_assets and crop_steps.get(row.row_id) == "done"
+                    else "failed"
+                    if crop_steps.get(row.row_id) == "failed"
+                    else "pending"
+                )
             results = [cell for cell in cells if cell["rowId"] == row.row_id]
             reasons = list(dict.fromkeys(str(cell["reason"]) for cell in results if cell["reason"]))
             roi = row.roi
@@ -184,6 +327,7 @@ class WorkbenchBridge(QObject):
                     "name": row.filename,
                     "fig": row.figure,
                     "protein": row.protein,
+                    "notes": row.notes,
                     "width": row.width,
                     "bitDepth": row.bit_depth,
                     "height": row.height,
@@ -193,12 +337,10 @@ class WorkbenchBridge(QObject):
                     "lanes": row.lane_count,
                     "emptyLanes": list(row.empty_lanes),
                     "reviewed": row.reviewed,
-                    "cropStatus": "ready"
-                    if row.roi and row_is_ready(project, row)
-                    else "pending"
-                    if row.roi
-                    else "failed",
-                    "preview": self._images.get(row.source.sha256) if row.source else None,
+                    "cropStatus": crop_status,
+                    "preview": self._images.get(row.source.sha256)
+                    if row.source and source_counts[row.source.sha256] == 1
+                    else None,
                     "reason": "；".join(reasons) or ("尚未定位裁剪区域" if not roi else "等待复核"),
                     "status": "valid"
                     if results and all(c["status"] == "valid" for c in results)
@@ -209,18 +351,22 @@ class WorkbenchBridge(QObject):
                 }
             )
         return {
+            "sessionEpoch": self.session_epoch,
+            "cropEditContract": _CROP_EDIT_CONTRACT,
+            "sourcePreviews": {
+                key: value for key, value in self._images.items() if source_counts[key] > 1
+            },
             "projectId": project.project_id,
             "revision": view.generation,
             "projectName": project.name,
+            "intake": intake,
             "canRetryLocation": not self.host.retry_location_button.isHidden(),
-            "sessionEpoch": self.session_epoch,
-            "cropEditContract": _CROP_EDIT_CONTRACT,
             "busy": self.host.operation_busy,
             "status": self._error or view.status.text(),
             "selectedId": selected.row_id if selected else "",
             "rows": rows,
             "cells": cells,
-            "quant": quant_snapshot(self.host),
+            "quant": quant_snapshot(self.host, project),
             "montage": montage,
             "montageRegions": regions,
             "montageWidth": montage_width,
@@ -241,6 +387,22 @@ class WorkbenchBridge(QObject):
             self.timer.stop()
             return
         try:
+            if self._pending_source and not self.host.operation_busy and not self.host.is_closing:
+                project_id, row_id = self._pending_source
+                self._pending_source = None
+                if self.host.view.project_identity == project_id:
+                    self.host.select_source(row_id)
+            progress = json.dumps(
+                {
+                    "busy": self.host.operation_busy,
+                    "status": self._error or self.host.view.status.text(),
+                    "progress": self.host.quant_progress,
+                },
+                ensure_ascii=False,
+            )
+            if progress != getattr(self, "_previous_progress", ""):
+                self._previous_progress = progress
+                self.progressChanged.emit(progress)
             if self._quant_overview and not self.host.operation_busy and not self.host.is_closing:
                 project_id, row_id = self._quant_overview
                 self._quant_overview = None
@@ -253,7 +415,24 @@ class WorkbenchBridge(QObject):
                     and self.host.view.rendered_preview is None
                 ):
                     self.host.compose()
+            view = self.host.view
+            key = (
+                view.presentation_key,
+                id(self.host.project_results),
+                id(view.analysis.result_view.cells),
+                id(view.source_preview),
+                view.preview_label.full_pixmap.cacheKey(),
+                self.host.operation_busy,
+                self.host.retry_location_button.isHidden(),
+                self.host.automatic.last_output_path,
+                self.host.automatic.discovery_report,
+                self._completed_key,
+                self._error,
+            )
+            if self._previous and key == self._published_key:
+                return
             state = json.dumps(self.snapshot(), ensure_ascii=False, allow_nan=False)
+            self._published_key = key
         except ValueError:
             return  # An incomplete native advanced edit is not a replacement project.
         if state != self._previous:
@@ -263,7 +442,14 @@ class WorkbenchBridge(QObject):
     @Slot(str, str)
     def request(self, action: str, payload: str = "{}") -> None:
         try:
-            if len(payload) > 4096:
+            limit = (
+                262144
+                if action in {"intake_plan", "intake_assign"}
+                else 32768
+                if action == "quant_target"
+                else 4096
+            )
+            if len(payload) > limit:
                 raise ValueError("操作参数过长")
             parsed: object = json.loads(payload)
             if not isinstance(parsed, dict):
@@ -274,14 +460,54 @@ class WorkbenchBridge(QObject):
             elif action == "cancel":
                 self._quant_overview = None
                 self.host.cancel()
-            elif self.host.operation_busy or self.host.is_closing:
+            elif self.host.is_closing or (
+                self.host.operation_busy and action not in {"select", "quant_select"}
+            ):
                 raise ValueError("当前任务仍在处理中，请稍候或取消")
+            elif isinstance(self.host.view.project(), WBIntakeProject) and action not in {
+                "intake_plan",
+                "intake_assign",
+                "intake_confirm",
+                "intake_prepare",
+                "intake_edit",
+                "intake_run",
+                "intake_crop_review",
+                "intake_crop_retry",
+                "intake_stage_retry",
+                "intake_view_figure",
+                "intake_export",
+                "select",
+                "intake_import_folder",
+                "open_project",
+                "retry_location",
+            }:
+                raise ValueError("仪器清单项目请使用阶段执行、原图复核和已保存Fig入口")
+            elif action in {
+                "intake_plan",
+                "intake_assign",
+                "intake_confirm",
+                "intake_prepare",
+                "intake_edit",
+                "intake_run",
+                "intake_crop_review",
+                "intake_crop_retry",
+                "intake_stage_retry",
+                "intake_view_figure",
+                "intake_export",
+            }:
+                apply_intake_command(self, action, data)
+            elif (
+                isinstance(self.host.view.project(), WBIntakeWorkflowProject)
+                and action == "intake_import_folder"
+            ):
+                raise ValueError("请先返回清单修改，再添加来源")
             elif action in {
                 "import",
                 "quant_import",
                 "import_folder",
                 "open_project",
                 "retry_location",
+                "intake_import_folder",
             }:
                 self.choose(action)
             elif action == "include_folder_source":
@@ -293,15 +519,33 @@ class WorkbenchBridge(QObject):
                 index = next((i for i, row in enumerate(rows) if row.row_id == data.get("id")), -1)
                 if index < 0:
                     raise ValueError("原图已改变，请重新选择")
-                if action == "quant_select" and data.get("overview") is True:
+                if (
+                    action == "quant_select"
+                    and data.get("overview") is True
+                    and not isinstance(self.host.view.project(), WBPartitionProject)
+                ):
                     self._quant_overview = (self.host.view.project().project_id, rows[index].row_id)
                 else:
                     self._quant_overview = None
+                previous_index = self.host.view.table.currentRow()
                 self.host.view.table.setCurrentCell(index, 0)
-                if not self.host.operation_busy:
+                if self.host.operation_busy:
+                    self._pending_source = (self.host.view.project_identity, rows[index].row_id)
+                elif previous_index == index:
                     self.host.select_source(rows[index].row_id)
             elif action == "quant_edit":
                 self._edit_quant(data)
+            elif action in {
+                "quant_new_group",
+                "quant_rename",
+                "quant_move_row",
+                "quant_merge_group",
+                "quant_band",
+                "quant_history",
+                "quant_fig",
+            }:
+                self._validate_quant_session(data)
+                self.manual_commands.run(action, data)
             elif action == "return_crop":
                 self._validate_quant_session(data)
                 project = self.host.view.project()
@@ -320,6 +564,52 @@ class WorkbenchBridge(QObject):
                 self.host.return_selected_crop(locate=data.get("locate", False) is True)
             elif action == "quant_target":
                 self._configure_quant_target(data)
+            elif action in {"quant_review_group", "quant_reset_group"}:
+                self._validate_quant_session(data)
+                project = self.host.view.project()
+                selected = self.host.view.selected_row()
+                if (
+                    selected is None
+                    or data.get("projectId") != project.project_id
+                    or data.get("figure") != selected.figure
+                    or type(data.get("revision")) is not int
+                    or data.get("revision") != self.host.view.generation
+                ):
+                    raise ValueError("当前分组或参数已改变，请重新审核")
+                if action == "quant_reset_group":
+                    self.manual_commands.remember()
+                    self.host.reset_quant_group(selected.row_id)
+                else:
+                    self.manual_commands.remember()
+
+                    def next_group() -> None:
+                        current = self.host.view.project()
+                        current_row = self.host.view.selected_row()
+                        if (
+                            current.project_id != project.project_id
+                            or current_row is None
+                            or current_row.figure != selected.figure
+                        ):
+                            return  # Browsing another group while saving is a newer intent.
+                        figures = list(current.figure_order)
+                        index = figures.index(selected.figure)
+                        following = figures[index + 1 :] + figures[:index]
+                        target = next(
+                            (f for f in following if not quant_group_reviewed(current, f)), None
+                        )
+                        if target:
+                            row_index = next(
+                                i for i, r in enumerate(current.rows) if r.figure == target
+                            )
+                            self.host.view.table.setCurrentCell(row_index, 0)
+                            self.host.select_source(current.rows[row_index].row_id)
+                        else:
+                            self.host.view.status.setText("全部分组已审核并保存")
+
+                    self.host.save(
+                        after=next_group,
+                        transform=lambda current: confirm_quant_group(current, selected.figure),
+                    )
             elif action == "quant_group":
                 selected = self.host.view.selected_row()
                 if selected is None or selected.figure != data.get("figure"):
@@ -336,7 +626,10 @@ class WorkbenchBridge(QObject):
                 ):
                     raise ValueError("组内各蛋白行须有裁剪且泳道数一致，才能按列对应定量")
                 self.host.analyze_project(
-                    row_ids=tuple(r.row_id for r in members), after=self.host.compose
+                    row_ids=tuple(r.row_id for r in members),
+                    after=None
+                    if isinstance(self.host.view.project(), WBPartitionProject)
+                    else self.host.compose,
                 )
             elif action == "quant_auto":
                 row = self.host.view.selected_row()
@@ -423,6 +716,31 @@ class WorkbenchBridge(QObject):
             self._error = str(error)
         self.publish()
 
+    def _validate_crop_edit(self, data: dict[str, object]) -> None:
+        project = self.host.view.project()
+        row = self.host.view.selected_row()
+        if (
+            data.get("cropEditContract") != _CROP_EDIT_CONTRACT
+            or data.get("projectId") != project.project_id
+            or type(data.get("sessionEpoch")) is not int
+            or data.get("sessionEpoch") != self.session_epoch
+            or type(data.get("revision")) is not int
+            or data.get("revision") != self.host.view.generation
+            or row is None
+            or row.source is None
+            or data.get("id") != row.row_id
+            or data.get("sourceId") != row.source.sha256
+        ):
+            raise ValueError("原图身份或裁剪已改变，请重新调整并复核")
+
+    def _validate_quant_session(self, data: dict[str, object]) -> None:
+        if (
+            data.get("projectId") != self.host.view.project().project_id
+            or type(data.get("sessionEpoch")) is not int
+            or data.get("sessionEpoch") != self.session_epoch
+        ):
+            raise ValueError("项目会话已改变，请刷新后重新调整")
+
     def _configure_quant_target(self, data: dict[str, object]) -> None:
         self._validate_quant_session(data)
         project = self.host.view.project()
@@ -460,6 +778,24 @@ class WorkbenchBridge(QObject):
         reset = data.get("resetBounds", False)
         if type(reset) is not bool:
             raise ValueError("重置边界须为明确布尔值")
+        raw_lanes = data.get("laneRois", [])
+        measurement_mode = data.get("measurementMode", "peaks")
+        if (
+            not isinstance(raw_lanes, list)
+            or len(cast(list[object], raw_lanes)) > 96
+            or measurement_mode not in ("peaks", "smear")
+        ):
+            raise ValueError("泳道列表或测量模式无效")
+        lane_rois: list[LaneROI] = []
+        for index, raw_box in enumerate(cast(list[object], raw_lanes), 1):
+            if not isinstance(raw_box, dict):
+                raise ValueError("泳道坐标无效")
+            box = cast(dict[str, object], raw_box)
+            coords = [box.get(key) for key in ("x", "y", "width", "height")]
+            if any(type(value) is not int for value in coords):
+                raise ValueError("泳道须使用整数原图坐标")
+            lx, ly, lw, lh = cast(list[int], coords)
+            lane_rois.append(LaneROI(f"{row.row_id}:{index:02d}", lx, ly, lx + lw, ly + lh))
         target = ManualQuantTarget(
             row.source.sha256,
             project.revision,
@@ -468,6 +804,8 @@ class WorkbenchBridge(QObject):
             polarity,
             tuple(cast(list[int], raw_empty)),
             reset,
+            tuple(lane_rois),
+            measurement_mode,
         )
         self.host.analyze_manual_target(target)
 
@@ -568,34 +906,11 @@ class WorkbenchBridge(QObject):
         )
         if updated is project:
             return
+        self.manual_commands.remember()
         self.host.view.set_project(updated)
         self.host.view.generation += 1
+        self.manual_commands.bind()
         if roi is not None:
             self.host.replan_quant_lane(row.row_id)
         else:
             self.host.analyze_project(row_ids=(row.row_id,))
-
-    def _validate_crop_edit(self, data: dict[str, object]) -> None:
-        project = self.host.view.project()
-        row = self.host.view.selected_row()
-        if (
-            data.get("cropEditContract") != _CROP_EDIT_CONTRACT
-            or data.get("projectId") != project.project_id
-            or type(data.get("sessionEpoch")) is not int
-            or data.get("sessionEpoch") != self.session_epoch
-            or type(data.get("revision")) is not int
-            or data.get("revision") != self.host.view.generation
-            or row is None
-            or row.source is None
-            or data.get("id") != row.row_id
-            or data.get("sourceId") != row.source.sha256
-        ):
-            raise ValueError("原图身份或裁剪已改变，请重新调整并复核")
-
-    def _validate_quant_session(self, data: dict[str, object]) -> None:
-        if (
-            data.get("projectId") != self.host.view.project().project_id
-            or type(data.get("sessionEpoch")) is not int
-            or data.get("sessionEpoch") != self.session_epoch
-        ):
-            raise ValueError("项目会话已改变，请刷新后重新调整")

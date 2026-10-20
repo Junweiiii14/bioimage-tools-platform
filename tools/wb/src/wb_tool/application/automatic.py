@@ -2,7 +2,7 @@
 
 from collections.abc import Callable
 from dataclasses import dataclass, replace
-from typing import Literal
+from typing import Literal, cast
 
 import numpy as np
 from pydantic import Field, model_validator
@@ -105,16 +105,17 @@ def suggest_analysis_for_crop(
         return AnalysisRequest(
             image.sha256, revision, polarity, tuple(lanes), "anchored_context@1", quant_policy
         )
-    if quant_policy in ("wbquant_1_4_3@1", "background_support@1"):
+    if quant_policy in ("wbquant_1_4_3@1", "peak_envelope@1", "background_support@1"):
         from wb_tool.domain.background_bounds import propose_background_lanes
         from wb_tool.domain.quant_supervision import propose_quant_lanes
 
-        propose = (
-            propose_background_lanes
+        proposals = (
+            propose_background_lanes(image.pixels, geometry, polarity)
             if quant_policy == "background_support@1"
-            else propose_quant_lanes
+            else propose_quant_lanes(
+                image.pixels, geometry, polarity, complete_peaks=quant_policy == "peak_envelope@1"
+            )
         )
-        proposals = propose(image.pixels, geometry, polarity)
         for index, proposal in enumerate(proposals, 1):
             check_detection_cancelled(cancelled)
             lanes.append(
@@ -224,9 +225,9 @@ class AutomaticRowEvidence(DocumentIO):
     settings: AutoWBSettings
     request: AnalysisRequest
     warnings: tuple[str, ...] = Field(default=(), max_length=64)
-    algorithm_id: Literal["automatic_wb_proposals@1", "automatic_wb_proposals@2"] = (
-        "automatic_wb_proposals@1"
-    )
+    algorithm_id: Literal[
+        "automatic_wb_proposals@1", "automatic_wb_proposals@2", "fig_partition@1"
+    ] = "automatic_wb_proposals@1"
     human_reviewed: Literal[False] = False
 
     @model_validator(mode="after")
@@ -251,6 +252,8 @@ class WBAutomaticProject(WBLayoutProject):
             raise ValueError("自动建议身份重复")
         rows = {r.row_id: r for r in self.rows}
         for evidence in self.automatic_rows:
+            if self.schema_version == 8 and evidence.algorithm_id == "fig_partition@1":
+                raise ValueError("Fig切分证据需要schema9")
             row = rows.get(evidence.row_id)
             if row is None or row.source is None or row.source.sha256 != evidence.source_sha256:
                 raise ValueError("自动建议来源不属于项目")
@@ -332,8 +335,11 @@ def install_automatic_result(
             update={"display_policy": "standard_lane_ratio@1"}
         )
         updated = with_figure_layout(installed, composition, style)
-        return WBAutomaticProject.model_validate(
-            {name: getattr(updated, name) for name in type(updated).model_fields}
+        return cast(
+            WBAutomaticProject,
+            type(updated).model_validate(
+                {name: getattr(updated, name) for name in type(updated).model_fields}
+            ),
         )
     return installed
 
@@ -380,12 +386,13 @@ def install_automatic_request(
     previous = getattr(project, "automatic_rows", ())
     plans = getattr(project, "analyses", ())
     fields.update(
-        schema_version=8,
+        schema_version=project.schema_version if isinstance(project, WBAutomaticProject) else 8,
         rows=tuple(changed if r.row_id == row_id else r for r in project.rows),
         automatic_rows=tuple(e for e in previous if e.row_id != row_id) + (evidence,),
         analyses=tuple(p for p in plans if p.row_id != row_id) + (plan,),
     )
-    upgraded = WBAutomaticProject.model_validate(fields)
+    cls = type(project) if isinstance(project, WBAutomaticProject) else WBAutomaticProject
+    upgraded = cls.model_validate(fields)
     composition = preserve_automatic_composition(
         upgraded, row_id, geometry_changed=row.roi != crop or row.lane_count != count
     )
@@ -416,5 +423,9 @@ def with_automatic_rows(
     project: WBFigureProject, automatic_rows: tuple[AutomaticRowEvidence, ...]
 ) -> WBAutomaticProject:
     fields = {name: getattr(project, name) for name in type(project).model_fields}
-    fields.update(schema_version=8, automatic_rows=automatic_rows)
-    return WBAutomaticProject.model_validate(fields)
+    cls = type(project) if isinstance(project, WBAutomaticProject) else WBAutomaticProject
+    fields.update(
+        schema_version=project.schema_version if isinstance(project, WBAutomaticProject) else 8,
+        automatic_rows=automatic_rows,
+    )
+    return cls.model_validate(fields)

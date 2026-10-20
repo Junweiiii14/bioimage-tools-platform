@@ -87,8 +87,8 @@ def export_automatic_results(
     discovery_report: bytes = b"",
     cancelled: Callable[[], bool] = lambda: False,
 ) -> str:
-    from wb_tool.adapters.figure_export import export_figure_bundle
-    from wb_tool.adapters.figure_image_export import export_figure_image
+    from wb_tool.adapters.figure_export import publish_rendered_bundle, render_figure
+    from wb_tool.adapters.figure_image_export import publish_rendered_image
     from wb_tool.adapters.project_evidence import verify_project_evidence
     from wb_tool.adapters.project_export import export_project_table
     from wb_tool.adapters.quant_export import export_wbquant_table
@@ -117,7 +117,12 @@ def export_automatic_results(
         )
         if any(
             p.request.quant_policy
-            in ("wbquant_1_4_3@1", "background_support@1", "anchored_background@1")
+            in (
+                "wbquant_1_4_3@1",
+                "peak_envelope@1",
+                "background_support@1",
+                "anchored_background@1",
+            )
             for p in getattr(project, "analyses", ())
         ):
             export_wbquant_table(
@@ -128,10 +133,18 @@ def export_automatic_results(
             )
         ready = [r for r in project.rows if r.roi and row_is_ready(project, r)]
         if ready:
-            export_figure_image(project, sources, str(stage / "figure.png"), cancelled=cancelled)
-            export_figure_image(project, sources, str(stage / "figure.tif"), cancelled=cancelled)
-            export_figure_bundle(
-                project, sources, str(stage / "project.zip"), runs=runs, cancelled=cancelled
+            rendered = render_figure(project, sources, cancelled=cancelled)
+            for name in ("figure.png", "figure.tif"):
+                publish_rendered_image(
+                    rendered, project.template.dpi, str(stage / name), cancelled=cancelled
+                )
+            publish_rendered_bundle(
+                project,
+                sources,
+                str(stage / "project.zip"),
+                rendered,
+                runs=runs,
+                cancelled=cancelled,
             )
         (stage / "project.json").write_text(project.model_dump_json(), encoding="utf-8")
         report = {

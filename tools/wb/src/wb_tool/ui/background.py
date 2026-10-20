@@ -20,6 +20,9 @@ from wb_tool.application.desktop_data import PreviewRaster, ProjectDerivedTables
 from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
 from wb_tool.application.figure_project import FigurePNG, FigureRender, WBFigureProject
 from wb_tool.application.figure_template import LoadedFigureTemplate
+from wb_tool.application.intake_crop import IntakeCropEvidence, IntakeCropFile
+from wb_tool.application.intake_figure import IntakeFigurePreparation
+from wb_tool.application.intake_output import IntakeOutputPreparation
 from wb_tool.application.project_analysis import (
     LoadedProjectResult,
     ProjectTableSnapshot,
@@ -90,6 +93,10 @@ class _Work(QObject):
                 | LoadedFigureTemplate
                 | MetadataBook
                 | CropSuggestion
+                | IntakeCropEvidence
+                | IntakeCropFile
+                | IntakeFigurePreparation
+                | IntakeOutputPreparation
                 | LoadedProjectResult
                 | ProjectTableSnapshot
                 | LoadedProjectOCR
@@ -110,6 +117,97 @@ class _Work(QObject):
                 from wb_tool.adapters.automatic_export import discover_tiffs
 
                 value = discover_tiffs(job.path, cancelled=cancel, with_report=True)
+            elif job.operation == "intake_workflow_prepare":
+                from wb_tool.application.intake_workflow import prepare_intake_workflow
+
+                if not isinstance(job.document, WBFigureProject) or cancel():
+                    raise ValueError("执行计划准备已取消或项目不存在")
+                value = prepare_intake_workflow(
+                    job.document, expected_digest=job.data.decode("ascii")
+                )
+                if cancel():
+                    raise ValueError("执行计划准备已取消")
+            elif job.operation == "intake_crop_prepare":
+                from wb_tool.application.intake_crop import prepare_intake_crops
+                from wb_tool.application.intake_workflow import (
+                    WBIntakeWorkflowProject,
+                    approve_intake_workflow,
+                    intake_workflow_digest,
+                )
+
+                if not isinstance(job.document, WBIntakeWorkflowProject) or cancel():
+                    raise ValueError("裁剪执行准备已取消或项目不存在")
+                if intake_workflow_digest(job.document) != job.data.decode("ascii"):
+                    raise ValueError("执行摘要已变化，请重新核对")
+                from wb_tool.application.intake_figure import prepare_intake_figures
+                from wb_tool.application.intake_output import prepare_intake_outputs
+
+                prepared = prepare_intake_outputs(
+                    prepare_intake_figures(prepare_intake_crops(job.document))
+                )
+                value = approve_intake_workflow(
+                    prepared, expected_digest=intake_workflow_digest(prepared)
+                )
+                if cancel():
+                    raise ValueError("裁剪执行准备已取消")
+            elif job.operation == "intake_output_export":
+                from wb_tool.adapters.intake_output import export_intake_outputs
+                from wb_tool.application.intake_output import WBIntakeOutputProject
+                from wb_tool.application.intake_workflow import IntakeWorkflowTicket
+
+                if not isinstance(job.document, WBIntakeOutputProject):
+                    raise ValueError("输出需要当前版本仪器清单项目")
+                value = export_intake_outputs(
+                    job.document,
+                    job.sources,
+                    job.destination,
+                    runs=job.archive_runs or (),
+                    ticket=IntakeWorkflowTicket.model_validate_json(job.data) if job.data else None,
+                    cancelled=cancel,
+                )
+            elif job.operation == "intake_figure_preview":
+                from wb_tool.adapters.intake_figure import load_intake_figure_preview
+                from wb_tool.application.intake_figure import WBIntakeFigureProject
+
+                if not isinstance(job.document, WBIntakeFigureProject):
+                    raise ValueError("缺少当前Fig显示项目")
+                value = load_intake_figure_preview(
+                    job.document, job.row_id, job.path, cancelled=cancel
+                )
+            elif job.operation == "intake_figure_prepare":
+                from wb_tool.adapters.intake_figure import prepare_intake_figure
+                from wb_tool.application.intake_figure import WBIntakeFigureProject
+                from wb_tool.application.intake_workflow import IntakeWorkflowTicket
+
+                if not isinstance(job.document, WBIntakeFigureProject):
+                    raise ValueError("缺少当前完整Fig项目")
+                value = prepare_intake_figure(
+                    job.document,
+                    IntakeWorkflowTicket.model_validate_json(job.data),
+                    job.sources,
+                    job.destination,
+                    cancelled=cancel,
+                )
+            elif job.operation in {"intake_crop_propose", "intake_crop_export"}:
+                from wb_tool.adapters.intake_crop import export_intake_crop, propose_intake_crop
+                from wb_tool.application.intake_crop import WBIntakeCropProject
+                from wb_tool.application.intake_workflow import IntakeWorkflowTicket
+
+                if not isinstance(job.document, WBIntakeCropProject):
+                    raise ValueError("缺少固定N裁剪项目")
+                if job.operation == "intake_crop_propose":
+                    value = propose_intake_crop(
+                        job.path, job.document, job.row_id, cancelled=cancel
+                    )
+                else:
+                    value = export_intake_crop(
+                        job.path,
+                        job.document,
+                        job.row_id,
+                        job.destination,
+                        ticket=IntakeWorkflowTicket.model_validate_json(job.data),
+                        cancelled=cancel,
+                    )
             elif job.operation == "automatic_row":
                 from wb_tool.adapters.automatic import automatic_project_row
 
@@ -225,6 +323,14 @@ class _Work(QObject):
                 if job.analysis_plan is None:
                     raise ValueError("缺少结果所属定量计划")
                 value = read_project_result(job.analysis_plan, job.data)
+            elif job.operation == "quant_group_reset":
+                from wb_tool.adapters.quant_supervision import reset_group_boundaries
+
+                if not isinstance(job.document, WBAnalysisProject):
+                    raise ValueError("缺少定量项目")
+                value = reset_group_boundaries(
+                    job.document, job.row_id, job.sources, cancelled=cancel
+                )
             elif job.operation == "quant_replan":
                 from wb_tool.adapters.quant_supervision import replan_quant_lanes
 
@@ -240,6 +346,14 @@ class _Work(QObject):
                     raise ValueError("独立灰度配置已取消")
                 value = configure_manual_quantification(
                     load_tiff(job.path), job.document, job.manual_target, cancelled=cancel
+                )
+            elif job.operation == "quant_fig":
+                from wb_tool.adapters.fig_quant import prepare_fig_quantification
+
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少Fig测量项目")
+                value = prepare_fig_quantification(
+                    job.path, job.document, job.row_id, cancelled=cancel
                 )
             elif job.operation == "quant_export":
                 from wb_tool.adapters.quant_export import export_wbquant_table
@@ -263,8 +377,18 @@ class _Work(QObject):
                         )
                     )
                 else:
+                    from wb_tool.application.intake_output import (
+                        WBIntakeOutputProject,
+                        fill_intake_table,
+                    )
+
                     value = ProjectTableSnapshot(
-                        fill_project_table(job.document, job.project_results)
+                        tuple(
+                            item.cell
+                            for item in fill_intake_table(job.document, job.project_results)
+                        )
+                        if isinstance(job.document, WBIntakeOutputProject)
+                        else fill_project_table(job.document, job.project_results)
                     )
             elif job.operation == "crop_suggest":
                 from wb_tool.adapters.crop_suggestions import suggest_crops

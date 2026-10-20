@@ -44,6 +44,8 @@ from wb_tool.api import (
     ReturnedCrop,
     WBAnalysisProject,
     WBFigureProject,
+    WBIntakeProject,
+    WBIntakeWorkflowProject,
     WBJob,
     WBLayoutProject,
     WBProjectOCR,
@@ -52,16 +54,20 @@ from wb_tool.api import (
     WBReviewProject,
     analysis_is_current,
     create_figure_project_view,
+    create_intake,
     create_wb_background,
     initial_composition,
     prepare_project_analyses,
     project_assets,
     project_with_ocr,
     record_crop_suggestion,
+    recover_intake_workflow,
     source_import_labels,
     with_figure_layout,
 )
 
+from bioimage_app.instrument_intake import InstrumentIntakeSession
+from bioimage_app.intake_workflow import IntakeWorkflowSession
 from bioimage_app.project_archive import ProjectArchiveSession
 from bioimage_app.project_entry import default_project_parent
 from bioimage_app.project_measurements import ProjectBatchCompletion, ProjectMeasurementSession
@@ -109,7 +115,10 @@ class FigureProjectWindow(QMainWindow):
         self._paths: dict[str, str] = {}
         self._saved_revision: int | None = None
         self._saved_generation = 0
+        self._save_on_close = True
+        self._transition_pending = False
         self._busy = False
+        self.quant_progress: dict[str, object] = {}
         self._closing = False
         self._shutting = False
         self._store_closed = False
@@ -124,6 +133,9 @@ class FigureProjectWindow(QMainWindow):
         self._selection_job: ProjectSelectionJob | None = None
         self._pending_project_paths: list[Path] = []
         self._pending_project_automatic = True
+        self._pending_project_intake = False
+        self.intake = InstrumentIntakeSession(self)
+        self.intake_workflow = IntakeWorkflowSession(self)
         self._auto_save = QTimer(self)
         self._auto_save.setSingleShot(True)
         self._auto_save.setInterval(700)
@@ -310,12 +322,12 @@ class FigureProjectWindow(QMainWindow):
         self.motion.move()
 
     def _schedule_save(self) -> None:
-        if self._workspace and not self._closing:
+        if self._workspace and not self._closing and not self._transition_pending:
             self.save_state.setText("待保存…")
             self._auto_save.start()
 
     def _save_idle_edits(self) -> None:
-        if self._closing or not self._workspace:
+        if self._closing or self._transition_pending or not self._workspace:
             return
         if self._busy:
             self._auto_save.start()
@@ -378,17 +390,28 @@ class FigureProjectWindow(QMainWindow):
         parent = QFileDialog.getExistingDirectory(self, "选择项目保存位置（软件自动创建子文件夹）")
         if parent and self._pending_project_paths:
             self.start_project_from_images(
-                self._pending_project_paths, Path(parent), automatic=self._pending_project_automatic
+                self._pending_project_paths,
+                Path(parent),
+                automatic=self._pending_project_automatic,
+                intake=self._pending_project_intake,
             )
 
     def start_project_from_images(
-        self, paths: list[Path], project_parent: Path | None = None, *, automatic: bool = True
+        self,
+        paths: list[Path],
+        project_parent: Path | None = None,
+        *,
+        automatic: bool = True,
+        intake: bool = False,
     ) -> None:
         """Select originals first; decode before any workspace or recent entry is created."""
         if not paths or self._busy or self._workspace or self._closing:
             return
+        if intake:
+            automatic = False
         self._pending_project_paths = list(paths)
         self._pending_project_automatic = automatic
+        self._pending_project_intake = intake
         self.retry_location_button.hide()
         self._start()
         self.view.status.setText("正在查找 WB 原图…")
@@ -436,18 +459,20 @@ class FigureProjectWindow(QMainWindow):
 
                     def created(_reply: StorageReply) -> None:
                         self._workspace = str(selection.destination)
-                        self.view.set_project(
-                            WBFigureProject(project_id=uuid4().hex, name=selection.name)
-                        )
+                        empty = WBFigureProject(project_id=uuid4().hex, name=selection.name)
+                        self.view.set_project(create_intake(empty) if intake else empty)
                         self.automatic.discovery_report = selection.discovery_report
                         self.workspace_opened.emit(self._workspace)
                         self._busy = False
                         if self._closing or self._cancellation.is_set():
                             self._done("创建后已取消；项目可稍后继续。")
                             return
-                        self.import_images(
-                            tuple(str(p) for p in selection.paths), automatic=automatic
-                        )
+                        if intake:
+                            self.intake.import_paths(selection.paths, paths[0].resolve())
+                        else:
+                            self.import_images(
+                                tuple(str(p) for p in selection.paths), automatic=automatic
+                            )
 
                     self._storage(
                         StorageCommand("create", path=str(selection.destination)), created
@@ -470,6 +495,7 @@ class FigureProjectWindow(QMainWindow):
         self._ocr_refresh_timer.stop()
         self._ocr_refresh_pending = False
         self.automatic.cancel()
+        self.intake_workflow.cancel()
         if self._measurement_session:
             self._measurement_session.cancel()
         if self._ocr_session:
@@ -566,10 +592,15 @@ class FigureProjectWindow(QMainWindow):
             self._error(str(error))
             return
         generation = self.view.generation
+        originals = {row.source.sha256: row.source for row in project.rows if row.source}
+        if isinstance(project, WBIntakeProject):
+            originals.update(
+                (source.asset.sha256, source.asset) for source in project.intake.sources
+            )
         sources = {
-            r.source.sha256: self._paths.get(r.source.sha256, "")
-            for r in project.rows
-            if r.source and not self.view.has_thumbnail(r.source.sha256)
+            digest: self._paths.get(digest, "")
+            for digest in originals
+            if not self.view.has_thumbnail(digest)
         }
         pending = list(sources.items())
         errors: list[str] = []
@@ -942,6 +973,60 @@ class FigureProjectWindow(QMainWindow):
         if self._closing:
             session.cancel()
 
+    def analyze_fig_sheet(self, row_id: str) -> None:
+        """Partition a sheet off-thread; measure each accepted row through durable runs."""
+        if self._busy or self._closing or not self._workspace:
+            return
+        project = self.view.project()
+        row = next((r for r in project.rows if r.row_id == row_id), None)
+        path = self.source_paths.get(row.source.sha256) if row and row.source else None
+        if path is None:
+            raise ValueError("原图资产不可用")
+        generation = self.view.generation
+        old_ids = {r.row_id for r in project.rows}
+        self._start()
+        self.quant_progress = {"phase": "partition", "label": "识别 Fig、蛋白与泳道"}
+
+        def prepared(reply: WBReply) -> None:
+            from wb_tool.api import WBPartitionProject
+
+            if self._closing or self._cancellation.is_set():
+                self._done("Fig识别已取消；原项目保留")
+                return
+            if (
+                generation != self.view.generation
+                or self.view.project().project_id != project.project_id
+            ):
+                self._done("参数已改变，旧Fig识别未覆盖当前草稿")
+                return
+            if reply.error or not isinstance(reply.value, WBPartitionProject):
+                self._error(reply.error or "Fig识别结果无效")
+                return
+            installed = reply.value
+            self.view.set_project(installed)
+            self.view.generation += 1
+            first = next((i for i, r in enumerate(installed.rows) if r.row_id not in old_ids), 0)
+            self.view.table.setCurrentCell(first, 0)
+            self._busy = False
+            ids = tuple(p.row_id for p in installed.analyses if p.row_id not in old_ids)
+            if ids:
+                self.analyze_project(row_ids=ids)
+            else:
+                self.save()
+                self._done("Fig已分组，泳道定位不足，请手动框选")
+
+        self._wb(
+            WBJob(
+                "quant_fig",
+                path=path,
+                document=project,
+                row_id=row_id,
+                cancellation=self._cancellation,
+            ),
+            prepared,
+            accept_errors=True,
+        )
+
     def analyze_manual_target(self, target: ManualQuantTarget) -> None:
         """Configure in the background, then use normal durable measurement runs."""
         if self._busy or self._closing or not self._workspace:
@@ -1069,6 +1154,49 @@ class FigureProjectWindow(QMainWindow):
 
         self.save(after=saved)
 
+    def reset_quant_group(self, row_id: str) -> None:
+        if self._busy or self._closing or not self._workspace:
+            return
+        project = self.view.project()
+        if not isinstance(project, WBAnalysisProject):
+            raise ValueError("请先配置泳道")
+        selected = next(r for r in project.rows if r.row_id == row_id)
+        row_ids = tuple(r.row_id for r in project.rows if r.figure == selected.figure)
+        generation = self.view.generation
+        self._start()
+        self.view.status.setText("重新规划本组完整峰边界…")
+        self.quant_progress = {"phase": "planning", "label": "重新规划本组完整峰边界"}
+
+        def prepared(reply: WBReply) -> None:
+            if self._closing or self._cancellation.is_set():
+                self._done("重新封底已取消；原参数保留")
+                return
+            if (
+                generation != self.view.generation
+                or project.project_id != self.view.project().project_id
+            ):
+                self._done("项目已改变，旧封底任务未覆盖当前草稿")
+                return
+            if reply.error or not isinstance(reply.value, WBAnalysisProject):
+                self._error(reply.error or "封底结果无效")
+                return
+            self.view.set_project(reply.value)
+            self.view.generation += 1
+            self._busy = False
+            self.analyze_project(row_ids=row_ids)
+
+        self._wb(
+            WBJob(
+                "quant_group_reset",
+                document=project,
+                row_id=row_id,
+                sources=tuple(FigureSourcePath(k, v) for k, v in self.source_paths.items()),
+                cancellation=self._cancellation,
+            ),
+            prepared,
+            accept_errors=True,
+        )
+
     def _start_measurements(
         self,
         project: WBAnalysisProject,
@@ -1083,6 +1211,7 @@ class FigureProjectWindow(QMainWindow):
         self._measurement_session = session
         session.progress.connect(self.view.status.setText)
         session.progress.connect(self.measurement_progress)
+        session.counts.connect(self._quant_counts)
 
         def completed(completion: ProjectBatchCompletion) -> None:
             self._measurement_session = None
@@ -1112,11 +1241,28 @@ class FigureProjectWindow(QMainWindow):
                 )
             )
             if completion.errors:
-                message += "；" + "；".join(completion.errors[:3])
+                message = (
+                    (
+                        "结果核验结束"
+                        if restore
+                        else (
+                            "计算已取消；已完成行保留"
+                            if completion.cancelled
+                            else "计算结束，部分行未完成"
+                        )
+                    )
+                    + "；"
+                    + "；".join(completion.errors[:3])
+                )
             if overflow:
                 message += "；部分曲线超过 64 MiB 显示预算，结果仍保留在历史"
             self._busy = False
             if not restore:
+                self.quant_progress = {
+                    **self.quant_progress,
+                    "phase": "save",
+                    "cancelled": completion.cancelled,
+                }
                 self.view.set_project(completion.project)
                 self.view.generation += 1
                 self.save(
@@ -1133,6 +1279,9 @@ class FigureProjectWindow(QMainWindow):
         if self._closing:
             session.cancel()
 
+    def _quant_counts(self, counts: dict[str, object]) -> None:
+        self.quant_progress = counts
+
     def refresh_project_table(
         self, message: str = "项目结果表已刷新", after: Callable[[], None] | None = None
     ) -> None:
@@ -1145,6 +1294,7 @@ class FigureProjectWindow(QMainWindow):
             return
         generation = self.view.generation
         self._start()
+        self.quant_progress = {"phase": "save", "label": "核验已提交结果"}
 
         def filled(reply: WBReply) -> None:
             # A phase transition is part of the same operation: do not let the
@@ -1224,11 +1374,16 @@ class FigureProjectWindow(QMainWindow):
         if self._export_generation is not None and self._export_generation != self.view.generation:
             self._cancellation.set()
 
-    def _export_with_evidence(self, job: WBJob, callback: Callable[[WBReply], None]) -> None:
+    def _export_with_evidence(
+        self, job: WBJob, callback: Callable[[WBReply], None], *, accept_errors: bool = False
+    ) -> None:
         from dataclasses import replace
 
         if not isinstance(job.document, WBFigureProject):
-            self._error("缺少导出项目")
+            if accept_errors:
+                callback(WBReply("", error="缺少导出项目"))
+            else:
+                self._error("缺少导出项目")
             return
         generation = self.view.generation
         self._export_generation = generation
@@ -1236,11 +1391,14 @@ class FigureProjectWindow(QMainWindow):
         def collected(evidence: tuple[ArchiveRunEvidence, ...]) -> None:
             self._archive_session = None
             if self._cancellation.is_set() or self._closing or generation != self.view.generation:
-                self._done("导出已取消，未发布输出")
+                if accept_errors:
+                    callback(WBReply("", error="导出已取消，未发布输出"))
+                else:
+                    self._done("导出已取消，未发布输出")
                 return
 
             def completed(reply: WBReply) -> None:
-                if reply.error:
+                if reply.error and not accept_errors:
                     if self._cancellation.is_set():
                         self._done("导出已取消，未发布输出")
                     else:
@@ -1257,7 +1415,10 @@ class FigureProjectWindow(QMainWindow):
             self._archive_session = session
             session.start()
         except (ValueError, RuntimeError) as error:
-            self._error(str(error))
+            if accept_errors:
+                callback(WBReply("", error=str(error)))
+            else:
+                self._error(str(error))
 
     @property
     def workspace_path(self) -> str:
@@ -1296,8 +1457,61 @@ class FigureProjectWindow(QMainWindow):
     ) -> None:
         self._wb(job, callback, accept_errors=accept_errors)
 
-    def submit_export_job(self, job: WBJob, callback: Callable[[WBReply], None]) -> None:
-        self._export_with_evidence(job, callback)
+    def submit_storage_job(
+        self,
+        command: StorageCommand,
+        callback: Callable[[StorageReply], None],
+        *,
+        accept_errors: bool = False,
+    ) -> None:
+        self._storage(command, callback, accept_errors=accept_errors)
+
+    def remember_source_path(self, asset: AssetRef, path: str) -> None:
+        """Remember a path returned by the verified storage asset resolver."""
+        self._paths[asset.sha256] = path
+
+    def create_measurement_session(self) -> ProjectMeasurementSession:
+        if self._measurement_session is not None:
+            raise ValueError("当前测量尚未退出，不能重复创建")
+        session = ProjectMeasurementSession(self._store, self._background, self)
+        self._measurement_session = session
+        session.progress.connect(self.view.status.setText)
+        session.progress.connect(self.measurement_progress)
+        session.counts.connect(self._quant_counts)
+        return session
+
+    def retire_measurement_session(self, session: ProjectMeasurementSession) -> None:
+        if self._measurement_session is session:
+            self._measurement_session = None
+        session.deleteLater()
+
+    def retain_project_results(self, results: tuple[LoadedProjectResult, ...]) -> None:
+        project = self.view.project()
+        if not isinstance(project, WBAnalysisProject):
+            raise ValueError("结果需要当前项目定量请求")
+        candidates = {r.row_id: r for r in (*self._project_results, *results)}
+        retained: list[LoadedProjectResult] = []
+        size = 0
+        for plan in project.analyses:
+            result = candidates.get(plan.row_id)
+            if (
+                result
+                and plan.run
+                and plan.run.result
+                and (
+                    result.run_id == plan.run.run_id
+                    and result.asset_sha256 == plan.run.result.sha256
+                )
+            ):
+                size += plan.run.result.size_bytes
+                if size <= 64 * 1024 * 1024:
+                    retained.append(result)
+        self._project_results = tuple(retained)
+
+    def submit_export_job(
+        self, job: WBJob, callback: Callable[[WBReply], None], *, accept_errors: bool = False
+    ) -> None:
+        self._export_with_evidence(job, callback, accept_errors=accept_errors)
 
     @property
     def resources_closed(self) -> bool:
@@ -1306,10 +1520,28 @@ class FigureProjectWindow(QMainWindow):
             and self._background_closed
             and self._restore_job is None
             and self._selection_job is None
+            and not self.intake.scanning
         )
 
+    @property
+    def has_unsaved_changes(self) -> bool:
+        return bool(self._workspace) and self.view.generation != self._saved_generation
+
+    def pause_auto_save(self, paused: bool) -> None:
+        self._transition_pending = paused
+        if paused:
+            self._auto_save.stop()
+        elif self.has_unsaved_changes and not self._closing:
+            self._auto_save.start()
+        self._controls()
+
+    def prepare_shutdown(self, *, save_changes: bool = True) -> None:
+        """The visible shell has already resolved save/discard/cancel choices."""
+        self._save_on_close = save_changes
+        self.pause_auto_save(True)
+
     def _controls(self) -> None:
-        idle = not self._busy and not self._closing
+        idle = not self._busy and not self._closing and not self._transition_pending
         self.create_button.setEnabled(idle and not self._workspace)
         self.open_button.setEnabled(idle and not self._workspace)
         self.restore_button.setEnabled(idle and not self._workspace)
@@ -1342,6 +1574,7 @@ class FigureProjectWindow(QMainWindow):
 
     def _start(self) -> None:
         self._busy = True
+        self.quant_progress = {"phase": "working", "label": "后台处理中"}
         self._cancellation.clear()
         self._controls()
 
@@ -1567,7 +1800,8 @@ class FigureProjectWindow(QMainWindow):
         if self._busy or not self._workspace:
             return
         try:
-            self.view.project()
+            if isinstance(self.view.project(), WBIntakeProject):
+                raise ValueError("请使用仪器导入页的“添加原图文件夹”")
         except ValueError as error:
             self._error(str(error))
             return
@@ -1772,6 +2006,11 @@ class FigureProjectWindow(QMainWindow):
             self.view.canvas.set_image(PreviewRaster("", 0, 0, 0, 0, b"", 0, ()))
             self.view.canvas.set_lanes(())
             return
+        preview = self.view.source_preview
+        if preview is not None and preview.sha256 == asset.sha256:
+            # Fig rows on the same sheet share one immutable display raster.
+            self.view.set_source_preview(preview)
+            return
         self._start()
 
         def previewed(reply: WBReply) -> None:
@@ -1820,6 +2059,7 @@ class FigureProjectWindow(QMainWindow):
             return
         generation = self.view.generation
         self._start()
+        self.quant_progress = {"phase": "save", "label": "保存项目"}
 
         def encoded(reply: WBReply) -> None:
             if install_guard is not None and not install_guard():
@@ -1833,7 +2073,8 @@ class FigureProjectWindow(QMainWindow):
                 self._saved_revision = project.revision
                 self._saved_generation = generation
                 if install_guard is not None and not install_guard():
-                    # Preserve committed history while retaining the prior draft.
+                    # CAS already committed. Retain that history and mark the
+                    # current draft unsaved instead of installing a cancelled result.
                     self.view.generation += 1
                     self._done("新修订已写入历史；已停止安装，当前草稿保留，请保存或继续编辑。")
                     return
@@ -1858,7 +2099,12 @@ class FigureProjectWindow(QMainWindow):
                     # result presentation. Rebuild from verified runs before any
                     # follow-up (including display-only compose), even when no
                     # scientific parameters changed.
-                    self.refresh_project_table("项目已保存，结果表已核验。", after=after)
+                    if isinstance(project, WBIntakeProject):
+                        self._done("导入清单已保存，可重新打开。")
+                        if after:
+                            after()
+                    else:
+                        self.refresh_project_table("项目已保存，结果表已核验。", after=after)
 
             self._storage(
                 StorageCommand(
@@ -1896,6 +2142,11 @@ class FigureProjectWindow(QMainWindow):
                     self._error("项目文档无效")
                     return
                 project = reply.value
+                interrupted = False
+                if isinstance(project, WBIntakeWorkflowProject):
+                    recovered = recover_intake_workflow(project)
+                    interrupted = recovered != project
+                    project = recovered
                 assets = {asset.sha256: asset for asset in project_assets(project)}
                 primary = {asset.sha256 for asset in project_assets(project, history=False)}
                 pending = list(assets.values())
@@ -1909,7 +2160,25 @@ class FigureProjectWindow(QMainWindow):
                         self._saved_generation = self.view.generation
                         self._project_results = ()
                         self._loaded_ocr = None
-                        if isinstance(project, WBRestoredProject):
+                        if isinstance(project, WBIntakeProject):
+
+                            def intake_loaded() -> None:
+                                current = self.view.project()
+                                if isinstance(current, WBRestoredProject) and current.analyses:
+                                    self._start()
+                                    self._restore_project_evidence(
+                                        current, after=self.load_thumbnails
+                                    )
+                                else:
+                                    self.load_thumbnails()
+
+                            self._done("导入清单已恢复，正在核验运行与缩略图。")
+                            if interrupted:
+                                self.view.generation += 1
+                                self.save(after=intake_loaded)
+                                return
+                            intake_loaded()
+                        elif isinstance(project, WBRestoredProject):
                             self._restore_project_evidence(project)
                         elif isinstance(project, WBAnalysisProject):
                             analysis_project = project
@@ -1954,7 +2223,9 @@ class FigureProjectWindow(QMainWindow):
 
         self._storage(StorageCommand("load", document_id=document_id), loaded)
 
-    def _restore_project_evidence(self, project: WBRestoredProject) -> None:
+    def _restore_project_evidence(
+        self, project: WBRestoredProject, *, after: Callable[[], None] | None = None
+    ) -> None:
         def collected(evidence: tuple[ArchiveRunEvidence, ...]) -> None:
             self._archive_session = None
             if self._closing or self._cancellation.is_set():
@@ -1972,7 +2243,7 @@ class FigureProjectWindow(QMainWindow):
                     self.refresh_project_table(
                         f"项目已恢复；{len(reply.value.errors)} 条运行证据不可用。"
                         "历史来源见结果表。",
-                        after=self.select_initial_source,
+                        after=after or self.select_initial_source,
                     )
 
             self._wb(
@@ -2329,7 +2600,11 @@ class FigureProjectWindow(QMainWindow):
     def _finish_close(self) -> None:
         if self._shutting:
             return
-        if self._workspace and self._saved_generation != self.view.generation:
+        if (
+            self._save_on_close
+            and self._workspace
+            and self._saved_generation != self.view.generation
+        ):
             self.save()
             return
         self._shutting = True

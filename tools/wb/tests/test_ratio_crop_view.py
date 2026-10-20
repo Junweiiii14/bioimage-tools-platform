@@ -5,10 +5,14 @@ from pytestqt.qtbot import QtBot
 from tool_contracts.api import AssetRef
 from wb_tool.api import FigureRow, LaneROI, WBFigureProject, create_figure_project_view
 
+from tools.wb.tests.owned_widgets import WidgetOwner
 
-def test_lane_count_and_crop_are_one_undoable_edit(qtbot: QtBot) -> None:
+
+def test_lane_count_and_crop_are_one_undoable_edit(
+    qtbot: QtBot, owned_widgets: WidgetOwner
+) -> None:
     view = create_figure_project_view()
-    qtbot.addWidget(view)
+    owned_widgets(view)
     original = LaneROI("r", 300, 100, 600, 180)
     project = WBFigureProject(
         project_id="test",
@@ -45,9 +49,11 @@ def test_lane_count_and_crop_are_one_undoable_edit(qtbot: QtBot) -> None:
     assert view.project().rows[0].lane_count == 2
 
 
-def test_undo_rejects_new_empty_slot_without_mutating_state_or_history(qtbot: QtBot) -> None:
+def test_undo_rejects_new_empty_slot_without_mutating_state_or_history(
+    qtbot: QtBot, owned_widgets: WidgetOwner
+) -> None:
     view = create_figure_project_view()
-    qtbot.addWidget(view)
+    owned_widgets(view)
     original = LaneROI("r", 300, 100, 600, 180)
     view.set_project(
         WBFigureProject(

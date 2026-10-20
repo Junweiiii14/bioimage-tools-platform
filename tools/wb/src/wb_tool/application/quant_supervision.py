@@ -31,6 +31,7 @@ def install_quant_request(
         "anchored_context@1",
     ) or request.quant_policy not in (
         "wbquant_1_4_3@1",
+        "peak_envelope@1",
         "background_support@1",
         "anchored_background@1",
     ):
@@ -88,7 +89,14 @@ def update_quant_lane(
                 "target",
                 None,
                 included=lane.bands[0].included,
-                detection_notes=("geometry_changed:replan_required",),
+                detection_notes=(
+                    "geometry_changed:replan_required",
+                    *(
+                        ("whole_lane_smear@1",)
+                        if any("whole_lane_smear@1" in b.detection_notes for b in lane.bands)
+                        else ()
+                    ),
+                ),
             ),
         )
     else:

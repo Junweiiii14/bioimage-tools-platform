@@ -99,7 +99,22 @@ def imported_run(project: WBFigureProject, run: RunRecord) -> ImportedRun | None
 
 
 def project_assets(project: WBFigureProject, *, history: bool = True) -> tuple[AssetRef, ...]:
+    from wb_tool.application.instrument_intake import WBIntakeProject
+    from wb_tool.application.intake_crop import WBIntakeCropProject
+
     assets = [row.source for row in project.rows if row.source]
+    if isinstance(project, WBIntakeProject):
+        assets.extend(source.asset for source in project.intake.sources)
+    if isinstance(project, WBIntakeCropProject):
+        assets.extend(e.raw_crop for e in project.intake_crops if e.raw_crop is not None)
+    from wb_tool.application.intake_figure import WBIntakeFigureProject
+
+    if isinstance(project, WBIntakeFigureProject):
+        assets.extend(e.image for e in project.intake_figures)
+    from wb_tool.application.intake_output import WBIntakeOutputProject
+
+    if isinstance(project, WBIntakeOutputProject):
+        assets.extend(e.index for e in project.intake_outputs)
     if project.template.font:
         assets.append(project.template.font)
     if isinstance(project, WBProjectOCR) and project.ocr:
@@ -176,6 +191,52 @@ def restore_staged_project(
         else project.template
     )
     changes: dict[str, object] = {"rows": rows, "template": template}
+    from wb_tool.application.instrument_intake import (
+        IntakeManifest,
+        WBIntakeProject,
+        intake_manifest_digest,
+    )
+    from wb_tool.application.intake_crop import WBIntakeCropProject
+    from wb_tool.application.intake_workflow import WBIntakeWorkflowProject, recover_intake_workflow
+
+    if isinstance(project, WBIntakeCropProject):
+        changes["intake_crops"] = tuple(
+            e.model_copy(update={"raw_crop": mapped(e.raw_crop)}) if e.raw_crop is not None else e
+            for e in project.intake_crops
+        )
+
+    from wb_tool.application.intake_figure import WBIntakeFigureProject
+
+    if isinstance(project, WBIntakeFigureProject):
+        changes["intake_figures"] = tuple(
+            e.model_copy(update={"image": mapped(e.image)}) for e in project.intake_figures
+        )
+    from wb_tool.application.intake_output import WBIntakeOutputProject
+
+    if isinstance(project, WBIntakeOutputProject):
+        changes["intake_outputs"] = tuple(
+            e.model_copy(update={"index": mapped(e.index)}) for e in project.intake_outputs
+        )
+
+    if isinstance(project, WBIntakeProject):
+        manifest_fields = dict(project.intake)
+        manifest_fields.update(
+            sources=tuple(
+                source.model_copy(update={"asset": mapped(source.asset)})
+                for source in project.intake.sources
+            ),
+            confirmed_digest="",
+        )
+        remapped_manifest = IntakeManifest.model_validate(manifest_fields)
+        changes["intake"] = remapped_manifest
+        remapped_digest = intake_manifest_digest(project.project_id, remapped_manifest)
+        if project.intake.confirmed_digest:
+            manifest_fields["confirmed_digest"] = remapped_digest
+            changes["intake"] = IntakeManifest.model_validate(manifest_fields)
+        if isinstance(project, WBIntakeWorkflowProject):
+            changes["workflow"] = recover_intake_workflow(project).workflow.model_copy(
+                update={"intake_digest": remapped_digest}
+            )
     if isinstance(project, WBProjectOCR) and project.ocr:
         changes["ocr"] = project.ocr.model_copy(update={"source": mapped(project.ocr.source)})
     sources: list[ArchiveSource] = []
@@ -207,6 +268,11 @@ def restore_staged_project(
             result=assets.get(record.result_sha256),
             error=record.error,
         )
-    return with_archive_history(
+    restored = with_archive_history(
         project.model_copy(update=changes), tuple(sources), tuple(historical.values())
+    )
+    return (
+        recover_intake_workflow(restored)
+        if isinstance(restored, WBIntakeWorkflowProject)
+        else restored
     )

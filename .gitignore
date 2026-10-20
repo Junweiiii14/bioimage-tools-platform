@@ -23,3 +23,6 @@ models/
 node_modules/
 .codex/config.local.toml
 nuitka-crash-report.xml
+
+# Local UI captures can contain private experimental images.
+.impeccable/review/

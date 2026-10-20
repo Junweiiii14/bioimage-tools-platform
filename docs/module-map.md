@@ -1,5 +1,26 @@
 # 模块地图
 
+E5/T058已完成schema14 `application/intake_output.py`：稳定Fig/行/槽位填表、冻结资产/run、新目录索引与恢复输出；桌面导入索引/CAS后才完成阶段。旧schema1–13保持，科学/目标机门禁另记。
+E6/T059已完成本机工程验证及绑定独审：同操作冻结FigureRender复用PNG/TIFF/ZIP，单Fig TIFF复用已核验保存PNG全像素，组合ZIP单独布局；PNG验证上下文由预览与编码实际复用。无跨操作原值缓存，不改变定量。阶段页支持完整分页。所属纯Qt测试控件按明确登记释放，不全局GC；E7集成/安装及外部验收状态见T-060和[验收索引](wb-execution-acceptance.md)。
+
+E4已完成增量：`application/intake_figure.py`提供schema13完整Fig依据、稳定身份与
+冻结测量终态合并；`adapters/intake_figure.py`生成核验PNG及只读缩放预览，定量仍从
+原图坐标规划。桌面`intake_workflow.py`持久化成图后连接真实RunSession，
+`project_measurement_session.py`可延迟合并已验证结果；旧单独调用默认行为保留。
+当前实现/验证状态以T-057任务为准，完整产品未完成。
+
+E3增量：`application/intake_crop.py`提供schema12完整固定槽位/原图复核证据，
+`adapters/intake_crop.py`只读分配原图并发布原值TIFF；桌面`intake_workflow.py`
+串行连接已持久化票据、后台执行、所属临时资产导入与CAS；`web_intake.py`及
+`web_ui/intake.js`管理明确复核和可保留草稿。不提前定量。当前验证见T-056。
+
+2026-10-19当前增量：`application/instrument_intake.py`提供schema10原图池、明确Fig/蛋白/N清单与确认；`bioimage_app/instrument_intake.py`异步导入，`web_intake.py`与`web_ui/intake.js`承接分配交互。确认仅表示来源对应，不产生ROI或结果。下表版本来自各包pyproject，不表示全部功能已集成main；运行/安装/证据地图见[execution-baseline.md](execution-baseline.md)。
+
+T045增量：`tools/wb/application/{standalone_quant,manual_groups,fig_quant}.py`负责明确
+泳道/组/版本9证据；`domain/fig_partition.py`只给几何建议；`adapters/fig_quant.py`
+本地OCR与原图规划；桌面`web_manual_quant.py`绑定当前项目身份，`web_ui/manual_lanes.js`
+只维护交互草稿。worker/存储沿用原闭环。状态与验收见T045，不外推完整科学验收。
+
 标记“规划”的模块当前不存在；只有真实消费者和就绪任务出现时创建。
 
 | 位置 | 职责与入口 | 状态 / 验证 |
@@ -14,7 +35,7 @@
 | `packages/desktop_sdk/` | ToolView、Qt 生命周期、宿主 UI 端口 | 规划；pytest-qt |
 | `packages/imaging_core/` | 原始图像、坐标和纯技术运算 | 规划；位深/几何/性质 |
 | `packages/imaging_ui/` | 真实复用需求出现后的画布适配 | 规划，不预建 |
-| `tools/wb/` | `wb_tool.api` 数值/单图文档v1/v2/严格协议、Qt画布/曲线/工作表、本地OCR与表格 | 已建0.19.0；schema7明确分段/原ROI逐行高度、逐源一次解码；独立模板/字体；有界ZIP历史；旧schema1–6读取及原渲染兼容 |
+| `tools/wb/` | `wb_tool.api` 数值/单图文档v1/v2/严格协议、Qt画布/曲线/工作表、本地OCR与表格 | 已建0.19.0；schema7分段/模板、8自动候选、9独立Fig定量、10清单、11阶段计划、12固定N裁剪、13完整Fig/原像素运行、14身份输出；旧1–13读取保留，10仍禁止夹带处理结果 |
 | `tools/if_intensity/` | 第二工具验证平台边界 | 规划，WB 最小闭环后 |
 | `tools/if_count/`, `tools/ihc_area/` | 各自独立的实验语义 | 后续规划 |
 
