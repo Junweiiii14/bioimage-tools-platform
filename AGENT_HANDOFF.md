@@ -46,17 +46,12 @@
 
 ## Current Pointer
 
-- 当前T-061真实图片识别/裁剪补全，精简验证；见snapshot与任务。用户2026-10-20另授权新包就绪后、首次启动前清理旧测试安装和安装包，保留项目与数据。下述旧候选保留说明为历史状态。
-
-- Last updated: 2026-10-20
-- Current implementation: E0–E7 engineering implementation, independent reviews, installed test candidate and main product integration completed. Final3680790/PR17 accepted as main0f358ac; both platforms910 tests/all wheels/real OCR/check0. Installed runtimee579 matches. Current e7-closeout includes documentation and a separately reviewed CI TEMP/TMP filesystem experiment; runtime unchanged. See T-060/acceptance index for scientific, sample-mapping, clean Win10 and physical-DPI gaps; no formal release/automation.
-- T-048 offline x64 Win10 test installer delivered from existing T-045 checkout: `C:/Users/70236/.codex/worktrees/t045-wbquant/bioimage-tools-platform`, branch `codex/t045-wbquant-manual-and-fig`; product3821c64, verify actual HEAD. Separate test installation/mandatory shortcuts/private runtime; Win11 nonadmin install/uninstall/reinstall and scoped independent review passed. Desktop delivery folder `BioImage-WB-Win10-测试版-T048`; clean Win10 acceptance still not run. No new worktree, original replacement or formal release. See T-048 task, validation and snapshot; previous T047 candidate/user windows retained.
-- Candidate entry: this checkout's `Start-BioImage.ps1`; `--verify-launch` confirms its source. The desktop “BioImage WB 工作台（当前开发）” shortcut remains pointed at the earlier t021 checkout; it was not changed for T-045.
-- Earlier t021 checkout currently lacks Git/hidden handoff files; cause UNKNOWN. Original ResearchVault checkout retains dirty historical work. Do not repair, delete, synchronize or switch old trees/shortcuts based on this candidate. Main/PR integration and release are separate.
-- Current state file: `.agent-handoff/snapshot.md`
-- Primary next-action source: `.agent-handoff/snapshot.md`
-- Risk source: `.agent-handoff/risks.md`
-- Backlog source: `.agent-handoff/backlog.md`
+- 当前任务：[T-063](work/tasks/T-063-grouped-intake-delivery-plan.md)，用户2026-10-20已确认持续执行[采集组交付计划](docs/wb-grouped-intake-plan.md)至独审、PR集成和新离线测试版。
+- 活动树：`C:/Users/70236/.codex/worktrees/wb-grouped-intake/bioimage-tools-platform`，起点main f3fb2ff，分支codex/wb-grouped-intake；启动时重新核验。
+- E0–E7及T061已经工程集成，见[验收索引](docs/wb-execution-acceptance.md)与任务。干净Win10/物理DPI/科学留出仍独立待验，不宣称正式发布。
+- t051树T062原型与交接未提交资料保留，桌面批准原型为BioImage-导入分组交互原型/index.html。历史ResearchVault树不作为当前开发入口。
+- 当前状态与下一步：`.agent-handoff/snapshot.md`；风险：`.agent-handoff/risks.md`；长期待办：`.agent-handoff/backlog.md`。
+- 旧原生异常UNKNOWN与旧缓存清理被自动审批拒绝的残余继续保留；不得借新版本自动删除历史树、原图或项目结果。
 
 ## Project Rule Targets
 

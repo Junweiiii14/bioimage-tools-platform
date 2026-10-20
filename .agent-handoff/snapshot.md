@@ -1,10 +1,11 @@
 # Handoff Snapshot
 
-- 唯一任务work/tasks/T-061-real-image-discovery.md：工程实现/本机验收/测试候选完成，最终PR检查中；旧缓存清理部分被自动审批阻止。用户批准精简验证，不重复本机全门禁。
-- 有效t051树，branch codex/t061-real-image-discovery，base8c1ca85，冻结产品710836e。一次916/763.69s原pytest0/u32=0、全部wheel/真实OCR/check0，独立审查/日志/合成1280截图接受，类型/规则/机械设计0。后续仅MD/JSON证据与产品说明，运行文件不变。
-- 82TIFF/21组/19待核验参考，21信号组27区域；N和目标未知、全unverified，14/7cohort前瞻划分55/27图且已看全数据，不称盲测/准确率，不训练无标签模型。桌面BioImage-原图集中核对-T061图册，私图不入Git。
-- 新清单v2/角色/原坐标候选/明确集中确认接固定N原像素链，旧v1 wire/digest保持。独立灰度/OCR与手工保留，量化公式不改。
-- 新候选source710836e已构建/安装0，PS5.1双流程0/私有新识别API及固定4槽probe0；用户数据SHA不变。桌面BioImage-WB-图像识别测试版-T061，setupSHA90915b9ffdd7c697d975390e8115240709fd6216203c9ff89e222209b3680709。
-- 旧E7已正常退出，三套旧安装各自身卸载0，旧桌面安装包与t021开发shortcut精确删除成功。递归旧runtime/构建缓存及批量元数据清理被自动审批blocked by policy拒绝；不绕过，残余保留，见T061/local-version-cleanup.json。原图/项目/历史结果/设置保留。先前关闭问题已无须回复。
-- PR19已创建，初轮quality39377044176作者主动取消以等最终证据，不算失败修复或通过。下一步最终收尾提交/真实规则0/同一非作者绑定复核/四必需CI后精确集成；不重建相同产品或重复本机全门禁。
-- 原ResearchVault dirty树、历史科学/native UNKNOWN、用户Esc停止原生CUA仍保留。不设定时任务，不正式发布。
+- 当前任务：work/tasks/T-063-grouped-intake-delivery-plan.md；完整计划docs/wb-grouped-intake-plan.md。
+- 用户已确认P0–P8执行，普通实现自主，仅无法消解的数据歧义集中问；当前已退出Plan模式。
+- 活动树C:/Users/70236/.codex/worktrees/wb-grouped-intake/bioimage-tools-platform，codex/wb-grouped-intake，起点main f3fb2ff；不要从历史ResearchVault树开发。
+- 新树依赖uv sync --locked --all-groups实际0、锁文件不变，T063 scope .规则已加载；P0文档/当前状态整理中。
+- t051树T062原型和交接未提交改动保留原位。桌面已批准无侧栏采集组网格，组内图片并排平等，批量归Fig、组蛋白名、单选裁剪源、Fig级N。
+- 本轮三指定目录95个TIFF/76唯一内容、19个三图采集组/19唯一裁剪参考；N初步建议及限制见计划，不沿用旧82/21。
+- PR19实时MERGED，四必需检查SUCCESS，merge f3fb2ff；E0–E7/T061复用，不重建引擎。
+- 下一步P1持久化采集组草稿与兼容设计，随后P2正式网格→P3现有主链；独审/PR/新包尚未开始。
+- 私图不上Git/外部API，原图/项目/历史结果不覆盖。旧原生UNKNOWN、目标Win10/DPI/科学留出与清理审批拒绝残余保留。
