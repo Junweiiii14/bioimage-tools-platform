@@ -1,6 +1,8 @@
 # T-071 Fig顺序分配、一键启动与整批自动导航
 
 - 状态：实施中。2026-10-20用户批准T070完整方案，已登记active计划目标，授权在新树持续至绑定独审、PR集成和新离线候选交付。
+- 2026-10-21进展：顶部配置/选源、纯单一启动/继续与CAS、@3真实阶段导航、独立发行配置和实际网页诊断已实现；扩大定向70/134.65s实际0，源码诊断13项/8.0s实际0。最终完整门禁/最终独审/PR/main/新安装交付尚未完成。
+- 唯一待答数据范围：指定三目录当前85TIFF/76唯一内容，保守列表47组，其中19仪器三联组、28组全部reference。用户已收到集中问题：参考组是否单独保留且不占自动分配序号。当前不擅自跳过中间参考组；最终真实链与相应UI/契约待答案，其他工作继续。
 - 基线：main6916b3a816b9a547ffdedf032a9dba82ce119c9d；规划来源提交0a966e84c7c07ca26dd71fade4dfe27e6bb4e435；新受管树C:/Users/70236/.codex/worktrees/wb-fig-sequence/bioimage-tools-platform，分支codex/fig-sequence-automation。旧规划树/所有其他树dirty、原图、项目、历史结果和T069安装保持。
 - 需求：顶部Fig名/N/有序蛋白条目，跨Fig连续分配完整采集组，手选组内来源；一个启动入口完成保存/校验/确认/冻结。整批全部裁剪→全部拼图→全部原像素定量→统一结果，真实提交驱动切页，仅人工处理时暂停，修正后断点继续。
 - 范围：tools/wb、apps/desktop、tests、tooling（仅交付/诊断）、docs、work、.agent-handoff、AGENT_HANDOFF.md、README.md、PRODUCT.md、.impeccable/surfaces、uv.lock（仅本地产品版本元数据；不升级第三方依赖）。不改平台包、门禁、技能或工作流。

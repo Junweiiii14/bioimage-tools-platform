@@ -10,16 +10,20 @@ from wb_tool.api import (
     IntakeDraftFigure,
     IntakeGrouping,
     IntakeSequenceProtein,
+    WBIntakeCropProject,
     WBIntakeProject,
     approve_intake_workflow,
     claim_intake_workflow_step,
     configure_intake_sequence,
     confirm_intake,
+    continue_intake_sequence,
     finish_intake_workflow_step,
     intake_digest,
     intake_grouping,
     intake_workflow_digest,
     intake_workflow_snapshot,
+    prepare_intake_crops,
+    prepare_intake_sequence,
     read_figure_project,
     retry_intake_workflow_step,
     save_intake_grouping,
@@ -27,6 +31,45 @@ from wb_tool.api import (
 
 from .test_intake_grouping import pool
 from .test_intake_workflow import workflow
+
+
+def test_one_submission_is_pure_and_compiles_exact_sequence_before_any_attempt() -> None:
+    project = pool()
+    original = project.model_dump_json()
+    grouping = configuration(project, ("A", "B"))
+    prepared = prepare_intake_sequence(project, grouping, expected_digest=intake_digest(project))
+    assert project.model_dump_json() == original
+    assert prepared.workflow.policy == "intake_workflow@3"
+    assert all(s.status == "pending" and s.attempt == 0 for s in prepared.workflow.steps)
+    assert prepared.intake.grouping == grouping
+    assert read_figure_project(prepared.model_dump_json().encode()) == prepared
+    with pytest.raises(ValueError, match="修改"):
+        prepare_intake_sequence(project, grouping, expected_digest="stale")
+    with pytest.raises(ValueError, match="已有执行计划"):
+        prepare_intake_sequence(prepared, grouping, expected_digest=intake_digest(prepared))
+
+
+def test_continue_requires_human_crop_review_and_retries_only_one_blocked_item() -> None:
+    project = pool()
+    prepared = prepare_intake_sequence(
+        project, configuration(project, ("A", "B")), expected_digest=intake_digest(project)
+    )
+    crop = prepare_intake_crops(prepared)
+    approved = approve_intake_workflow(crop, expected_digest=intake_workflow_digest(crop))
+    active, ticket = claim_intake_workflow_step(approved, session_key="test")
+    assert ticket is not None
+    review = finish_intake_workflow_step(
+        active, ticket, "needs_review", reason="original crop needs confirmation"
+    )
+    assert isinstance(review, WBIntakeCropProject)
+    with pytest.raises(ValueError, match="确认裁剪范围"):
+        continue_intake_sequence(review, expected_digest=intake_workflow_digest(review))
+    failed = finish_intake_workflow_step(active, ticket, "failed", reason="reader failed")
+    assert isinstance(failed, WBIntakeCropProject)
+    retried = continue_intake_sequence(failed, expected_digest=intake_workflow_digest(failed))
+    assert [s.status for s in retried.workflow.steps] == ["pending"] * len(retried.workflow.steps)
+    assert not retried.workflow.approved
+    assert retried.workflow.steps[0].attempt == 1
 
 
 def configuration(project: WBIntakeProject, labels: tuple[str, ...]) -> IntakeGrouping:

@@ -13,6 +13,12 @@ for variable in (
 
 
 def main() -> int:
+    if len(sys.argv) == 3 and sys.argv[1] == "--verify-sequence-installation":
+        from pathlib import Path
+
+        from bioimage_app.installation_check_sequence import verify_sequence_installation
+
+        return verify_sequence_installation(Path(sys.argv[2]))
     if sys.argv[1:] == ["--worker", "wb"]:
         from wb_tool.api import run_wb_worker
 

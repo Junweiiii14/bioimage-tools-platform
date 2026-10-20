@@ -161,6 +161,7 @@ from wb_tool.application.intake_revision import (
     revise_completed_intake_crop,
     revise_intake_grouping,
 )
+from wb_tool.application.intake_sequence import continue_intake_sequence, prepare_intake_sequence
 from wb_tool.application.intake_workflow import (
     IntakeWorkflowLedger,
     IntakeWorkflowStep,
@@ -328,6 +329,8 @@ __all__ = [
     "IntakeGrouping",
     "IntakeSequenceProtein",
     "configure_intake_sequence",
+    "prepare_intake_sequence",
+    "continue_intake_sequence",
     "intake_grouping",
     "save_intake_grouping",
     "ExportDiscovery",

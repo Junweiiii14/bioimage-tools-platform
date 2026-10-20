@@ -11,3 +11,9 @@ configure_intake_sequence纯用例重建确定性投影；save_intake_grouping�
 workflow@3采用整批阶段屏障：所有crop done后才能claim任一compose；所有compose done后才能claim任一measure，最后export。任何needs_review/failed/cancelled/interrupted暂停整批claim，须明确修正/重试再继续。旧@1/@2保留就绪Fig优先语义。已完成且仍有效的其他Fig证据在局部修正后保留，不能因当前阶段屏障而倒判历史done无效；屏障作用于新claim/running。
 
 单一启动对精确提交草稿串行保存、校验确认、准备@3账本和启动真实会话；任何一步取消、CAS失败、会话/代际变化即停止，不把草稿后继安装为成功。输出新目录在执行前明确。真实持久快照与当前活动阶段驱动页面导航；人工编辑/复核时不被后台进度抢走。旧账本恢复不自动续跑或静默变策略。
+
+`prepare_intake_sequence` 是纯编译用例，不启动进程。宿主 `intake_sequence_start` 将其作为精确 CAS transform，成功安装后才创建执行会话。`continue_intake_sequence` 只保存明确原图 ROI 修正或重试最早阻断项；`intake_sequence_continue` 仍先 CAS 再执行。失败的保存/过期摘要不能启动 worker。
+
+桌面 `automation` 载荷携带本会话 key、真实 phase/targetId、暂停原因、完整提交状态及仍有效的保留/复用阶段。跟随仅限本项目本会话；关闭/重开不自动跟随或执行。最终结果页以完整阶段及当前完整输出登记为依据，不能以定时器、已点击或 worker 已退出替代。拼图显示通过已提交资产的独立预览，不参与原值计算。
+
+FigSequenceTest 发行通道独立于 GroupedIntakeTest，安装路径、AppId、设置与快捷方式均不同。新的 `--verify-sequence-installation` 显式创建自有合成资料和新报告，操作发货网页并核对 worker/输出/重开/关闭；报告的原图像素、状态、阶段与 PID 检查不构成科学或干净目标机验收。

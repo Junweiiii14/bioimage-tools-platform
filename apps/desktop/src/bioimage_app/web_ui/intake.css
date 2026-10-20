@@ -45,3 +45,25 @@
 .intake-workflow{padding:20px 0;border-top:1px solid var(--line)}.intake-workflow h2{font-size:16px}.intake-workflow ol{list-style:none;padding:0;margin:16px 0}.intake-workflow li{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px}.intake-workflow li strong{flex:1;min-width:160px;overflow-wrap:anywhere}.intake-workflow li p{flex-basis:100%;margin:0;color:var(--warning);line-height:1.7}.intake-workflow details{font-size:12px;line-height:1.7}.intake-workflow summary{cursor:pointer}.intake-workflow>p{line-height:1.7}
 
 .intake-stage-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.intake-crop-active .mode-actions{display:none}.intake-crop-active #inspector-action{display:flex;flex-direction:column;gap:10px}
+
+/* Fig sequence editor: one row per Fig, followed by the equal acquisition grid. */
+.sequence-figures{margin-bottom:24px}
+.sequence-figure{border:0;border-bottom:1px solid var(--line);padding:16px 0;margin-top:12px;min-width:0}
+.sequence-figure legend{font-size:14px;font-weight:600;padding:0 8px 0 0}
+.sequence-figure-fields{display:grid;grid-template-columns:minmax(140px,1fr) minmax(120px,.7fr) minmax(240px,2fr);gap:18px;align-items:start}
+.sequence-figure-fields label{display:flex;flex-direction:column;gap:7px;min-width:0;font-size:12px}
+.sequence-figure-fields input,.sequence-figure-fields textarea{font:inherit;line-height:1.6;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:4px;width:100%;padding:8px;min-width:0}
+.sequence-figure-fields textarea{resize:vertical;min-height:84px}
+.sequence-figure-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:10px}
+.sequence-figure-footer p,.sequence-output{font-size:12px;line-height:1.6;color:var(--muted);overflow-wrap:anywhere}
+.sequence-figure-footer>div{display:flex;gap:12px}
+.sequence-toolbar h2{font-size:15px;margin-right:auto}
+.sequence-toolbar .grouped-search{flex:0 1 360px}
+.sequence-binding{font-size:14px;line-height:1.6;font-weight:600;overflow-wrap:anywhere}
+.sequence-save>strong{font-size:13px;line-height:1.7}
+.sequence-save>label,.sequence-save>.sequence-output{flex-basis:100%}
+.sequence-save details{font-size:12px;line-height:1.7}
+.sequence-save details label{display:flex;gap:7px;align-items:center;padding-top:7px}
+@media(max-width:850px){.sequence-figure-fields{grid-template-columns:minmax(0,1fr) minmax(120px,.6fr)}.sequence-proteins{grid-column:1/-1}.sequence-figure-footer{align-items:start}.sequence-save>div{flex-basis:100%}}
+#intake-batch-progress{display:flex;gap:24px;align-items:center;padding:12px 24px;border-bottom:1px solid var(--line);background:var(--paper);flex-wrap:wrap}
+#intake-batch-progress[hidden]{display:none}#intake-batch-progress>div:first-child{flex:1;min-width:220px}#intake-batch-progress strong{font-size:13px}#intake-batch-progress span{margin-left:12px;font-size:12px}#intake-batch-progress p{font-size:12px;line-height:1.5;color:var(--muted);margin-top:5px}#intake-batch-progress ol{display:flex;list-style:none;gap:16px;flex-wrap:wrap;font-size:12px}#intake-batch-progress li[aria-current]{color:var(--accent)}#intake-batch-progress>div:last-child{display:flex;gap:12px;align-items:center}.batch-measurements{list-style:none;margin:24px 0;padding:0}.batch-measurements li{display:flex;gap:24px;padding:18px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}.batch-measurements li p{flex-basis:100%;font-size:12px}

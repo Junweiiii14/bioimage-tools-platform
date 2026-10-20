@@ -7,6 +7,12 @@ window.intakeWorkspace = (() => {
   root.hidden = true;
   root.setAttribute('aria-label', '仪器原图导入与分配');
   $('.workspace').before(root);
+  const progress = document.createElement('section');
+  progress.id = 'intake-batch-progress';progress.hidden = true;
+  progress.setAttribute('aria-label','整批处理进度');root.before(progress);
+  let followed = '', browsing = false, composing = false;
+  const batchPolicy = () => state.intake?.workflow?.policy === 'intake_workflow@3';
+  const phaseNames = {crop:'原图裁剪',compose:'完整 Fig 拼图',measure:'原像素定量',export:'结果输出',complete:'统一结果'};
   const live = document.createElement('div');
   live.className = 'sr-only';
   live.id = 'intake-live-status';
@@ -42,6 +48,7 @@ window.intakeWorkspace = (() => {
   };
 
   function reset() {
+    followed = '';browsing = false;composing = false;progress.hidden = true;
     window.intakeGroups.reset();
     discoveryKey = ''; discoveryDirty = false; discoveryChoices.clear();
     cropDrafts.clear(); cropPending.clear();
@@ -94,7 +101,7 @@ window.intakeWorkspace = (() => {
       const evidence = state.intake.crops?.find(e => e.row_id === r.id);
       const submitted = cropPending.get(r.id);
       const step = state.intake.workflow.steps.find(s=>s.stage==='crop'&&s.target_id===r.id);
-      if (submitted && evidence?.reviewed && step?.status === 'pending' && submitted.digest !== state.intake.workflow.digest && JSON.stringify(cropBox(evidence.crop)) === JSON.stringify(submitted.roi)) {
+      if (submitted && evidence?.reviewed && (step?.status === 'pending' || batchPolicy() && ['running','done'].includes(step?.status)) && submitted.digest !== state.intake.workflow.digest && JSON.stringify(cropBox(evidence.crop)) === JSON.stringify(submitted.roi)) {
         const newer=cropDrafts.get(r.id);
         if(newer && JSON.stringify(newer.roi)!==JSON.stringify(submitted.roi)) {
           newer.original={...submitted.roi};newer.digest=state.intake.workflow.digest;newer.conflict=false;
@@ -161,6 +168,12 @@ window.intakeWorkspace = (() => {
     $('#inspector-content').innerHTML = `<section class="inspect-section"><h3>${r?escapeText(targetName(r.id)):'请选择蛋白行'}</h3><p>${reviewable?'在原图上拖出范围，或调整建议框。':'本行用于原图回溯；已保存的原值裁剪与历史保持。'}${r?.lanes||0} 个槽位包含无信号空位，不含 Marker；本行独立定位。</p>${dataPair('固定槽位数',r?.lanes||0)}${dataPair('原值裁剪',evidence?.raw_crop?'已保存':'尚未生成')}<p class="row-reason">${escapeText(draft?.conflict?'后台输入已改变，草稿保留；放弃后重新核对。':evidence?.reason||'请先运行固定N定位，取得该行处理状态。')}</p><p>确认整行范围将按固定 N 等宽分割。无信号不等于未上样，也不作为零值。</p></section>`;
     if (correcting) $('#inspector-content').insertAdjacentHTML('beforeend','<p class="row-reason">保存修正会使本行裁剪、本 Fig 拼图与测量、当前输出过期；其他 Fig 和历史文件保留。</p>');
     $('#inspector-action').innerHTML = `<button class="button primary full" data-intake-crop-action="confirm" ${state.busy||!r?.roi||!evidence||!reviewable||draft?.conflict||(correcting||step?.status==='pending')&&!draft?'disabled':''}>${correcting?'保存修正，标记本 Fig 待重算':'确认此范围与固定槽位'}</button><button class="button subtle full" data-intake-crop-action="run" ${state.busy||hasDraft()||!runnable()?'disabled':''}>继续处理批次</button><button class="text-button" data-intake-crop-action="discard" ${state.busy||!draft?'disabled':''}>放弃本行裁剪草稿</button><button class="text-button" data-intake-crop-action="back">返回清单与异常</button>`;
+    if (batchPolicy()) {
+      $('[data-intake-crop-action="confirm"]').hidden = true;
+      const resume=$('[data-intake-crop-action="run"]');
+      resume.textContent='保存范围并继续自动处理';resume.className='button primary full';
+      resume.disabled=!!state.busy||!r?.roi||!evidence||!reviewable||!!draft?.conflict||!!cropPending.size;
+    }
     const focus = cropSavedRow === r?.id ? 'run' : cropFocusAction;
     cropSavedRow = null;
     if (focus) {
@@ -186,7 +199,55 @@ window.intakeWorkspace = (() => {
     return `<span class="intake-stage-actions"><button class="text-button" data-intake="review-crop" data-id="${escapeText(step.target_id)}" ${state.busy?'disabled':''}>查看原图${reviewable?'并复核':''}</button>${reviewable?`<button class="text-button" data-intake="retry-crop" data-id="${escapeText(step.target_id)}" ${state.busy||hasDraft()?'disabled':''}>重试本行</button>`:''}</span>`;
   }
 
-  const allowedModes = () => state.intake?.workflow?.editing ? ['intake'] : ['intake', ...(state.intake?.cropEnabled?['review']:[]), ...(state.intake?.figureEnabled?['layout','results']:[])];
+  const allowedModes = () => state.intake?.workflow?.editing ? ['intake'] : ['intake', ...(state.intake?.cropEnabled?['review']:[]), ...(state.intake?.figureEnabled?['layout',...(batchPolicy()?['quant']:[]),'results']:[])];
+  function resumeBatch() {
+    if(state.busy||!bridge||!batchPolicy())return;
+    const r=row(),step=state.intake.workflow.steps.find(s=>s.stage==='crop'&&s.target_id===r?.id);
+    const correcting=mode==='review'&&r?.roi&&cropEditable(r.id)&&(step?.status!=='done'||cropDrafts.has(r.id));
+    if(hasDraft()&&(!correcting||[...cropDrafts.keys()].some(id=>id!==r.id)||window.intakeGroups.hasDraft()||planDirty()||discoveryDirty||batch.length)){toast('请先保存或放弃其他草稿。');return;}
+    const blocked=state.intake.workflow.steps.find(s=>s.stage==='crop'&&s.status==='needs_review');
+    if(!correcting&&blocked){select(blocked.target_id);switchMode('review');toast('请在此原图确认裁剪范围后继续。');return;}
+    const payload=cropGuard();
+    if(correcting){
+      if(cropDrafts.get(r.id)?.conflict)return;
+      payload.rowId=r.id;payload.roi={...r.roi};
+      cropPending.set(r.id,{roi:{...r.roi},digest:state.intake.workflow.digest});
+    }
+    browsing=false;followed='';send('intake_sequence_continue',payload);
+  }
+  function renderProgress() {
+    const a=state.intake?.automation;
+    progress.hidden=!batchPolicy()||!!state.intake.workflow.editing;
+    if(progress.hidden)return;
+    const focus=document.activeElement?.dataset.batchAction;
+    const steps=state.intake.workflow.steps;
+    progress.innerHTML=`<div><strong>${escapeText(a?.complete?'处理完成':phaseNames[a?.phase]||'等待继续')}</strong><span>${escapeText(a?.phase==='crop'?targetName(a.targetId):state.intake.figures.find(f=>f.figure_id===a?.targetId)?.label||'')}</span><p role="status">${escapeText(a?.reason|| (state.busy?'正在处理并保存当前阶段':a?.complete?'全部阶段与结果目录已保存':'已暂停；核对当前对象后继续'))}</p></div><ol>${['crop','compose','measure','export'].map(stage=>{const items=steps.filter(s=>s.stage===stage),retained=items.filter(s=>s.status==='done'&&a?.retained?.some(r=>r.stage===stage&&r.targetId===s.target_id)).length;return `<li ${a?.phase===stage?'aria-current="step"':''}>${phaseNames[stage]} <strong>${items.filter(s=>s.status==='done').length}/${items.length}</strong>${retained?`<small>保留/复用 ${retained}</small>`:''}</li>`;}).join('')}</ol><div><button class="text-button" data-batch-action="follow">${browsing?'跟随当前阶段':'暂停自动切页'}</button><button class="button primary" data-batch-action="resume" ${state.busy||a?.complete||!bridge?'disabled':''}>继续自动处理</button></div>`;
+    if(focus)progress.querySelector(`[data-batch-action="${focus}"]`)?.focus({preventScroll:true});
+  }
+  function followBatch() {
+    const a=state.intake?.automation;
+    if(!a?.follow||!a.key||browsing||!batchPolicy()||hasDraft()||composing||drag||drawing||!$('#drawer').hidden||document.querySelector('dialog[open]')||document.activeElement?.matches('input,textarea,select,[contenteditable=true]'))return;
+    const event=JSON.stringify([key,a.key,a.phase,a.targetId,a.paused,a.complete]);
+    if(event===followed)return;
+    const next=a.complete?'results':a.phase==='crop'?'review':a.phase==='compose'?'layout':a.phase==='measure'?'quant':null;
+    if(!next)return;
+    followed=event;
+    if(a.phase==='crop'&&state.rows.some(r=>r.id===a.targetId)&&state.selectedId!==a.targetId)select(a.targetId);
+    if(a.phase==='compose')chosenFigureId=a.targetId;
+    if(mode!==next)switchMode(next);
+  }
+  progress.addEventListener('click',event=>{
+    const action=event.target.closest('[data-batch-action]')?.dataset.batchAction;
+    if(action==='resume')resumeBatch();
+    if(action==='follow'){browsing=!browsing;followed='';renderProgress();followBatch();}
+  });
+  document.addEventListener('compositionstart',()=>{composing=true;});
+  document.addEventListener('compositionend',()=>{composing=false;});
+  document.addEventListener('focusout',()=>{queueMicrotask(followBatch);});
+  function renderBatchMeasurement() {
+    const steps=state.intake.workflow.steps.filter(s=>s.stage==='measure');
+    root.innerHTML=`<div class="intake-heading"><div><h1>原像素定量</h1><p>全部 Fig 成图已提交。现在按原图坐标计算，每个 Fig 保留独立运行记录。</p></div></div><ol class="batch-measurements">${steps.map(s=>`<li><strong>${escapeText(state.intake.figures.find(f=>f.figure_id===s.target_id)?.label||s.target_id)}</strong><span>${escapeText({pending:'等待计算',running:'正在计算',done:'运行已提交',needs_review:'需要复核',failed:'失败',cancelled:'已取消',interrupted:'未完整提交'}[s.status]||s.status)}</span><p>${escapeText(s.reason||'')}</p></li>`).join('')}</ol><p class="intake-help">显示缩放与拼图像素不参与测量。缺失、失败和待复核保留各自状态，不记作有效零值。</p>${outputInfo()}`;
+  }
   const runnable = () => (state.intake?.workflow?.pending_ready ?? state.intake?.workflow?.steps.filter(s=>s.stage==='crop'&&s.status==='pending').length ?? 0)>0;
   function requestFigure() {
     const figures=state.intake?.figuresReady||[];
@@ -318,7 +379,7 @@ window.intakeWorkspace = (() => {
       const start=stagePage*pageSize;
       const navigation=pages>1?`<nav class="intake-stage-actions" aria-label="阶段列表分页"><button class="text-button" data-intake="previous-stages" ${stagePage===0?'disabled':''}>上一页阶段</button><span role="status">第 ${stagePage+1} / ${pages} 页 · ${start+1}–${Math.min(start+pageSize,workflow.steps.length)} / ${workflow.steps.length} 个阶段</span><button class="text-button" data-intake="next-stages" ${stagePage===pages-1?'disabled':''}>下一页阶段</button></nav>`:'';
 
-      return `<section class="intake-summary"><div><h2>执行计划已准备</h2><p>${state.intake.figures.length} 个 Fig · ${total} 个蛋白行 · ${state.intake.proteins.reduce((sum, row) => sum + (state.intake.figures.find(fig => fig.figure_id === row.figure_id)?.lane_count || 0), 0)} 个独立槽位。</p><p>按原值裁剪、完整 Fig 拼图、原像素定量、结果输出的顺序处理。${state.intake.figureEnabled?'完整 Fig 保存后才计算原像素；数值和质量结论分别保留。':'先核对原图定位，再保存原值裁剪；尚未生成定量结果。'}</p></div><div class="intake-stage-actions"><button class="button primary" data-intake="run" ${disabled} ${hasDraft()||!runnable()?'disabled':''}>${state.intake.figureEnabled?'继续处理':'定位与裁剪'}</button><button class="button subtle" data-intake="edit" ${disabled} ${frozen||hasDraft() ? 'disabled' : ''}>${state.intake.grouped_draft?'修改分组与对应关系':'返回清单修改'}</button></div></section>${outputInfo()}<section class="intake-workflow" aria-label="执行阶段"><h2 id="intake-stages-heading" tabindex="-1">阶段与异常</h2><p class="intake-help">已记录 ${workflow.ready_count} / ${workflow.steps.length} 个阶段。${issues.length ? `${issues.length} 项需要处理，其他完整 Fig 可以继续。` : '暂无异常。裁剪完成不代表科学复核通过。'}</p>${navigation}<ol start="${start+1}">${workflow.steps.slice(start, start+pageSize).map(step => `<li><span>${escapeText(names[step.stage] || step.stage)}</span><strong>${escapeText(step.stage === 'crop' ? targetName(step.target_id) : state.intake.figures.find(fig => fig.figure_id === step.target_id)?.label || state.projectName)}</strong><span>${escapeText(statuses[step.status] || step.status)}</span>${cropActions(step)}${step.reason ? `<p>${escapeText(step.reason)}</p>` : ''}</li>`).join('')}</ol>${issues.length ? `<details><summary>查看全部异常原因</summary><ul>${issues.map(step => `<li>${escapeText(names[step.stage] || step.stage)} · ${escapeText(step.target_id)}：${escapeText(step.reason)}${cropActions(step)}</li>`).join('')}</ul></details>` : ''}</section>`;
+      return `<section class="intake-summary"><div><h2>执行计划已准备</h2><p>${state.intake.figures.length} 个 Fig · ${total} 个蛋白行 · ${state.intake.proteins.reduce((sum, row) => sum + (state.intake.figures.find(fig => fig.figure_id === row.figure_id)?.lane_count || 0), 0)} 个独立槽位。</p><p>按原值裁剪、完整 Fig 拼图、原像素定量、结果输出的顺序处理。${state.intake.figureEnabled?'完整 Fig 保存后才计算原像素；数值和质量结论分别保留。':'先核对原图定位，再保存原值裁剪；尚未生成定量结果。'}</p></div><div class="intake-stage-actions"><button class="button primary" data-intake="run" ${disabled} ${hasDraft()||!runnable()?'disabled':''}>${state.intake.figureEnabled?'继续处理':'定位与裁剪'}</button><button class="button subtle" data-intake="edit" ${disabled} ${frozen||hasDraft() ? 'disabled' : ''}>${state.intake.grouped_draft?'修改分组与对应关系':'返回清单修改'}</button></div></section>${outputInfo()}<section class="intake-workflow" aria-label="执行阶段"><h2 id="intake-stages-heading" tabindex="-1">阶段与异常</h2><p class="intake-help">已记录 ${workflow.ready_count} / ${workflow.steps.length} 个阶段。${issues.length ? `${issues.length} 项需要处理${batchPolicy()?'；整批暂停，修正后继续':'，其他完整 Fig 可以继续'}。` : '暂无异常。裁剪完成不代表科学复核通过。'}</p>${navigation}<ol start="${start+1}">${workflow.steps.slice(start, start+pageSize).map(step => `<li><span>${escapeText(names[step.stage] || step.stage)}</span><strong>${escapeText(step.stage === 'crop' ? targetName(step.target_id) : state.intake.figures.find(fig => fig.figure_id === step.target_id)?.label || state.projectName)}</strong><span>${escapeText(statuses[step.status] || step.status)}</span>${cropActions(step)}${step.reason ? `<p>${escapeText(step.reason)}</p>` : ''}</li>`).join('')}</ol>${issues.length ? `<details><summary>查看全部异常原因</summary><ul>${issues.map(step => `<li>${escapeText(names[step.stage] || step.stage)} · ${escapeText(step.target_id)}：${escapeText(step.reason)}${cropActions(step)}</li>`).join('')}</ul></details>` : ''}</section>`;
     }
     if (state.intake.confirmed) return `<section class="intake-summary"><div><h2>清单与对应关系已确认</h2><p>${count} 个蛋白行已明确分配原图。准备执行计划，预建布局位置和待计算表格，原文件保持不变。</p></div><button class="button primary" data-intake="prepare" ${disabled}>准备执行计划</button></section>`;
     return `<section class="intake-summary"><div><h2>${state.intake.confirmed ? '清单与对应关系已确认' : '确认本次导入'}</h2><p>${count} / ${total} 个蛋白行已有原图。${state.intake.confirmed ? '当前完成导入分配阶段，后续裁剪流程尚未执行。' : '核对所有蛋白行的来源后确认；未使用的原图可留在图池。'}</p></div><button class="button primary" data-intake="confirm" ${disabled}>${icon('check')}确认清单与对应关系</button></section>`;
@@ -342,13 +403,16 @@ window.intakeWorkspace = (() => {
     if (prepare) prepare.disabled = locked || hasDraft() || !state.intake.confirmed;
   }
   function renderActive() {
-    const active = mode === 'intake' && !!state.intake;
+    renderProgress();
+    const measuring=batchPolicy()&&mode==='quant';
+    const active = (mode === 'intake'||measuring) && !!state.intake;
     root.hidden = !active;
     document.body.classList.toggle('intake-active', active);
     document.body.classList.toggle('grouped-intake-active', active && !!state.intake?.grouped_draft && (!state.intake.workflow || state.intake.workflow.editing));
     $$('.mode-tab').forEach(item => item.hidden = state.intake ? !allowedModes().includes(item.dataset.mode) : item.dataset.mode === 'intake');
     document.body.classList.toggle('intake-crop-active', !!state.intake?.cropEnabled && mode === 'review');
     if (!active) return false;
+    if(measuring){renderBatchMeasurement();return true;}
     if ((!state.intake.workflow || state.intake.workflow.editing) && state.intake.grouped_draft) {
       const returned = renderedWorkflow === true;
       renderedWorkflow = false;
@@ -453,7 +517,7 @@ window.intakeWorkspace = (() => {
     else if (action === 'save-plan') { pending = {kind: 'plan', value: planText(draft)}; send('intake_plan', {...guard(), ...copyPlan(draft)}); }
     else if (action === 'assign') { pending = {kind: 'assign', value: batch.map(binding => ({...binding}))}; send('intake_assign', {...guard(), bindings: batch, replace, allowReuse}); }
     else if (action === 'confirm') send('intake_confirm', guard());
-    else if (action === 'run') { if(!hasDraft())send('intake_run', cropGuard()); }
+    else if (action === 'run') { if(batchPolicy())resumeBatch();else if(!hasDraft())send('intake_run', cropGuard()); }
     else if (action==='previous-stages'||action==='next-stages') {
       stagePage+=action==='next-stages'?1:-1;
       renderActive();
@@ -491,11 +555,12 @@ window.intakeWorkspace = (() => {
       if (completed && !cropDrafts.has(r.id)) return;
       cropPending.set(r.id,{roi:{...r.roi},digest:state.intake.workflow.digest});
       send(completed?'intake_crop_revise':'intake_crop_review',{...cropGuard(),rowId:r.id,roi:{...r.roi}});
-    } else if (action === 'run' && !hasDraft()) send('intake_run',cropGuard());
+    } else if (action === 'run' && batchPolicy()) resumeBatch();
+    else if (action === 'run' && !hasDraft()) send('intake_run',cropGuard());
     else if (action === 'discard') {
       const draft = cropDrafts.get(r.id); r.roi = draft?.original || null; r.draft = false;
       cropDrafts.delete(r.id); cropPending.delete(r.id); syncCrops(); render();
     }
   });
-  return {sync, renderActive, hasDraft, reset, stageCrop, undoCrop, renderCropInspector, cropEditable, allowedModes, requestFigure, renderFigureInspector, renderIntakeResults};
+  return {sync, renderActive, hasDraft, reset, stageCrop, undoCrop, renderCropInspector, cropEditable, allowedModes, requestFigure, renderFigureInspector, renderIntakeResults, followBatch};
 })();

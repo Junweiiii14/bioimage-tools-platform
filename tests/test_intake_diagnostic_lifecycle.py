@@ -141,3 +141,43 @@ def test_grouped_diagnostic_uses_real_cli_workers_and_shipped_shortcuts(tmp_path
         "owned-resources-closed",
         "owned-window-deleted",
     }.issubset(data["checks"])
+
+
+def test_sequence_diagnostic_uses_real_page_workers_and_stage_navigation(tmp_path: Path) -> None:
+    report = tmp_path / "sequence-diagnostic.json"
+    result = subprocess.run(
+        [sys.executable, "-I", "-m", "bioimage_app", "--verify-sequence-installation", str(report)],
+        env={
+            **os.environ,
+            "QT_QPA_PLATFORM": "offscreen",
+            "QTWEBENGINE_CHROMIUM_FLAGS": "--disable-gpu",
+            "PYTHONIOENCODING": "utf-8",
+        },
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        timeout=180,
+        check=False,
+    )
+    assert result.returncode == 0, (
+        result.stdout + result.stderr + report.read_text(encoding="utf-8")
+    )
+    data = json.loads(report.read_bytes())
+    assert data["diagnostic"] == "fig_sequence_installed@1"
+    assert data["phase"] == "passed" and data["errors"] == []
+    assert data["isolated_imports"] is True
+    assert len(data["worker_pids"]) == 2 and all(pid > 0 for pid in data["worker_pids"])
+    assert all(mode in data["page_modes"] for mode in ("review", "layout", "quant", "results"))
+    assert {
+        "top-fields-one-start",
+        "whole-batch-pause",
+        "two-human-continues",
+        "stage-barriers",
+        "original-pixel-crops",
+        "missing-is-not-zero",
+        "committed-output",
+        "safe-reopen",
+        "originals-unchanged",
+        "owned-resources-closed",
+        "owned-window-deleted",
+    }.issubset(data["checks"])
