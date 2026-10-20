@@ -186,3 +186,5 @@ INT001 resumes authorized E7 only in this temporary historical integration tree.
 Final3680790 actualbase842独审/13历史来源规则0；产品PR17 Windows910/666.50s、Linux910/353.99s及全部wheel/真实OCR/四检查SUCCESS，精确merge main0f358ac（00:29:51Z）。本机8e910/705.48s与安装e579工程验证另列，不混作服务器证据；运行文件相同。桌面setup SHA复核一致，旧原图/历史/安装/用户窗口保留。当前仅更新任务done、README/验收索引和handoff；旧validation已先复制校验再归档。科学留出/明确样本配对、干净Win10/物理DPI仍未验，原失败和UNKNOWN保留，无正式发布/定时任务。
 
 2026-10-20 CI收尾：main0f的910/762.24s及wheel功能通过后清理遭15分钟取消，整命令未通过；旧main3b702/590.48s后原退出0xc0000005/wheel未跑，原因UNKNOWN。原306四CI通过不销旧失败。仅foundation TEMP/TMP同盘与实际路径诊断实验，保留时限/测试/退出检查；新head待绑定独审及四CI。详见work/evidence/T-060/ci-temp-filesystem.md。
+
+2026-10-20 T061：导出组/角色/候选原坐标与集中确认已接入；真实82图仅开发候选无监督真值；新增必要4core、11Web相关、1host重开及1回执修正通过，首次核心2fail及原因保留。完整门禁/最终独审/安装候选待验，状态与细节见T061任务。

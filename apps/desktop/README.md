@@ -1,3 +1,5 @@
+T061新增“识别导出组与条带”后台动作和集中复核；候选不自动填N或确认目标，保存重开保留证据。新测试候选显示为“图像识别测试版”，旧测试安装按用户授权在新版本首次启动前清理；实验项目/原图/历史结果不删。
+
 E5/schema14 now freezes assets and run evidence, fills stable Fig/row/slot tables, writes
 new output roots and imports the verified index before committing done. Reopening and
 archive recovery retain imported history rather than inventing local runs. E6 reuses

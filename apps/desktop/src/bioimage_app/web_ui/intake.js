@@ -21,13 +21,15 @@ window.intakeWorkspace = (() => {
   const cropDrafts = new Map(), cropPending = new Map();
   let cropSavedRow = null, cropFocusAction = null, chosenFigureId = null;
   let resultPage = 0, stagePage = 0;
+  let discoveryKey = '', discoveryDirty = false;
+  const discoveryChoices = new Map();
   const copyPlan = intake => ({
     figures: intake.figures.map(item => ({...item})),
     proteins: intake.proteins.map(item => ({...item}))
   });
   const planText = value => JSON.stringify(copyPlan(value));
   const planDirty = () => !!draft && planText(draft) !== basePlan;
-  const hasDraft = () => planDirty() || batch.length > 0 || cropDrafts.size > 0;
+  const hasDraft = () => discoveryDirty || planDirty() || batch.length > 0 || cropDrafts.size > 0;
   const guard = () => ({projectId: state.projectId, sessionEpoch: state.sessionEpoch, digest: baseDigest});
   const uid = () => crypto.randomUUID();
   const source = id => state.intake?.sources.find(item => item.source_id === id);
@@ -40,6 +42,7 @@ window.intakeWorkspace = (() => {
   };
 
   function reset() {
+    discoveryKey = ''; discoveryDirty = false; discoveryChoices.clear();
     cropDrafts.clear(); cropPending.clear();
     cropSavedRow = null;
     cropFocusAction = null; chosenFigureId = null; resultPage = 0; stagePage = 0;
@@ -65,6 +68,13 @@ window.intakeWorkspace = (() => {
       if (JSON.stringify(batch) === JSON.stringify(pending.value)) batch = [];
       selected.clear(); pending = null; baseDigest = intake.digest; basePlan = planText(intake);
       conflict = false; replace = false; allowReuse = false;
+    }
+    if (pending?.kind === 'discovery' && intake.discovery?.selections &&
+        JSON.stringify(intake.discovery.selections) === JSON.stringify(pending.value)) {
+      if (JSON.stringify([...discoveryChoices.values()]) === pending.draftValue) {
+        discoveryDirty=false; discoveryChoices.clear();
+      }
+      pending=null;
     }
     if (intake.digest !== baseDigest) {
       if (hasDraft()) conflict = true;
@@ -199,6 +209,34 @@ window.intakeWorkspace = (() => {
     $('#result-count').textContent=`${state.cells.length} 个固定槽位记录${pages>1?` · 第 ${start+1}–${Math.min(start+pageSize,state.cells.length)} 项`:''}`;
     $('.table-footer>span:last-child').innerHTML=pages>1?`<button class="text-button" data-intake-crop-action="previous-results" ${resultPage===0||state.busy?'disabled':''}>上一页</button><span role="status">第 ${resultPage+1} / ${pages} 页</span><button class="text-button" data-intake-crop-action="next-results" ${resultPage===pages-1||state.busy?'disabled':''}>下一页</button>`:'输出包在结果输出阶段生成';
   }
+  function renderDiscovery(disabled) {
+    if (state.intake.workflow) return '';
+    const report = state.intake.discovery;
+    if (discoveryKey !== baseDigest) {
+      discoveryKey = baseDigest; discoveryDirty = false; discoveryChoices.clear();
+    }
+    const button = `<button class="button subtle" data-intake="discover" ${disabled} ${hasDraft()||!state.intake.sources.length?'disabled':''}>识别导出组与条带</button>`;
+    if (!report) return `<section class="intake-summary"><div><h2>自动整理原图</h2><p>导入文件夹后识别信号、白光与合并图，并提出条带和 N 候选。未知信息集中核对。</p></div>${button}</section>`;
+    const labels = {signal:'信号图候选',merge:'合并图候选',white:'白光图候选',reference:'处理结果候选',unknown:'角色待确认'};
+    const grouped = new Map();
+    report.observations.forEach(o=>{if(!grouped.has(o.group_id))grouped.set(o.group_id,[]);grouped.get(o.group_id).push(o);});
+    const rows = [...grouped.entries()].filter(([,items])=>items.some(o=>o.role!=='reference')).map(([id,items])=>{
+      let choice = discoveryChoices.get(id);
+      if (!choice) {
+        const suggestion=items.find(o=>o.role==='signal')||items[0], src=source(suggestion.source_id);
+        const parts=src.relative_path.split('/');
+        choice={include:false,source_id:suggestion.source_id,figure_label:parts.length>1?parts.at(-2):'',protein_label:src.original_name.split(/_\d{6}/)[0].replace(/\.tiff?$/i,''),lane_count:'',region_index:''};
+        discoveryChoices.set(id,choice);
+      }
+      const observation=items.find(o=>o.source_id===choice.source_id),src=source(choice.source_id);
+      const field=(name,label,value,type='text')=>`<label>${label}<input data-intake-field="discovery-${name}" data-id="${id}" type="${type}" value="${escapeText(String(value))}" ${disabled} ${type==='number'?'min="1" max="96"':''}></label>`;
+      return `<li><label><input type="checkbox" data-discovery-include="${id}" ${choice.include?'checked':''} ${disabled}>纳入本次清单</label><p>${escapeText(src.relative_path)}</p><div class="intake-stage-actions">${items.map(o=>{const s=source(o.source_id);return `<figure>${s.preview?`<img src="${escapeText(s.preview)}" width="128" alt="${escapeText(labels[o.role])}">`:''}<figcaption>${escapeText(labels[o.role])}</figcaption></figure>`;}).join('')}</div><label>原图来源<select data-intake-field="discovery-source_id" data-id="${id}" ${disabled}>${items.map(o=>`<option value="${escapeText(o.source_id)}" ${choice.source_id===o.source_id?'selected':''}>${escapeText(source(o.source_id).original_name)} · ${labels[o.role]}</option>`).join('')}</select></label><div class="intake-stage-actions">${field('figure_label','Fig',choice.figure_label)}${field('protein_label','蛋白',choice.protein_label)}${field('lane_count','确认 N',choice.lane_count,'number')}</div><label>目标条带<select data-intake-field="discovery-region_index" data-id="${id}" ${disabled}><option value="">稍后在原图明确框选</option>${observation.regions.map((r,i)=>`<option value="${i}" ${String(choice.region_index)===String(i)?'selected':''}>候选 ${i+1} · N 建议 ${r.lane_counts.join(' / ')||'未知'} · 倾斜 ${r.angle_degrees.toFixed(1)}° · 原图范围 ${r.x0},${r.y0}–${r.x1},${r.y1}</option>`).join('')}</select></label><p>${escapeText(observation.error||observation.reasons.join('；'))}。候选不是确认结果，后续仍在原图核对裁剪框。</p></li>`;
+    }).join('');
+    const references=report.observations.filter(o=>o.role==='reference');
+    const editable=!state.intake.figures.length&&!state.intake.assignments.length;
+    return `<section class="intake-workflow" aria-label="原图集中复核"><h2>导出组与条带建议</h2><p>${grouped.size-references.length} 组原图候选 · ${references.length} 张处理结果候选。填写 N、选择来源和目标；留空的组不会执行。建议不代表科学真值。</p>${button}${editable?`<ol>${rows}</ol><button class="button primary" data-intake="accept-discovery" ${disabled}>将勾选且核对的组建立为清单</button>`:'<p>清单已建立，识别证据随项目保留；请在下方修改清单与分配。</p>'}<details><summary>处理结果参考（逐图待核验）</summary><div class="intake-stage-actions">${references.map(o=>{const s=source(o.source_id);return `<figure>${s.preview?`<img src="${escapeText(s.preview)}" width="200" alt="人工结果候选">`:''}<figcaption>${escapeText(s.relative_path)} · 未作为训练真值</figcaption></figure>`;}).join('')}</div></details><p id="intake-discovery-message" role="status"></p></section>`;
+  }
+
   function planError() {
     if (!draft?.figures.length) return '先添加一个 Fig。';
     if (draft.figures.some(fig => !fig.label.trim())) return '请填写每个 Fig 的名称。';
@@ -307,7 +345,7 @@ window.intakeWorkspace = (() => {
     const scroll = root.scrollTop;
     const disabled = state.busy || !bridge || conflict ? 'disabled' : '';
     const editingDisabled = disabled || state.intake.workflow ? 'disabled' : '';
-    root.innerHTML = `<div class="intake-heading"><div><h1>仪器导入与分配</h1><p>先保存 Fig 清单，再将原图分配到蛋白行。原始文件保持原名。</p></div><span class="status-badge ${state.intake.confirmed ? 'ok' : 'pending'}">${state.intake.confirmed ? '已确认' : '待确认'}</span></div>${conflict ? '<div class="intake-conflict" role="alert">项目清单已在后台变化。本地草稿已保留，请核对后使用“放弃草稿并重新载入”获取最新清单。</div>' : ''}<div class="intake-columns">${renderPlan(batch.length ? 'disabled' : editingDisabled)}<div class="intake-allocation">${renderSources(editingDisabled)}${renderBatch(editingDisabled)}</div></div>${renderSummary(disabled)}`;
+    root.innerHTML = `<div class="intake-heading"><div><h1>仪器导入与分配</h1><p>先识别导出组并集中核对，或手工填写清单与分配。原始文件保持原名。</p></div><span class="status-badge ${state.intake.confirmed ? 'ok' : 'pending'}">${state.intake.confirmed ? '已确认' : '待确认'}</span></div>${conflict ? '<div class="intake-conflict" role="alert">项目清单已在后台变化。本地草稿已保留，请核对后使用“放弃草稿并重新载入”获取最新清单。</div>' : ''}${renderDiscovery(editingDisabled)}<div class="intake-columns">${renderPlan(batch.length ? 'disabled' : editingDisabled)}<div class="intake-allocation">${renderSources(editingDisabled)}${renderBatch(editingDisabled)}</div></div>${renderSummary(disabled)}`;
     controls(); root.scrollTop = scroll;
     const summary = $('.intake-summary h2', root);
     summary?.setAttribute('tabindex', '-1');
@@ -329,6 +367,12 @@ window.intakeWorkspace = (() => {
 
   root.addEventListener('input', event => {
     const field = event.target.dataset.intakeField, id = event.target.dataset.id;
+    if (field?.startsWith('discovery-')) {
+      const c=discoveryChoices.get(id); if(!c)return;
+      c[field.slice(10)]=event.target.value; discoveryDirty=true;
+      if(field==='discovery-source_id'){c.region_index='';renderActive();}
+      return;
+    }
     if (field === 'fig-label') draft.figures.find(item => item.figure_id === id).label = event.target.value;
     if (field === 'lanes') draft.figures.find(item => item.figure_id === id).lane_count = event.target.value === '' ? null : Number(event.target.value);
     if (field === 'protein') draft.proteins.find(item => item.protein_id === id).label = event.target.value;
@@ -337,6 +381,7 @@ window.intakeWorkspace = (() => {
   });
   root.addEventListener('change', event => {
     const item = event.target;
+    if (item.dataset.discoveryInclude) { discoveryChoices.get(item.dataset.discoveryInclude).include=item.checked; discoveryDirty=true; }
     if (item.dataset.intakeSource) { if (item.checked) selected.add(item.dataset.intakeSource); else selected.delete(item.dataset.intakeSource); item.closest('.intake-source').classList.toggle('selected', item.checked); }
     if (item.hasAttribute('data-intake-target')) batch[Number(item.dataset.intakeTarget)].protein_id = item.value;
     if (item.dataset.intakePermission === 'replace') replace = item.checked;
@@ -348,6 +393,17 @@ window.intakeWorkspace = (() => {
     if (!item || item.disabled) return;
     const action = item.dataset.intake;
     let focusFigure = null, focusAddFigure = false;
+    if (action === 'discover') { if(!hasDraft())send('intake_discover',guard()); return; }
+    if (action === 'accept-discovery') {
+      const choices=[...discoveryChoices.values()].filter(c=>c.include);
+      const message=$('#intake-discovery-message',root);
+      if(!choices.length||choices.some(c=>!c.figure_label.trim()||!c.protein_label.trim()||!Number.isInteger(Number(c.lane_count))||Number(c.lane_count)<1||Number(c.lane_count)>96)){
+        message.textContent='请勾选需要的组并填写 Fig、蛋白与确认 N。';return;
+      }
+      const selections=choices.map(({include,...c})=>({...c,lane_count:Number(c.lane_count),region_index:c.region_index===''?null:Number(c.region_index)}));
+      pending={kind:'discovery',value:selections,draftValue:JSON.stringify([...discoveryChoices.values()])};
+      send('intake_accept_discovery',{...guard(),selections});return;
+    }
     if (action === 'add-fig') {
       const figure_id = uid(); draft.figures.push({figure_id, label: '', lane_count: null});
       draft.proteins.push({protein_id: uid(), figure_id, label: ''});
@@ -359,7 +415,7 @@ window.intakeWorkspace = (() => {
     } else if (action === 'remove-new-protein' && !state.intake.proteins.some(protein => protein.protein_id === item.dataset.id)) {
       focusFigure = draft.proteins.find(protein => protein.protein_id === item.dataset.id)?.figure_id;
       draft.proteins = draft.proteins.filter(protein => protein.protein_id !== item.dataset.id);
-    } else if (action === 'reload') { for (const r of state.rows) { const local=cropDrafts.get(r.id); if(local){r.roi=local.original;r.draft=false;} } cropDrafts.clear(); cropPending.clear(); syncCrops(); draft = copyPlan(state.intake); basePlan = planText(state.intake); baseDigest = state.intake.digest; batch = []; selected.clear(); conflict = false; pending = null; }
+    } else if (action === 'reload') { discoveryChoices.clear(); discoveryDirty=false; for (const r of state.rows) { const local=cropDrafts.get(r.id); if(local){r.roi=local.original;r.draft=false;} } cropDrafts.clear(); cropPending.clear(); syncCrops(); draft = copyPlan(state.intake); basePlan = planText(state.intake); baseDigest = state.intake.digest; batch = []; selected.clear(); conflict = false; pending = null; }
     else if (action === 'stage') { for (const source_id of selected) if (!batch.some(binding => binding.source_id === source_id)) batch.push({source_id, protein_id: ''}); selected.clear(); }
     else if (action === 'duplicate') batch.splice(Number(item.dataset.index) + 1, 0, {source_id: batch[Number(item.dataset.index)].source_id, protein_id: ''});
     else if (action === 'remove-binding') batch.splice(Number(item.dataset.index), 1);

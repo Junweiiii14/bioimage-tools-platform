@@ -3,6 +3,7 @@
 from typing import TYPE_CHECKING, Literal, cast
 
 from wb_tool.api import (
+    ExportSelection,
     IntakeAssignment,
     IntakeFigure,
     IntakeProtein,
@@ -15,6 +16,7 @@ from wb_tool.api import (
     WBIntakeWorkflowProject,
     WBJob,
     WBReply,
+    accept_export_selections,
     assign_intake_sources,
     confirm_intake,
     intake_digest,
@@ -41,6 +43,32 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
         or not isinstance(digest, str)
     ):
         raise ValueError("当前导入项目已改变，请刷新后重试")
+    if action == "intake_discover":
+        host.intake.discover(digest)
+        return
+    if action == "intake_accept_discovery":
+        selections = data.get("selections")
+        if not isinstance(selections, list):
+            raise ValueError("请填写原图、Fig、蛋白、N与目标候选")
+        choices = tuple(
+            ExportSelection.model_validate(item) for item in cast(list[object], selections)
+        )
+
+        def accept(current: WBFigureProject) -> WBIntakeProject:
+            if not isinstance(current, WBIntakeProject):
+                raise ValueError("导入项目已改变")
+            return accept_export_selections(current, choices, expected_digest=digest)
+
+        generation = host.view.generation
+        host.save(
+            transform=accept,
+            install_guard=lambda: (
+                not host.is_closing
+                and not host.cancellation.is_set()
+                and host.view.generation == generation
+            ),
+        )
+        return
     if action == "intake_prepare":
         generation = host.view.generation
         host.begin_operation()

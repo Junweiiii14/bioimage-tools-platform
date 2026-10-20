@@ -1,3 +1,5 @@
+T061新增清单v2的导出组/来源角色/信号区域与未知N建议；显式集中确认后接既有固定N裁剪，保留原图复核。旧清单v1字段/摘要保持。公开契约见 `../../docs/contracts/wb-export-discovery-v1.md`。
+
 E3 implements `intake_crop@1` / schema12, preserving explicit N and stable slot IDs even
 when original geometry is unlocated. Automatic proposals remain unreviewed; an explicit
 original-coordinate rectangle confirms fixed-N segmentation. Reviewed crops export the

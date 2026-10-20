@@ -1061,3 +1061,52 @@ def test_intake_output_failure_and_cancellation_never_fabricate_completion(
         assert current(window) == final
         assert list((Path(window.host.workspace_path) / "outputs").glob("WB-intake-*")) == folders
     monkeypatch.undo()
+
+
+def test_export_discovery_real_worker_save_and_reopen(
+    intake_window: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
+) -> None:
+    window = intake_window
+    directory = tmp_path / "instrument"
+    directory.mkdir()
+    signal = np.full((180, 360), 60000, dtype=np.uint16)
+    white = np.zeros_like(signal)
+    white[55:125, 50:310] = 60000
+    merged = white.copy()
+    for x in (80, 135, 190, 245):
+        signal[80:94, x : x + 28] = 8000
+        merged[80:94, x : x + 28] = 8000
+    for i, raw in enumerate((signal, white, merged), 1):
+        tifffile.imwrite(directory / f"P_123456_0 ({i}).tiff", raw)
+    start(window, qtbot, directory)
+    request(window, "intake_discover")
+    qtbot.waitUntil(lambda: current(window).intake.discovery is not None, timeout=20000)
+    wait_saved(window, qtbot)
+    report = current(window).intake.discovery
+    assert report is not None
+    signal_record = next(o for o in report.observations if o.role == "signal")
+    assert signal_record.regions and not current(window).intake.figures
+    request(
+        window,
+        "intake_accept_discovery",
+        selections=[
+            {
+                "source_id": signal_record.source_id,
+                "figure_label": "Fig",
+                "protein_label": "P",
+                "lane_count": 4,
+                "region_index": 0,
+            }
+        ],
+    )
+    wait_saved(window, qtbot)
+    assert len(current(window).intake.assignments) == 1
+    workspace, epoch = window.host.workspace_path, window.bridge.session_epoch
+    window.open_project(workspace)
+    qtbot.waitUntil(
+        lambda: window.bridge.session_epoch > epoch and window.shutdown_stage == "idle",
+        timeout=20000,
+    )
+    wait_saved(window, qtbot)
+    restored = current(window).intake.discovery
+    assert restored is not None and restored.selections[0].source_id == signal_record.source_id

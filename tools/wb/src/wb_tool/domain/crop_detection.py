@@ -72,7 +72,9 @@ class CropDetection:
     sample_region: LaneROI | None
     candidates: tuple[CropCandidate, ...]
     flags: tuple[str, ...]
-    algorithm_id: Literal["membrane_periodic_profile_candidates@1", "source_geometry@2"] = ALGORITHM
+    algorithm_id: Literal[
+        "membrane_periodic_profile_candidates@1", "source_geometry@2", "export_signal_regions@1"
+    ] = ALGORITHM
 
 
 def _check(cancelled: Callable[[], bool]) -> None:

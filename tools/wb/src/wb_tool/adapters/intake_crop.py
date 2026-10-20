@@ -18,6 +18,9 @@ from wb_tool.application.intake_workflow import (
     validate_intake_workflow_ticket,
 )
 from wb_tool.domain.automatic import AutoWBSettings, detect_automatic_geometry
+from wb_tool.domain.crop_detection import CropCandidate, CropDetection, CropDetectionSettings
+from wb_tool.domain.grid import fixed_lane_grid
+from wb_tool.domain.lanes import LaneROI
 
 
 def propose_intake_crop(
@@ -43,6 +46,54 @@ def propose_intake_crop(
         AutoWBSettings(lane_count=row.lane_count, crop_policy="source_geometry@2"),
         cancelled=cancelled,
     )
+    discovery = project.intake.discovery
+    source_id = next(
+        (b.source_id for b in project.intake.assignments if b.protein_id == row_id), None
+    )
+    source = next((s for s in project.intake.sources if s.source_id == source_id), None)
+    selection = (
+        next(
+            (
+                s
+                for s in discovery.selections
+                if source and s.source_id == source.source_id and s.lane_count == row.lane_count
+            ),
+            None,
+        )
+        if discovery
+        else None
+    )
+    if selection is not None and selection.region_index is not None and discovery is not None:
+        observed = next(o for o in discovery.observations if o.source_id == selection.source_id)
+        region = observed.regions[selection.region_index]
+        roi = LaneROI(row_id, region.x0, region.y0, region.x1, region.y1)
+        lanes = fixed_lane_grid(roi, row.lane_count)
+        flags = (
+            "user_selected_target_candidate",
+            "fixed_n_unreviewed",
+            "axis_aligned_original_pixels",
+        )
+        candidate = CropCandidate(
+            roi,
+            (roi.y0 + roi.y1) // 2,
+            (0.0,) * row.lane_count,
+            (),
+            tuple(range(1, row.lane_count + 1)),
+            (),
+            flags,
+            lanes,
+        )
+        detection = CropDetection(
+            CropDetectionSettings(row.lane_count, roi.y1 - roi.y0, "dark", left_marker=False),
+            row.width,
+            row.height,
+            None,
+            None,
+            roi,
+            (candidate,),
+            flags,
+            "export_signal_regions@1",
+        )
     if cancelled():
         raise ValueError("固定N定位已取消")
     return make_intake_crop_evidence(project, row_id, detection)

@@ -671,3 +671,96 @@ def test_stage_pages_reach_late_output_and_survive_busy_refresh(
         )
         == 0
     )
+
+
+def test_export_suggestions_require_explicit_n_and_target_choice(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
+) -> None:
+    window = intake_page
+    report = {
+        "schema_version": 1,
+        "algorithm": "export_signal_regions@1",
+        "selections": [],
+        "observations": [
+            {
+                "source_id": "source-a",
+                "sha256": "a" * 64,
+                "group_id": "b" * 24,
+                "role": "signal",
+                "reasons": ["待确认"],
+                "error": "",
+                "regions": [
+                    {
+                        "x0": 20,
+                        "y0": 30,
+                        "x1": 160,
+                        "y1": 60,
+                        "lane_counts": [4, 5],
+                        "angle_degrees": 4.0,
+                    }
+                ],
+            }
+        ],
+    }
+    javascript(
+        window,
+        qtbot,
+        "setState({intake:{...state.intake,figures:[],proteins:[],"
+        "discovery:" + json.dumps(report) + "}});true",
+    )
+    assert (
+        javascript(
+            window,
+            qtbot,
+            "document.querySelector('[data-intake-field=discovery-lane_count]').value",
+        )
+        == ""
+    )
+    javascript(
+        window, qtbot, "document.querySelector('[data-intake=accept-discovery]').click();true"
+    )
+    assert javascript(window, qtbot, "sent.length") == 0
+    javascript(
+        window,
+        qtbot,
+        """
+      document.querySelector('[data-discovery-include]').click();
+      const edits=[['figure_label','Fig'],['protein_label','P'],['lane_count','4'],
+                   ['region_index','0']];
+      for(const [field,value] of edits){
+        const input=document.querySelector('[data-intake-field=discovery-'+field+']');
+        input.value=value; input.dispatchEvent(new Event('input',{bubbles:true}));
+      }
+      document.querySelector('[data-intake=accept-discovery]').click();true
+    """,
+    )
+    raw = javascript(window, qtbot, "JSON.stringify(sent)")
+    assert isinstance(raw, str)
+    command = json.loads(raw)[-1]
+    assert command["action"] == "intake_accept_discovery"
+    assert command["payload"]["selections"] == [
+        {
+            "source_id": "source-a",
+            "figure_label": "Fig",
+            "protein_label": "P",
+            "lane_count": 4,
+            "region_index": 0,
+        }
+    ]
+
+    window.resize(1280, 720)
+    window.grab().save(str(tmp_path / "export-review.png"))
+    report["selections"] = command["payload"]["selections"]
+    acknowledged = {
+        "digest": "accepted-discovery",
+        "figures": [{"figure_id": "f", "label": "Fig", "lane_count": 4}],
+        "proteins": [{"protein_id": "p", "figure_id": "f", "label": "P"}],
+        "assignments": [{"protein_id": "p", "source_id": "source-a"}],
+        "discovery": report,
+    }
+    javascript(
+        window,
+        qtbot,
+        "setState({intake:{...state.intake,..." + json.dumps(acknowledged) + "}});true",
+    )
+    assert javascript(window, qtbot, "window.intakeWorkspace.hasDraft()") is False

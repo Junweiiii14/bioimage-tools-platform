@@ -1,3 +1,5 @@
+T061在WB原包内增加export_detection/discovery与清单v2证据，桌面intake页后台识别及集中确认；不扩展平台、不新增依赖。契约见[导出识别v1](contracts/wb-export-discovery-v1.md)。
+
 # 模块地图
 
 E5/T058已完成schema14 `application/intake_output.py`：稳定Fig/行/槽位填表、冻结资产/run、新目录索引与恢复输出；桌面导入索引/CAS后才完成阶段。旧schema1–13保持，科学/目标机门禁另记。

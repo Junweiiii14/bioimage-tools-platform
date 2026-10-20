@@ -46,6 +46,8 @@
 
 ## Current Pointer
 
+- 当前T-061真实图片识别/裁剪补全，精简验证；见snapshot与任务。用户2026-10-20另授权新包就绪后、首次启动前清理旧测试安装和安装包，保留项目与数据。下述旧候选保留说明为历史状态。
+
 - Last updated: 2026-10-20
 - Current implementation: E0–E7 engineering implementation, independent reviews, installed test candidate and main product integration completed. Final3680790/PR17 accepted as main0f358ac; both platforms910 tests/all wheels/real OCR/check0. Installed runtimee579 matches. Current e7-closeout includes documentation and a separately reviewed CI TEMP/TMP filesystem experiment; runtime unchanged. See T-060/acceptance index for scientific, sample-mapping, clean Win10 and physical-DPI gaps; no formal release/automation.
 - T-048 offline x64 Win10 test installer delivered from existing T-045 checkout: `C:/Users/70236/.codex/worktrees/t045-wbquant/bioimage-tools-platform`, branch `codex/t045-wbquant-manual-and-fig`; product3821c64, verify actual HEAD. Separate test installation/mandatory shortcuts/private runtime; Win11 nonadmin install/uninstall/reinstall and scoped independent review passed. Desktop delivery folder `BioImage-WB-Win10-测试版-T048`; clean Win10 acceptance still not run. No new worktree, original replacement or formal release. See T-048 task, validation and snapshot; previous T047 candidate/user windows retained.

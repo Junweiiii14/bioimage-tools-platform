@@ -52,7 +52,9 @@ def _edge_fit(xs: NDArray[np.int64], ys: NDArray[np.int64]) -> float:
     return slope
 
 
-def _plane(pixels: NDArray[np.uint8 | np.uint16], membrane: LaneROI) -> DetectionPlane:
+def source_detection_plane(
+    pixels: NDArray[np.uint8 | np.uint16], membrane: LaneROI
+) -> DetectionPlane:
     pad = max(20, round(membrane.width * 0.1))
     x0, y0 = max(0, membrane.x0 - pad), max(0, membrane.y0 - pad)
     raw = pixels[
@@ -212,7 +214,7 @@ def detect_source_geometry(
         flags.append("uniform_background_field_without_orientation_evidence")
     else:
         try:
-            plane = _plane(pixels, membrane)
+            plane = source_detection_plane(pixels, membrane)
         except ValueError as exc:
             return failure(str(exc))
     raw, valid = plane.values, plane.valid
