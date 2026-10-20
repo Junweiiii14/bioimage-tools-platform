@@ -10,9 +10,10 @@ window.intakeGroups = (() => {
   const dirty = () => !!draft && text(draft) !== base;
   const normalizedSave = () => {
     const value = clone(draft), counts = new Map();
+    const committed = new Map(JSON.parse(base).groups.map(g=>[g.group_id,g]));
     const sha = id => source(id)?.asset?.sha256 || id;
     value.groups.forEach(g => {if(g.selected_source_id){const key=sha(g.selected_source_id);counts.set(key,(counts.get(key)||0)+1);}});
-    value.groups.forEach(g => {g.reuse_confirmed=!!(g.selected_source_id && counts.get(sha(g.selected_source_id))>1 && (reuse || g.reuse_confirmed));});
+    value.groups.forEach(g => {const old=committed.get(g.group_id);g.reuse_confirmed=!!(g.selected_source_id && counts.get(sha(g.selected_source_id))>1 && (reuse || (old?.selected_source_id===g.selected_source_id && old?.reuse_confirmed)));});
     return value;
   };
   const source = id => state.intake.sources.find(item => item.source_id === id);

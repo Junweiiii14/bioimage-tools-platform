@@ -551,11 +551,29 @@ def test_grouped_save_accepts_explicit_reuse_normalization_without_false_conflic
       document.querySelector('[data-group-action=save]').click();
       window.normalized=JSON.parse(JSON.stringify(sent.at(-1).payload.grouping));
       normalized.groups.forEach(g=>g.reuse_confirmed=true);
+      const later=document.querySelector('[data-group-field=protein]');
+      later.value='保存期间后写';later.dispatchEvent(new Event('input',{bubbles:true}));
       setState({intake:{...state.intake,digest:'reuse-saved',grouped_draft:normalized}});true
     """,
     )
-    assert javascript(window, qtbot, "!intakeWorkspace.hasDraft()")
+    assert javascript(window, qtbot, "intakeWorkspace.hasDraft()")
+    assert (
+        javascript(window, qtbot, "document.querySelector('[data-group-field=protein]').value")
+        == "保存期间后写"
+    )
     assert javascript(window, qtbot, "!document.querySelector('.intake-conflict[role=alert]')")
+    javascript(
+        window,
+        qtbot,
+        """
+      document.querySelector('[data-group-reuse]').click();
+      document.querySelector('[data-group-action=save]').click();
+      const normalized=JSON.parse(JSON.stringify(sent.at(-1).payload.grouping));
+      normalized.groups.forEach(g=>g.reuse_confirmed=true);
+      setState({intake:{...state.intake,digest:'reuse-later-saved',grouped_draft:normalized}});true
+    """,
+    )
+    assert javascript(window, qtbot, "!intakeWorkspace.hasDraft()")
     assert javascript(
         window, qtbot, "!document.querySelector('[data-group-action=confirm]').disabled"
     )
