@@ -1,6 +1,6 @@
 # T-064 采集组草稿与正式网格主流程
 
-- 状态：P1/P2工程实现与提交绑定独审完成，PR22已创建并附着；四检查等待最终Windows，完整P3及后续任务继续，不宣告整体交付完成。
+- 状态：P1/P2工程实现与提交绑定独审完成，PR22四检查SUCCESS，已精确合main2044aaf；完整P3及后续任务继续，不宣告整体交付完成。
 - 基线：当前main1625ae5（PR21已合），原产品f3fb2ff；已在产品树快进前置并重载规则。
 - 范围：tools/wb、apps/desktop、tests、docs/contracts、docs/module-map.md、work、.agent-handoff、AGENT_HANDOFF.md、PRODUCT.md、.impeccable/surfaces。
 - 授权与验收：用户已确认docs/wb-grouped-intake-plan.md，并要求新树持续推进；普通选择自主，原图/旧结果/现有dirty保留。

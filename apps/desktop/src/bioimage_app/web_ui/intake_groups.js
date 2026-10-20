@@ -31,7 +31,7 @@ window.intakeGroups = (() => {
     const regions=observation(g.selected_source_id)?.regions || [];
     if (!regions.length) return '<p class="intake-help">尚无目标区域候选；可先识别来源，或在裁剪阶段手动画范围。</p>';
     const saved=JSON.parse(base).groups.find(item=>item.group_id===g.group_id);
-    const savedFigure=JSON.parse(base).figures.find(f=>f.figure_id===g.figure_id);
+    const savedFigure=JSON.parse(base).figures.find(f=>f.figure_id===saved?.figure_id);
     const changed=saved?.selected_source_id!==g.selected_source_id || savedFigure?.lane_count!==figure(g.figure_id)?.lane_count;
     return `<label class="grouped-region">目标区域（未审核）<select data-group-field="region" data-id="${escapeText(g.group_id)}" ${disabled} ${changed?'disabled':''}><option value="">不选候选，使用原图定位或手动复核</option>${regions.map((r,i)=>`<option value="${i}" ${g.region_index===i?'selected':''}>区域 ${i+1} · 原图 (${r.x0}, ${r.y0})–(${r.x1}, ${r.y1})</option>`).join('')}</select><small>${changed?'原图或 N 有修改；先保存，再选择当前区域。':'仅传递原图坐标建议；裁剪阶段仍须核对 Marker 和全部槽位。'}</small></label>`;
   }

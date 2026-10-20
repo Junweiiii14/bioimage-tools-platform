@@ -377,6 +377,15 @@ def test_completed_crop_correction_invalidates_only_its_fig_and_preserves_publis
     assert not revised.workflow.approved and not revised.workflow.cancel_requested
     assert read_figure_project(revised.model_dump_json().encode()) == revised
     assert {p: sha256(p.read_bytes()).hexdigest() for p in files} == files
+    newer_roi = LaneROI("a1", 2, 14, 120, 60)
+    newer = review_intake_crop(
+        revised, "a1", newer_roi, expected_digest=intake_workflow_digest(revised)
+    )
+    assert isinstance(newer, WBIntakeOutputProject)
+    assert next(e for e in newer.intake_crops if e.row_id == "a1").crop == newer_roi
+    assert newer.intake_outputs == revised.intake_outputs
+    assert newer.analyses == revised.analyses
+    assert read_figure_project(newer.model_dump_json().encode()) == newer
     with pytest.raises(ValueError, match="仅用于"):
         revise_completed_intake_crop(
             revised, "a1", roi, expected_digest=intake_workflow_digest(revised)
