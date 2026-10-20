@@ -19,3 +19,5 @@
 T061收尾：冻结710一次916/763.69s及全wheel/OCR/check0；非作者接受、安装/PS5.1双流程/新私有识别probe0，用户数据不变。三旧安装卸载0与桌面旧包/过期shortcut移除；递归残余清理被自动审批blocked by policy阻止，未绕过。最终PR19四检查待验，详见T061/validation.md。
 
 2026-10-20 T063：Git状态/HEAD、GitHub API main/PR19实际0，PR19四检查SUCCESS已合f3fb2ff；新树uv sync --locked --all-groups实际0、无锁变；context T063 scope .实际0。产品测试/全门禁/新安装未运行。
+
+2026-10-20 T064：核心5/10.49s0、旧核心20/15.83s0、初Web/host12pass1fail（新桥接未路由），host后继误用Workspace测试构造失败，修正为真实重开；相关最终70/70.69s0，Pyright/Ruff/格式/diff0。三目录atlas95/19信号/23区域仅候选；合成三窗口图无横溢。未完整门禁/新包，独审待绑定提交。

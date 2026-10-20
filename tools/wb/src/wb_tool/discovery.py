@@ -12,7 +12,6 @@ import numpy as np
 from PIL import Image, ImageDraw
 from tool_contracts.api import AssetRef
 
-from wb_tool.adapters.export_discovery import export_group
 from wb_tool.adapters.tiff_input import load_tiff
 from wb_tool.api import (
     AutoWBSettings,
@@ -26,6 +25,7 @@ from wb_tool.api import (
     intake_digest,
     register_intake_source,
 )
+from wb_tool.application.intake_grouping import acquisition_key as export_group
 
 
 def build_atlas(

@@ -29,7 +29,7 @@ window.intakeWorkspace = (() => {
   });
   const planText = value => JSON.stringify(copyPlan(value));
   const planDirty = () => !!draft && planText(draft) !== basePlan;
-  const hasDraft = () => discoveryDirty || planDirty() || batch.length > 0 || cropDrafts.size > 0;
+  const hasDraft = () => window.intakeGroups.hasDraft() || discoveryDirty || planDirty() || batch.length > 0 || cropDrafts.size > 0;
   const guard = () => ({projectId: state.projectId, sessionEpoch: state.sessionEpoch, digest: baseDigest});
   const uid = () => crypto.randomUUID();
   const source = id => state.intake?.sources.find(item => item.source_id === id);
@@ -42,6 +42,7 @@ window.intakeWorkspace = (() => {
   };
 
   function reset() {
+    window.intakeGroups.reset();
     discoveryKey = ''; discoveryDirty = false; discoveryChoices.clear();
     cropDrafts.clear(); cropPending.clear();
     cropSavedRow = null;
@@ -56,9 +57,11 @@ window.intakeWorkspace = (() => {
     const nextKey = `${state.sessionEpoch}:${state.projectId}`;
     if (nextKey !== key) {
       reset(); key = nextKey; baseDigest = intake.digest; draft = copyPlan(intake); basePlan = planText(intake);
+      window.intakeGroups.sync();
       syncCrops();
       return;
     }
+    window.intakeGroups.sync();
     // Only acknowledge the exact submitted draft, never an unrelated later snapshot.
     if (pending?.kind === 'plan' && planText(intake) === pending.value) {
       if (draft && planText(draft) === pending.value) draft = copyPlan(intake);
@@ -330,9 +333,11 @@ window.intakeWorkspace = (() => {
     const active = mode === 'intake' && !!state.intake;
     root.hidden = !active;
     document.body.classList.toggle('intake-active', active);
+    document.body.classList.toggle('grouped-intake-active', active && !!state.intake?.grouped_draft && !state.intake.workflow);
     $$('.mode-tab').forEach(item => item.hidden = state.intake ? !allowedModes().includes(item.dataset.mode) : item.dataset.mode === 'intake');
     document.body.classList.toggle('intake-crop-active', !!state.intake?.cropEnabled && mode === 'review');
     if (!active) return false;
+    if (!state.intake.workflow && state.intake.grouped_draft) return window.intakeGroups.render(root);
     const focused = root.contains(document.activeElement) ? document.activeElement : null;
     const action = focused?.dataset.intake;
     const stageHeadingFocus = focused?.id === 'intake-stages-heading';
@@ -365,7 +370,9 @@ window.intakeWorkspace = (() => {
     return true;
   }
 
+  window.intakeGroups.bind(root);
   root.addEventListener('input', event => {
+    if (state.intake?.grouped_draft && !state.intake.workflow) return;
     const field = event.target.dataset.intakeField, id = event.target.dataset.id;
     if (field?.startsWith('discovery-')) {
       const c=discoveryChoices.get(id); if(!c)return;
@@ -380,6 +387,7 @@ window.intakeWorkspace = (() => {
     controls();
   });
   root.addEventListener('change', event => {
+    if (state.intake?.grouped_draft && !state.intake.workflow) return;
     const item = event.target;
     if (item.dataset.discoveryInclude) { discoveryChoices.get(item.dataset.discoveryInclude).include=item.checked; discoveryDirty=true; }
     if (item.dataset.intakeSource) { if (item.checked) selected.add(item.dataset.intakeSource); else selected.delete(item.dataset.intakeSource); item.closest('.intake-source').classList.toggle('selected', item.checked); }

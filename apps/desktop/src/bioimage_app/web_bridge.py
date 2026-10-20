@@ -83,6 +83,8 @@ class WorkbenchBridge(QObject):
         self._previous_progress = ""
         self._published_key = None
         self._images.clear()
+        self._intake_zoom_key = None
+        self._intake_zoom = None
         self._montage_key = 0
         self._montage = None
         self._error = ""
@@ -104,6 +106,8 @@ class WorkbenchBridge(QObject):
         self._previous = ""
         self._published_key: tuple[object, ...] | None = None
         self._images: dict[str, str | None] = {}
+        self._intake_zoom_key: tuple[str, str] | None = None
+        self._intake_zoom: str | None = None
         self._montage_key = 0
         self._montage: str | None = None
         self._error = ""
@@ -160,6 +164,26 @@ class WorkbenchBridge(QObject):
                     }
                 )
             intake["sources"] = sources
+            group_preview = self.host.intake.group_preview
+            if group_preview is not None:
+                source_id, raster = group_preview
+                if any(
+                    s.source_id == source_id and s.asset.sha256 == raster.sha256
+                    for s in project.intake.sources
+                ):
+                    zoom_key = source_id, raster.sha256
+                    if zoom_key != self._intake_zoom_key:
+                        self._intake_zoom_key = zoom_key
+                        self._intake_zoom = image_url(
+                            QImage(
+                                raster.pixels,
+                                raster.preview_width,
+                                raster.preview_height,
+                                raster.preview_width,
+                                QImage.Format.Format_Grayscale8,
+                            )
+                        )
+                    intake["zoom"] = {"sourceId": source_id, "preview": self._intake_zoom}
             intake["issues"] = list(self.host.intake.issues)
             intake["cropEnabled"] = isinstance(project, WBIntakeCropProject)
             intake["figureEnabled"] = isinstance(project, WBIntakeFigureProject)
@@ -421,6 +445,7 @@ class WorkbenchBridge(QObject):
                 id(self.host.project_results),
                 id(view.analysis.result_view.cells),
                 id(view.source_preview),
+                id(self.host.intake.group_preview),
                 view.preview_label.full_pixmap.cacheKey(),
                 self.host.operation_busy,
                 self.host.retry_location_button.isHidden(),
@@ -444,7 +469,8 @@ class WorkbenchBridge(QObject):
         try:
             limit = (
                 262144
-                if action in {"intake_plan", "intake_assign"}
+                if action
+                in {"intake_plan", "intake_assign", "intake_grouping", "intake_accept_discovery"}
                 else 32768
                 if action == "quant_target"
                 else 4096
@@ -465,6 +491,8 @@ class WorkbenchBridge(QObject):
             ):
                 raise ValueError("当前任务仍在处理中，请稍候或取消")
             elif isinstance(self.host.view.project(), WBIntakeProject) and action not in {
+                "intake_grouping",
+                "intake_preview",
                 "intake_discover",
                 "intake_accept_discovery",
                 "intake_plan",
@@ -485,6 +513,8 @@ class WorkbenchBridge(QObject):
             }:
                 raise ValueError("仪器清单项目请使用阶段执行、原图复核和已保存Fig入口")
             elif action in {
+                "intake_grouping",
+                "intake_preview",
                 "intake_discover",
                 "intake_accept_discovery",
                 "intake_plan",

@@ -415,6 +415,88 @@ def intake_page(qtbot: QtBot, tmp_path: Path) -> Iterator[WebWorkbenchWindow]:
         )
 
 
+def test_grouped_grid_saves_fig_n_and_keeps_newer_edits_across_save_ack(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    grouping = {
+        "schema_version": 1,
+        "figures": [],
+        "groups": [
+            {
+                "group_id": "group-" + suffix,
+                "source_ids": ["source-" + suffix],
+                "figure_id": None,
+                "protein_label": "",
+                "selected_source_id": None,
+                "region_index": None,
+                "reuse_confirmed": False,
+            }
+            for suffix in ("a", "b")
+        ],
+    }
+    javascript(
+        window,
+        qtbot,
+        "setState({intake:{...state.intake,figures:[],proteins:[],grouped_draft:"
+        + json.dumps(grouping)
+        + "}});true",
+    )
+    assert javascript(window, qtbot, "document.querySelectorAll('.grouped-card').length") == 2
+    assert javascript(window, qtbot, "!document.querySelector('.intake-columns')")
+    javascript(
+        window,
+        qtbot,
+        """
+      document.querySelector('[data-group-action=add-fig]').click();
+      document.querySelector('[data-group-action=select-visible]').click();
+      document.querySelector('[data-group-action=assign]').click();
+      for(const el of document.querySelectorAll('[data-group-field=protein]')){
+        el.value='蛋白';el.dispatchEvent(new Event('input',{bubbles:true}));
+      }
+      const n=document.querySelector('[data-group-field=lanes]');
+      n.value='4';n.dispatchEvent(new Event('input',{bubbles:true}));
+      document.querySelector('[data-group-source=source-a]').click();
+      document.querySelector('[data-group-source=source-b]').click();
+      document.querySelector('[data-group-action=save]').click();
+      window.groupSubmission=sent.at(-1);true
+    """,
+    )
+    raw = javascript(window, qtbot, "JSON.stringify(groupSubmission)")
+    assert isinstance(raw, str)
+    command = json.loads(raw)
+    assert command["action"] == "intake_grouping"
+    assert command["payload"]["grouping"]["figures"][0]["lane_count"] == 4
+    assert len({g["figure_id"] for g in command["payload"]["grouping"]["groups"]}) == 1
+    assert javascript(window, qtbot, "intakeWorkspace.hasDraft()")
+    javascript(
+        window,
+        qtbot,
+        """
+      const el=document.querySelector('[data-group-field=protein]');
+      el.value='保存期间的新草稿';el.dispatchEvent(new Event('input',{bubbles:true}));
+      setState({intake:{...state.intake,digest:'grouped-saved',grouped_draft:groupSubmission.payload.grouping}});true
+    """,
+    )
+    assert javascript(window, qtbot, "intakeWorkspace.hasDraft()")
+    assert (
+        javascript(window, qtbot, "document.querySelector('[data-group-field=protein]').value")
+        == "保存期间的新草稿"
+    )
+    assert javascript(window, qtbot, "!document.querySelector('.intake-conflict')")
+    bridge_snapshot(window, qtbot, "({...state,busy:false,status:'保存失败保留草稿'})")
+    assert (
+        javascript(window, qtbot, "document.querySelector('[data-group-field=protein]').value")
+        == "保存期间的新草稿"
+    )
+    bridge_snapshot(window, qtbot, "({...state,sessionEpoch:state.sessionEpoch+1})")
+    assert javascript(window, qtbot, "!intakeWorkspace.hasDraft()")
+    assert (
+        javascript(window, qtbot, "document.querySelector('[data-group-field=protein]').value")
+        == "蛋白"
+    )
+
+
 def test_batch_requires_explicit_targets_and_preserves_duplicate_names(
     intake_page: WebWorkbenchWindow, qtbot: QtBot
 ) -> None:
