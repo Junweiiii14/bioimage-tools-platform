@@ -11,3 +11,5 @@
 作者修复：键盘继续受dialog保护，只有当前session错误dialog内明确open按钮走同一打开动作；设置列表保留控件身份、scrollTop，保存暂禁时焦点落status，实际回执后恢复原保存按钮。新增真实反例2项，快捷键9项/6.88s实际0，待新head原非作者复验。没有改变科学算法、时限或旧测试预期。
 
 同时实现非作者独立核验T065窄CI测试修正a263fee：无行动项，产品无diff，原身份/非忙态加强成功条件，20秒和完整来源断言不变；冻结1/4.46s实际0。该结论不自动外推T066修正head。
+
+复验绑定 ce7b0394fdad6c78a15e6ddc864ee3e44184c6d5：实现非作者原P2 resolved，冻结4/6.06s实际0，含原独立反例，无新可证实P0–P2。原finish审查者看补充after-disable-focus截图后原焦点/滚动resolved、remaining clear、disposition ship（仅本修复）；未运行detector。作者截图脚本实际0，精确activeElement/scrollTop断言通过。
