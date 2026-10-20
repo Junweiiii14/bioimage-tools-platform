@@ -81,7 +81,10 @@ def observe(command: list[str], *, seconds: int) -> tuple[int, bool, str]:
                         raise RuntimeError("Owned inferior ancestry no longer matches") from None
                     print(f"OWNED_WATCHDOG debugger={child.pid} inferior={inferior}", flush=True)
                     os.kill(inferior, signal.SIGINT)
-                    child.wait(timeout=20)
+                    try:
+                        child.wait(timeout=20)
+                    except subprocess.TimeoutExpired:
+                        print("NATIVE_CAPTURE_GRACE_EXPIRED", flush=True)
             finally:
                 if child.poll() is None:
                     if os.getpgid(child.pid) != child.pid:
