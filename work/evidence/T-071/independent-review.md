@@ -29,3 +29,17 @@
 - 非作者t064_independent_review绑定7e6568300e5eded27001b25c01f35bc451310224→20c106f6e34523bfb39c00d687b7c1faccbb8fc9：Accepted，无可证实P0–P2。
 - 冻结AST原样提取observed/traced_save及实际host.save/_storage_reply，18纯控制/1.67s实际0（.local/t071-diagnostic-20c106f/run_review.py）。编码/存储前不观测，CAS/guard/代际/取消不伪造事件；成功安装后先观测再原after一次；异常不吞，patch正常/异常均恢复。精确集合拒绝缺项/外来或重复target凑数，屏障违规仍失败。
 - 时限120/150秒、25ms轮询、真实网页导航/worker/原像素/输出/重开/关闭要求不变；生产调度、CI和其他UI无diff。未运行Qt/worker/完整门禁。初版独立.local探针nested-with AST定位错误收集exit2，仅修该探针遍历后通过；无产品/门禁变化。
+
+## 真实数据证据只读复核
+
+- 非作者t064_independent_review冻结20c106f公开API，只读本地TIFF/SQLite/输出；Accepted。未运行GUI/worker，未重跑数值流程，也未外传私图。
+- 核对47组（19执行、28参考）、85来源/76内容SHA、74稳定槽位；两次快照共38份裁剪与原图ROI逐数组、dtype和shape一致（uint16×16、uint8×22）。208历史草稿资产摘要有效；196→197只失效一个Fig，其余18个Fig裁剪/成图/分析完整对象保持，206→207重开结果不变；81个持久运行快照符合整批屏障。
+- 20个成功RunRecord/PID、38结果来源引用及请求source_sha256有效；旧/新输出254/255成员的SHA和大小、表内74槽位身份逐项核对。19项来源/ROI/标签/N与控制器选择表一致，后续修订仅首行ROI的y±2。
+- 当前104个源文件与既有T069持久114项清单的对应子集摘要一致。本轮104项初始清单仅在控制器内存，没有独立持久逐文件启动清单；不得补称已有该证据。属于已见参考辅助回归，不证明生物配对、科学真值或留出准确率。
+- 首个合并探针在像素/历史核对完成后误用AnalysisRequest.asset_sha256而退出1；改用公开source_sha256后只续核剩余run/output，6.28s实际0，另选择/历史控制1.66s实际0；未重复数值流程。
+
+## 所属端口关闭顺序 a952555
+
+- 非作者t064_independent_review绑定cb2c26a63eb4a5c00994094d0f1441f06fa9553e→a9525556369e5757ae87c862e5b332c675921de7：Accepted，无新增可证实P0–P2。
+- 冻结实际save/_storage_reply/closeEvent/_finish_close、全部closed回调及resources_closed，11纯控制/1.50s实际0（.local/t071-close-order-a952555/run_review.py）；diff检查0。最终编码/CAS成功后才关闭WB，失败不关闭端口、不提前成功；WB完全closed后才关storage，提前closed和重复close均正确。恢复/selection/扫描未结束时，即使双端口closed也不宣告完成。
+- 未启动Qt、worker或完整门禁。接受局部顺序修正，原Windows原生挂起仍需新CI验证，不表示历史native UNKNOWN已解决。

@@ -20,3 +20,5 @@
 - 20c106f诊断增量非作者Accepted/18纯控制1.67s0，覆盖保存失败/取消无伪造、原回调异常及恢复、逐目标集合/屏障门槛未弱化。新完整门禁运行中，仅增加现有verbose/faulthandler/native观察以记录实际退出，不改变测试/时限。
 
 - 二次本机完整977/全部wheel/OCR/check0，Linux完整977/debugger0/全wheel/check0；Windows在第5个旧归档close测试挂起被取消，退出未知，尚未合main或构建安装。已按现场栈把单宿主WB退休与存储关闭串行，补早closed边界，23项定向66.80s0；后续绑定独审/必要全门禁和四CI，详windows-close-order。
+
+- a952555关闭顺序增量独审Accepted，11纯控制/1.50s实际0；真实数据只读独审接受像素/历史/来源/输出证据，逐项范围和104源文件初始清单限制见independent-review。必要新完整门禁运行中，仍待新四CI、合main及安装交付。
