@@ -444,6 +444,23 @@ def test_grouped_grid_saves_fig_n_and_keeps_newer_edits_across_save_ack(
     )
     assert javascript(window, qtbot, "document.querySelectorAll('.grouped-card').length") == 2
     assert javascript(window, qtbot, "!document.querySelector('.intake-columns')")
+    assert javascript(
+        window, qtbot, "document.querySelector('.grouped-card-title').innerText.includes('Run 1')"
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('[data-group-select]').getAttribute('aria-label')"
+        ".includes('采集组 01')",
+    )
+    bridge_snapshot(
+        window, qtbot, "({...state,intake:{...state.intake,issues:['合成失败.tif：格式无效']}})"
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('[aria-label=导入失败文件]').innerText.includes('成功读取的原图仍可继续')",
+    )
     javascript(
         window,
         qtbot,
@@ -483,7 +500,7 @@ def test_grouped_grid_saves_fig_n_and_keeps_newer_edits_across_save_ack(
         javascript(window, qtbot, "document.querySelector('[data-group-field=protein]').value")
         == "保存期间的新草稿"
     )
-    assert javascript(window, qtbot, "!document.querySelector('.intake-conflict')")
+    assert javascript(window, qtbot, "!document.querySelector('.intake-conflict[role=alert]')")
     bridge_snapshot(window, qtbot, "({...state,busy:false,status:'保存失败保留草稿'})")
     assert (
         javascript(window, qtbot, "document.querySelector('[data-group-field=protein]').value")
@@ -495,6 +512,65 @@ def test_grouped_grid_saves_fig_n_and_keeps_newer_edits_across_save_ack(
         javascript(window, qtbot, "document.querySelector('[data-group-field=protein]').value")
         == "蛋白"
     )
+
+
+def test_grouped_save_accepts_explicit_reuse_normalization_without_false_conflict(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    grouping = {
+        "schema_version": 1,
+        "figures": [{"figure_id": "fig", "label": "Fig 1", "lane_count": 4}],
+        "groups": [
+            {
+                "group_id": "g-" + suffix,
+                "source_ids": ["source-" + suffix],
+                "figure_id": "fig",
+                "protein_label": "P",
+                "selected_source_id": "source-" + suffix,
+                "region_index": None,
+                "reuse_confirmed": False,
+            }
+            for suffix in ("a", "b")
+        ],
+    }
+    javascript(
+        window,
+        qtbot,
+        "setState({intake:{...state.intake,figures:[],proteins:[],sources:state.intake.sources.map(s=>({...s,asset:{sha256:'a'.repeat(64)}})),grouped_draft:"
+        + json.dumps(grouping)
+        + "}});true",
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      const el=document.querySelector('[data-group-field=protein]');
+      el.value='修改';el.dispatchEvent(new Event('input',{bubbles:true}));
+      document.querySelector('[data-group-reuse]').click();
+      document.querySelector('[data-group-action=save]').click();
+      window.normalized=JSON.parse(JSON.stringify(sent.at(-1).payload.grouping));
+      normalized.groups.forEach(g=>g.reuse_confirmed=true);
+      setState({intake:{...state.intake,digest:'reuse-saved',grouped_draft:normalized}});true
+    """,
+    )
+    assert javascript(window, qtbot, "!intakeWorkspace.hasDraft()")
+    assert javascript(window, qtbot, "!document.querySelector('.intake-conflict[role=alert]')")
+    assert javascript(
+        window, qtbot, "!document.querySelector('[data-group-action=confirm]').disabled"
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      document.querySelector('[data-group-action=unpick]').click();
+      document.querySelector('[data-group-action=save]').click();
+      const normalized=sent.at(-1).payload.grouping;
+      normalized.groups.forEach(g=>g.reuse_confirmed=false);
+      setState({intake:{...state.intake,digest:'reuse-removed',grouped_draft:normalized}});true
+    """,
+    )
+    assert javascript(window, qtbot, "!intakeWorkspace.hasDraft()")
 
 
 def test_batch_requires_explicit_targets_and_preserves_duplicate_names(

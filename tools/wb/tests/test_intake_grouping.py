@@ -5,6 +5,8 @@ import json
 import pytest
 from tool_contracts.api import AssetRef
 from wb_tool.api import (
+    ExportDiscovery,
+    ExportObservation,
     IntakeDraftFigure,
     IntakeGrouping,
     IntakeManifest,
@@ -14,6 +16,7 @@ from wb_tool.api import (
     build_intake_execution_plan,
     confirm_intake,
     create_intake,
+    install_export_discovery,
     intake_digest,
     intake_grouping,
     read_figure_project,
@@ -76,6 +79,34 @@ def test_incomplete_group_draft_survives_roundtrip_without_executable_rows() -> 
     with pytest.raises(ValueError, match="Fig级N"):
         confirm_intake(saved, expected_digest=intake_digest(saved))
     assert project.intake.schema_version == 1 and not project.intake.grouping
+
+
+@pytest.mark.parametrize("failed", [False, True])
+def test_latest_reference_or_failed_observation_blocks_previously_saved_selection(
+    failed: bool,
+) -> None:
+    project = pool()
+    saved = save_intake_grouping(project, grouped(project), expected_digest=intake_digest(project))
+    observation = ExportObservation(
+        source_id="s1",
+        sha256=project.intake.sources[0].asset.sha256,
+        group_id="0" * 24,
+        role="unknown" if failed else "reference",
+        error="读取失败" if failed else "",
+    )
+    current = install_export_discovery(
+        saved, ExportDiscovery(observations=(observation,)), expected_digest=intake_digest(saved)
+    )
+    assert current.intake.grouping == saved.intake.grouping
+    with pytest.raises(ValueError, match="重新核对原图"):
+        confirm_intake(current, expected_digest=intake_digest(current))
+    forged = current.model_copy(
+        update={
+            "intake": current.intake.model_copy(update={"confirmed_digest": intake_digest(current)})
+        }
+    )
+    with pytest.raises(ValueError, match="重新核对原图"):
+        build_intake_execution_plan(forged, expected_digest=intake_digest(forged))
 
 
 def test_n_and_source_changes_preserve_group_row_identity_but_change_geometry() -> None:

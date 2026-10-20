@@ -1,6 +1,7 @@
 """Cancellable instrument import; scientific identities are assigned by the user."""
 
 import os
+from hashlib import sha256
 from pathlib import Path
 from threading import Event
 from typing import TYPE_CHECKING
@@ -258,7 +259,11 @@ class InstrumentIntakeSession:
                 next_image()
                 return
             path = pending.pop(0)
-            relative = path.relative_to(root).as_posix()
+            root_key = sha256(os.path.normcase(str(root.resolve())).encode("utf-8")).hexdigest()[
+                :16
+            ]
+            namespace = f"{root.name or 'root'}~batch2-{root_key}"
+            relative = namespace + "/" + path.relative_to(root).as_posix()
             host.view.status.setText(f"正在读取 {relative}；剩余 {len(pending)} 张")
 
             def previewed(reply: WBReply) -> None:

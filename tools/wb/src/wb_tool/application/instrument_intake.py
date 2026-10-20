@@ -258,6 +258,17 @@ class WBIntakeProject(WBPartitionProject):
 
 
 def validate_intake_complete(manifest: IntakeManifest) -> None:
+    observations = (
+        {item.source_id: item for item in manifest.discovery.observations}
+        if manifest.discovery
+        else {}
+    )
+    if any(
+        (observation := observations.get(binding.source_id)) is not None
+        and (observation.role == "reference" or observation.error)
+        for binding in manifest.assignments
+    ):
+        raise ValueError("所选来源现为参考成品或读取失败，请重新核对原图后确认")
     if manifest.grouping is not None:
         figures = {figure.figure_id: figure for figure in manifest.grouping.figures}
         for group in manifest.grouping.groups:

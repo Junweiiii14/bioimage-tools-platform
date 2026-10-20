@@ -8,9 +8,21 @@ window.intakeGroups = (() => {
   const clone = value => JSON.parse(JSON.stringify(value));
   const text = value => JSON.stringify(value);
   const dirty = () => !!draft && text(draft) !== base;
+  const normalizedSave = () => {
+    const value = clone(draft), counts = new Map();
+    const sha = id => source(id)?.asset?.sha256 || id;
+    value.groups.forEach(g => {if(g.selected_source_id){const key=sha(g.selected_source_id);counts.set(key,(counts.get(key)||0)+1);}});
+    value.groups.forEach(g => {g.reuse_confirmed=!!(g.selected_source_id && counts.get(sha(g.selected_source_id))>1 && (reuse || g.reuse_confirmed));});
+    return value;
+  };
   const source = id => state.intake.sources.find(item => item.source_id === id);
   const figure = id => draft?.figures.find(item => item.figure_id === id);
   const group = id => draft?.groups.find(item => item.group_id === id);
+  const groupName = item => `采集组 ${String(draft.groups.indexOf(item)+1).padStart(2,'0')}`;
+  const groupDirectory = item => {
+    const path = source(item.source_ids[0])?.relative_path || '';
+    return path.includes('/') ? path.slice(0,path.lastIndexOf('/')) : '当前导入目录';
+  };
   const guard = () => ({projectId:state.projectId, sessionEpoch:state.sessionEpoch, digest});
   const locked = () => state.busy || !bridge || conflict || !!state.intake?.workflow;
   function reset() {
@@ -28,8 +40,8 @@ window.intakeGroups = (() => {
       reset(); identity = key; draft = clone(next); base = text(next); digest = state.intake.digest;
       return;
     }
-    if (pending && text(next) === pending) {
-      if (text(draft) === pending) draft = clone(next);
+    if (pending && text(next) === pending.expected) {
+      if (text(draft) === pending.draft) draft = clone(next);
       base = text(next); digest = state.intake.digest; pending = null; conflict = false;
     }
     if (state.intake.digest !== digest) {
@@ -86,10 +98,11 @@ window.intakeGroups = (() => {
     const options = current => `<option value="">待归 Fig</option>${draft.figures.map(f => `<option value="${escapeText(f.figure_id)}" ${current===f.figure_id?'selected':''}>${escapeText(f.label || '未命名 Fig')}</option>`).join('')}`;
     root.innerHTML = `<div class="intake-heading"><div><h1>采集组与 Fig</h1><p>先将采集组归入 Fig，再填写蛋白名并选择裁剪原图。N 包含空槽，不含 Marker。</p></div><button class="button subtle" data-group-action="import" ${disabled} ${dirty()?'disabled':''}>添加图片文件夹</button></div>
       ${conflict?'<p class="intake-conflict" role="alert">后台清单已改变。本地草稿保留，请核对后重新载入。</p>':''}
+      ${state.intake.issues?.length?`<details class="intake-conflict" aria-label="导入失败文件"><summary>${state.intake.issues.length} 个文件读取失败；成功读取的原图仍可继续</summary><ul>${state.intake.issues.map(issue=>`<li>${escapeText(issue)}</li>`).join('')}</ul></details>`:''}
       <section class="grouped-figures" aria-label="Fig 与固定样本槽位"><div class="intake-section-heading"><h2>Fig 与 N</h2><button class="text-button" data-group-action="add-fig" ${disabled}>添加 Fig</button></div><div class="grouped-fig-grid">${draft.figures.map(f => `<fieldset class="grouped-fig"><legend>${escapeText(f.label || '未命名 Fig')}</legend><label>Fig 名称<input type="text" maxlength="120" data-group-field="fig-label" data-id="${escapeText(f.figure_id)}" value="${escapeText(f.label)}" ${disabled}></label><label>样本槽位 N<input type="number" min="1" max="96" step="1" placeholder="待推断或填写" data-group-field="lanes" data-id="${escapeText(f.figure_id)}" value="${f.lane_count ?? ''}" ${disabled}></label><p>${suggestions(f).length?`算法候选（未确认）：${escapeText(suggestions(f).join('；'))}`:'同 Fig 只共享数量；每行独立定位。'}</p></fieldset>`).join('') || '<p class="intake-empty">添加 Fig 后，可一次归入多个采集组。N 未知时可以先保存草稿。</p>'}</div></section>
       <div class="grouped-toolbar"><label class="grouped-search">查找采集组<input type="search" data-group-search value="${escapeText(filter)}" placeholder="文件名、目录或蛋白名"></label><button class="button subtle" data-group-action="select-visible" ${disabled}>选择当前显示组</button><button class="text-button" data-group-action="clear-selection" ${disabled}>取消选组</button><label>将 ${selected.size} 组归入<select data-group-field="bulk-fig" ${disabled}>${options(bulkFigure)}</select></label><button class="button primary" data-group-action="assign" ${disabled} ${!selected.size?'disabled':''}>批量归 Fig</button><button class="text-button" data-group-action="discover" ${disabled} ${dirty()||!state.intake.sources.length?'disabled':''}>识别来源与 N 建议</button></div>
       <p class="intake-help">${draft.groups.length} 个采集组 · ${state.intake.sources.length} 张图。组内图片并列，辅助图跟随本组标注；只有所选原图进入裁剪。</p>
-      <div class="grouped-grid">${visible().map(g => `<section class="grouped-card" data-group-id="${escapeText(g.group_id)}"><div class="grouped-card-heading"><label><input type="checkbox" data-group-select="${escapeText(g.group_id)}" ${selected.has(g.group_id)?'checked':''} ${disabled}>选择此组</label><label>所属 Fig<select data-group-field="figure" data-id="${escapeText(g.group_id)}" ${disabled}>${options(g.figure_id)}</select></label></div><label class="grouped-protein">蛋白名称<input type="text" maxlength="120" data-group-field="protein" data-id="${escapeText(g.group_id)}" value="${escapeText(g.protein_label)}" placeholder="由实验人员填写" ${disabled}></label><div class="grouped-images">${g.source_ids.map(id => {
+      <div class="grouped-grid">${visible().map(g => `<section class="grouped-card" data-group-id="${escapeText(g.group_id)}"><div class="grouped-card-title"><h3>${escapeText(groupName(g))}</h3><p>${escapeText(groupDirectory(g))}</p></div><div class="grouped-card-heading"><label><input type="checkbox" aria-label="选择${escapeText(groupName(g))} · ${escapeText(groupDirectory(g))}" data-group-select="${escapeText(g.group_id)}" ${selected.has(g.group_id)?'checked':''} ${disabled}>选择此组</label><label>所属 Fig<select data-group-field="figure" data-id="${escapeText(g.group_id)}" ${disabled}>${options(g.figure_id)}</select></label></div><label class="grouped-protein">蛋白名称<input type="text" maxlength="120" data-group-field="protein" data-id="${escapeText(g.group_id)}" value="${escapeText(g.protein_label)}" placeholder="由实验人员填写" ${disabled}></label><div class="grouped-images">${g.source_ids.map(id => {
         const s = source(id); if (!s) return '';
         return `<div class="grouped-image ${g.selected_source_id===id?'chosen':''}"><button class="grouped-zoom" data-group-action="zoom" data-id="${escapeText(id)}" aria-label="放大 ${escapeText(s.original_name)}">${s.preview?`<img src="${s.preview}" alt="${escapeText(s.original_name)} 的显示预览">`:'<span>预览加载中</span>'}</button><label><input type="radio" name="group-${escapeText(g.group_id)}" data-group-source="${escapeText(id)}" data-id="${escapeText(g.group_id)}" ${g.selected_source_id===id?'checked':''} ${disabled}>用于裁剪</label><strong>${escapeText(s.original_name)}</strong><small>${escapeText(s.relative_path)}</small><small>${s.width} × ${s.height} · ${s.bit_depth} 位</small></div>`;
       }).join('')}</div><div class="grouped-card-footer"><span>${escapeText(figure(g.figure_id)?.label || '待归 Fig')} · ${escapeText(g.protein_label || '蛋白待命名')}${g.selected_source_id?' · 已选裁剪源':' · 未选裁剪源'}</span><button class="text-button" data-group-action="unpick" data-id="${escapeText(g.group_id)}" ${disabled} ${!g.selected_source_id?'disabled':''}>取消裁剪源</button></div></section>`).join('') || '<p class="intake-empty">没有匹配的采集组；清除筛选可查看全部。</p>'}</div>
@@ -119,7 +132,7 @@ window.intakeGroups = (() => {
       if (el.dataset.groupSelect) { if(el.checked)selected.add(el.dataset.groupSelect);else selected.delete(el.dataset.groupSelect); }
       if (el.dataset.groupField==='bulk-fig') bulkFigure = el.value;
       if (el.dataset.groupField==='figure' && g) { g.figure_id = el.value || null; g.region_index=null; }
-      if (el.dataset.groupSource && g) { g.selected_source_id=el.dataset.groupSource; g.region_index=null; }
+      if (el.dataset.groupSource && g) { g.selected_source_id=el.dataset.groupSource; g.region_index=null; g.reuse_confirmed=false; }
       if (el.hasAttribute('data-group-reuse')) reuse=el.checked;
       render(root);
     });
@@ -143,8 +156,8 @@ window.intakeGroups = (() => {
       if (action==='select-visible') visible().forEach(item => selected.add(item.group_id));
       if (action==='clear-selection') selected.clear();
       if (action==='assign') { draft.groups.filter(item=>selected.has(item.group_id)).forEach(item=>{item.figure_id=bulkFigure||null;item.region_index=null;});selected.clear(); }
-      if (action==='unpick') { const g=group(button.dataset.id);g.selected_source_id=null;g.region_index=null; }
-      if (action==='save' && dirty()) { pending=text(draft);send('intake_grouping',{...guard(),grouping:clone(draft),allowReuse:reuse}); }
+      if (action==='unpick') { const g=group(button.dataset.id);g.selected_source_id=null;g.region_index=null;g.reuse_confirmed=false; }
+      if (action==='save' && dirty()) { pending={draft:text(draft),expected:text(normalizedSave())};send('intake_grouping',{...guard(),grouping:clone(draft),allowReuse:reuse}); }
       if (action==='confirm' && !dirty() && !readiness()) send('intake_confirm',guard());
       if (action==='prepare' && !dirty() && state.intake.confirmed) send('intake_prepare',guard());
       if (action==='discover' && !dirty()) send('intake_discover',guard());

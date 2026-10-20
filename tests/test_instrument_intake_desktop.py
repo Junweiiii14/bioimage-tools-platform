@@ -525,7 +525,7 @@ def test_raw_variants_assign_and_reopen_without_algorithm(
     project = current(window)
     assert len(project.intake.sources) == 3
     assert not project.rows and not project.analyses and project.ocr is None
-    assert {s.relative_path for s in project.intake.sources} == {
+    assert {s.relative_path.split("/", 1)[1] for s in project.intake.sources} == {
         "run1/Image001 (1).tif",
         "run1/Image001 (2).tif",
         "run2/Image001 (1).tif",
@@ -667,8 +667,8 @@ def test_distinct_export_folders_keep_same_named_same_content_candidates(
     intake_window: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
 ) -> None:
     window = intake_window
-    first = make_source(tmp_path / "export-a" / "Image001.tif")
-    second = make_source(tmp_path / "export-b" / "Image001.tif")
+    first = make_source(tmp_path / "a" / "export" / "Image001.tif")
+    second = make_source(tmp_path / "b" / "export" / "Image001.tif")
     assert first.read_bytes() == second.read_bytes()
     start(window, qtbot, first.parent)
     window.host.intake.import_folder(second.parent)
@@ -677,6 +677,10 @@ def test_distinct_export_folders_keep_same_named_same_content_candidates(
     assert len(sources) == 2 and sources[0].source_id != sources[1].source_id
     assert sources[0].asset.sha256 == sources[1].asset.sha256
     assert sources[0].asset.size_bytes == sources[1].asset.size_bytes
+    assert sources[0].relative_path != sources[1].relative_path
+    grouped_snapshot = cast(dict[str, object], window.bridge.snapshot()["intake"])
+    grouped_draft = cast(dict[str, object], grouped_snapshot["grouped_draft"])
+    assert len(cast(list[object], grouped_draft["groups"])) == 2
     window.host.intake.import_folder(second.parent)
     qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=10000)
     assert current(window).intake.sources == sources

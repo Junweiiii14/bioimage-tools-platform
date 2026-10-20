@@ -11,6 +11,7 @@
 .grouped-toolbar{display:flex;align-items:end;flex-wrap:wrap;gap:12px;margin:18px 0}.grouped-search{flex:1;min-width:200px!important}
 .grouped-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr));grid-auto-rows:1fr;gap:18px;align-items:stretch}
 .grouped-card{min-width:0;background:var(--paper);border:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:14px}
+.grouped-card-title h3{font-size:13px;font-weight:650}.grouped-card-title p{font-size:12px;line-height:1.5;color:var(--muted);overflow-wrap:anywhere;margin-top:5px}
 .grouped-card-heading{display:flex;justify-content:space-between;align-items:center;gap:18px}.grouped-card-heading>label:first-child{flex-direction:row;align-items:center;white-space:nowrap}
 .grouped-card-heading>label:last-child{min-width:140px}.grouped-card input[type=checkbox],.grouped-card input[type=radio],.grouped-save input{accent-color:var(--accent);width:17px;height:17px;flex:none}
 .grouped-images{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;flex:1;align-items:start}.grouped-image{min-width:0;padding:3px;border:1px solid transparent}.grouped-image.chosen{border-color:var(--accent);background:var(--ground)}
