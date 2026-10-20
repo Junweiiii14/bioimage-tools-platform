@@ -1,5 +1,7 @@
 # E0 执行基线
 
+此页保留2026-10-19 E0历史快照，表内OPEN/未集成/旧安装状态不是当前状态。后续E0–E7见[验收索引](wb-execution-acceptance.md)，当前工作树与增量见[采集组交付计划](wb-grouped-intake-plan.md)和任务交接。
+
 2026-10-19，T-053。源码起点536f04e，产品65ff278；批准规划保存为c57bfcf。工作树`C:/Users/70236/.codex/worktrees/t051-instrument-intake/bioimage-tools-platform`已原位建分支`codex/wb-e0-e7`，既有T052成果已单独提交保留。
 
 ## 入口与集成事实

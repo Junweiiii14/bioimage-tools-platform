@@ -6,7 +6,7 @@
 
 Web + Windows desktop（PySide6 QtWebEngine），保留既有 Qt Widgets 高级编辑器。T-033 按用户明确要求网页先行，浏览器与 QtWebEngine 直接加载 `apps/desktop/src/bioimage_app/web_ui` 的同一 HTML/CSS/JS assets。网页预览读取历史记录、允许交互草稿，不执行新的科学计算；桌面通过本地桥接连接真实项目和后台。
 
-默认启动仍进入既有原生平台；同源工作台使用 `python -m bioimage_app --web-workbench` 显式进入。当前不是原生高级能力全部网页化，也不代表移动端完整科学工作流已验收。既有 Windows Qt 控件不适用 Impeccable 的 web 平台组件枚举，继续按真实原生实现记录。
+默认启动 `python -m bioimage_app` 进入同源 WebWorkbenchWindow（QtWebEngine宿主）；`--web-workbench`同样进入该工作台。原生高级编辑器和显式兼容入口仍保留，移动端完整科学工作流未验收。
 
 ## Users
 
