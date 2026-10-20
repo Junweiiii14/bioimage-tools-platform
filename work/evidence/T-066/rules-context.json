@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "task": "T-066",
-  "base_commit": "2044aafaa49afb76711530ff95e559dfe0cf2298",
+  "base_commit": "e842c6c040cf42a8268ac4af0bb6457c878970e0",
   "scopes": [
     ".agent-handoff",
     ".impeccable/surfaces",
