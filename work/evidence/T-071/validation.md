@@ -22,3 +22,6 @@
 - 独审2a发现关闭途中资产/渲染回调可遗留busy（24通过/2失败实际1）；现补相同key才结束操作，旧key不得结束新任务。UI独审要求手动浏览保留页/选中/焦点、暂停人话说明及明确放弃草稿文案，已修复待最终绑定复审。原失败与本地抓图探针失败保留，不混作通过。
 
 - 最后修复后的网页/宿主/快捷键定向64 passed/91.77s，进程实际0；包含手动浏览页/源/焦点保持、参考独立区域、编码取消和两Fig真实链。Ruff和八文件Pyright实际0。
+
+- 冻结c935产品/7e文档的首个完整check --all：静态/类型/9依赖契约通过，pytest 976通过/1失败、849.93s，整命令实际1，后续wheel未跑；不以976项替代全门禁成功。唯一失败为新增序列安装诊断没有看到每个短暂running状态。PR30首Linux同一失败：976通过/1失败、399.97s，inferior01/debugger1，后续wheel未跑。原日志.local/t071-final-fullcheck.log、t071-ci-ubuntu-first.log保留。
+- 诊断根因已确认：bridge.stateChanged节流/合并快照，不保证每次成功持久保存都发布。两平台都已完整输出、两个真实worker和review/layout/quant/results真实页面成立，但短暂阶段样本不全，诊断应失败。修复仅诊断观察：包装实际host.save成功回调，先观察已安装的持久修订再调用原有after，失败/CAS/取消不伪造事件；网页导航仍由真实JS独立检查。阶段要求从数量加强为与最终账本全部(stage,target)集合精确相等，记录revision及committed-save-callback来源，不删断言、不加重试/延迟、不改生产调度/门禁。局部真实-I诊断11.83s实际0；新字典推断类型初次1错误，显式dict[str,object]后Pyright0，无忽略。

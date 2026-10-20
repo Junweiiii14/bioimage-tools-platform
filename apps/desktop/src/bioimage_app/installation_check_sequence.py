@@ -5,9 +5,11 @@ import os
 import sys
 import tempfile
 import time
+from collections.abc import Callable
 from hashlib import sha256
 from pathlib import Path
 from typing import cast
+from unittest.mock import patch
 
 CONFIGURE = """(()=>{
  const add=document.querySelector('[data-group-action=add-fig]');
@@ -37,7 +39,12 @@ def verify_sequence_installation(report_path: Path) -> int:
     from PySide6.QtCore import QSettings, QTimer
     from PySide6.QtWidgets import QApplication
     from shiboken6 import isValid
-    from wb_tool.api import WBIntakeOutputProject, WBIntakeProject, WBIntakeWorkflowProject
+    from wb_tool.api import (
+        WBFigureProject,
+        WBIntakeOutputProject,
+        WBIntakeProject,
+        WBIntakeWorkflowProject,
+    )
 
     from bioimage_app.web_window import WebWorkbenchWindow
 
@@ -107,6 +114,7 @@ def verify_sequence_installation(report_path: Path) -> int:
                     "worker_pids": worker_pids,
                     "page_modes": modes,
                     "stage_events": stage_events,
+                    "stage_event_source": "committed-save-callback",
                     "last_status": observed_status,
                     "corrected_rows": sorted(corrected),
                     "limitations": (
@@ -133,38 +141,54 @@ def verify_sequence_installation(report_path: Path) -> int:
             record()
             return 1
 
-        def observed(raw: str) -> None:
+        def observed(project: WBFigureProject) -> None:
             try:
-                state = cast(dict[str, object], json.loads(raw))
-                intake = cast(dict[str, object], state.get("intake") or {})
-                workflow = cast(dict[str, object], intake.get("workflow") or {})
-                if workflow.get("policy") != "intake_workflow@3":
+                if (
+                    not isinstance(project, WBIntakeWorkflowProject)
+                    or project.workflow.policy != "intake_workflow@3"
+                ):
                     return
-                steps = cast(list[dict[str, object]], workflow["steps"])
+                steps = project.workflow.steps
                 for step in steps:
-                    if step["status"] != "running":
+                    if step.status != "running":
                         continue
                     earlier = {
                         "crop": (),
                         "compose": ("crop",),
                         "measure": ("crop", "compose"),
                         "export": ("crop", "compose", "measure"),
-                    }[str(step["stage"])]
-                    if any(s["status"] != "done" for s in steps if s["stage"] in earlier):
+                    }[step.stage]
+                    if any(s.status != "done" for s in steps if s.stage in earlier):
                         errors.append(
                             "Observed a running stage before its whole-batch prerequisites"
                         )
-                    entry = {
-                        "stage": step["stage"],
-                        "target": step["target_id"],
-                        "attempt": step["attempt"],
+                    entry: dict[str, object] = {
+                        "stage": step.stage,
+                        "target": step.target_id,
+                        "attempt": step.attempt,
+                        "revision": project.revision,
                     }
                     if entry not in stage_events:
                         stage_events.append(entry)
             except (ValueError, KeyError, TypeError) as error:
                 errors.append("Invalid stage snapshot: " + str(error))
 
-        window.bridge.stateChanged.connect(observed)
+        original_save = window.host.save
+
+        def traced_save(
+            after: Callable[[], None] | None = None,
+            *,
+            transform: Callable[[WBFigureProject], WBFigureProject] | None = None,
+            install_guard: Callable[[], bool] | None = None,
+        ) -> None:
+            def committed() -> None:
+                # Bridge publication is coalesced. Observe every installed durable
+                # revision before its normal continuation can claim the next stage.
+                observed(window.host.view.project())
+                if after:
+                    after()
+
+            original_save(committed, transform=transform, install_guard=install_guard)
 
         def received(value: object) -> None:
             nonlocal pending_js, js_value
@@ -324,15 +348,9 @@ def verify_sequence_installation(report_path: Path) -> int:
                         modes = json.loads(js_value)
                         if not all(m in modes for m in ("review", "layout", "quant", "results")):
                             raise ValueError("Shipped page did not automatically visit all stages")
-                        if any(
-                            sum(e["stage"] == stage for e in stage_events) < count
-                            for stage, count in (
-                                ("crop", 2),
-                                ("compose", 2),
-                                ("measure", 2),
-                                ("export", 1),
-                            )
-                        ):
+                        if not isinstance(project, WBIntakeWorkflowProject) or {
+                            (e["stage"], e["target"]) for e in stage_events
+                        } != {(s.stage, s.target_id) for s in project.workflow.steps}:
                             raise ValueError("Not every actual running batch stage was observed")
                         checks.extend(("automatic-navigation", "stage-barriers"))
                         workspace, epoch = window.host.workspace_path, window.bridge.session_epoch
@@ -379,15 +397,16 @@ def verify_sequence_installation(report_path: Path) -> int:
 
         timer = QTimer(app)
         timer.timeout.connect(poll)
-        try:
-            window.show()
-            window.start_from_images([sources], intake=True)
-        except (ValueError, OSError, RuntimeError) as error:
-            errors.append(str(error))
-            phase = "close"
-            window.close()
-        timer.start(25)
-        code = app.exec()
+        with patch.object(window.host, "save", new=traced_save):
+            try:
+                window.show()
+                window.start_from_images([sources], intake=True)
+            except (ValueError, OSError, RuntimeError) as error:
+                errors.append(str(error))
+                phase = "close"
+                window.close()
+            timer.start(25)
+            code = app.exec()
         timer.stop()
         if code or required - set(checks):
             errors.append("Required sequence checks or owned shutdown did not complete")

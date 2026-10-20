@@ -164,6 +164,9 @@ def test_sequence_diagnostic_uses_real_page_workers_and_stage_navigation(tmp_pat
     )
     data = json.loads(report.read_bytes())
     assert data["diagnostic"] == "fig_sequence_installed@1"
+    assert data["stage_event_source"] == "committed-save-callback"
+    assert len({(e["stage"], e["target"]) for e in data["stage_events"]}) == 7
+    assert all(e["revision"] > 0 for e in data["stage_events"])
     assert data["phase"] == "passed" and data["errors"] == []
     assert data["isolated_imports"] is True
     assert len(data["worker_pids"]) == 2 and all(pid > 0 for pid in data["worker_pids"])
