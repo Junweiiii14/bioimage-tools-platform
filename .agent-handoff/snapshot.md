@@ -1,13 +1,7 @@
 # Handoff Snapshot
 
-- 当前状态唯一来源work/tasks/T-071-fig-sequence-automation.md。用户2026-10-20已批准T070完整方案并授权持续至独审、PR和新离线包，active计划目标已登记全文；不再等待重复批准。
-- 活动新树C:/Users/70236/.codex/worktrees/wb-fig-sequence/bioimage-tools-platform，codex/fig-sequence-automation，基线main6916b3a；规划来源0a966e8。旧wb-grouped-intake/codex/fig-sequence-plan的所有dirty原位保留；仅承接四份规划证据，SHA记录.local/t070-transfer.json。
-- 已实现顺序草稿grouping@2/manifest4、workflow@3整批屏障、顶部Fig/N/蛋白顺序、选源、一键保存CAS启动、真实阶段导航及修正后单一继续、独立FigSequenceTest发行/诊断。70项定向/134.65s实际0，源码新诊断13项/8.0s实际0，实际页面review→layout→quant→results与两个真实worker/完整输出/重开无续跑通过。核心edb5a5e独审accepted/40项0，尚不覆盖后续产品。旧wire/策略及原值保持。
-- 用户已确认19仪器采集组编号、28参考保留单列且不占分配；核心/页面已接入。真实三目录192.59s实际0，19 Fig/74槽位/真实worker/局部修订/旧输出和104源文件保持；尚不等于科学留出。2a代码独审P2及UI三项已修复，c935代码复审Accepted，UI限定范围ship，原问题resolved。
-- UI一次detector0仅24advisory；1440/1024/390配置和网格Qt截图有效。阶段Qt抓图为空，不可送审；需同源冻结DOM浏览器渲染（明确范围）或有效Qt重捕。一个本地Subclass抓图辅助进程0xc00000fd、无成功主张；正式70项/新诊断通过，不消除历史native UNKNOWN。
-- 最终独审/四CI/精确合main/新冻结离线包安装/摘要manifest交付均未完成，持续推进。T070历史回执绑定来源提交，最终显式integration-context，不删除/改成功状态或绕过门禁。
-- T069已安装候选和桌面交付仍冻结6080867，旧原图/项目/历史/安装及其他树保留；私图不入Git/外部API。旧native UNKNOWN、干净Win10/物理DPI/科学留出缺口继续保留，不升级依赖、不扩工具、不正式Release。
-
-- PR30首全门禁本机849.93s/Linux399.97s均976通过+1失败，新增诊断从节流快照漏短暂阶段；已改观察已提交save回调/加强逐目标集合，局部-I11.83s0。下一步增量独审、新完整门禁与四CI；未交付。
-
-- 当前PR30/cb2的本机与Linux全977/wheel/check0；Windows第5个旧归档close用例native挂起，20分钟CANCELLED/原pytest退出未知，API日志404，live247行片段本地保留。新修正单宿主先WB worker destroyed/closed再storage.shutdown，提前closed只记状态，23定向66.80s0；下一步绑定新提交独审、必要完整门禁/四CI，尚无新包。
+- 当前状态唯一来源：[T071](../work/tasks/T-071-fig-sequence-automation.md)。用户批准完整T070方案与持续实施；完整方案已登记目标，没有待答数据问题。
+- 活动树C:/Users/70236/.codex/worktrees/wb-fig-sequence/bioimage-tools-platform，文档收尾codex/fig-sequence-delivery。产品PR30精确head5f2090a四必需检查后正常合main710bb85；二进制冻结该main，收尾不改产物来源。
+- 新桌面目录BioImage-WB-Fig顺序自动化测试版-T071已生成，当前用户独立安装/新快捷方式已建立，三流程实际OS0、PS5.1随包三自检0、7,751载荷文件摘要一致。最终非作者交付审计Accepted；本次文档PR仅整理已完成事实，四检查集成后完成目标，无后续获批产品实施待办。交付摘要与证据见[记录](../docs/wb-fig-sequence-delivery.md)。
+- 旧wb-grouped-intake/codex/fig-sequence-plan的10份dirty文件SHA、HEAD/status与旧T069三关键文件SHA不变；原图/历史结果和其他树保持。T069仍冻结6080867，不自动删除/升级旧安装。
+- 当前85TIFF/19执行组＋28参考组、74槽是已见参照辅助回归，不是科学留出。旧native/手动坐标UNKNOWN、干净Win10、物理按钮/DPI和独立科学真值继续保留；无正式Release/依赖升级/新工具扩展。原失败与源码/包态界限见T071 evidence，勿据后继成功销账。

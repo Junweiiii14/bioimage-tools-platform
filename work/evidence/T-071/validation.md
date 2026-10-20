@@ -27,3 +27,6 @@
 - 诊断根因已确认：bridge.stateChanged节流/合并快照，不保证每次成功持久保存都发布。两平台都已完整输出、两个真实worker和review/layout/quant/results真实页面成立，但短暂阶段样本不全，诊断应失败。修复仅诊断观察：包装实际host.save成功回调，先观察已安装的持久修订再调用原有after，失败/CAS/取消不伪造事件；网页导航仍由真实JS独立检查。阶段要求从数量加强为与最终账本全部(stage,target)集合精确相等，记录revision及committed-save-callback来源，不删断言、不加重试/延迟、不改生产调度/门禁。局部真实-I诊断11.83s实际0；新字典推断类型初次1错误，显式dict[str,object]后Pyright0，无忽略。
 
 - 二次本机完整977/845.63s、原child0/u32=0、全部wheel/真实OCR及整命令0；Linuxcb2完整977/395.52s/debugger0/wheel/check0。cb2仅比本机开始20c多两份Markdown/8行，没有在执行期间改产品、测试或门禁。Windowscb2在第5个既有归档关闭用例原生挂起，job20分钟CANCELLED、pytest退出未知，API日志404，live247行片段已保留；未合并。最窄所属端口顺序修正与23项定向0见windows-close-order.md，需要新冻结全门禁/CI。
+
+- 最终a952完整979/825.65s、原child0/u32=0、全部wheel/OCR/check0；5f诊断请求确认另有真实-I11.68s0与32独立纯控制0，不冒充被a952完整覆盖。最终5f两平台979项（Windows615.77s/Linux332.14s）及全部wheel/OCR/check0、四required SUCCESS，PR30正常精确合main710bb85；非作者核全树相同。原a541两平台各978通过/1失败及Windows手动坐标UNKNOWN保留，未改该旧测试答案或容差。详final-ci.md。
+- 冻结main710bb构建/当前用户安装0，安装态顺序13项、旧采集组17项、灰度OCR7项全passed，父OS0、无所属残留或开发模块；PS5.1随包三流程外层0。7751构建载荷SHA与安装一致，新桌面T071交付已生成，旧3文件和10dirty/HEAD/status保持。首PS5.1本地外层中文路径编码失败-196608保留，仅补BOM后新轮0；详offline-installation.md，最终非作者产物核验见独审文件。

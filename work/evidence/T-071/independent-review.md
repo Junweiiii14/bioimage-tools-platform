@@ -43,3 +43,24 @@
 - 非作者t064_independent_review绑定cb2c26a63eb4a5c00994094d0f1441f06fa9553e→a9525556369e5757ae87c862e5b332c675921de7：Accepted，无新增可证实P0–P2。
 - 冻结实际save/_storage_reply/closeEvent/_finish_close、全部closed回调及resources_closed，11纯控制/1.50s实际0（.local/t071-close-order-a952555/run_review.py）；diff检查0。最终编码/CAS成功后才关闭WB，失败不关闭端口、不提前成功；WB完全closed后才关storage，提前closed和重复close均正确。恢复/selection/扫描未结束时，即使双端口closed也不宣告完成。
 - 未启动Qt、worker或完整门禁。接受局部顺序修正，原Windows原生挂起仍需新CI验证，不表示历史native UNKNOWN已解决。
+
+## 请求确认增量 5f2090a
+
+- 非作者t064_independent_review绑定a541b68b34c5d39834efec1dbee4a81a2202d83c→5f2090ad05af6ce6d427b43e428916cefba3df7f：Accepted，无新增可证实P0–P2。冻结归档下实际CONFIGURE/点击片段12个Node控制、poll/回调/最终判据20个AST控制均实际0，后者0.63s；diff检查0。
+- 请求及原回调原样转发；ack不是持久成功，CAS/安装未成立仍失败；在途等待不重复点击、逐目标标志重置，异常、120/150秒时限、所属关闭及13项判据不变。未启动Qt/worker/私图链/完整门禁。临时AST harness两次构造错误退出1，修正后20控制通过，非产品失败。
+- 本机979完整只绑定a952；5f由专项与新CI覆盖。最终CI/main全树同一性的独立核对见final-ci.md，初次直接tree查询被PowerShell解析拒绝，改subprocess读取后逐项实际0。
+
+## 本地交付辅助脚本
+
+- 非作者只读审查发现并关闭报告清单不完整、超时/清理后误判成功及侧车覆盖三个缺口；最终辅助范围Accepted。finalize SHA256 45a6abe01e823de076a54a554dd6c2e66c9efbc002a5be3772dc61012833dffe；common observer baa02be81f43687736193ad06ac80bd961a27e99ccf4f033fdc4f82297827410；diagnostic wrapper ea1beebfb7a0b89019b6d01df36d2cc903260547a298406305db48c41f92f5db；shipped wrapper bb459430fa26ba819a600d52beda907996589376513aab6ef92612ea0953fb9e。
+- 仅提取finalize报告校验段、排除真实delivery写入，49纯控制/1.01s实际0，包含实际0/17/timeout父回执，null/error/residue/缺字段/缺报告/重复/越界/失败报告均拒绝。审查者未运行PS/Qt/worker或真实交付写入。
+- 作者PS5.1.26100.9711实际0/17/timeout/拒侧车四控制通过；中间StartTime竞态控制失败1保留，live-stamp空值保护后0。基线中文路径读取初用-I默认编码失败，明确UTF8后旧3文件、10dirty文件摘要及旧HEAD/status全匹配。辅助脚本不入产品，不冒充包态成功。
+
+## 冻结main710bb85的最终交付审计
+
+- 非作者t064_independent_review绑定main710bb85de99e88a970f4d0f5613ca554b705ecf7及安装器SHA256760b3ee0d7e9c3d22f8f470185791f3c11b26f051babce2c3d4d94f57df75c94：Accepted，无新增可证实P0–P2，无需补证。只读产物/报告/Git核验，不启动Qt/worker或改写产品。
+- 安装器361,622,169字节、构建/安装7,751载荷文件逐摘要相同，41个校验成员和37份证据副本完整；source-code.zip的302文件与冻结Git来源核对通过，四wheel的176包文件与对应源码/安装对应；文本的LF/CRLF换行差异单独识别，不冒称所有文本逐字节相同。安装后额外1,257份pyc的源码编译一致，未把额外文件混作构建载荷。
+- 安装态顺序13/旧分组17/灰度OCR7项及三份父OS0、无timeout/error/residue/开发模块；PS5.1随包三份报告及父0通过。首外层-196608失败保留，UTF8 BOM是本地wrapper唯一字节变化，去BOM等原受审文本；产品/包没有改动。
+- 旧3关键文件与10dirty文件、旧树HEAD/status均保持；独立发行身份及4快捷方式核对。独立读取当前新安装根进程数0。外部CIM仅采样，顺序报告中的两个worker PID仅采到一个，不能宣称采全所有子进程；原产品所属资源关闭检查通过。真实worker证据来自持久运行报告，父退出与当前残留另核，不混为同一种证明。
+
+- 最终只读Python/Git/PowerShell核验均实际0，私有runtime的38个锁定发行版本一致。两次审查脚本因安装器路径分类和CP936读取假设错误退出1，修正后相关核验通过，非产品/包失败；没有启动Qt、worker、安装或完整门禁。

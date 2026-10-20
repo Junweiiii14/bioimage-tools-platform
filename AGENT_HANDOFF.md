@@ -46,8 +46,8 @@
 
 ## Current Pointer
 
-- 当前实施：[T-071](work/tasks/T-071-fig-sequence-automation.md)；用户2026-10-20已批准[T070方案](docs/wb-fig-sequence-automation-plan.md)并授权持续至独审、PR和新离线包。完整方案已登记active目标。
-- 活动树：`C:/Users/70236/.codex/worktrees/wb-fig-sequence/bioimage-tools-platform`，codex/fig-sequence-automation，基线main6916b3a。旧wb-grouped-intake/codex/fig-sequence-plan的所有未提交规划与其他树保留；T069安装仍冻结6080867，见交付记录。
+- 当前任务：[T-071](work/tasks/T-071-fig-sequence-automation.md)；完整获批方案已登记目标，产品PR30已集成main710bb85，新[T071离线候选](docs/wb-fig-sequence-delivery.md)已构建/安装/三流程/PS5.1及载荷校验，最终交付审计Accepted，证据随本次文档PR集成，见任务。
+- 活动树：`C:/Users/70236/.codex/worktrees/wb-fig-sequence/bioimage-tools-platform`，收尾分支codex/fig-sequence-delivery。二进制冻结main710bb85；旧wb-grouped-intake/codex/fig-sequence-plan全部dirty与其他树保留，T069仍冻结6080867。
 - E0–E7及T061已经工程集成，见[验收索引](docs/wb-execution-acceptance.md)与任务。干净Win10/物理DPI/科学留出仍独立待验，不宣称正式发布。
 - t051树T062原型与交接未提交资料保留，桌面批准原型为BioImage-导入分组交互原型/index.html。历史ResearchVault树不作为当前开发入口。
 - 当前状态与下一步：`.agent-handoff/snapshot.md`；风险：`.agent-handoff/risks.md`；长期待办：`.agent-handoff/backlog.md`。
