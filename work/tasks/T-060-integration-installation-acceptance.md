@@ -1,6 +1,6 @@
 # T-060：E7 集成、包态与交付验收
 
-- 状态：review；E0–E6实现/绑定独审已完成，E7产品e579及910项完整本机门禁/全部wheel、独立安装候选工程验证通过。最终主线依赖PR15四CI运行，准备集成清单13历史来源已真实校验；仍须实际main重载/最终绑定独审/产品PR四CI。原起点base5e3459a/E6产品ea7ed55及其862/624.64s证据保留。
+- 状态：review；E0–E6实现/绑定独审完成，E7产品e579及910项完整本机门禁/全部wheel、独立安装候选工程验证通过。历史依赖PR15已按最终独审/四CI接受main842918a；已合实际基线并重载13历史来源集成清单，待最终提交独审/冻结规则/产品PR四CI及main接受。原起点base5e3459a/E6产品ea7ed55及其862/624.64s证据保留。
 - 授权：按docs/wb-execution-plan.md连续推进，无阶段重复批准、无定时任务。有效t051/codex/wb-e0-e7；root sole writer，非作者只读独审。原ResearchVault dirty树、旧候选/安装/原图/历史结果/用户窗口保持。
 - 范围：apps/desktop、tools/wb、tooling、tests、docs、README.md、AGENT_HANDOFF.md、.agent-handoff、work/tasks、work/evidence、.github（仅实际CI诊断必要时单独说明/独审，不改规则以绕过失败）。scope .加载全部当前与BASE规则。
 - 首项：补充当前存活高风险链独审已绑定ea7ed55/base536f04e，发现历史OCR迟到取消P2。ProjectOCRSession异步解码后不查取消，宿主完成/安装只查generation；先改草稿再保存使失败/取消可能替换关联。修session完成与host完成/安装/CAS前后保护；真实已提交RunRecord不撤销，保存失败/取消保留当前旧关联。覆盖decode/install/关闭/encode前/CAS在途/保存失败/后续显式重试及过期generation。
@@ -10,7 +10,7 @@
 - 安装验收：本机非管理员Win11新候选安装、卸载/重装、中文路径、独立入口/设置、原资产与旧安装保护；私有实际runtime运行新清单批量主链（保存/真实worker/稳定槽表/新目录输出/重开/重复不覆盖）与独立灰度/OCR两条流程、所属进程关闭、离线模型，精确进程退出和文件摘要。不调用用户Esc停止的原生Computer Use；离屏工程不外推物理输入/DPI。
 - 待验边界：独立真实仪器真值/样本对应、干净目标Win10与125/150/200%DPI缺失时保留未验；继续不依赖的候选/集成工作，不标正式发布完成。历史纯虚调用UNKNOWN保留，不据本轮成功销账。
 - 验证：针对性真实Qt/故障测试、全量check和隔离wheel、非作者当前提交风险复审；Qt测试/探针/安装态串行。记录每次命令/退出码/环境/提交与失败，未跑明确未跑；必要实验先冻结预期，不弱化断言/容差/时限。
-- 下一步：PR14修复最终HEAD四CI→精确合并→PR15实际main重载/绑定独审/四CI→主树合最终依赖并生成唯一T060集成清单→最终产品PR四CI/main及交接。OCR/CAS、E0–E6、910完整本机门禁与安装候选已完成，原始失败和外部验收边界保留；精确当前事实见下方记录及snapshot。
+- 下一步：最终actualbase/finalHEAD规则核验和非作者独审→产品PR四CI/main接受→工程收尾记录与交接。历史依赖链/实际main重载已完成；OCR/CAS、E0–E6、910完整本机门禁与安装候选已完成。原始失败和外部验收边界保留；精确事实见final-integration.md及snapshot。
 
 ## 当前进展
 

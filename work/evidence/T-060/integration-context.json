@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "task": "T-060",
-  "base_commit": "330e329c24c886fbfcfe87417d3bf97202b27aa8",
-  "source_head": "69da260f84e64153b93478938b8f5ab6d896b06a",
+  "base_commit": "842918af019b75660eda134b0eaf1288e11adc5e",
+  "source_head": "3ca9da9d8590fe040abf4bee20182008872f3664",
   "historical_receipts": {
     "work/evidence/T-045/rules-context.json": "e78a14a5076faaaa64b1f1baa195a54b11742040",
     "work/evidence/T-046/rules-context.json": "992c33842f92c2153c6d00107fbd241060efe8f5",
