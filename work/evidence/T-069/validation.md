@@ -41,3 +41,4 @@ T067/PR26最终head1259c5d53af83db7db5f301db5e3e03c4e883f09四检查SUCCESS，Wi
 HEAD 3f7340845da39adf938b29a183b258d6460ad572，干净工作树，Windows/Python3.12.14；2026-10-20T20:30:40+08→20:45:41+08。命令uv run --locked --no-sync python dev.py check --all。PYTHONIOENCODING=utf-8/PYTHONUNBUFFERED=1/PYTHONFAULTHANDLER=1，QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu，PYTEST_ADDOPTS=-vv -o faulthandler_timeout=60，BIOIMAGE_NATIVE_STACKS=1/BIOIMAGE_WINDOWS_FAULTS=1。
 
 Ruff/764文件格式/Pyright/import contracts通过；955 passed/800.04s，Observed child exit=0/u32=0；独立wheel全部安装/公开API及真实OCR完成；最外层实际exit_code=0。原始全日志.local/t069-fullcheck-3f73408.log、原始退出与起止.local/t069-fullcheck-3f73408-process.json。冻结期间未改源码、未另启Qt。一次完成，不把pytest摘要代替整命令退出；不外推目标Win10/DPI/科学留出或未构建安装包。
+本地全门禁后的合并只增加T068已独审取证与文档，3f73408→当前apps/desktop、tools/wb、packages、tests、uv.lock、根pyproject差异为空；不重复本地完整门禁来制造新结果。服务器最终PR检查照常完成；若发现新产品/共享接口问题再按必要范围复验。
