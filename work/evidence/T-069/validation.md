@@ -44,3 +44,17 @@ Ruff/764文件格式/Pyright/import contracts通过；955 passed/800.04s，Obser
 截至b99aac4阶段，本地全门禁后的合并只增加T068已独审取证与文档，3f73408→b99aac4的apps/desktop、tools/wb、packages、tests、uv.lock、根pyproject差异为空。后继5e1f6c3已按新CI失败修改诊断/相关测试，955旧结果不覆盖新head；对应增量验证和原生取证见pr28-ci.md。
 
 PR27最终0a96d607b01c62ebb8ff0de6dabb5e3e3a239613四必需检查SUCCESS，quality39426524859：Windows118640498573为951/467.54s、child0/u32=0；Linux118640498667为951/287.23s、debugger0；全部独立wheel/真实OCR完成。取证两问题绑定d2790a3独审resolved；未新增产品修复，不将后继通过销旧0b712f3 Linux关闭UNKNOWN。2026-10-20T13:09:21Z精确正常合main5729cb81581370339fcc5c86cda1cb20264e8c5c，已同步/真实重载规则。原日志.local/t068-pr27-{windows,linux}-final.log保留。
+
+## P8精确集成、构建与安装
+
+PR28最终93d1ef06d5fbe0457b79aea694983013515826e1四必需检查SUCCESS；quality39432692428 Windows118661540201为956/520.17s、child0/u32=0，Linux118661539937为956/406.82s、debugger0，全部独立wheel/真实OCR完成。手动39432688787/job118661531871外部取消控制17/完整栈后，完整pytest956/382.32s、debugger0/deadlineFalse；没有复现旧挂起。2026-10-20T13:52:48Z精确正常合main60808671cc2a3e9bb255bce85d546a18416c64a5；main push quality39434244738两平台/桌面环境也成功。不把手动成功替代正常四门禁，也不声称旧UNKNOWN已修复。
+
+干净HEAD==origin/main6080867、Windows11Home中文x64/10.0.26200、Python3.12.14/uv0.13.0/锁不变；命令python -m tooling.build_runtime_candidate --iscc <已核验Inno6.7.3> --gcc <已核验GCC15.2.0> --grouped-intake-test。2026-10-20T21:53:13+08→21:54:11+08，实际exit0，编译/安装器0，四wheel和完整source/licenses保留；原始.local/t069-build-6080867{.log,-process.json}。产物361584364字节，SHA256=99c0ec5540161c27a0bcea990e5286aebadeea65b3372239fab1ed4a9cbb6d97。
+
+本机独立新目录/AppId安装21:55:05→21:56:20实际0，HKCU新卸载键、无需重启，旧安装和原图/项目/历史不动。两个必建快捷方式的目标/工作目录正确。安装命令VERYSILENT/SUPPRESSMSGBOXES/NORESTART/新LOG，Start-Process Hidden；未关闭其他进程。新目录和桌面交付文件夹原先均不存在。
+
+首次PS5.1父采集器未持有.Handle，安装grouped报告17项passed/20.14s且所属全闭，但OS退出码null、采集器实际1；完整原文件和first-observer副本保留，旧null不改成0。修正的仅是忽略.local采集器，先真实0/17控制匹配，再运行新报告：grouped17项/10.625s、两个真实worker PID56964/27684，原值裁剪/输出/重开/一次真实KeyK/精确设置重载通过；独立gray/OCR8.203s通过。两父采集器实际0，remaining=[]/forbidden_development_modules=[]，运行exe和package路径均在安装根，isolated=true/channel正确。没有重新构建或改安装程序。
+
+随包selfcheck.ps1在真实WindowsPowerShell5.1.26100.9711串行两flags实际0（22:01:19→22:01:45+08）；两个新JSON报告passed。报告与stderr、父进程/模块和快捷方式证据在.local/t069-package-checks/final。安装私有解释器-I metadata显示sys.path全在安装根，Python3.12.14、锁定库/四产品版本相符。
+
+完整载荷7749文件与构建源逐文件SHA相同；交付到C:/Users/70236/Desktop/BioImage-WB-采集组测试版-T069，复制安装器摘要复核一致，含manifest/SHA256SUMS/载荷清单/安装说明/验证报告。原始console receipt中文显示乱码单独保留，真实目录与UTF8清单正确；新.local/t069-delivery-receipt.json以ASCII转义可靠记录路径，不改变原日志。安装独审另列。干净Win10/物理DPI与独立科学留出未验，不创建GitHub正式Release。

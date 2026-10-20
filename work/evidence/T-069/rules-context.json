@@ -1,14 +1,12 @@
 {
   "schema": 1,
   "task": "T-069",
-  "base_commit": "5729cb81581370339fcc5c86cda1cb20264e8c5c",
+  "base_commit": "60808671cc2a3e9bb255bce85d546a18416c64a5",
   "scopes": [
     ".agent-handoff",
-    ".github",
-    "apps/desktop",
+    "AGENT_HANDOFF.md",
+    "README.md",
     "docs",
-    "tests",
-    "tooling",
     "work"
   ],
   "rules": {

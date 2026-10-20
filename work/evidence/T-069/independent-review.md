@@ -29,3 +29,13 @@ SQLite revision131与first-project一致；revision132仅4A待执行、1G完成�
 非作者t064_independent_review绑定5e1f6c3eb9a9aaca8573e65e9327c7a270a1f140，相对b99增量接受，无新增可证实P0–P2。冻结archive经-I/-B运行，真实忙态Qt键对照+原grouped CLI两项15.80s实际0；CLI17checks/9.109s、两个不同真实worker PID，probe仅一次KeyK，BODY/focused/idle/no modal/drawer，精确保存重载通过，未留所属Qt进程。未修改共享源/Git。
 
 normal两jobs及concurrency相对b99 YAML结构恒等；新增suite命令/660s与正常0/17、超时17/0恒124等四mock分支0；独立rule_context check0。原120秒、单次真实键、原保护和精确绑定/持久化条件保持。旧Windows具体trigger和两处Linux原生挂起仍UNKNOWN，不把机制对照当原故障因果证明。没有重复私图/完整门禁。作者验证与原始失败边界详见pr28-ci.md。
+
+## 冻结 main 安装包与交付证据独审
+
+非作者t064_independent_review绑定 `60808671cc2a3e9bb255bce85d546a18416c64a5`，只读检查安装包、已安装文件、报告、原文件摘要及旧工作树；接受，无新增可证实P0–P2。未启动Qt/worker、重新安装或修改Git/项目/文件。
+
+两份安装器均361,584,364字节，SHA256为 `99c0ec5540161c27a0bcea990e5286aebadeea65b3372239fab1ed4a9cbb6d97`；32个交付摘要成员相符，构建与安装载荷各7,749文件逐一匹配。源码ZIP按构建器明确声明的归档范围核对296文件与提交/ZIP commit注释相符；四wheel摘要及174份包文件与冻结源码/安装内容相符，其中两份WB文本仅CRLF规范化差异。独立AppId/channel/QSettings及四个快捷方式目标/AppUserModelID相符。
+
+安装态分组17项/10.625s/两个真实worker PID，灰度OCR8.203s；父进程实际退出0、remaining与forbidden_development_modules均空，296/310条原生模块记录均来自安装目录或Windows。随包PS5.1自检双流程实际0。首观察器null退出码及采集失败记录仍保留，不被后继成功替换。114份原文件SHA不变，三个旧工作树HEAD及dirty计数4/2/2保持。
+
+首个审查探针因误以为源码ZIP包含整个仓库而实际1；当时载荷检查已完成。按构建器实际声明的归档范围更正审查后，源码与其余核验命令实际0，不把首探针改写为成功或产品失败。干净Win10、物理DPI/按钮、独立科学真值/留出及历史原生UNKNOWN继续保留。详见validation.md与本机忽略的独审记录。

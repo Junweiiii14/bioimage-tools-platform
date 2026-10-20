@@ -1,6 +1,6 @@
 # WB迭代与证据导航
 
-当前总任务是 [T063采集组交付](../work/tasks/T-063-grouped-intake-delivery-plan.md)，完整授权范围与验收见 [P0–P8计划](wb-grouped-intake-plan.md)。[GitHub交付跟踪 #25](https://github.com/Junweiiii14/bioimage-tools-platform/issues/25) 和 [离线测试版里程碑](https://github.com/Junweiiii14/bioimage-tools-platform/milestone/1) 汇总进展；任务文件仍是状态来源。这里的历史通过不代表当前候选已交付。
+本轮总任务是 [T063采集组交付](../work/tasks/T-063-grouped-intake-delivery-plan.md)，完整授权与验收见 [P0–P8计划](wb-grouped-intake-plan.md)，新候选实际证据见[T069交付记录](wb-grouped-intake-delivery.md)。[GitHub跟踪 #25](https://github.com/Junweiiii14/bioimage-tools-platform/issues/25) 和 [里程碑](https://github.com/Junweiiii14/bioimage-tools-platform/milestone/1) 汇总进展；任务文件仍是状态来源。历史通过不替代后继候选验收。
 
 | 迭代 | 可观察结果与契约 | 实施/审查证据及集成 |
 |---|---|---|
@@ -9,10 +9,10 @@
 | T063/P0 | 专用工作树、需求/任务/验收映射 | [完整计划](wb-grouped-intake-plan.md)，PR21已合；历史dirty与原图保持 |
 | T064/P1/P2 | 采集组草稿、唯一Fig级N、稳定行/源/槽位，批准网格 | [分组契约](contracts/wb-intake-grouping-v1.md)、[独审](../work/evidence/T-064/independent-review.md)，[PR22](https://github.com/Junweiiii14/bioimage-tools-platform/pull/22)已四检查合main |
 | T065/P3 | 目标候选与原坐标框，已完成裁剪的新修订/定向失效 | [修订契约](contracts/wb-intake-revision-v1.md)、[独审](../work/evidence/T-065/independent-review.md)、[CI原始失败与最终结果](../work/evidence/T-065/pr23-ci.md)，[PR23](https://github.com/Junweiiii14/bioimage-tools-platform/pull/23)已合main e842c6c |
-| T066/P4 | 统一21动作、配置/冲突/默认/持久化、输入/IME/弹窗保护 | [快捷键契约](contracts/workbench-shortcuts-v1.md)、[独审](../work/evidence/T-066/independent-review.md)，[PR24](https://github.com/Junweiiii14/bioimage-tools-platform/pull/24)检查/集成以任务为准 |
-| T067/P1/P3补齐 | 执行后未知N/未选源草稿、失效矩阵、数值请求全等才复用真实run | [分组修订契约](contracts/wb-intake-group-revision-v1.md)、[任务](../work/tasks/T-067-intake-group-revisions.md)、[独审](../work/evidence/T-067/independent-review.md)，已接受1211d70，后继PR待前置集成 |
-| T068/P5/P6 | 算法消费者/版本清单、仓库导航、依赖分流 | [算法清单](wb-algorithm-inventory.md)、[任务](../work/tasks/T-068-wb-algorithm-inventory.md)，不为了删行改变数值或删除兼容能力 |
-| P7/P8 | 三目录正式整链含人工修正/失效/重开，一次最终本地全门禁，冻结离线安装双流程/SHA/manifest | 本轮新候选尚未交付，以T063及后继交付任务真实证据更新；干净Win10/物理DPI/独立科学真值仍未验 |
+| T066/P4 | 统一21动作、配置/冲突/默认/持久化、输入/IME/弹窗保护 | [快捷键契约](contracts/workbench-shortcuts-v1.md)、[独审](../work/evidence/T-066/independent-review.md)，[PR24](https://github.com/Junweiiii14/bioimage-tools-platform/pull/24)四检查合main367ba2b |
+| T067/P1/P3补齐 | 执行后未知N/未选源草稿、失效矩阵、数值请求全等才复用真实run | [分组修订契约](contracts/wb-intake-group-revision-v1.md)、[任务](../work/tasks/T-067-intake-group-revisions.md)、[独审](../work/evidence/T-067/independent-review.md)，PR26四检查合mainc0ac071 |
+| T068/P5/P6 | 算法消费者/版本清单、仓库导航、依赖分流 | [算法清单](wb-algorithm-inventory.md)、[任务](../work/tasks/T-068-wb-algorithm-inventory.md)，PR27四检查合main5729cb8；无证据的删除不实施 |
+| T069/P7/P8 | 三目录主链含人工修正/失效/重开，冻结全门禁，独立离线安装双流程/SHA/manifest | [交付记录](wb-grouped-intake-delivery.md)、[任务/证据](../work/tasks/T-069-grouped-intake-offline.md)，PR28四检查合main6080867；干净Win10/物理DPI/独立科学真值仍未验 |
 
 ## 数据与检查边界
 
