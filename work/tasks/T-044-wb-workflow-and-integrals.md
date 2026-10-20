@@ -1,6 +1,6 @@
 # T-044：积分边界、文件夹/同Fig工作流与独立灰度分析
 
-- 状态：preparing；E7/T060授权实际main依赖集成；2026-10-18产品与CI历史保留，下述历史review不替代最终集成验收。
+- 状态：review；前置PR14已按最终2f独审/四检查接受main3b7716d。本分支已合实际基线并重载scope .，产品保持已审9ad；待最终绑定独审/四CI。2026-10-18原始产品/CI及未验科学边界保留，不以旧review代替当前集成。
 - 基线：d11552c32b87538e33ef3bfbe70fb3797e3f403e；同一活动树，新分支codex/t044-wb-workflow-and-integrals。原.impeccable/questions与历史dirty树/原图/旧结果保留。
 - 前轮当前事实：d11552c远端run39030621380两平台670和全部wheel/最终check成功，规则/桌面成功；历史间歇退出根因UNKNOWN，不以通过销账。
 
