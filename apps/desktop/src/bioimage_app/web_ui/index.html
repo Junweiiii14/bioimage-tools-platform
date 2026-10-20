@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="group_review.css">
   <link rel="stylesheet" href="desktop_session.css">
   <link rel="stylesheet" href="intake.css">
+  <link rel="stylesheet" href="shortcuts.css">
 </head>
 <body>
   <aside class="platform-rail" aria-label="工具平台">
@@ -19,7 +20,7 @@
   <div class="app-shell">
     <header class="project-header">
       <div class="breadcrumb"><button data-action="home">工作台</button><i data-icon="chevron"></i><span>WB 自动化</span><span class="header-divider"></span><strong id="project-name">新建实验项目</strong></div>
-      <div class="header-actions"><details id="session-menu"><summary>文件</summary><nav><button data-session="new_intake_folder">新建仪器导入项目…</button><button data-session="new">新建灰度项目</button><button data-session="open">打开已有项目…</button><button data-session="save">保存项目</button><button data-session="home">关闭项目并返回首页</button><button data-session="exit">退出软件</button></nav></details><span id="save-status" class="save-status"><i data-icon="check"></i>就绪</span><span id="runtime-badge" class="runtime-badge">网页预览</span><button class="button subtle" data-action="import"><i data-icon="plus"></i><span>添加原图</span></button><button class="button primary" data-action="export"><i data-icon="download"></i><span>导出结果</span></button></div>
+      <div class="header-actions"><details id="session-menu"><summary>文件</summary><nav><button data-session="new_intake_folder">新建仪器导入项目…</button><button data-session="new">新建灰度项目</button><button data-session="open">打开已有项目…</button><button data-session="save">保存项目</button><button data-action="shortcut-settings">快捷键设置…</button><button data-session="home">关闭项目并返回首页</button><button data-session="exit">退出软件</button></nav></details><span id="save-status" class="save-status"><i data-icon="check"></i>就绪</span><span id="runtime-badge" class="runtime-badge">网页预览</span><button class="button subtle" data-action="import"><i data-icon="plus"></i><span>添加原图</span></button><button class="button primary" data-action="export"><i data-icon="download"></i><span>导出结果</span></button></div>
     </header>
     <main id="home-view" class="home-view" hidden>
       <div class="home-intro"><div><h1>开始工作</h1><p>导入原图创建项目，或继续已有项目。</p></div></div>
@@ -62,6 +63,7 @@
   <script src="intake_groups.js" defer></script>
   <script src="intake.js" defer></script>
   <script src="desktop_session.js" defer></script>
+  <script src="shortcuts.js" defer></script>
   <dialog id="session-dialog" aria-labelledby="session-dialog-title"><div id="session-dialog-body"></div></dialog>
 </body>
 </html>

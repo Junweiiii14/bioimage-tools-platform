@@ -71,7 +71,7 @@ const desktopSession = (() => {
   }
   function connect(bridgeObject){
     if(channel)return;channel=bridgeObject;
-    channel.sessionStateChanged.connect(raw=>{try{const next=JSON.parse(raw);if((next.epoch??0)<epoch)return;epoch=next.epoch??0;session=next;renderSession();route();}catch{toast('项目会话状态读取失败，请重试。');}});
+    channel.sessionStateChanged.connect(raw=>{try{const next=JSON.parse(raw);if((next.epoch??0)<epoch)return;epoch=next.epoch??0;session=next;window.workbenchActions?.receive(next.shortcuts);renderSession();route();}catch{toast('项目会话状态读取失败，请重试。');}});
     send('refresh');timer=setInterval(position,500);
   }
   document.addEventListener('click',event=>{
@@ -81,6 +81,7 @@ const desktopSession = (() => {
     if(!el||!channel)return;
     event.preventDefault();event.stopImmediatePropagation();position();$('#session-menu').open=false;
     const action=el.dataset.session||'home';
+    if(window.workbenchActions&&['save','open'].includes(action)){window.workbenchActions.invoke(`project.${action}`,{button:el});return;}
     const workflow=document.querySelector('[name=session-workflow]:checked')?.value||'quant';
     if(action==='images'){manualQuant.pendingImport=workflow==='quant';bridge.request(workflow==='quant'?'quant_import':'import','{}');}
     else if(action==='folder'&&workflow!=='quant')bridge.request('import_folder','{}');
@@ -91,7 +92,7 @@ const desktopSession = (() => {
   document.addEventListener('pointerup',()=>queueMicrotask(position));
   window.addEventListener('pagehide',()=>{if(timer)clearInterval(timer);});
   function acceptState(next){const value=next.sessionEpoch??0;if(value<epoch)return false;epoch=value;return true;}
-  return {connect,route,hasDraft,acceptState};
+  return {connect,route,hasDraft,acceptState,shortcutState:()=>session.shortcuts,request:(action,data={})=>{if(!channel)return false;send(action,data);return true;}};
 })();
 window.desktopSession=desktopSession;
 if(bridge)desktopSession.connect(bridge);
