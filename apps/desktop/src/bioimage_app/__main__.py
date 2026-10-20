@@ -33,6 +33,12 @@ def main() -> int:
         from bioimage_app.installation_check_intake import verify_intake_installation
 
         return verify_intake_installation(Path(sys.argv[2]))
+    if len(sys.argv) == 3 and sys.argv[1] == "--verify-grouped-intake-installation":
+        from pathlib import Path
+
+        from bioimage_app.installation_check_intake import verify_intake_installation
+
+        return verify_intake_installation(Path(sys.argv[2]), grouped=True)
     from bioimage_app.desktop_entry import create_desktop_window, desktop_mode
 
     mode = desktop_mode(sys.argv[1:])

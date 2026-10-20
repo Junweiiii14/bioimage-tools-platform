@@ -96,3 +96,48 @@ def test_original_gray_diagnostic_completes_real_cli_workflow(tmp_path: Path) ->
         "busy-exit-confirmation",
         "post-cancel-dirty-confirmation",
     }.issubset(data["checks"])
+
+
+def test_grouped_diagnostic_uses_real_cli_workers_and_shipped_shortcuts(tmp_path: Path) -> None:
+    report = tmp_path / "grouped-diagnostic.json"
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-I",
+            "-m",
+            "bioimage_app",
+            "--verify-grouped-intake-installation",
+            str(report),
+        ],
+        env={
+            **os.environ,
+            "QT_QPA_PLATFORM": "offscreen",
+            "QTWEBENGINE_CHROMIUM_FLAGS": "--disable-gpu",
+            "PYTHONIOENCODING": "utf-8",
+        },
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        timeout=180,
+        check=False,
+    )
+    assert result.returncode == 0, (
+        result.stdout + result.stderr + report.read_text(encoding="utf-8")
+    )
+    data = json.loads(report.read_bytes())
+    assert data["diagnostic"] == "grouped_intake_installed@1"
+    assert data["phase"] == "passed" and data["errors"] == []
+    assert data["isolated_imports"] is True
+    assert len(data["worker_pids"]) == 2 and all(pid > 0 for pid in data["worker_pids"])
+    assert {
+        "incomplete-group-draft",
+        "grouped-stable-mapping",
+        "shortcut-settings",
+        "original-pixel-crops",
+        "saved-project-reopen",
+        "repeat-export-no-overwrite",
+        "archive-imported-history",
+        "archive-resume-output",
+        "owned-resources-closed",
+        "owned-window-deleted",
+    }.issubset(data["checks"])

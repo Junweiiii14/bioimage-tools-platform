@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import cast
 
 
-def verify_intake_installation(report_path: Path) -> int:
+def verify_intake_installation(report_path: Path, *, grouped: bool = False) -> int:
     import numpy as np
     import tifffile
     from PySide6.QtCore import QSettings, QTimer
@@ -72,6 +72,10 @@ def verify_intake_installation(report_path: Path) -> int:
             "archive-imported-history",
             "archive-resume-output",
         }
+        if grouped:
+            required.update(
+                {"incomplete-group-draft", "grouped-stable-mapping", "shortcut-settings"}
+            )
 
         def record() -> None:
             report.seek(0)
@@ -79,7 +83,7 @@ def verify_intake_installation(report_path: Path) -> int:
             json.dump(
                 {
                     "schema": 1,
-                    "diagnostic": "intake_installed@1",
+                    "diagnostic": "grouped_intake_installed@1" if grouped else "intake_installed@1",
                     "phase": phase,
                     "checks": checks,
                     "errors": errors,
@@ -156,7 +160,7 @@ def verify_intake_installation(report_path: Path) -> int:
 
         def poll() -> None:
             nonlocal phase, workspace, epoch, saved_runs, saved_outputs, original_zip
-            nonlocal js_pending, closed
+            nonlocal js_pending, closed, dom_ready
             try:
                 elapsed = time.monotonic() - started
                 if elapsed > 150:
@@ -202,6 +206,29 @@ def verify_intake_installation(report_path: Path) -> int:
                 if phase == "import":
                     if len(project.intake.sources) != 2:
                         raise ValueError("Two independent sources were not imported")
+                    if grouped:
+                        phase = "group-draft"
+                        request(
+                            "intake_grouping",
+                            grouping={
+                                "schema_version": 1,
+                                "figures": [{"figure_id": "fig-a", "label": "Fig 1"}],
+                                "groups": [
+                                    {
+                                        "group_id": key,
+                                        "source_ids": [source.source_id],
+                                        "figure_id": "fig-a",
+                                        "protein_label": "GAPDH",
+                                    }
+                                    for key, source in zip(
+                                        ("protein-a", "protein-b"),
+                                        project.intake.sources,
+                                        strict=True,
+                                    )
+                                ],
+                            },
+                        )
+                        return
                     phase = "plan"
                     request(
                         "intake_plan",
@@ -211,6 +238,38 @@ def verify_intake_installation(report_path: Path) -> int:
                             for key in ("protein-a", "protein-b")
                         ],
                     )
+                elif phase == "group-draft":
+                    draft = project.intake.grouping
+                    if (
+                        draft is None
+                        or draft.figures[0].lane_count is not None
+                        or any(group.selected_source_id is not None for group in draft.groups)
+                        or project.rows
+                        or project.intake.confirmed_digest
+                    ):
+                        raise ValueError("Incomplete grouped draft invented executable rows")
+                    checks.append("incomplete-group-draft")
+                    phase = "group-complete"
+                    request(
+                        "intake_grouping",
+                        grouping={
+                            "schema_version": 1,
+                            "figures": [{"figure_id": "fig-a", "label": "Fig 1", "lane_count": 8}],
+                            "groups": [
+                                {
+                                    **group.model_dump(mode="json"),
+                                    "selected_source_id": group.source_ids[0],
+                                }
+                                for group in draft.groups
+                            ],
+                        },
+                    )
+                elif phase == "group-complete":
+                    if {row.row_id for row in project.rows} != {"protein-a", "protein-b"}:
+                        raise ValueError("Grouped mapping did not retain stable row identities")
+                    checks.append("grouped-stable-mapping")
+                    phase = "confirm"
+                    request("intake_confirm")
                 elif phase == "plan":
                     phase = "assign"
                     by_name = {
@@ -403,8 +462,14 @@ def verify_intake_installation(report_path: Path) -> int:
                 elif phase == "dom":
                     if dom_ready:
                         checks.append("real-dom-webchannel")
-                        phase = "close"
-                        window.close()
+                        if grouped:
+                            window.activateWindow()
+                            window.web.setFocus()
+                            dom_ready = False
+                            phase = "shortcut-focus"
+                        else:
+                            phase = "close"
+                            window.close()
                     elif not js_pending:
                         js_pending = True
                         window.web.page().runJavaScript(
@@ -412,6 +477,57 @@ def verify_intake_installation(report_path: Path) -> int:
                             "document.readyState === 'complete'",
                             received,
                         )
+                elif phase == "shortcut-focus":
+                    if dom_ready:
+                        from PySide6.QtCore import Qt
+                        from PySide6.QtTest import QTest
+
+                        proxy = window.web.focusProxy()
+                        if proxy is None:
+                            raise ValueError("WebEngine keyboard focus proxy missing")
+                        QTest.keyClick(
+                            proxy,
+                            Qt.Key.Key_K,
+                            Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier,
+                        )
+                        dom_ready = False
+                        phase = "shortcut-open"
+                    elif not js_pending:
+                        js_pending = True
+                        window.web.page().runJavaScript(
+                            "(()=>{document.body.tabIndex=-1;document.body.focus();"
+                            "return document.hasFocus() && "
+                            "!!window.workbenchActions?.loaded();})()",
+                            received,
+                        )
+                elif phase == "shortcut-open":
+                    if dom_ready:
+                        phase = "shortcut-save"
+                        window.web.page().runJavaScript(
+                            "(()=>{const f=document.querySelector("
+                            "'[data-shortcut-record=\"project.save\"]');"
+                            "f.focus();f.dispatchEvent(new KeyboardEvent('keydown',"
+                            "{key:'s',code:'KeyS',ctrlKey:true,shiftKey:true,bubbles:true,"
+                            "cancelable:true}));document.querySelector("
+                            "'[data-shortcut-command=save]').click();return true;})()"
+                        )
+                    elif not js_pending:
+                        js_pending = True
+                        window.web.page().runJavaScript(
+                            "!!document.querySelector('#shortcuts-dialog[open]')", received
+                        )
+                elif phase == "shortcut-save":
+                    if window.shortcuts.bindings["project.save"] == "Ctrl+Shift+S":
+                        from bioimage_app.shortcuts import WorkbenchShortcuts
+
+                        reloaded = WorkbenchShortcuts(
+                            QSettings(str(root / "intake.ini"), QSettings.Format.IniFormat)
+                        )
+                        if reloaded.bindings != window.shortcuts.bindings or reloaded.error:
+                            raise ValueError("Saved shortcut settings did not reload exactly")
+                        checks.append("shortcut-settings")
+                        phase = "close"
+                        window.close()
                 record()
             except (ValueError, OSError, RuntimeError, KeyError, TypeError) as error:
                 errors.append(str(error))

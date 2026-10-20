@@ -22,8 +22,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--iscc", required=True, type=Path)
     parser.add_argument("--gcc", required=True, type=Path)
-    parser.add_argument(
+    profiles = parser.add_mutually_exclusive_group()
+    profiles.add_argument(
         "--execution-test", action="store_true", help="Build the isolated E7 test distribution"
+    )
+    profiles.add_argument(
+        "--grouped-intake-test",
+        action="store_true",
+        help="Build the isolated grouped-intake test distribution",
     )
     args = parser.parse_args()
     if subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT).strip():
@@ -101,7 +107,20 @@ def main() -> int:
         raise RuntimeError("Locked Qt wheel is missing required MSVC redistributables")
     for library in redistributables:
         shutil.copyfile(library, runtime / library.name)
-    distribution = "windows_execution_test" if args.execution_test else "windows_test"
+    distribution = (
+        "windows_grouped_intake_test"
+        if args.grouped_intake_test
+        else "windows_execution_test"
+        if args.execution_test
+        else "windows_test"
+    )
+    channel = (
+        "wb-grouped-intake-test"
+        if args.grouped_intake_test
+        else "wb-execution-test"
+        if args.execution_test
+        else "win10-test"
+    )
     shutil.copyfile(ROOT / f"tooling/{distribution}_readme.txt", dist / "安装与使用说明.txt")
     shutil.copyfile(ROOT / f"tooling/{distribution}_selfcheck.ps1", dist / "selfcheck.ps1")
     shutil.copyfile(ROOT / "tooling/windows_test_selfcheck.cmd", dist / "测试版环境自检.cmd")
@@ -125,9 +144,7 @@ def main() -> int:
             "-municode",
             "-mwindows",
             "-static-libgcc",
-            '-DRELEASE_CHANNEL=L"'
-            + ("wb-execution-test" if args.execution_test else "win10-test")
-            + '"',
+            '-DRELEASE_CHANNEL=L"' + channel + '"',
             str(ROOT / "tooling/windows_candidate_launcher.c"),
             str(resource_object),
             "-o",
@@ -176,6 +193,14 @@ def main() -> int:
             distribution_id="BioImageTools.WB.E7Test",
             release_channel="wb-execution-test",
             settings_namespace="E7Test",
+            acceptance="candidate-only; clean Win10/DPI/scientific holdout pending",
+        )
+    elif args.grouped_intake_test:
+        manifest.update(
+            schema=2,
+            distribution_id="BioImageTools.WB.GroupedIntakeTest",
+            release_channel=channel,
+            settings_namespace="GroupedIntakeTest",
             acceptance="candidate-only; clean Win10/DPI/scientific holdout pending",
         )
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
