@@ -188,3 +188,5 @@ Final3680790 actualbase842独审/13历史来源规则0；产品PR17 Windows910/6
 2026-10-20 CI收尾：main0f的910/762.24s及wheel功能通过后清理遭15分钟取消，整命令未通过；旧main3b702/590.48s后原退出0xc0000005/wheel未跑，原因UNKNOWN。原306四CI通过不销旧失败。仅foundation TEMP/TMP同盘与实际路径诊断实验，保留时限/测试/退出检查；新head待绑定独审及四CI。详见work/evidence/T-060/ci-temp-filesystem.md。
 
 2026-10-20 T061：导出组/角色/候选原坐标与集中确认已接入；真实82图仅开发候选无监督真值；新增必要4core、11Web相关、1host重开及1回执修正通过，首次核心2fail及原因保留。完整门禁/最终独审/安装候选待验，状态与细节见T061任务。
+
+T061收尾：冻结710一次916/763.69s及全wheel/OCR/check0；非作者接受、安装/PS5.1双流程/新私有识别probe0，用户数据不变。三旧安装卸载0与桌面旧包/过期shortcut移除；递归残余清理被自动审批blocked by policy阻止，未绕过。最终PR19四检查待验，详见T061/validation.md。

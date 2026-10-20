@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "graceful_old_exit": true,
+  "forced_termination": false,
+  "uninstall": [
+    {
+      "registered_after": false,
+      "directory_after": true,
+      "install": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB Candidate",
+      "version": "T047",
+      "exit": 0
+    },
+    {
+      "registered_after": false,
+      "directory_after": true,
+      "install": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB Test",
+      "version": "T048",
+      "exit": 0
+    },
+    {
+      "registered_after": false,
+      "directory_after": true,
+      "install": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB E7 测试版",
+      "version": "T060",
+      "exit": 0
+    }
+  ],
+  "old_desktop_installers_removed": true,
+  "obsolete_t021_shortcut_removed": true,
+  "preserved_user_data_sha256": "8ba966222ab954e42f9c6bc61dda7b19918aee136a1dfd0c8a34c5c396d52b10",
+  "new_install_exit": 0,
+  "new_registry_display": "BioImage WB（图像识别测试版） version 0.14.0-T061-710836e65521",
+  "residual_cleanup_complete": false,
+  "automatic_review_rejections": {
+    "recursive_bulk_cleanup": "blocked by policy",
+    "explicit_retired_runtime_recursive_cleanup": "blocked by policy",
+    "bulk_old_build_files_and_metadata_cleanup": "blocked by policy"
+  },
+  "remaining": [
+    "T047/T048 retired runtime bytecode caches",
+    "older ignored release build directories in t045/t051 .local/releases",
+    "desktop old T048/T060 delivery metadata (installers removed)"
+  ],
+  "decision": "No alternate-tool bypass. Application uninstall and precise desktop installer/shortcut removal succeeded; original images/projects/results/settings retained."
+}

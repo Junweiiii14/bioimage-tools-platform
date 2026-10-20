@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "product_commit": "710836e65521cf570a8407cdcc6799620a2d1701",
+  "platform": "Windows 11 x64, non-elevated",
+  "install_exit": 0,
+  "setup_size": 361523190,
+  "setup_sha256": "90915b9ffdd7c697d975390e8115240709fd6216203c9ff89e222209b3680709",
+  "distribution_id": "BioImageTools.WB.E7Test",
+  "display_version": "T061 image-discovery test",
+  "selfcheck_exit": 0,
+  "existing_flows": [
+    "grayscale and offline OCR",
+    "intake complete worker/output/reopen"
+  ],
+  "new_discovery_probe": {
+    "schema": 1,
+    "phase": "passed",
+    "runtime": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB E7 测试版\\runtime",
+    "roles": [
+      "signal",
+      "white",
+      "merge"
+    ],
+    "fixed_slots": 4,
+    "crop_reviewed": false,
+    "originals_unchanged": true,
+    "module_sha256": "8f05d837cc78c36c7641fce234f0fffcac965da3a1d379c4fe255b9c9feb703e"
+  },
+  "user_data_preserved": true,
+  "formal_release": false
+}
