@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "task": "T-069",
-  "base_commit": "c0ac071d735a09268628e43da5091598a1aca8e7",
+  "base_commit": "5729cb81581370339fcc5c86cda1cb20264e8c5c",
   "scopes": [
     ".agent-handoff",
     "apps/desktop",

@@ -42,3 +42,5 @@ HEAD 3f7340845da39adf938b29a183b258d6460ad572，干净工作树，Windows/Python
 
 Ruff/764文件格式/Pyright/import contracts通过；955 passed/800.04s，Observed child exit=0/u32=0；独立wheel全部安装/公开API及真实OCR完成；最外层实际exit_code=0。原始全日志.local/t069-fullcheck-3f73408.log、原始退出与起止.local/t069-fullcheck-3f73408-process.json。冻结期间未改源码、未另启Qt。一次完成，不把pytest摘要代替整命令退出；不外推目标Win10/DPI/科学留出或未构建安装包。
 本地全门禁后的合并只增加T068已独审取证与文档，3f73408→当前apps/desktop、tools/wb、packages、tests、uv.lock、根pyproject差异为空；不重复本地完整门禁来制造新结果。服务器最终PR检查照常完成；若发现新产品/共享接口问题再按必要范围复验。
+
+PR27最终0a96d607b01c62ebb8ff0de6dabb5e3e3a239613四必需检查SUCCESS，quality39426524859：Windows118640498573为951/467.54s、child0/u32=0；Linux118640498667为951/287.23s、debugger0；全部独立wheel/真实OCR完成。取证两问题绑定d2790a3独审resolved；未新增产品修复，不将后继通过销旧0b712f3 Linux关闭UNKNOWN。2026-10-20T13:09:21Z精确正常合main5729cb81581370339fcc5c86cda1cb20264e8c5c，已同步/真实重载规则。原日志.local/t068-pr27-{windows,linux}-final.log保留。
