@@ -1,10 +1,10 @@
 # 生物图像工具平台
 
-本轮[采集组交付计划](docs/wb-grouped-intake-plan.md)已完成本机工程测试候选：采集组网格、Fig级N、来源草稿、执行后修订/失效与可配置快捷键均已独审并分PR合main；指定三目录主链、人工修正和保存重开通过，新离线候选已构建、安装并独立核验。安装包摘要、双流程/PS5.1自检及边界见[交付记录](docs/wb-grouped-intake-delivery.md)。[迭代/证据导航](docs/iterations.md)、[GitHub跟踪](https://github.com/Junweiiii14/bioimage-tools-platform/issues/25)与[交接入口](AGENT_HANDOFF.md)保留历史失败和当前任务指针。
+本轮[Fig顺序方案](docs/wb-fig-sequence-automation-plan.md)已实现顶部Fig名/每Fig一次N/有序蛋白配置、跨Fig连续分配、组内手选原图及一次启动；整批裁剪→拼图→原像素定量→结果按真实提交自动切页，人工问题暂停后单一继续。PR30四必需检查及两平台979项/全部wheel/OCR通过，main710bb85的新独立离线候选已构建、安装并通过三流程与PS5.1自检。摘要和验收边界见[T071交付](docs/wb-fig-sequence-delivery.md)；旧[T069交付](docs/wb-grouped-intake-delivery.md)及原图/历史/旧未提交改动保持。[迭代/证据导航](docs/iterations.md)与[交接入口](AGENT_HANDOFF.md)保留实际初败和当前任务指针。
 
 当前WB需求以[开发规划v2](docs/wb-development-plan-v2.md)为准，实施见[E0–E7执行计划](docs/wb-execution-plan.md)：清单、固定N原值裁剪、拼图后原像素定量、稳定槽表格、导出与恢复。E0–E7工程实现、独审及主线集成已完成；两平台910项完整门禁及全部隔离wheel通过，独立测试安装候选在本机Win11通过双流程和生命周期验证，独立灰度与OCR保留。科学留出、明确样本配对、干净目标Win10和物理DPI仍待验，不代表正式发布。详见[验收索引](docs/wb-execution-acceptance.md)和T060证据。
 
-当前阶段：**WB 本机工程测试。指定三目录95 TIFF/19采集组的已见开发回归已走通，956项两平台检查、独立wheel/OCR与新安装候选双流程通过；科学真值/留出、干净Win10、物理DPI和正式发布仍未完成。** 实际状态以任务和验证记录为准。
+当前阶段：**WB 本机工程测试。当前三目录85 TIFF/19执行组＋28参考组的已见开发回归已走通，979项两平台检查、独立wheel/OCR与新安装候选三流程通过；科学真值/留出、干净Win10、物理DPI和正式发布仍未完成。** 历史95 TIFF清单不改写；实际状态以[T071](work/tasks/T-071-fig-sequence-automation.md)和验证记录为准。
 
 最初的 [V3.0 技术方案](生物图像工具平台与全AI长期迭代技术方案.pdf) 保持原样，首次提交可追溯。
 当前WB采用Windows本地Python/PySide6、独立计算进程及单仓库分包；IF/IHC保留为后续单独任务。目标机验收缺口单列，已授权WB技术栈继续完成工程交付。

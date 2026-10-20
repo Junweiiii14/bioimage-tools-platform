@@ -1,6 +1,9 @@
 # Validation Index
 
-当前交付状态唯一来源是work/tasks/T-069-grouped-intake-offline.md；本轮见[采集组交付记录](../docs/wb-grouped-intake-delivery.md)与T069 evidence。PR28最终956两平台/全部wheel/OCR/四检查0；冻结main6080867本机新安装、双流程/PS5.1/7749载荷及独立交付审查通过。以下T060等均为当时历史证据，不覆盖原失败或外部验收缺口。旧索引替换前已逐字节复制/校验，保留于[validation-20261020-e7-closeout.md](archive/validation-20261020-e7-closeout.md)，更早历史按其链接继续可查。
+当前T071产品PR30已按四检查合main710bb85；两平台979/全wheel/OCR/check0，新独立包已安装并通过三流程/PS5.1/7751载荷校验，最终交付审计与文档收尾见[T071](../work/tasks/T-071-fig-sequence-automation.md)及[交付](../docs/wb-fig-sequence-delivery.md)。以下T069/T060为历史记录，保留当时状态，不作当前指针。
+
+
+历史T069交付状态来源是work/tasks/T-069-grouped-intake-offline.md；当时见[采集组交付记录](../docs/wb-grouped-intake-delivery.md)与T069 evidence。PR28最终956两平台/全部wheel/OCR/四检查0；冻结main6080867本机新安装、双流程/PS5.1/7749载荷及独立交付审查通过。以下T060等均为当时历史证据，不覆盖原失败或外部验收缺口。旧索引替换前已逐字节复制/校验，保留于[validation-20261020-e7-closeout.md](archive/validation-20261020-e7-closeout.md)，更早历史按其链接继续可查。
 
 - E0–E6各阶段实现、schema11–14、数值/旧格式/恢复及绑定独审见[验收索引](../docs/wb-execution-acceptance.md)和T053–T059；E6最终ea7ed55完整862/624.64s、全部wheel/check0。
 - E7最终产品368079078180eea067079f542a523df0094e99ac，actualbase842918a，非作者绑定独审无新增P0–P2，13份历史回执来源/冻结规则0。PR17四必需检查SUCCESS，2026-10-20T00:29:51Z精确合main0f358ac2983540b1bae98b1e6340280207e135fe。
@@ -29,3 +32,5 @@ T065最终产品708d2d7：初审两P2和一UI文案修正，作者34/29.12s实�
 2026-10-20 T064独审：4a初审3项数据/保存缺陷及界面2项；b93后11/6.44s+旧核心27/2.62s0，第三项二次后写反例partial再修cdbe，作者单项2.54s0；原非作者冻结反例0/真实Web1项4.14s0，三项全部resolved。界面两修复resolved/ship及documenter No changes；仍未全门禁/三目录整链/安装。
 
 2026-10-21 T071：状态唯一来源改为T071任务；70定向/新诊断13项/参考31项及真实19 Fig链192.59s均实际0，104源文件保持。用户19采集+28参考范围已确认。最终绑定复审、全门禁、PR和新安装仍未完成，见work/evidence/T-071。
+
+- T071最终产物非作者只读Accepted，冻结main/安装器SHA、7751载荷、302源码/4wheel/41校验成员/37证据副本与PS5.1失败保留均核验；具体边界见T071 independent-review。main710bb自动quality39473538375也SUCCESS。

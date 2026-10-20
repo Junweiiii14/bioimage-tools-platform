@@ -1,24 +1,15 @@
 # T-071 Fig顺序分配、一键启动与整批自动导航
 
-- 状态：实施中。2026-10-20用户批准T070完整方案，已登记active计划目标，授权在新树持续至绑定独审、PR集成和新离线候选交付。
-- 2026-10-21进展：顶部配置/选源、纯单一启动/继续与CAS、@3真实阶段导航、独立发行配置和实际网页诊断已实现；扩大定向70/134.65s实际0，源码诊断13项/8.0s实际0。最终完整门禁/最终独审/PR/main/新安装交付尚未完成。
-- 数据范围已确认：用户明确只给19仪器采集组编号，28组参考结果保留单列、不占蛋白顺序。全部47组和原始身份保持；只从19组跨Fig连续分配。没有待答数据问题。
-- 基线：main6916b3a816b9a547ffdedf032a9dba82ce119c9d；规划来源提交0a966e84c7c07ca26dd71fade4dfe27e6bb4e435；新受管树C:/Users/70236/.codex/worktrees/wb-fig-sequence/bioimage-tools-platform，分支codex/fig-sequence-automation。旧规划树/所有其他树dirty、原图、项目、历史结果和T069安装保持。
-- 需求：顶部Fig名/N/有序蛋白条目，跨Fig连续分配完整采集组，手选组内来源；一个启动入口完成保存/校验/确认/冻结。整批全部裁剪→全部拼图→全部原像素定量→统一结果，真实提交驱动切页，仅人工处理时暂停，修正后断点继续。
-- 范围：tools/wb、apps/desktop、tests、tooling（仅交付/诊断）、docs、work、.agent-handoff、AGENT_HANDOFF.md、README.md、PRODUCT.md、.impeccable/surfaces、uv.lock（仅本地产品版本元数据；不升级第三方依赖）。不改平台包、门禁、技能或工作流。
-- 顺序：版本化草稿/纯顺序映射与兼容→正式顶部配置/选源→保存CAS/单一启动→版本化整批调度/进度导航→暂停修正/恢复/输出→实际发货UI与指定真实目录回归→冻结全门禁一次/非作者独审→四CI/精确合main→新独立安装候选/载荷与SHA/manifest/交接。
-- 验收：至少两Fig的真实事件证明全部crop完成后才compose、全部compose提交后才measure；筛选不改映射，缺组/余组/空名/重复名/顺序/N/来源修改与保存重开；IME/焦点/忙态、取消和旧消息保护，人工复核期间不抢页；旧清单/账本wire及语义保持，8/16/RGB原值、历史和灰度/OCR保持。
-- 权限：普通实现自主，仅无法消解数据歧义集中询问；私图不上Git/外部API，不覆盖旧包/项目/原图，不自动正式Release或扩工具。干净Win10/物理DPI/科学留出及历史native UNKNOWN继续单列。
-- 证据：work/evidence/T-071；T070历史回执原样保留且绑定来源提交，最终PR使用T071唯一当前回执与显式integration-context，不删历史回执解决门禁。
-
-- 2026-10-21增量：参考组证据与可选reference_group_ids入契约，新仪器池自动识别、旧保存项目不静默分类；独审2a的关闭收尾P2及界面浏览/暂停说明/放弃草稿三项已修复，已在c935绑定复审接受。真实三目录链192.59s实际0：19原坐标复核、19真实worker/74槽位、新输出、局部修订保留其余18 Fig/旧输出、重开及104原文件字节保持；开发回归不等于科学真值。
-
-- 冻结产品c9355ba：代码独审Accepted/32会话控制+40参考兼容纯控制0，七格式wire/digest字节保持；UI限定范围ship/五项resolved。最终全门禁运行中；下一步四必需CI/PR正常集成和新独立安装。
-
-- PR30已建立，首完整门禁本机/Linux均唯一新增诊断取证采样漏阶段而失败（976通过各1失败），原证据保留；仅修诊断为每次持久保存成功回调观察，逐目标要求加强，真实-I局部11.83s0。需绑定增量独审及复跑必要全门禁/四CI，不把原失败改成功。
-
-- 20c106f诊断增量非作者Accepted/18纯控制1.67s0，覆盖保存失败/取消无伪造、原回调异常及恢复、逐目标集合/屏障门槛未弱化。新完整门禁运行中，仅增加现有verbose/faulthandler/native观察以记录实际退出，不改变测试/时限。
-
-- 二次本机完整977/全部wheel/OCR/check0，Linux完整977/debugger0/全wheel/check0；Windows在第5个旧归档close测试挂起被取消，退出未知，尚未合main或构建安装。已按现场栈把单宿主WB退休与存储关闭串行，补早closed边界，23项定向66.80s0；后续绑定独审/必要全门禁和四CI，详windows-close-order。
-
-- a952555关闭顺序增量独审Accepted，11纯控制/1.50s实际0；真实数据只读独审接受像素/历史/来源/输出证据，逐项范围和104源文件初始清单限制见independent-review。必要新完整门禁运行中，仍待新四CI、合main及安装交付。
+- 状态：本轮工程交付完成。产品独审/四必需检查后PR30精确集成main710bb85；新独立离线候选构建、安装、三流程/PS5.1/7,751载荷校验及最终非作者产物审计Accepted。最终证据随本次文档PR正常集成；二进制来源仍为冻结main710bb85。
+- 用户2026-10-20已批准[T070完整方案](../../docs/wb-fig-sequence-automation-plan.md)，全文已登记active计划目标，授权持续至独审、PR集成和新离线测试版。普通实现自主，仅无法消解的数据歧义集中询问。
+- 需求已落实：顶部Fig名、每Fig一次N、有序蛋白名；跨Fig连续分配完整采集组，组内手选原图；一个入口保存/校验/确认/冻结并启动。整批全部裁剪→全部拼图→全部原像素定量→统一结果；真实提交自动切页，人工问题暂停，修正后单一继续。浏览/输入/草稿保护及重开不自动运行。
+- 唯一数据澄清已回答：只编号19个仪器采集组，28参考组保留单列、不占蛋白顺序；全部47组原身份保留。没有待答问题。
+- 基线main6916b3a；新受管树C:/Users/70236/.codex/worktrees/wb-fig-sequence/bioimage-tools-platform。规划来源0a966e8，仅复制四份明确规划证据；旧wb-grouped-intake/codex/fig-sequence-plan和所有其他树原有dirty保持。
+- 实现与兼容：grouping@2/manifest4保存顺序草稿、缺组/显式排除，旧wire不改；workflow@3整批屏障、异常全批暂停，旧策略不静默迁移；单一启动/继续保留原CAS、代际/取消保护及历史复用。平台/数值公式/原始数组/第三方依赖/门禁/技能不扩展或改写。
+- 范围回执：tools/wb、apps/desktop、tests、tooling、docs、work、.agent-handoff、AGENT_HANDOFF.md、README.md、PRODUCT.md、.impeccable/surfaces、uv.lock（仅项目版本元数据）。产品PR保留T070历史回执及显式integration-context；文档收尾按main710bb重新加载T071回执，不删除旧记录。
+- 产品提交依次edb5a5e、2a676e3、c9355ba、20c106f、a952555、5f2090a。非作者代码/兼容/实际数据证据复审Accepted，UI限定范围ship；局部发现与修复、验证边界见[独审](../evidence/T-071/independent-review.md)。
+- 最终门禁：本机启动源a952为979/825.65s、raw child0/全部wheel/OCR/check0；5f专项及最终CI独立覆盖，Windows979/615.77s、Linux979/332.14s及全部wheel/OCR/check0。四required SUCCESS后2026-10-20T18:18:14Z正常合main710bb85de99e88a970f4d0f5613ca554b705ecf7；非作者确认tree与5f相同。
+- 新交付：[T071交付记录](../../docs/wb-fig-sequence-delivery.md)。冻结main710bb构建，安装器361,622,169字节/SHA256760b3ee0d7e9c3d22f8f470185791f3c11b26f051babce2c3d4d94f57df75c94。独立AppId/目录/设置/快捷方式，旧T069仍冻结6080867、不覆盖。
+- 数据保护：当前三目录104文件/85TIFF/76内容，19回归Fig/74槽，19初始真实worker和一次局部修订；其他18 Fig及旧输出保留。非作者38裁剪逐数组核对、208历史资产摘要、81阶段快照及新旧输出通过。104文件本轮初始逐项清单仅内存，持久比较用既有T069清单的对应子集，不能补称已有本轮持久启动清单。
+- 原失败均保留：[验证](../evidence/T-071/validation.md)、[最终CI](../evidence/T-071/final-ci.md)、[关闭现场](../evidence/T-071/windows-close-order.md)。新诊断曾漏节流阶段、过早点击与错误原生预览前置，均保留实际失败；a541旧手动坐标偏差、历史native及Subclass抓图异常仍UNKNOWN。无测试容差/skip/忽略或门禁削弱。
+- 外部验收边界：已见参照辅助开发回归，不报生物配对/科学准确率；干净Win10、物理DPI/按钮、独立真值/留出仍待验。未正式Release、未升级依赖、未扩其他工具，不恢复被用户停止的原生CUA。

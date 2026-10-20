@@ -1,5 +1,8 @@
 # Risks, Blockers, And Unknowns
 
+- 2026-10-21 T071：产品PR30/5f独审及两平台979/全部wheel/四CI0，冻结main710bb85新独立候选安装/三流程/PS5.1/7751载荷通过。a541旧手工Qt坐标偏差未复现但根因UNKNOWN；cb2关闭native现场与更早UNKNOWN均保留，串行所属关闭通过不等于所有根因已明。真实85TIFF/19执行＋28参考/74槽是已见回归；本轮104源文件启动逐项清单仅内存，持久核验用旧T069对应子集。干净Win10/物理DPI/独立科学留出未验，未正式发布。详见T071 final-ci/independent-review与交付记录。
+
+
 - 2026-10-20 T069本机工程交付完成：main6080867构建/安装/双流程/PS5.1与非作者交付独审通过。PR27旧Linux关闭挂起、PR28首轮Windows快捷键诊断超时与另一Linux fixture关闭挂起仍UNKNOWN；后继两平台956及手动956成功不能证明原生根因已修复。首安装观察器null退出码按失败保留，持有句柄并经0/17控制后新报告实际0。干净Win10、物理按钮/多DPI、独立科学真值/留出仍未验；95图/19组为已见参考辅助开发回归，不报准确率或科学泛化。当前交付索引docs/wb-grouped-intake-delivery.md；原失败见work/evidence/T-069/pr28-ci.md与validation.md。
 
 - 2026-10-20 E2/b4b519f首次全门禁822断言通过后原pytest0xc0000409；精确栈主线程abort→purecall→QObject析构→PySide destroyQCoreApplication→Py_FinalizeEx，首轮wheel未执行。同产品诊断复验822/566.49s及全部wheel/check0，独审解除E2阻断。全量inventory344/truncated包含旧无父视图/OCR面板，转E6精确所属销毁；E2所属host/view/page/profile探针均失效，profile假设未复现。来源UNKNOWN，不用复验成功抹失败。见T055 validation。
