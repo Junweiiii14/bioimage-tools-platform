@@ -39,3 +39,5 @@ Post-reinstall installed v3 dual-flow actual0: intake controller14.8269492s, gra
 PR14旧b1 Windows699/644.74s+全wheel0，Linux15m16s超时停repeated WB close，实际native栈未捕获/rootUNKNOWN。仅窄移植后继已审CI012测试窗口所属销毁，真实red2/2.76s→16/32.60s0，原20轮/10s/GC与产品不动；最终2fbe9cb独审/冻结规则0，新四CI39343775888/39343775941运行。不得沿用旧Windows绿标新head通过。
 
 PR14 final2f四CI/绑定独审通过：Win702/584.67s、Linux702/249.75s及全部wheel/check0，精确merge3b7716d（00:00:48Z）。主树合180a464，测试helper唯一冲突保留E7已完整验证的关闭提示处理版；相对8e产品/测试/诊断运行文件空diff。actualbase3b的普通scope规则及BASE已重载读取。PR15 final330e329实际基线独审/规则0，四CI39345152689/39345152630中；其接受后才生成T060最终集成清单。
+
+2026-10-20 CI收尾：main0f的910/762.24s及wheel功能通过后清理遭15分钟取消，整命令未通过；旧main3b702/590.48s后原退出0xc0000005/wheel未跑，原因UNKNOWN。原306四CI通过不销旧失败。仅foundation TEMP/TMP同盘与实际路径诊断实验，保留时限/测试/退出检查；新head待绑定独审及四CI。详见work/evidence/T-060/ci-temp-filesystem.md。

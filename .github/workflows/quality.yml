@@ -19,6 +19,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     env:
+      TEMP: ${{ runner.temp }}
+      TMP: ${{ runner.temp }}
       QT_QPA_PLATFORM: offscreen
       QTWEBENGINE_CHROMIUM_FLAGS: --disable-gpu
       PYTHONUNBUFFERED: '1'
@@ -42,6 +44,9 @@ jobs:
           sudo apt-get install -y --no-install-recommends libegl1 libopengl0 libxkbcommon0 gdb
           gdb --version
       - run: uv sync --locked --group desktop
+      - name: Report temporary environment filesystem
+        run: |
+          uv run --locked --no-sync python -c "import os,tempfile; from pathlib import Path; print('Python temporary directory:',Path(tempfile.gettempdir()).resolve()); print('uv cache directory:',Path(os.environ['UV_CACHE_DIR']).resolve())"
       - name: Verify native diagnostic exit propagation (Linux)
         if: runner.os == 'Linux'
         run: uv run --locked --no-sync python -m tooling.linux_native_run --probe

@@ -11,3 +11,5 @@
 - E6性能20次新进程/模式：同操作冻结渲染复用，旧导出p50改善28.91%、清单17.78%；不是整个实验批次或科学准确率承诺。见T059/performance-comparison.md。
 - 原purecall/native、32d页面及GBK退出未知、5bb908/1fail、d7f909/1fail、PR14旧b1 Linux超时等原证据保留。具体fixture/身份/迟到批次缺口已修复并验证，不宣称所有历史根因已明。见T060/fullcheck-diagnostics.md及SYNC008/fixture-retirement.md。
 - 独立科学留出/明确生物样本配对、干净目标Win10、物理DPI125/150/200未验。当前为工程测试候选，正式发布未执行；无定时任务，不恢复被用户停止的原生CUA。
+
+2026-10-20 CI收尾：main0f的910/762.24s及wheel功能通过后清理遭15分钟取消，整命令未通过；旧main3b702/590.48s后原退出0xc0000005/wheel未跑，原因UNKNOWN。原306四CI通过不销旧失败。仅foundation TEMP/TMP同盘与实际路径诊断实验，保留时限/测试/退出检查；新head待绑定独审及四CI。详见work/evidence/T-060/ci-temp-filesystem.md。
