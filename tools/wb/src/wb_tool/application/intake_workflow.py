@@ -61,7 +61,9 @@ class IntakeWorkflowStep(DocumentIO):
 class IntakeWorkflowLedger(DocumentIO):
     model_config = ConfigDict(revalidate_instances="always")
 
-    policy: Literal["intake_workflow@1", "intake_workflow@2"] = "intake_workflow@1"
+    policy: Literal["intake_workflow@1", "intake_workflow@2", "intake_workflow@3"] = (
+        "intake_workflow@1"
+    )
     editing: bool = False
     intake_digest: str = Field(pattern="^[0-9a-f]{64}$")
     approved: bool = False
@@ -78,7 +80,7 @@ class IntakeWorkflowLedger(DocumentIO):
     @model_validator(mode="after")
     def editing_is_explicit(self) -> "IntakeWorkflowLedger":
         if self.editing and (
-            self.policy != "intake_workflow@2"
+            self.policy not in {"intake_workflow@2", "intake_workflow@3"}
             or self.approved
             or any(s.status == "running" for s in self.steps)
         ):
@@ -138,7 +140,9 @@ class WBIntakeWorkflowProject(WBIntakeProject):
         for step in self.workflow.steps:
             if step.status == "running" and step.input_digest != _inputs_digest(self):
                 raise ValueError("阶段输入已改变，不能接收旧执行回复")
-            if step.status in {"running", "done"} and not _prerequisites(self, step, statuses):
+            if step.status in {"running", "done"} and not _prerequisites(
+                self, step, statuses, batch=step.status == "running"
+            ):
                 raise ValueError("执行阶段越过尚未就绪的裁剪、拼图或定量依赖")
         return self
 
@@ -147,7 +151,16 @@ def _prerequisites(
     project: WBIntakeWorkflowProject,
     step: IntakeWorkflowStep,
     statuses: dict[tuple[Stage, str], StepStatus],
+    *,
+    batch: bool = True,
 ) -> bool:
+    if batch and project.workflow.policy == "intake_workflow@3":
+        order = {"crop": 0, "compose": 1, "measure": 2, "export": 3}
+        if any(
+            s.status != "done" and order[s.stage] < order[step.stage]
+            for s in project.workflow.steps
+        ):
+            return False
     if step.stage == "crop":
         return True
     if step.stage == "compose":
@@ -164,7 +177,10 @@ def _replace_ledger(project: WBIntakeWorkflowProject, **changes: object) -> WBIn
 
 
 def prepare_intake_workflow(
-    project: WBFigureProject, *, expected_digest: str
+    project: WBFigureProject,
+    *,
+    expected_digest: str,
+    batch_stages: bool = False,
 ) -> WBIntakeWorkflowProject:
     plan = build_intake_execution_plan(project, expected_digest=expected_digest)
     if isinstance(project, WBIntakeWorkflowProject):
@@ -176,6 +192,7 @@ def prepare_intake_workflow(
             **dict(project),
             "schema_version": 11,
             "workflow": IntakeWorkflowLedger(
+                policy="intake_workflow@3" if batch_stages else "intake_workflow@1",
                 intake_digest=plan.intake_digest,
                 steps=tuple(
                     IntakeWorkflowStep(stage=s, target_id=t) for s, t in _addresses(project)
@@ -222,6 +239,11 @@ def claim_intake_workflow_step(
         s.status == "running" for s in project.workflow.steps
     ):
         return project, None
+    if project.workflow.policy == "intake_workflow@3" and any(
+        s.status in {"needs_review", "failed", "cancelled", "interrupted"}
+        for s in project.workflow.steps
+    ):
+        return project, None
     statuses: dict[tuple[Stage, str], StepStatus] = {
         (s.stage, s.target_id): s.status for s in project.workflow.steps
     }
@@ -232,8 +254,12 @@ def claim_intake_workflow_step(
         and (stage_filter is None or s.stage == stage_filter)
         and _prerequisites(project, s, statuses)
     ]
-    # Finish a ready Fig before moving to the next pending crop; failed Fig never blocks another.
-    pending.sort(key=lambda s: s.stage == "crop")
+    if project.workflow.policy == "intake_workflow@3":
+        order = {"crop": 0, "compose": 1, "measure": 2, "export": 3}
+        pending.sort(key=lambda s: order[s.stage])
+    else:
+        # Preserve the original ready-Fig priority for existing ledgers.
+        pending.sort(key=lambda s: s.stage == "crop")
     if not pending:
         return project, None
     step = pending[0]
@@ -369,6 +395,13 @@ def intake_workflow_snapshot(project: WBIntakeWorkflowProject) -> dict[str, obje
         "ready_count": sum(s.status == "done" for s in project.workflow.steps),
         "pending_ready": 0
         if project.workflow.editing
+        or (
+            project.workflow.policy == "intake_workflow@3"
+            and any(
+                s.status in {"needs_review", "failed", "cancelled", "interrupted"}
+                for s in project.workflow.steps
+            )
+        )
         else sum(
             s.status == "pending"
             and (s.stage != "export" or isinstance(project, WBIntakeOutputProject))

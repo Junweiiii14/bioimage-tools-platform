@@ -246,7 +246,7 @@ def complete_intake_figure(
     merged = tuple(
         old
         if (
-            project.workflow.policy == "intake_workflow@2"
+            project.workflow.policy in {"intake_workflow@2", "intake_workflow@3"}
             and (old := previous.get(plan.row_id)) is not None
             and _current_intake_plan(project, old)
             and old.crop == plan.crop

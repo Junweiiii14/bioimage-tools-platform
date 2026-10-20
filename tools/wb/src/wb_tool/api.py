@@ -142,6 +142,8 @@ from wb_tool.application.intake_grouping import (
     IntakeAcquisitionGroup,
     IntakeDraftFigure,
     IntakeGrouping,
+    IntakeSequenceProtein,
+    configure_intake_sequence,
 )
 from wb_tool.application.intake_output import (
     IntakeOutputEvidence,
@@ -324,6 +326,8 @@ __all__ = [
     "IntakeAcquisitionGroup",
     "IntakeDraftFigure",
     "IntakeGrouping",
+    "IntakeSequenceProtein",
+    "configure_intake_sequence",
     "intake_grouping",
     "save_intake_grouping",
     "ExportDiscovery",

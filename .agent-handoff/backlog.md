@@ -1,5 +1,7 @@
 # Task Backlog
 
+- [ ] T071：已批准顶部Fig/蛋白/N顺序配置、手选来源、一键启动、整批crop→compose→measure→results及自动切页；新树实施至独审/精确PR集成/新离线候选。T070规划与旧dirty保留，原图/历史/安装不覆盖。
+
 - [x] 本轮获批P0–P8本机工程交付：PR21–24/26–28四检查集成，三目录主链/修正/重开、独审及T069新离线安装候选通过。状态见T063/T069；干净Win10/DPI/独立科学真值及原生UNKNOWN仍另列，不扩展其他工具。
 
 - [ ] 原生生命周期后续：T055首次全量822后purecall/0xc0000409根因UNKNOWN；同产品诊断及后继E6/E7完整门禁通过不销账。后继已按明确所属完善销毁/等待，不全局清扫；profile假设未复现。详见T055 validation与docs/research/2026-10-20-qt-finalization.md。
