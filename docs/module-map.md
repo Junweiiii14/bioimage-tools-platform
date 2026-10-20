@@ -50,3 +50,6 @@ T045增量：`tools/wb/application/{standalone_quant,manual_groups,fig_quant}.py
 T-024 历史集成：工具平台静态注册 WB；目录导入→自动泳道/裁剪/边界→后台测量→新结果目录与可恢复ZIP。WB schema8保留机器建议来源、失败及原始积分；源图三栏和图上调整。契约见 `contracts/wb-automatic-v1.md`，状态见 `../work/tasks/T-024-platform-automation.md`。现阶段未宣称完整科学验收或第二工具完成。
 
 当前日常桌面入口（T-043）：`python -m bioimage_app` 经 `desktop_entry.py` 打开绿色 `WebWorkbenchWindow`；历史 `--figure-project` / `--platform` 同样进入该工作台。旧 `PlatformWindow` / `FigureProjectWindow` / `WBWindow` 仅显式兼容参数使用，不能作为当前产品验收入口。Windows 的 `Start-BioImage.ps1` 固定自身检出目录；普通门禁默认离屏，不能弹出旧测试窗口作为产品演示。
+
+
+T067在WB既有intake_revision内实现执行后分组编辑和intake_workflow@2，宿主/网页复用原CAS与采集组网格，不新增平台实验特判或依赖。契约见 contracts/wb-intake-group-revision-v1.md，任务T067。

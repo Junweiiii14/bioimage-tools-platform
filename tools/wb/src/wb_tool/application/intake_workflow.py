@@ -2,9 +2,15 @@
 
 import json
 from hashlib import sha256
-from typing import Literal
+from typing import Literal, cast
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import (
+    ConfigDict,
+    Field,
+    SerializerFunctionWrapHandler,
+    model_serializer,
+    model_validator,
+)
 
 from wb_tool.application.document import DocumentIO
 from wb_tool.application.figure_project import WBFigureProject
@@ -55,11 +61,29 @@ class IntakeWorkflowStep(DocumentIO):
 class IntakeWorkflowLedger(DocumentIO):
     model_config = ConfigDict(revalidate_instances="always")
 
-    policy: Literal["intake_workflow@1"] = "intake_workflow@1"
+    policy: Literal["intake_workflow@1", "intake_workflow@2"] = "intake_workflow@1"
+    editing: bool = False
     intake_digest: str = Field(pattern="^[0-9a-f]{64}$")
     approved: bool = False
     cancel_requested: bool = False
     steps: tuple[IntakeWorkflowStep, ...] = Field(max_length=1537)
+
+    @model_serializer(mode="wrap")
+    def serialize_ledger(self, handler: SerializerFunctionWrapHandler) -> dict[str, object]:
+        fields = cast(dict[str, object], handler(self))
+        if self.policy == "intake_workflow@1":
+            fields.pop("editing", None)
+        return fields
+
+    @model_validator(mode="after")
+    def editing_is_explicit(self) -> "IntakeWorkflowLedger":
+        if self.editing and (
+            self.policy != "intake_workflow@2"
+            or self.approved
+            or any(s.status == "running" for s in self.steps)
+        ):
+            raise ValueError("分组编辑必须使用版本2且不可同时确认或运行")
+        return self
 
 
 class IntakeWorkflowTicket(DocumentIO):
@@ -87,9 +111,12 @@ class WBIntakeWorkflowProject(WBIntakeProject):
     @model_validator(mode="after")
     def intake_projection(self) -> "WBIntakeWorkflowProject":
         # Override schema10's no-processing validator while retaining its identity projection.
-        validate_intake_complete(self.intake)
         digest = intake_digest(self)
-        if self.intake.confirmed_digest != digest or self.workflow.intake_digest != digest:
+        if not self.workflow.editing:
+            validate_intake_complete(self.intake)
+        if self.workflow.intake_digest != digest or (
+            not self.workflow.editing and self.intake.confirmed_digest != digest
+        ):
             raise ValueError("执行快照必须绑定当前已确认清单；修改清单须创建新执行计划")
         expected = intake_project_rows(self.intake)
         mutable = {"roi", "reviewed", "empty_lanes", "notes"}
@@ -172,6 +199,8 @@ def intake_workflow_digest(project: WBIntakeWorkflowProject) -> str:
 def approve_intake_workflow(
     project: WBIntakeWorkflowProject, *, expected_digest: str
 ) -> WBIntakeWorkflowProject:
+    if project.workflow.editing:
+        raise ValueError("请先保存并确认修改后的清单")
     if expected_digest != intake_workflow_digest(project):
         raise ValueError("执行摘要已变化，请重新核对")
     if any(s.status == "running" for s in project.workflow.steps):
@@ -338,7 +367,9 @@ def intake_workflow_snapshot(project: WBIntakeWorkflowProject) -> dict[str, obje
         "digest": intake_workflow_digest(project),
         "stages_finished": all(s.status == "done" for s in project.workflow.steps),
         "ready_count": sum(s.status == "done" for s in project.workflow.steps),
-        "pending_ready": sum(
+        "pending_ready": 0
+        if project.workflow.editing
+        else sum(
             s.status == "pending"
             and (s.stage != "export" or isinstance(project, WBIntakeOutputProject))
             and _prerequisites(

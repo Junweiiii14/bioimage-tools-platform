@@ -82,6 +82,8 @@ class IntakeWorkflowSession:
     def publish_snapshot(self, expected_digest: str) -> None:
         host = self.host
         project = host.view.project()
+        if isinstance(project, WBIntakeWorkflowProject) and project.workflow.editing:
+            raise ValueError("分组编辑中请先确认清单，再输出当前结果")
         if host.operation_busy or host.is_closing:
             return
         if not isinstance(

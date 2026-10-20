@@ -12,7 +12,7 @@ window.workbenchActions = (() => {
   const click=el=>{if(!available(el))return false;el.click();return true;};
   const button=selector=>[...document.querySelectorAll(selector)].find(available);
   const project=()=>!!state.projectId&&(state.rows.length>0||!!state.intake)&&!$('#work-view').hidden;
-  const grouped=()=>project()&&mode==='intake'&&!state.intake?.workflow&&!!state.intake?.grouped_draft;
+  const grouped=()=>project()&&mode==='intake'&&(!state.intake?.workflow||state.intake.workflow.editing)&&!!state.intake?.grouped_draft;
   function syncIdentity(){const next=`${state.sessionEpoch}:${state.projectId}`;if(identity!==next){identity=next;groupId=null;}}
   function rememberGroup(event){syncIdentity();const el=event.target.closest?.('[data-group-id]');if(grouped()&&el)groupId=el.dataset.groupId;}
   for(const name of ['focusin','pointerdown','click'])document.addEventListener(name,rememberGroup,true);

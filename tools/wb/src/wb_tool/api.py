@@ -153,7 +153,12 @@ from wb_tool.application.intake_output import (
     prepare_intake_outputs,
     record_intake_output,
 )
-from wb_tool.application.intake_revision import revise_completed_intake_crop
+from wb_tool.application.intake_revision import (
+    begin_intake_group_revision,
+    confirm_intake_group_revision,
+    revise_completed_intake_crop,
+    revise_intake_grouping,
+)
 from wb_tool.application.intake_workflow import (
     IntakeWorkflowLedger,
     IntakeWorkflowStep,
@@ -313,6 +318,9 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "begin_intake_group_revision",
+    "confirm_intake_group_revision",
+    "revise_intake_grouping",
     "IntakeAcquisitionGroup",
     "IntakeDraftFigure",
     "IntakeGrouping",

@@ -308,6 +308,41 @@ def test_custom_shortcut_settings_save_restore_and_restart_in_the_real_window(
             )
 
 
+def test_executed_group_revision_uses_source_keys_and_one_group_save(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    grouped_page(window, qtbot)
+    javascript(
+        window,
+        qtbot,
+        """
+      setState({intake:{...state.intake,workflow:{editing:true,steps:[],pending_ready:0}}});
+      document.querySelector('.grouped-card').tabIndex=-1;
+      document.querySelector('.grouped-card').focus();window.sent=[];true
+    """,
+    )
+    target = window.web.focusProxy()
+    assert target is not None
+    QTest.keyClick(target, Qt.Key.Key_2, Qt.KeyboardModifier.AltModifier)
+    qtbot.waitUntil(
+        lambda: (
+            javascript(
+                window, qtbot, "document.querySelector('[data-group-source=source-b]').checked"
+            )
+            is True
+        )
+    )
+    QTest.keyClick(target, Qt.Key.Key_S, Qt.KeyboardModifier.ControlModifier)
+    qtbot.waitUntil(lambda: javascript(window, qtbot, "sent.length===1") is True)
+    assert javascript(
+        window,
+        qtbot,
+        "sent[0].action==='intake_grouping' && "
+        "sent[0].payload.grouping.groups[0].selected_source_id==='source-b'",
+    )
+
+
 def test_explicit_error_dialog_open_button_still_uses_the_open_action(
     intake_page: WebWorkbenchWindow,
     qtbot: QtBot,

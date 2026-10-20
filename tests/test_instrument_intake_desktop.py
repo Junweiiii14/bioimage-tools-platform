@@ -510,6 +510,80 @@ def test_grouped_draft_and_original_preview_save_reopen_with_real_storage(
     assert prepared_snapshot["grouped_draft"] == draft
 
 
+def test_executed_grouping_incomplete_revision_is_durable_and_blocks_execution(
+    intake_window: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
+) -> None:
+    window = intake_window
+    root = tmp_path / "grouped-revision"
+    source = make_source(root / "P_123456 (1).tif")
+    before = source.read_bytes()
+    start(window, qtbot, root)
+    draft = cast(
+        dict[str, object],
+        cast(dict[str, object], window.bridge.snapshot()["intake"])["grouped_draft"],
+    )
+    groups = cast(list[dict[str, object]], draft["groups"])
+    draft["figures"] = [{"figure_id": "fig", "label": "Fig 1", "lane_count": 4}]
+    groups[0].update(
+        figure_id="fig",
+        protein_label="P",
+        selected_source_id=current(window).intake.sources[0].source_id,
+    )
+    request(window, "intake_grouping", grouping=draft)
+    wait_saved(window, qtbot)
+    request(window, "intake_confirm")
+    wait_saved(window, qtbot)
+    request(window, "intake_prepare")
+    wait_saved(window, qtbot)
+    prepared = current(window)
+    assert isinstance(prepared, WBIntakeWorkflowProject)
+    request(window, "intake_run", workflowDigest=intake_workflow_digest(prepared))
+    wait_saved(window, qtbot)
+    executed = current(window)
+    assert isinstance(executed, WBIntakeCropProject)
+    assert any(s.attempt for s in executed.workflow.steps)
+    request(window, "intake_edit")
+    wait_saved(window, qtbot)
+    editing = current(window)
+    assert isinstance(editing, WBIntakeWorkflowProject) and editing.workflow.editing
+    groups[0]["selected_source_id"] = None
+    request(window, "intake_grouping", grouping=draft)
+    wait_saved(window, qtbot)
+    saved = current(window)
+    assert isinstance(saved, WBIntakeCropProject)
+    assert saved.workflow.editing and not saved.rows and not saved.intake_crops
+    assert saved.intake.grouping is not None
+    assert saved.intake.grouping.groups[0].selected_source_id is None
+    request(window, "intake_run", workflowDigest=intake_workflow_digest(saved))
+    wait_saved(window, qtbot)
+    assert current(window) == saved
+    workspace = window.host.workspace_path
+    assert workspace is not None
+    epoch = window.bridge.session_epoch
+    window.open_project(workspace)
+    qtbot.waitUntil(
+        lambda: (
+            window.bridge.session_epoch > epoch
+            and window.shutdown_stage == "idle"
+            and window.host.view.project().project_id == saved.project_id
+            and not window.host.operation_busy
+        ),
+        timeout=20000,
+    )
+    assert current(window) == saved
+    assert source.read_bytes() == before
+    # Re-selecting creates a pending row, never a recovered success or zero result.
+    groups[0]["selected_source_id"] = saved.intake.sources[0].source_id
+    request(window, "intake_grouping", grouping=draft)
+    wait_saved(window, qtbot)
+    request(window, "intake_confirm")
+    wait_saved(window, qtbot)
+    confirmed = current(window)
+    assert isinstance(confirmed, WBIntakeWorkflowProject) and not confirmed.workflow.editing
+    assert not confirmed.workflow.approved
+    assert next(s for s in confirmed.workflow.steps if s.stage == "crop").status == "pending"
+
+
 def test_raw_variants_assign_and_reopen_without_algorithm(
     intake_window: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
 ) -> None:
