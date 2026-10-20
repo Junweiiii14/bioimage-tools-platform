@@ -591,6 +591,152 @@ def test_grouped_save_accepts_explicit_reuse_normalization_without_false_conflic
     assert javascript(window, qtbot, "!intakeWorkspace.hasDraft()")
 
 
+def test_grouped_region_choice_is_explicit_and_original_coordinates_survive_save(
+    intake_page: WebWorkbenchWindow,
+    qtbot: QtBot,
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        """
+      setState({intake:{...state.intake,proteins:[],grouped_draft:{schema_version:1,
+        figures:[{figure_id:'f',label:'Fig',lane_count:4},
+          {figure_id:'other',label:'Fig 2',lane_count:6}],
+        groups:[{group_id:'g',source_ids:['source-a','source-b'],figure_id:'f',protein_label:'P',selected_source_id:'source-a',region_index:null,reuse_confirmed:false}]},
+        sources:state.intake.sources.map(s=>({...s,preview:'data:image/png;base64,iVBORw0KGgo='})),
+        discovery:{observations:[{source_id:'source-a',regions:[{x0:10,y0:20,x1:100,y1:40},{x0:30,y0:55,x1:150,y1:75}]}]}}});true
+    """,
+    )
+    assert (
+        javascript(window, qtbot, "document.querySelector('[data-group-field=region]').value") == ""
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      const regionChoice=document.querySelector('[data-group-field=region]');
+      regionChoice.value='1';regionChoice.dispatchEvent(new Event('change',{bubbles:true}));
+      document.querySelector('[data-group-action=save]').click();true
+    """,
+    )
+    raw = javascript(window, qtbot, "JSON.stringify(sent.at(-1))")
+    assert isinstance(raw, str)
+    command = json.loads(raw)
+    assert command["payload"]["grouping"]["groups"][0]["region_index"] == 1
+    assert (
+        javascript(window, qtbot, "document.querySelector('.grouped-zoom rect').getAttribute('x')")
+        == "30"
+    )
+    assert (
+        javascript(
+            window, qtbot, "document.querySelector('.grouped-zoom svg').getAttribute('viewBox')"
+        )
+        == "0 0 180 90"
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      setState({intake:{...state.intake,digest:'region-saved',grouped_draft:sent.at(-1).payload.grouping}});
+      const owner=document.querySelector('[data-group-field=figure]');owner.value='other';
+      owner.dispatchEvent(new Event('change',{bubbles:true}));true
+    """,
+    )
+    assert javascript(window, qtbot, "document.querySelector('[data-group-field=region]').disabled")
+    javascript(
+        window,
+        qtbot,
+        """
+      document.querySelector('[data-group-action=save]').click();
+      setState({intake:{...state.intake,digest:'moved-fig',grouped_draft:sent.at(-1).payload.grouping}});
+      true
+    """,
+    )
+    assert javascript(window, qtbot, "!intakeWorkspace.hasDraft()")
+    assert javascript(window, qtbot, "!document.querySelector('.intake-conflict[role=alert]')")
+    javascript(
+        window,
+        qtbot,
+        """
+      const n=document.querySelector('[data-group-field=lanes][data-id=other]');n.value='5';
+      n.dispatchEvent(new Event('input',{bubbles:true}));
+      n.dispatchEvent(new Event('change',{bubbles:true}));true
+    """,
+    )
+    assert javascript(window, qtbot, "document.querySelector('[data-group-field=region]').disabled")
+    assert javascript(window, qtbot, "!document.querySelector('.grouped-zoom rect')")
+    assert javascript(window, qtbot, "intakeWorkspace.hasDraft()")
+
+
+def test_completed_crop_requires_explicit_changed_draft_and_uses_revision_action(
+    intake_page: WebWorkbenchWindow,
+    qtbot: QtBot,
+) -> None:
+    window = intake_page
+    bridge_snapshot(
+        window,
+        qtbot,
+        """
+      ({...state,selectedId:'protein-a',rows:[{id:'protein-a',sourceId:'sha',name:'raw.tif',
+        fig:'Fig 1',protein:'P',width:180,height:90,lanes:6,
+        roi:{x:20,y:20,width:120,height:16},results:[]}],
+       intake:{...state.intake,confirmed:true,cropEnabled:true,crops:[{row_id:'protein-a',crop:{x0:20,y0:20,x1:140,y1:36},reviewed:true,raw_crop:{sha256:'raw'},reason:''}],
+         workflow:{digest:'completed',ready_count:1,steps:[{stage:'crop',target_id:'protein-a',status:'done',attempt:2,reason:''}]}}})
+    """,
+    )
+    javascript(window, qtbot, "document.querySelector('[data-intake=review-crop]').click();true")
+    assert javascript(
+        window, qtbot, "document.querySelector('[data-intake-crop-action=confirm]').disabled"
+    )
+    javascript(window, qtbot, "commitCrop({x:22,y:22,width:118,height:16},row().roi);true")
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('#inspector-content').innerText.includes('历史文件保留')",
+    )
+    javascript(
+        window, qtbot, "document.querySelector('[data-intake-crop-action=confirm]').click();true"
+    )
+    raw = javascript(window, qtbot, "JSON.stringify(sent.at(-1))")
+    assert isinstance(raw, str)
+    command = json.loads(raw)
+    assert command["action"] == "intake_crop_revise"
+    assert command["payload"]["workflowDigest"] == "completed"
+    assert command["payload"]["roi"]["x"] == 22
+    javascript(window, qtbot, "commitCrop({x:24,y:24,width:116,height:16},row().roi);true")
+    bridge_snapshot(
+        window,
+        qtbot,
+        """
+      ({...state,rows:state.rows.map(r=>({...r,roi:{x:22,y:22,width:118,height:16},draft:false})),
+        intake:{...state.intake,crops:[{row_id:'protein-a',
+          crop:{x0:22,y0:22,x1:140,y1:38},reviewed:true,raw_crop:null,reason:''}],
+          workflow:{...state.intake.workflow,digest:'saved-first',steps:[
+            {stage:'crop',target_id:'protein-a',status:'pending',attempt:2,reason:''}]}}})
+    """,
+    )
+    assert javascript(window, qtbot, "row().roi.x===24 && intakeWorkspace.hasDraft()")
+    assert javascript(
+        window, qtbot, "!document.querySelector('[data-intake-crop-action=confirm]').disabled"
+    )
+    javascript(
+        window, qtbot, "document.querySelector('[data-intake-crop-action=confirm]').click();true"
+    )
+    raw = javascript(window, qtbot, "JSON.stringify(sent.at(-1))")
+    assert isinstance(raw, str)
+    command = json.loads(raw)
+    assert command["action"] == "intake_crop_review"
+    assert command["payload"]["workflowDigest"] == "saved-first"
+    assert command["payload"]["roi"]["x"] == 24
+    bridge_snapshot(window, qtbot, "({...state,busy:false,status:'保存失败，草稿保留'})")
+    assert javascript(window, qtbot, "intakeWorkspace.hasDraft()")
+    javascript(
+        window, qtbot, "document.querySelector('[data-intake-crop-action=discard]').click();true"
+    )
+    assert javascript(window, qtbot, "row().roi.x===22 && !intakeWorkspace.hasDraft()")
+
+
 def test_batch_requires_explicit_targets_and_preserves_duplicate_names(
     intake_page: WebWorkbenchWindow, qtbot: QtBot
 ) -> None:

@@ -19,6 +19,22 @@ window.intakeGroups = (() => {
   const source = id => state.intake.sources.find(item => item.source_id === id);
   const figure = id => draft?.figures.find(item => item.figure_id === id);
   const group = id => draft?.groups.find(item => item.group_id === id);
+  const observation = id => state.intake.discovery?.observations.find(item=>item.source_id===id);
+  const region = g => g?.region_index == null ? null : observation(g.selected_source_id)?.regions[g.region_index];
+  function preview(s, target) {
+    if (!s.preview) return '<span>预览加载中</span>';
+    if (!target) return `<img src="${s.preview}" alt="${escapeText(s.original_name)} 的显示预览">`;
+    return `<svg class="grouped-source-preview" viewBox="0 0 ${s.width} ${s.height}" role="img" aria-label="${escapeText(s.original_name)} 与所选目标区域"><image href="${s.preview}" width="${s.width}" height="${s.height}"/><rect x="${target.x0}" y="${target.y0}" width="${target.x1-target.x0}" height="${target.y1-target.y0}" fill="none" stroke="var(--accent)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+  }
+  function regionControl(g, disabled) {
+    if (!g.selected_source_id) return '';
+    const regions=observation(g.selected_source_id)?.regions || [];
+    if (!regions.length) return '<p class="intake-help">尚无目标区域候选；可先识别来源，或在裁剪阶段手动画范围。</p>';
+    const saved=JSON.parse(base).groups.find(item=>item.group_id===g.group_id);
+    const savedFigure=JSON.parse(base).figures.find(f=>f.figure_id===saved?.figure_id);
+    const changed=saved?.selected_source_id!==g.selected_source_id || savedFigure?.lane_count!==figure(g.figure_id)?.lane_count;
+    return `<label class="grouped-region">目标区域（未审核）<select data-group-field="region" data-id="${escapeText(g.group_id)}" ${disabled} ${changed?'disabled':''}><option value="">不选候选，使用原图定位或手动复核</option>${regions.map((r,i)=>`<option value="${i}" ${g.region_index===i?'selected':''}>区域 ${i+1} · 原图 (${r.x0}, ${r.y0})–(${r.x1}, ${r.y1})</option>`).join('')}</select><small>${changed?'原图或 N 有修改；先保存，再选择当前区域。':'仅传递原图坐标建议；裁剪阶段仍须核对 Marker 和全部槽位。'}</small></label>`;
+  }
   const groupName = item => `采集组 ${String(draft.groups.indexOf(item)+1).padStart(2,'0')}`;
   const groupDirectory = item => {
     const path = source(item.source_ids[0])?.relative_path || '';
@@ -51,7 +67,9 @@ window.intakeGroups = (() => {
     }
     const dialog = document.querySelector('#grouped-image-dialog'), zoom = state.intake.zoom;
     if (dialog?.open && zoom?.sourceId === zoomSource && zoom.preview) {
-      dialog.querySelector('img').src = zoom.preview;
+      const img=dialog.querySelector('img'), svgImage=dialog.querySelector('image');
+      if(img)img.src=zoom.preview;
+      if(svgImage)svgImage.setAttribute('href',zoom.preview);
       dialog.querySelector('p').textContent = '原图显示预览；裁剪复核阶段使用原图坐标。';
     }
   }
@@ -105,8 +123,8 @@ window.intakeGroups = (() => {
       <p class="intake-help">${draft.groups.length} 个采集组 · ${state.intake.sources.length} 张图。组内图片并列，辅助图跟随本组标注；只有所选原图进入裁剪。</p>
       <div class="grouped-grid">${visible().map(g => `<section class="grouped-card" data-group-id="${escapeText(g.group_id)}"><div class="grouped-card-title"><h3>${escapeText(groupName(g))}</h3><p>${escapeText(groupDirectory(g))}</p></div><div class="grouped-card-heading"><label><input type="checkbox" aria-label="选择${escapeText(groupName(g))} · ${escapeText(groupDirectory(g))}" data-group-select="${escapeText(g.group_id)}" ${selected.has(g.group_id)?'checked':''} ${disabled}>选择此组</label><label>所属 Fig<select data-group-field="figure" data-id="${escapeText(g.group_id)}" ${disabled}>${options(g.figure_id)}</select></label></div><label class="grouped-protein">蛋白名称<input type="text" maxlength="120" data-group-field="protein" data-id="${escapeText(g.group_id)}" value="${escapeText(g.protein_label)}" placeholder="由实验人员填写" ${disabled}></label><div class="grouped-images">${g.source_ids.map(id => {
         const s = source(id); if (!s) return '';
-        return `<div class="grouped-image ${g.selected_source_id===id?'chosen':''}"><button class="grouped-zoom" data-group-action="zoom" data-id="${escapeText(id)}" aria-label="放大 ${escapeText(s.original_name)}">${s.preview?`<img src="${s.preview}" alt="${escapeText(s.original_name)} 的显示预览">`:'<span>预览加载中</span>'}</button><label><input type="radio" name="group-${escapeText(g.group_id)}" data-group-source="${escapeText(id)}" data-id="${escapeText(g.group_id)}" ${g.selected_source_id===id?'checked':''} ${disabled}>用于裁剪</label><strong>${escapeText(s.original_name)}</strong><small>${escapeText(s.relative_path)}</small><small>${s.width} × ${s.height} · ${s.bit_depth} 位</small></div>`;
-      }).join('')}</div><div class="grouped-card-footer"><span>${escapeText(figure(g.figure_id)?.label || '待归 Fig')} · ${escapeText(g.protein_label || '蛋白待命名')}${g.selected_source_id?' · 已选裁剪源':' · 未选裁剪源'}</span><button class="text-button" data-group-action="unpick" data-id="${escapeText(g.group_id)}" ${disabled} ${!g.selected_source_id?'disabled':''}>取消裁剪源</button></div></section>`).join('') || '<p class="intake-empty">没有匹配的采集组；清除筛选可查看全部。</p>'}</div>
+        return `<div class="grouped-image ${g.selected_source_id===id?'chosen':''}"><button class="grouped-zoom" data-group-action="zoom" data-id="${escapeText(id)}" aria-label="放大 ${escapeText(s.original_name)}">${preview(s,g.selected_source_id===id?region(g):null)}</button><label><input type="radio" name="group-${escapeText(g.group_id)}" data-group-source="${escapeText(id)}" data-id="${escapeText(g.group_id)}" ${g.selected_source_id===id?'checked':''} ${disabled}>用于裁剪</label><strong>${escapeText(s.original_name)}</strong><small>${escapeText(s.relative_path)}</small><small>${s.width} × ${s.height} · ${s.bit_depth} 位</small></div>`;
+      }).join('')}</div>${regionControl(g,disabled)}<div class="grouped-card-footer"><span>${escapeText(figure(g.figure_id)?.label || '待归 Fig')} · ${escapeText(g.protein_label || '蛋白待命名')}${g.selected_source_id?' · 已选裁剪源':' · 未选裁剪源'}</span><button class="text-button" data-group-action="unpick" data-id="${escapeText(g.group_id)}" ${disabled} ${!g.selected_source_id?'disabled':''}>取消裁剪源</button></div></section>`).join('') || '<p class="intake-empty">没有匹配的采集组；清除筛选可查看全部。</p>'}</div>
       <footer class="grouped-save"><p data-group-status role="status"></p><label><input type="checkbox" data-group-reuse ${reuse?'checked':''} ${disabled}>明确允许相同原图内容用于多个蛋白</label><div><button class="text-button" data-group-action="reload" ${state.busy?'disabled':''}>放弃修改并重新载入</button><button class="button subtle" data-group-action="save">保存分组草稿</button><button class="button primary" data-group-action="confirm">确认清单与对应关系</button>${state.intake.confirmed?'<button class="button primary" data-group-action="prepare">准备执行计划</button>':''}</div></footer>`;
     controls(root); root.scrollTop = scroll;
     const replacement = searchFocus ? root.querySelector('[data-group-search]') : field ? [...root.querySelectorAll('[data-group-field]')].find(e => e.dataset.groupField===field && e.dataset.id===id) : action ? [...root.querySelectorAll('[data-group-action]')].find(e => e.dataset.groupAction===action && e.dataset.id===id && !e.disabled) : null;
@@ -133,6 +151,7 @@ window.intakeGroups = (() => {
       if (el.dataset.groupSelect) { if(el.checked)selected.add(el.dataset.groupSelect);else selected.delete(el.dataset.groupSelect); }
       if (el.dataset.groupField==='bulk-fig') bulkFigure = el.value;
       if (el.dataset.groupField==='figure' && g) { g.figure_id = el.value || null; g.region_index=null; }
+      if (el.dataset.groupField==='region' && g && !el.disabled) g.region_index=el.value===''?null:Number(el.value);
       if (el.dataset.groupSource && g) { g.selected_source_id=el.dataset.groupSource; g.region_index=null; g.reuse_confirmed=false; }
       if (el.hasAttribute('data-group-reuse')) reuse=el.checked;
       render(root);
@@ -145,7 +164,8 @@ window.intakeGroups = (() => {
         const s = source(button.dataset.id); if (!s?.preview) return;
         let dialog = document.querySelector('#grouped-image-dialog');
         if (!dialog) { dialog=document.createElement('dialog');dialog.id='grouped-image-dialog';document.body.append(dialog); }
-        dialog.innerHTML=`<form method="dialog"><button class="button subtle">关闭预览</button></form><h2>${escapeText(s.original_name)}</h2><img src="${s.preview}" alt="${escapeText(s.original_name)} 的显示预览"><p>显示预览；裁剪复核阶段使用原图坐标。</p>`;
+        const owner=draft.groups.find(g=>g.selected_source_id===s.source_id);
+        dialog.innerHTML=`<form method="dialog"><button class="button subtle">关闭预览</button></form><h2>${escapeText(s.original_name)}</h2>${preview(s,region(owner))}<p>显示预览；目标框采用原图坐标，裁剪阶段仍须复核。</p>`;
         zoomSource = s.source_id;
         if (!dialog.open) dialog.showModal();
         if (!locked()) send('intake_preview',{...guard(),sourceId:s.source_id});

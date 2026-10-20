@@ -95,9 +95,17 @@ window.intakeWorkspace = (() => {
       const submitted = cropPending.get(r.id);
       const step = state.intake.workflow.steps.find(s=>s.stage==='crop'&&s.target_id===r.id);
       if (submitted && evidence?.reviewed && step?.status === 'pending' && submitted.digest !== state.intake.workflow.digest && JSON.stringify(cropBox(evidence.crop)) === JSON.stringify(submitted.roi)) {
-        cropDrafts.delete(r.id); cropPending.delete(r.id);
-        cropSavedRow = mode === 'review' ? r.id : null;
-        live.textContent = '裁剪范围已保存，可继续生成原值裁剪。';
+        const newer=cropDrafts.get(r.id);
+        if(newer && JSON.stringify(newer.roi)!==JSON.stringify(submitted.roi)) {
+          newer.original={...submitted.roi};newer.digest=state.intake.workflow.digest;newer.conflict=false;
+          newer.history=[{...submitted.roi},{...newer.roi}];newer.index=1;
+          live.textContent='已保存提交的范围；之后的新调整仍保留为草稿。';
+        } else {
+          cropDrafts.delete(r.id);
+          cropSavedRow = mode === 'review' ? r.id : null;
+          live.textContent = '裁剪范围已保存，可继续生成原值裁剪。';
+        }
+        cropPending.delete(r.id);
       }
       const draft = cropDrafts.get(r.id);
       if (draft) {
@@ -112,7 +120,8 @@ window.intakeWorkspace = (() => {
   }
   function cropEditable(id) {
     const step = state.intake?.workflow?.steps.find(s=>s.stage==='crop'&&s.target_id===id);
-    return !!step && ['needs_review','failed','cancelled','interrupted'].includes(step.status);
+    const evidence=state.intake?.crops?.find(e=>e.row_id===id);
+    return !!step && (['needs_review','failed','cancelled','interrupted','done'].includes(step.status) || step.status==='pending'&&evidence?.reviewed&&!evidence.raw_crop);
   }
   function stageCrop(next, before) {
     const r = row();
@@ -143,12 +152,14 @@ window.intakeWorkspace = (() => {
     const evidence = state.intake.crops?.find(e => e.row_id === r?.id);
     const step = state.intake.workflow.steps.find(s => s.stage === 'crop' && s.target_id === r?.id);
     const draft = r && cropDrafts.get(r.id);
-    const reviewable = step && ['needs_review','failed','cancelled','interrupted'].includes(step.status);
+    const correcting = step?.status === 'done';
+    const reviewable = r && cropEditable(r.id);
     $('#inspector-title').textContent = '原图裁剪复核';
     $('#review-badge').textContent = evidence?.raw_crop ? '原值已保存' : '待核对';
     $('#review-badge').className = 'status-badge '+(evidence?.raw_crop?'ok':'pending');
     $('#inspector-content').innerHTML = `<section class="inspect-section"><h3>${r?escapeText(targetName(r.id)):'请选择蛋白行'}</h3><p>${reviewable?'在原图上拖出范围，或调整建议框。':'本行用于原图回溯；已保存的原值裁剪与历史保持。'}${r?.lanes||0} 个槽位包含无信号空位，不含 Marker；本行独立定位。</p>${dataPair('固定槽位数',r?.lanes||0)}${dataPair('原值裁剪',evidence?.raw_crop?'已保存':'尚未生成')}<p class="row-reason">${escapeText(draft?.conflict?'后台输入已改变，草稿保留；放弃后重新核对。':evidence?.reason||'请先运行固定N定位，取得该行处理状态。')}</p><p>确认整行范围将按固定 N 等宽分割。无信号不等于未上样，也不作为零值。</p></section>`;
-    $('#inspector-action').innerHTML = `<button class="button primary full" data-intake-crop-action="confirm" ${state.busy||!r?.roi||!evidence||!reviewable||draft?.conflict?'disabled':''}>确认此范围与固定槽位</button><button class="button subtle full" data-intake-crop-action="run" ${state.busy||hasDraft()||!runnable()?'disabled':''}>继续处理批次</button><button class="text-button" data-intake-crop-action="discard" ${state.busy||!draft?'disabled':''}>放弃本行裁剪草稿</button><button class="text-button" data-intake-crop-action="back">返回清单与异常</button>`;
+    if (correcting) $('#inspector-content').insertAdjacentHTML('beforeend','<p class="row-reason">保存修正会使本行裁剪、本 Fig 拼图与测量、当前输出过期；其他 Fig 和历史文件保留。</p>');
+    $('#inspector-action').innerHTML = `<button class="button primary full" data-intake-crop-action="confirm" ${state.busy||!r?.roi||!evidence||!reviewable||draft?.conflict||(correcting||step?.status==='pending')&&!draft?'disabled':''}>${correcting?'保存修正，标记本 Fig 待重算':'确认此范围与固定槽位'}</button><button class="button subtle full" data-intake-crop-action="run" ${state.busy||hasDraft()||!runnable()?'disabled':''}>继续处理批次</button><button class="text-button" data-intake-crop-action="discard" ${state.busy||!draft?'disabled':''}>放弃本行裁剪草稿</button><button class="text-button" data-intake-crop-action="back">返回清单与异常</button>`;
     const focus = cropSavedRow === r?.id ? 'run' : cropFocusAction;
     cropSavedRow = null;
     if (focus) {
@@ -197,7 +208,7 @@ window.intakeWorkspace = (() => {
   function outputInfo() {
     if(!state.intake?.outputEnabled)return '';
     const output=state.intake.output, latest=(state.intake.outputs||[]).find(item=>item.destination===output?.path);
-    const status=output?.path?(output.committed?(latest?.complete?'完整快照已登记':'部分快照已登记，未完成项仍需处理'):(state.busy?'目录已发布，正在登记项目':'目录已发布，项目尚未登记；已生成文件保留')):'完整批次完成后自动输出；也可先保存含未完成项的快照。';
+    const status=output?.path?(output.committed?(output.current===false?'历史快照已保留；当前输入已变化，需要重新输出':latest?.complete?'完整快照已登记':'部分快照已登记，未完成项仍需处理'):(state.busy?'目录已发布，正在登记项目':'目录已发布，项目尚未登记；已生成文件保留')):'完整批次完成后自动输出；也可先保存含未完成项的快照。';
     return `<section class="inspect-section intake-output-info"><h3>结果快照</h3><p role="status">${escapeText(status)}</p>${output?.path?`<p class="intake-output-path">${escapeText(output.path)}</p>`:''}<p>每次使用新目录。CSV / Excel、原值与显示裁剪、Fig、状态和恢复归档分别保留；缺项见状态报告。</p>${latest?.errors?.length?`<details><summary>${latest.errors.length} 项缺口</summary><ul>${latest.errors.map(error=>`<li>${escapeText(error)}</li>`).join('')}</ul></details>`:''}<button class="button subtle full" data-intake-crop-action="export" ${state.busy||hasDraft()||!bridge?'disabled':''}>${output?.path?'重新导出到新目录':'保存当前结果快照'}</button></section>`;
   }
   function renderIntakeResults() {
@@ -464,8 +475,10 @@ window.intakeWorkspace = (() => {
     if(action==='figure'&&!state.busy){chosenFigureId=button.dataset.id;switchMode('layout');return;}
     if (!r || state.busy) return;
     if (action === 'confirm' && r.roi && !cropDrafts.get(r.id)?.conflict) {
+      const completed=state.intake.workflow.steps.some(s=>s.stage==='crop'&&s.target_id===r.id&&s.status==='done');
+      if (completed && !cropDrafts.has(r.id)) return;
       cropPending.set(r.id,{roi:{...r.roi},digest:state.intake.workflow.digest});
-      send('intake_crop_review',{...cropGuard(),rowId:r.id,roi:{...r.roi}});
+      send(completed?'intake_crop_revise':'intake_crop_review',{...cropGuard(),rowId:r.id,roi:{...r.roi}});
     } else if (action === 'run' && !hasDraft()) send('intake_run',cropGuard());
     else if (action === 'discard') {
       const draft = cropDrafts.get(r.id); r.roi = draft?.original || null; r.draft = false;

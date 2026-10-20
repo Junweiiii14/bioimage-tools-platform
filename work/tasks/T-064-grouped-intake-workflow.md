@@ -1,6 +1,6 @@
 # T-064 采集组草稿与正式网格主流程
 
-- 状态：P1/P2工程实现与提交绑定独审完成，准备PR四检查；完整P3及后续任务继续，不宣告整体交付完成。
+- 状态：P1/P2工程实现与提交绑定独审完成，PR22四检查SUCCESS，已精确合main2044aaf；完整P3及后续任务继续，不宣告整体交付完成。
 - 基线：当前main1625ae5（PR21已合），原产品f3fb2ff；已在产品树快进前置并重载规则。
 - 范围：tools/wb、apps/desktop、tests、docs/contracts、docs/module-map.md、work、.agent-handoff、AGENT_HANDOFF.md、PRODUCT.md、.impeccable/surfaces。
 - 授权与验收：用户已确认docs/wb-grouped-intake-plan.md，并要求新树持续推进；普通选择自主，原图/旧结果/现有dirty保留。
@@ -17,7 +17,7 @@
 - Pyright初3项为过量cast/移动函数消费者导入/测试类型未收窄，已按真实类型修正；最终0 errors/warnings。没有忽略、skip、容差、锁文件或CI变更。
 - 三指定目录识别一次95图、19信号候选/23区域、5.0853s（仅算法）。私有atlas/JSON仅在.local/t064-three-directory-discovery；无源图改写、训练或科学正确率声明。
 - 合成截图.local/t064-visual的1440/960/620宽，无页面横向溢出；实际原图大预览/存储另由host测试证明。Qt/Chromium离屏显示出现GPU上下文诊断，进程真实0，不据此销旧native UNKNOWN。
-- 尚未跑本地完整门禁/最终三目录整链、未创建产品PR/新包；P4快捷键、P5算法盘点、P6仓库整理及P7/P8仍继续。目标区域候选接入与执行后人工修正失效需继续核验。
+- 尚未跑本地完整门禁/最终三目录整链或新包；产品PR22已创建。P3目标候选/执行后修正由T065继续，P4快捷键、P5算法盘点、P6仓库整理及P7/P8仍继续。
 
 
 ## 独审修正

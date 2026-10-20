@@ -153,6 +153,7 @@ from wb_tool.application.intake_output import (
     prepare_intake_outputs,
     record_intake_output,
 )
+from wb_tool.application.intake_revision import revise_completed_intake_crop
 from wb_tool.application.intake_workflow import (
     IntakeWorkflowLedger,
     IntakeWorkflowStep,
@@ -333,6 +334,7 @@ __all__ = [
     "intake_output_digest",
     "prepare_intake_outputs",
     "record_intake_output",
+    "revise_completed_intake_crop",
     "load_intake_figure_preview",
     "IntakeFigureEvidence",
     "IntakeFigurePreparation",

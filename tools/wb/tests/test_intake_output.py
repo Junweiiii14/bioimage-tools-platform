@@ -55,6 +55,7 @@ from wb_tool.api import (
     record_intake_output,
     restore_staged_project,
     review_intake_crop,
+    revise_completed_intake_crop,
     stage_project_archive,
 )
 
@@ -327,6 +328,87 @@ def full_files(
         ),
         tuple(evidence),
     )
+
+
+def test_completed_crop_correction_invalidates_only_its_fig_and_preserves_published_history(
+    tmp_path: Path,
+) -> None:
+    project, paths, runs = full_files(tmp_path)
+    active, ticket = claim_intake_workflow_step(
+        project, session_key="export", stage_filter="export"
+    )
+    assert isinstance(active, WBIntakeOutputProject) and ticket is not None
+    destination = tmp_path / "before-correction"
+    output = export_intake_outputs(active, paths, str(destination), runs=runs, ticket=ticket)
+    saved = record_intake_output(active, output, asset(destination / "index.json"), ticket=ticket)
+    original = saved.model_dump_json()
+    files = {p: sha256(p.read_bytes()).hexdigest() for p in tmp_path.rglob("*") if p.is_file()}
+    roi = LaneROI("a1", 0, 12, 120, 58)
+    with pytest.raises(ValueError, match="只能重试"):
+        review_intake_crop(saved, "a1", roi, expected_digest=intake_workflow_digest(saved))
+    with pytest.raises(ValueError, match="输入已变化"):
+        revise_completed_intake_crop(saved, "a1", roi, expected_digest="old")
+    revised = revise_completed_intake_crop(
+        saved, "a1", roi, expected_digest=intake_workflow_digest(saved)
+    )
+    assert isinstance(revised, WBIntakeOutputProject)
+    assert saved.model_dump_json() == original
+    assert revised.intake_outputs == saved.intake_outputs
+    assert intake_output_digest(revised) != saved.intake_outputs[-1].input_digest
+    assert {e.figure_id for e in revised.intake_figures} == {"b"}
+    assert revised.analyses == tuple(p for p in saved.analyses if p.row_id == "b1")
+    before = {(s.stage, s.target_id): s for s in saved.workflow.steps}
+    after = {(s.stage, s.target_id): s for s in revised.workflow.steps}
+    for address in (
+        ("crop", "a1"),
+        ("compose", "a"),
+        ("measure", "a"),
+        ("export", saved.project_id),
+    ):
+        assert after[address].status == "pending"
+        assert after[address].attempt == before[address].attempt
+    for address in (("crop", "a2"), ("crop", "b1"), ("compose", "b"), ("measure", "b")):
+        assert after[address] == before[address]
+    evidence = next(e for e in revised.intake_crops if e.row_id == "a1")
+    assert evidence.crop == roi and evidence.reviewed and evidence.raw_crop is None
+    assert tuple(s.slot_id for s in evidence.slots) == tuple(
+        s.slot_id for e in saved.intake_crops if e.row_id == "a1" for s in e.slots
+    )
+    assert not revised.workflow.approved and not revised.workflow.cancel_requested
+    assert read_figure_project(revised.model_dump_json().encode()) == revised
+    assert {p: sha256(p.read_bytes()).hexdigest() for p in files} == files
+    newer_roi = LaneROI("a1", 2, 14, 120, 60)
+    newer = review_intake_crop(
+        revised, "a1", newer_roi, expected_digest=intake_workflow_digest(revised)
+    )
+    assert isinstance(newer, WBIntakeOutputProject)
+    assert next(e for e in newer.intake_crops if e.row_id == "a1").crop == newer_roi
+    assert newer.intake_outputs == revised.intake_outputs
+    assert newer.analyses == revised.analyses
+    assert read_figure_project(newer.model_dump_json().encode()) == newer
+    with pytest.raises(ValueError, match="仅用于"):
+        revise_completed_intake_crop(
+            revised, "a1", roi, expected_digest=intake_workflow_digest(revised)
+        )
+    running, new_ticket = claim_intake_workflow_step(
+        approve_intake_workflow(revised, expected_digest=intake_workflow_digest(revised)),
+        session_key="new-crop",
+        stage_filter="crop",
+    )
+    assert isinstance(running, WBIntakeOutputProject) and new_ticket is not None
+    assert new_ticket.attempt == before["crop", "a1"].attempt + 1
+    with pytest.raises(ValueError, match="当前阶段退出"):
+        revise_completed_intake_crop(
+            running,
+            "b1",
+            LaneROI("b1", 0, 12, 120, 58),
+            expected_digest=intake_workflow_digest(running),
+        )
+    target = tmp_path / "corrected-original.tiff"
+    export_intake_crop(str(tmp_path / "a1.tiff"), running, "a1", str(target), ticket=new_ticket)
+    corrected = complete_intake_crop(running, new_ticket, asset(target))
+    assert read_figure_project(corrected.model_dump_json().encode()) == corrected
+    assert {p: sha256(p.read_bytes()).hexdigest() for p in files} == files
 
 
 def test_complete_output_requires_verified_runs_and_reexports_without_overwriting(

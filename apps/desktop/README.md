@@ -31,6 +31,8 @@ geometry drafts; failed saves retain drafts, and session changes retire them. Se
 
 # Desktop host
 
+T065网格增加目标区域选择及原坐标显示框；已完成裁剪可明确保存修正，宿主CAS生成新修订，所属Fig当前结果失效、旧输出显示为历史。见 `../../docs/contracts/wb-intake-revision-v1.md`，不覆写原图或发布目录。
+
 T064增加已批准的采集组网格：组内图并排、批量归Fig、组蛋白名、单选裁剪源和Fig级N，保存通过当前项目CAS；历史行式项目保留原界面。大图预览独立后台读取原图，显示数据不入定量。契约与状态见 `../../docs/contracts/wb-intake-grouping-v1.md` / T064。
 
 E2 adds asynchronous execution-plan preparation after intake confirmation. Schema11

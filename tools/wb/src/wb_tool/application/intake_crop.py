@@ -9,6 +9,7 @@ from tool_contracts.api import AssetRef
 from wb_tool.application.document import DocumentIO
 from wb_tool.application.intake_execution import planned_intake_slots
 from wb_tool.application.intake_workflow import (
+    IntakeWorkflowLedger,
     IntakeWorkflowTicket,
     WBIntakeWorkflowProject,
     finish_intake_workflow_step,
@@ -225,6 +226,28 @@ def review_intake_crop(
     previous = next((e for e in project.intake_crops if e.row_id == row_id), None)
     if previous is None:
         raise ValueError("请先取得该行定位状态，不能跳过失败/复核记录")
+    step = next(s for s in project.workflow.steps if s.stage == "crop" and s.target_id == row_id)
+    if step.status == "pending" and previous.reviewed and previous.raw_crop is None:
+        # A saved review awaiting export may be corrected again. Rebase against the
+        # actual saved digest; never broaden retry to arbitrary pending/done stages.
+        if any(s.status == "running" for s in project.workflow.steps):
+            raise ValueError("请等待当前阶段退出后再修正裁剪")
+        workflow = IntakeWorkflowLedger.model_validate(
+            {
+                **dict(project.workflow),
+                "approved": False,
+                "steps": tuple(
+                    s.model_copy(
+                        update={"status": "needs_review", "reason": "明确调整尚未导出的已审核范围"}
+                    )
+                    if s == step
+                    else s
+                    for s in project.workflow.steps
+                ),
+            }
+        )
+        project = type(project).model_validate({**dict(project), "workflow": workflow})
+        expected_digest = intake_workflow_digest(project)
     reset = retry_intake_workflow_step(project, "crop", row_id, expected_digest=expected_digest)
     evidence = IntakeCropEvidence(
         row_id=row_id,
