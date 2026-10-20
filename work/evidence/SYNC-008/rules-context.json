@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "task": "SYNC-008",
-  "base_commit": "c2e5bf7277708444e934114d4c17e753f035d1cc",
+  "base_commit": "6e8b1e665e07b78171203721ecbd6985fb52b981",
   "scopes": [
     "."
   ],
