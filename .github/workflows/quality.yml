@@ -18,7 +18,7 @@ concurrency:
 jobs:
   foundation:
     if: github.event_name != 'workflow_dispatch' || inputs.native-case == 'normal'
-    name: foundation (${{ matrix.os }})
+    name: ${{ github.event_name == 'workflow_dispatch' && inputs.native-case != 'normal' && 'diagnostic-unused-foundation' || format('foundation ({0})', matrix.os) }}
     strategy:
       fail-fast: false
       matrix:
@@ -67,6 +67,7 @@ jobs:
           TMP: ${{ runner.temp }}
   desktop-environment:
     if: github.event_name != 'workflow_dispatch' || inputs.native-case == 'normal'
+    name: ${{ github.event_name == 'workflow_dispatch' && inputs.native-case != 'normal' && 'diagnostic-unused-desktop' || 'desktop-environment' }}
     runs-on: windows-latest
     timeout-minutes: 20
     steps:

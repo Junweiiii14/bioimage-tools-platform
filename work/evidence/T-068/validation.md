@@ -17,3 +17,5 @@ README更新当前入口/导航及已授权技术栈的状态；原始PDF和历�
 PR27 0b712f3：Windows951项/594.53s、wheel/OCR及检查成功；Linux在下一项test_local_page_channel_and_drain的finally关闭等待挂起，Python后台栈为_Work.retire:60(moveToThread)，15分钟取消。原生锁栈尚无，根因UNKNOWN；前段gdb分离输出和控制probe不当作故障现场。
 
 追加独立手动诊断事件（normal默认/PR/push门禁和15分钟时限保持）。独立concurrency，手动target/prefix跳过普通完整jobs，不作为其替代。仅新临时目录记录本次gdb/inferior，超时前核对/proc父链再SIGINT，20秒采样宽限后只清理所属process group；超时即124，原gdb退出码另打印，不将后续0视为成功。外部控制要求实际17+完整SIGINT采样/无截断；先target，必要时同文件原前五项+target。新路径尚未在Linux执行，尚无根因结论；Windows静态Ruff/Pyright/policy退出0。未改产品销毁、测试断言、依赖或服务器保护。
+
+取证583d411：manual run39425695652实际成功；外部watchdog仅向核对父链inferior发SIGINT，实际gdb17/完整采样/无截断，controller0；原目标1通过/5.10s、gdb0/deadlineFalse，未复现挂起。独审指出诊断事件跳过desktop-environment仍会提供同名skipped必需context；已改为diagnostic-unused-*名称，只在普通事件保留原必需名称，不接受诊断作为门禁成功。根因仍UNKNOWN，下一假设为原同文件前驱影响。
