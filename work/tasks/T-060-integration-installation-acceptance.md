@@ -37,3 +37,5 @@ Post-reinstall installed v3 dual-flow actual0: intake controller14.8269492s, gra
 8e11028完整910/705.48s、原pytest0/u32=0、inventory4非截断、全部隔离wheel/真实OCR/check actual0；最终非作者无P0–P2，历史失败保留。PR12/13四CI及独审已接受，main6e8b1e6；PR14 finalb1d2c8b四CI中，已最终独审/规则0。主树仅状态文档刷新，剩余实际main依赖与最终T060清单/PR检查未完成。安装态候选仍e579通过，外部科学/目标机/DPI未验。
 
 PR14旧b1 Windows699/644.74s+全wheel0，Linux15m16s超时停repeated WB close，实际native栈未捕获/rootUNKNOWN。仅窄移植后继已审CI012测试窗口所属销毁，真实red2/2.76s→16/32.60s0，原20轮/10s/GC与产品不动；最终2fbe9cb独审/冻结规则0，新四CI39343775888/39343775941运行。不得沿用旧Windows绿标新head通过。
+
+PR14 final2f四CI/绑定独审通过：Win702/584.67s、Linux702/249.75s及全部wheel/check0，精确merge3b7716d（00:00:48Z）。主树合180a464，测试helper唯一冲突保留E7已完整验证的关闭提示处理版；相对8e产品/测试/诊断运行文件空diff。actualbase3b的普通scope规则及BASE已重载读取。PR15 final330e329实际基线独审/规则0，四CI39345152689/39345152630中；其接受后才生成T060最终集成清单。
