@@ -12,9 +12,10 @@ from pytestqt.qtbot import QtBot
 from tools.wb.tests.test_project_analysis import configured
 
 
+@pytest.mark.parametrize("action", ["quant_edit", "quant_target"])
 @pytest.mark.parametrize("invalid", ["project", "epoch", "boolean_epoch", "missing_epoch"])
 def test_quant_edit_rejects_prior_session_before_mutating(
-    qtbot: QtBot, tmp_path: Path, invalid: str
+    qtbot: QtBot, tmp_path: Path, invalid: str, action: str
 ) -> None:
     project, _ = configured(tmp_path)
     row = project.rows[0]
@@ -27,8 +28,11 @@ def test_quant_edit_rejects_prior_session_before_mutating(
         pass
 
     class SessionProbe(WorkbenchBridge):
-        def apply(self, data: dict[str, object]) -> None:
-            self._edit_quant(data)
+        def apply(self, action: str, data: dict[str, object]) -> None:
+            if action == "quant_edit":
+                self._edit_quant(data)
+            else:
+                self._configure_quant_target(data)
 
     host = cast(
         FigureProjectWindow,
@@ -41,6 +45,7 @@ def test_quant_edit_rejects_prior_session_before_mutating(
             ),
             automatic=SimpleNamespace(finished=SimpleNamespace(connect=connection)),
             analyze_project=forbidden,
+            analyze_manual_target=forbidden,
             project_results=[],
             operation_busy=False,
             is_closing=False,
@@ -68,5 +73,5 @@ def test_quant_edit_rejects_prior_session_before_mutating(
     else:
         payload.pop("sessionEpoch")
     with pytest.raises(ValueError, match="会话已改变"):
-        bridge.apply(payload)
+        bridge.apply(action, payload)
     assert host.view.project() is project and host.view.generation == 9

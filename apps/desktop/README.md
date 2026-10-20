@@ -1,10 +1,26 @@
 # Desktop host
 
 The default `python -m bioimage_app` entry opens the current green WB web workbench.
+For daily Windows use, `Start-BioImage.ps1` runs Python in isolated mode and verifies
+the installed desktop module and shipped UI against its own checkout before dispatch.
+A stale editable installation or missing UI stops with an actionable error; there is no
+older-version fallback. `./Start-BioImage.ps1 --verify-launch` prints the verified paths
+without opening Qt. Direct Python invocations do not receive this launcher protection.
 `--web-workbench`, `--figure-project` and `--platform` all open that same workbench;
 an unknown argument fails before Qt starts. Its hidden native host supplies asynchronous
 storage, computation and advanced tools. Native editors open only on an explicit advanced
 action; a failed close does not switch the interface to the hidden host.
+
+The same workbench offers independent grayscale import: manual source-pixel targets,
+explicit lane count/polarity, normal worker commits and saved results, without automatic
+membrane detection or composition. A shipped local script presents free target selection
+and all-lane/single-lane profiles; it never supplies quantitative results. See
+`../../docs/contracts/wb-standalone-quant-v1.md` for identity/cancellation and compatibility.
+
+Reviewed crops can be returned beside the locally selected original from the same workbench.
+The project is saved first; the background rechecks the origin and publishes distinct verified
+display PNG/raw TIFF files and a final receipt without replacement. Local origin paths never
+enter project archives. See `../../docs/contracts/wb-crop-return-v1.md`.
 
 Native compatibility windows require `--legacy-platform`, `--legacy-figure-project`, or
 `--legacy-wb-manual` and have a title marked **兼容工具（旧版）**. `--wb-manual` remains a

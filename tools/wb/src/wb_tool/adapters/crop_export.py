@@ -2,7 +2,9 @@
 
 import json
 import os
+from collections.abc import Callable
 from dataclasses import asdict
+from fractions import Fraction
 from hashlib import file_digest, sha256
 from pathlib import Path
 from typing import cast
@@ -16,7 +18,18 @@ from wb_tool.adapters.tiff_input import load_tiff
 from wb_tool.application.crop import CropRequest
 
 
-def export_crop(source: str, request: CropRequest, destination: str) -> str:
+def export_crop(
+    source: str,
+    request: CropRequest,
+    destination: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> str:
+    def check_cancel() -> None:
+        if cancelled():
+            raise ValueError("原值裁剪已取消，未发布当前文件")
+
+    check_cancel()
     target = Path(destination).absolute()
     if target.suffix.lower() not in (".tif", ".tiff"):
         raise ValueError("请选择新的 TIFF 文件")
@@ -53,6 +66,7 @@ def export_crop(source: str, request: CropRequest, destination: str) -> str:
         stream.seek(0)
         if file_digest(stream, "sha256").hexdigest() != request.source_sha256:
             raise ValueError("裁剪读取期间原图已改变")
+    check_cancel()
     cropped = np.ascontiguousarray(original[roi.y0 : roi.y1, roi.x0 : roi.x1])
     manifest = {
         "schema_version": 1,
@@ -84,6 +98,33 @@ def export_crop(source: str, request: CropRequest, destination: str) -> str:
             )
             file.flush()
             os.fsync(file.fileno())
+        check_cancel()
+        with tifffile.TiffFile(stage) as image:
+            page = image.pages[0]
+            if (
+                len(image.pages) != 1
+                or not isinstance(page, tifffile.TiffPage)
+                or page.dtype != cropped.dtype
+                or page.shape != cropped.shape
+                or page.photometric != photometric
+                or page.resolutionunit != unit
+                or tuple(page.extrasamples) != extras
+                or page.software != "bioimage-wb original_sample_crop@1"
+                or json.loads(page.description) != manifest
+                or not np.array_equal(page.asarray(), cropped)
+            ):
+                raise ValueError("原值裁剪写后核验失败，未发布当前文件")
+            if resolution is not None:
+                for name, expected in zip(("XResolution", "YResolution"), resolution, strict=True):
+                    tag = page.tags.get(name)
+                    if (
+                        tag is None
+                        or not tag.value[1]
+                        or not expected[1]
+                        or Fraction(*tag.value) != Fraction(*expected)
+                    ):
+                        raise ValueError("原值裁剪分辨率写后核验失败，未发布当前文件")
+        check_cancel()
         if os.name == "nt":
             os.rename(stage, target)
         else:

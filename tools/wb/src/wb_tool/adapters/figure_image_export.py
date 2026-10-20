@@ -63,13 +63,7 @@ def _verify(path: Path, rendered: FigureRender, dpi: int, *, png: bool) -> None:
             raise ValueError("TIFF显示像素不一致")
 
 
-def export_figure_image(
-    project: WBFigureProject,
-    sources: tuple[FigureSourcePath, ...],
-    destination: str,
-    *,
-    cancelled: Callable[[], bool] = lambda: False,
-) -> str:
+def _image_target(destination: str) -> Path:
     target = Path(destination).absolute()
     if target.suffix.lower() not in (".png", ".tif", ".tiff"):
         raise ValueError("请选择新的TIFF或PNG成图文件")
@@ -77,8 +71,31 @@ def export_figure_image(
         raise FileExistsError("成图目标已存在，请选择新文件")
     if any(p.is_symlink() or p.is_junction() for p in (target.parent, *target.parent.parents)):
         raise ValueError("成图目录不能经过符号链接或junction")
+    return target
+
+
+def export_figure_image(
+    project: WBFigureProject,
+    sources: tuple[FigureSourcePath, ...],
+    destination: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> str:
+    _image_target(destination)
     _cancel(cancelled)
     rendered = render_figure(project, sources, cancelled=cancelled)
+    return publish_rendered_image(rendered, project.template.dpi, destination, cancelled=cancelled)
+
+
+def publish_rendered_image(
+    rendered: FigureRender,
+    dpi: int,
+    destination: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> str:
+    """Publish a verified display render; used by montage and reviewed crop export."""
+    target = _image_target(destination)
     if len(rendered.manifest_json.encode("utf-8")) > 16 * 1024 * 1024:
         raise ValueError("成图来源记录超过16MiB，请拆分项目")
     _cancel(cancelled)
@@ -87,7 +104,7 @@ def export_figure_image(
     try:
         with stage.open("xb") as stream:
             if png:
-                encoded = encode_figure_png(rendered, project.template.dpi)
+                encoded = encode_figure_png(rendered, dpi)
                 for start in range(0, len(encoded.data), 1024 * 1024):
                     _cancel(cancelled)
                     stream.write(encoded.data[start : start + 1024 * 1024])
@@ -103,14 +120,14 @@ def export_figure_image(
                     compression=None,
                     metadata=None,
                     description=rendered.manifest_json,
-                    resolution=(project.template.dpi, project.template.dpi),
+                    resolution=(dpi, dpi),
                     resolutionunit="INCH",
                     software=DISPLAY_TIFF_SOFTWARE,
                 )
             stream.flush()
             os.fsync(stream.fileno())
         _cancel(cancelled)
-        _verify(stage, rendered, project.template.dpi, png=png)
+        _verify(stage, rendered, dpi, png=png)
         _cancel(cancelled)
         if os.name == "nt":
             os.rename(stage, target)

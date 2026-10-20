@@ -1,5 +1,11 @@
 # Validation History
 
+- 2026-10-18 da00768完整704passed/483.01秒、原child0、全部隔离wheel/最终check实际0，独审6项2.08秒0；原生AV未复现不销账。后继独立灰度当前本地41相关34.78秒0，全项目Pyright/Ruff格式491文件/9导入契约/Node0；真实发货页面入口/正常worker/不调用自动或compose/位置失败重选/全泳道弹框/键盘基线/保存重开已验。后继绑定独审/完整检查/8图/视觉待做。新二次背景反例36750→25158，故不接仅扩大上限v2，保留现有2背景不足。细节work/evidence/T-044/standalone-quant.md。
+
+- 2026-10-18 662d767绑定独审5项0.37秒0；实际View两个自有原生观察进程actual0/noAV，显式parent/view无效后仍11无parent控件。后继补隐藏控件父归属，隔离生命周期旧红1failed/2.27秒、新绿连诊断6项2.21秒0，工作流/保存重开/定量重算12项18.09秒0、相关Pyright/Ruff/格式0。共享Qt试验caplog teardown KeyError保留，正式用独立进程未忽略错误。原生AV根因UNKNOWN，后继完整检查/绑定独审待做。
+
+- 2026-10-18 efec471 check --all带退出清单/native observer：700passed/1failed、488.11秒，原child/外层1，wheel未跑；未复现AV。失败trace证实全局4208根超128根预算，新测试对象未入截断报告。测试隔离真实Qt根/来源表并补根/节点/容量反例，作者5项0.46秒0、相关Pyright/Ruff/格式0；后继完整检查/绑定独审待做。不是产品退出修复。独立三角峰解析36750在35%首次支持、准确36750，诊断原型0，无参考像素/产品注入；候选v2未实施。
+
 - 2026-10-17 T042/base b32acff：context/doctor/smoke-env/policy/gh只读认证/8源图SHA检查均exit0。配置证据work/evidence/T-042/configuration.md；私有清单.local/t042。未跑产品测试/全门禁/重新识别/独审；doctor过时product_status不作产品结论。
 
 - 2026-10-16 T035/25ac71d：两指定原图端到端与原值像素核对退出0；独审18专项退出0；首次全量581 passed但退出1、根因UNKNOWN，最终复查见work/evidence/T-035/validation.md，不把测试摘要等同进程成功。
@@ -181,6 +187,17 @@ CI009产品57fd7ea正式check --all实际exit0：669passed/497.77秒，Observed 
 ## 2026-10-17 CI010 Linux退出SIGSEGV
 
 0d仅文档后继Linux669/146.29秒后SIGSEGV主线程noPythonframe，exit245/wheel未跑；同HEAD Windows669/346.68秒child0+wheels/dev成功。T043重开in_progress，旧成功/失败全保留；CI010只增显式GDB观察/0与17与真实SIGSEGV控制，不猜测性修Qt清理，不改产品/断言/15分钟。作者相关8项2.49秒0，双平台模块类型0；Linux控制/全检待真实执行，独审待绑定。
+
+- T044锚定上下文阶段：112相关20.79秒0（含旧文档/worker/OCR/schema）、既有网页9项27.89秒0、新快照1项1.98秒0、入口12项4.17秒0，全项目Pyright/Ruff/格式/Node语法0。8原图当前Web正常导入8worker/新导出/重开关闭实际0，.local/t044/workbench-anchored/validation.json，原SHA/参考未读，CSV48槽13valid35review，背景不足2/旧21。旧205全检不覆盖新阶段，最终完整门禁/绑定独审待做；离屏GPU告警不作视觉验收。e6d1abd独审2项2.33秒0关闭归属P2及核父路由。
+
+- T044 3a830fb正式check：696passed/488.23秒后AV，原child3221225477/c0000005、dev/外层-1、wheel未跑，实际失败；native-exit.md新证据1线程Qt父子/包装器析构，精确根因UNKNOWN。独审18项11.36秒0/P2不变target清人工参数；后继作者38项29.70秒0+新API/公开桥接2项2.00秒0、相关类型/Ruff0，待绑定。29未扩展原面积/bounds/flags与完整成图像素保持。
+
+- T044 9f96f5c绑定独审2项1.64秒0，P2关闭。四组Qt-only控制observer均附着、exit0/无fault，未复现非产品修复。新增可选qt_exit_inventory观察器2项0.34秒0/相关类型Ruff格式0，源码/描述见T044/native-exit.md；绑定审查和必要完整检查待做。
+
+- T044诊断容错：694279f独审2项0.38秒0，后继故障注入旧1failed/0.58秒1、新3passed/0.45秒0，相关类型/Ruff/格式0；未改原测试结果/时限。提交绑定复核及带对象清单的必要完整检查待执行。
+
+- T044最终本地交付：a72e7102891df287e3484f20f3724612779b53f5：733 passed in 525.53s、pytest child/全部wheel/dev实际0。最终正常Web8原图/8回存/保存重开/关闭0；8图产物独审0。API延迟依赖修复独审11项3.31秒0+隔离导入/发现0，无阻断。裁图回归1/8→8/8，积分13有效35复核不是准确率。详见work/evidence/T-044/final-delivery.md。下一步外置最终备份、阶段9草稿PR/日志/远端检查；main不直接合并。
+- CI012：3e5 Linux29%SIGSEGV/Windows733+wheels成功；925 Linux28%SIGSEGV/Windows因新push取消；c5 Linux735passed133.44秒/wheels/dev0，Windows记录时仍跑。独审ab1/1.96秒关闭P2、c5 5/9.96秒0。后继测试专用自有窗口helper作者67/157.28秒0、全类型/静态0，总736，最终实际CI见PR15/issue6；产品a72未改。
 - 2026-10-19 T050/main221a2df：规划文档链接/PDF blob一致性、policy、diff、handoff容量均exit0。policy扫描0产品文件不证明产品通过。PDF文本初次GBK控制台失败，UTF-8重读exit0；归档目录缺失已由main原始blob恢复。产品测试/GUI/安装/科学评分未运行，后续文档审查见T050证据。
 - T050方案fa61c29独立文档审查无阻塞，精确回执/链接/PDF/归档/diff exit0；PR16为Draft，远端检查以最终head为准。本轮仅规划，不合并或实施产品。
 - T050后续澄清：当前方案942ecaa增量独立文档审查通过，按蛋白行分别管理槽位，检查exit0；无产品测试或修改。

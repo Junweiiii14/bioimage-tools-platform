@@ -27,6 +27,11 @@ create_wb_view/create_wb_background 是延迟装配入口；PreviewRaster 是显
 不会传给定量用例。WBDocument v1 保存原输入资产/标注，契约见 wb-document-v1.md。
 后台关闭排空已接受请求后，由worker在自身线程移回owner，再停止原QThread；
 owner非阻塞确认线程退出和实际QObject销毁后才发送closed，避免跨线程析构的Qt锁/GIL反转。
+隐藏兼容控件也须明确归属View；宿主排空完成不等于窗口已经析构。
+独立进程生命周期回归验证父对象销毁后子控件释放和真实退出码，不对全局测试窗口强制清理。
+`ManualQuantTarget/configure_manual_quantification` 提供不依赖自动裁膜/拼图的人工测量目标，
+复用已有schema7逐行高度及正常worker；相同目标保留人工参数，显式重置才恢复边界。
+契约见 `../../docs/contracts/wb-standalone-quant-v1.md`，旧运行/原图保持不可变。
 桌面入口由apps显式装配：`uv run --locked --no-sync python -m bioimage_app`。
 当前界面可拖ROI/编辑闭区间与基线/查看原始曲线、OCR原文和自动结果表。
 
@@ -69,3 +74,11 @@ T-024自动主流程已集成。schema8与自动输出契约见 `../../docs/cont
 T-041：FigureLayoutStyle显式standard_lane_ratio@1可将同Fig不同原生ROI尺寸显示为每泳道lane_unit宽、4/5 lane_unit高的RGB8 LANCZOS行；原生默认、定量和原值裁剪保持。manifest操作@2明确回源与显示重采样，TIFF定量入口拒绝；预算仍3200万像素。详见wb-laboratory-layout-v1.md。
 
 T-042：source_geometry@2以短膜轮廓、上下边方向和跨阈值泳道中心推断几何；多行Marker证据仅排除实际Marker。检测/显示拉正保留原像素逐泳道ROI。手动ROI/N变化撤销该行旧显示框，旧项目与旧策略仍可重放。background_support@1要求连续背景支持，原始profile_integral@1公式不变；背景不足/多信号需复核，不能作为有效信号。现网页工作台默认启用两项新策略，HTML/CSS布局未改。研究与8图限定评分见docs/research/2026-10-17-source-only-geometry.md、work/evidence/T-042/crop-scoring.md（仓库根）。
+
+T-044当前阶段：folder_sources@1目录头信息筛选已知派生图和明确采集编号变体；literal_source_labels@1按明确Fig路径/采集文件名保留字面分组与条带标签，不推断配对。后台自动选择支持标签的已安装字体后导入项目资产。旧项目/原值/积分策略保持，完整状态和未完功能见work/tasks/T-044-wb-workflow-and-integrals.md。
+
+T-044新增当前网页工作台默认anchored_context@1/anchored_background@1，固定原目标、逐步扩展最多25%背景上下文；保存目标/采样原坐标与比例，手动几何编辑清除旧边界并从目标重新规划。旧策略和已有请求不会静默升级，旧序列化字节保持，三份机器schema增加显式版本化扩展。原始profile_integral@1/位深风险保持，背景不足不强判有效。详见wb-anchored-context-v1.md与T044实际验证。
+
+审核后原位置回存契约见 `../../docs/contracts/wb-crop-return-v1.md`。
+`return_reviewed_crop` 复用显示分段映射和原值裁剪，写后核验且不替换旧文件；
+多文件部分失败明确列出已发布文件，无完成记录，不改变定量公式或项目格式。

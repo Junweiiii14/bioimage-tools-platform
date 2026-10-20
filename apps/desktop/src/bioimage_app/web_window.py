@@ -16,6 +16,7 @@ from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import QApplication, QFileDialog, QMainWindow
 
 from bioimage_app.figure_window import FigureProjectWindow
+from bioimage_app.source_origins import SourceOrigins
 from bioimage_app.web_bridge import WorkbenchBridge
 
 
@@ -66,9 +67,10 @@ class WebWorkbenchWindow(QMainWindow):
         self.resize(1440, 940)
         self.settings = settings or QSettings("BioImageTools", "Platform")
         self.host = AdvancedHost()
+        self.host.source_origins = SourceOrigins(self.settings)
         self.host.setParent(self, Qt.WindowType.Window)
         self.host.automatic.crop_policy = "source_geometry@2"
-        self.host.automatic.quant_policy = "background_support@1"
+        self.host.automatic.quant_policy = "anchored_background@1"
         self.host.closed.connect(self._backend_closed)
         self.host.workspace_opened.connect(self._workspace_ready)
         self.web = QWebEngineView(self)
@@ -96,15 +98,21 @@ class WebWorkbenchWindow(QMainWindow):
         self._closing = False
 
     def choose(self, action: str) -> None:
-        if action == "import":
+        if action in {"import", "quant_import"}:
             paths, _ = QFileDialog.getOpenFileNames(
                 self, "选择 WB 原图", "", "TIFF 原图 (*.tif *.tiff)"
             )
             if paths:
                 if self.host.workspace_path:
-                    self.host.import_images(tuple(paths), automatic=True)
+                    self.host.import_images(tuple(paths), automatic=action != "quant_import")
                 else:
-                    self.start_from_images([Path(path) for path in paths])
+                    self.start_from_images(
+                        [Path(path) for path in paths], automatic=action != "quant_import"
+                    )
+        elif action == "retry_location":
+            if self.host.retry_location_button.isHidden():
+                raise ValueError("当前没有等待重新选择保存位置的项目")
+            self.host.retry_location_button.click()
         elif action in {"quant_export_xlsx", "quant_export_csv"}:
             extension = action.rsplit("_", 1)[-1]
             path, _ = QFileDialog.getSaveFileName(
@@ -143,9 +151,11 @@ class WebWorkbenchWindow(QMainWindow):
             if isinstance(document_id, str) and document_id:
                 self.host.load_document(document_id)
 
-    def start_from_images(self, paths: list[Path]) -> None:
+    def start_from_images(self, paths: list[Path], *, automatic: bool = True) -> None:
         parent = str(self.settings.value("project_parent", ""))
-        self.host.start_project_from_images(paths, project_parent=Path(parent) if parent else None)
+        self.host.start_project_from_images(
+            paths, project_parent=Path(parent) if parent else None, automatic=automatic
+        )
 
     def closeEvent(self, event: QCloseEvent) -> None:
         if self.host.resources_closed:

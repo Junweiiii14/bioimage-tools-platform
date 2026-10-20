@@ -4,6 +4,7 @@ import csv
 import json
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any, cast
 from zipfile import ZipFile
 
@@ -11,8 +12,115 @@ import numpy as np
 import tifffile
 from bioimage_app.figure_window import FigureProjectWindow
 from bioimage_app.web_bridge import WorkbenchBridge
+from bioimage_app.web_quant import quant_snapshot
 from pytestqt.qtbot import QtBot
 from wb_tool.api import WBAnalysisProject, initial_composition, make_row_analysis
+
+from tooling.qt_test_lifecycle import close_and_dispose_window
+
+
+def test_same_target_bridge_keeps_generation_and_manual_parameters(qtbot: QtBot) -> None:
+    from wb_tool.api import Baseline, update_quant_lane
+
+    from tools.wb.tests.test_anchored_analysis import anchored_project
+
+    project = anchored_project()
+    annotation = project.analyses[0].request.lanes[0]
+    assert annotation.target_roi is not None
+    target = annotation.target_roi
+    project = update_quant_lane(project, "r", annotation.roi.lane_id, baseline=Baseline(1, 1))
+    view = SimpleNamespace(
+        project=lambda: project, selected_row=lambda: project.rows[0], generation=9
+    )
+
+    # No setters/replan methods: any attempted mutation or recompute fails this control.
+    class NoErrorBridge(WorkbenchBridge):
+        def publish(self) -> None:
+            assert not self._error
+
+    def ignore_connection(callback: object) -> None:
+        pass
+
+    host = cast(
+        FigureProjectWindow,
+        SimpleNamespace(
+            view=view,
+            project_results=[],
+            operation_busy=False,
+            is_closing=False,
+            automatic=SimpleNamespace(finished=SimpleNamespace(connect=ignore_connection)),
+        ),
+    )
+    bridge = NoErrorBridge(host, lambda _: None)
+    bridge.timer.stop()
+    bridge.request(
+        "quant_edit",
+        json.dumps(
+            {
+                "projectId": project.project_id,
+                "sessionEpoch": bridge.session_epoch,
+                "id": "r",
+                "sourceId": project.rows[0].source.sha256 if project.rows[0].source else "",
+                "revision": 9,
+                "lane": 1,
+                "roi": {
+                    "x": target.x0,
+                    "y": target.y0,
+                    "width": target.width,
+                    "height": target.y1 - target.y0,
+                },
+            }
+        ),
+    )
+    assert view.generation == 9
+    assert view.project() is project
+
+
+def test_anchored_snapshot_keeps_target_distinct_from_sampling_context() -> None:
+    from tool_contracts.api import AssetRef
+    from wb_tool.api import FigureRow, FigureTemplate, LaneROI, ProjectRowAnalysis
+
+    from tools.wb.tests.test_anchored_analysis import anchored_request
+
+    image, request = anchored_request()
+    crop = LaneROI("r", 0, 38, 4, 62)
+    row = FigureRow(
+        row_id="r",
+        figure="Fig1",
+        protein="target",
+        lane_count=1,
+        source=AssetRef(
+            asset_id="source", relative_path="inputs/source.tif", sha256=image.sha256, size_bytes=1
+        ),
+        filename="source.tif",
+        width=4,
+        height=120,
+        bit_depth=16,
+        roi=crop,
+        reviewed=True,
+    )
+    project = WBAnalysisProject(
+        project_id="p",
+        rows=(row,),
+        figure_order=("Fig1",),
+        template=FigureTemplate(crop_height=24),
+        analyses=(ProjectRowAnalysis(row_id="r", crop=crop, request=request),),
+    )
+    # A presentation unit test needs no filesystem or live native host.
+    host = cast(
+        FigureProjectWindow,
+        SimpleNamespace(
+            view=SimpleNamespace(project=lambda: project, selected_row=lambda: row, generation=0),
+            project_results=[],
+            operation_busy=False,
+        ),
+    )
+    data = cast(dict[str, Any], quant_snapshot(host))
+    lane = data["lanes"][0]
+    assert lane["targetRoi"] == {"x": 0, "y": 38, "width": 4, "height": 24}
+    assert lane["roi"]["y"] < 38
+    assert lane["contextExpansionPercent"] > 0
+    assert data["contextBounds"] == lane["roi"]
 
 
 def test_quant_supervision_recomputes_and_exports(qtbot: QtBot, tmp_path: Path) -> None:
@@ -145,5 +253,6 @@ def test_quant_supervision_recomputes_and_exports(qtbot: QtBot, tmp_path: Path) 
         assert source.read_bytes() == before
     finally:
         bridge.timer.stop()
-        host.close()
-        qtbot.waitUntil(lambda: host.resources_closed, timeout=20000)
+        close_and_dispose_window(
+            host, qtbot, resources_closed=lambda: host.resources_closed, timeout=20000
+        )

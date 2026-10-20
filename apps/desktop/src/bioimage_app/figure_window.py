@@ -34,12 +34,14 @@ from wb_tool.api import (
     LoadedFigureTemplate,
     LoadedProjectOCR,
     LoadedProjectResult,
+    ManualQuantTarget,
     MetadataBook,
     PreviewRaster,
     ProjectDerivedTables,
     ProjectOCRState,
     ProjectTableSnapshot,
     RestoredProjectResults,
+    ReturnedCrop,
     WBAnalysisProject,
     WBFigureProject,
     WBJob,
@@ -56,6 +58,7 @@ from wb_tool.api import (
     project_assets,
     project_with_ocr,
     record_crop_suggestion,
+    source_import_labels,
     with_figure_layout,
 )
 
@@ -65,6 +68,7 @@ from bioimage_app.project_measurements import ProjectBatchCompletion, ProjectMea
 from bioimage_app.project_ocr import ProjectOCRCompletion, ProjectOCRSession
 from bioimage_app.project_restore import ArchiveRestoreJob, ArchiveRestoreResult
 from bioimage_app.project_start import ProjectSelectionJob
+from bioimage_app.source_origins import SourceOrigins
 from bioimage_app.storage import AsyncStorage, StorageCommand, StorageReply
 from bioimage_app.workbench_motion import NavigationMotion, PanelReveal
 from bioimage_app.workbench_style import apply_workbench_theme
@@ -101,6 +105,7 @@ class FigureProjectWindow(QMainWindow):
         self._store.closed.connect(self._store_stopped)
         self._background.closed.connect(self._background_stopped)
         self._workspace = ""
+        self.source_origins = SourceOrigins()
         self._paths: dict[str, str] = {}
         self._saved_revision: int | None = None
         self._saved_generation = 0
@@ -118,6 +123,7 @@ class FigureProjectWindow(QMainWindow):
         self._restore_job: ArchiveRestoreJob | None = None
         self._selection_job: ProjectSelectionJob | None = None
         self._pending_project_paths: list[Path] = []
+        self._pending_project_automatic = True
         self._auto_save = QTimer(self)
         self._auto_save.setSingleShot(True)
         self._auto_save.setInterval(700)
@@ -371,21 +377,27 @@ class FigureProjectWindow(QMainWindow):
     def _retry_project_location(self) -> None:
         parent = QFileDialog.getExistingDirectory(self, "选择项目保存位置（软件自动创建子文件夹）")
         if parent and self._pending_project_paths:
-            self.start_project_from_images(self._pending_project_paths, Path(parent))
+            self.start_project_from_images(
+                self._pending_project_paths, Path(parent), automatic=self._pending_project_automatic
+            )
 
     def start_project_from_images(
-        self, paths: list[Path], project_parent: Path | None = None
+        self, paths: list[Path], project_parent: Path | None = None, *, automatic: bool = True
     ) -> None:
         """Select originals first; decode before any workspace or recent entry is created."""
         if not paths or self._busy or self._workspace or self._closing:
             return
         self._pending_project_paths = list(paths)
+        self._pending_project_automatic = automatic
         self.retry_location_button.hide()
         self._start()
         self.view.status.setText("正在查找 WB 原图…")
         self.welcome_status.setText("正在查找 WB 原图…")
         job = ProjectSelectionJob(
-            paths, project_parent or default_project_parent(), self._cancellation
+            paths,
+            project_parent or default_project_parent(),
+            self._cancellation,
+            automatic=automatic,
         )
         self._selection_job = job
 
@@ -427,12 +439,15 @@ class FigureProjectWindow(QMainWindow):
                         self.view.set_project(
                             WBFigureProject(project_id=uuid4().hex, name=selection.name)
                         )
+                        self.automatic.discovery_report = selection.discovery_report
                         self.workspace_opened.emit(self._workspace)
                         self._busy = False
                         if self._closing or self._cancellation.is_set():
                             self._done("创建后已取消；项目可稍后继续。")
                             return
-                        self.import_images(tuple(str(p) for p in selection.paths), automatic=True)
+                        self.import_images(
+                            tuple(str(p) for p in selection.paths), automatic=automatic
+                        )
 
                     self._storage(
                         StorageCommand("create", path=str(selection.destination)), created
@@ -926,6 +941,51 @@ class FigureProjectWindow(QMainWindow):
         session.start(project, self._workspace, restore=restore)
         if self._closing:
             session.cancel()
+
+    def analyze_manual_target(self, target: ManualQuantTarget) -> None:
+        """Configure in the background, then use normal durable measurement runs."""
+        if self._busy or self._closing or not self._workspace:
+            return
+        project = self.view.project()
+        path = self.source_paths.get(target.source_sha256)
+        if not path:
+            raise ValueError("原图资产不可用，无法配置测量区域")
+        generation = self.view.generation
+        self._start()
+
+        def configured(reply: WBReply) -> None:
+            if self._closing or self._cancellation.is_set():
+                self._done("独立灰度配置已取消；原项目和历史结果保留")
+                return
+            if (
+                generation != self.view.generation
+                or self.view.project().project_id != project.project_id
+            ):
+                self._done("项目或参数已改变，旧测量目标未覆盖当前编辑")
+                return
+            if reply.error or not isinstance(reply.value, WBAnalysisProject):
+                self._error(reply.error or "测量目标配置结果无效")
+                return
+            if reply.value != project:
+                self.view.set_project(reply.value)
+                self.view.generation += 1
+            self._project_results = tuple(
+                item for item in self._project_results if item.row_id != target.roi.lane_id
+            )
+            self._busy = False
+            self.analyze_project(row_ids=(target.roi.lane_id,))
+
+        self._wb(
+            WBJob(
+                "quant_target",
+                path=path,
+                document=project,
+                manual_target=target,
+                cancellation=self._cancellation,
+            ),
+            configured,
+            accept_errors=True,
+        )
 
     def replan_quant_lane(self, row_id: str) -> None:
         """Re-detect changed lane geometry off the GUI thread, then commit measurements."""
@@ -1535,7 +1595,7 @@ class FigureProjectWindow(QMainWindow):
                     and not self._cancellation.is_set()
                     and not self._closing
                 ):
-                    self.automatic.analyze(row_ids=tuple(imported_ids), import_errors=tuple(errors))
+                    self._analyze_imported_rows(tuple(imported_ids), tuple(errors))
                 return
             if len(self.view.project().rows) >= 512:
                 self._done(f"项目已达 512 行；剩余 {len(pending)} 张未导入，请另建项目。")
@@ -1574,17 +1634,20 @@ class FigureProjectWindow(QMainWindow):
                             next_image()
                             return
                         self._paths[asset.sha256] = reply.value
+                        labels = source_import_labels(path) if automatic else None
                         row = FigureRow(
                             row_id=uuid4().hex,
                             source=asset,
                             filename=Path(path).name,
-                            # Portable, explicitly unknown label, never a source/protein inference.
-                            protein="Unassigned",
+                            # Literal labels do not establish a control/sample pairing.
+                            protein=labels.protein if labels and labels.protein else "Unassigned",
                             width=raster.width,
                             height=raster.height,
                             bit_depth=16 if raster.bit_depth == 16 else 8,
                             figure=(
-                                f"Fig{len(current.rows) + 1}"
+                                labels.figure or f"Fig{len(current.rows) + 1}"
+                                if labels
+                                else f"Fig{len(current.rows) + 1}"
                                 if automatic
                                 else current.figure_order[-1]
                                 if current.figure_order
@@ -1603,6 +1666,9 @@ class FigureProjectWindow(QMainWindow):
                         )
                         self.view.generation += 1
                         generation = self.view.generation
+                        self.source_origins.remember(
+                            self._workspace, current.project_id, row.row_id, asset.sha256, path
+                        )
                         self.view.install_thumbnail(raster)
                         imported_ids.append(row.row_id)
                         next_image()
@@ -1616,6 +1682,82 @@ class FigureProjectWindow(QMainWindow):
             self._wb(WBJob("preview", path=path, preview_edge=128), previewed, accept_errors=True)
 
         next_image()
+
+    def return_selected_crop(self, *, locate: bool = False) -> None:
+        if self._busy or self._closing or not self._workspace:
+            return
+        row = self.view.selected_row()
+        if row is None or row.source is None or row.roi is None:
+            raise ValueError("请先选定原图裁剪范围")
+        project = self.view.project()
+        source_sha = row.source.sha256
+        source_path = (
+            ""
+            if locate
+            else self.source_origins.lookup(
+                self._workspace, project.project_id, row.row_id, source_sha
+            )
+        )
+        if not source_path:
+            source_path, _ = QFileDialog.getOpenFileName(
+                self, "定位原图：核验后在其所在文件夹生成新裁图", "", "TIFF (*.tif *.tiff)"
+            )
+            if not source_path:
+                return
+        self._auto_save.stop()
+        self.view.confirm_row(row.row_id)
+        generation, workspace = self.view.generation, self._workspace
+
+        def saved() -> None:
+            current = self.view.project()
+            if (
+                self._closing
+                or self._cancellation.is_set()
+                or generation != self.view.generation
+                or workspace != self._workspace
+                or current.project_id != project.project_id
+            ):
+                return
+            self._start()
+
+            def returned(reply: WBReply) -> None:
+                if reply.error or not isinstance(reply.value, ReturnedCrop):
+                    message = reply.error or "裁图回存未返回核验记录"
+                    if self._closing:
+                        self._done(message)
+                    else:
+                        self._error(message)
+                    return
+                result = reply.value
+                if (
+                    self._closing
+                    or generation != self.view.generation
+                    or workspace != self._workspace
+                    or self.view.project().project_id != project.project_id
+                ):
+                    self._done("旧裁图输出已保留；当前项目未替换")
+                    return
+                self.source_origins.remember(
+                    workspace, project.project_id, row.row_id, source_sha, source_path
+                )
+                self._done(
+                    f"裁图已核验并回存至 {Path(source_path).parent}；"
+                    f"新增 {len(result.files)} 个图像和1份记录，原图与旧结果保留。"
+                )
+
+            self._wb(
+                WBJob(
+                    "return_crop",
+                    path=source_path,
+                    document=current,
+                    row_id=row.row_id,
+                    cancellation=self._cancellation,
+                ),
+                returned,
+                accept_errors=True,
+            )
+
+        self.save(after=saved)
 
     def select_source(self, row_id: str) -> None:
         if self._busy or self._closing:
@@ -2094,7 +2236,35 @@ class FigureProjectWindow(QMainWindow):
         if path:
             self.import_font(path)
 
-    def import_font(self, path: str) -> None:
+    def _analyze_imported_rows(self, row_ids: tuple[str, ...], errors: tuple[str, ...]) -> None:
+        project = self.view.project()
+
+        def analyze() -> None:
+            self.automatic.analyze(row_ids=row_ids, import_errors=errors)
+
+        if project.template.font or not any(
+            ord(char) > 255
+            for label in (*project.figure_order, *(row.protein for row in project.rows))
+            for char in label
+        ):
+            analyze()
+            return
+        generation = self.view.generation
+        self._start()
+
+        def selected(reply: WBReply) -> None:
+            if generation != self.view.generation or self._closing or self._cancellation.is_set():
+                self._done("标签字体选择已取消。")
+                return
+            if not isinstance(reply.value, str):
+                self._error(reply.error or "标签字体路径无效")
+                return
+            self._done("已找到标签字体，正在保存到项目。")
+            self.import_font(reply.value, finished=analyze)
+
+        self._wb(WBJob("label_font", document=project), selected)
+
+    def import_font(self, path: str, *, finished: Callable[[], None] | None = None) -> None:
         if self._busy:
             return
         try:
@@ -2103,6 +2273,7 @@ class FigureProjectWindow(QMainWindow):
             self._error(str(error))
             return
         self._start()
+        generation = self.view.generation
 
         def fingerprinted(reply: WBReply) -> None:
             if not isinstance(reply.value, str):
@@ -2116,6 +2287,13 @@ class FigureProjectWindow(QMainWindow):
                 asset = reply.value
 
                 def resolved(reply: StorageReply) -> None:
+                    if (
+                        generation != self.view.generation
+                        or self._closing
+                        or self._cancellation.is_set()
+                    ):
+                        self._done("字体导入已取消：当前项目已更改或正在关闭。")
+                        return
                     if not isinstance(reply.value, str):
                         self._error("字体路径无效")
                         return
@@ -2127,6 +2305,8 @@ class FigureProjectWindow(QMainWindow):
                     )
                     self.view.generation += 1
                     self._done("字体已导入，随项目保存。")
+                    if finished is not None:
+                        finished()
 
                 self._storage(StorageCommand("asset", asset=asset), resolved)
 

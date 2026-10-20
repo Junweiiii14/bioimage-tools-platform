@@ -13,6 +13,8 @@ from bioimage_app.figure_window import FigureProjectWindow
 from pytestqt.qtbot import QtBot
 from wb_tool.api import WBAutomaticProject, read_figure_project
 
+from tooling.qt_test_lifecycle import close_and_dispose_window
+
 
 @pytest.fixture
 def automatic_window(qtbot: QtBot, tmp_path: Path) -> Iterator[FigureProjectWindow]:
@@ -21,8 +23,9 @@ def automatic_window(qtbot: QtBot, tmp_path: Path) -> Iterator[FigureProjectWind
     window.open_workspace(str(tmp_path / "workspace"), create=True)
     qtbot.waitUntil(lambda: not window.operation_busy, timeout=15000)
     yield window
-    window.close()
-    qtbot.waitUntil(lambda: window.resources_closed, timeout=20000)
+    close_and_dispose_window(
+        window, qtbot, resources_closed=lambda: window.resources_closed, timeout=20000
+    )
 
 
 def make_sources(root: Path) -> tuple[Path, Path]:
@@ -68,6 +71,9 @@ def test_directory_import_detect_compute_export_and_reopen(
     assert (output / "measurements.xlsx").is_file()
     assert (output / "figure.png").is_file()
     assert (output / "figure.tif").is_file()
+    status = json.loads((output / "status.json").read_text(encoding="utf-8"))
+    assert status["source_discovery"]["policy"] == "folder_sources@1"
+    assert len(status["source_discovery"]["paths"]) == 3
     with ZipFile(output / "project.zip") as archive:
         manifest = json.loads(archive.read("manifest.json"))
         assert manifest["unrendered_rows"][0]["row_id"] == project.rows[0].row_id
@@ -90,6 +96,42 @@ def test_directory_import_detect_compute_export_and_reopen(
     assert window.view.table.currentRow() == 1
     assert window.view.analysis.summary.rowCount() == 5
     assert window.view.canvas.image_rect().width() > 0
+
+
+def test_explicit_fig_folder_groups_acquisition_rows(
+    qtbot: QtBot, tmp_path: Path, automatic_window: FigureProjectWindow
+) -> None:
+    group = tmp_path / "1D"
+    group.mkdir()
+    paths: list[str] = []
+    for offset, protein in enumerate(("ABCA9", "β-actin")):
+        image = np.full((180, 360), 50000, dtype=np.uint16)
+        image[0, 0] -= offset  # Distinct source identities with the same measured geometry.
+        for x in (60, 120, 180, 240, 300):
+            image[70:85, x - 17 : x + 17] = 15000
+        source = group / f"{protein}_100646_0_14_0_0 (1).tiff"
+        tifffile.imwrite(source, image)
+        paths.append(str(source))
+    window = automatic_window
+    window.import_images(tuple(paths), automatic=True)
+    qtbot.waitUntil(
+        lambda: bool(window.automatic.last_output_path) or "操作失败" in window.view.status.text(),
+        timeout=40000,
+    )
+    assert window.automatic.last_output_path, window.view.status.text()
+    qtbot.waitUntil(lambda: not window.operation_busy, timeout=15000)
+    project = window.view.project()
+    assert project.figure_order == ("1D",)
+    assert [(row.figure, row.protein) for row in project.rows] == [
+        ("1D", "ABCA9"),
+        ("1D", "β-actin"),
+    ]
+    assert project.template.font is not None
+    saved = read_figure_project(
+        (Path(window.automatic.last_output_path) / "project.json").read_bytes()
+    )
+    assert saved.figure_order == project.figure_order
+    assert saved.template.font == project.template.font
 
 
 def test_close_during_directory_discovery_drains_resources(

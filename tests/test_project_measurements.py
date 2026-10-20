@@ -19,6 +19,8 @@ from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 from pytestqt.qtbot import QtBot
 from wb_tool.api import WBAnalysisProject, WBNormalizedProject, WBProjectOCR, plan_figure_layout
 
+from tooling.qt_test_lifecycle import close_and_dispose_window
+
 if TYPE_CHECKING:
     from bioimage_app.api import FigureProjectWindow
 
@@ -41,9 +43,12 @@ def windows(qtbot: QtBot) -> Iterator[Callable[[], "FigureProjectWindow"]]:
 
     yield make
     for window in opened:
-        if not window.resources_closed:
-            window.close()
-            qtbot.waitUntil(lambda window=window: window.resources_closed, timeout=20000)
+        close_and_dispose_window(
+            window,
+            qtbot,
+            resources_closed=lambda window=window: window.resources_closed,
+            timeout=20000,
+        )
 
 
 def setup(

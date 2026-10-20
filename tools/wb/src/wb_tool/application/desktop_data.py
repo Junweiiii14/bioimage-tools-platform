@@ -8,6 +8,7 @@ from tool_contracts.api import RunRecord
 
 from wb_tool.application.analysis import AnalysisResult
 from wb_tool.application.crop import CropRequest
+from wb_tool.application.crop_return import ReturnedCrop
 from wb_tool.application.crop_suggestions import CropSuggestion
 from wb_tool.application.document import WBDocument, WBWorksheetDocument
 from wb_tool.application.figure_project import (
@@ -28,6 +29,7 @@ from wb_tool.application.project_metadata import MetadataBook
 from wb_tool.application.project_normalization import NormalizationSnapshot
 from wb_tool.application.project_ocr import LoadedProjectOCR
 from wb_tool.application.project_restore import RestoredProjectResults
+from wb_tool.application.standalone_quant import ManualQuantTarget
 from wb_tool.domain.automatic import CropPolicy, QuantPolicy
 from wb_tool.domain.crop_detection import CropDetectionSettings
 from wb_tool.domain.worksheet import OCRRecognition, Worksheet
@@ -61,12 +63,14 @@ class WBJob:
         "stored_result",
         "export",
         "crop",
+        "return_crop",
         "figure_document",
         "figure_preview",
         "figure_ocr",
         "figure_export",
         "figure_image_export",
         "font_digest",
+        "label_font",
         "template_read",
         "template_export",
         "crop_suggest",
@@ -75,6 +79,7 @@ class WBJob:
         "project_export",
         "quant_export",
         "quant_replan",
+        "quant_target",
         "project_ocr_result",
         "project_ocr_install",
         "project_ocr_table",
@@ -99,6 +104,7 @@ class WBJob:
     source_sha256: str = ""
     revision: int = 0
     analysis_plan: ProjectRowAnalysis | None = None
+    manual_target: ManualQuantTarget | None = None
     project_results: tuple[LoadedProjectResult, ...] = ()
     ocr_run: RunRecord | None = None
     project_ocr_result: LoadedProjectOCR | None = None
@@ -119,6 +125,7 @@ class WBReply:
     request_id: str
     value: (
         PreviewRaster
+        | ReturnedCrop
         | WBDocument
         | WBWorksheetDocument
         | WBFigureProject

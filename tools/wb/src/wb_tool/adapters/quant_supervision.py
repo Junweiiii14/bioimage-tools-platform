@@ -19,13 +19,41 @@ def replan_quant_lanes(
     cancelled: Callable[[], bool] = lambda: False,
 ) -> WBAnalysisProject:
     plan = next((p for p in project.analyses if p.row_id == row_id), None)
-    if plan is None or plan.request.quant_policy not in ("wbquant_1_4_3@1", "background_support@1"):
+    if plan is None or plan.request.quant_policy not in (
+        "wbquant_1_4_3@1",
+        "background_support@1",
+        "anchored_background@1",
+    ):
         raise ValueError("没有新版定量计划")
     image = load_tiff(path)
     if image.sha256 != plan.request.source_sha256:
         raise ValueError("原图来源不一致")
     if cancelled():
         raise ValueError("重新规划已取消")
+    if plan.request.quant_policy == "anchored_background@1":
+        from wb_tool.application.automatic import suggest_analysis_for_crop
+
+        generated = suggest_analysis_for_crop(
+            image,
+            crop=plan.crop,
+            lane_count=len(plan.request.lanes),
+            revision=plan.request.revision,
+            polarity=plan.request.polarity,
+            empty_lanes=plan.empty_lanes,
+            quant_policy=plan.request.quant_policy,
+            lane_rois=tuple(lane.target_roi or lane.roi for lane in plan.request.lanes),
+            cancelled=cancelled,
+        )
+        request = replace(
+            plan.request,
+            lanes=tuple(
+                replace(new, bands=(replace(new.bands[0], included=old.bands[0].included),))
+                if any("geometry_changed:replan_required" in b.detection_notes for b in old.bands)
+                else old
+                for old, new in zip(plan.request.lanes, generated.lanes, strict=True)
+            ),
+        )
+        return install_quant_request(project, row_id, request)
     from wb_tool.domain.background_bounds import propose_background_lanes
 
     propose = (

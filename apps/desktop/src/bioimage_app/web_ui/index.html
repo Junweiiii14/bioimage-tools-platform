@@ -20,8 +20,9 @@
     </header>
     <main id="home-view" class="home-view" hidden>
       <div class="home-intro"><div><h1>让图像，成为清晰的结果。</h1><p>从原始图像到可追溯的分析，在一个工作台里完成。</p></div><span class="local-label"><span></span>本地工作空间</span></div>
-      <section class="tool-feature"><div class="tool-feature-copy"><div class="tool-symbol"><i data-icon="lanes"></i></div><h2>WB 自动化</h2><p>导入原图，自动定位泳道与裁剪范围。<br>直接查看拼图，点击图片即可回到原图调整。</p><button class="button primary large" data-action="import"><i data-icon="upload"></i>选择原图并开始<i data-icon="arrow"></i></button><button class="text-button" data-action="import_folder">或选择原图文件夹</button><small>项目文件夹自动创建 · 原始图像完整保留</small></div><div class="tool-feature-image"><img id="home-image" alt="WB 原始图像预览"><div class="feature-caption"><span>原图 · 泳道 · 结果</span><span>同一条证据链</span></div></div></section>
+      <section class="tool-feature"><div class="tool-feature-copy"><div class="tool-symbol"><i data-icon="lanes"></i></div><h2>WB 自动化</h2><p>导入原图，自动定位泳道与裁剪范围。<br>直接查看拼图，点击图片即可回到原图调整。</p><button class="button primary large" data-action="import"><i data-icon="upload"></i>选择原图并开始<i data-icon="arrow"></i></button><button class="text-button" data-action="import_folder">或选择原图文件夹</button><button class="button subtle" data-action="quant_import"><i data-icon="curve"></i>独立灰度分析</button><small>项目文件夹自动创建 · 原始图像完整保留</small></div><div class="tool-feature-image"><img id="home-image" alt="WB 原始图像预览"><div class="feature-caption"><span>原图 · 泳道 · 结果</span><span>同一条证据链</span></div></div></section>
       <section class="recent-section"><div class="section-heading"><h2>继续你的工作</h2><button class="text-button" data-action="open_project"><i data-icon="folder"></i>打开已有项目</button></div><button class="recent-project" data-action="demo"><div class="recent-thumbnail"><img id="recent-image" alt="项目缩略图"></div><div><h3 id="recent-name">查看交互预览</h3><p id="recent-description">体验原图复核、拼图与结果浏览</p></div><span class="recent-label">打开项目</span><i data-icon="arrow"></i></button></section>
+      <button id="retry-location" class="button subtle" data-action="retry_location" hidden>重新选择项目保存位置</button>
       <p class="home-note" id="home-note">网页用于界面与交互预览。真实导入、计算和导出由同源桌面版执行。</p>
     </main>
     <div id="work-view" class="work-view">
@@ -43,6 +44,13 @@
   <div id="drawer-backdrop" class="drawer-backdrop" hidden></div><aside id="drawer" class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" hidden><div class="drawer-heading"><h2 id="drawer-title">项目工具</h2><button class="icon-button" data-action="close-drawer" aria-label="关闭面板"><i data-icon="close"></i></button></div><div id="drawer-content"></div></aside>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <noscript>需要启用 JavaScript 才能操作图像工作台。</noscript>
+  <dialog id="quant-profiles-dialog" aria-labelledby="quant-profiles-title">
+    <header class="quant-profiles-header"><h2 id="quant-profiles-title">灰度峰与积分区域</h2><button class="icon-button" data-close-quant-profiles aria-label="关闭曲线窗口"><i data-icon="close"></i></button></header>
+    <div class="quant-profiles-toolbar"><label class="quant-field">视图<select id="quant-profile-view"><option value="all">全部泳道</option><option value="single">单泳道细调</option></select></label><label class="quant-field">泳道<select id="quant-profile-lane"></select></label><label id="quant-profile-band-label" class="quant-field" hidden>条带<select id="quant-profile-band"></select></label><p>曲线、区域内峰点、直线封底和积分填充来自同一原图测量。</p></div>
+    <div class="quant-profiles-scroll"><div id="quant-profiles-all"></div><section id="quant-profiles-single-wrap" hidden><div id="quant-profile-single"></div><div id="quant-profile-fields" class="quant-fields"></div><p>拖动端点，或 Tab 选择手柄后用方向键微调；数值修改后正常后台重算。</p></section><details id="quant-profiles-quality"></details></div>
+    <footer class="quant-profiles-footer">横轴：采样区内纵向位置 y（原图像素） · 直线封底是背景模型，人工调整不等于实验有效性证明。</footer>
+  </dialog>
+  <script src="manual_quant.js" defer></script>
   <script src="app.js" defer></script>
 </body>
 </html>

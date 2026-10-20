@@ -40,7 +40,7 @@ def test_normal_entry_opens_current_workbench(qtbot: QtBot, arguments: list[str]
         window.show()
         assert not window.host.isVisible()
         assert window.host.automatic.crop_policy == "source_geometry@2"
-        assert window.host.automatic.quant_policy == "background_support@1"
+        assert window.host.automatic.quant_policy == "anchored_background@1"
     finally:
         window.close()
         qtbot.waitUntil(lambda: window.host.resources_closed, timeout=15000)

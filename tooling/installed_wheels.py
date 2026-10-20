@@ -70,7 +70,7 @@ from wb_tool.api import (
     AnalysisRequest, BandAnnotation, BandBounds, Baseline, LaneAnnotation, LaneROI,
     analyze_annotations, compute_lane_profiles, integrate_profile, load_tiff,
     StartFrame, WorkerConversation, encode_worker_frame, ResultFrame,
-    CropRequest, export_crop, fixed_lane_grid,
+    CropRequest, export_crop, fixed_lane_grid, discover_tiffs, return_reviewed_crop,
     FigureRow, WBFigureProject, read_metadata_file, preview_metadata, apply_metadata,
 )
 import numpy as np
@@ -78,6 +78,14 @@ import tifffile
 import subprocess
 import wb_tool.api
 assert Path(wb_tool.api.__file__).is_relative_to(Path(sys.prefix))
+assert callable(return_reviewed_crop)
+assert not any(name == 'PIL' or name.startswith('PIL.') for name in sys.modules)
+import json
+Path('source-folder').mkdir()
+tifffile.imwrite('source-folder/input.tiff', np.zeros((3, 4), dtype=np.uint16))
+discovered = json.loads(discover_tiffs('source-folder', with_report=True))
+assert len(discovered['paths']) == 1 and discovered['skipped'] == []
+assert not any(name == 'PIL' or name.startswith('PIL.') for name in sys.modules)
 assert integrate_profile([10., 20., 10.], BandBounds(0, 2)).signal == 10.
 assert integrate_profile([8., 8.], BandBounds(0, 1), Baseline(0, 0)).signal == 8.
 pixels = np.array([[245], [235], [245]], dtype=np.uint8)

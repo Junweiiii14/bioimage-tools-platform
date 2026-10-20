@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Stop'
 $env:PYTHONUTF8 = '1'
 Push-Location -LiteralPath $PSScriptRoot
 try {
-    & uv run --locked --no-sync --project $PSScriptRoot python -m bioimage_app @args
+    & uv run --locked --no-sync --project $PSScriptRoot python -I (Join-Path $PSScriptRoot 'tooling/launch_workbench.py') @args
     exit $LASTEXITCODE
 }
 finally {

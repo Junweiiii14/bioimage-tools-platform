@@ -79,6 +79,32 @@ def suggest_analysis_for_crop(
     )
     if len(geometry) != lane_count:
         raise ValueError("检测泳道数与请求不一致")
+    if quant_policy == "anchored_background@1":
+        from wb_tool.domain.anchored_context import propose_anchored_lanes
+
+        anchored = propose_anchored_lanes(image.pixels, geometry, polarity)
+        for index, item in enumerate(anchored, 1):
+            check_detection_cancelled(cancelled)
+            band = item.proposal.bands[0]
+            lanes.append(
+                LaneAnnotation(
+                    item.proposal.roi,
+                    (
+                        BandAnnotation(
+                            "target",
+                            band.bounds,
+                            band.baseline,
+                            index not in empty_lanes,
+                            band.notes,
+                        ),
+                    ),
+                    item.target,
+                    item.expansion_percent,
+                )
+            )
+        return AnalysisRequest(
+            image.sha256, revision, polarity, tuple(lanes), "anchored_context@1", quant_policy
+        )
     if quant_policy in ("wbquant_1_4_3@1", "background_support@1"):
         from wb_tool.domain.background_bounds import propose_background_lanes
         from wb_tool.domain.quant_supervision import propose_quant_lanes

@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from wb_tool.ui.view import WBView
 
 from wb_tool.adapters.automatic import automatic_project_row
+from wb_tool.adapters.automatic_export import discover_tiffs
 from wb_tool.adapters.metadata_input import read_metadata_file
 from wb_tool.adapters.ocr_input import OCRImage, load_ocr_image
 from wb_tool.adapters.quant_export import (
@@ -44,6 +45,7 @@ from wb_tool.application.automatic import (
     with_automatic_rows,
 )
 from wb_tool.application.crop import CropRequest
+from wb_tool.application.crop_return import ReturnedCrop
 from wb_tool.application.crop_suggestions import (
     CropSuggestion,
     WBReviewProject,
@@ -67,6 +69,11 @@ from wb_tool.application.figure_template import (
     LoadedFigureTemplate,
     PortableFigureTemplate,
     TemplateFont,
+)
+from wb_tool.application.import_labels import (
+    FolderDiscoveryReport,
+    SourceImportLabels,
+    source_import_labels,
 )
 from wb_tool.application.laboratory_layout import (
     DisplayFrame,
@@ -154,6 +161,7 @@ from wb_tool.application.project_restore import (
     restore_staged_project,
 )
 from wb_tool.application.quant_supervision import install_quant_request, update_quant_lane
+from wb_tool.application.standalone_quant import ManualQuantTarget, configure_manual_quantification
 from wb_tool.application.worker_protocol import (
     AcceptedFrame,
     CancelFrame,
@@ -209,6 +217,11 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "discover_tiffs",
+    "ReturnedCrop",
+    "return_reviewed_crop",
+    "ManualQuantTarget",
+    "configure_manual_quantification",
     "export_wbquant_table",
     "wbquant_table_rows",
     "wbquant_csv_bytes",
@@ -269,6 +282,9 @@ __all__ = [
     "MetadataSheet",
     "apply_metadata",
     "filename_metadata",
+    "SourceImportLabels",
+    "FolderDiscoveryReport",
+    "source_import_labels",
     "preview_metadata",
     "read_metadata_file",
     "ProjectDerivedTables",
@@ -423,6 +439,18 @@ def create_figure_project_view(parent: "QWidget | None" = None) -> "FigureProjec
     from wb_tool.ui.figure_view import FigureProjectView
 
     return FigureProjectView(parent)
+
+
+def return_reviewed_crop(
+    project: WBFigureProject,
+    row_id: str,
+    original_path: str,
+    *,
+    cancelled: Callable[[], bool] = lambda: False,
+) -> ReturnedCrop:
+    from wb_tool.adapters.crop_return import return_reviewed_crop as export
+
+    return export(project, row_id, original_path, cancelled=cancelled)
 
 
 def render_figure(

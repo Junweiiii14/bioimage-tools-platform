@@ -6,6 +6,7 @@ from pathlib import Path
 from threading import Event
 
 from PySide6.QtCore import QThread
+from wb_tool.api import FolderDiscoveryReport, discover_tiffs
 
 from bioimage_app.project_entry import allocate_project_path, collect_source_images
 
@@ -16,21 +17,33 @@ class ProjectSelection:
     destination: Path | None = None
     name: str = ""
     error: str = ""
+    discovery_report: bytes = b""
 
 
 class ProjectSelectionJob(QThread):
     """Owner reads result only after finished; cancellation never publishes a workspace."""
 
-    def __init__(self, paths: list[Path], parent: Path, cancellation: Event) -> None:
+    def __init__(
+        self, paths: list[Path], parent: Path, cancellation: Event, *, automatic: bool = True
+    ) -> None:
         super().__init__()
         self.paths = list(paths)
         self.destination_parent = parent
         self.cancellation = cancellation
+        self.automatic = automatic
         self.result = ProjectSelection()
 
     def run(self) -> None:
         try:
-            paths = collect_source_images(self.paths, self.cancellation)
+            report = b""
+            selected = self.paths
+            if self.automatic and len(self.paths) == 1 and self.paths[0].is_dir():
+                report = discover_tiffs(
+                    str(self.paths[0]), cancelled=self.cancellation.is_set, with_report=True
+                )
+                discovery = FolderDiscoveryReport.model_validate_json(report)
+                selected = [Path(path) for path in discovery.paths]
+            paths = collect_source_images(selected, self.cancellation)
             parent = self.destination_parent.absolute()
             if any(p.is_symlink() or p.is_junction() for p in (parent, *parent.parents)):
                 raise ValueError("项目保存位置不能经过链接，请换一个本地文件夹。")
@@ -42,6 +55,8 @@ class ProjectSelectionJob(QThread):
             if self.cancellation.is_set():
                 raise InterruptedError("已取消选择原图")
             display_name = f"{source_name[:120] or 'WB 项目'} · {datetime.now():%Y-%m-%d}"
-            self.result = ProjectSelection(paths, destination, display_name)
+            self.result = ProjectSelection(
+                paths, destination, display_name, discovery_report=report
+            )
         except (OSError, ValueError) as error:
             self.result = ProjectSelection(error=str(error))

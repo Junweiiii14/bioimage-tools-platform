@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-from wb_tool.adapters.tiff_input import load_tiff
+from wb_tool.adapters.tiff_input import LoadedTiff, load_tiff
 from wb_tool.application.figure_project import FigureRender, FigureSourcePath
 from wb_tool.application.laboratory_layout import (
     SegmentPlacement,
@@ -168,71 +168,83 @@ def _paste_source(
     for placed, record in segments:
         if cancelled():
             raise ValueError("拼图任务已取消，未发布输出")
-        row, roi = placed.row, placed.roi
-        if row.source is None or roi is None:
-            raise ValueError("拼图分段缺少原图或ROI")
-        if (
-            original.sha256 != row.source.sha256
-            or original.source.stat().st_size != row.source.size_bytes
-            or original.pixels.shape != (row.height, row.width)
-            or original.bit_depth != row.bit_depth
-        ):
-            raise ValueError("拼图原图摘要/字节数/尺寸/位深不一致")
-        crop = original.pixels[roi.y0 : roi.y1, roi.x0 : roi.x1]
-        display = (crop // 257).astype(np.uint8) if row.bit_depth == 16 else crop
-        display_image = Image.fromarray(display).convert("RGB")
-        if resample:
-            x0, y0, x1, y1 = placed.output_box
-            frame = placed.segment.display_frame
-            angle = radians(frame.angle_degrees) if frame else 0.0
-            c, s = cos(angle), sin(angle)
-            cx = frame.center_x if frame else (roi.x0 + roi.x1) / 2
-            cy = frame.center_y if frame else (roi.y0 + roi.y1) / 2
-            fw = frame.width if frame else float(roi.width)
-            fh = frame.height if frame else float(roi.y1 - roi.y0)
-            sx, sy = (x1 - x0) / fw, (y1 - y0) / fh
-            matrix = [
-                [sx * c, sx * s, x0 + (x1 - x0) / 2 - sx * (c * cx + s * cy)],
-                [-sy * s, sy * c, y0 + (y1 - y0) / 2 + sy * (s * cx - c * cy)],
-            ]
-            sampling = "pillow_rgb8_lanczos@1"
-            if frame:
-                # Pillow affine coordinates refer to pixel edges; source and output
-                # pixel centers are therefore mapped consistently without rounding ROI.
-                sampling = "pillow_rgb8_affine_bilinear@1"
-                source_display = (
-                    (original.pixels // 257).astype(np.uint8)
-                    if row.bit_depth == 16
-                    else original.pixels
-                )
-                source_image = Image.fromarray(source_display).convert("RGB")
-                a, b = c / sx, -s / sy
-                d, e = s / sx, c / sy
-                display_image = source_image.transform(
-                    (x1 - x0, y1 - y0),
-                    Image.Transform.AFFINE,
-                    (a, b, cx - c * fw / 2 + s * fh / 2, d, e, cy - s * fw / 2 - c * fh / 2),
-                    resample=Image.Resampling.BILINEAR,
-                )
-            else:
-                display_image = display_image.resize((x1 - x0, y1 - y0), Image.Resampling.LANCZOS)
-            record.update(
-                source_to_output=matrix,
-                display_frame=frame.model_dump(mode="json") if frame else None,
-            )
-            record.update(
-                display_policy="standard_lane_ratio@1",
-                resampling=sampling,
-                original_roi_size=[roi.width, roi.y1 - roi.y0],
-                display_output_size=[x1 - x0, y1 - y0],
-                display_rgb_sha256=sha256(display_image.tobytes()).hexdigest(),
-            )
+        display_image = render_display_segment(original, placed, record, resample=resample)
         canvas.paste(display_image, (placed.output_box[0], placed.output_box[1]))
-        record.update(
-            roi={"x0": roi.x0, "y0": roi.y0, "x1": roi.x1, "y1": roi.y1},
-            source_photometric=original.photometric,
-            gray_conversion=original.conversion,
-            source_warnings=original.warnings,
-            display_pixel_sha256=sha256(display.tobytes()).hexdigest(),
-        )
     # original, crop and display go out of scope before the next source is decoded.
+
+
+def render_display_segment(
+    original: LoadedTiff,
+    placed: SegmentPlacement,
+    record: dict[str, object],
+    *,
+    resample: bool,
+) -> Image.Image:
+    """Shared exact display mapping for montage and reviewed source-folder strips."""
+    row, roi = placed.row, placed.roi
+    if row.source is None or roi is None:
+        raise ValueError("拼图分段缺少原图或ROI")
+    if (
+        original.sha256 != row.source.sha256
+        or original.source.stat().st_size != row.source.size_bytes
+        or original.pixels.shape != (row.height, row.width)
+        or original.bit_depth != row.bit_depth
+    ):
+        raise ValueError("拼图原图摘要/字节数/尺寸/位深不一致")
+    crop = original.pixels[roi.y0 : roi.y1, roi.x0 : roi.x1]
+    display = (crop // 257).astype(np.uint8) if row.bit_depth == 16 else crop
+    display_image = Image.fromarray(display).convert("RGB")
+    if resample:
+        x0, y0, x1, y1 = placed.output_box
+        frame = placed.segment.display_frame
+        angle = radians(frame.angle_degrees) if frame else 0.0
+        c, s = cos(angle), sin(angle)
+        cx = frame.center_x if frame else (roi.x0 + roi.x1) / 2
+        cy = frame.center_y if frame else (roi.y0 + roi.y1) / 2
+        fw = frame.width if frame else float(roi.width)
+        fh = frame.height if frame else float(roi.y1 - roi.y0)
+        sx, sy = (x1 - x0) / fw, (y1 - y0) / fh
+        matrix = [
+            [sx * c, sx * s, x0 + (x1 - x0) / 2 - sx * (c * cx + s * cy)],
+            [-sy * s, sy * c, y0 + (y1 - y0) / 2 + sy * (s * cx - c * cy)],
+        ]
+        sampling = "pillow_rgb8_lanczos@1"
+        if frame:
+            # Pillow affine coordinates refer to pixel edges; source and output
+            # pixel centers are therefore mapped consistently without rounding ROI.
+            sampling = "pillow_rgb8_affine_bilinear@1"
+            source_display = (
+                (original.pixels // 257).astype(np.uint8)
+                if row.bit_depth == 16
+                else original.pixels
+            )
+            source_image = Image.fromarray(source_display).convert("RGB")
+            a, b = c / sx, -s / sy
+            d, e = s / sx, c / sy
+            display_image = source_image.transform(
+                (x1 - x0, y1 - y0),
+                Image.Transform.AFFINE,
+                (a, b, cx - c * fw / 2 + s * fh / 2, d, e, cy - s * fw / 2 - c * fh / 2),
+                resample=Image.Resampling.BILINEAR,
+            )
+        else:
+            display_image = display_image.resize((x1 - x0, y1 - y0), Image.Resampling.LANCZOS)
+        record.update(
+            source_to_output=matrix,
+            display_frame=frame.model_dump(mode="json") if frame else None,
+        )
+        record.update(
+            display_policy="standard_lane_ratio@1",
+            resampling=sampling,
+            original_roi_size=[roi.width, roi.y1 - roi.y0],
+            display_output_size=[x1 - x0, y1 - y0],
+            display_rgb_sha256=sha256(display_image.tobytes()).hexdigest(),
+        )
+    record.update(
+        roi={"x0": roi.x0, "y0": roi.y0, "x1": roi.x1, "y1": roi.y1},
+        source_photometric=original.photometric,
+        gray_conversion=original.conversion,
+        source_warnings=original.warnings,
+        display_pixel_sha256=sha256(display.tobytes()).hexdigest(),
+    )
+    return display_image

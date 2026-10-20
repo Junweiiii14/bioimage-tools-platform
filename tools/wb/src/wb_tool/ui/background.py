@@ -14,6 +14,7 @@ from wb_tool.adapters.crop_export import export_crop
 from wb_tool.adapters.tiff_input import load_tiff
 from wb_tool.adapters.worksheet_export import export_worksheet
 from wb_tool.application.analysis import AnalysisResult
+from wb_tool.application.crop_return import ReturnedCrop
 from wb_tool.application.crop_suggestions import CropSuggestion, read_figure_project
 from wb_tool.application.desktop_data import PreviewRaster, ProjectDerivedTables, WBJob, WBReply
 from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_wb_document
@@ -80,6 +81,7 @@ class _Work(QObject):
                 )
             value: (
                 PreviewRaster
+                | ReturnedCrop
                 | WBDocument
                 | WBWorksheetDocument
                 | WBFigureProject
@@ -98,10 +100,16 @@ class _Work(QObject):
                 | bytes
                 | str
             )
-            if job.operation == "discover_tiffs":
+            if job.operation == "return_crop":
+                from wb_tool.adapters.crop_return import return_reviewed_crop
+
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少审核后回存项目")
+                value = return_reviewed_crop(job.document, job.row_id, job.path, cancelled=cancel)
+            elif job.operation == "discover_tiffs":
                 from wb_tool.adapters.automatic_export import discover_tiffs
 
-                value = discover_tiffs(job.path, cancelled=cancel)
+                value = discover_tiffs(job.path, cancelled=cancel, with_report=True)
             elif job.operation == "automatic_row":
                 from wb_tool.adapters.automatic import automatic_project_row
 
@@ -126,6 +134,7 @@ class _Work(QObject):
                     job.destination,
                     runs=job.archive_runs or (),
                     processing_errors=job.processing_errors,
+                    discovery_report=job.data,
                     cancelled=cancel,
                 )
             elif job.operation == "project_evidence":
@@ -222,6 +231,16 @@ class _Work(QObject):
                 if not isinstance(job.document, WBAnalysisProject):
                     raise ValueError("缺少定量项目")
                 value = replan_quant_lanes(job.path, job.document, job.row_id, cancelled=cancel)
+            elif job.operation == "quant_target":
+                from wb_tool.application.standalone_quant import configure_manual_quantification
+
+                if not isinstance(job.document, WBFigureProject) or job.manual_target is None:
+                    raise ValueError("缺少人工测量目标或项目")
+                if cancel():
+                    raise ValueError("独立灰度配置已取消")
+                value = configure_manual_quantification(
+                    load_tiff(job.path), job.document, job.manual_target, cancelled=cancel
+                )
             elif job.operation == "quant_export":
                 from wb_tool.adapters.quant_export import export_wbquant_table
 
@@ -274,6 +293,15 @@ class _Work(QObject):
                     value = export_figure_template(
                         job.document, job.sources, job.destination, cancelled=cancel
                     )
+            elif job.operation == "label_font":
+                from wb_tool.adapters.label_font import find_label_font
+
+                if not isinstance(job.document, WBFigureProject):
+                    raise ValueError("缺少标签所属项目")
+                value = find_label_font(
+                    (*job.document.figure_order, *(row.protein for row in job.document.rows)),
+                    cancelled=cancel,
+                )
             elif job.operation == "font_digest":
                 path = Path(job.path)
                 if (
@@ -385,10 +413,12 @@ class _Work(QObject):
                 if job.crop is None:
                     raise ValueError("缺少原图裁剪范围")
                 value = export_crop(job.path, job.crop, job.destination)
-            else:
+            elif job.operation == "encode":
                 if job.document is None:
                     raise ValueError("缺少文档")
                 value = job.document.model_dump_json().encode("utf-8")
+            else:
+                raise ValueError("未知WB后台操作，未执行")
             reply = WBReply(request_id, value)
         except (ValueError, OSError, TypeError) as error:
             reply = WBReply(request_id, error=str(error))

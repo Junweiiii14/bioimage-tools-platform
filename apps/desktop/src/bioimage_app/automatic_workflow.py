@@ -1,6 +1,7 @@
 """Host orchestration only: tool-owned detection, committed runs, traceable publication."""
 
 from datetime import datetime
+from hashlib import sha256
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, cast
 from uuid import uuid4
@@ -10,6 +11,7 @@ from PySide6.QtWidgets import QFileDialog
 from wb_tool.api import (
     FigureRender,
     FigureSourcePath,
+    FolderDiscoveryReport,
     WBAnalysisProject,
     WBFigureProject,
     WBJob,
@@ -30,11 +32,25 @@ class AutomaticWorkflow(QObject):
         self.crop_policy: Literal["legacy_fixed_height@1", "lane_ratio@1", "source_geometry@2"] = (
             "legacy_fixed_height@1"
         )
-        self.quant_policy: Literal["legacy_bounds@1", "wbquant_1_4_3@1", "background_support@1"] = (
-            "legacy_bounds@1"
-        )
+        self.quant_policy: Literal[
+            "legacy_bounds@1", "wbquant_1_4_3@1", "background_support@1", "anchored_background@1"
+        ] = "legacy_bounds@1"
         self.failures: tuple[str, ...] = ()
+        self._discovery_report: bytes = b""
+        self._discovery_context: tuple[str, str] | None = None
         self.cancelled = False
+
+    @property
+    def discovery_report(self) -> bytes:
+        context = (self.window.workspace_path, self.window.view.project().project_id)
+        return self._discovery_report if context == self._discovery_context else b""
+
+    @discovery_report.setter
+    def discovery_report(self, value: bytes) -> None:
+        self._discovery_report = value
+        self._discovery_context = (
+            (self.window.workspace_path, self.window.view.project().project_id) if value else None
+        )
 
     def cancel(self) -> None:
         self.cancelled = True
@@ -64,6 +80,10 @@ class AutomaticWorkflow(QObject):
                 window.fail_operation("原图文件列表无效")
                 return
             paths: object = json.loads(reply.value)
+            if isinstance(paths, dict):
+                report = FolderDiscoveryReport.model_validate_json(reply.value)
+                self.discovery_report = reply.value
+                paths = list(report.paths)
             if not isinstance(paths, list) or not all(
                 isinstance(path, str) for path in cast(list[object], paths)
             ):
@@ -80,6 +100,25 @@ class AutomaticWorkflow(QObject):
             found,
             accept_errors=True,
         )
+
+    def include_discovered_source(self, index: object, report_id: object) -> None:
+        if not self.discovery_report or report_id != sha256(self.discovery_report).hexdigest():
+            raise ValueError("筛选记录已改变，请重新打开文件夹筛选记录")
+        report = FolderDiscoveryReport.model_validate_json(self.discovery_report)
+        if type(index) is not int or not 0 <= index < len(report.skipped):
+            raise ValueError("请选择当前筛选记录中的原图")
+        source = report.skipped[index]
+        if source.reason != "numbered_acquisition_variant":
+            raise ValueError("显示拼图或已导出裁剪不能作为待裁原图重新处理")
+        report = report.model_copy(
+            update={
+                "requested_additions": tuple(
+                    dict.fromkeys((*report.requested_additions, source.path))
+                )
+            }
+        )
+        self.discovery_report = report.model_dump_json().encode()
+        self.window.import_images((source.path,), automatic=True)
 
     def analyze(
         self,
@@ -274,6 +313,7 @@ class AutomaticWorkflow(QObject):
                     ),
                     cancellation=window.cancellation,
                     processing_errors=self.failures,
+                    data=self.discovery_report,
                 ),
                 exported,
             )

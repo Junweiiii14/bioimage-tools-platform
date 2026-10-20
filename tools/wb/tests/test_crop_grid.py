@@ -1,6 +1,7 @@
 """Analytic integer geometry and lossless source samples, including color and MINISWHITE."""
 
 import json
+import struct
 from hashlib import sha256
 from pathlib import Path
 from typing import Any
@@ -9,6 +10,52 @@ import numpy as np
 import pytest
 import tifffile
 from wb_tool.api import CropRequest, LaneROI, export_crop, fixed_lane_grid, load_tiff
+
+
+def test_genuinely_changed_resolution_is_not_published(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source, target = tmp_path / "device.tiff", tmp_path / "crop.tiff"
+    tifffile.imwrite(source, np.zeros((10, 12), dtype=np.uint16), resolution=(600, 600))
+    original = source.read_bytes()
+    write = tifffile.imwrite
+
+    def wrong_resolution(*args: Any, **kwargs: Any) -> None:
+        kwargs["resolution"] = (720, 720)
+        write(*args, **kwargs)
+
+    monkeypatch.setattr(tifffile, "imwrite", wrong_resolution)
+    request = CropRequest(sha256(original).hexdigest(), 0, LaneROI("r", 2, 3, 8, 7))
+    with pytest.raises(ValueError, match="分辨率写后核验失败"):
+        export_crop(str(source), request, str(target))
+    assert not target.exists() and not list(tmp_path.glob(".wb-crop-*"))
+    assert source.read_bytes() == original
+
+
+def test_equivalent_unreduced_device_resolution_is_accepted(tmp_path: Path) -> None:
+    source, target = tmp_path / "device.tiff", tmp_path / "crop.tiff"
+    pixels = np.arange(120, dtype=np.uint16).reshape(10, 12)
+    tifffile.imwrite(source, pixels, resolution=(600, 600), resolutionunit="INCH", byteorder="<")
+    with tifffile.TiffFile(source) as image:
+        page = image.pages[0]
+        assert isinstance(page, tifffile.TiffPage)
+        offsets = [page.tags[name].valueoffset for name in ("XResolution", "YResolution")]
+    # Real acquisition headers can store unreduced rationals. Patch only these
+    # two known header slots; the input pixels remain unchanged.
+    with source.open("r+b") as stream:
+        for offset in offsets:
+            stream.seek(offset)
+            stream.write(struct.pack("<II", 6000000, 10000))
+    original = source.read_bytes()
+    request = CropRequest(sha256(original).hexdigest(), 0, LaneROI("r", 2, 3, 8, 7))
+    export_crop(str(source), request, str(target))
+    with tifffile.TiffFile(target) as image:
+        page = image.pages[0]
+        assert isinstance(page, tifffile.TiffPage)
+        assert page.tags["XResolution"].value == (600, 1)
+        assert page.tags["YResolution"].value == (600, 1)
+        np.testing.assert_array_equal(page.asarray(), pixels[3:7, 2:8])
+    assert source.read_bytes() == original
 
 
 def test_fixed_grid_keeps_blanks_and_remainder() -> None:
