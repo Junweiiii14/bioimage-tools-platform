@@ -3,7 +3,7 @@
 // A key invokes the same guarded button/action path. No scientific input is synthesized.
 window.workbenchActions = (() => {
   let catalog=null, bindings={}, groupId=null, identity='', composing=false, focused=true;
-  let preferences=null, preferenceBase='', pending=null, message='';
+  let preferences=null, preferenceBase='', pending=null, message='', settingsFocus=null;
   const handlers=new Map(), scopes={global:'全局',project:'项目',intake:'采集组',workflow:'执行阶段',image:'图像调整'};
   const dialog=document.createElement('dialog');dialog.id='shortcuts-dialog';dialog.setAttribute('aria-labelledby','shortcuts-title');document.body.append(dialog);
   const editable=target=>target instanceof Element&&!!target.closest('input,textarea,select,[contenteditable]:not([contenteditable=false])');
@@ -66,9 +66,10 @@ window.workbenchActions = (() => {
   handlers.set('edit.undo',()=>project()&&['review','layout','results'].includes(mode)&&!$('[data-action=undo]').disabled&&(action('undo'),true));
   handlers.set('edit.redo',()=>project()&&['review','layout','results'].includes(mode)&&!$('[data-action=redo]').disabled&&(action('redo'),true));
   handlers.set('shortcuts.settings',()=>{open();return true;});
-  function invoke(id){
+  function invoke(id,options={}){
     if(!catalog||state.busy||!focused||!document.hasFocus())return false;
-    if(document.querySelector('dialog[open]')||!$('#drawer').hidden)return false;
+    const explicitOpen=id==='project.open'&&options.button instanceof HTMLElement&&options.button.dataset.session==='open'&&options.button.closest('#session-dialog[open]');
+    if((document.querySelector('dialog[open]')||!$('#drawer').hidden)&&!explicitOpen)return false;
     return handlers.get(id)?.()===true;
   }
   function key(event){
@@ -89,13 +90,23 @@ window.workbenchActions = (() => {
     }return '';
   }
   function renderSettings(){
-    const active=document.activeElement?.dataset.shortcutRecord;
+    const active=document.activeElement;
+    for(const kind of ['record','clear','command']){
+      const id=active?.getAttribute?.(`data-shortcut-${kind}`);
+      if(id)settingsFocus={kind,id};
+    }
+    const scroll=dialog.querySelector('.shortcut-list')?.scrollTop||0;
     dialog.innerHTML=`<header><h2 id="shortcuts-title">快捷键</h2><button class="button subtle" data-shortcut-command="close">关闭</button></header><p>点击一个组合键，再按新的按键。作用域内使用同一按钮操作；输入文字、中文输入法组合、弹窗和忙碌时不触发。</p><div class="shortcut-list">${catalog.actions.map(entry=>`<label class="shortcut-row"><span>${escapeText(entry.label)}<small>${scopes[entry.scope]||entry.scope}</small></span><input readonly data-shortcut-record="${entry.id}" value="${escapeText(preferences[entry.id])}" placeholder="未绑定" aria-label="${escapeText(entry.label)} 的快捷键"><button type="button" class="text-button" data-shortcut-clear="${entry.id}" aria-label="禁用${escapeText(entry.label)}快捷键">禁用</button></label>`).join('')}</div><p data-shortcut-status role="status">${escapeText(message||validate(preferences)||(JSON.stringify(preferences)===preferenceBase?'当前设置已保存。':'有修改，保存后生效。'))}</p><footer><button class="text-button" data-shortcut-command="restore">恢复默认草稿</button><button class="button primary" data-shortcut-command="save" ${pending||validate(preferences)?'disabled':''}>保存快捷键</button></footer>`;
-    if(active)dialog.querySelector(`[data-shortcut-record="${active}"]`)?.focus();
+    dialog.querySelector('.shortcut-list').scrollTop=scroll;
+    if(settingsFocus){
+      const target=dialog.querySelector(`[data-shortcut-${settingsFocus.kind}="${settingsFocus.id}"]`);
+      if(target&&!target.disabled)target.focus({preventScroll:true});
+      else{const status=dialog.querySelector('[data-shortcut-status]');status.tabIndex=-1;status.focus({preventScroll:true});}
+    }
   }
   function open(){
     if(!catalog){toast('快捷键目录尚未载入，请稍候。');return;}
-    $('#session-menu').open=false;preferences={...bindings};preferenceBase=JSON.stringify(bindings);message='';pending=null;renderSettings();if(!dialog.open)dialog.showModal();
+    $('#session-menu').open=false;preferences={...bindings};preferenceBase=JSON.stringify(bindings);message='';pending=null;settingsFocus=null;renderSettings();if(!dialog.open)dialog.showModal();
   }
   function receive(next){
     if(!next?.actions||next.schema_version!==1)return;

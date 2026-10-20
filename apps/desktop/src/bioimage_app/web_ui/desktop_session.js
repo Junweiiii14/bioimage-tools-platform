@@ -81,7 +81,7 @@ const desktopSession = (() => {
     if(!el||!channel)return;
     event.preventDefault();event.stopImmediatePropagation();position();$('#session-menu').open=false;
     const action=el.dataset.session||'home';
-    if(window.workbenchActions&&['save','open'].includes(action)){window.workbenchActions.invoke(`project.${action}`);return;}
+    if(window.workbenchActions&&['save','open'].includes(action)){window.workbenchActions.invoke(`project.${action}`,{button:el});return;}
     const workflow=document.querySelector('[name=session-workflow]:checked')?.value||'quant';
     if(action==='images'){manualQuant.pendingImport=workflow==='quant';bridge.request(workflow==='quant'?'quant_import':'import','{}');}
     else if(action==='folder'&&workflow!=='quant')bridge.request('import_folder','{}');

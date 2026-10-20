@@ -306,3 +306,101 @@ def test_custom_shortcut_settings_save_restore_and_restart_in_the_real_window(
                 resources_closed=lambda window=window: window.host.resources_closed,
                 timeout=20000,
             )
+
+
+def test_explicit_error_dialog_open_button_still_uses_the_open_action(
+    intake_page: WebWorkbenchWindow,
+    qtbot: QtBot,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    window = intake_page
+    grouped_page(window, qtbot)
+    calls: list[str] = []
+    monkeypatch.setattr(window, "choose", calls.append)
+    window.bridge.sessionRequested.emit("invalid-shortcut-recovery-test", "{}")
+    qtbot.waitUntil(
+        lambda: (
+            javascript(
+                window,
+                qtbot,
+                "!!document.querySelector('#session-dialog[open] [data-session=open]')",
+            )
+            is True
+        )
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      document.body.dispatchEvent(new KeyboardEvent('keydown',{
+        key:'o',code:'KeyO',ctrlKey:true,bubbles:true,cancelable:true}));true
+    """,
+    )
+    assert calls == []
+    javascript(
+        window, qtbot, "document.querySelector('#session-dialog [data-session=open]').click();true"
+    )
+    qtbot.waitUntil(lambda: bool(calls))
+    assert calls == ["open_project"]
+
+
+def test_settings_buttons_preserve_focus_and_list_scroll_during_save_ack(
+    intake_page: WebWorkbenchWindow,
+    qtbot: QtBot,
+) -> None:
+    window = intake_page
+    grouped_page(window, qtbot)
+    javascript(
+        window,
+        qtbot,
+        "window.prefCatalog="
+        + json.dumps(window.shortcuts.snapshot())
+        + ";workbenchActions.open();true",
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      const list=document.querySelector('.shortcut-list');list.scrollTop=list.scrollHeight;
+      window.prefScroll=list.scrollTop;
+      const clear=document.querySelector('[data-shortcut-clear="shortcuts.settings"]');
+      clear.focus({preventScroll:true});clear.click();true
+    """,
+    )
+    assert javascript(
+        window, qtbot, "document.activeElement.dataset.shortcutClear==='shortcuts.settings'"
+    )
+    assert javascript(
+        window, qtbot, "document.querySelector('.shortcut-list').scrollTop===prefScroll"
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      const restore=document.querySelector('[data-shortcut-command=restore]');
+      restore.focus();restore.click();
+      const previousRequest=desktopSession.request;
+      desktopSession.request=(name,data)=>{
+        if(name==='shortcuts'){window.prefSubmission=data;return true;}
+        return previousRequest(name,data);
+      };
+      const save=document.querySelector('[data-shortcut-command=save]');
+      save.focus();save.click();true
+    """,
+    )
+    assert javascript(window, qtbot, "document.activeElement.matches('[data-shortcut-status]')")
+    assert javascript(
+        window, qtbot, "document.querySelector('.shortcut-list').scrollTop===prefScroll"
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      workbenchActions.receive({...prefCatalog,bindings:prefSubmission.bindings,
+        receipt:prefSubmission.requestId,error:''});true
+    """,
+    )
+    assert javascript(window, qtbot, "document.activeElement.dataset.shortcutCommand==='save'")
+    assert javascript(
+        window, qtbot, "document.querySelector('.shortcut-list').scrollTop===prefScroll"
+    )
