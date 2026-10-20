@@ -685,9 +685,16 @@ def test_distinct_export_folders_keep_same_named_same_content_candidates(
     qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=10000)
     assert current(window).intake.sources == sources
     path = window.host.workspace_path
+    project_id = current(window).project_id
     window.open_project(path)
     qtbot.waitUntil(
-        lambda: window.bridge.session_epoch == 1 and window.shutdown_stage == "idle", timeout=20000
+        lambda: (
+            window.bridge.session_epoch == 1
+            and window.shutdown_stage == "idle"
+            and window.host.view.project().project_id == project_id
+            and not window.host.operation_busy
+        ),
+        timeout=20000,
     )
     assert current(window).intake.sources == sources
     window.host.intake.import_folder(first.parent)
