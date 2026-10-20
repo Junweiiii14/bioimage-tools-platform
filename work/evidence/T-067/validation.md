@@ -10,3 +10,5 @@
 - 合成Qt截图.local/t067-visual：entry、editing-desktop1440、editing-narrow620；实际脚本0、无文档横溢出。首次返回保留旧滚动导致标题离屏，已修进入编辑时回顶部并聚焦h1；复抓同一批状态并实际看图。新网页焦点/scrollTop断言1项/2.75s实际0。没有新图片资产或重复detector；截图不证明科学选择。
 
 最终本地check --all/真实三目录完整链/新包尚未运行，留P7/P8；非作者独审、产品PR及四服务器检查另计。旧原生UNKNOWN及外部科学/干净机/DPI缺口保留。
+
+独审定向修正后：快捷键/导入网页26项20.22s实际0，Pyright0、Ruff0。截图以真实crop/figure/output三能力flag重抓：进入编辑前有原图/布局/结果入口，编辑后仅分组页；实际脚本0、root已看图。测试Qt focusProxy增加非空断言解决静态类型要求，没有ignore。

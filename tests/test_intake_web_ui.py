@@ -57,12 +57,19 @@ def test_executed_group_revision_returns_to_grid_with_explicit_editing_guard(
         qtbot,
         """
       setState({intake:{...state.intake,confirmed:false,
+        cropEnabled:true,figureEnabled:true,outputEnabled:true,
         workflow:{...state.intake.workflow,editing:true}}});true
     """,
     )
     assert javascript(window, qtbot, "document.body.classList.contains('grouped-intake-active')")
     assert javascript(window, qtbot, "document.activeElement.matches('#intake-workspace h1')")
     assert javascript(window, qtbot, "document.querySelector('#intake-workspace').scrollTop===0")
+    assert javascript(
+        window, qtbot, "JSON.stringify(intakeWorkspace.allowedModes())==='[\"intake\"]'"
+    )
+    assert javascript(window, qtbot, "!intakeWorkspace.cropEditable('protein-a')")
+    javascript(window, qtbot, "switchMode('review');true")
+    assert javascript(window, qtbot, "mode==='intake'")
     assert javascript(
         window, qtbot, "!document.querySelector('[data-group-field=protein]').disabled"
     )

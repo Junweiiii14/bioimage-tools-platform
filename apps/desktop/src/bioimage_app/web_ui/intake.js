@@ -119,6 +119,7 @@ window.intakeWorkspace = (() => {
     }
   }
   function cropEditable(id) {
+    if (state.intake?.workflow?.editing) return false;
     const step = state.intake?.workflow?.steps.find(s=>s.stage==='crop'&&s.target_id===id);
     const evidence=state.intake?.crops?.find(e=>e.row_id===id);
     return !!step && (['needs_review','failed','cancelled','interrupted','done'].includes(step.status) || step.status==='pending'&&evidence?.reviewed&&!evidence.raw_crop);
@@ -139,7 +140,7 @@ window.intakeWorkspace = (() => {
   }
   function undoCrop(redo) {
     const r = row(), draft = r && cropDrafts.get(r.id);
-    if (!draft || state.busy) return;
+    if (!draft || state.busy || state.intake?.workflow?.editing) return;
     const index = draft.index + (redo ? 1 : -1);
     if (index < 0 || index >= draft.history.length) return;
     draft.index = index; draft.roi = draft.history[index]; r.roi = draft.roi;
@@ -185,7 +186,7 @@ window.intakeWorkspace = (() => {
     return `<span class="intake-stage-actions"><button class="text-button" data-intake="review-crop" data-id="${escapeText(step.target_id)}" ${state.busy?'disabled':''}>查看原图${reviewable?'并复核':''}</button>${reviewable?`<button class="text-button" data-intake="retry-crop" data-id="${escapeText(step.target_id)}" ${state.busy||hasDraft()?'disabled':''}>重试本行</button>`:''}</span>`;
   }
 
-  const allowedModes = () => ['intake', ...(state.intake?.cropEnabled?['review']:[]), ...(state.intake?.figureEnabled?['layout','results']:[])];
+  const allowedModes = () => state.intake?.workflow?.editing ? ['intake'] : ['intake', ...(state.intake?.cropEnabled?['review']:[]), ...(state.intake?.figureEnabled?['layout','results']:[])];
   const runnable = () => (state.intake?.workflow?.pending_ready ?? state.intake?.workflow?.steps.filter(s=>s.stage==='crop'&&s.status==='pending').length ?? 0)>0;
   function requestFigure() {
     const figures=state.intake?.figuresReady||[];
@@ -317,7 +318,7 @@ window.intakeWorkspace = (() => {
       const start=stagePage*pageSize;
       const navigation=pages>1?`<nav class="intake-stage-actions" aria-label="阶段列表分页"><button class="text-button" data-intake="previous-stages" ${stagePage===0?'disabled':''}>上一页阶段</button><span role="status">第 ${stagePage+1} / ${pages} 页 · ${start+1}–${Math.min(start+pageSize,workflow.steps.length)} / ${workflow.steps.length} 个阶段</span><button class="text-button" data-intake="next-stages" ${stagePage===pages-1?'disabled':''}>下一页阶段</button></nav>`:'';
 
-      return `<section class="intake-summary"><div><h2>执行计划已准备</h2><p>${state.intake.figures.length} 个 Fig · ${total} 个蛋白行 · ${state.intake.proteins.reduce((sum, row) => sum + (state.intake.figures.find(fig => fig.figure_id === row.figure_id)?.lane_count || 0), 0)} 个独立槽位。</p><p>按原值裁剪、完整 Fig 拼图、原像素定量、结果输出的顺序处理。${state.intake.figureEnabled?'完整 Fig 保存后才计算原像素；数值和质量结论分别保留。':'先核对原图定位，再保存原值裁剪；尚未生成定量结果。'}</p></div><div class="intake-stage-actions"><button class="button primary" data-intake="run" ${disabled} ${hasDraft()||!runnable()?'disabled':''}>${state.intake.figureEnabled?'继续处理':'定位与裁剪'}</button><button class="button subtle" data-intake="edit" ${disabled} ${frozen ? 'disabled' : ''}>${state.intake.grouped_draft?'修改分组与对应关系':'返回清单修改'}</button></div></section>${outputInfo()}<section class="intake-workflow" aria-label="执行阶段"><h2 id="intake-stages-heading" tabindex="-1">阶段与异常</h2><p class="intake-help">已记录 ${workflow.ready_count} / ${workflow.steps.length} 个阶段。${issues.length ? `${issues.length} 项需要处理，其他完整 Fig 可以继续。` : '暂无异常。裁剪完成不代表科学复核通过。'}</p>${navigation}<ol start="${start+1}">${workflow.steps.slice(start, start+pageSize).map(step => `<li><span>${escapeText(names[step.stage] || step.stage)}</span><strong>${escapeText(step.stage === 'crop' ? targetName(step.target_id) : state.intake.figures.find(fig => fig.figure_id === step.target_id)?.label || state.projectName)}</strong><span>${escapeText(statuses[step.status] || step.status)}</span>${cropActions(step)}${step.reason ? `<p>${escapeText(step.reason)}</p>` : ''}</li>`).join('')}</ol>${issues.length ? `<details><summary>查看全部异常原因</summary><ul>${issues.map(step => `<li>${escapeText(names[step.stage] || step.stage)} · ${escapeText(step.target_id)}：${escapeText(step.reason)}${cropActions(step)}</li>`).join('')}</ul></details>` : ''}</section>`;
+      return `<section class="intake-summary"><div><h2>执行计划已准备</h2><p>${state.intake.figures.length} 个 Fig · ${total} 个蛋白行 · ${state.intake.proteins.reduce((sum, row) => sum + (state.intake.figures.find(fig => fig.figure_id === row.figure_id)?.lane_count || 0), 0)} 个独立槽位。</p><p>按原值裁剪、完整 Fig 拼图、原像素定量、结果输出的顺序处理。${state.intake.figureEnabled?'完整 Fig 保存后才计算原像素；数值和质量结论分别保留。':'先核对原图定位，再保存原值裁剪；尚未生成定量结果。'}</p></div><div class="intake-stage-actions"><button class="button primary" data-intake="run" ${disabled} ${hasDraft()||!runnable()?'disabled':''}>${state.intake.figureEnabled?'继续处理':'定位与裁剪'}</button><button class="button subtle" data-intake="edit" ${disabled} ${frozen||hasDraft() ? 'disabled' : ''}>${state.intake.grouped_draft?'修改分组与对应关系':'返回清单修改'}</button></div></section>${outputInfo()}<section class="intake-workflow" aria-label="执行阶段"><h2 id="intake-stages-heading" tabindex="-1">阶段与异常</h2><p class="intake-help">已记录 ${workflow.ready_count} / ${workflow.steps.length} 个阶段。${issues.length ? `${issues.length} 项需要处理，其他完整 Fig 可以继续。` : '暂无异常。裁剪完成不代表科学复核通过。'}</p>${navigation}<ol start="${start+1}">${workflow.steps.slice(start, start+pageSize).map(step => `<li><span>${escapeText(names[step.stage] || step.stage)}</span><strong>${escapeText(step.stage === 'crop' ? targetName(step.target_id) : state.intake.figures.find(fig => fig.figure_id === step.target_id)?.label || state.projectName)}</strong><span>${escapeText(statuses[step.status] || step.status)}</span>${cropActions(step)}${step.reason ? `<p>${escapeText(step.reason)}</p>` : ''}</li>`).join('')}</ol>${issues.length ? `<details><summary>查看全部异常原因</summary><ul>${issues.map(step => `<li>${escapeText(names[step.stage] || step.stage)} · ${escapeText(step.target_id)}：${escapeText(step.reason)}${cropActions(step)}</li>`).join('')}</ul></details>` : ''}</section>`;
     }
     if (state.intake.confirmed) return `<section class="intake-summary"><div><h2>清单与对应关系已确认</h2><p>${count} 个蛋白行已明确分配原图。准备执行计划，预建布局位置和待计算表格，原文件保持不变。</p></div><button class="button primary" data-intake="prepare" ${disabled}>准备执行计划</button></section>`;
     return `<section class="intake-summary"><div><h2>${state.intake.confirmed ? '清单与对应关系已确认' : '确认本次导入'}</h2><p>${count} / ${total} 个蛋白行已有原图。${state.intake.confirmed ? '当前完成导入分配阶段，后续裁剪流程尚未执行。' : '核对所有蛋白行的来源后确认；未使用的原图可留在图池。'}</p></div><button class="button primary" data-intake="confirm" ${disabled}>${icon('check')}确认清单与对应关系</button></section>`;
