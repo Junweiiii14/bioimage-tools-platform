@@ -72,12 +72,31 @@ def test_copy_manual_multipeak_history_new_group_save_and_reopen(
     try:
         window.show()
         qtbot.waitUntil(lambda: js("Boolean(typeof bridge!=='undefined'&&bridge)") is True)
+        js(
+            "window.initialQuantRoute=null;bridge.sessionStateChanged.connect(raw=>{"
+            "const next=JSON.parse(raw);if(next.route?.projectId&&next.route.mode==='quant')"
+            "window.initialQuantRoute=next.route;});true"
+        )
         assert js("document.querySelector('[data-action=quant_import]').click(); true") is True
         qtbot.waitUntil(
             lambda: len(window.host.view.project().rows) == 1 and not window.host.operation_busy,
             timeout=20000,
         )
         qtbot.waitUntil(lambda: js("mode==='quant'&&Boolean(row()?.preview)") is True)
+        # Import's first quant snapshot can precede the session's initial route.
+        # Consume that received route before zoom/pointer coordinates are established;
+        # the same route token cannot then reset zoom during the real Qt gesture.
+        qtbot.waitUntil(
+            lambda: (
+                js(
+                    "initialQuantRoute?.projectId===state.projectId && !state.busy && "
+                    "state.quant?.rowId===row()?.id"
+                )
+                is True
+            ),
+            timeout=10000,
+        )
+        js("desktopSession.route();true")
         # Real Qt pointer events verify view translation, cancellation and the
         # original-coordinate mapping after zoom/pan; numerical fixtures follow.
         js("manualLanes.activate();focusCrop=false;zoom=1.4;render();true")
@@ -137,6 +156,14 @@ def test_copy_manual_multipeak_history_new_group_save_and_reopen(
         )
         js("document.dispatchEvent(new KeyboardEvent('keyup',{code:'Space'}));true")
         assert js("!imagePan.space") is True
+        # Native details toggles may schedule layout. Observe its completed frames
+        # before mapping source points; do not loosen the original-coordinate oracle.
+        js(
+            "window.pointerLayoutReady=false;requestAnimationFrame(()=>{fitImage();"
+            "requestAnimationFrame(()=>{window.pointerLayoutReady=true;});});true"
+        )
+        qtbot.waitUntil(lambda: js("pointerLayoutReady") is True, timeout=10000)
+        assert js("zoom===1.4") is True
         QTest.mousePress(target_widget, Qt.MouseButton.LeftButton, pos=image_point(35, 40))
         qtbot.waitUntil(lambda: js("Boolean(manualLanes.dragging)") is True)
         QTest.mouseMove(target_widget, image_point(55, 80))
