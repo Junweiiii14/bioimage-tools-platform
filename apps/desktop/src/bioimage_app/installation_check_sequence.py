@@ -14,6 +14,16 @@ from unittest.mock import patch
 CONFIGURE = """(()=>{
  const add=document.querySelector('[data-group-action=add-fig]');
  if(!add||add.disabled||state.busy)return false;
+ if(!window.sequenceRequestObserver){
+  window.sequenceRequestObserver=bridge.request;
+  window.sequenceOutstanding=0;
+  bridge.request=function(action,payload,callback){
+   sequenceOutstanding++;
+   return sequenceRequestObserver.call(bridge,action,payload,result=>{
+    sequenceOutstanding--;if(callback)callback(result);
+   });
+  };
+ }
  window.sequenceModes=[];window.sequenceSwitch=switchMode;
  switchMode=function(next){const result=sequenceSwitch(next);
    sequenceModes.push(mode);return result;};
@@ -71,6 +81,7 @@ def verify_sequence_installation(report_path: Path) -> int:
         stage_events: list[dict[str, object]] = []
         worker_pids: list[int] = []
         corrected: set[str] = set()
+        review_submitted = False
         pending_js = False
         js_value: object = None
         workspace = ""
@@ -204,6 +215,7 @@ def verify_sequence_installation(report_path: Path) -> int:
         def poll() -> None:
             nonlocal phase, failed_phase, workspace, epoch, output, output_digest, run_ids
             nonlocal modes, worker_pids, js_value, observed_status
+            nonlocal review_submitted
             try:
                 elapsed = time.monotonic() - started
                 if elapsed > 150:
@@ -265,6 +277,7 @@ def verify_sequence_installation(report_path: Path) -> int:
                             checks.append("whole-batch-pause")
                         phase = "review:" + blocked.target_id
                         js_value = None
+                        review_submitted = False
                     elif all(s.status == "done" for s in project.workflow.steps):
                         if not isinstance(project, WBIntakeOutputProject):
                             raise ValueError("No output project")
@@ -330,13 +343,18 @@ def verify_sequence_installation(report_path: Path) -> int:
                     if persisted:
                         corrected.add(target)
                         phase = "processing"
+                    elif review_submitted:
+                        if js_value == "acknowledged":
+                            raise ValueError(
+                                "Review click did not commit its correction: " + observed_status
+                            )
+                        javascript("sequenceOutstanding===0?'acknowledged':'pending'")
                     elif js_value is True:
-                        raise ValueError(
-                            "Review click did not commit its correction: " + observed_status
-                        )
+                        review_submitted = True
+                        js_value = None
                     else:
                         javascript(
-                            "(()=>{if(state.busy||mode!=='review'||row()?.id!=="
+                            "(()=>{if(state.busy||sequenceOutstanding||mode!=='review'||row()?.id!=="
                             + json.dumps(target)
                             + ")return false;"
                             "commitCrop({x:12,y:10,width:120,height:40},row().roi);"
