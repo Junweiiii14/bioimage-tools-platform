@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "task": "T-060",
-  "base_commit": "3b7716dc0342aee087c86f51703ed20e2135ed7f",
+  "base_commit": "330e329c24c886fbfcfe87417d3bf97202b27aa8",
   "scopes": [
     "."
   ],

@@ -1,6 +1,6 @@
 # T-060：E7 集成、包态与交付验收
 
-- 状态：implementing；base5e3459a，E6产品ea7ed55。前置E0–E6各阶段相关/完整门禁、绑定独审及证据已收尾；E6 862/624.64s、原child0、全部wheel/真实OCR/check0。
+- 状态：review；E0–E6实现/绑定独审已完成，E7产品e579及910项完整本机门禁/全部wheel、独立安装候选工程验证通过。最终主线依赖PR15四CI运行，准备集成清单13历史来源已真实校验；仍须实际main重载/最终绑定独审/产品PR四CI。原起点base5e3459a/E6产品ea7ed55及其862/624.64s证据保留。
 - 授权：按docs/wb-execution-plan.md连续推进，无阶段重复批准、无定时任务。有效t051/codex/wb-e0-e7；root sole writer，非作者只读独审。原ResearchVault dirty树、旧候选/安装/原图/历史结果/用户窗口保持。
 - 范围：apps/desktop、tools/wb、tooling、tests、docs、README.md、AGENT_HANDOFF.md、.agent-handoff、work/tasks、work/evidence、.github（仅实际CI诊断必要时单独说明/独审，不改规则以绕过失败）。scope .加载全部当前与BASE规则。
 - 首项：补充当前存活高风险链独审已绑定ea7ed55/base536f04e，发现历史OCR迟到取消P2。ProjectOCRSession异步解码后不查取消，宿主完成/安装只查generation；先改草稿再保存使失败/取消可能替换关联。修session完成与host完成/安装/CAS前后保护；真实已提交RunRecord不撤销，保存失败/取消保留当前旧关联。覆盖decode/install/关闭/encode前/CAS在途/保存失败/后续显式重试及过期generation。
