@@ -9,6 +9,7 @@
     "apps/desktop",
     "docs/contracts",
     "tests",
+    "tools/wb",
     "work"
   ],
   "rules": {
