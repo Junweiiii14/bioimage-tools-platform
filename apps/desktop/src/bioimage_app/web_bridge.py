@@ -83,6 +83,7 @@ class WorkbenchBridge(QObject):
         self._previous_progress = ""
         self._published_key = None
         self._images.clear()
+        self._source_preview_key = None
         self._intake_zoom_key = None
         self._intake_zoom = None
         self._montage_key = 0
@@ -107,6 +108,7 @@ class WorkbenchBridge(QObject):
         self._previous = ""
         self._published_key: tuple[object, ...] | None = None
         self._images: dict[str, str | None] = {}
+        self._source_preview_key: tuple[str, int, int] | None = None
         self._intake_zoom_key: tuple[str, str] | None = None
         self._intake_zoom: str | None = None
         self._montage_key = 0
@@ -132,7 +134,10 @@ class WorkbenchBridge(QObject):
         selected_index = view.table.currentRow()
         selected = project.rows[selected_index] if 0 <= selected_index < len(project.rows) else None
         preview = view.source_preview
-        if preview and preview.sha256 not in self._images:
+        preview_key = (
+            (preview.sha256, preview.preview_width, preview.preview_height) if preview else None
+        )
+        if preview and preview_key != self._source_preview_key:
             image = QImage(
                 preview.pixels,
                 preview.preview_width,
@@ -141,6 +146,7 @@ class WorkbenchBridge(QObject):
                 QImage.Format.Format_Grayscale8,
             )
             self._images[preview.sha256] = image_url(image)
+            self._source_preview_key = preview_key
         live_sources = {r.source.sha256 for r in project.rows if r.source}
         intake = None
         if isinstance(project, WBIntakeProject):
@@ -221,8 +227,26 @@ class WorkbenchBridge(QObject):
                 if isinstance(project, WBIntakeFigureProject)
                 else []
             )
+            intake["measurementPreview"] = (
+                self.host.intake_workflow.presentation.snapshot(project)
+                if isinstance(project, WBIntakeFigureProject)
+                else None
+            )
             intake["crops"] = (
-                [e.model_dump(mode="json") for e in project.intake_crops]
+                [
+                    {
+                        **e.model_dump(mode="json"),
+                        "displayFrame": next(
+                            (
+                                s.display_frame.model_dump(mode="json")
+                                for s in project.composition.slices
+                                if s.row_id == e.row_id and s.display_frame is not None
+                            ),
+                            None,
+                        ),
+                    }
+                    for e in project.intake_crops
+                ]
                 if isinstance(project, WBIntakeCropProject)
                 else []
             )
@@ -514,7 +538,8 @@ class WorkbenchBridge(QObject):
                 self._quant_overview = None
                 self.host.cancel()
             elif self.host.is_closing or (
-                self.host.operation_busy and action not in {"select", "quant_select"}
+                self.host.operation_busy
+                and action not in {"select", "quant_select", "intake_measurement_preview"}
             ):
                 raise ValueError("当前任务仍在处理中，请稍候或取消")
             elif isinstance(self.host.view.project(), WBIntakeProject) and action not in {
@@ -536,6 +561,8 @@ class WorkbenchBridge(QObject):
                 "intake_crop_retry",
                 "intake_stage_retry",
                 "intake_view_figure",
+                "intake_measurement_preview",
+                "intake_export_table",
                 "intake_export",
                 "select",
                 "intake_import_folder",
@@ -562,6 +589,8 @@ class WorkbenchBridge(QObject):
                 "intake_crop_retry",
                 "intake_stage_retry",
                 "intake_view_figure",
+                "intake_measurement_preview",
+                "intake_export_table",
                 "intake_export",
             }:
                 apply_intake_command(self, action, data)

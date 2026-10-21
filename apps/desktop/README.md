@@ -31,6 +31,14 @@ geometry drafts; failed saves retain drafts, and session changes retire them. Se
 
 # Desktop host
 
+T072 connects `intake_crop@2` machine acceptance and existing small-angle display frames
+to unattended batches. The quantification page uses bounded, identity-checked saved Fig
+previews independent of batch execution keys. Unified results expose the actual table
+and direct Excel/CSV export. `--automatic-flow-test` builds a separate AutomaticFlowTest
+distribution; `--verify-automatic-flow-installation <new-report.json>` checks reliable
+two-Fig geometry without crop confirmations, original samples, visible images/regions,
+results, real workers and reopening. This remains engineering evidence; see T072.
+
 T071 adds the versioned Fig sequence editor and a single guarded start/continue
 path. New batches use `intake_workflow@3`: all crops, then all complete Figs,
 then original-pixel measurements, then a committed output. The live batch snapshot

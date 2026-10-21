@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass, replace
 from math import atan, ceil, cos, degrees, floor, sin
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 import numpy as np
 from numpy.typing import NDArray
@@ -171,28 +171,39 @@ def _filled_membrane(pixels: NDArray[np.uint8 | np.uint16]) -> tuple[LaneROI | N
 
 
 def detect_source_geometry(
-    pixels: NDArray[np.uint8 | np.uint16], settings: "AutoWBSettings", cancelled: Callable[[], bool]
+    pixels: NDArray[np.uint8 | np.uint16],
+    settings: "AutoWBSettings",
+    cancelled: Callable[[], bool],
+    *,
+    guidance: tuple[DetectionPlane, LaneROI] | None = None,
 ) -> CropDetection:
     h, w = pixels.shape
     initial = CropDetectionSettings(
         settings.lane_count or 1, 2, settings.polarity, left_marker=False
     )
-    membrane, old_flags = detection_membrane(pixels, initial, cancelled)
-    if membrane is None:
+    algorithm: Literal["instrument_guided_geometry@1", "source_geometry@2"] = (
+        "instrument_guided_geometry@1" if guidance else "source_geometry@2"
+    )
+    membrane, old_flags = (
+        (guidance[1], ("white_light_geometry_guide",))
+        if guidance
+        else detection_membrane(pixels, initial, cancelled)
+    )
+    if membrane is None and guidance is None:
         membrane, multiple = _filled_membrane(pixels)
         if membrane is not None:
             old_flags = ("filled_membrane_contour",) + (("multiple_membranes",) if multiple else ())
     flags = ["crop_policy:source_geometry@2", "automatic_geometry_unreviewed", *old_flags]
 
     def failure(reason: str) -> CropDetection:
-        return CropDetection(
-            initial, w, h, membrane, None, None, (), (*flags, reason), "source_geometry@2"
-        )
+        return CropDetection(initial, w, h, membrane, None, None, (), (*flags, reason), algorithm)
 
     if "multiple_membranes" in old_flags:
         return failure("no_reliable_membrane")
     check_detection_cancelled(cancelled)
-    if membrane is None:
+    if guidance is not None:
+        plane = guidance[0]
+    elif membrane is None:
         # Previously cropped fields have no membrane/background contour. Accept
         # only a uniform perimeter with sparse signal of the declared polarity.
         raw_field = pixels.astype(np.float64)
@@ -372,5 +383,5 @@ def detect_source_geometry(
         )
     chosen = replace(initial, lane_count=count, crop_height=crop.y1 - crop.y0)
     return CropDetection(
-        chosen, w, h, membrane, marker_roi, crop, (candidate,), tuple(flags), "source_geometry@2"
+        chosen, w, h, membrane, marker_roi, crop, (candidate,), tuple(flags), algorithm
     )

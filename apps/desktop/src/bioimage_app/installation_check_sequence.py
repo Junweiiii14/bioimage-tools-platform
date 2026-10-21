@@ -43,7 +43,7 @@ CONFIGURE = """(()=>{
 })()"""
 
 
-def verify_sequence_installation(report_path: Path) -> int:
+def verify_sequence_installation(report_path: Path, *, automatic: bool = False) -> int:
     import numpy as np
     import tifffile
     from PySide6.QtCore import QSettings, QTimer
@@ -68,7 +68,32 @@ def verify_sequence_installation(report_path: Path) -> int:
         originals: dict[Path, str] = {}
         for name, value in (("A_123456 (1).tif", 1000), ("B_123456 (1).tif", 2000)):
             path = sources / name
-            tifffile.imwrite(path, np.full((72, 144), value, dtype=np.uint16))
+            pixels = np.full((72, 144), value, dtype=np.uint16)
+            if automatic:
+                # Signal direction differs from its same-acquisition white-light guide.
+                count, angle = (4, 3) if value == 1000 else (5, -3)
+                yy, xx = np.mgrid[:300, :700]
+                c, s = np.cos(np.deg2rad(angle)), np.sin(np.deg2rad(angle))
+                u, v = (xx - 350) * c + (yy - 150) * s, -(xx - 350) * s + (yy - 150) * c
+                width = count * 48 + 20
+                pixels = np.tile(np.linspace(43000, 63000, 700).astype(np.uint16), (300, 1))
+                gc, gs = np.cos(np.deg2rad(angle * 8 / 3)), np.sin(np.deg2rad(angle * 8 / 3))
+                gu, gv = (xx - 350) * gc + (yy - 150) * gs, -(xx - 350) * gs + (yy - 150) * gc
+                guide = np.full(xx.shape, 15, dtype=np.uint16)
+                guide[(np.abs(gu) < width / 2) & (np.abs(gv) < 45)] = 50000
+                merged = guide.copy()
+                for index in range(count):
+                    pixels[(np.abs(u - (-width / 2 + 34 + index * 48)) < 17) & (np.abs(v) < 7)] = (
+                        8000
+                    )
+                    merged[(np.abs(u - (-width / 2 + 34 + index * 48)) < 17) & (np.abs(v) < 7)] = (
+                        8000
+                    )
+                for peer, peer_pixels in ((2, guide), (3, merged)):
+                    peer_path = sources / name.replace("(1)", f"({peer})")
+                    tifffile.imwrite(peer_path, peer_pixels)
+                    originals[peer_path] = sha256(peer_path.read_bytes()).hexdigest()
+            tifffile.imwrite(path, pixels)
             originals[path] = sha256(path.read_bytes()).hexdigest()
         settings = QSettings(str(root / "sequence.ini"), QSettings.Format.IniFormat)
         settings.setValue("project_parent", str(root / "项目"))
@@ -105,6 +130,18 @@ def verify_sequence_installation(report_path: Path) -> int:
             "owned-resources-closed",
             "owned-window-deleted",
         }
+        if automatic:
+            required.difference_update(("whole-batch-pause", "two-human-continues"))
+            required.update(
+                (
+                    "no-human-crop-confirmations",
+                    "display-correction",
+                    "visible-gray-image",
+                    "visible-results-table",
+                    "signal-direction-independent-of-guide",
+                    "original-preview-replaces-thumbnail",
+                )
+            )
 
         def record() -> None:
             report.seek(0)
@@ -112,7 +149,9 @@ def verify_sequence_installation(report_path: Path) -> int:
             json.dump(
                 {
                     "schema": 1,
-                    "diagnostic": "fig_sequence_installed@1",
+                    "diagnostic": "automatic_flow_installed@1"
+                    if automatic
+                    else "fig_sequence_installed@1",
                     "phase": phase,
                     "failed_phase": failed_phase,
                     "checks": checks,
@@ -255,15 +294,26 @@ def verify_sequence_installation(report_path: Path) -> int:
                 if not isinstance(project, WBIntakeProject) or not window.host.workspace_path:
                     return
                 if phase == "import":
-                    if len(project.intake.sources) == 2 and not window.host.has_unsaved_changes:
+                    if (
+                        len(project.intake.sources) == (6 if automatic else 2)
+                        and not window.host.has_unsaved_changes
+                    ):
                         phase = "configure"
-                        javascript(CONFIGURE)
+                        javascript(
+                            CONFIGURE.replace("[1].click();", "[3].click();")
+                            if automatic
+                            else CONFIGURE
+                        )
                 elif phase == "configure":
                     if js_value is True:
                         checks.append("top-fields-one-start")
                         phase = "processing"
                     else:
-                        javascript(CONFIGURE)
+                        javascript(
+                            CONFIGURE.replace("[1].click();", "[3].click();")
+                            if automatic
+                            else CONFIGURE
+                        )
                 elif phase == "processing":
                     if not isinstance(project, WBIntakeWorkflowProject):
                         return
@@ -271,6 +321,10 @@ def verify_sequence_installation(report_path: Path) -> int:
                         (s for s in project.workflow.steps if s.status == "needs_review"), None
                     )
                     if blocked and blocked.stage == "crop" and blocked.target_id not in corrected:
+                        if automatic:
+                            raise ValueError(
+                                "Reliable geometry unexpectedly required human confirmation"
+                            )
                         if any(s.attempt for s in project.workflow.steps if s.stage != "crop"):
                             raise ValueError("Whole batch advanced before all crop reviews")
                         if "whole-batch-pause" not in checks:
@@ -281,9 +335,14 @@ def verify_sequence_installation(report_path: Path) -> int:
                     elif all(s.status == "done" for s in project.workflow.steps):
                         if not isinstance(project, WBIntakeOutputProject):
                             raise ValueError("No output project")
-                        if len(corrected) != 2 or len(project.intake_figures) != 2:
+                        if (
+                            len(corrected) != (0 if automatic else 2)
+                            or len(project.intake_figures) != 2
+                        ):
                             raise ValueError("Missing two independent Fig reviews or saved images")
-                        checks.append("two-human-continues")
+                        checks.append(
+                            "no-human-crop-confirmations" if automatic else "two-human-continues"
+                        )
                         worker_pids = [p.run.pid for p in project.analyses if p.run and p.run.pid]
                         run_ids = tuple(p.run.run_id for p in project.analyses if p.run)
                         if len(worker_pids) != 2 or any(
@@ -295,7 +354,8 @@ def verify_sequence_installation(report_path: Path) -> int:
                             row = next(r for r in project.rows if r.row_id == crop.row_id)
                             if (
                                 crop.raw_crop is None
-                                or not crop.reviewed
+                                or not crop.geometry_ready
+                                or (automatic and (crop.policy != "intake_crop@2" or crop.reviewed))
                                 or len(crop.slots) != row.lane_count
                             ):
                                 raise ValueError("Missing original crop or fixed slots")
@@ -303,16 +363,45 @@ def verify_sequence_installation(report_path: Path) -> int:
                                 Path(window.host.workspace_path) / crop.raw_crop.relative_path
                             ) as image:
                                 pixels = image.asarray()
-                            value = 1000 if row.protein == "Alpha" else 2000
-                            if (
+                            if automatic:
+                                assert crop.crop is not None
+                                source = sources / (
+                                    "A_123456 (1).tif"
+                                    if row.protein == "Alpha"
+                                    else "B_123456 (1).tif"
+                                )
+                                with tifffile.TiffFile(source) as original:
+                                    raw = original.asarray()
+                                r = crop.crop
+                                if not np.array_equal(pixels, raw[r.y0 : r.y1, r.x0 : r.x1]):
+                                    raise ValueError(
+                                        "Automatic crop changed original uint16 samples"
+                                    )
+                                frame = next(
+                                    s.display_frame
+                                    for s in project.composition.slices
+                                    if s.row_id == row.row_id
+                                )
+                                if frame is None or abs(abs(frame.angle_degrees) - 3) > 1:
+                                    raise ValueError("Small-angle correction was lost")
+                                if crop.geometry_policy != "instrument_guided_geometry@1":
+                                    raise ValueError(
+                                        "Diagnostic did not exercise paired-guide path"
+                                    )
+                            elif (
                                 pixels.dtype != np.uint16
                                 or pixels.shape != (40, 120)
-                                or not np.all(pixels == value)
+                                or not np.all(pixels == (1000 if row.protein == "Alpha" else 2000))
                             ):
                                 raise ValueError("Original uint16 crop changed")
                         checks.append("original-pixel-crops")
+                        if automatic:
+                            checks.append("display-correction")
+                            checks.append("signal-direction-independent-of-guide")
                         if len(cast(list[object], window.bridge.snapshot()["cells"])) != 9 or any(
-                            b.status != "not_detected" or b.measurement is not None
+                            (b.status != "not_detected" or b.measurement is not None)
+                            if not automatic
+                            else (b.status == "not_detected" and b.measurement is not None)
                             for result in window.host.project_results
                             for lane in result.result.lanes
                             for b in lane.bands
@@ -334,7 +423,8 @@ def verify_sequence_installation(report_path: Path) -> int:
                             raise ValueError("Output index or workbook incomplete")
                         output_digest = sha256((output / "project.zip").read_bytes()).hexdigest()
                         checks.append("committed-output")
-                        phase = "page-results"
+                        phase = "page-automatic" if automatic else "page-results"
+                        js_value = None
                 elif phase.startswith("review:"):
                     target = phase.split(":", 1)[1]
                     persisted = isinstance(project, WBIntakeOutputProject) and any(
@@ -361,7 +451,46 @@ def verify_sequence_installation(report_path: Path) -> int:
                             "const b=document.querySelector('[data-intake-crop-action=run]');"
                             "if(!b||b.disabled)return false;b.click();return true;})()"
                         )
+                elif phase == "page-automatic":
+                    if isinstance(js_value, str):
+                        modes = json.loads(js_value)
+                        if not all(m in modes for m in ("review", "layout", "quant", "results")):
+                            raise ValueError("Automatic navigation missed a real stage")
+                        phase, js_value = "page-original", None
+                        javascript("select(state.rows[0].id);switchMode('review');false")
+                    else:
+                        javascript("mode==='results'?JSON.stringify(sequenceModes):false")
+                elif phase == "page-original":
+                    if js_value is True:
+                        checks.append("original-preview-replaces-thumbnail")
+                        phase, js_value = "page-gray", None
+                        javascript("switchMode('quant');false")
+                    else:
+                        javascript("document.querySelector('#source-image').naturalWidth===700")
+                elif phase == "page-gray":
+                    if js_value is True:
+                        checks.append("visible-gray-image")
+                        phase, js_value = "page-results", None
+                        javascript("switchMode('results');false")
+                    else:
+                        javascript(
+                            "(()=>{const img=document.querySelector('.intake-measure-raster img');"
+                            "return !!img&&img.checkVisibility()&&img.naturalWidth>0&&"
+                            "document.querySelectorAll('.intake-measure-raster polygon')"
+                            ".length>=4;})()"
+                        )
                 elif phase == "page-results":
+                    if automatic:
+                        if js_value is not True:
+                            javascript(
+                                "mode==='results'&&"
+                                "document.querySelector('.results-scroll table')"
+                                ".checkVisibility()&&"
+                                "document.querySelectorAll('#results-body tr').length===9"
+                            )
+                            return
+                        checks.append("visible-results-table")
+                        js_value = json.dumps(modes)
                     if isinstance(js_value, str):
                         modes = json.loads(js_value)
                         if not all(m in modes for m in ("review", "layout", "quant", "results")):

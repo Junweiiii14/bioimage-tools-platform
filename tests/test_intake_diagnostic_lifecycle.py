@@ -143,6 +143,55 @@ def test_grouped_diagnostic_uses_real_cli_workers_and_shipped_shortcuts(tmp_path
     }.issubset(data["checks"])
 
 
+def test_automatic_flow_diagnostic_checks_unattended_crop_and_visible_images(
+    tmp_path: Path,
+) -> None:
+    report = tmp_path / "automatic-flow-diagnostic.json"
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-I",
+            "-m",
+            "bioimage_app",
+            "--verify-automatic-flow-installation",
+            str(report),
+        ],
+        env={
+            **os.environ,
+            "QT_QPA_PLATFORM": "offscreen",
+            "QTWEBENGINE_CHROMIUM_FLAGS": "--disable-gpu",
+            "PYTHONIOENCODING": "utf-8",
+        },
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        timeout=180,
+        check=False,
+    )
+    assert result.returncode == 0, (
+        result.stdout + result.stderr + report.read_text(encoding="utf-8")
+    )
+    data = json.loads(report.read_bytes())
+    assert data["diagnostic"] == "automatic_flow_installed@1"
+    assert data["phase"] == "passed" and data["errors"] == []
+    assert data["isolated_imports"] is True
+    assert len(data["worker_pids"]) == 2
+    assert len({(e["stage"], e["target"]) for e in data["stage_events"]}) == 7
+    assert {
+        "no-human-crop-confirmations",
+        "display-correction",
+        "visible-gray-image",
+        "visible-results-table",
+        "signal-direction-independent-of-guide",
+        "original-preview-replaces-thumbnail",
+        "original-pixel-crops",
+        "safe-reopen",
+        "owned-resources-closed",
+        "owned-window-deleted",
+    }.issubset(data["checks"])
+    assert not {"whole-batch-pause", "two-human-continues"}.intersection(data["checks"])
+
+
 def test_sequence_diagnostic_uses_real_page_workers_and_stage_navigation(tmp_path: Path) -> None:
     report = tmp_path / "sequence-diagnostic.json"
     result = subprocess.run(

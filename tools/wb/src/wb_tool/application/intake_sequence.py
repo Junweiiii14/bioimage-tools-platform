@@ -56,6 +56,7 @@ def continue_intake_sequence(
     *,
     expected_digest: str,
     crop: LaneROI | None = None,
+    display_angle: float | None = None,
 ) -> WBIntakeCropProject:
     """Explicitly save one human correction or retry the first blocked batch item."""
     if project.workflow.policy != "intake_workflow@3" or project.workflow.editing:
@@ -76,7 +77,13 @@ def continue_intake_sequence(
         if selected is None:
             raise ValueError("裁剪行不在本批中")
         review = revise_completed_intake_crop if selected.status == "done" else review_intake_crop
-        return review(project, crop.lane_id, crop, expected_digest=expected_digest)
+        return review(
+            project,
+            crop.lane_id,
+            crop,
+            expected_digest=expected_digest,
+            display_angle=display_angle,
+        )
     order = {"crop": 0, "compose": 1, "measure": 2, "export": 3}
     blocked = sorted(
         (

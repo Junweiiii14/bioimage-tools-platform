@@ -1,16 +1,19 @@
 """Assigned-source-only fixed N detection and verified original-sample export."""
 
 from collections.abc import Callable
+from dataclasses import replace
 from hashlib import file_digest
 from pathlib import Path
 
 from wb_tool.adapters.crop_export import export_crop
-from wb_tool.adapters.tiff_input import load_tiff
+from wb_tool.adapters.tiff_input import LoadedTiff, load_tiff
 from wb_tool.application.crop import CropRequest
+from wb_tool.application.figure_project import FigureSourcePath
 from wb_tool.application.intake_crop import (
     IntakeCropEvidence,
     IntakeCropFile,
     WBIntakeCropProject,
+    intake_crop_companion_assets,
     make_intake_crop_evidence,
 )
 from wb_tool.application.intake_workflow import (
@@ -19,7 +22,9 @@ from wb_tool.application.intake_workflow import (
 )
 from wb_tool.domain.automatic import AutoWBSettings, detect_automatic_geometry
 from wb_tool.domain.crop_detection import CropCandidate, CropDetection, CropDetectionSettings
+from wb_tool.domain.export_detection import inspect_export
 from wb_tool.domain.grid import fixed_lane_grid
+from wb_tool.domain.instrument_geometry import detect_instrument_geometry
 from wb_tool.domain.lanes import LaneROI
 
 
@@ -28,6 +33,7 @@ def propose_intake_crop(
     project: WBIntakeCropProject,
     row_id: str,
     *,
+    sources: tuple[FigureSourcePath, ...] = (),
     cancelled: Callable[[], bool] = lambda: False,
 ) -> IntakeCropEvidence:
     type(project).model_validate(dict(project))
@@ -46,6 +52,21 @@ def propose_intake_crop(
         AutoWBSettings(lane_count=row.lane_count, crop_policy="source_geometry@2"),
         cancelled=cancelled,
     )
+    if detection.candidates:
+        # A single legacy candidate does not establish signal direction or
+        # target uniqueness. Apply the independent signal checks to this path too.
+        checked = detect_instrument_geometry(
+            image.pixels,
+            image.pixels,
+            AutoWBSettings(lane_count=row.lane_count, crop_policy="source_geometry@2"),
+            cancelled=cancelled,
+        )
+        detection = replace(
+            checked,
+            algorithm_id="source_signal_geometry@1",
+            flags=tuple(f for f in checked.flags if f != "white_light_geometry_guide")
+            + ("source_signal_contour",),
+        )
     discovery = project.intake.discovery
     source_id = next(
         (b.source_id for b in project.intake.assignments if b.protein_id == row_id), None
@@ -63,10 +84,54 @@ def propose_intake_crop(
         if discovery
         else None
     )
+    target = None
     if selection is not None and selection.region_index is not None and discovery is not None:
         observed = next(o for o in discovery.observations if o.source_id == selection.source_id)
         region = observed.regions[selection.region_index]
-        roi = LaneROI(row_id, region.x0, region.y0, region.x1, region.y1)
+        target = LaneROI(row_id, region.x0, region.y0, region.x1, region.y1)
+    companions = intake_crop_companion_assets(project, row_id)
+    if not detection.candidates and len(companions) == 2 and sources:
+        paths = {item.sha256: item.path for item in sources}
+        dark: list[tuple[float, LoadedTiff]] = []
+        for asset in companions:
+            if cancelled():
+                raise ValueError("辅助定位已取消")
+            if asset.sha256 not in paths:
+                raise ValueError("同组辅助定位资产缺失")
+            peer = load_tiff(paths[asset.sha256])
+            metadata = next(s for s in project.intake.sources if s.asset == asset)
+            if (
+                peer.sha256 != asset.sha256
+                or peer.pixels.shape != image.pixels.shape
+                or peer.bit_depth != metadata.bit_depth
+                or peer.source.stat().st_size != asset.size_bytes
+            ):
+                raise ValueError("同组辅助定位资产身份或尺寸变化")
+            feature = inspect_export(peer.pixels)
+            if not feature.bright_background:
+                dark.append((feature.texture, peer))
+        dark.sort(key=lambda item: item[0])
+        if len(dark) == 2 and dark[1][0] - dark[0][0] >= 0.03:
+            guide, other = dark[0][1], dark[1][1]
+            detection = detect_instrument_geometry(
+                image.pixels,
+                guide.pixels,
+                AutoWBSettings(lane_count=row.lane_count, crop_policy="source_geometry@2"),
+                target=target,
+                cancelled=cancelled,
+            )
+            detection = replace(
+                detection,
+                flags=(
+                    *detection.flags,
+                    "guide_sha256:" + guide.sha256,
+                    "guide_peer_sha256:" + other.sha256,
+                ),
+            )
+    if target is not None and not (
+        detection.algorithm_id == "instrument_guided_geometry@1" and detection.candidates
+    ):
+        roi = target
         lanes = fixed_lane_grid(roi, row.lane_count)
         flags = (
             "user_selected_target_candidate",
@@ -114,7 +179,7 @@ def export_intake_crop(
     if project.workflow.cancel_requested or cancelled():
         raise ValueError("原值裁剪已取消，不发布新文件")
     evidence = next((e for e in project.intake_crops if e.row_id == row_id), None)
-    if evidence is None or not evidence.reviewed or evidence.crop is None:
+    if evidence is None or not evidence.geometry_ready or evidence.crop is None:
         raise ValueError("请先明确核对并审核原图裁剪范围")
     path_out = export_crop(
         path,

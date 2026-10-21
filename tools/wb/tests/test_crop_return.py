@@ -3,7 +3,7 @@
 import json
 from hashlib import sha256
 from pathlib import Path
-from typing import cast
+from typing import Literal, cast
 
 import numpy as np
 import pytest
@@ -70,7 +70,11 @@ def test_split_lanes_return_separate_strips_without_dropping_or_reordering(tmp_p
     ] == [1, 2]
 
 
-def test_rotated_return_matches_current_montage_display_and_keeps_raw_rect(tmp_path: Path) -> None:
+@pytest.mark.parametrize("policy", ["native_samples@1", "standard_lane_ratio@1"])
+def test_rotated_return_matches_current_montage_display_and_keeps_raw_rect(
+    tmp_path: Path,
+    policy: Literal["native_samples@1", "standard_lane_ratio@1"],
+) -> None:
     base, paths = sample(tmp_path)
     composition = initial_composition(base)
     frame = DisplayFrame(center_x=18, center_y=15, width=24, height=8, angle_degrees=4)
@@ -82,9 +86,7 @@ def test_rotated_return_matches_current_montage_display_and_keeps_raw_rect(tmp_p
             )
         }
     )
-    project = with_figure_layout(
-        base, composition, FigureLayoutStyle(display_policy="standard_lane_ratio@1")
-    )
+    project = with_figure_layout(base, composition, FigureLayoutStyle(display_policy=policy))
     result = return_reviewed_crop(project, "r0", paths[0].path)
     montage_path = str(tmp_path / "montage.png")
     export_figure_image(project, paths, montage_path)
@@ -95,6 +97,13 @@ def test_rotated_return_matches_current_montage_display_and_keeps_raw_rect(tmp_p
         assert strip.tobytes() == montage.crop(tuple(record["output_box"])).tobytes()
         assert json.loads(strip.info["wb_provenance"])["display_frame"] == frame.model_dump()
     np.testing.assert_array_equal(read_pixels(result.files[1]), read_pixels(paths[0].path)[5:25])
+    # The unframed row in the same Fig follows that Fig's display scale too.
+    peer = return_reviewed_crop(project, "r1", paths[1].path)
+    with Image.open(montage_path) as montage, Image.open(peer.files[0]) as strip:
+        metadata = json.loads(montage.info["wb_provenance"])
+        record = next(r for r in metadata["rows"] if r["row_id"] == "r1")
+        assert strip.size == (360, 96)
+        assert strip.tobytes() == montage.crop(tuple(record["output_box"])).tobytes()
 
 
 def test_partial_failure_keeps_named_files_and_does_not_claim_completion(

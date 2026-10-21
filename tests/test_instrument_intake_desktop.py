@@ -1448,6 +1448,19 @@ def test_sequence_real_page_two_figs_pause_continue_stage_barriers_and_reopen(
     assert len(finished.intake_outputs) == 1 and finished.intake_outputs[0].complete
     qtbot.waitUntil(lambda: js("mode==='results'") is True, timeout=10000)
     modes = js("JSON.stringify(sequenceModes)")
+    visible_table = js("""JSON.stringify((()=>{
+      const table=document.querySelector('.results-scroll table'),
+        stage=document.querySelector('#result-stage'),box=table.getBoundingClientRect();
+      return {width:box.width,height:box.height,stageHidden:stage.hidden,
+        visible:!!table.checkVisibility(),
+        rows:document.querySelectorAll('#results-body tr').length};
+    })())""")
+    assert isinstance(visible_table, str)
+    table_state = json.loads(visible_table)
+    assert table_state["visible"] and table_state["width"] > 0 and table_state["height"] > 0, (
+        table_state
+    )
+    assert not table_state["stageHidden"] and table_state["rows"] == 9, table_state
     assert isinstance(modes, str)
     visited = json.loads(modes)
     assert all(m in visited for m in ("review", "layout", "quant", "results")), visited
@@ -1482,6 +1495,163 @@ def test_sequence_real_page_two_figs_pause_continue_stage_barriers_and_reopen(
     )
     assert (output / "project.zip").read_bytes() == old_zip
     assert all(p.read_bytes() == content for p, content in originals.items())
+
+
+def test_reliable_sequence_needs_no_crop_confirmations_and_shows_images_and_table(
+    intake_window: WebWorkbenchWindow,
+    qtbot: QtBot,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tools.wb.tests.test_source_geometry import membrane
+
+    window = intake_window
+    root = tmp_path / "reliable-raw"
+    root.mkdir()
+    for index, angle in enumerate((3, -3), 1):
+        tifffile.imwrite(root / f"Sample{index}_123456 (1).tiff", membrane(angle=angle))
+    originals = {p: p.read_bytes() for p in root.iterdir()}
+    start(window, qtbot, root)
+
+    def js(code: str) -> object:
+        replies: list[object] = []
+        window.web.page().runJavaScript(code, replies.append)
+        qtbot.waitUntil(lambda: bool(replies), timeout=10000)
+        return replies[0]
+
+    qtbot.waitUntil(
+        lambda: (
+            js(
+                "!!document.querySelector('[data-group-action=add-fig]') && "
+                "!document.querySelector('[data-group-action=add-fig]').disabled && !state.busy"
+            )
+            is True
+        ),
+        timeout=10000,
+    )
+    assert (
+        js("""
+      const fill=(el,value)=>{el.value=value;el.dispatchEvent(new Event('input',{bubbles:true}));};
+      for(let i=0;i<2;i++){
+        document.querySelector('[data-group-action=add-fig]').click();
+        fill(document.querySelectorAll('[data-group-field=fig-label]')[i],'Fig '+(i+1));
+        fill(document.querySelectorAll('[data-group-field=lanes]')[i],'5');
+        fill(document.querySelectorAll('[data-group-field=proteins]')[i],'AKT');
+      }
+      document.querySelectorAll('[data-group-source]')[0].click();
+      document.querySelectorAll('[data-group-source]')[1].click();
+      document.querySelector('[data-group-action=start]').click();true
+    """)
+        is True
+    )
+    wait_saved(window, qtbot)
+    finished = current(window)
+    assert isinstance(finished, WBIntakeOutputProject), window.host.view.status.text()
+    assert all(step.status == "done" for step in finished.workflow.steps), (
+        window.host.view.status.text()
+    )
+    assert all(
+        e.policy == "intake_crop@2" and not e.reviewed and e.raw_crop for e in finished.intake_crops
+    )
+    assert all(not row.reviewed for row in finished.rows)
+    assert all(a.run and a.run.state == "succeeded" for a in finished.analyses)
+    qtbot.waitUntil(
+        lambda: (
+            js(
+                "mode==='results' && "
+                "document.querySelector('.results-scroll table').checkVisibility() && "
+                "document.querySelectorAll('#results-body tr').length===10"
+            )
+            is True
+        ),
+        timeout=10000,
+    )
+    assert js("document.querySelectorAll('#results-body tr').length") == 10
+    assert js("select(state.rows[0].id);switchMode('review');true") is True
+    qtbot.waitUntil(
+        lambda: js("document.querySelector('#source-image').naturalWidth===700") is True,
+        timeout=10000,
+    )
+    assert js("document.querySelector('#source-image').naturalHeight") == 300
+    assert js("switchMode('results');true") is True
+    assert js("document.querySelector('[data-intake-table-export]').checkVisibility()") is True
+    assert (Path(finished.intake_outputs[-1].destination) / "measurements.xlsx").is_file()
+    assert js("switchMode('quant');true") is True
+    qtbot.waitUntil(
+        lambda: (
+            js(
+                "!!document.querySelector('.intake-measure-raster img') && "
+                "document.querySelector('.intake-measure-raster img').naturalWidth>0"
+            )
+            is True
+        ),
+        timeout=10000,
+    )
+    assert js("document.querySelectorAll('.intake-measure-raster polygon').length") == 5
+    batch_key = window.host.intake_workflow.presentation_key[:-1]
+    assert (
+        js(
+            "const sel=document.querySelector('[data-intake-measure-figure]');"
+            "sel.selectedIndex=0;sel.dispatchEvent(new Event('change',{bubbles:true}));true"
+        )
+        is True
+    )
+    qtbot.waitUntil(
+        lambda: (
+            js(
+                "state.intake.measurementPreview?.figureId==="
+                "state.intake.figuresReady[0].figure_id && "
+                "document.querySelector('.intake-measure-raster img')?.naturalWidth>0"
+            )
+            is True
+        ),
+        timeout=10000,
+    )
+    assert window.host.intake_workflow.presentation_key[:-1] == batch_key
+    assert all(p.read_bytes() == data for p, data in originals.items())
+
+    # Read-only preview errors and late replies cannot replace another Fig or
+    # terminate the operation whose progress the user is currently browsing.
+    from bioimage_app.intake_presentation import IntakeFigurePresentation
+
+    presentation = IntakeFigurePresentation(window.host)
+    callbacks: list[Callable[[StorageReply], None]] = []
+
+    def capture_asset(
+        command: StorageCommand,
+        callback: Callable[[StorageReply], None],
+        *,
+        accept_errors: bool = False,
+    ) -> None:
+        assert command.operation == "asset" and accept_errors
+        callbacks.append(callback)
+
+    figures = finished.intake_figures
+    with monkeypatch.context() as preview_patch:
+        preview_patch.setattr(window.host, "submit_storage_job", capture_asset)
+        window.host.begin_operation()
+        try:
+            presentation.request(finished, figures[0].figure_id)
+            presentation.request(finished, figures[1].figure_id)
+            callbacks[0](StorageReply("old", error_code="missing", message="old Fig error"))
+            loading = presentation.snapshot(finished)
+            assert loading and loading["figureId"] == figures[1].figure_id
+            assert loading["loading"] is True and loading["error"] == ""
+            assert "image" not in loading
+            callbacks[1](
+                StorageReply("current", error_code="missing", message="current image missing")
+            )
+            failed = presentation.snapshot(finished)
+            assert failed and failed["error"] == "current image missing"
+            assert failed["loading"] is False and "image" not in failed
+            presentation.request(finished, figures[1].figure_id)
+            assert len(callbacks) == 3
+            retry = presentation.snapshot(finished)
+            assert retry and retry["loading"] is True and retry["error"] == ""
+            assert window.host.operation_busy
+            assert window.host.intake_workflow.presentation_key[:-1] == batch_key
+        finally:
+            window.host.finish_operation("Synthetic read-only preview verification complete")
 
 
 @pytest.mark.parametrize("failure", ["stale", "cas-failed", "cancel-encode"])

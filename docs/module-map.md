@@ -2,6 +2,11 @@ T061在WB原包内增加export_detection/discovery与清单v2证据，桌面inta
 
 # 模块地图
 
+T072增量：intake_crop@2自动采纳与人工review分离，既有方向框接入显示纠偏；
+桌面intake_presentation.py提供按Fig资产身份绑定的有界只读预览，灰度页图像/区域、
+统一可见结果表和直接导出接入原工作台；独立AutomaticFlowTest候选及可选真实流程诊断。
+契约见[自动裁图v2](contracts/wb-intake-automatic-crop-v2.md)，实际状态见T072任务。
+
 T064当前增量在WB包内增加 `application/intake_grouping.py` 和清单v3采集组草稿，桌面 `web_ui/intake_groups.js` 对应已批准网格；派生完整行接既有E0–E7主链，不另建平台实验抽象。状态/验证见T064任务，[契约](contracts/wb-intake-grouping-v1.md)。
 
 E5/T058已完成schema14 `application/intake_output.py`：稳定Fig/行/槽位填表、冻结资产/run、新目录索引与恢复输出；桌面导入索引/CAS后才完成阶段。旧schema1–13保持，科学/目标机门禁另记。

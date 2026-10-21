@@ -78,6 +78,7 @@ class WebWorkbenchWindow(QMainWindow):
             "wb-execution-test",
             "wb-grouped-intake-test",
             "wb-fig-sequence-test",
+            "wb-automatic-flow-test",
         }
         self.setWindowTitle("BioImage WB · 候选版" if candidate else "BioImage · WB 工作台")
         self.setWindowIcon(QIcon(str(Path(__file__).with_name("web_ui") / "bioimage.svg")))
@@ -88,6 +89,7 @@ class WebWorkbenchWindow(QMainWindow):
             "wb-execution-test": "E7Test",
             "wb-grouped-intake-test": "GroupedIntakeTest",
             "wb-fig-sequence-test": "FigSequenceTest",
+            "wb-automatic-flow-test": "AutomaticFlowTest",
         }.get(channel or "", "Platform")
         self.settings = settings or QSettings("BioImageTools", settings_name)
         self.shortcuts = WorkbenchShortcuts(self.settings)

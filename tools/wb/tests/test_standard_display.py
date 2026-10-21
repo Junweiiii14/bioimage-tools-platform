@@ -220,8 +220,16 @@ def test_rotated_frame_affine_and_bounds_leave_original_uint16_unchanged(tmp_pat
     assert original.pixels.dtype == np.uint16 and original.pixels.tobytes() == pixels_before
     assert Path(paths[0].path).read_bytes() == before
     native = project.model_copy(update={"layout_style": FigureLayoutStyle(heading_size=12)})
-    with pytest.raises(ValueError, match="仅支持"):
-        plan_laboratory_layout(native)
+    native_output = render_figure(native, paths)
+    native_manifest = json.loads(native_output.manifest_json)
+    assert native.layout_style.display_policy == "native_samples@1"
+    assert native_manifest["operation"] == "figure_segmented_geometry@3"
+    assert native_manifest["display_policy"] == "per_figure_display_frame@1"
+    assert native_manifest["framed_figures"] == [parts[0].figure]
+    assert next(r for r in native_manifest["rows"] if r["row_id"] == "r0")[
+        "display_frame"
+    ] == frame.model_dump(mode="json")
+    assert Path(paths[0].path).read_bytes() == before
     parts[0] = parts[0].model_copy(
         update={"display_frame": frame.model_copy(update={"center_x": -1.0})}
     )

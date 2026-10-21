@@ -23,13 +23,16 @@ from wb_tool.api import (
     WBIntakeWorkflowProject,
     WBJob,
     WBReply,
+    accept_automatic_intake_crop,
     approve_intake_workflow,
+    automatic_intake_crop_allowed,
     claim_intake_workflow_step,
     complete_intake_crop,
     complete_intake_figure,
     complete_intake_measurement,
     fail_intake_crop,
     finish_intake_workflow_step,
+    intake_crop_companion_assets,
     intake_output_digest,
     intake_workflow_digest,
     prepare_intake_measurement_revision,
@@ -41,6 +44,7 @@ from wb_tool.api import (
     retry_intake_workflow_step,
 )
 
+from bioimage_app.intake_presentation import IntakeFigurePresentation
 from bioimage_app.project_measurements import ProjectBatchCompletion
 from bioimage_app.storage import StorageCommand, StorageReply
 
@@ -51,6 +55,7 @@ if TYPE_CHECKING:
 class IntakeWorkflowSession:
     def __init__(self, host: "FigureProjectWindow") -> None:
         self.host = host
+        self.presentation = IntakeFigurePresentation(host)
         self._key = ""
         self._cancelled = False
         self._temporary: TemporaryDirectory[str] | None = None
@@ -76,7 +81,14 @@ class IntakeWorkflowSession:
 
     @property
     def presentation_key(self) -> tuple[object, ...]:
-        return self._parent_context, self._output_parent, self._batch_context, self._batch_key
+        return (
+            self._parent_context,
+            self._output_parent,
+            self._batch_context,
+            self._batch_key,
+            self._key,
+            self.presentation.serial,
+        )
 
     def batch_snapshot(self, project: WBIntakeProject) -> dict[str, object] | None:
         if (
@@ -377,6 +389,8 @@ class IntakeWorkflowSession:
             return
         host.begin_operation()
         host.view.status.setText(f"处理原图：{row.figure} / {row.protein}")
+        companions = intake_crop_companion_assets(project, row.row_id)
+        guide_paths: list[FigureSourcePath] = []
 
         def resolved(reply: StorageReply) -> None:
             if self._obsolete(key, generation):
@@ -386,7 +400,25 @@ class IntakeWorkflowSession:
                 self._finish(ticket, error=reply.message or "原图资产无法解析")
                 return
             evidence = next((e for e in project.intake_crops if e.row_id == row.row_id), None)
-            if evidence is not None and evidence.reviewed:
+            if (evidence is None or not evidence.geometry_ready) and len(guide_paths) < len(
+                companions
+            ):
+                asset = companions[len(guide_paths)]
+
+                def guide_loaded(guide_reply: StorageReply) -> None:
+                    if self._obsolete(key, generation):
+                        host.finish_operation("旧辅助定位回复未安装。")
+                    elif guide_reply.error_code or not isinstance(guide_reply.value, str):
+                        self._finish(ticket, error=guide_reply.message or "辅助定位资产无法读取")
+                    else:
+                        guide_paths.append(FigureSourcePath(asset.sha256, guide_reply.value))
+                        resolved(reply)
+
+                host.submit_storage_job(
+                    StorageCommand("asset", asset=asset), guide_loaded, accept_errors=True
+                )
+                return
+            if evidence is not None and evidence.geometry_ready:
                 try:
                     self._temporary = TemporaryDirectory(prefix="bioimage-intake-crop-")
                     self._temporary_root = Path(self._temporary.name).resolve()
@@ -408,6 +440,7 @@ class IntakeWorkflowSession:
                     path=reply.value,
                     document=project,
                     row_id=row.row_id,
+                    sources=tuple(guide_paths),
                     cancellation=host.cancellation,
                 )
 
@@ -488,7 +521,12 @@ class IntakeWorkflowSession:
             if error or cancelled:
                 updated = fail_intake_crop(project, ticket, (error or "用户取消裁剪")[:2000])
             elif evidence is not None:
-                updated = record_intake_crop_proposal(project, ticket, evidence)
+                updated = (
+                    accept_automatic_intake_crop(project, ticket, evidence)
+                    if project.workflow.policy == "intake_workflow@3"
+                    and automatic_intake_crop_allowed(evidence)
+                    else record_intake_crop_proposal(project, ticket, evidence)
+                )
             elif asset is not None:
                 updated = complete_intake_crop(project, ticket, asset)
             else:
@@ -657,6 +695,7 @@ class IntakeWorkflowSession:
             if stopped():
                 return
             if not self._cancelled and not reply.error and isinstance(reply.value, FigureRender):
+                self.presentation.remember(project, reply.value)
                 host.view.show_render(reply.value)
             self._advance()
 

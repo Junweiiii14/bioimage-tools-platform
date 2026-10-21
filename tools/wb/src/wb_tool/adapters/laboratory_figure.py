@@ -32,6 +32,7 @@ def render_laboratory_figure(
         raise ValueError("同一来源摘要对应多个路径")
     template, style = project.template, project.layout_style
     standard = style.display_policy == "standard_lane_ratio@1"
+    framed_figures = {s.figure for s in project.composition.slices if s.display_frame is not None}
     required = {row.source.sha256 for row in project.rows if row.source}
     if template.font:
         required.add(template.font.sha256)
@@ -117,19 +118,24 @@ def render_laboratory_figure(
     # The plan has non-overlapping output boxes, so drawing by source changes no pixels.
     # Keep records in display order, but retain only one decoded source at a time.
     for digest, segments in by_source.items():
-        _paste_source(canvas, paths[digest], segments, cancelled, resample=standard)
+        for framed in (False, True):
+            subset = [(p, r) for p, r in segments if (p.segment.figure in framed_figures) == framed]
+            if subset:
+                _paste_source(canvas, paths[digest], subset, cancelled, resample=standard or framed)
     if cancelled():
         raise ValueError("拼图任务已取消，未发布输出")
     project_record = project.model_dump(mode="json")
-    if not standard:
+    if not standard and not framed_figures:
         # Retain the frozen native manifest representation for legacy projects.
         project_record["layout_style"].pop("display_policy")
         project_record["layout_style"].pop("lane_unit")
         for segment in project_record["composition"]["slices"]:
             segment.pop("display_frame")
-    manifest = {
+    manifest: dict[str, object] = {
         "schema_version": 2,
-        "operation": "figure_segmented_geometry@2" if standard else "figure_segmented_geometry@1",
+        "operation": "figure_segmented_geometry@2"
+        if standard
+        else ("figure_segmented_geometry@3" if framed_figures else "figure_segmented_geometry@1"),
         "project_id": project.project_id,
         "revision": project.revision,
         "purpose": "display_only_not_quantitative",
@@ -148,6 +154,13 @@ def render_laboratory_figure(
             resampling="per_segment_explicit@1"
             if any(s.display_frame for s in project.composition.slices)
             else "pillow_rgb8_lanczos@1",
+        )
+    elif framed_figures:
+        manifest.update(
+            display_policy="per_figure_display_frame@1",
+            framed_figures=sorted(framed_figures),
+            lane_unit=style.lane_unit,
+            resampling="per_segment_explicit@1",
         )
     return FigureRender(
         layout.width, layout.height, canvas.tobytes(), json.dumps(manifest, ensure_ascii=True)

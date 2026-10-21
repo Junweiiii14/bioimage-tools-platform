@@ -266,6 +266,17 @@ def row_is_ready(project: WBFigureProject, row: FigureRow) -> bool:
     """Human confirmation OR exact machine provenance; stale geometry is never authorized."""
     if row.reviewed:
         return True
+    from wb_tool.application.intake_crop import WBIntakeCropProject
+
+    if isinstance(project, WBIntakeCropProject) and row.source is not None:
+        return any(
+            e.row_id == row.row_id
+            and e.geometry_ready
+            and e.source_sha256 == row.source.sha256
+            and e.crop == row.roi
+            and e.lane_count == row.lane_count
+            for e in project.intake_crops
+        )
     if not isinstance(project, WBAutomaticProject) or row.source is None:
         return False
     for evidence in project.automatic_rows:

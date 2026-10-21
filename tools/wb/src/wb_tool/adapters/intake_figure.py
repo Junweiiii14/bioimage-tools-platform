@@ -51,7 +51,9 @@ def prepare_intake_figure(
     if len(paths) != len(sources):
         raise ValueError("Fig来源路径重复")
     projection = intake_figure_projection(project, ticket.target_id)
-    rendered = render_figure(projection, sources, cancelled=cancelled)
+    # The projection has already checked every member's v1 review or v2 machine
+    # provenance. Keep row.reviewed false for automatically accepted geometry.
+    rendered = render_figure(projection, sources, require_review=False, cancelled=cancelled)
     plans: list[ProjectRowAnalysis] = []
     crops = {e.row_id: e for e in project.intake_crops}
     for row in intake_figure_rows(project, ticket.target_id):
@@ -198,6 +200,11 @@ def load_intake_figure_preview(
         matrix = TypeAdapter(
             tuple[tuple[float, float, float], tuple[float, float, float]] | None
         ).validate_python(row.get("source_to_output"))
+        if matrix is None and box and row.get("roi") is not None:
+            roi = TypeAdapter(dict[str, int]).validate_python(row["roi"])
+            if (box[2] - box[0], box[3] - box[1]) != (roi["x1"] - roi["x0"], roi["y1"] - roi["y0"]):
+                raise ValueError("旧原像素Fig缺少可核验的坐标映射")
+            matrix = ((1.0, 0.0, box[0] - roi["x0"]), (0.0, 1.0, box[1] - roi["y0"]))
         if matrix:
             row["preview_source_to_output"] = [
                 [value * sx for value in matrix[0]],

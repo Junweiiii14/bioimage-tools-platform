@@ -73,7 +73,11 @@ class CropDetection:
     candidates: tuple[CropCandidate, ...]
     flags: tuple[str, ...]
     algorithm_id: Literal[
-        "membrane_periodic_profile_candidates@1", "source_geometry@2", "export_signal_regions@1"
+        "membrane_periodic_profile_candidates@1",
+        "source_geometry@2",
+        "export_signal_regions@1",
+        "instrument_guided_geometry@1",
+        "source_signal_geometry@1",
     ] = ALGORITHM
 
 

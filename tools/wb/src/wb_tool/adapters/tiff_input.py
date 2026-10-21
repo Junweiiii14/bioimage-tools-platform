@@ -21,6 +21,7 @@ def _display_only(page: tifffile.TiffPage) -> bool:
         "figure_original_geometry@1",
         "figure_segmented_geometry@1",
         "figure_segmented_geometry@2",
+        "figure_segmented_geometry@3",
     )
     if len(description) > 16 * 1024 * 1024 or not any(op in description for op in operations):
         return False

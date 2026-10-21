@@ -214,6 +214,62 @@ def test_batch_navigation_follows_real_phase_but_preserves_human_draft(
     assert javascript(window, qtbot, "mode==='results'")
 
 
+def test_rotation_draft_late_save_preserves_newer_angle_and_can_reset(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        """
+      setState({selectedId:'protein-a',rows:[{id:'protein-a',sourceId:'sha',name:'raw.tif',
+        fig:'Fig 1',protein:'AKT',width:180,height:90,lanes:6,
+        roi:{x:20,y:20,width:120,height:16},results:[]}],
+        intake:{...state.intake,confirmed:true,cropEnabled:true,crops:[{
+          row_id:'protein-a',crop:{x0:20,y0:20,x1:140,y1:36},reviewed:true,
+          raw_crop:{sha256:'raw'},reason:'',displayFrame:{angle_degrees:3}}],
+          workflow:{digest:'completed',ready_count:1,steps:[{
+            stage:'crop',target_id:'protein-a',status:'done',attempt:2,reason:''}]}}});
+      switchMode('review');true
+    """,
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      let angle=document.querySelector('[data-intake-rotation]');angle.value='1';
+      angle.dispatchEvent(new Event('change',{bubbles:true}));
+      document.querySelector('[data-intake-crop-action=confirm]').click();true
+    """,
+    )
+    assert javascript(window, qtbot, "sent.at(-1).payload.displayAngle===1")
+    javascript(
+        window,
+        qtbot,
+        """
+      let nextAngle=document.querySelector('[data-intake-rotation]');nextAngle.value='2';
+      nextAngle.dispatchEvent(new Event('change',{bubbles:true}));
+      setState({intake:{...state.intake,crops:[{...state.intake.crops[0],raw_crop:null,
+        displayFrame:{angle_degrees:1}}],workflow:{...state.intake.workflow,digest:'saved-one',
+        steps:[{stage:'crop',target_id:'protein-a',status:'pending'}]}}});true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "intakeWorkspace.hasDraft() && "
+        "document.querySelector('[data-intake-rotation]').value==='2.00'",
+    )
+    javascript(window, qtbot, "document.querySelector('[data-intake-reset-rotation]').click();true")
+    assert javascript(
+        window, qtbot, "document.querySelector('[data-intake-rotation]').value==='0.00'"
+    )
+    javascript(window, qtbot, "intakeWorkspace.undoCrop(false);true")
+    assert javascript(
+        window, qtbot, "document.querySelector('[data-intake-rotation]').value==='2.00'"
+    )
+
+
 def test_prepared_workflow_summary_preserves_pending_and_edit_guard(
     intake_page: WebWorkbenchWindow, qtbot: QtBot
 ) -> None:

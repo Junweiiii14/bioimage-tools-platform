@@ -36,6 +36,11 @@ def main() -> int:
         action="store_true",
         help="Build the isolated Fig sequence automation test distribution",
     )
+    profiles.add_argument(
+        "--automatic-flow-test",
+        action="store_true",
+        help="Build the isolated automatic crop/gray/results test distribution",
+    )
     args = parser.parse_args()
     if subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT).strip():
         raise RuntimeError("A committed, clean checkout is required")
@@ -113,7 +118,9 @@ def main() -> int:
     for library in redistributables:
         shutil.copyfile(library, runtime / library.name)
     distribution = (
-        "windows_fig_sequence_test"
+        "windows_automatic_flow_test"
+        if args.automatic_flow_test
+        else "windows_fig_sequence_test"
         if args.fig_sequence_test
         else "windows_grouped_intake_test"
         if args.grouped_intake_test
@@ -122,7 +129,9 @@ def main() -> int:
         else "windows_test"
     )
     channel = (
-        "wb-fig-sequence-test"
+        "wb-automatic-flow-test"
+        if args.automatic_flow_test
+        else "wb-fig-sequence-test"
         if args.fig_sequence_test
         else "wb-grouped-intake-test"
         if args.grouped_intake_test
@@ -202,6 +211,14 @@ def main() -> int:
             distribution_id="BioImageTools.WB.E7Test",
             release_channel="wb-execution-test",
             settings_namespace="E7Test",
+            acceptance="candidate-only; clean Win10/DPI/scientific holdout pending",
+        )
+    elif args.automatic_flow_test:
+        manifest.update(
+            schema=2,
+            distribution_id="BioImageTools.WB.AutomaticFlowTest",
+            release_channel=channel,
+            settings_namespace="AutomaticFlowTest",
             acceptance="candidate-only; clean Win10/DPI/scientific holdout pending",
         )
     elif args.fig_sequence_test:
