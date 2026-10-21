@@ -437,9 +437,10 @@ window.intakeWorkspace = (() => {
     if(!viewport||!raster)return;
     const image=raster.querySelector('img');
     if(!image.naturalWidth){image.onload=fitMeasurement;return;}
-    const fit=Math.min((viewport.clientWidth-48)/image.naturalWidth,(viewport.clientHeight-48)/image.naturalHeight);
+    const style=getComputedStyle(viewport),availableWidth=viewport.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight),availableHeight=viewport.clientHeight-parseFloat(style.paddingTop)-parseFloat(style.paddingBottom);
+    const fit=Math.min(availableWidth/image.naturalWidth,availableHeight/image.naturalHeight);
     const width=Math.max(1,image.naturalWidth*fit*measureZoom);
-    raster.style.width=width+'px';raster.style.marginTop=Math.max(0,(viewport.clientHeight-48-width*image.naturalHeight/image.naturalWidth)/2)+'px';
+    raster.style.width=width+'px';raster.style.marginTop=Math.max(0,(availableHeight-width*image.naturalHeight/image.naturalWidth)/2)+'px';
     $('[data-intake-measure-zoom="fit"]').textContent=measureZoom===1?'适应窗口':Math.round(measureZoom*100)+'%';
   }
   window.addEventListener('resize',()=>requestAnimationFrame(fitMeasurement));
@@ -467,11 +468,16 @@ window.intakeWorkspace = (() => {
     }).join('');
     const markup=window.intakeViews.measurement({intake:state.intake,selected,current,members,outlines,cells:state.cells,busy:state.busy,selectedRowId:row()?.id,quant:state.quant});
     if(markup!==measurementMarkup||!$('.intake-measure-workspace',root)){
+      const scrollSelectors=['.intake-measure-main','.intake-figure-list','.intake-measure-inspector','.intake-figure-curves-scroll','.intake-measure-viewport'];
+      const offsets=scrollSelectors.map(selector=>{const node=$(selector,root);return {selector,x:node?.scrollLeft||0,y:node?.scrollTop||0};});
       const focused=root.contains(document.activeElement)?document.activeElement:null;
-      const attributes=['data-intake-measure-select','data-intake-measure-protein','data-intake-measure-zoom','data-intake-measure-figure','data-intake-preview-retry','data-intake-crop-action','data-id'];
+      const attributes=['data-intake-measure-select','data-intake-measure-protein','data-intake-measure-zoom','data-intake-measure-figure','data-intake-preview-retry','data-intake-crop-action','data-id','data-iq-field','data-iq-row','data-iq-lane','data-iq-action'];
       const selector=focused?attributes.filter(name=>focused.hasAttribute(name)).map(name=>`[${name}="${CSS.escape(focused.getAttribute(name))}"]`).join(''):'';
+      const hadEditor=!!$('.intake-figure-editor',root);
       root.innerHTML=markup;measurementMarkup=markup;
       if(selector)$(selector,root)?.focus({preventScroll:true});
+      offsets.forEach(({selector,x,y})=>{const node=$(selector,root);if(node){node.scrollLeft=x;node.scrollTop=y;}});
+      if(!hadEditor&&$('.intake-figure-editor',root))window.uiMotion.enter($('.intake-figure-editor',root));
     }
     if(!$('#drawer').hidden&&$('#drawer').dataset.intakeView==='measurement')updateMarkup($('#drawer-content'),$('.intake-measure-inspector').innerHTML);
     if(measureFigure!==selected?.figure_id){measureZoom=1;measureFigure=selected?.figure_id;}

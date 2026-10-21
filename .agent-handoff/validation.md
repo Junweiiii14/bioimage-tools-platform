@@ -1,5 +1,7 @@
 # Validation Index
 
+当前 T075 检查见 work/evidence/T-075/validation.md 与任务；下列T072及以前记录均为历史，不代表当前通过。
+
 当前T072产品44a独审Accepted、PR32四检查集成main0630604；两平台1013与本机1013/全部wheel/OCR/check0，新独立AutomaticFlowTest安装/四流程/PS5.1新轮/7753载荷通过，最终审计及收尾见[T072](../work/tasks/T-072-automatic-flow-repair.md)和[交付](../docs/wb-automatic-flow-repair-delivery.md)。首外层观察器误停OneDrive已重启，失败/修复证据保留，非产品静默改包。以下T071/T069/T060均为历史记录。
 
 

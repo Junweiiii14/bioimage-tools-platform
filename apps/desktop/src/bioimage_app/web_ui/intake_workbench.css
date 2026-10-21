@@ -1,11 +1,4 @@
-/* T073 workbench. Tokens and geometry follow docs/prototypes/t073/workbench.css.
-   Scoped to intake projects; independent grayscale retains its existing layout. */
-.intake-project {
-  --ink: #22332f; --muted: #64716d; --accent: #087e71; --accent-hover: #05675d;
-  --accent-light: #e4f2ec; --ground: #f4f6f5; --paper: #fff; --line: #e2e8e4;
-  --warning: #875719; --warning-bg: #fbf1dd; --canvas: #e9ede9;
-  font-size: 14px; line-height: 1.5;
-}
+/* Intake geometry preserves T074 workflows; shared tokens live in design_tokens.css. */
 .intake-project .platform-rail { display: none; }
 .intake-project .app-shell { margin-left: 0; }
 .intake-project .project-header { height: 56px; padding: 0 24px; gap: 18px; }
@@ -29,7 +22,7 @@
 .intake-project .mode-actions { display: flex; }
 .intake-project .mode-tab { min-width: 0; padding: 0 2px; font-size: 13px; white-space: nowrap; }
 .intake-project .mode-tab:disabled { opacity: 1; color: var(--muted); }
-.mode-step { display: grid; place-items: center; width: 19px; height: 19px; border-radius: 50%; background: var(--ground); font-size: 11px; font-variant-numeric: tabular-nums; }
+.mode-step { display: grid; place-items: center; width: 19px; height: 19px; border-radius: 50%; background: var(--ground); font-size:12px; font-variant-numeric: tabular-nums; }
 .intake-project .mode-tab.active .mode-step, .stage-complete .mode-step { background: var(--accent-light); color: var(--accent); }
 .intake-top-summary { margin-left: auto; color: var(--muted); font-size: 12px; white-space: nowrap; }
 #intake-primary { flex-shrink: 0; }
@@ -62,7 +55,7 @@
 .sequence-add small { color: var(--muted); font-size: 12px; }
 .sequence-toolbar { margin: 28px 0 15px; align-items: center; }
 .sequence-toolbar h2 { font-size: 17px; }
-.sequence-toolbar .grouped-search { flex: 0 1 300px; font-size: 11px; }
+.sequence-toolbar .grouped-search { flex: 0 1 300px; font-size:12px; }
 .sequence-options { font-size: 12px; }
 .sequence-groups { display: flex; flex-direction: column; }
 .sequence-group { display: grid; grid-template-columns: 170px minmax(0,1fr); align-items: start; gap: 20px; padding: 18px 0; border-top: 1px solid var(--line); }
@@ -81,11 +74,11 @@
 .sequence-source-choice input:focus-visible + .sequence-source-image { outline: 2px solid var(--accent); outline-offset: 3px; }
 .sequence-source-choice input:checked + .sequence-source-image { background: var(--accent-light); border-color: var(--accent); }
 .sequence-source-choice input:disabled + .sequence-source-image { opacity: .65; cursor: default; }
-.sequence-picked { display: none; position: absolute; top: 7px; right: 9px; padding: 2px 6px; color: white; background: var(--accent); border-radius: 4px; font-size: 11px; }
+.sequence-picked { display: none; position: absolute; top: 7px; right: 9px; padding: 2px 6px; color: white; background: var(--accent); border-radius: 4px; font-size:12px; }
 .sequence-source-choice input:checked + .sequence-source-image .sequence-picked { display: block; }
 .sequence-source-caption { display: flex; align-items: center; gap: 8px; justify-content: space-between; padding-top: 6px; font-size: 12px; }
 .sequence-source-caption > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sequence-source-meta { font-size: 11px; color: var(--muted); }
+.sequence-source-meta { font-size:12px; color: var(--muted); }
 .sequence-source-meta p { overflow-wrap: anywhere; }
 .sequence-save { position: static; background: transparent; padding: 14px 0; }
 .sequence-save [data-group-action="start"] { display: none; }
@@ -101,14 +94,14 @@
 .intake-project .canvas-heading p { font-size: 12px; }
 .intake-project .image-stage { background: var(--canvas); border-radius: 8px; }
 .intake-project .inspector { padding: 23px 20px 0; background: var(--paper); border-left: 1px solid var(--line); }
-.intake-project .status-bar { background: var(--paper); font-size: 11px; }
+.intake-project .status-bar { background: var(--paper); font-size:12px; }
 .intake-saved-note { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
 .intake-project .intake-object-group { margin: 18px 0; }
 .intake-object-group > h3 { display: flex; justify-content: space-between; margin: 0 8px 8px; font-size: 12px; color: var(--muted); font-weight: 500; }
 .intake-project .intake-object { padding: 10px 12px; margin-bottom: 4px; min-height: 54px; }
 .intake-object .source-copy { display: flex; flex-direction: column; gap: 2px; }
 .intake-project .intake-object .source-copy strong { font-weight: 550; }
-.intake-object small { color: var(--muted); font-size: 11px; }
+.intake-object small { color: var(--muted); font-size:12px; }
 .intake-project #intake-workspace.intake-measure-active { padding: 0; overflow: hidden; }
 .intake-measure-workspace { height: 100%; min-height: 0; display: grid; grid-template-columns: 215px minmax(300px,1fr) 268px; }
 .intake-figure-list { overflow: auto; background: #f7f9f7; padding: 22px 14px; border-right: 1px solid var(--line); }
@@ -119,7 +112,7 @@
 .intake-figure-select select { border: 1px solid var(--line); padding: 5px 8px; border-radius: 6px; background: white; color: var(--ink); }
 .intake-measure-main .canvas-heading { flex-shrink: 0; }
 .intake-project .intake-measure-image { flex: 1; min-height: 200px; overflow: hidden; position: relative; background: var(--canvas); border: 0; border-radius: 8px; padding: 0; }
-.intake-measure-caption { position: absolute; left: 20px; top: 14px; z-index: 1; color: var(--muted); font-size: 11px; pointer-events: none; }
+.intake-measure-caption { position: absolute; left: 20px; top: 14px; z-index: 1; color: var(--muted); font-size:12px; pointer-events: none; }
 .intake-measure-viewport { position: absolute; inset: 38px 0 54px; padding: 24px; overflow: auto; }
 .intake-project .intake-measure-raster { width: auto; max-width: none; margin: 0 auto; }
 .intake-project .intake-measure-raster img { width: 100%; max-height: none; height: auto; display: block; }
@@ -129,17 +122,17 @@
 .intake-values > div { display: flex; justify-content: space-between; gap: 10px; margin: 7px 0; }
 .intake-values dt { color: var(--muted); }
 .intake-values dd { font-variant-numeric: tabular-nums; }
-.intake-measure-foot { margin: 0; min-height: 44px; display: flex; align-items: center; font-size: 11px; color: var(--muted); }
+.intake-measure-foot { margin: 0; min-height: 44px; display: flex; align-items: center; font-size:12px; color: var(--muted); }
 .intake-profile-panel { flex-shrink: 0; margin-top: 18px; padding: 14px 18px; border-radius: 6px; background: white; }
 .intake-profile-panel > header { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 12px; }
-.intake-profile-panel > header span { color: var(--muted); font-size: 11px; }
+.intake-profile-panel > header span { color: var(--muted); font-size:12px; }
 .intake-profile-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(120px,1fr)); gap: 10px; max-height: 170px; overflow: auto; }
 .intake-profile-grid figure { margin: 12px 0 0; min-width: 0; }
-.intake-profile-grid figcaption { font-size: 11px; color: var(--muted); }
+.intake-profile-grid figcaption { font-size:12px; color: var(--muted); }
 .intake-profile-grid svg { width: 100%; height: 85px; display: block; }
 .intake-profile-grid polyline { fill: none; stroke: var(--accent); stroke-width: 1.5; }
 .intake-profile-grid .profile-axis { fill: none; stroke: var(--line); }
-.intake-profile-grid text { fill: var(--muted); font-size: 10px; }
+.intake-profile-grid text { fill: var(--muted); font-size:12px; }
 .intake-project.reduce-motion *, .intake-project.reduce-motion *::before, .intake-project.reduce-motion *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 .intake-result-grid { margin: 20px 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: white; }
 .intake-result-toolbar { display: flex; gap: 18px; padding: 16px 20px; border-bottom: 1px solid var(--line); }

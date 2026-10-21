@@ -1,3 +1,5 @@
+T075新增工作台明确修订公开用例 prepare_workbench_revision / apply_workbench_metadata / revise_workbench_figure_order；不改变算法与项目schema，保留历史并撤回相应阶段批准。契约见 ../../docs/contracts/wb-workbench-revision-v1.md。
+
 T074 当前增量与契约：`../../docs/contracts/wb-intake-supervision-v1.md`。下列为既有版本说明，不代表本轮验证。
 
 T061新增清单v2的导出组/来源角色/信号区域与未知N建议；显式集中确认后接既有固定N裁剪，保留原图复核。旧清单v1字段/摘要保持。公开契约见 `../../docs/contracts/wb-export-discovery-v1.md`。

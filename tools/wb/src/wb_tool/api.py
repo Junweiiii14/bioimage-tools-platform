@@ -276,6 +276,12 @@ from wb_tool.application.project_restore import (
 )
 from wb_tool.application.quant_supervision import install_quant_request, update_quant_lane
 from wb_tool.application.standalone_quant import ManualQuantTarget, configure_manual_quantification
+from wb_tool.application.workbench_revision import (
+    apply_workbench_metadata,
+    prepare_workbench_revision,
+    revise_workbench_figure_order,
+    workbench_project_digest,
+)
 from wb_tool.application.worker_protocol import (
     AcceptedFrame,
     CancelFrame,
@@ -331,6 +337,10 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "apply_workbench_metadata",
+    "prepare_workbench_revision",
+    "revise_workbench_figure_order",
+    "workbench_project_digest",
     "IntakeGrid",
     "WBIntakeGridProject",
     "revise_intake_grid",

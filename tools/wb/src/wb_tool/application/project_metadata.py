@@ -200,6 +200,16 @@ def apply_metadata(
     fields: tuple[str, ...],
 ) -> WBFigureProject:
     """Apply the explicitly selected, possibly corrected preview atomically to the frozen draft."""
+    return type(project).model_validate(metadata_proposal(project, preview, selected, fields))
+
+
+def metadata_proposal(
+    project: WBFigureProject,
+    preview: MetadataPreview,
+    selected: tuple[MetadataEntry, ...],
+    fields: tuple[str, ...],
+) -> dict[str, object]:
+    """Compute validated row values; the caller owns schema-specific identity reconciliation."""
     if metadata_digest(project) != preview.project_digest:
         raise ValueError("项目已修改，请重新生成元信息预览")
     if (
@@ -268,4 +278,4 @@ def apply_metadata(
     data.update(
         rows=tuple(rows), figure_order=order, name=next(iter(names)) if names else project.name
     )
-    return type(project).model_validate(data)
+    return data

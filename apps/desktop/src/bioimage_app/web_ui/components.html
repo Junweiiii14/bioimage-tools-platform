@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="forest" data-density="comfortable" data-motion="expressive">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BioImage · 组件与状态</title>
+  <link rel="stylesheet" href="design_tokens.css"><link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="components.css"><link rel="stylesheet" href="advanced.css">
+  <style>
+    main{max-width:1120px;margin:auto;padding:var(--space-page)}
+    header{background:var(--rail);color:var(--shell-ink);padding:24px 32px;display:flex;gap:24px;align-items:center}
+    header a{color:inherit;margin-left:auto}h1{font-size:24px}h2{font-size:18px;margin-bottom:16px}
+    .catalog-controls,.catalog-actions{display:flex;gap:16px;align-items:end;flex-wrap:wrap}
+    .catalog-section{padding:var(--space-group);margin-top:var(--space-group);background:var(--paper);border-radius:12px}
+    .catalog-controls label{display:grid;gap:8px;flex:1}.catalog-controls select{height:var(--control);background:var(--field);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:4px 12px}
+    .catalog-note{color:var(--muted);margin-top:16px}.catalog-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-group)}
+    .catalog-section .advanced-form{margin-top:0}.catalog-reveal{padding:16px;background:var(--field);margin-top:12px;border-radius:8px}
+    @media(max-width:700px){.catalog-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header><strong>BioImage</strong><span>组件与状态</span><a href="index.html?preview=1">进入完整工作台 →</a></header>
+  <main>
+    <h1>同一套界面语言</h1><p class="catalog-note">与正式工作台共用字体、主题、控件与动效代码。此页为组件示例，未连接实验项目。</p>
+    <section class="catalog-section catalog-controls" aria-label="外观配置">
+      <label>配色<select data-config="theme"><option value="forest">墨绿 × 酸橙</option><option value="ember">炭黑 × 朱砂</option><option value="iris">深靛 × 冰蓝</option><option value="neutral">白灰</option></select></label>
+      <label>信息密度<select data-config="density"><option value="comfortable">舒展</option><option value="compact">紧凑</option></select></label>
+      <label>动态效果<select data-config="motion"><option value="expressive">丰富</option><option value="gentle">轻柔</option><option value="reduced">减少动态效果</option></select></label>
+    </section>
+    <div class="catalog-grid">
+      <section class="catalog-section"><h2>操作与反馈</h2><div class="catalog-actions"><button class="button primary" id="sample-save">保存示例</button><button class="button subtle" id="sample-error">模拟失败</button><button class="button" disabled>等待来源</button></div><p class="catalog-note" id="sample-receipt" role="status">点击后立即响应，收到演示回执再显示确认。</p></section>
+      <section class="catalog-section"><h2>状态</h2><div class="catalog-actions"><span class="status-badge ok">✓ 已保存</span><span class="status-badge pending">! 待复核</span><span class="status-badge" style="color:var(--danger);background:var(--danger-bg)">× 保存失败</span></div><p class="catalog-note">状态同时通过短标签和符号表达。</p></section>
+      <section class="catalog-section"><h2>输入</h2><div class="advanced-form"><label class="advanced-field"><span>蛋白</span><input value="p-AKT" aria-label="蛋白"></label><label class="advanced-field"><span>泳道数 N</span><input type="number" value="6" min="1" aria-label="泳道数"></label></div><p class="catalog-note">输入保留中文、单位及当前值。</p></section>
+      <section class="catalog-section"><h2>逐层展开</h2><button class="button subtle" id="sample-disclosure" aria-expanded="false" aria-controls="sample-detail">查看来源</button><div id="sample-detail" class="catalog-reveal" hidden>Fig 1 · p-AKT<br><span class="catalog-note">采集组 01 · 合成演示图</span></div><p class="catalog-note">上下文原位保留，快速反向操作从当前状态接续。</p></section>
+    </div>
+    <section class="catalog-section"><h2>科学数值与来源</h2><div class="advanced-table-scroll"><table class="advanced-table"><thead><tr><th>Fig</th><th>蛋白</th><th>泳道</th><th>有效信号</th><th>状态</th></tr></thead><tbody><tr><td>Fig 1</td><td>p-AKT</td><td>1</td><td>1,250</td><td>✓ 已保存</td></tr><tr><td>Fig 1</td><td>p-AKT</td><td>2</td><td>—</td><td>! 待复核</td></tr></tbody></table></div><p class="catalog-note">演示数据；缺失不显示为零，科学数值不使用装饰性滚动。</p></section>
+  </main>
+  <script src="motion.js"></script><script src="component_examples.js"></script>
+</body>
+</html>

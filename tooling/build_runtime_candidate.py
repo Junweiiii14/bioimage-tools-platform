@@ -49,6 +49,9 @@ def main() -> int:
         action="store_true",
         help="Build the isolated fixed-grid crop and redesigned workbench test distribution",
     )
+    profiles.add_argument(
+        "--ui-system-test", action="store_true", help="Build isolated T075 UI system candidate"
+    )
     args = parser.parse_args()
     if subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT).strip():
         raise RuntimeError("A committed, clean checkout is required")
@@ -126,7 +129,9 @@ def main() -> int:
     for library in redistributables:
         shutil.copyfile(library, runtime / library.name)
     distribution = (
-        "windows_supervision_test"
+        "windows_ui_system_test"
+        if args.ui_system_test
+        else "windows_supervision_test"
         if args.supervision_test
         else "windows_reliable_crop_test"
         if args.reliable_crop_test
@@ -141,7 +146,9 @@ def main() -> int:
         else "windows_test"
     )
     channel = (
-        "wb-supervision-test"
+        "wb-ui-system-test"
+        if args.ui_system_test
+        else "wb-supervision-test"
         if args.supervision_test
         else "wb-reliable-crop-test"
         if args.reliable_crop_test
@@ -227,6 +234,14 @@ def main() -> int:
             distribution_id="BioImageTools.WB.E7Test",
             release_channel="wb-execution-test",
             settings_namespace="E7Test",
+            acceptance="candidate-only; clean Win10/DPI/scientific holdout pending",
+        )
+    elif args.ui_system_test:
+        manifest.update(
+            schema=2,
+            distribution_id="BioImageTools.WB.UISystemTest",
+            release_channel=channel,
+            settings_namespace="UISystemTest",
             acceptance="candidate-only; clean Win10/DPI/scientific holdout pending",
         )
     elif args.supervision_test:

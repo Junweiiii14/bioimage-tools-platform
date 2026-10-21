@@ -3,7 +3,7 @@
 // Drafts remain bound to project/session/source/row/lane/band, never to list position.
 window.intakeQuant = (() => {
   const drafts = new Map();
-  let selected = null, drag = null, selectionKey = null;
+  let selected = null, drag = null, selectionKey = null, matrixAnchor=null;
   const fields = ['start', 'end', 'baselineStart', 'baselineEnd'];
   const values = band => Object.fromEntries(fields.map(k => [k, band?.[k]]));
   const key = (lane, band) => [state.projectId,state.sessionEpoch,row()?.id,row()?.sourceId,lane.lane,band.id].join(':');
@@ -70,10 +70,10 @@ window.intakeQuant = (() => {
     const protein=members.find(p=>p.protein_id===row()?.id);
     const selectedLanes=rows.find(r=>r.rowId===protein?.protein_id)?.lanes||[];
     const editor=protein?markup(selectedLanes,protein,true):'';
-    const columns=Array.from({length:n},(_,i)=>`<strong class="intake-curve-column">泳道 ${i+1}</strong>`).join('');
+    const columns=Array.from({length:n},(_,i)=>`<strong class="intake-curve-column" data-iq-column="${i+1}">泳道 ${i+1}</strong>`).join('');
     const matrix=members.map(p=>{
       const lanes=rows.find(r=>r.rowId===p.protein_id)?.lanes||[];
-      return `<strong class="intake-curve-protein">${escapeText(p.label)}</strong>`+Array.from({length:n},(_,i)=>{
+      return `<strong class="intake-curve-protein" data-iq-protein="${escapeText(p.protein_id)}">${escapeText(p.label)}</strong>`+Array.from({length:n},(_,i)=>{
         const lane=lanes.find(l=>l.lane===i+1),band=lane?.bands?.[0];
         if(!band||!lane.profile?.length||!lane.profile.every(Number.isFinite)){
           const pending=[...drafts.values()].some(d=>d.project===state.projectId&&d.epoch===state.sessionEpoch&&d.rowId===p.protein_id&&d.lane?.lane===i+1);
@@ -82,15 +82,25 @@ window.intakeQuant = (() => {
         return `<button class="intake-curve-card" data-iq-row="${escapeText(p.protein_id)}" data-iq-lane="${lane.lane}" aria-label="${escapeText(fig.label)} · 蛋白 ${escapeText(p.label)} · 泳道 ${lane.lane}，调整封底" aria-pressed="${p.protein_id===row()?.id&&lane.lane===selected}">${manualQuant.chart(lane,band,false)}<span>0–${lane.profile.length-1} y 像素${band.reason?' · 需复核':''}</span></button>`;
       }).join('');
     }).join('');
-    return `<section class="intake-profile-panel"><header><strong>${escapeText(fig.label)} · ${members.length} 个蛋白 × ${n} 条泳道</strong><button class="text-button" data-iq-action="all">整组概览</button></header><p class="intake-curve-help">行对应蛋白，列对应泳道。每格为已提交的单泳道 y 剖面（独立纵轴）；点击任意曲线调整对应封底，草稿显示在下方编辑区。</p><div class="intake-figure-curves-scroll"><div class="intake-figure-curves" style="grid-template-columns:64px repeat(${n},minmax(150px,1fr))"><strong>蛋白</strong>${columns}${matrix}</div></div>${editor}</section>`;
+    return `<section class="intake-profile-panel"><header><strong>${escapeText(fig.label)} · ${members.length} 个蛋白 × ${n} 条泳道</strong><button class="text-button" data-iq-action="all">整组概览</button></header><p class="intake-curve-help">行对应蛋白，列对应泳道。点击曲线调整封底。各格为已提交的 y 剖面，纵轴独立。</p><div class="intake-figure-curves-scroll"><div class="intake-figure-curves" style="grid-template-columns:64px repeat(${n},minmax(150px,1fr))"><strong>蛋白</strong>${columns}${matrix}</div></div>${editor}</section>`;
   }
+  function highlight(cell){
+    const matrix=document.querySelector('.intake-figure-curves');if(!matrix)return;
+    matrix.querySelectorAll('.matrix-hover').forEach(el=>el.classList.remove('matrix-hover'));
+    if(!cell)return;
+    const rowId=cell.dataset.iqRow,lane=cell.dataset.iqLane;
+    matrix.querySelectorAll('[data-iq-row],[data-iq-protein],[data-iq-column]').forEach(el=>{if(el.dataset.iqRow===rowId||el.dataset.iqProtein===rowId||el.dataset.iqLane===lane||el.dataset.iqColumn===lane)el.classList.add('matrix-hover');});
+  }
+  document.addEventListener('pointerover',event=>{const cell=event.target.closest('.intake-figure-curves [data-iq-row]');if(cell&&!cell.contains(event.relatedTarget))highlight(cell);});
+  document.addEventListener('pointerout',event=>{if(event.target.closest('.intake-figure-curves')&&!event.relatedTarget?.closest?.('.intake-figure-curves'))highlight(null);});
+  document.addEventListener('focusin',event=>{const cell=event.target.closest('.intake-figure-curves [data-iq-row]');if(cell)highlight(cell);});
   const refresh=()=>window.intakeWorkspace.renderActive();
   document.addEventListener('click',event=>{
     const lane=event.target.closest('[data-iq-lane]');
-    if(lane&&!lane.disabled){selected=Number(lane.dataset.iqLane);const target=lane.dataset.iqRow;if(target&&target!==row()?.id){selectionKey=[state.projectId,state.sessionEpoch,target].join(':');select(target);}else refresh();requestAnimationFrame(()=>document.querySelector('.intake-figure-editor')?.scrollIntoView({block:'nearest'}));return;}
+    if(lane&&!lane.disabled){const scroll=document.querySelector('.intake-figure-curves-scroll');matrixAnchor={row:lane.dataset.iqRow||row()?.id,lane:lane.dataset.iqLane,x:scroll?.scrollLeft||0,y:scroll?.scrollTop||0};selected=Number(lane.dataset.iqLane);const target=lane.dataset.iqRow;if(target&&target!==row()?.id){selectionKey=[state.projectId,state.sessionEpoch,target].join(':');select(target);}else refresh();requestAnimationFrame(()=>document.querySelector('.intake-figure-editor')?.scrollIntoView({block:'nearest'}));return;}
     const action=event.target.closest('[data-iq-action]')?.dataset.iqAction;
     if(!action)return;
-    if(action==='all'){selected=null;refresh();return;}
+    if(action==='all'){selected=null;refresh();requestAnimationFrame(()=>{const anchor=matrixAnchor;if(!anchor)return;const scroll=document.querySelector('.intake-figure-curves-scroll');if(scroll){scroll.scrollLeft=anchor.x;scroll.scrollTop=anchor.y;}document.querySelector(`[data-iq-row="${CSS.escape(anchor.row)}"][data-iq-lane="${anchor.lane}"]`)?.focus({preventScroll:true});});return;}
     if(action==='discard-stale'&&!state.busy){
       const valid=new Set((quantData()?.lanes||[]).flatMap(l=>l.bands?.[0]&&entry(l,l.bands[0]).item?[entry(l,l.bands[0]).id]:[]));
       for(const [id,item] of drafts)if(item.rowId===row()?.id&&!valid.has(id))drafts.delete(id);

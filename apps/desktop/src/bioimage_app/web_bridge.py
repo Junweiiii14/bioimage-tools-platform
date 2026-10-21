@@ -32,6 +32,7 @@ from wb_tool.api import (
 )
 
 from bioimage_app.figure_window import FigureProjectWindow
+from bioimage_app.web_advanced import AdvancedCommands
 from bioimage_app.web_intake import apply_intake_command
 from bioimage_app.web_manual_quant import ManualQuantCommands
 from bioimage_app.web_quant import quant_snapshot
@@ -67,6 +68,7 @@ class WorkbenchBridge(QObject):
     progressChanged = Signal(str)
     sessionRequested = Signal(str, str)
     sessionStateChanged = Signal(str)
+    advancedStateChanged = Signal(str)
 
     @Slot(str, str)
     def session(self, action: str, payload: str = "{}") -> None:
@@ -76,6 +78,7 @@ class WorkbenchBridge(QObject):
     def replace_host(self, host: FigureProjectWindow) -> None:
         self.session_epoch += 1
         self.manual_commands = ManualQuantCommands(self)
+        self.advanced_commands = AdvancedCommands(self)
         self.host.automatic.finished.disconnect(self._automatic_completed)
         self.host.intake_stage_committed.disconnect(self.publish)
         self.host = host
@@ -121,6 +124,7 @@ class WorkbenchBridge(QObject):
         self._quant_overview: tuple[str, str] | None = None
         self._pending_source: tuple[str, str] | None = None
         self.manual_commands = ManualQuantCommands(self)
+        self.advanced_commands = AdvancedCommands(self)
         self.host.automatic.finished.connect(self._automatic_completed)
         self.host.intake_stage_committed.connect(self.publish)
         self.timer = QTimer(self)
@@ -461,6 +465,7 @@ class WorkbenchBridge(QObject):
 
     @Slot()
     def publish(self) -> None:
+        self.advanced_commands.poll()
         if self.host.resources_closed:
             self.timer.stop()
             return
@@ -528,6 +533,7 @@ class WorkbenchBridge(QObject):
                 262144
                 if action
                 in {
+                    "advanced_ui",
                     "intake_grid_save",
                     "intake_plan",
                     "intake_assign",
@@ -550,6 +556,8 @@ class WorkbenchBridge(QObject):
             elif action == "cancel":
                 self._quant_overview = None
                 self.host.cancel()
+            elif action == "advanced_ui":
+                self.advanced_commands.command(data)
             elif self.host.is_closing or (
                 self.host.operation_busy
                 and action not in {"select", "quant_select", "intake_measurement_preview"}
@@ -839,6 +847,10 @@ class WorkbenchBridge(QObject):
             self._error = ""
         except (ValueError, TypeError) as error:
             self._error = str(error)
+            if action == "advanced_ui":
+                request_id = data.get("requestId")
+                if isinstance(request_id, str) and 0 < len(request_id) <= 80:
+                    self.advanced_commands.emit(request_id, "failed", str(error))
             if action == "intake_sequence_start":
                 self.sequence_response = {
                     "projectId": data.get("projectId"),
