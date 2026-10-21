@@ -1,5 +1,6 @@
 """Guarded aggregate presentation and persisted batch display configuration."""
 
+import json
 from typing import TYPE_CHECKING, Literal, cast
 
 from wb_tool.api import (
@@ -40,7 +41,7 @@ def apply_supervision(bridge: "WorkbenchBridge", action: str, data: dict[str, ob
         )
 
     if action == "intake_grid_save":
-        grid = IntakeGrid.model_validate(data.get("grid"))
+        grid = IntakeGrid.model_validate_json(json.dumps(data.get("grid")))
         updated = revise_intake_grid(project, grid)
         host.save(
             transform=lambda saved: type(updated).model_validate(
