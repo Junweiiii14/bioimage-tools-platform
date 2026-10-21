@@ -1,6 +1,10 @@
 # T074 使用与交付入口
 
-状态唯一来源：[T074任务](../work/tasks/T-074-curves-fig-grid.md)。当前分支 codex/t074-curves-fig-grid，基线 main 91dd985；测试版/PR/最终验证尚待完成，不沿用 T071–T073 验证结论。
+状态唯一来源：[T074任务](../work/tasks/T-074-curves-fig-grid.md)。产品固定569674a经独立复核后构建，新“BioImage WB（曲线与整版拼图测试版）”已独立安装，安装版19项相关流程通过（10.875秒）。[交付证据](../work/evidence/T-074/delivery.md)记录包/报告SHA及真实初败。
+
+安装目录：`%LOCALAPPDATA%/Programs/BioImage WB 曲线与整版拼图测试版`。构建包保留在本工作树 `.local/releases/runtime-569674a82e33/`；原安装保持。
+
+[PR35](https://github.com/Junweiiii14/bioimage-tools-platform/pull/35)包含代码、文档及规则回执，最终必需检查状态以PR为准；未经确认不合并。
 
 1. 在批次“灰度定量”中选择蛋白，再点泳道放大。修改积分起止点和两端封底，或拖动/键盘移动端点；可撤销/重做。点击“保存并重算”，等待实际结果提交。
 2. “拼图”左侧选择单 Fig，蛋白按钮定位；修改原图使用右侧明确的“修改裁剪”。当前 Fig 可单独导出。
