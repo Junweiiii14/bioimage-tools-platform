@@ -181,7 +181,9 @@ window.intakeWorkspace = (() => {
     const evidence=state.intake.crops?.find(e=>e.row_id===r?.id);
     const step=state.intake.workflow.steps.find(s=>s.stage==='crop'&&s.target_id===r?.id);
     const draft=r&&cropDrafts.get(r.id),correcting=step?.status==='done';
-    const locked=!!state.busy||!r?.roi||!evidence||!cropEditable(r.id)||!!draft?.conflict||!!cropPending.size;
+    // Legacy cropPending tracks the saved-snapshot acknowledgement, not an
+    // active request; failed saves must retain the original retry action.
+    const locked=!!state.busy||!r?.roi||!evidence||!cropEditable(r.id)||!!draft?.conflict||(batchPolicy()&&!!cropPending.size);
     const saved=batchPolicy()&&correcting&&!draft;
     $$('[data-intake-crop-action="confirm"]').forEach(button=>{
       button.disabled=locked||((correcting||step?.status==='pending')&&!draft);button.hidden=saved;
