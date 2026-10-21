@@ -23,13 +23,7 @@ window.intakeViews = (() => {
     const protein=members.find(p=>p.protein_id===selectedRowId);
     const lanes=protein?quant?.group?.rows?.find(r=>r.rowId===protein.protein_id)?.lanes||[]:[];
     const available=lanes.filter(l=>l.profile?.length>1&&l.profile.every(Number.isFinite));
-    let low=0,high=0;
-    for(const lane of available)for(const value of lane.profile){low=Math.min(low,value);high=Math.max(high,value);}
-    const span=high-low||1;
-    return `<section class="intake-profile-panel" aria-label="当前蛋白的已提交泳道曲线"><header><strong>${escapeText(protein?.label||'当前蛋白')} · 泳道剖面</strong><span>${available.length?'原像素已提交曲线 · 同一纵轴':'等待当前蛋白的已提交结果'}</span></header><div class="intake-profile-grid">${available.map(lane=>{
-      const values=lane.profile,points=profilePoints(values).map(i=>`${(8+204*i/(values.length-1)).toFixed(2)},${(76-64*(values[i]-low)/span).toFixed(2)}`).join(' ');
-      return `<figure><figcaption>泳道 ${lane.lane}</figcaption><svg viewBox="0 0 220 92" role="img" aria-label="泳道 ${lane.lane} 原图纵向剖面，灰度范围 ${number(low)} 至 ${number(high)}"><path d="M8 8V76H212" class="profile-axis"/><polyline points="${points}"/><text x="8" y="90">${lane.roi.y}</text><text x="212" y="90" text-anchor="end">${lane.roi.y+values.length-1} px</text></svg></figure>`;
-    }).join('')}</div></section>`;
+    return window.intakeQuant.markup(available, protein);
   }
 
   function figureList(intake, selectedId, selectedRowId) {

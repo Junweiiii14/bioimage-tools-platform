@@ -1,10 +1,8 @@
 # 生物图像工具平台
 
-本轮[Fig顺序方案](docs/wb-fig-sequence-automation-plan.md)已实现顶部Fig名/每Fig一次N/有序蛋白配置、跨Fig连续分配、组内手选原图及一次启动；整批裁剪→拼图→原像素定量→结果按真实提交自动切页，人工问题暂停后单一继续。PR30四必需检查及两平台979项/全部wheel/OCR通过，main710bb85的新独立离线候选已构建、安装并通过三流程与PS5.1自检。摘要和验收边界见[T071交付](docs/wb-fig-sequence-delivery.md)；旧[T069交付](docs/wb-grouped-intake-delivery.md)及原图/历史/旧未提交改动保持。[迭代/证据导航](docs/iterations.md)与[交接入口](AGENT_HANDOFF.md)保留实际初败和当前任务指针。
+当前开发入口：[T074任务](work/tasks/T-074-curves-fig-grid.md) → [曲线与整版拼图说明](docs/wb-supervision-delivery.md) → [交接索引](AGENT_HANDOFF.md)。本轮从 main 91dd985 建立独立分支，完成封底调整、单 Fig 浏览与全部 Fig 网格输出；交付状态以任务记录为准。
 
-当前WB需求以[开发规划v2](docs/wb-development-plan-v2.md)为准，实施见[E0–E7执行计划](docs/wb-execution-plan.md)：清单、固定N原值裁剪、拼图后原像素定量、稳定槽表格、导出与恢复。E0–E7工程实现、独审及主线集成已完成；两平台910项完整门禁及全部隔离wheel通过，独立测试安装候选在本机Win11通过双流程和生命周期验证，独立灰度与OCR保留。科学留出、明确样本配对、干净目标Win10和物理DPI仍待验，不代表正式发布。详见[验收索引](docs/wb-execution-acceptance.md)和T060证据。
-
-当前阶段：**WB 本机工程测试。当前三目录85 TIFF/19执行组＋28参考组的已见开发回归已走通，979项两平台检查、独立wheel/OCR与新安装候选三流程通过；科学真值/留出、干净Win10、物理DPI和正式发布仍未完成。** 历史95 TIFF清单不改写；实际状态以[T071](work/tasks/T-071-fig-sequence-automation.md)和验证记录为准。
+T071–T073 是历史版本及证据，旧测试结果不作为本轮通过证明。WB仍处于本机工程测试阶段；科学留出、干净Win10、物理DPI和正式发布未完成。开发范围保持WB，IF/IHC不自动扩展。
 
 最初的 [V3.0 技术方案](生物图像工具平台与全AI长期迭代技术方案.pdf) 保持原样，首次提交可追溯。
 当前WB采用Windows本地Python/PySide6、独立计算进程及单仓库分包；IF/IHC保留为后续单独任务。目标机验收缺口单列，已授权WB技术栈继续完成工程交付。

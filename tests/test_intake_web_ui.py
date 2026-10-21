@@ -201,7 +201,8 @@ def test_batch_navigation_follows_real_phase_but_preserves_human_draft(
     javascript(
         window,
         qtbot,
-        "document.querySelector('[data-intake-crop-action=discard]').click();intakeWorkspace.followBatch();true",
+        "document.querySelector('[data-intake-crop-action=discard]').click();"
+        "intakeWorkspace.followBatch();true",
     )
     assert javascript(window, qtbot, "mode==='layout'")
     javascript(
@@ -404,8 +405,12 @@ def test_batch_profiles_show_only_current_committed_row_and_keep_narrow_peak(
         qtbot,
         """
       const profile=Array.from({length:2048},(_,i)=>i===1001?100:0);
-      setState({selectedId:'protein-a',rows:[{id:'protein-a',protein:'A',fig:'Fig 1',lanes:6}],
-        quant:{group:{rows:[{rowId:'protein-a',lanes:[{lane:1,roi:{y:20},profile}]}]}},
+      const lanes=[{lane:1,roi:{y:20},profile,bands:[{id:'target',start:998,end:1004,
+        baselineStart:0,baselineEnd:0,reason:''}]}];
+      setState({selectedId:'protein-a',rows:[{id:'protein-a',sourceId:'src',
+          protein:'A',fig:'Fig 1',lanes:6}],
+        quant:{rowId:'protein-a',revision:1,sourceId:'src',status:'ready',lanes,
+          group:{rows:[{rowId:'protein-a',lanes}]}},
         intake:{...state.intake,cropEnabled:true,figureEnabled:true,crops:[],
           figuresReady:[{figure_id:'fig-a',row_ids:['protein-a'],image:{sha256:'fig'}}],
           workflow:{policy:'intake_workflow@3',digest:'profiles',steps:[]}}});
@@ -413,25 +418,52 @@ def test_batch_profiles_show_only_current_committed_row_and_keep_narrow_peak(
     """,
     )
     assert javascript(
-        window, qtbot, "document.querySelectorAll('.intake-profile-grid polyline').length===1"
+        window, qtbot, "document.querySelectorAll('.intake-profile-panel .quant-curve').length===1"
     )
     assert javascript(
         window,
         qtbot,
-        "document.querySelector('.intake-profile-grid polyline')"
-        ".getAttribute('points').includes(',12.00')",
+        "!!document.querySelector('.intake-profile-panel .quant-baseline')"
+        " && !!document.querySelector('.intake-profile-panel .quant-fill')",
     )
     assert javascript(
         window,
         qtbot,
-        "document.querySelector('.intake-profile-grid').textContent.includes('2067 px')",
+        "document.querySelector('.intake-profile-panel .quant-curve')"
+        ".getAttribute('d').split('L').length===2048",
+    )
+    javascript(
+        window,
+        qtbot,
+        "document.querySelector('[data-iq-lane]').click();"
+        "const input=document.querySelector('[data-iq-field=baselineStart]');input.value='3';"
+        "input.dispatchEvent(new Event('change',{bubbles:true}));true",
+    )
+    assert javascript(
+        window, qtbot, "intakeQuant.hasDraft() && !sent.some(x=>x.action==='quant_edit')"
+    )
+    javascript(window, qtbot, "document.querySelector('[data-iq-action=undo]').click();true")
+    assert javascript(
+        window, qtbot, "document.querySelector('[data-iq-field=baselineStart]').value==='0'"
+    )
+    javascript(
+        window,
+        qtbot,
+        "document.querySelector('[data-iq-action=redo]').click();"
+        "document.querySelector('[data-iq-action=save]').click();true",
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "sent.at(-1).action==='quant_edit'"
+        " && sent.at(-1).payload.baselineStart===3 && sent.at(-1).payload.id==='protein-a'",
     )
     javascript(window, qtbot, "setState({quant:{group:{rows:[{rowId:'other',lanes:[]}]}}});true")
     assert javascript(
         window,
         qtbot,
-        "!document.querySelector('.intake-profile-grid polyline') && "
-        "document.querySelector('.intake-profile-panel').textContent.includes('等待')",
+        "!document.querySelector('.intake-profile-panel .quant-curve')"
+        " && document.querySelector('.intake-profile-panel').textContent.includes('等待')",
     )
 
 
@@ -606,7 +638,7 @@ def test_intake_fig_routes_preserve_saved_preview_results_and_source_identity(
         window, qtbot, "!document.querySelector('[data-edit-row=protein-b]').disabled"
     )
     javascript(window, qtbot, "document.querySelector('[data-edit-row=protein-b]').click();true")
-    assert javascript(window, qtbot, "mode==='review'&&state.selectedId==='protein-b'")
+    assert javascript(window, qtbot, "mode==='layout'&&state.selectedId==='protein-b'")
     javascript(window, qtbot, "switchMode('results');true")
     bridge_snapshot(window, qtbot, "({...state,status:'记录保持'})")
     assert javascript(window, qtbot, "mode==='results'")
@@ -683,7 +715,8 @@ def test_intake_fig_routes_preserve_saved_preview_results_and_source_identity(
     javascript(
         window,
         qtbot,
-        "switchMode('results');document.querySelector('[data-intake-crop-action=previous-results]').click();true",
+        "switchMode('results');"
+        "document.querySelector('[data-intake-crop-action=previous-results]').click();true",
     )
     assert javascript(window, qtbot, "document.querySelectorAll('#results-body tr').length") == 200
 
@@ -1596,8 +1629,8 @@ def test_manual_browsing_keeps_page_and_selection_until_follow_is_requested(
         w,
         qtbot,
         """
-      document.querySelector('[data-row=protein-b]').focus();
-      document.querySelector('[data-row=protein-b]').click();
+      document.querySelector('[data-ig-row=protein-b]').focus();
+      document.querySelector('[data-ig-row=protein-b]').click();
       setState({intake:{...state.intake,automation:{...state.intake.automation,
         phase:'measure',targetId:'fig-a'}}});true
     """,
@@ -1606,7 +1639,7 @@ def test_manual_browsing_keeps_page_and_selection_until_follow_is_requested(
         w,
         qtbot,
         "mode==='layout' && row().id==='protein-b' && "
-        "document.activeElement.dataset.row==='protein-b'",
+        "document.activeElement.dataset.igRow==='protein-b'",
     )
     javascript(w, qtbot, "document.querySelector('[data-batch-action=follow]').click();true")
     assert javascript(w, qtbot, "mode==='quant'")
@@ -1781,3 +1814,42 @@ def test_narrow_measurement_details_are_visible_and_stable(
     assert javascript(
         window, qtbot, "detailsButton.isConnected && document.activeElement===detailsButton"
     )
+
+
+def test_grid_draft_order_save_and_missing_export(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        """
+      setState({intake:{...state.intake,confirmed:true,figureEnabled:true,cropEnabled:true,
+        outputEnabled:true,displayFigureId:'fig-a',grid:{columns:2,gap:40,order:[]},
+        figures:[{figure_id:'fig-a',label:'A',lane_count:6},
+                 {figure_id:'fig-b',label:'B',lane_count:6}],
+        figuresReady:[{figure_id:'fig-a',row_ids:['protein-a','protein-b']}],
+        workflow:{digest:'grid-guard',editing:false,steps:[]}}});
+      switchMode('layout');true
+    """,
+    )
+    assert javascript(window, qtbot, "document.querySelector('[data-ig-export=all]').disabled")
+    javascript(
+        window,
+        qtbot,
+        """
+      const field=document.querySelector('[data-ig-field=columns]');field.value='1';
+      field.dispatchEvent(new Event('change',{bubbles:true}));
+      document.querySelector('[data-ig-down="0"]').click();
+      document.querySelector('[data-ig-save]').click();true
+    """,
+    )
+    raw = javascript(window, qtbot, "JSON.stringify(sent.at(-1))")
+    assert isinstance(raw, str)
+    request = json.loads(raw)
+    assert request["action"] == "intake_grid_save"
+    assert request["payload"]["grid"] == {"columns": 1, "gap": 40, "order": ["fig-b", "fig-a"]}
+    assert request["payload"]["workflowDigest"] == "grid-guard"
+    assert javascript(window, qtbot, "mode==='layout'&&intakeGrid.hasDraft()")
+    javascript(window, qtbot, "intakeGrid.reset();true")
+    assert javascript(window, qtbot, "!intakeGrid.hasDraft()")

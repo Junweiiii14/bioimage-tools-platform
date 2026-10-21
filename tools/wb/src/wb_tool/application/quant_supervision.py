@@ -114,6 +114,7 @@ def update_quant_lane(
                                 for note in b.detection_notes
                                 if not (bounds is not None or baseline is not None)
                                 or not note.startswith("boundary_review:")
+                                or note == "boundary_review:local_signal_ambiguity"
                             ),
                             "manually_adjusted",
                         )

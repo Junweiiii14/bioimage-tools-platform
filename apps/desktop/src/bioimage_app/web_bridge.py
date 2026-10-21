@@ -193,6 +193,13 @@ class WorkbenchBridge(QObject):
                         )
                     intake["zoom"] = {"sourceId": source_id, "preview": self._intake_zoom}
             intake["issues"] = list(self.host.intake.issues)
+            from wb_tool.api import IntakeGrid, WBIntakeGridProject
+
+            intake["grid"] = (
+                project.grid
+                if isinstance(project, WBIntakeGridProject)
+                else IntakeGrid(columns=min(3, max(1, len(project.intake.figures))))
+            ).model_dump(mode="json")
             intake["outputParent"] = self.host.intake_workflow.output_parent(project)
             intake["automation"] = self.host.intake_workflow.batch_snapshot(project)
             if (
@@ -282,6 +289,8 @@ class WorkbenchBridge(QObject):
             ):
                 if intake_preview and intake is not None:
                     intake["displayFigureId"] = binding.get("figure_id")
+                if intake is not None and manifest.get("aggregate"):
+                    intake["displayFigureId"] = "__all__"
                 montage = self._montage
                 montage_width, montage_height = rendered.width, rendered.height
                 for item in manifest.get("rows", []):
@@ -516,6 +525,7 @@ class WorkbenchBridge(QObject):
                 262144
                 if action
                 in {
+                    "intake_grid_save",
                     "intake_plan",
                     "intake_assign",
                     "intake_grouping",
@@ -543,6 +553,11 @@ class WorkbenchBridge(QObject):
             ):
                 raise ValueError("当前任务仍在处理中，请稍候或取消")
             elif isinstance(self.host.view.project(), WBIntakeProject) and action not in {
+                "quant_edit",
+                "intake_grid_save",
+                "intake_grid_preview",
+                "intake_grid_export",
+                "intake_single_export",
                 "intake_sequence_start",
                 "intake_choose_output",
                 "intake_grouping",
@@ -570,6 +585,15 @@ class WorkbenchBridge(QObject):
                 "retry_location",
             }:
                 raise ValueError("仪器清单项目请使用阶段执行、原图复核和已保存Fig入口")
+            elif action in {
+                "intake_grid_save",
+                "intake_grid_preview",
+                "intake_grid_export",
+                "intake_single_export",
+            }:
+                from bioimage_app.web_intake_supervision import apply_supervision
+
+                apply_supervision(self, action, data)
             elif action in {
                 "intake_sequence_start",
                 "intake_choose_output",
@@ -1000,6 +1024,38 @@ class WorkbenchBridge(QObject):
                 baseline = Baseline(float(cast(float, raw[0])), float(cast(float, raw[1])))
         else:
             raise ValueError("缺少泳道范围或积分边界")
+        if isinstance(project, WBIntakeFigureProject):
+            from wb_tool.api import intake_workflow_digest, revise_intake_quant
+
+            if roi is not None or bounds is None or baseline is None:
+                raise ValueError("批处理曲线仅调整积分边界与封底；裁剪请使用明确入口")
+            updated_batch = revise_intake_quant(
+                project,
+                row.row_id,
+                annotation.roi.lane_id,
+                band_id=band_id,
+                bounds=bounds,
+                baseline=baseline,
+            )
+            generation, epoch = self.host.view.generation, self.session_epoch
+            self.host.save(
+                transform=lambda saved: type(updated_batch).model_validate(
+                    {
+                        **dict(updated_batch),
+                        "revision": saved.revision,
+                    }
+                ),
+                install_guard=lambda: (
+                    self.host.view.generation == generation
+                    and self.session_epoch == epoch
+                    and not self.host.is_closing
+                    and not self.host.cancellation.is_set()
+                ),
+                after=lambda: self.host.intake_workflow.start(
+                    intake_workflow_digest(cast(WBIntakeFigureProject, self.host.view.project()))
+                ),
+            )
+            return
         updated = update_quant_lane(
             project,
             row.row_id,

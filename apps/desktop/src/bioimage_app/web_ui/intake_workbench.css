@@ -194,3 +194,9 @@
 @media (prefers-reduced-motion: reduce) {
   .intake-project *, .intake-project *::before, .intake-project *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+.intake-quant-lane { padding: 12px 0; border-bottom: 1px solid var(--line, #dce3df); }
+.intake-quant-lane .quant-chart { display: block; width: 100%; min-height: 196px; }
+.intake-grid-order { padding-left: 20px; }
+.intake-grid-order li { display: flex; align-items: center; gap: 8px; }
+.intake-grid-order li span { flex: 1; }

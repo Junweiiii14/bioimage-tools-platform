@@ -80,10 +80,13 @@ class WebWorkbenchWindow(QMainWindow):
             "wb-fig-sequence-test",
             "wb-automatic-flow-test",
             "wb-reliable-crop-test",
+            "wb-supervision-test",
         }
         self.setWindowTitle("BioImage WB · 候选版" if candidate else "BioImage · WB 工作台")
         if channel == "wb-reliable-crop-test":
             self.setWindowTitle("BioImage WB · 可靠裁图与界面测试版 T073")
+        if channel == "wb-supervision-test":
+            self.setWindowTitle("BioImage WB · 曲线与整版拼图测试版 T074")
         self.setWindowIcon(QIcon(str(Path(__file__).with_name("web_ui") / "bioimage.svg")))
         self.resize(1440, 940)
         settings_name = {
@@ -94,6 +97,7 @@ class WebWorkbenchWindow(QMainWindow):
             "wb-fig-sequence-test": "FigSequenceTest",
             "wb-automatic-flow-test": "AutomaticFlowTest",
             "wb-reliable-crop-test": "ReliableCropTest",
+            "wb-supervision-test": "SupervisionTest",
         }.get(channel or "", "Platform")
         self.settings = settings or QSettings("BioImageTools", settings_name)
         self.shortcuts = WorkbenchShortcuts(self.settings)

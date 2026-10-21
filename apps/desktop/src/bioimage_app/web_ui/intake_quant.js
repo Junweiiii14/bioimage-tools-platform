@@ -1,0 +1,102 @@
+'use strict';
+
+// Drafts remain bound to project/session/source/row/lane/band, never to list position.
+window.intakeQuant = (() => {
+  const drafts = new Map();
+  let selected = null, drag = null;
+  const fields = ['start', 'end', 'baselineStart', 'baselineEnd'];
+  const values = band => Object.fromEntries(fields.map(k => [k, band?.[k]]));
+  const key = (lane, band) => [state.projectId,state.sessionEpoch,row()?.id,row()?.sourceId,lane.lane,band.id].join(':');
+  function entry(lane, band) {
+    const id=key(lane,band), actual=values(band);
+    let item=drafts.get(id);
+    if(item?.submitted && !state.busy && quantData()?.status==='ready' && fields.every(k=>actual[k]===item.value[k])) {
+      drafts.delete(id); item=null;
+    }
+    return {id,item,actual};
+  }
+  function selection() {
+    const cached=[...drafts.values()].find(i=>i.project===state.projectId&&i.epoch===state.sessionEpoch&&i.rowId===row()?.id&&i.lane.lane===selected);
+    const lane=quantData()?.lanes?.find(l=>l.lane===selected)||cached?.lane, band=lane?.bands?.[0];
+    if(!lane||!band)return null;
+    const result=entry(lane,band);
+    return {lane:lane.profile?.length?lane:result.item?.lane||lane,band,...result};
+  }
+  function change(next) {
+    const s=selection();if(!s||state.busy)return;
+    const item=s.item||{value:s.actual,undo:[],redo:[],revision:quantData().revision,lane:structuredClone(s.lane),rowId:row().id,project:state.projectId,epoch:state.sessionEpoch};
+    item.undo.push({...item.value}); item.redo=[];item.value={...item.value,...next};item.submitted=false;
+    drafts.set(s.id,item);
+  }
+  function markup(lanes, protein) {
+    const current=quantData();
+    if(!protein||current?.rowId!==protein.protein_id)return '<section class="intake-profile-panel"><p>等待所选蛋白的已提交曲线…</p></section>';
+    lanes=[...lanes];
+    for(const item of drafts.values())if(item.project===state.projectId&&item.epoch===state.sessionEpoch&&item.rowId===protein.protein_id&&!lanes.some(l=>l.lane===item.lane.lane))lanes.push(item.lane);
+    const chosen=lanes.find(l=>l.lane===selected);
+    const visible=chosen?[chosen]:lanes;
+    const body=visible.map(lane=>{
+      const band=lane.bands?.[0];if(!band)return '';
+      const {item,actual}=entry(lane,band), effective={...band,...(item?.value||actual)};
+      const editable=!!chosen;
+      return `<section class="intake-quant-lane"><button class="text-button" data-iq-lane="${lane.lane}">泳道 ${lane.lane}${editable?'':' · 放大调整'}</button>${manualQuant.chart({...lane,bands:[effective]},effective,editable).replaceAll('data-quant-point','data-iq-point')}
+      ${editable?`<div class="quant-fields">${fields.map(k=>`<label class="quant-field">${({start:'积分起点 y',end:'积分终点 y',baselineStart:'起点封底',baselineEnd:'终点封底'})[k]}<input type="number" data-iq-field="${k}" value="${effective[k]??''}" step="${k.startsWith('baseline')?'.1':'1'}" ${state.busy?'disabled':''}></label>`).join('')}</div>
+      <div class="intake-stage-actions"><button class="button subtle" data-iq-action="undo" ${!item?.undo.length||state.busy?'disabled':''}>撤销</button><button class="button subtle" data-iq-action="redo" ${!item?.redo.length||state.busy?'disabled':''}>重做</button><button class="button subtle" data-iq-action="discard" ${!item||state.busy?'disabled':''}>放弃调整</button><button class="button primary" data-iq-action="save" ${!item||state.busy||!bridge?'disabled':''}>保存并重算</button></div><p role="status">${item?'调整草稿尚未完成重算；当前结果不代表此草稿。':'已提交曲线；坐标为泳道内原像素位置。'}</p>`:''}
+      ${qualityContent([{reason:band.reason,label:'泳道 '+lane.lane}])}</section>`;
+    }).join('');
+    return `<section class="intake-profile-panel"><header><strong>${escapeText(protein.label)} · 灰度峰与封底</strong><button class="text-button" data-iq-action="all">全部泳道</button></header>${body||'<p>等待已提交的原像素曲线。</p>'}</section>`;
+  }
+  const refresh=()=>window.intakeWorkspace.renderActive();
+  document.addEventListener('click',event=>{
+    const lane=event.target.closest('[data-iq-lane]');
+    if(lane){selected=Number(lane.dataset.iqLane);refresh();return;}
+    const action=event.target.closest('[data-iq-action]')?.dataset.iqAction;
+    if(!action)return;
+    if(action==='all'){selected=null;refresh();return;}
+    const s=selection();if(!s?.item||state.busy)return;
+    const item=s.item;
+    if(action==='discard')drafts.delete(s.id);
+    if(action==='undo'&&item.undo.length){item.redo.push(item.value);item.value=item.undo.pop();}
+    if(action==='redo'&&item.redo.length){item.undo.push(item.value);item.value=item.redo.pop();}
+    if(action==='save'){
+      const v=item.value;
+      if(fields.some(k=>!Number.isFinite(v[k]))||!Number.isInteger(v.start)||!Number.isInteger(v.end)||v.start<0||v.start>=v.end||v.end>=s.lane.profile.length||v.baselineStart<0||v.baselineEnd<0)return toast('请使用泳道内的整数积分边界和非负有限封底。');
+      if(item.revision!==quantData().revision && !item.submitted)return toast('参数已变化，请放弃旧调整后重新核对。');
+      item.submitted=true;
+      send('quant_edit',{...quantIdentity(),lane:s.lane.lane,bandId:s.band.id,...v});
+    }
+    refresh();
+  });
+  document.addEventListener('change',event=>{
+    const input=event.target;if(!input.matches('[data-iq-field]'))return;
+    if(input.value===''||!Number.isFinite(Number(input.value)))return toast('请输入有效数值');
+    change({[input.dataset.iqField]:Number(input.value)});refresh();
+  });
+  document.addEventListener('pointerdown',event=>{
+    const point=event.target.closest('[data-iq-point]'),s=selection();
+    if(!point||!s||state.busy||!bridge)return;
+    event.preventDefault();
+    const band={...s.band,...(s.item?.value||s.actual)};
+    drag={id:s.id,key:point.dataset.iqPoint,rect:point.closest('svg').getBoundingClientRect(),g:profileGeometry(s.lane,band),band};
+    point.setPointerCapture(event.pointerId);
+  });
+  document.addEventListener('pointerup',event=>{
+    if(!drag)return;const d=drag;drag=null;
+    const s=selection();if(!s||s.id!==d.id||state.busy)return;
+    const x=(event.clientX-d.rect.left)/d.rect.width*680,y=(event.clientY-d.rect.top)/d.rect.height*196;
+    let value=d.key.startsWith('baseline')?Math.max(0,d.g.min+(156-y)/128*d.g.span):Math.round((x-44)/612*(s.lane.profile.length-1));
+    if(d.key==='start')value=Math.max(0,Math.min(d.band.end-1,value));
+    if(d.key==='end')value=Math.max(d.band.start+1,Math.min(s.lane.profile.length-1,value));
+    change({[d.key]:value});refresh();
+  });
+  document.addEventListener('pointercancel',()=>{drag=null;});
+  document.addEventListener('keydown',event=>{
+    const point=event.target.closest('[data-iq-point]'),s=selection();
+    if(!point||!s||event.isComposing||state.busy||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key))return;
+    event.preventDefault();const k=point.dataset.iqPoint,v=s.item?.value||s.actual;
+    let value=v[k]+(['ArrowLeft','ArrowDown'].includes(event.key)?-1:1)*(event.shiftKey?10:1);
+    value=k==='start'?Math.max(0,Math.min(v.end-1,value)):k==='end'?Math.max(v.start+1,Math.min(s.lane.profile.length-1,value)):Math.max(0,value);
+    change({[k]:value});refresh();document.querySelector(`[data-iq-point="${k}"]`)?.focus();
+  });
+  return {markup,hasDraft:()=>drafts.size>0,reset:()=>{drafts.clear();selected=null;drag=null;}};
+})();

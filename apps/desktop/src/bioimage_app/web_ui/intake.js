@@ -55,7 +55,7 @@ window.intakeWorkspace = (() => {
   });
   const planText = value => JSON.stringify(copyPlan(value));
   const planDirty = () => !!draft && planText(draft) !== basePlan;
-  const hasDraft = () => window.intakeGroups.hasDraft() || discoveryDirty || planDirty() || batch.length > 0 || cropDrafts.size > 0;
+  const hasDraft = () => window.intakeGrid.hasDraft() || window.intakeQuant.hasDraft() || window.intakeGroups.hasDraft() || discoveryDirty || planDirty() || batch.length > 0 || cropDrafts.size > 0;
   const guard = () => ({projectId: state.projectId, sessionEpoch: state.sessionEpoch, digest: baseDigest});
   const uid = () => crypto.randomUUID();
   const source = id => state.intake?.sources.find(item => item.source_id === id);
@@ -71,7 +71,7 @@ window.intakeWorkspace = (() => {
     if(root.contains(resultStage))resultParent.append(resultStage);
     previewRequested='';
     followed = '';browsing = false;composing = false;progress.hidden = true;
-    window.intakeGroups.reset();
+    window.intakeGroups.reset();window.intakeQuant.reset();window.intakeGrid.reset();
     discoveryKey = ''; discoveryDirty = false; discoveryChoices.clear();
     cropDrafts.clear(); cropPending.clear();
     cropSavedRow = null;
@@ -380,6 +380,12 @@ window.intakeWorkspace = (() => {
   }
   function renderSourceList() {
     if(!state.intake?.cropEnabled)return false;
+    if(mode==='layout'){
+      const list=$('#source-list'),focused=list.contains(document.activeElement)?document.activeElement:null;
+      const attr=focused?.hasAttribute('data-ig-row')?'data-ig-row':'data-ig-view',id=focused?.getAttribute(attr);
+      updateMarkup(list,window.intakeGrid.sidebar());$('#source-count').textContent=state.intake.figures.length;
+      if(id)list.querySelector(`[${attr}="${CSS.escape(id)}"]`)?.focus({preventScroll:true});return true;
+    }
     const list=$('#source-list'),focused=list.contains(document.activeElement)?document.activeElement.dataset.row:null;
     const query=$('#source-search').value.trim().toLocaleLowerCase();
     $('.source-panel').classList.remove('quant-sources');
@@ -495,7 +501,15 @@ window.intakeWorkspace = (() => {
     paintedMarkup.set($('#drawer-content'),$('.intake-measure-inspector').innerHTML);
     $('#drawer').dataset.intakeView='measurement';return true;
   }
+  function chooseFigure(id) {
+    chosenFigureId=id;noteBrowse();
+    if(mode!=='layout')switchMode('layout');else requestFigure();
+  }
   function requestFigure() {
+    if(chosenFigureId==='__all__'){
+      if(!state.busy)send('intake_grid_preview',cropGuard());
+      return;
+    }
     const figures=state.intake?.figuresReady||[];
     const selected=figures.find(f=>f.figure_id===chosenFigureId)||figures.find(f=>f.row_ids.includes(row()?.id))||figures[0];
     if(selected&&!state.busy)send('intake_view_figure',{...cropGuard(),figureId:selected.figure_id});
@@ -508,8 +522,9 @@ window.intakeWorkspace = (() => {
     $('#inspector-title').textContent=mode==='layout'?'已保存的 Fig':'原像素测量记录';
     $('#review-badge').textContent=mode==='layout'?(state.montage?'显示成图':'等待成图'):'数值与状态分列';
     $('#review-badge').className='status-badge';
-    $('#inspector-content').innerHTML=mode==='layout'?`<section class="inspect-section"><h3>${escapeText(fig?.label||'选择已完成的 Fig')}</h3><p>完整 Fig 已保存；点击蛋白行查看原图。</p><div class="intake-source-links">${members.map(p=>`<button class="text-button full" data-intake-crop-action="source" data-id="${escapeText(p.protein_id)}" ${state.busy?'disabled':''}>${escapeText(targetName(p.protein_id))}</button>`).join('')}</div></section><section class="inspect-section"><h3>其他已保存成图</h3><div class="intake-source-links">${(state.intake.figuresReady||[]).map(f=>`<button class="text-button full" data-intake-crop-action="figure" data-id="${escapeText(f.figure_id)}" ${state.busy?'disabled':''}>${escapeText(state.intake.figures.find(x=>x.figure_id===f.figure_id)?.label||f.figure_id)}</button>`).join('')||'<p>完整 Fig 原值裁剪完成后，继续处理即可成图。</p>'}</div></section>`:`<section class="inspect-section"><h3>结果与原图一一对应</h3><p>按 Fig、蛋白和泳道查看数值与状态。</p><details><summary>数值与状态说明</summary><p>未检测、失败或未计算保留为空；待复核积分与有效信号分列。运行完成不表示科学准确率已验收。</p></details></section>`;
+    $('#inspector-content').innerHTML=mode==='layout'?`<section class="inspect-section"><h3>${escapeText(state.intake.displayFigureId==='__all__'?'全部 Fig 总图':fig?.label||'选择已完成的 Fig')}</h3><p>完整 Fig 已保存；选择蛋白行可定位；修改裁剪使用下方明确入口。</p><div class="intake-source-links">${members.map(p=>`<button class="text-button full" data-intake-crop-action="source" data-id="${escapeText(p.protein_id)}" ${state.busy?'disabled':''}>修改裁剪：${escapeText(targetName(p.protein_id))}</button>`).join('')}</div></section><section class="inspect-section"><h3>其他已保存成图</h3><div class="intake-source-links">${(state.intake.figuresReady||[]).map(f=>`<button class="text-button full" data-intake-crop-action="figure" data-id="${escapeText(f.figure_id)}" ${state.busy?'disabled':''}>${escapeText(state.intake.figures.find(x=>x.figure_id===f.figure_id)?.label||f.figure_id)}</button>`).join('')||'<p>完整 Fig 原值裁剪完成后，继续处理即可成图。</p>'}</div></section>`:`<section class="inspect-section"><h3>结果与原图一一对应</h3><p>按 Fig、蛋白和泳道查看数值与状态。</p><details><summary>数值与状态说明</summary><p>未检测、失败或未计算保留为空；待复核积分与有效信号分列。运行完成不表示科学准确率已验收。</p></details></section>`;
     $('#inspector-action').innerHTML=`${mode==='layout'?'<button class="button primary full" data-intake-crop-action="results">查看测量记录</button>':''}<button class="button subtle full" data-intake-crop-action="back">返回阶段与异常</button>`;
+    if(mode==='layout')$('#inspector-content').insertAdjacentHTML('beforeend',window.intakeGrid.inspector());
     $('#inspector-content').insertAdjacentHTML('beforeend',outputInfo());
     return true;
   }
@@ -823,5 +838,5 @@ window.intakeWorkspace = (() => {
       cropDrafts.delete(r.id); cropPending.delete(r.id); syncCrops(); render();
     }
   });
-  return {sync, updateChrome, renderActive, hasDraft, reset, stageCrop, undoCrop, renderCropInspector, cropEditable, allowedModes, requestFigure, renderFigureInspector, renderIntakeResults, followBatch, noteBrowse, renderSourceList, inspectMeasurement, syncInspectorDrawer};
+  return {chooseFigure, sync, updateChrome, renderActive, hasDraft, reset, stageCrop, undoCrop, renderCropInspector, cropEditable, allowedModes, requestFigure, renderFigureInspector, renderIntakeResults, followBatch, noteBrowse, renderSourceList, inspectMeasurement, syncInspectorDrawer};
 })();

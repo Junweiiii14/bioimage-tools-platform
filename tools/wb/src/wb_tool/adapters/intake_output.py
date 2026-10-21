@@ -297,6 +297,23 @@ def export_intake_outputs(
                 except (KeyError, OSError, ValueError) as error:
                     check()
                     errors.append(f"蛋白行{row.row_id}：{error}")
+        try:
+            from wb_tool.adapters.intake_grid import render_intake_grid
+
+            aggregate = render_intake_grid(project, frozen_sources, cancelled=cancelled)
+            for suffix in (".png", ".tiff"):
+                publish_rendered_image(
+                    aggregate,
+                    project.template.dpi,
+                    str(stage / ("all-figures" + suffix)),
+                    cancelled=cancelled,
+                )
+            (stage / "all-figures-layout.json").write_text(
+                aggregate.manifest_json, encoding="utf-8"
+            )
+        except (OSError, ValueError) as error:
+            check()
+            errors.append(f"全部Fig总图：{error}")
         if all(asset.sha256 in frozen_paths for asset in project_assets(project)):
             try:
                 export_figure_bundle(

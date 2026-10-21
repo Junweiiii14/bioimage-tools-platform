@@ -42,6 +42,9 @@ def main() -> int:
         help="Build the isolated automatic crop/gray/results test distribution",
     )
     profiles.add_argument(
+        "--supervision-test", action="store_true", help="Build T074 supervision test"
+    )
+    profiles.add_argument(
         "--reliable-crop-test",
         action="store_true",
         help="Build the isolated fixed-grid crop and redesigned workbench test distribution",
@@ -123,7 +126,9 @@ def main() -> int:
     for library in redistributables:
         shutil.copyfile(library, runtime / library.name)
     distribution = (
-        "windows_reliable_crop_test"
+        "windows_supervision_test"
+        if args.supervision_test
+        else "windows_reliable_crop_test"
         if args.reliable_crop_test
         else "windows_automatic_flow_test"
         if args.automatic_flow_test
@@ -136,7 +141,9 @@ def main() -> int:
         else "windows_test"
     )
     channel = (
-        "wb-reliable-crop-test"
+        "wb-supervision-test"
+        if args.supervision_test
+        else "wb-reliable-crop-test"
         if args.reliable_crop_test
         else "wb-automatic-flow-test"
         if args.automatic_flow_test
@@ -220,6 +227,14 @@ def main() -> int:
             distribution_id="BioImageTools.WB.E7Test",
             release_channel="wb-execution-test",
             settings_namespace="E7Test",
+            acceptance="candidate-only; clean Win10/DPI/scientific holdout pending",
+        )
+    elif args.supervision_test:
+        manifest.update(
+            schema=2,
+            distribution_id="BioImageTools.WB.SupervisionTest",
+            release_channel=channel,
+            settings_namespace="SupervisionTest",
             acceptance="candidate-only; clean Win10/DPI/scientific holdout pending",
         )
     elif args.reliable_crop_test:

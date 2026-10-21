@@ -166,6 +166,12 @@ from wb_tool.application.intake_revision import (
     revise_intake_grouping,
 )
 from wb_tool.application.intake_sequence import continue_intake_sequence, prepare_intake_sequence
+from wb_tool.application.intake_supervision import (
+    IntakeGrid,
+    WBIntakeGridProject,
+    revise_intake_grid,
+    revise_intake_quant,
+)
 from wb_tool.application.intake_workflow import (
     IntakeWorkflowLedger,
     IntakeWorkflowStep,
@@ -325,6 +331,10 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "IntakeGrid",
+    "WBIntakeGridProject",
+    "revise_intake_grid",
+    "revise_intake_quant",
     "begin_intake_group_revision",
     "confirm_intake_group_revision",
     "revise_intake_grouping",
