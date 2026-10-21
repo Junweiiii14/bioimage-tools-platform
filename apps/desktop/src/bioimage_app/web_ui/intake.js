@@ -846,5 +846,5 @@ window.intakeWorkspace = (() => {
       cropDrafts.delete(r.id); cropPending.delete(r.id); syncCrops(); render();
     }
   });
-  return {layoutState,chooseFigure, sync, updateChrome, renderActive, hasDraft, reset, stageCrop, undoCrop, renderCropInspector, cropEditable, allowedModes, requestFigure, renderFigureInspector, renderIntakeResults, followBatch, noteBrowse, renderSourceList, inspectMeasurement, syncInspectorDrawer};
+  return {expectFigure:id=>{chosenFigureId=id;noteBrowse();},layoutState,chooseFigure, sync, updateChrome, renderActive, hasDraft, reset, stageCrop, undoCrop, renderCropInspector, cropEditable, allowedModes, requestFigure, renderFigureInspector, renderIntakeResults, followBatch, noteBrowse, renderSourceList, inspectMeasurement, syncInspectorDrawer};
 })();

@@ -129,7 +129,10 @@ def test_batch_baseline_edit_matches_independent_request_without_touching_pixels
     assert replace(actual.request, lanes=plan.request.lanes) == plan.request
 
 
-def test_grid_order_survives_regrouping_with_changed_fig_ids(tmp_path: Path) -> None:
+@pytest.mark.parametrize("empty_draft", [False, True])
+def test_grid_order_survives_regrouping_with_changed_fig_ids(
+    tmp_path: Path, empty_draft: bool
+) -> None:
     from wb_tool.api import begin_intake_group_revision, intake_digest, revise_intake_grouping
 
     from tools.wb.tests.test_intake_group_revision import grouped_full
@@ -151,9 +154,15 @@ def test_grid_order_survives_regrouping_with_changed_fig_ids(tmp_path: Path) -> 
             ),
         }
     )
+    if empty_draft:
+        changed = grouping.model_copy(
+            update={
+                "groups": tuple(g.model_copy(update={"figure_id": "b"}) for g in grouping.groups)
+            }
+        )
     result = revise_intake_grouping(editing, changed, expected_digest=intake_digest(editing))
     assert isinstance(result, WBIntakeGridProject)
-    assert result.grid.order == ("b", "c")
+    assert result.grid.order == (("b",) if empty_draft else ("b", "c"))
     assert result.grid.columns == 1
     assert grid.grid.order == ("b", "a")
 

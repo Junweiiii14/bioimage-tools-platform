@@ -33,7 +33,7 @@ window.intakeGrid = (() => {
     if(protein){select(protein.dataset.igRow);window.intakeWorkspace.chooseFigure(protein.dataset.igFigure);return;}
     const up=event.target.closest('[data-ig-up]'),down=event.target.closest('[data-ig-down]');
     if((up||down)&&!state.busy){draft=config();const i=Number(up?.dataset.igUp??down.dataset.igDown),j=i+(up?-1:1);if(j>=0&&j<draft.order.length)[draft.order[i],draft.order[j]]=[draft.order[j],draft.order[i]];window.intakeWorkspace.renderFigureInspector();}
-    if(event.target.closest('[data-ig-save]')&&!state.busy&&draft)send('intake_grid_save',{...guard(),grid:draft});
+    if(event.target.closest('[data-ig-save]')&&!state.busy&&draft){window.intakeWorkspace.expectFigure('__all__');send('intake_grid_save',{...guard(),grid:draft});}
     const exp=event.target.closest('[data-ig-export]');
     if(exp&&!exp.disabled&&!state.busy)send(exp.dataset.igExport==='all'?'intake_grid_export':'intake_single_export',{...guard(),figureId:exp.dataset.igExport==='single'?state.intake.displayFigureId:undefined});
   });
