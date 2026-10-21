@@ -174,5 +174,18 @@ class SupervisionCheck:
                     image.thumbnail((2048, 2048), Image.Resampling.LANCZOS)
                     if image.size != self.size or image.convert("RGB").tobytes() != self.preview:
                         raise ValueError("Export pixels differ from the visible grid")
-            return True
+            # Native reopen must follow the page's current draft/position acknowledgement,
+            # rather than a possibly stale 500 ms heartbeat from before grid save.
+            self.action(
+                """if(desktopSession.hasDraft())return false;
+              const r=row();window.supervisionPositionAck=false;
+              bridge.session('position',JSON.stringify({projectId:state.projectId,mode,
+                rowId:r?.id||'',figure:r?.fig||'',lane:quantLane,name:state.projectName,
+                draft:desktopSession.hasDraft()}),()=>{window.supervisionPositionAck=true;})""",
+                "position-ack",
+            )
+        elif self.stage == "position-ack":
+            if self.result is True:
+                return True
+            self.js("window.supervisionPositionAck===true")
         return False

@@ -117,6 +117,7 @@ def verify_sequence_installation(
         output_digest = ""
         run_ids: tuple[str, ...] = ()
         observed_status = ""
+        observed_shutdown = ""
         required = {
             "top-fields-one-start",
             "whole-batch-pause",
@@ -161,6 +162,7 @@ def verify_sequence_installation(
                     else "fig_sequence_installed@1",
                     "phase": phase,
                     "failed_phase": failed_phase,
+                    "shutdown_stage": observed_shutdown,
                     "checks": checks,
                     "errors": errors,
                     "elapsed": time.monotonic() - started,
@@ -268,9 +270,10 @@ def verify_sequence_installation(
 
         def poll() -> None:
             nonlocal phase, failed_phase, workspace, epoch, output, output_digest, run_ids
-            nonlocal modes, worker_pids, js_value, observed_status
+            nonlocal modes, worker_pids, js_value, observed_status, observed_shutdown
             nonlocal review_submitted
             try:
+                observed_shutdown = window.shutdown_stage
                 elapsed = time.monotonic() - started
                 if elapsed > 150:
                     errors.append("Owned diagnostic shutdown exceeded 150 seconds")
@@ -302,6 +305,10 @@ def verify_sequence_installation(
                         phase = "dispose"
                         window.deleteLater()
                     return
+                if phase == "reopen" and window.shutdown_stage.startswith("confirm_"):
+                    raise ValueError(
+                        "Reopen requested a transition confirmation: " + window.shutdown_stage
+                    )
                 if pending_js or window.shutdown_stage != "idle" or window.host.operation_busy:
                     return
                 project = window.host.view.project()
