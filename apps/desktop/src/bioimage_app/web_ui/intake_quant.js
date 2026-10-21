@@ -35,6 +35,10 @@ window.intakeQuant = (() => {
     const current=quantData();
     if(!protein||current?.rowId!==protein.protein_id)return '<section class="intake-profile-panel"><p>等待所选蛋白的已提交曲线…</p></section>';
     lanes=[...lanes];
+    for(const lane of current.lanes||[]){
+      const band=lane.bands?.[0];
+      if(band&&entry(lane,band).item&&!lanes.some(l=>l.lane===lane.lane))lanes.push(lane);
+    }
     const applicable=new Set(lanes.flatMap(l=>l.bands?.[0]&&entry(l,l.bands[0]).item?[entry(l,l.bands[0]).id]:[]));
     const stale=[...drafts].filter(([id,item])=>item.project===state.projectId&&item.epoch===state.sessionEpoch&&item.rowId===protein.protein_id&&!applicable.has(id));
     const warning=stale.length?'<p role="status">有旧来源或旧范围的调整草稿，未应用到当前曲线。</p><button class="text-button" data-iq-action="discard-stale">丢弃过期草稿</button>':'';
