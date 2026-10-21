@@ -75,7 +75,10 @@ window.intakeQuant = (() => {
       const lanes=rows.find(r=>r.rowId===p.protein_id)?.lanes||[];
       return `<strong class="intake-curve-protein">${escapeText(p.label)}</strong>`+Array.from({length:n},(_,i)=>{
         const lane=lanes.find(l=>l.lane===i+1),band=lane?.bands?.[0];
-        if(!band||!lane.profile?.length||!lane.profile.every(Number.isFinite))return '<div class="intake-curve-missing">等待该泳道已提交曲线</div>';
+        if(!band||!lane.profile?.length||!lane.profile.every(Number.isFinite)){
+          const pending=[...drafts.values()].some(d=>d.project===state.projectId&&d.epoch===state.sessionEpoch&&d.rowId===p.protein_id&&d.lane?.lane===i+1);
+          return pending?`<button class="intake-curve-missing" data-iq-row="${escapeText(p.protein_id)}" data-iq-lane="${i+1}">暂无已提交曲线 · 处理草稿</button>`:'<div class="intake-curve-missing">等待该泳道已提交曲线</div>';
+        }
         return `<button class="intake-curve-card" data-iq-row="${escapeText(p.protein_id)}" data-iq-lane="${lane.lane}" aria-label="${escapeText(fig.label)} · 蛋白 ${escapeText(p.label)} · 泳道 ${lane.lane}，调整封底" aria-pressed="${p.protein_id===row()?.id&&lane.lane===selected}">${manualQuant.chart(lane,band,false)}<span>0–${lane.profile.length-1} y 像素${band.reason?' · 需复核':''}</span></button>`;
       }).join('');
     }).join('');
