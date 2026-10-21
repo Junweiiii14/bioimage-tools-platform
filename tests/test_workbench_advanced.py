@@ -168,6 +168,11 @@ def test_web_advanced_save_reopen_and_import_receipts(
     assert refreshed["revision"] == host.view.generation
     command("template_apply", {}, expected="failed", revision_delta=-1)
     assert "修订已改变" in replies[-1]["error"]
+    with monkeypatch.context() as patch:
+        patch.setattr(FigureProjectWindow, "operation_busy", property(lambda self: True))
+        command("open", {"section": "template"})
+        command("template_apply", {}, expected="failed")
+    assert "当前任务仍在处理中" in replies[-1]["error"]
 
 
 def test_actual_web_forms_save_reopen_and_export(

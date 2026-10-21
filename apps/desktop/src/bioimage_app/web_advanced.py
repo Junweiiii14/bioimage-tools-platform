@@ -237,8 +237,8 @@ class AdvancedCommands:
                 or (operation != "open" and data.get("revision") != host.view.generation)
             ):
                 raise ValueError("项目或修订已改变；编辑已保留，请刷新后核对。")
-            if host.operation_busy or host.is_closing:
-                raise ValueError("当前任务仍在处理中，请等待或取消。")
+            if host.is_closing:
+                raise ValueError("工作区正在关闭。")
             value = mapping(data.get("value", {}))
             if operation == "open":
                 section = text(value.get("section"), 32)
@@ -247,6 +247,8 @@ class AdvancedCommands:
                 self.section = section
                 self.emit(request, "done")
                 return
+            if host.operation_busy:
+                raise ValueError("当前任务仍在处理中，请等待或取消。")
             if not host.workspace_path:
                 raise ValueError("请先打开或创建项目。")
             if operation == "metadata_headers":
