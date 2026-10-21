@@ -1559,7 +1559,8 @@ def test_reliable_sequence_needs_no_crop_confirmations_and_shows_images_and_tabl
         lambda: (
             js(
                 "mode==='results' && "
-                "document.querySelector('.results-scroll table').checkVisibility()"
+                "document.querySelector('.results-scroll table').checkVisibility() && "
+                "document.querySelectorAll('#results-body tr').length===10"
             )
             is True
         ),

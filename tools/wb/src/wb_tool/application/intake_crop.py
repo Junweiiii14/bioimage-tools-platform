@@ -63,7 +63,9 @@ def automatic_intake_crop_allowed(evidence: "IntakeCropEvidence") -> bool:
     detection = evidence.detection
     if (
         detection is None
-        or detection.algorithm_id not in {"source_geometry@2", "instrument_guided_geometry@1"}
+        or detection.algorithm_id
+        not in {"source_signal_geometry@1", "instrument_guided_geometry@1"}
+        or "signal_orientation_fit@1" not in detection.flags
         or len(detection.candidates) != 1
         or evidence.selected_index != 0
         or evidence.geometry_policy != detection.algorithm_id
@@ -127,7 +129,10 @@ class IntakeCropEvidence(DocumentIO):
     raw_crop: AssetRef | None = None
     reason: str = Field(default="", max_length=2000)
     geometry_policy: Literal[
-        "source_geometry@2", "explicit_original_roi@1", "instrument_guided_geometry@1"
+        "source_geometry@2",
+        "explicit_original_roi@1",
+        "instrument_guided_geometry@1",
+        "source_signal_geometry@1",
     ] = "source_geometry@2"
 
     @property
@@ -307,9 +312,13 @@ def make_intake_crop_evidence(
         source_revision=project.revision,
         lane_count=row.lane_count,
         detection=detection,
-        geometry_policy="instrument_guided_geometry@1"
-        if detection.algorithm_id == "instrument_guided_geometry@1"
-        else "source_geometry@2",
+        geometry_policy="source_signal_geometry@1"
+        if detection.algorithm_id == "source_signal_geometry@1"
+        else (
+            "instrument_guided_geometry@1"
+            if detection.algorithm_id == "instrument_guided_geometry@1"
+            else "source_geometry@2"
+        ),
         selected_index=0 if located else None,
         crop=replace(candidate.roi, lane_id=row_id) if located and candidate else None,
         slots=slots,
@@ -412,11 +421,6 @@ def review_intake_crop(
                 for r in reset.rows
             ),
             "intake_crops": (*[e for e in project.intake_crops if e.row_id != row_id], evidence),
-            "layout_style": reset.layout_style.model_copy(
-                update={"display_policy": "standard_lane_ratio@1"}
-            )
-            if frame
-            else reset.layout_style,
             "composition": reset.composition.model_copy(
                 update={
                     "slices": tuple(
@@ -496,9 +500,6 @@ def accept_automatic_intake_crop(
             "intake_crops": tuple(
                 accepted if item.row_id == evidence.row_id else item
                 for item in recorded.intake_crops
-            ),
-            "layout_style": reset.layout_style.model_copy(
-                update={"display_policy": "standard_lane_ratio@1"}
             ),
             "composition": reset.composition.model_copy(
                 update={

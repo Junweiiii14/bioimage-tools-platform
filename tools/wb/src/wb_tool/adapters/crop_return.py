@@ -25,6 +25,7 @@ from wb_tool.application.laboratory_layout import (
     FigureColumn,
     FigureComposition,
     WBLayoutProject,
+    figure_uses_standard_display,
     initial_composition,
     plan_laboratory_layout,
     with_figure_layout,
@@ -71,6 +72,11 @@ def return_reviewed_crop(
     )
     subset = layout.model_copy(
         update={
+            "layout_style": layout.layout_style.model_copy(
+                update={"display_policy": "standard_lane_ratio@1"}
+            )
+            if figure_uses_standard_display(layout, row.figure)
+            else layout.layout_style,
             "rows": (row,),
             "figure_order": (row.figure,),
             "composition": FigureComposition(
@@ -114,7 +120,7 @@ def return_reviewed_crop(
                 original,
                 placed,
                 record,
-                resample=layout.layout_style.display_policy == "standard_lane_ratio@1",
+                resample=figure_uses_standard_display(subset, row.figure),
             )
             display_path = str(prefix) + f"_{index:02d}_显示.png"
             rendered = FigureRender(width, height, image.tobytes(), json.dumps(record))

@@ -26,7 +26,10 @@ from wb_tool.application.intake_workflow import (
     IntakeWorkflowTicket,
     validate_intake_workflow_ticket,
 )
-from wb_tool.application.laboratory_layout import plan_laboratory_layout
+from wb_tool.application.laboratory_layout import (
+    figure_uses_standard_display,
+    plan_laboratory_layout,
+)
 from wb_tool.application.project_archive import ArchiveRunEvidence, project_runs
 from wb_tool.application.project_restore import project_assets
 
@@ -278,8 +281,9 @@ def export_intake_outputs(
                             original,
                             replace(segment, output_box=(0, 0, width, height)),
                             record,
-                            resample=projection.layout_style.display_policy
-                            == "standard_lane_ratio@1",
+                            resample=figure_uses_standard_display(
+                                projection, segment.segment.figure
+                            ),
                         )
                         name = Path(row.display_crop_path)
                         if len(segments) > 1:

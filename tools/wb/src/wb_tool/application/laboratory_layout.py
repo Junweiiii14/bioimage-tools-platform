@@ -267,8 +267,6 @@ def _groups(
         if frame is not None:
             if segment.first_lane != 1 or segment.last_lane != row.lane_count:
                 raise ValueError("旋转显示框仅允许完整原图行，不能用于分段泳道")
-            if project.layout_style.display_policy != "standard_lane_ratio@1":
-                raise ValueError("旋转显示框仅支持standard_lane_ratio@1策略")
             roi = row.roi
             if row.source is None or roi is None:
                 raise ValueError("旋转显示框需要实际原图ROI")
@@ -313,6 +311,13 @@ def _roi(row: FigureRow, segment: FigureSlice) -> LaneROI | None:
     )
 
 
+def figure_uses_standard_display(project: WBLayoutProject, figure: str) -> bool:
+    """Explicit frames affect their Fig, preserving other native figures."""
+    return project.layout_style.display_policy == "standard_lane_ratio@1" or any(
+        s.figure == figure and s.display_frame is not None for s in project.composition.slices
+    )
+
+
 def plan_laboratory_layout(
     project: WBLayoutProject,
     *,
@@ -321,9 +326,9 @@ def plan_laboratory_layout(
     groups = _groups(project, require_review)
     rows = {row.row_id: row for row in project.rows}
     template, style = project.template, project.layout_style
-    standard = style.display_policy == "standard_lane_ratio@1"
     dimensions: dict[str, tuple[list[int], list[int], int, int]] = {}
     for figure, lines in groups.items():
+        standard = figure_uses_standard_display(project, figure)
         count = len(lines[0])
         if any(len(line) != count for line in lines):
             raise ValueError(f"{figure} 各显示行段数不同，请补齐明确缺图位")
@@ -384,6 +389,7 @@ def plan_laboratory_layout(
     panels: list[FigurePlacement] = []
     result: list[LinePlacement] = []
     for figure in project.figure_order:
+        standard = figure_uses_standard_display(project, figure)
         widths, heights, panel_width, _ = dimensions[figure]
         x, y = positions[figure]
         panels.append(

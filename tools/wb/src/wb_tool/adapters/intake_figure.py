@@ -200,6 +200,11 @@ def load_intake_figure_preview(
         matrix = TypeAdapter(
             tuple[tuple[float, float, float], tuple[float, float, float]] | None
         ).validate_python(row.get("source_to_output"))
+        if matrix is None and box and row.get("roi") is not None:
+            roi = TypeAdapter(dict[str, int]).validate_python(row["roi"])
+            if (box[2] - box[0], box[3] - box[1]) != (roi["x1"] - roi["x0"], roi["y1"] - roi["y0"]):
+                raise ValueError("旧原像素Fig缺少可核验的坐标映射")
+            matrix = ((1.0, 0.0, box[0] - roi["x0"]), (0.0, 1.0, box[1] - roi["y0"]))
         if matrix:
             row["preview_source_to_output"] = [
                 [value * sx for value in matrix[0]],

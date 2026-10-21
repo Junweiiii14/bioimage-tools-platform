@@ -77,6 +77,7 @@ class CropDetection:
         "source_geometry@2",
         "export_signal_regions@1",
         "instrument_guided_geometry@1",
+        "source_signal_geometry@1",
     ] = ALGORITHM
 
 

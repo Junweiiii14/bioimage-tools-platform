@@ -52,6 +52,21 @@ def propose_intake_crop(
         AutoWBSettings(lane_count=row.lane_count, crop_policy="source_geometry@2"),
         cancelled=cancelled,
     )
+    if detection.candidates:
+        # A single legacy candidate does not establish signal direction or
+        # target uniqueness. Apply the independent signal checks to this path too.
+        checked = detect_instrument_geometry(
+            image.pixels,
+            image.pixels,
+            AutoWBSettings(lane_count=row.lane_count, crop_policy="source_geometry@2"),
+            cancelled=cancelled,
+        )
+        detection = replace(
+            checked,
+            algorithm_id="source_signal_geometry@1",
+            flags=tuple(f for f in checked.flags if f != "white_light_geometry_guide")
+            + ("source_signal_contour",),
+        )
     discovery = project.intake.discovery
     source_id = next(
         (b.source_id for b in project.intake.assignments if b.protein_id == row_id), None

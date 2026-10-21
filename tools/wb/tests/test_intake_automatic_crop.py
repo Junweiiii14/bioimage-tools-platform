@@ -44,6 +44,78 @@ from wb_tool.api import (
 from tools.wb.tests.test_source_geometry import membrane
 
 
+@pytest.mark.parametrize("double_row", [False, True])
+def test_source_contour_cannot_prove_signal_direction_or_single_target(
+    tmp_path: Path,
+    double_row: bool,
+) -> None:
+    yy, xx = np.mgrid[:300, :700]
+    angle = np.deg2rad(0 if double_row else 9)
+    u = (xx - 350) * np.cos(angle) + (yy - 150) * np.sin(angle)
+    v = -(xx - 350) * np.sin(angle) + (yy - 150) * np.cos(angle)
+    pixels = np.full(xx.shape, 15, dtype=np.uint16)
+    pixels[(abs(u) < 155) & (abs(v) < 55)] = 50000
+    for x in (254, 302, 350, 398, 446):
+        for y in (144, 156) if double_row else (150,):
+            pixels[(abs(xx - x) < 17) & (abs(yy - y) < 4)] = 8000
+    path = tmp_path / "source.tiff"
+    tifffile.imwrite(path, pixels)
+    proposal = propose_intake_crop(str(path), prepared(path), "r")
+    if double_row:
+        assert not automatic_intake_crop_allowed(proposal)
+    else:
+        assert automatic_intake_crop_allowed(proposal)
+        assert proposal.detection and proposal.detection.candidates[0].display_frame
+        assert proposal.detection.candidates[0].display_frame.angle_degrees == 0
+
+
+def test_rotation_preserves_other_completed_fig_and_native_global_style(tmp_path: Path) -> None:
+    from wb_tool.api import (
+        FigureLayoutStyle,
+        LaneROI,
+        WBIntakeFigureProject,
+        intake_figure_digest,
+        intake_figure_projection,
+        render_figure,
+    )
+
+    from tools.wb.tests.test_intake_figure import compose, ready_fig
+
+    project, sources = ready_fig(tmp_path)
+    project = type(project).model_validate(
+        {
+            **dict(project),
+            "layout_style": FigureLayoutStyle(heading_size=28, display_policy="native_samples@1"),
+        }
+    )
+    project = compose(project, sources, tmp_path / "a.png")
+    previous_digest = intake_figure_digest(project, "a")
+    previous_image = (tmp_path / "a.png").read_bytes()
+    previous_render = render_figure(intake_figure_projection(project, "a"), sources).rgb
+    active, ticket = claim_intake_workflow_step(
+        approve_intake_workflow(project, expected_digest=intake_workflow_digest(project)),
+        session_key="b",
+        stage_filter="crop",
+    )
+    assert isinstance(active, WBIntakeFigureProject) and ticket and ticket.target_id == "b1"
+    proposed = record_intake_crop_proposal(
+        active, ticket, propose_intake_crop(sources[2].path, active, "b1")
+    )
+    changed = review_intake_crop(
+        proposed,
+        "b1",
+        LaneROI("b1", 0, 10, 120, 60),
+        expected_digest=intake_workflow_digest(proposed),
+        display_angle=3,
+    )
+    assert isinstance(changed, WBIntakeFigureProject)
+    assert changed.layout_style == project.layout_style
+    assert changed.intake_figures == project.intake_figures and changed.analyses == project.analyses
+    assert intake_figure_digest(changed, "a") == previous_digest
+    assert (tmp_path / "a.png").read_bytes() == previous_image
+    assert render_figure(intake_figure_projection(changed, "a"), sources).rgb == previous_render
+
+
 def prepared(path: Path, count: int = 5) -> WBIntakeCropProject:
     image = load_tiff(path)
     p = create_intake(WBFigureProject(project_id="automatic-crop"))

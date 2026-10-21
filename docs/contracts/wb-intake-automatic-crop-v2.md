@@ -6,7 +6,7 @@ T072：裁图证据子策略 `intake_crop@2`。外层 schema12–14 不变，旧
 
 专用合成回归包括guide/signal方向冲突、水平回零、近邻双排、多膜、选上排但标准高度吞下排，以及同组资产身份。最小实验发现旧候选峰距会压掉近邻目标；本路径不以大峰距证明唯一目标，同时独立检查原信号组件，避免将双排平均质心当单排。现有19组已见参照辅助只读检查，源图单独0/19可采纳；导向路径初稿13/19，但独审发现上述四类缺陷，修复后保守4/19，其余明确暂停。不得把13作为有效自动能力或把4解释为科学准确率。
 
-仅已明确 Fig、蛋白、N、原图来源且用户启动的 `intake_workflow@3` 整批可自动采纳。源图身份、原坐标与 N 必须符合既有 source_geometry@2；仅一个完整候选、槽位数和逐槽原图矩形精确匹配、存在方向框且绝对角度不超过10°。无候选、多候选、N冲突、选中区域的等分回退或大角度仍暂停。10°是本轮“小角度”工程范围，合成 ±9°原有几何样例及本轮端到端验证不构成真实科学准确率阈值或留出结论。
+仅已明确 Fig、蛋白、N、原图来源且用户启动的 `intake_workflow@3` 整批可自动采纳。源图身份、原坐标与 N 必须符合 `source_signal_geometry@1` 或同组三图 `instrument_guided_geometry@1`；旧 source_geometry@2 单一最强候选不能直接自动采纳。两条新路径共享信号方向/目标唯一性校验；仅一个完整候选、槽位数和逐槽原图矩形精确匹配、存在方向框且绝对角度不超过10°。无候选、多候选、N冲突、选中区域的等分回退或大角度仍暂停。10°是本轮“小角度”工程范围，合成 ±9°原有几何样例及本轮端到端验证不构成真实科学准确率阈值或留出结论。
 
 机器采纳使用 policy@2，`reviewed=false`；`geometry_ready` 只表示几何可供本次处理，不代表人工审核、上样身份、有效信号或生物学对应。人工指定范围仍使用policy@1、reviewed=true。两条路径共用当前来源/固定N/逐槽校验；未取得依据不能发布原值资产或进行完整Fig测量。原值TIFF仍逐样本保留，旋转显示数组不入定量。
 
@@ -19,3 +19,10 @@ T072：裁图证据子策略 `intake_crop@2`。外层 schema12–14 不变，旧
 统一结果直接展示固定槽位表，显示与状态分列；所有Fig/同名蛋白仍按稳定身份保留，可导出已有CSV/XLSX或新完整结果快照。缺失/失败/待复核与有效零值保持区别。普通说明收拢，真实质量状态和当前阻断原因保留。
 
 依据：既有 [source_geometry@2](wb-automatic-v1.md)、[固定N裁图v1](wb-intake-crop-v1.md)、[完整Fig后定量](wb-intake-figure-v1.md)、[结果输出](wb-intake-output-v1.md)。2026-10-21核验[Pillow affine transform](https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.transform)与[SciPy map_coordinates](https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.map_coordinates.html)：两者属于重采样；本项目锁版本Pillow12.3.0/SciPy1.18.1，以本地实现和原坐标/原值回归为准，不升级依赖。
+
+
+补充独审决策：源图同时能看见膜也不能把膜角度等同于信号方向。`source_signal_geometry@1` 先沿旧检测找结构，再以本图提供范围、原信号组件独立验证方向与多目标；自动门槛只接受带 `signal_orientation_fit@1` 的新路径。旧 @1 人工数据保持，不接纳未发布初稿的未验证source自动证据。
+
+添加角度不改变全局 `layout_style`。当旧native版式的某Fig有完整行显示框，仅该Fig采用既有标准泳道显示尺度，其他native Fig保持像素/摘要/历史不变。同Fig无框行也遵循该Fig尺度；规划、拼图、单独显示裁图及回存使用一致决策。新混合显示产物记录 `figure_segmented_geometry@3` / `per_figure_display_frame@1`，无框native旧渲染保持原行为。旧程序不支持这种显示组合时拒绝重绘；不伪装旧版支持。旧native PNG灰度预览可由已验证ROI与原尺寸输出框推导平移矩阵，并随预览缩放，不修改资产。
+
+中央原图预览修复：列表128像素缩略图不能阻止高清图替换。缓存身份增加实际预览尺寸，中央原图按既有最长边2048预算显示，列表仍使用小预览；16位到8位显示转换不进入定量。700×300合成图自然尺寸必须700×300，安装诊断同检。

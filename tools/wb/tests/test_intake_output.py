@@ -166,8 +166,16 @@ def test_partial_output_is_versioned_and_restore_relocates_only_assets() -> None
     assert saved.model_dump_json() == original
 
 
-def partial_files(tmp_path: Path) -> tuple[WBIntakeOutputProject, tuple[FigureSourcePath, ...]]:
+def partial_files(
+    tmp_path: Path, *, native: bool = False
+) -> tuple[WBIntakeOutputProject, tuple[FigureSourcePath, ...]]:
     project, originals = ready_fig(tmp_path)
+    if native:
+        from wb_tool.api import FigureLayoutStyle
+
+        project = type(project).model_validate(
+            {**dict(project), "layout_style": FigureLayoutStyle(heading_size=28)}
+        )
     project = compose(prepare_intake_outputs(project), originals, tmp_path / "saved-figure.png")
     assert isinstance(project, WBIntakeOutputProject)
     paths = tuple(
@@ -248,8 +256,10 @@ def test_cancel_and_disk_full_never_publish_a_complete_root(
 
 def full_files(
     tmp_path: Path,
+    *,
+    native_frame: bool = False,
 ) -> tuple[WBIntakeOutputProject, tuple[FigureSourcePath, ...], tuple[ArchiveRunEvidence, ...]]:
-    project, paths = partial_files(tmp_path)
+    project, paths = partial_files(tmp_path, native=native_frame)
     active, ticket = claim_intake_workflow_step(project, session_key="b-crop", stage_filter="crop")
     assert isinstance(active, WBIntakeOutputProject) and ticket is not None
     project = record_intake_crop_proposal(
@@ -260,6 +270,7 @@ def full_files(
         "b1",
         LaneROI("b1", 0, 10, 120, 60),
         expected_digest=intake_workflow_digest(project),
+        display_angle=3 if native_frame else None,
     )
     active, ticket = claim_intake_workflow_step(
         approve_intake_workflow(project, expected_digest=intake_workflow_digest(project)),
@@ -328,6 +339,38 @@ def full_files(
         ),
         tuple(evidence),
     )
+
+
+def test_native_history_with_local_rotation_exports_exact_display_and_preview_mapping(
+    tmp_path: Path,
+) -> None:
+    from PIL import Image
+    from wb_tool.api import build_intake_execution_plan, load_intake_figure_preview
+
+    project, paths, runs = full_files(tmp_path, native_frame=True)
+    assert project.layout_style.display_policy == "native_samples@1"
+    active, ticket = claim_intake_workflow_step(
+        project, session_key="mixed-export", stage_filter="export"
+    )
+    assert isinstance(active, WBIntakeOutputProject) and ticket
+    destination = tmp_path / "mixed-output"
+    result = export_intake_outputs(active, paths, str(destination), runs=runs, ticket=ticket)
+    assert result.complete and not result.errors
+    plan = build_intake_execution_plan(active, expected_digest=intake_digest(active))
+    for fig in plan.figures:
+        preview = load_intake_figure_preview(
+            active,
+            fig.figure_id,
+            str(tmp_path / ("saved-figure.png" if fig.figure_id == "a" else "b-figure.png")),
+        )
+        rows = json.loads(preview.manifest_json)["rows"]
+        assert all("preview_source_to_output" in r for r in rows)
+        for row in fig.rows:
+            with Image.open(destination / row.display_crop_path) as strip:
+                assert strip.size == ((360, 96) if fig.figure_id == "b" else (120, 50))
+                record = json.loads(strip.info["wb_provenance"])
+                assert bool(record.get("display_frame")) == (fig.figure_id == "b")
+    assert json.loads((destination / "index.json").read_bytes())["complete"] is True
 
 
 def test_completed_crop_correction_invalidates_only_its_fig_and_preserves_published_history(
