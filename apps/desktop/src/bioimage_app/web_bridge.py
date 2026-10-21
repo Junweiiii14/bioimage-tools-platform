@@ -77,6 +77,7 @@ class WorkbenchBridge(QObject):
         self.session_epoch += 1
         self.manual_commands = ManualQuantCommands(self)
         self.host.automatic.finished.disconnect(self._automatic_completed)
+        self.host.intake_stage_committed.disconnect(self.publish)
         self.host = host
         self.host.automatic.finished.connect(self._automatic_completed)
         self.host.intake_stage_committed.connect(self.publish)
@@ -121,6 +122,7 @@ class WorkbenchBridge(QObject):
         self._pending_source: tuple[str, str] | None = None
         self.manual_commands = ManualQuantCommands(self)
         self.host.automatic.finished.connect(self._automatic_completed)
+        self.host.intake_stage_committed.connect(self.publish)
         self.timer = QTimer(self)
         self.timer.setInterval(180)
         self.timer.timeout.connect(self.publish)

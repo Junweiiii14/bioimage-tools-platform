@@ -448,3 +448,32 @@ def test_ratio_crop_no_confirmation_montage_and_lane_resize(
     restored = host.view.project().rows[0]
     assert restored.roi == row.roi and restored.lane_count == 3
     assert source.read_bytes() == before
+
+
+def test_stage_publication_is_immediate_and_detaches_replaced_host(
+    qtbot: QtBot, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    published: list[FigureProjectWindow] = []
+
+    def publish(self: WorkbenchBridge) -> None:
+        published.append(self.host)
+
+    monkeypatch.setattr(WorkbenchBridge, "publish", publish)
+    first, second = FigureProjectWindow(), FigureProjectWindow()
+    adapter = WorkbenchBridge(first, lambda action: None)
+    adapter.timer.stop()
+    try:
+        first.intake_stage_committed.emit()
+        assert published == [first]
+        adapter.replace_host(second)
+        adapter.timer.stop()
+        first.intake_stage_committed.emit()
+        assert published == [first]
+        second.intake_stage_committed.emit()
+        assert published == [first, second]
+    finally:
+        adapter.timer.stop()
+        for host in (first, second):
+            close_and_dispose_window(
+                host, qtbot, resources_closed=lambda host=host: host.resources_closed, timeout=20000
+            )
