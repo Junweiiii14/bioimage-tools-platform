@@ -8,10 +8,12 @@ import tifffile
 from numpy.typing import NDArray
 from tool_contracts.api import AssetRef
 from wb_tool.api import (
+    AutoWBSettings,
     FigureSourcePath,
     IntakeDraftFigure,
     IntakeGrouping,
     IntakeSource,
+    LaneROI,
     WBFigureProject,
     WBIntakeCropProject,
     accept_automatic_intake_crop,
@@ -32,6 +34,26 @@ from wb_tool.api import (
     register_intake_source,
     save_intake_grouping,
 )
+from wb_tool.domain.reliable_geometry import detect_reliable_geometry
+
+
+def test_implicit_registration_target_cannot_hide_a_narrower_second_row() -> None:
+    guide = np.full((300, 500), 100, dtype=np.uint16)
+    guide[50:250, 50:450] = 50000
+    signal = guide.copy()
+    signal[116:125, 210:290] = 8000
+    signal[180:189, 240:271] = 8000
+    result = detect_reliable_geometry(
+        signal,
+        guide,
+        AutoWBSettings(lane_count=1),
+        target=LaneROI("implicit", 200, 100, 300, 140),
+        lane_width=100,
+        width_is_estimate=True,
+        registration_target=True,
+    )
+    assert not result.candidates
+    assert "guided_target_ambiguous" in result.flags
 
 
 def _grouped(

@@ -101,12 +101,17 @@ def test_verified_width_not_replaced_by_108_pixel_peak_spacing() -> None:
 
 
 @pytest.mark.parametrize("count", [2, 4, 5])
-def test_width_estimate_cannot_absorb_an_extra_complete_weak_sample(count: int) -> None:
+@pytest.mark.parametrize("band_width", [25, 32])
+def test_width_estimate_cannot_absorb_an_extra_complete_weak_sample(
+    count: int, band_width: int
+) -> None:
     raw = np.full((240, 600), 100, dtype=np.uint16)
     raw[55:185, 70:530] = 50000
     for i in range(count + 1):
         x = 200 + 50 * i
-        raw[116:125, x - 16 : x + 16] = 49000 if i == count else 8000
+        raw[116:125, x - band_width // 2 : x - band_width // 2 + band_width] = (
+            49000 if i == count else 8000
+        )
     result = detect_reliable_geometry(
         raw, raw, AutoWBSettings(lane_count=count), lane_width=50, width_is_estimate=True
     )

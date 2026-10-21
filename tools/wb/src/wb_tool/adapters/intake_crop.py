@@ -145,7 +145,11 @@ def propose_intake_crop(
         flags=(*checked.flags, "source_signal_contour"),
     )
     companions = intake_crop_companion_assets(project, row_id)
-    if not detection.candidates and len(companions) == 2 and sources:
+    if (
+        len(companions) == 2
+        and sources
+        and (not detection.candidates or inspect_export(image.pixels).bright_background)
+    ):
         paths = {item.sha256: item.path for item in sources}
         members = [image]
         for asset in companions:

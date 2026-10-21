@@ -177,12 +177,31 @@ window.intakeWorkspace = (() => {
     draft.displayAngle=draft.angleHistory?.[index];
     render();
   }
+  function syncCropControls(r) {
+    const evidence=state.intake.crops?.find(e=>e.row_id===r?.id);
+    const step=state.intake.workflow.steps.find(s=>s.stage==='crop'&&s.target_id===r?.id);
+    const draft=r&&cropDrafts.get(r.id),correcting=step?.status==='done';
+    const locked=!!state.busy||!r?.roi||!evidence||!cropEditable(r.id)||!!draft?.conflict||!!cropPending.size;
+    const saved=batchPolicy()&&correcting&&!draft;
+    $$('[data-intake-crop-action="confirm"]').forEach(button=>{
+      button.disabled=locked||((correcting||step?.status==='pending')&&!draft);button.hidden=saved;
+    });
+    $$('[data-intake-crop-action="run"]').forEach(button=>{
+      button.disabled=batchPolicy()?locked:!!state.busy||hasDraft()||!runnable();button.hidden=saved;
+    });
+    $$('[data-intake-crop-action="discard"]').forEach(button=>button.disabled=!!state.busy||!draft);
+    const notice=draft?.conflict?'后台输入已改变，草稿保留；放弃后重新核对。':
+      ['needs_review','failed'].includes(step?.status)?batchReason(evidence?.reason):'';
+    $$('[data-intake-crop-notice]').forEach(node=>{node.textContent=notice;node.hidden=!notice;});
+    if(!saved)$$('.intake-saved-note').forEach(note=>note.remove());
+  }
   function renderCropInspector(r) {
     const focused = document.activeElement;
     // A progress snapshot must not replace the input under a user's caret/IME.
     // The change handler commits its draft without replacing a pressed action.
     if(cropInspectorRow===r?.id&&focused?.matches('[data-intake-rotation]')){
       focused.disabled=!!state.busy||!cropEditable(r.id);
+      syncCropControls(r);
       drawRotationPreview(r,state.intake.crops?.find(e=>e.row_id===r.id),cropDrafts.get(r.id));
       return;
     }
@@ -198,7 +217,7 @@ window.intakeWorkspace = (() => {
     $('#inspector-title').textContent = '裁剪信息';
     $('#review-badge').textContent = draft ? '未保存' : evidence?.raw_crop ? '原值已保存' : step?.status==='needs_review' ? '需调整' : '待处理';
     $('#review-badge').className = 'status-badge '+(evidence?.raw_crop?'ok':'pending');
-    $('#inspector-content').innerHTML = `<section class="inspect-section"><h3>${r?escapeText(targetName(r.id)):'请选择蛋白行'}</h3>${dataPair('固定槽位数',r?.lanes||0)}${dataPair('裁图',evidence?.raw_crop?(['intake_crop@2','intake_crop@3'].includes(evidence.policy)?'自动定位已保存':'已保存'):'待处理')}${draft?.conflict||step?.status==='needs_review'||step?.status==='failed'?`<p class="row-reason" role="status">${escapeText(draft?.conflict?'后台输入已改变，草稿保留；放弃后重新核对。':batchReason(evidence?.reason))}</p>`:''}<details><summary>范围与槽位说明</summary><p>在原图调整整行范围。手动确认按固定 N 等宽分割；无信号槽位保留。</p><p>${escapeText(evidence?.reason||'尚未定位')}</p></details></section>`;
+    $('#inspector-content').innerHTML = `<section class="inspect-section"><h3>${r?escapeText(targetName(r.id)):'请选择蛋白行'}</h3>${dataPair('固定槽位数',r?.lanes||0)}${dataPair('裁图',evidence?.raw_crop?(['intake_crop@2','intake_crop@3'].includes(evidence.policy)?'自动定位已保存':'已保存'):'待处理')}<p class="row-reason" data-intake-crop-notice role="status" hidden></p><details><summary>范围与槽位说明</summary><p>在原图调整整行范围。手动确认按固定 N 等宽分割；无信号槽位保留。</p><p>${escapeText(evidence?.reason||'尚未定位')}</p></details></section>`;
     if(r?.roi){
       const angle=draft?.displayAngle??evidence?.displayFrame?.angle_degrees??0;
       $('#inspector-content').insertAdjacentHTML('beforeend',`<section class="inspect-section"><h3>裁图纠偏</h3><canvas class="intake-rotation-preview" aria-label="纠偏后的裁图预览"></canvas><label>角度（度）<input data-intake-rotation type="number" min="-10" max="10" step="0.1" value="${Number(angle).toFixed(2)}" ${state.busy||!reviewable?'disabled':''}></label><button class="text-button" data-intake-reset-rotation ${state.busy||!reviewable?'disabled':''}>恢复不旋转</button><small>纠偏用于显示与拼图；定量范围保持原图坐标。</small></section>`);
@@ -206,14 +225,14 @@ window.intakeWorkspace = (() => {
     }
     if(batchPolicy()&&evidence?.reason&&batchReason(evidence.reason)!==evidence.reason)$('#inspector-content').insertAdjacentHTML('beforeend',`<details class="inspect-section"><summary>处理详情</summary><p class="row-reason">${escapeText(evidence.reason)}</p></details>`);
     if (correcting&&draft) $('#inspector-content').insertAdjacentHTML('beforeend','<p class="row-reason">保存后重算本 Fig；其他 Fig 和历史文件保留。</p>');
-    $('#inspector-action').innerHTML = `<button class="button primary full" data-intake-crop-action="confirm" ${state.busy||!r?.roi||!evidence||!reviewable||draft?.conflict||(correcting||step?.status==='pending')&&!draft?'disabled':''}>${correcting?'保存修正，标记本 Fig 待重算':'确认此范围与固定槽位'}</button><button class="button subtle full" data-intake-crop-action="run" ${state.busy||hasDraft()||!runnable()?'disabled':''}>继续处理批次</button><button class="text-button" data-intake-crop-action="discard" ${state.busy||!draft?'disabled':''}>放弃本行裁剪草稿</button><button class="text-button" data-intake-crop-action="back">返回清单与异常</button>`;
+    $('#inspector-action').innerHTML = `<button class="button primary full" data-intake-crop-action="confirm" disabled>${correcting?'保存修正，标记本 Fig 待重算':'确认此范围与固定槽位'}</button><button class="button subtle full" data-intake-crop-action="run" disabled>继续处理批次</button><button class="text-button" data-intake-crop-action="discard" disabled>放弃本行裁剪草稿</button><button class="text-button" data-intake-crop-action="back">返回清单与异常</button>`;
     if (batchPolicy()) {
       const saveOnly=$('[data-intake-crop-action="confirm"]');saveOnly.textContent='仅保存范围';saveOnly.className='text-button';
       const resume=$('[data-intake-crop-action="run"]');
       resume.textContent='保存范围并继续自动处理';resume.className='button primary full';
-      resume.disabled=!!state.busy||!r?.roi||!evidence||!reviewable||!!draft?.conflict||!!cropPending.size;
       if(correcting&&!draft){saveOnly.hidden=true;resume.hidden=true;$('#inspector-action').insertAdjacentHTML('afterbegin','<p class="intake-saved-note">此图已保存，无需确认。</p>');}
     }
+    syncCropControls(r);
     const focus = cropSavedRow === r?.id ? 'run' : cropFocusAction;
     cropSavedRow = null;
     if (focus) {
@@ -258,10 +277,7 @@ window.intakeWorkspace = (() => {
     // Number inputs emit change between a button's mousedown and mouseup.
     // Keep those DOM nodes alive so that the same press can finish its click.
     $('#review-badge').textContent='未保存';
-    $$('[data-intake-crop-action="discard"]').forEach(button=>button.disabled=false);
-    $$('[data-intake-crop-action="confirm"]').forEach(button=>{button.hidden=false;button.disabled=false;});
-    $$('[data-intake-crop-action="run"]').forEach(button=>{button.hidden=false;button.disabled=!batchPolicy()||!!cropPending.size;});
-    $$('.intake-saved-note').forEach(note=>note.remove());
+    syncCropControls(r);
     drawRotationPreview(r,state.intake.crops?.find(e=>e.row_id===r.id),draft);
     updateChrome();renderSourceList();
   }

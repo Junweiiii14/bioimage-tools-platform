@@ -322,6 +322,29 @@ def test_batch_progress_preserves_uncommitted_rotation_input_and_drawer_focus(
     )
     assert javascript(window, qtbot, "intakeWorkspace.hasDraft() && sent.length===0")
 
+    assert javascript(
+        window,
+        qtbot,
+        """
+      window.saveBefore=document.querySelector(
+        '#drawer-content [data-intake-crop-action="confirm"]');
+      setState({intake:{...state.intake,workflow:{...state.intake.workflow,digest:'changed'}}});
+      document.activeElement===drawerAngle && drawerAngle.isConnected && saveBefore.disabled &&
+        document.querySelector('#drawer-content [data-intake-crop-notice]')
+          .textContent.includes('后台输入已改变')
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        """
+      drawerAngle.dispatchEvent(new Event('change',{bubbles:true}));
+      const resume=document.querySelector('#drawer-content [data-intake-crop-action="run"]');
+      saveBefore.click();resume.click();
+      saveBefore.isConnected && saveBefore.disabled && resume.disabled && sent.length===0
+    """,
+    )
+
 
 def test_batch_result_grid_keeps_headers_zero_and_missing_separate_from_full_records(
     intake_page: WebWorkbenchWindow, qtbot: QtBot

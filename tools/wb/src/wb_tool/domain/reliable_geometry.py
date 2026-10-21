@@ -37,6 +37,7 @@ class SignalComponent:
     snr: float
     touches_boundary: bool
     footprint: NDArray[np.bool_] = field(compare=False, repr=False)
+    support_id: int
 
 
 @dataclass(frozen=True)
@@ -97,7 +98,7 @@ def _components(
     support_boxes = ndi.find_objects(support_labels)
     boundary = valid & ~ndi.binary_erosion(valid, iterations=1)
     result: list[SignalComponent] = []
-    regions: list[tuple[slice, slice, NDArray[np.bool_]]] = []
+    regions: list[tuple[slice, slice, NDArray[np.bool_], int]] = []
     for index, bounds in enumerate(support_boxes, 1):
         if bounds is None:
             continue
@@ -127,10 +128,10 @@ def _components(
             py, px = np.nonzero(part)
             sub_y = slice(ys.start + int(py.min()), ys.start + int(py.max()) + 1)
             sub_x = slice(xs.start + left + int(px.min()), xs.start + left + int(px.max()) + 1)
-            regions.append((sub_y, sub_x, support_labels[sub_y, sub_x] == index))
+            regions.append((sub_y, sub_x, support_labels[sub_y, sub_x] == index, index))
     if len(regions) > 200:
         return []
-    for ys, xs, mask in regions:
+    for ys, xs, mask, support_id in regions:
         if np.count_nonzero(mask) < 6:
             continue
         weight = strength[ys, xs] * mask
@@ -168,6 +169,7 @@ def _components(
                 float(np.max(weight / noise[xs])),
                 bool(np.any(mask & boundary[ys, xs])),
                 mask.copy(),
+                support_id,
             )
         )
     return result
@@ -340,6 +342,55 @@ def _row_line(
         float(fit[0]),
         float(np.max(np.abs(ys - np.polyval(fit, xs)))),
     )
+
+
+def _seed_grid_conflict(
+    chosen: list[SignalComponent],
+    components: list[SignalComponent],
+    shared_marks: list[SignalComponent],
+    width: float,
+    count: int,
+    strength: NDArray[np.float64],
+    membrane: LaneROI,
+) -> bool:
+    """Reject contradictory independent support before refining an estimated grid.
+
+    Peak splits of one connected strip cannot establish independent anchors.
+    This is only a rejection check; connected/fragmented rows need no anchors
+    to proceed through the existing whole-row geometry checks.
+    """
+    support_counts: dict[int, int] = {}
+    for component in components:
+        support_counts[component.support_id] = support_counts.get(component.support_id, 0) + 1
+    independent = [b for b in chosen if support_counts[b.support_id] == 1]
+    anchors = sorted(
+        (b for b in independent if width * 0.5 <= b.box.width <= width), key=lambda b: b.x
+    )
+    if count < 2 or len(anchors) < count:
+        return False
+    _, _, slope, _ = _row_line(anchors, strength, membrane)
+    if abs(degrees(atan(slope))) > 10:
+        return False
+    ca, sa = cos(atan(slope)), sin(atan(slope))
+    positions = np.array([b.x * ca + b.y * sa for b in anchors])
+    # Test the whole set against one grid, not just consecutive gaps. No
+    # strongest/first subset is selected when the anchor set is ambiguous.
+    offsets = positions - np.arange(len(anchors)) * width
+    origin = float(np.median(offsets))
+    if np.any(abs(offsets - origin) > width * 0.2):
+        return False
+    if len(anchors) > count:
+        return True
+    phase = origin + (count - 1) * width / 2
+    reach = (count / 2 + 0.25) * width
+    for b in independent:
+        if b in anchors or b in shared_marks:
+            continue
+        yy, xx = np.nonzero(b.footprint)
+        local = (xx + b.box.x0) * ca + (yy + b.box.y0) * sa - phase
+        if local.min() > reach or local.max() < -reach:
+            return True
+    return False
 
 
 def _ridge_columns(row: list[SignalComponent], width: float) -> tuple[set[int], int]:
@@ -544,6 +595,16 @@ def detect_reliable_geometry(
         uncertain: list[SignalComponent] = []
         if lane_width is not None:
             strength, _ = _signal_field(signal, valid, membrane, settings)
+            if width_is_estimate and _seed_grid_conflict(
+                chosen,
+                components,
+                shared_marks,
+                lane_width,
+                settings.lane_count or 1,
+                strength,
+                membrane,
+            ):
+                return failure("explicit_lane_count_conflicts_with_evidence")
             cx, cy, fitted_slope, _ = _row_line(chosen, strength, membrane)
             ca, sa = cos(atan(fitted_slope)), sin(atan(fitted_slope))
             # The fixed row may contain weak disconnected lobes or a connected
@@ -619,11 +680,7 @@ def detect_reliable_geometry(
             return b in shared_marks and b not in chosen
 
         if (target is None or registration_target) and any(
-            b not in chosen
-            and b not in edge_marks
-            and not separated_guide_mark(b)
-            and widths.min() * 0.5 <= b.box.width <= widths.max() * 2
-            for b in bands
+            b not in chosen and b not in edge_marks and not separated_guide_mark(b) for b in bands
         ):
             return failure("guided_target_ambiguous")
         if any(
