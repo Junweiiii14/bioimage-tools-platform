@@ -464,11 +464,13 @@ def test_batch_profiles_show_only_current_committed_row_and_keep_narrow_peak(
         """
       state.quant.status='pending';state.quant.lanes[0].profile=[];
       state.quant.lanes[0].bands[0].baselineStart=3;
-      document.querySelector('#inspector-content').innerHTML=intakeQuant.markup(
+      document.querySelector('.intake-profile-panel').outerHTML=intakeQuant.markup(
         [],{protein_id:'protein-a',label:'A'});true
     """,
     )
-    assert javascript(window, qtbot, "!!document.querySelector('#inspector-content .quant-curve')")
+    assert javascript(
+        window, qtbot, "!!document.querySelector('.intake-profile-panel .quant-curve')"
+    )
     assert javascript(window, qtbot, "!document.querySelector('[data-iq-action=discard-stale]')")
     javascript(window, qtbot, "document.querySelector('[data-iq-action=discard]').click();true")
     assert javascript(window, qtbot, "!intakeQuant.hasDraft()")
