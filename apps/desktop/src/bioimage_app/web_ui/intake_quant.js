@@ -99,9 +99,10 @@ window.intakeQuant = (() => {
     if(!point||!s||state.busy||!bridge)return;
     event.preventDefault();
     const band={...s.band,...(s.item?.value||s.actual)};
-    drag={id:s.id,key:point.dataset.iqPoint,rect:point.closest('svg').getBoundingClientRect(),g:profileGeometry(s.lane,band),band};
+    drag={id:s.id,geometry:geometry(s.lane),revision:quantData()?.revision,key:point.dataset.iqPoint,rect:point.closest('svg').getBoundingClientRect(),g:profileGeometry(s.lane,band),band};
     document.body.setPointerCapture(event.pointerId);
   });
+  const sameDrag=(s,d)=>s&&s.id===d.id&&geometry(s.lane)===d.geometry&&quantData()?.revision===d.revision;
   function pointerValue(event,d,s) {
     const x=(event.clientX-d.rect.left)/d.rect.width*680,y=(event.clientY-d.rect.top)/d.rect.height*196;
     let value=d.key.startsWith('baseline')?Math.max(0,d.g.min+(156-y)/128*d.g.span):Math.round((x-44)/612*(s.lane.profile.length-1));
@@ -110,14 +111,14 @@ window.intakeQuant = (() => {
     return value;
   }
   document.addEventListener('pointermove',event=>{
-    if(!drag)return;const s=selection();if(!s||s.id!==drag.id||state.busy){drag=null;refresh();return;}
+    if(!drag)return;const s=selection();if(!sameDrag(s,drag)||state.busy){drag=null;refresh();return;}
     const svg=document.querySelector('.intake-quant-lane .quant-chart');
     if(svg){const band={...drag.band,[drag.key]:pointerValue(event,drag,s)};
       svg.outerHTML=manualQuant.chart({...s.lane,bands:[band]},band,true).replaceAll('data-quant-point','data-iq-point');}
   });
   document.addEventListener('pointerup',event=>{
     if(!drag)return;const d=drag;drag=null;
-    const s=selection();if(!s||s.id!==d.id||state.busy){refresh();return;}
+    const s=selection();if(!sameDrag(s,d)||state.busy){refresh();return;}
     change({[d.key]:pointerValue(event,d,s)});refresh();
   });
   document.addEventListener('pointercancel',()=>{drag=null;refresh();});

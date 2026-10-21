@@ -1992,3 +1992,23 @@ def test_batch_lane_overview_cards_open_bounded_editor_and_drag_preview(
     assert javascript(
         window, qtbot, "sent.at(-1).action==='quant_edit' && sent.at(-1).payload.lane===3"
     )
+
+    javascript(
+        window,
+        qtbot,
+        """
+      intakeQuant.reset();intakeWorkspace.renderActive();
+      document.querySelector('[data-iq-lane="1"]').click();
+      const stalePoint=document.querySelector('[data-iq-point=baselineStart]');
+      const staleRect=stalePoint.closest('svg').getBoundingClientRect();
+      const oldCapture=document.body.setPointerCapture;
+      document.body.setPointerCapture=()=>{};
+      stalePoint.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:2,
+        clientX:staleRect.left+100,clientY:staleRect.top+100}));
+      document.body.setPointerCapture=oldCapture;
+      state.quant.revision++;state.quant.lanes[0].roi={y:21};
+      document.body.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerId:2,
+        clientX:staleRect.left+100,clientY:staleRect.top+50}));true
+    """,
+    )
+    assert javascript(window, qtbot, "!intakeQuant.hasDraft()")
