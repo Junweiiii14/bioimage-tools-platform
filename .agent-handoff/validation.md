@@ -1,6 +1,6 @@
 # Validation Index
 
-当前T071产品PR30已按四检查合main710bb85；两平台979/全wheel/OCR/check0，新独立包已安装并通过三流程/PS5.1/7751载荷校验，最终交付审计与文档收尾见[T071](../work/tasks/T-071-fig-sequence-automation.md)及[交付](../docs/wb-fig-sequence-delivery.md)。以下T069/T060为历史记录，保留当时状态，不作当前指针。
+当前T072产品44a独审Accepted、PR32四检查集成main0630604；两平台1013与本机1013/全部wheel/OCR/check0，新独立AutomaticFlowTest安装/四流程/PS5.1新轮/7753载荷通过，最终审计及收尾见[T072](../work/tasks/T-072-automatic-flow-repair.md)和[交付](../docs/wb-automatic-flow-repair-delivery.md)。首外层观察器误停OneDrive已重启，失败/修复证据保留，非产品静默改包。以下T071/T069/T060均为历史记录。
 
 
 历史T069交付状态来源是work/tasks/T-069-grouped-intake-offline.md；当时见[采集组交付记录](../docs/wb-grouped-intake-delivery.md)与T069 evidence。PR28最终956两平台/全部wheel/OCR/四检查0；冻结main6080867本机新安装、双流程/PS5.1/7749载荷及独立交付审查通过。以下T060等均为当时历史证据，不覆盖原失败或外部验收缺口。旧索引替换前已逐字节复制/校验，保留于[validation-20261020-e7-closeout.md](archive/validation-20261020-e7-closeout.md)，更早历史按其链接继续可查。
@@ -34,3 +34,5 @@ T065最终产品708d2d7：初审两P2和一UI文案修正，作者34/29.12s实�
 2026-10-21 T071：状态唯一来源改为T071任务；70定向/新诊断13项/参考31项及真实19 Fig链192.59s均实际0，104源文件保持。用户19采集+28参考范围已确认。最终绑定复审、全门禁、PR和新安装仍未完成，见work/evidence/T-071。
 
 - T071最终产物非作者只读Accepted，冻结main/安装器SHA、7751载荷、302源码/4wheel/41校验成员/37证据副本与PS5.1失败保留均核验；具体边界见T071 independent-review。main710bb自动quality39473538375也SUCCESS。
+
+- T072收尾PR33/be38 quality39539807356：Linux1012/1、328.68s；Windows1012/1、625.64s/child1，均双Fig E2E读1行占位而非9，wheel未跑。仅等待完整9行、原断言/10秒截止保持；两相关E2E17.54s0、Ruff/格式/diff0；a65非作者Accepted/独立两项15.66s0。最终head四检查/merge查PR33，原日志本地保留，冻结包不变，详见T072/final-ci。

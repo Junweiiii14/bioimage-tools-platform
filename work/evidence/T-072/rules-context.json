@@ -1,19 +1,13 @@
 {
   "schema": 1,
   "task": "T-072",
-  "base_commit": "975942de14120bdbc07e811f12bee053f3f90621",
+  "base_commit": "0630604f607415311f405efa99aff46461b46778",
   "scopes": [
     ".agent-handoff",
-    ".impeccable/surfaces",
     "AGENT_HANDOFF.md",
-    "PRODUCT.md",
     "README.md",
-    "apps/desktop",
     "docs",
     "tests",
-    "tooling",
-    "tools/wb",
-    "uv.lock",
     "work"
   ],
   "rules": {
@@ -30,7 +24,7 @@
     "docs/ai-workflow.md": "8003be926d828df9eaf0398d77f463a9472316be021467e7f22fb63132063f70",
     "docs/architecture.md": "dabf3823b44d4af2f372fd5dc244747cb3cd7ff56abcfd13cf007721b8a0dbbd",
     "docs/coding-standards.md": "40fe9541a84163e6df6be9d2a57b836b9703471440f412bd16456f1ef0382d71",
-    "docs/module-map.md": "8cfbcb0c10a856ca9c579f1b539f2f0fd7b0cd9b57cf49879a0bffe9b7e7af36",
+    "docs/module-map.md": "bb8c8006aa353cda408c5e08d009471e71a7283a98bfdc7b218ffecb074d9431",
     "docs/research-protocol.md": "b1ab0f9bf291e50f5872e01147f7af2671fdc5885bf2f065c804c5f4a240aa51",
     "docs/runbooks/rule-enforcement.md": "43c1aafc0003f1901c4c35f4aa896cd520cf79dc96856019e11c1b095fc5c090"
   }

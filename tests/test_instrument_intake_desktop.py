@@ -1446,7 +1446,17 @@ def test_sequence_real_page_two_figs_pause_continue_stage_barriers_and_reopen(
     assert len(finished.intake_figures) == 2 and len(finished.analyses) == 2
     assert all(a.run and a.run.pid and a.run.state == "succeeded" for a in finished.analyses)
     assert len(finished.intake_outputs) == 1 and finished.intake_outputs[0].complete
-    qtbot.waitUntil(lambda: js("mode==='results'") is True, timeout=10000)
+    qtbot.waitUntil(
+        lambda: (
+            js(
+                "mode==='results' && "
+                "document.querySelector('.results-scroll table').checkVisibility() && "
+                "document.querySelectorAll('#results-body tr').length===9"
+            )
+            is True
+        ),
+        timeout=10000,
+    )
     modes = js("JSON.stringify(sequenceModes)")
     visible_table = js("""JSON.stringify((()=>{
       const table=document.querySelector('.results-scroll table'),

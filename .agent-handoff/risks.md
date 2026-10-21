@@ -1,5 +1,8 @@
 # Risks, Blockers, And Unknowns
 
+- T072：首本地外层observer因父PID复用误收昨天OneDrive.Sync.Service并停止；微软签名同exe已重启并核运行，未全面验同步状态。原失败保留。新版helper经非作者Accepted，CIM微秒身份+出生顺序、删除所有自动终止，只观察并对timeout/残留报失败；随包新轮0，产品字节不变。轮询不能证明捕获所有短命后代。原27/10 dirty、旧交付和原图/历史保持。最终产物边界见T072 evidence。
+- T072自动策略只在可靠几何继续，现有19已见组4满足保守条件，其余需人工；不得宣称全部真实图无需复核或科学准确率。干净Win10/物理DPI/科学留出及旧native UNKNOWN仍保留。
+
 - 2026-10-21 T071：产品PR30/5f独审及两平台979/全部wheel/四CI0，冻结main710bb85新独立候选安装/三流程/PS5.1/7751载荷通过。a541旧手工Qt坐标偏差未复现但根因UNKNOWN；cb2关闭native现场与更早UNKNOWN均保留，串行所属关闭通过不等于所有根因已明。真实85TIFF/19执行＋28参考/74槽是已见回归；本轮104源文件启动逐项清单仅内存，持久核验用旧T069对应子集。干净Win10/物理DPI/独立科学留出未验，未正式发布。详见T071 final-ci/independent-review与交付记录。
 
 
