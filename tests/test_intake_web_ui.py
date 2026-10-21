@@ -1915,3 +1915,80 @@ def test_batch_curve_draft_cannot_fill_changed_source_or_geometry(
         window, qtbot, "document.querySelector('[data-iq-action=discard-stale]').click();true"
     )
     assert javascript(window, qtbot, "!intakeQuant.hasDraft()")
+
+
+def test_batch_lane_overview_cards_open_bounded_editor_and_drag_preview(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        """
+      const lanes=Array.from({length:5},(_,i)=>({lane:i+1,roi:{y:20},
+        profile:[0,2,5,8,5,2,0],bands:[{id:'target',start:1,end:5,
+        baselineStart:1,baselineEnd:1,reason:''}]}));
+      setState({selectedId:'protein-a',rows:[{id:'protein-a',sourceId:'src',
+        protein:'A',fig:'Fig 1',lanes:5}],
+        quant:{rowId:'protein-a',revision:1,sourceId:'src',status:'ready',lanes,
+          group:{rows:[{rowId:'protein-a',lanes}]}},
+        intake:{...state.intake,cropEnabled:true,figureEnabled:true,crops:[],
+          figuresReady:[{figure_id:'fig-a',row_ids:['protein-a'],image:{sha256:'fig'}}],
+          workflow:{policy:'intake_workflow@3',digest:'profiles',steps:[]}}});
+      switchMode('quant');true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        """(()=>{
+      const cards=[...document.querySelectorAll('.intake-curve-card')];
+      return cards.length===5 && cards[1].offsetLeft>cards[0].offsetLeft &&
+        cards.every(c=>c.getBoundingClientRect().height<180) &&
+        !document.querySelector('[data-iq-point]');})()""",
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      document.querySelector('[data-iq-lane="3"] svg').dispatchEvent(
+        new MouseEvent('click',{bubbles:true}));true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        """
+      intakeQuant.selectedLane()===3 && document.querySelectorAll('[data-iq-point]').length===4 &&
+      document.querySelector('.intake-quant-lane .quant-chart').getBoundingClientRect().height===220
+    """,
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      const point=document.querySelector('[data-iq-point=baselineStart]');
+      const rect=point.closest('svg').getBoundingClientRect();
+      const capture=document.body.setPointerCapture;
+      document.body.setPointerCapture=()=>{};
+      point.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:1,
+        clientX:rect.left+100,clientY:rect.top+100}));
+      document.body.setPointerCapture=capture;
+      const baseline=()=>document.querySelector('.intake-quant-lane .quant-baseline');
+      window.dragBefore=baseline().getAttribute('d');
+      document.body.dispatchEvent(new PointerEvent('pointermove',{bubbles:true,pointerId:1,
+        clientX:rect.left+100,clientY:rect.top+70}));
+      window.dragChanged=dragBefore!==baseline().getAttribute('d');
+      document.body.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerId:1,
+        clientX:rect.left+100,clientY:rect.top+70}));true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "dragChanged && intakeQuant.hasDraft() && !sent.some(x=>x.action==='quant_edit')",
+    )
+    javascript(window, qtbot, "document.querySelector('[data-iq-action=save]').click();true")
+    assert javascript(
+        window, qtbot, "sent.at(-1).action==='quant_edit' && sent.at(-1).payload.lane===3"
+    )

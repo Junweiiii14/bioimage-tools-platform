@@ -462,7 +462,7 @@ window.intakeWorkspace = (() => {
       return evidence.slots.filter(s=>s.roi).map(s=>{
         const r=s.roi,points=[[r.x0,r.y0],[r.x1,r.y0],[r.x1,r.y1],[r.x0,r.y1]].map(([x,y])=>
           `${matrix[0][0]*x+matrix[0][1]*y+matrix[0][2]},${matrix[1][0]*x+matrix[1][1]*y+matrix[1][2]}`).join(' ');
-        return `<polygon points="${points}" data-row-id="${escapeText(evidence.row_id)}"><title>${escapeText(targetName(evidence.row_id))} · 泳道 ${s.position}</title></polygon>`;
+        return `<polygon points="${points}" data-row-id="${escapeText(evidence.row_id)}" data-lane="${s.position}" class="${evidence.row_id===row()?.id&&s.position===window.intakeQuant.selectedLane()?'selected-measure-lane':''}"><title>${escapeText(targetName(evidence.row_id))} · 泳道 ${s.position}</title></polygon>`;
       });
     }).join('');
     const markup=window.intakeViews.measurement({intake:state.intake,selected,current,members,outlines,cells:state.cells,busy:state.busy,selectedRowId:row()?.id,quant:state.quant});
