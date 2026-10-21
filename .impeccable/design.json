@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-21T18:19:14+00:00",
+  "generatedAt": "2026-10-21T18:49:43+00:00",
   "title": "Design System: BioImage WB · T075",
   "extensions": {
     "colorMeta": {
@@ -1160,7 +1160,7 @@
       "task": "work/tasks/T-075-ui-system.md",
       "baseCommit": "0376f23ccbf8b8047d532ec7708a1fa85581c087",
       "branch": "codex/t075-ui-system",
-      "state": "当前未提交实现快照；不表示绑定最终提交或完成交付。",
+      "state": "edafe65是已构建并安装的候选基准；安装高级工具问题仍在修正，后续修正需重新绑定验证，不是最终交付。",
       "sources": [
         "apps/desktop/src/bioimage_app/web_ui/design_tokens.css",
         "apps/desktop/src/bioimage_app/web_ui/components.css",
@@ -1168,32 +1168,73 @@
         "apps/desktop/src/bioimage_app/web_ui/motion.js",
         "apps/desktop/src/bioimage_app/web_ui/appearance.js",
         "apps/desktop/src/bioimage_app/web_ui/interactions.js",
-        "apps/desktop/src/bioimage_app/web_ui/styles.css"
+        "apps/desktop/src/bioimage_app/web_ui/styles.css",
+        "apps/desktop/src/bioimage_app/web_ui/desktop_session.js"
       ],
-      "runtime": "已记录的源码环境 Qt 6.12 / Chromium 140.0.7339.225；不是安装验收结论。",
+      "runtime": "Qt 6.12 / Chromium 140.0.7339.225；Windows原生平台、DPR1.5、无禁用GPU参数；不是完整目标机验收结论。",
       "tonalRamps": "从实际颜色转换OKLCH，以相同色相/色度生成15–95%亮度八阶，仅供设计面板；产品未使用。",
-      "componentSnippets": "由实际公共组件提取并改为 ds- 类名；CSS custom properties保留，fallback仅供独立面板；未加载产品字库的外部面板不能作字体对照。"
+      "componentSnippets": "由实际公共组件提取并改为 ds- 类名；CSS custom properties保留，fallback仅供独立面板；未加载产品字库的外部面板不能作字体对照。",
+      "productCommit": "edafe65e1451ecf2e5cb695f9f6b33ddfda2e49e"
     },
     "verification": {
-      "status": "implementation-in-progress",
-      "staticEvidence": ".local/t075-visual-confirm/report.json：22 个状态、1440×900与960×640、DPR1、offscreen/--disable-gpu；实际平台字库均为本地Noto Sans SC；控制台无记录。",
+      "status": "candidate-validation-in-progress",
+      "staticEvidence": ".local/t075-final-source/report.json：edafe65，22个页面状态（1440×900、960×640）加四主题图，共26张；Windows native、DPR1.5、console=[]。",
       "notValidated": [
         "M6完成",
-        "安装版四主题对照",
-        "绑定最终资源的动态对照与真实跟手体验",
-        "硬件渲染稳定性",
-        "高缩放与物理DPI",
-        "源码/wheel/安装目录资源完整对照",
-        "安装候选验收",
-        "绑定最终提交独立审查"
+        "安装版高级业务完整验收",
+        "源码与安装版录屏对照",
+        "必需CI",
+        "完整目标机与物理DPI验证（当前已覆盖本机DPR1.5）"
       ],
       "constraints": [
-        "旧页面硬编码样式仍须集中核对，规范不宣称已全部清除。",
-        "常规按钮已显式使用40/32px控件高度与4px垂直内边距；首页主入口与装饰缩略卡保留专有尺寸。",
-        "静态截图与软件渲染通过不代替真实安装版或硬件验证。"
+        "旧页面保留布局契约规则，不宣称旧CSS已全部清零。",
+        "常规按钮40/32px高度；首页主入口与装饰缩略卡保留专有尺寸。",
+        "局部独审、源码录屏和载荷相同不等于完整安装验收或所有目标机性能保证。"
       ],
-      "themeEvidence": ".local/t075-visual-confirm/theme-*.png：真实主题按钮生成的四套新截图；仅旧 .local/t075-visual-valid/theme* 排除。",
-      "motionEvidence": ".local/t075-visual-confirm/frames.json：69帧交互记录；不是硬件帧率、完整手感或安装验收结论。"
+      "themeEvidence": ".local/t075-final-source/theme-*.png：真实主题按钮生成的四主题截图；旧offscreen材料不再是当前基准。",
+      "motionEvidence": ".local/t075-final-source/interactions.mp4 / frames.json：274帧；pointer-actions.json记录真实CDP mouseMoved；仍需安装版录屏对照。",
+      "reviews": {
+        "code": {
+          "commit": "1d872bf2c09c9463b463f18412139da160f0be0d",
+          "report": ".local/t075-code-review-1d872bf.md",
+          "result": "ACCEPTED，限定代码复核范围。"
+        },
+        "visual": {
+          "commit": "edafe65e1451ecf2e5cb695f9f6b33ddfda2e49e",
+          "report": ".local/t075-finish-review-edafe65.md",
+          "previousReport": ".local/t075-finish-review-1d872bf.md",
+          "result": "ship，仅四项视觉修正及裁剪标注直接回归。"
+        }
+      },
+      "resources": {
+        "report": ".local/t075-final-source-wheel.json",
+        "commit": "edafe65e1451ecf2e5cb695f9f6b33ddfda2e49e",
+        "frontendFiles": 34,
+        "sourceWheelEqual": true
+      },
+      "installedCandidate": {
+        "payloadReport": ".local/t075-installed-payload.json",
+        "payloadFiles": 7780,
+        "payloadEqual": true,
+        "supervision": "19项检查，errors=[]；仅该诊断范围。",
+        "remaining": "高级工具入口修订同步和加载错误反馈正在修正；完整高级业务、录屏对照与必需CI仍待完成。",
+        "supervisionReport": "C:/Users/70236/AppData/Local/BioImage-WB-UI-System-Test/Diagnostics/20261022-024554-11cdac9495f74b4bbb495150cb1fce94.json"
+      }
+    },
+    "previewBoundary": {
+      "reservedBottom": "48px",
+      "scope": "preview-mode only",
+      "production": "正式产品无演示工具栏或这项留底；抽屉与工作区同源。"
+    },
+    "quickPreview": {
+      "objects": [
+        "来源",
+        "Fig",
+        "首页最近项目"
+      ],
+      "dwell": "350ms",
+      "keyboard": "聚焦立即显示",
+      "click": "信息按钮固定详情；项目卡主点击继续打开项目。"
     }
   },
   "components": [
@@ -1254,17 +1295,17 @@
       "css": ".ds-preview{padding:24px;background:var(--soft-header,#e9efde);color:var(--ink,#203b2e);border-radius:12px;font-family:\"WB Sans\",sans-serif;align-self:start}.ds-preview h3{font-size:16px;font-weight:550;margin:0 0 16px}.ds-preview p{font-size:12px;color:var(--muted,#52634c);line-height:1.8;margin:16px 0}"
     },
     {
-      "name": "来源快速预览",
+      "name": "对象快速预览",
       "kind": "custom",
       "refersTo": "quick-preview",
-      "description": "停留350ms或键盘聚焦显示，点击来源信息按钮固定详情；本例仅展示浮层内容。",
+      "description": "来源、Fig、最近项目共用；停留350ms或聚焦显示，信息按钮固定详情；本例只展示提示内容。",
       "html": "<div class=\"ds-quick-preview\" role=\"tooltip\">Fig 1 · 来源原图<br>来源详情可通过对应信息按钮打开。</div>",
       "css": ".ds-quick-preview{max-width:350px;padding:14px 16px;border:1px solid var(--line,#dce3d4);border-radius:10px;background:var(--paper,#fefff9);color:var(--ink,#203b2e);box-shadow:0 10px 28px #14251c20;font-family:\"WB Sans\",sans-serif;font-size:12px;line-height:1.7;overflow-wrap:anywhere;pointer-events:none}"
     }
   ],
   "narrative": {
     "northStar": "舒展的实验工作台",
-    "overview": "以稳定的操作位置和明亮的科学画布组织复杂实验流程。墨绿外壳负责项目身份，酸橙标出当前主要动作；留白让来源、Fig、蛋白和泳道的关系更容易辨认。界面可以有温度与动感，原图、坐标、曲线和数值必须保持严谨。\n\n这是一份从 T075 当前工作树提取的实现规范，基于最新 T074 `0376f23`，不是完成验收声明。正式入口为 `WebWorkbenchWindow`；HTML 预览与桌面加载同一套 `apps/desktop/src/bioimage_app/web_ui` 资源，通过不同数据适配器运行。不能另写安装版样式来掩盖差异。",
+    "overview": "以稳定的操作位置和明亮的科学画布组织复杂实验流程。墨绿外壳负责项目身份，酸橙标出当前主要动作；留白让来源、Fig、蛋白和泳道的关系更容易辨认。界面可以有温度与动感，原图、坐标、曲线和数值必须保持严谨。\n\n这份规范对应 T075 已构建候选基准 `edafe65`，继承 T074 `0376f23` 的最新业务结构；后续安装问题仍在修正，该提交不是最终交付声明。正式入口为 `WebWorkbenchWindow`；HTML 预览与桌面加载同一套 `apps/desktop/src/bioimage_app/web_ui` 资源，通过不同数据适配器运行。不能另写安装版样式来掩盖差异。",
     "keyCharacteristics": [
       "默认 forest / comfortable / expressive；四主题共用结构与业务语义。",
       "主操作稳定可见，低频细节原位展开，辅助信息在悬停、聚焦和点击时同样可达。",

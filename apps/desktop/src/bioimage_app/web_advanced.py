@@ -230,15 +230,15 @@ class AdvancedCommands:
                 raise ValueError("高级工具接口版本不支持")
             host = self.bridge.host
             project = host.view.project()
+            operation = text(data.get("operation"), 80)
             if (
                 data.get("projectId") != project.project_id
                 or data.get("sessionEpoch") != self.bridge.session_epoch
-                or data.get("revision") != host.view.generation
+                or (operation != "open" and data.get("revision") != host.view.generation)
             ):
                 raise ValueError("项目或修订已改变；编辑已保留，请刷新后核对。")
             if host.operation_busy or host.is_closing:
                 raise ValueError("当前任务仍在处理中，请等待或取消。")
-            operation = text(data.get("operation"), 80)
             value = mapping(data.get("value", {}))
             if operation == "open":
                 section = text(value.get("section"), 32)

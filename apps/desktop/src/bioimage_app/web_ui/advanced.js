@@ -68,7 +68,7 @@ window.advancedWorkspace=(()=>{
     if(section==='metadata')absorbPage();
     remember();render();
   }
-  function status(text,failed=false){message=text;error=failed;const node=document.getElementById('advanced-status');if(node){node.textContent=text;node.dataset.error=String(failed);}const note=document.getElementById('advanced-unsaved');if(note)note.textContent=dirty?'未保存编辑':'';}
+  function status(text,failed=false){message=text;error=failed;const loading=document.querySelector('.advanced-drawer .advanced-loading');if(loading)loading.innerHTML=failed?`<p class="advanced-error" role="alert">${esc(text)}</p><button class="button subtle" data-advanced="reload">重试</button>`:esc(text);const node=document.getElementById('advanced-status');if(node){node.textContent=text;node.dataset.error=String(failed);}const note=document.getElementById('advanced-unsaved');if(note)note.textContent=dirty?'未保存编辑':'';}
   function syncBusy(){document.querySelectorAll('#advanced-editor input,#advanced-editor select,#advanced-editor textarea,#advanced-editor button,#advanced-footer [data-advanced]:not([data-advanced=close])').forEach(el=>{if(pending){if(el.dataset.busyDisabled===undefined)el.dataset.busyDisabled=String(el.disabled);el.disabled=true;}else if(el.dataset.busyDisabled!==undefined){el.disabled=el.dataset.busyDisabled==='true';delete el.dataset.busyDisabled;}});}
   function open(next){if(pending){status('当前操作完成后可切换工具。');return;}remember();section=next;page=0;identity=state.sessionEpoch+':'+state.projectId;data=null;draft=null;pending=null;openDrawer(titles[section],'<div class="advanced-loading" role="status">正在读取项目…</div>');document.getElementById('drawer').classList.add('advanced-drawer');command('open',{section});}
   function render(){

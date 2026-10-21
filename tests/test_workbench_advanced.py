@@ -46,7 +46,7 @@ def test_web_advanced_save_reopen_and_import_receipts(
     bridge.advancedStateChanged.connect(receive)
 
     def command(
-        operation: str, value: dict[str, object], *, expected: str = "done"
+        operation: str, value: dict[str, object], *, expected: str = "done", revision_delta: int = 0
     ) -> dict[str, Any]:
         request = f"request-{len(replies)}"
         manager.command(
@@ -55,7 +55,7 @@ def test_web_advanced_save_reopen_and_import_receipts(
                 "requestId": request,
                 "projectId": host.view.project().project_id,
                 "sessionEpoch": bridge.session_epoch,
-                "revision": host.view.generation,
+                "revision": host.view.generation + revision_delta,
                 "operation": operation,
                 "value": value,
             }
@@ -164,6 +164,10 @@ def test_web_advanced_save_reopen_and_import_receipts(
     assert manager.snapshot()["tables"]
     host.view.generation += 1
     assert manager.snapshot()["tables"] == {}
+    refreshed = command("open", {"section": "ocr"}, revision_delta=-1)
+    assert refreshed["revision"] == host.view.generation
+    command("template_apply", {}, expected="failed", revision_delta=-1)
+    assert "修订已改变" in replies[-1]["error"]
 
 
 def test_actual_web_forms_save_reopen_and_export(
@@ -189,12 +193,31 @@ def test_actual_web_forms_save_reopen_and_export(
 
         def open_tool(name: str) -> None:
             js("advancedWorkspace.open(" + json.dumps(name) + ")")
-            qtbot.waitUntil(
-                lambda: (
-                    javascript(window, qtbot, "!!document.querySelector('#advanced-editor')")
-                    is True
+            try:
+                qtbot.waitUntil(
+                    lambda: (
+                        javascript(window, qtbot, "!!document.querySelector('#advanced-editor')")
+                        is True
+                    )
                 )
-            )
+            except Exception as failure:
+                reply = window.bridge.advanced_commands.response
+                failure.add_note(
+                    json.dumps(
+                        {
+                            "status": reply.get("status"),
+                            "error": reply.get("error"),
+                            "hostRevision": host.view.generation,
+                            "busy": host.operation_busy,
+                            "stateRevision": javascript(window, qtbot, "state.revision"),
+                            "drawer": javascript(
+                                window, qtbot, "document.querySelector('#drawer-content').innerText"
+                            ),
+                        },
+                        ensure_ascii=True,
+                    )
+                )
+                raise
 
         def field(path: str, value: str | int) -> None:
             js(
@@ -233,6 +256,18 @@ def test_actual_web_forms_save_reopen_and_export(
                 is True
             ), status
 
+        js("advancedWorkspace.open('unavailable')")
+        qtbot.waitUntil(
+            lambda: (
+                javascript(
+                    window,
+                    qtbot,
+                    "!!document.querySelector('.advanced-loading .advanced-error')&&"
+                    "!!document.querySelector('.advanced-loading [data-advanced=reload]')",
+                )
+                is True
+            )
+        )
         open_tool("template")
         # A late open receipt may update stored state, never replace a newer drawer.
         js("advancedWorkspace.open('template');workbenchAppearance.open()")
@@ -290,11 +325,18 @@ def test_actual_web_forms_save_reopen_and_export(
         js(
             "document.querySelector('[data-adv-path=\"field:notes\"]').click();document.querySelector('[data-adv-path=\"entries.0.selected\"]').click()"
         )
+        # Save receipt deliberately precedes the main state snapshot. Read-only tool
+        # opening must load the latest revision while writes remain guarded.
+        window.bridge.timer.stop()
+        stale_revision = javascript(window, qtbot, "state.revision")
         click("metadata_apply")
         completed()
+        assert javascript(window, qtbot, "state.revision") == stale_revision
+        assert host.view.generation != stale_revision
         assert host.view.project().rows[0].notes == "网页中文实验备注"
 
         open_tool("ocr")
+        window.bridge.timer.start()
         monkeypatch.setattr(
             "bioimage_app.web_advanced.QFileDialog.getOpenFileName",
             dialog(tmp_path / "original0.tiff"),
