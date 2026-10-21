@@ -2,10 +2,11 @@
 
 - 当前任务唯一状态：[T072](../work/tasks/T-072-automatic-flow-repair.md)。用户2026-10-21批准六项试用反馈修复，完整方案已登记活动目标，持续到独审、PR/main与新离线测试版。
 - 新树 C:/Users/70236/.codex/worktrees/wb-auto-flow-repair/bioimage-tools-platform，分支codex/t072-automatic-flow-repair，基线main975942de。旧主目录27份dirty、旧grouped树10份dirty、T071树clean的HEAD/status/SHA清单在新树.local/t072/preserved-worktrees.json；未改旧树、原图/历史/安装。
-- 当前已实现草稿：intake_crop@2自动采纳和人工review分离；已有倾角接入显示框；手动显示角度/恢复；独立有界只读Fig预览，灰度页图片与原坐标区域映射；结果页显式全宽表格/导出入口，收拢常驻说明。未提交/未最终独审/未全门禁/未打包。
-- 已验：新增12核心反例0；真实两Fig自动链不需手动确认、10表格记录、灰度图片/5区域、Excel及原图保持；加原暂停链/修正提示共3项17.66s0。首扩展回归72passed/2failed保留（修正提示缩短、序列现场）；后继三项通过不覆盖早期GPU context lost日志。新测试初次误放参数装饰器导致collection1已修正。Pyright曾0，最终改动后须重跑。
-- 最新：原信号无膜轮廓19组源图单独0/19；新增instrument_guided_geometry@1初稿13/19但独审发现方向、多膜、近邻双排和标准高度吞目标四问题；已修复，13专用用例及独立扩展反例通过，保守4/19自动其余暂停。原图不变；13旧结果不可当有效能力。导向源码隔离自检9槽/两Fig/图表/退出0。
-- 下一步：完成预览异步/视觉验证、更新证据，最终提交独审→完整门禁/四CI→新独立离线包。targeted-v4出现GPU context lost/停滞，核对PID后仅终止本轮pytest；v5改软件渲染运行，未削弱断言。不得将合成通过称科学留出；不操作用户正在使用的旧安装窗口。
+- 产品修复head44a342ede883f05365437779b97bf751e74eab0b，非作者/root/t072_commit_review独审Accepted，51项10.31s0及原反例通过。PR32草稿已附任务，四CI中两平台待完成，精确head本机全门禁正在.local/t072/check-all-44a342e.log运行。
+- 新语义：source_signal_geometry@1与instrument_guided_geometry@1共享信号方向/多目标校验，旧source@2不能直接自动；4/19已见真实组可自动，其他15保留暂停。intake_crop@2机器采纳不冒充人工。旧native角度仅影响当前Fig，所有显示输出/回存caller按Fig一致，混合manifest@3，其他Fig历史/摘要保持。
+- 已验：真实19组全链180.688s0（源图/旧新输出/局部修订/重开保持）；91定向0、53core0、32输出/回存0、mixed完整输出1项11.29s0、两Fig与导向源码隔离诊断2项20.29s0、Pyright/Ruff0。初始完整1007pass/1fail为E2E只等表可见提前读取占位1行，改等待完整10行并保留10行断言；初轮不是最终头覆盖。失败证据见T072 validation。
+- 用户追加预览模糊：128缩略图SHA缓存阻止高清替换，已按SHA/尺寸提升中央预览，700×300自然尺寸/安装诊断断言；原值定量不变。UI两尺寸2轮截图可见图/区域/表，无横溢出，普通说明折叠。
+- 下一步：等当前两平台CI/完整门禁，主线正常PR集成→干净集成头独立AutomaticFlowTest离线包→安装/四诊断与PS5.1/载荷核验→最终产物独审/交接。源码独审不替代安装证明；不将合成或已见数据称科学留出。旧T071窗口不操作。
 
 ## 上次交付（历史指针）
 
