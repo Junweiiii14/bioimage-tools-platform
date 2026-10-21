@@ -2,6 +2,12 @@
 name: BioImage 工具平台与 WB 证据工作台
 description: 网页与 QtWebEngine 同源的图像中心工作台，保留原生高级编辑器
 colors:
+  batch-ink: "#22332f"
+  batch-muted: "#64716d"
+  batch-accent: "#087e71"
+  batch-ground: "#f4f6f5"
+  batch-line: "#e2e8e4"
+  batch-canvas: "#e9ede9"
   web-ink: "#20342f"
   web-muted: "#58675f"
   web-accent: "#087f72"
@@ -107,6 +113,25 @@ components:
 ---
 
 # Design System: BioImage 工具平台与 WB 证据工作台
+
+## T073 批次工作台的局部规范
+
+用户批准简洁清晰的批次界面重构。`intake_workbench.css`中的`.intake-project`
+限定本轮规则：白色工具面、batch-ground工作区、batch-canvas图像台、batch-accent
+主动作。56px项目栏、58px五阶段栏；配置矩阵顶部Fig/N/蛋白，原图三列；
+处理区215px对象/弹性中央/268px属性，≤1050px属性进入详情抽屉、对象184px。
+24px配置/结果标题，20px图像标题，13–14px正文与按钮，11–12px辅助文字；
+沿用Windows系统中文UI字体。控件6px、图像台8px圆角，避免层层卡片。
+
+与独立HTML共用信息层级、色彩和操作顺序。真实软件另保留保存、历史、错误和
+完整记录状态，不能以示例隐藏这些功能。中央图像、曲线与数值不动画；控件反馈
+140–200ms，系统及应用减少动效关闭过渡。新Fig聚焦名称，文字输入/IME和主动
+浏览不抢页；图像缩放保留选择，失败保留草稿。
+
+代码依据：`web_ui/intake{,_groups,_views}.js`与`intake_workbench.css`；
+视觉证据为`.impeccable/review/t073-prototype`与`t073-software`本地合成截图，
+不代替科学/交付验证。此前原生高级窗口和独立灰度的规范保持各自范围；
+旧sidecar的默认入口/三模式历史描述漂移不在本轮顺手修复。
 
 ## Overview
 

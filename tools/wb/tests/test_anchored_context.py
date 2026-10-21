@@ -87,3 +87,17 @@ def test_rounding_is_integer_and_bounded() -> None:
     assert context_padding(10, 5) == 1
     with pytest.raises(ValueError):
         context_padding(100, 30)
+
+
+def test_detected_exclusion_blocks_background_expansion_even_for_a_weak_mark() -> None:
+    profile = 3000.0 + np.arange(120) * 10
+    profile[40:60] += 1000
+    profile[64] += 25  # Below the dominant-peak heuristic, still a known exclusion.
+    source = pixels(profile)
+    target = LaneROI("lane", 0, 38, 4, 62)
+    limited = propose_anchored_lanes(
+        source, (target,), "light", limits=(LaneROI("limit", 0, 0, 4, 64),)
+    )[0]
+    assert limited.proposal.roi.y1 <= 64
+    assert limited.proposal.bands[0].notes == ("boundary_review:insufficient_background_support",)
+    assert limited.proposal.roi == target

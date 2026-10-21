@@ -1,0 +1,603 @@
+{
+  "document_type": "wb_figure_project",
+  "schema_version": 13,
+  "project_id": "automatic-crop",
+  "name": "WB 项目",
+  "revision": 0,
+  "rows": [
+    {
+      "row_id": "r",
+      "source": {
+        "asset_id": "raw",
+        "relative_path": "assets/raw.tiff",
+        "sha256": "587cb51467fc0b2f55f0f8231b4becc8b60097c57b119cc08e37ee97bd8b45ba",
+        "size_bytes": 420256,
+        "schema_version": 1
+      },
+      "filename": "original.tiff",
+      "width": 700,
+      "height": 300,
+      "bit_depth": 16,
+      "figure": "Fig",
+      "protein": "AKT",
+      "lane_count": 5,
+      "empty_lanes": [],
+      "roi": {
+        "lane_id": "r",
+        "x0": 253,
+        "y0": 125,
+        "x1": 497,
+        "y1": 178
+      },
+      "reviewed": false,
+      "notes": ""
+    }
+  ],
+  "figure_order": [
+    "Fig"
+  ],
+  "template": {
+    "schema_version": 1,
+    "name": "实验室行式模板",
+    "font": null,
+    "font_size": 18,
+    "label_width": 150,
+    "label_side": "left",
+    "crop_height": 60,
+    "row_gap": 10,
+    "figure_gap": 40,
+    "margin": 24,
+    "border": 1,
+    "columns": 3,
+    "dpi": 300,
+    "display_mapping": "bt601_uint16_div257@1"
+  },
+  "suggestions": [],
+  "analyses": [
+    {
+      "row_id": "r",
+      "crop": {
+        "lane_id": "r",
+        "x0": 253,
+        "y0": 125,
+        "x1": 497,
+        "y1": 178
+      },
+      "empty_lanes": [],
+      "request": {
+        "source_sha256": "587cb51467fc0b2f55f0f8231b4becc8b60097c57b119cc08e37ee97bd8b45ba",
+        "revision": 0,
+        "polarity": "dark",
+        "lanes": [
+          {
+            "roi": {
+              "lane_id": "r:01",
+              "x0": 253,
+              "y0": 125,
+              "x1": 303,
+              "y1": 168
+            },
+            "bands": [
+              {
+                "band_id": "target",
+                "bounds": {
+                  "left": 12,
+                  "right": 31
+                },
+                "baseline": {
+                  "left_value": 15535.0,
+                  "right_value": 15535.0
+                },
+                "included": true,
+                "detection_notes": []
+              }
+            ],
+            "target_roi": {
+              "lane_id": "r:01",
+              "x0": 253,
+              "y0": 125,
+              "x1": 303,
+              "y1": 168
+            },
+            "context_expansion_percent": 0
+          },
+          {
+            "roi": {
+              "lane_id": "r:02",
+              "x0": 303,
+              "y0": 128,
+              "x1": 350,
+              "y1": 171
+            },
+            "bands": [
+              {
+                "band_id": "target",
+                "bounds": {
+                  "left": 11,
+                  "right": 30
+                },
+                "baseline": {
+                  "left_value": 15535.0,
+                  "right_value": 15535.0
+                },
+                "included": true,
+                "detection_notes": []
+              }
+            ],
+            "target_roi": {
+              "lane_id": "r:02",
+              "x0": 303,
+              "y0": 128,
+              "x1": 350,
+              "y1": 171
+            },
+            "context_expansion_percent": 0
+          },
+          {
+            "roi": {
+              "lane_id": "r:03",
+              "x0": 350,
+              "y0": 130,
+              "x1": 398,
+              "y1": 173
+            },
+            "bands": [
+              {
+                "band_id": "target",
+                "bounds": {
+                  "left": 12,
+                  "right": 31
+                },
+                "baseline": {
+                  "left_value": 15535.0,
+                  "right_value": 15535.0
+                },
+                "included": true,
+                "detection_notes": []
+              }
+            ],
+            "target_roi": {
+              "lane_id": "r:03",
+              "x0": 350,
+              "y0": 130,
+              "x1": 398,
+              "y1": 173
+            },
+            "context_expansion_percent": 0
+          },
+          {
+            "roi": {
+              "lane_id": "r:04",
+              "x0": 398,
+              "y0": 133,
+              "x1": 446,
+              "y1": 176
+            },
+            "bands": [
+              {
+                "band_id": "target",
+                "bounds": {
+                  "left": 11,
+                  "right": 30
+                },
+                "baseline": {
+                  "left_value": 15535.0,
+                  "right_value": 15535.0
+                },
+                "included": true,
+                "detection_notes": []
+              }
+            ],
+            "target_roi": {
+              "lane_id": "r:04",
+              "x0": 398,
+              "y0": 133,
+              "x1": 446,
+              "y1": 176
+            },
+            "context_expansion_percent": 0
+          },
+          {
+            "roi": {
+              "lane_id": "r:05",
+              "x0": 446,
+              "y0": 135,
+              "x1": 497,
+              "y1": 178
+            },
+            "bands": [
+              {
+                "band_id": "target",
+                "bounds": {
+                  "left": 12,
+                  "right": 31
+                },
+                "baseline": {
+                  "left_value": 15535.0,
+                  "right_value": 15535.0
+                },
+                "included": true,
+                "detection_notes": []
+              }
+            ],
+            "target_roi": {
+              "lane_id": "r:05",
+              "x0": 446,
+              "y0": 135,
+              "x1": 497,
+              "y1": 178
+            },
+            "context_expansion_percent": 0
+          }
+        ],
+        "geometry_policy": "anchored_context@1",
+        "quant_policy": "anchored_background@1"
+      },
+      "run": null
+    }
+  ],
+  "ocr": null,
+  "normalizations": [],
+  "archive_sources": [],
+  "imported_runs": [],
+  "layout_style": {
+    "schema_version": 1,
+    "display_policy": "standard_lane_ratio@1",
+    "lane_unit": 120,
+    "heading_size": 26,
+    "segment_gap": 8,
+    "label_alignment": "right",
+    "flow": "columns"
+  },
+  "composition": {
+    "schema_version": 1,
+    "slices": [
+      {
+        "display_frame": {
+          "center_x": 374.4664492846983,
+          "center_y": 151.2827664691879,
+          "width": 240.0,
+          "height": 38.4,
+          "angle_degrees": 3.0013731095913436
+        },
+        "row_id": "r",
+        "figure": "Fig",
+        "line": 1,
+        "position": 1,
+        "first_lane": 1,
+        "last_lane": 5
+      }
+    ],
+    "columns": [
+      {
+        "figure": "Fig",
+        "column": 1
+      }
+    ]
+  },
+  "automatic_rows": [],
+  "partition_sources": [],
+  "intake": {
+    "schema_version": 1,
+    "figures": [
+      {
+        "figure_id": "f",
+        "label": "Fig",
+        "lane_count": 5
+      }
+    ],
+    "proteins": [
+      {
+        "protein_id": "r",
+        "figure_id": "f",
+        "label": "AKT"
+      }
+    ],
+    "sources": [
+      {
+        "source_id": "s",
+        "asset": {
+          "asset_id": "raw",
+          "relative_path": "assets/raw.tiff",
+          "sha256": "587cb51467fc0b2f55f0f8231b4becc8b60097c57b119cc08e37ee97bd8b45ba",
+          "size_bytes": 420256,
+          "schema_version": 1
+        },
+        "original_name": "original.tiff",
+        "relative_path": "original.tiff",
+        "width": 700,
+        "height": 300,
+        "bit_depth": 16
+      }
+    ],
+    "assignments": [
+      {
+        "protein_id": "r",
+        "source_id": "s",
+        "reuse_confirmed": false
+      }
+    ],
+    "confirmed_digest": "0bd1f8cfcf2ab875d9f977e2000ffbed6d8b0456b568fcee7603281737f46618"
+  },
+  "workflow": {
+    "policy": "intake_workflow@3",
+    "editing": false,
+    "intake_digest": "0bd1f8cfcf2ab875d9f977e2000ffbed6d8b0456b568fcee7603281737f46618",
+    "approved": true,
+    "cancel_requested": false,
+    "steps": [
+      {
+        "stage": "crop",
+        "target_id": "r",
+        "status": "done",
+        "attempt": 2,
+        "claim_id": "d6d3ae539590146811d4c3442ce9f8fdb4a69b0f685ae81d8752848f045229b1",
+        "input_digest": "5294afdd0e19f5457212fed9509426523d1245ad56f29287f0a25a18cda5384c",
+        "reason": ""
+      },
+      {
+        "stage": "compose",
+        "target_id": "f",
+        "status": "done",
+        "attempt": 1,
+        "claim_id": "02af0e34c27a8e6c432581af271109cd8c683d2a65505f313f2c58a6b72a770c",
+        "input_digest": "fc3a86e2ca3f65af6fffa4e590f254455311dd98cc7513fcf495e7b58b3ea4de",
+        "reason": ""
+      },
+      {
+        "stage": "measure",
+        "target_id": "f",
+        "status": "pending",
+        "attempt": 0,
+        "claim_id": "",
+        "input_digest": "",
+        "reason": ""
+      },
+      {
+        "stage": "export",
+        "target_id": "automatic-crop",
+        "status": "pending",
+        "attempt": 0,
+        "claim_id": "",
+        "input_digest": "",
+        "reason": ""
+      }
+    ]
+  },
+  "intake_crops": [
+    {
+      "policy": "intake_crop@2",
+      "row_id": "r",
+      "source_sha256": "587cb51467fc0b2f55f0f8231b4becc8b60097c57b119cc08e37ee97bd8b45ba",
+      "source_revision": 0,
+      "lane_count": 5,
+      "detection": {
+        "settings": {
+          "lane_count": 5,
+          "crop_height": 53,
+          "polarity": "dark",
+          "left_marker": false,
+          "min_snr": 4.0,
+          "membrane_hint": null,
+          "include_membrane_edges": false
+        },
+        "width": 700,
+        "height": 300,
+        "membrane": {
+          "lane_id": "membrane",
+          "x0": 197,
+          "y0": 106,
+          "x1": 504,
+          "y1": 195
+        },
+        "marker": null,
+        "sample_region": {
+          "lane_id": "candidate",
+          "x0": 253,
+          "y0": 125,
+          "x1": 497,
+          "y1": 178
+        },
+        "candidates": [
+          {
+            "roi": {
+              "lane_id": "candidate",
+              "x0": 253,
+              "y0": 125,
+              "x1": 497,
+              "y1": 178
+            },
+            "peak_y": 151,
+            "lane_snr": [
+              30000.000000000007,
+              42000.00000000001,
+              30000.000000000007,
+              42000.00000000001,
+              30000.000000000007
+            ],
+            "detected_lanes": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "weak_lanes": [],
+            "possible_empty_lanes": [],
+            "flags": [
+              "crop_policy:source_geometry@2",
+              "automatic_geometry_unreviewed",
+              "white_light_geometry_guide",
+              "angle_degrees:3.001373",
+              "center_support:60,70,60,70,60",
+              "explicit_lane_count"
+            ],
+            "lane_rois": [
+              {
+                "lane_id": "lane-1",
+                "x0": 253,
+                "y0": 125,
+                "x1": 303,
+                "y1": 168
+              },
+              {
+                "lane_id": "lane-2",
+                "x0": 303,
+                "y0": 128,
+                "x1": 350,
+                "y1": 171
+              },
+              {
+                "lane_id": "lane-3",
+                "x0": 350,
+                "y0": 130,
+                "x1": 398,
+                "y1": 173
+              },
+              {
+                "lane_id": "lane-4",
+                "x0": 398,
+                "y0": 133,
+                "x1": 446,
+                "y1": 176
+              },
+              {
+                "lane_id": "lane-5",
+                "x0": 446,
+                "y0": 135,
+                "x1": 497,
+                "y1": 178
+              }
+            ],
+            "display_frame": {
+              "center_x": 374.4664492846983,
+              "center_y": 151.2827664691879,
+              "width": 240.0,
+              "height": 38.4,
+              "angle_degrees": 3.0013731095913436
+            }
+          }
+        ],
+        "flags": [
+          "crop_policy:source_geometry@2",
+          "automatic_geometry_unreviewed",
+          "angle_degrees:3.001373",
+          "center_support:60,70,60,70,60",
+          "explicit_lane_count",
+          "signal_orientation_fit@1",
+          "signal_fit_residual:0.027051",
+          "source_signal_contour"
+        ],
+        "algorithm_id": "source_signal_geometry@1"
+      },
+      "selected_index": 0,
+      "crop": {
+        "lane_id": "r",
+        "x0": 253,
+        "y0": 125,
+        "x1": 497,
+        "y1": 178
+      },
+      "slots": [
+        {
+          "slot_id": "722e30d5b61bd2571458c470e3b55d9bc53074338843d863bb21f289339f1f00",
+          "position": 1,
+          "roi": {
+            "lane_id": "722e30d5b61bd2571458c470e3b55d9bc53074338843d863bb21f289339f1f00",
+            "x0": 253,
+            "y0": 125,
+            "x1": 303,
+            "y1": 168
+          },
+          "signal": "detected"
+        },
+        {
+          "slot_id": "2f289d03bc918951e01edcc97f952cb1d6282d265c1565b0764d675125ec5249",
+          "position": 2,
+          "roi": {
+            "lane_id": "2f289d03bc918951e01edcc97f952cb1d6282d265c1565b0764d675125ec5249",
+            "x0": 303,
+            "y0": 128,
+            "x1": 350,
+            "y1": 171
+          },
+          "signal": "detected"
+        },
+        {
+          "slot_id": "10d73484dfd1996aff9e66a20b23c7ade852dd28d0ad998794476be299ae0b4a",
+          "position": 3,
+          "roi": {
+            "lane_id": "10d73484dfd1996aff9e66a20b23c7ade852dd28d0ad998794476be299ae0b4a",
+            "x0": 350,
+            "y0": 130,
+            "x1": 398,
+            "y1": 173
+          },
+          "signal": "detected"
+        },
+        {
+          "slot_id": "9ca9a6ac5924c49c307d63a33e94c3cbcf8f3de4069f3a3e8ff4f8b169cd13ec",
+          "position": 4,
+          "roi": {
+            "lane_id": "9ca9a6ac5924c49c307d63a33e94c3cbcf8f3de4069f3a3e8ff4f8b169cd13ec",
+            "x0": 398,
+            "y0": 133,
+            "x1": 446,
+            "y1": 176
+          },
+          "signal": "detected"
+        },
+        {
+          "slot_id": "cb49e3169159781d12c00536bd01c5c6fbd9eae85866734fa831c495b5647e99",
+          "position": 5,
+          "roi": {
+            "lane_id": "cb49e3169159781d12c00536bd01c5c6fbd9eae85866734fa831c495b5647e99",
+            "x0": 446,
+            "y0": 135,
+            "x1": 497,
+            "y1": 178
+          },
+          "signal": "detected"
+        }
+      ],
+      "reviewed": false,
+      "raw_crop": {
+        "asset_id": "historic-crop",
+        "relative_path": "assets/crop.tiff",
+        "sha256": "56b0731a063610bec0d1f3174289dd152720a26d87110197942b9d9e9d908933",
+        "size_bytes": 26600,
+        "schema_version": 1
+      },
+      "reason": "已自动采纳完整定位",
+      "geometry_policy": "source_signal_geometry@1"
+    }
+  ],
+  "intake_figures": [
+    {
+      "policy": "intake_figure@1",
+      "figure_id": "f",
+      "row_ids": [
+        "r"
+      ],
+      "slot_ids": [
+        [
+          "722e30d5b61bd2571458c470e3b55d9bc53074338843d863bb21f289339f1f00",
+          "2f289d03bc918951e01edcc97f952cb1d6282d265c1565b0764d675125ec5249",
+          "10d73484dfd1996aff9e66a20b23c7ade852dd28d0ad998794476be299ae0b4a",
+          "9ca9a6ac5924c49c307d63a33e94c3cbcf8f3de4069f3a3e8ff4f8b169cd13ec",
+          "cb49e3169159781d12c00536bd01c5c6fbd9eae85866734fa831c495b5647e99"
+        ]
+      ],
+      "input_digest": "56d6e073095ac765e92907a40e54b47ea69585515c2ea98cfc8474637d2a9d32",
+      "image": {
+        "asset_id": "historic-figure",
+        "relative_path": "assets/figure.png",
+        "sha256": "5fde3f324931d22e62d0876366af74109be823db273f4475bbf5849c2b8a670d",
+        "size_bytes": 9491,
+        "schema_version": 1
+      },
+      "width": 800,
+      "height": 192
+    }
+  ]
+}

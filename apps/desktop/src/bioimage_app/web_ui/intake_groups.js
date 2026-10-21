@@ -162,6 +162,8 @@ window.intakeGroups = (() => {
         const assigned = draft.groups.filter(g => g.figure_id === node.dataset.sequenceRange);
         node.textContent = assigned.length ? `对应${groupName(assigned[0])}–${groupName(assigned.at(-1))}` : '填写蛋白名后自动对应采集组';
       });
+      root.querySelectorAll('[data-sequence-protein]').forEach(node=>{const g=group(node.dataset.sequenceProtein);node.textContent=g.protein_label||groupName(g);});
+      window.intakeWorkspace?.updateChrome();
       const unused = acquisitionGroups().filter(g => !g.figure_id);
       root.querySelector('[data-sequence-remaining]').hidden = !unused.length;
       root.querySelector('[data-sequence-remaining-label]').textContent = `确认剩余 ${unused.length} 组不纳入本次处理（原图保留）`;
@@ -178,15 +180,38 @@ window.intakeGroups = (() => {
     if(!refs.length)return '';
     return `<details class="sequence-references"><summary>参考结果 ${refs.length} 组 · 原图保留，不占蛋白顺序与采集组编号</summary><p class="intake-help">已识别的验证或裁剪结果仅作参考。它们不进入本次裁剪和原像素定量。</p><div class="grouped-grid">${refs.map((g,i)=>`<section class="grouped-card"><div class="grouped-card-title"><h3>参考 ${String(i+1).padStart(2,'0')}</h3><p>${escapeText(groupDirectory(g))}</p></div><div class="grouped-images">${g.source_ids.map(id=>{const s=source(id);return s?`<div class="grouped-image"><button class="grouped-zoom" data-group-action="zoom" data-id="${escapeText(id)}" aria-label="放大参考 ${escapeText(s.original_name)}">${preview(s,null)}</button><strong>${escapeText(s.original_name)}</strong><small>${escapeText(s.relative_path)}</small></div>`:'';}).join('')}</div>${g.selected_source_id?`<button class="text-button" data-group-action="unpick" data-id="${escapeText(g.group_id)}" ${disabled}>取消原有裁剪源选择</button>`:''}</section>`).join('')}</div></details>`;
   }
+  function sequenceFigure(f, index, disabled) {
+    const id=escapeText(f.figure_id), label=escapeText(f.label || `Fig ${index+1}`);
+    const names=draft.sequence.filter(p=>p.figure_id===f.figure_id).map(p=>p.label).join('\n');
+    return `<div class="sequence-figure" role="group" aria-label="${label}">
+      <input aria-label="${label} 名称" type="text" data-group-field="fig-label" data-id="${id}" value="${escapeText(f.label)}" maxlength="120" ${disabled}>
+      <label class="sequence-n"><span>N</span><input aria-label="${label} 泳道数 N" type="number" min="1" max="96" step="1" data-group-field="lanes" data-id="${id}" value="${f.lane_count ?? ''}" ${disabled}></label>
+      <textarea aria-label="${label} 蛋白名，每行一个" data-group-field="proteins" data-id="${id}" rows="3" spellcheck="false" placeholder="如：SLC3A2&#10;GAPDH" ${disabled}>${escapeText(names)}</textarea>
+      <p class="sequence-range" data-sequence-range="${id}"></p>
+      <details class="sequence-row-menu"><summary aria-label="${label} 排序与删除">···</summary><div>
+        <button class="text-button" data-group-action="fig-up" data-id="${id}" ${disabled} ${index===0?'disabled':''}>上移</button>
+        <button class="text-button" data-group-action="fig-down" data-id="${id}" ${disabled} ${index===draft.figures.length-1?'disabled':''}>下移</button>
+        <button class="text-button" data-group-action="remove-fig" data-id="${id}" ${disabled}>删除 Fig</button>
+      </div></details></div>`;
+  }
+  function sequenceSource(g, id, disabled) {
+    const s=source(id);if(!s)return '';
+    return `<div class="sequence-source ${g.selected_source_id===id?'chosen':''}">
+      <label class="sequence-source-choice"><input type="radio" name="group-${escapeText(g.group_id)}" data-group-source="${escapeText(id)}" data-id="${escapeText(g.group_id)}" aria-label="${escapeText(groupName(g))}，选择 ${escapeText(s.original_name)} 用于裁剪" ${g.selected_source_id===id?'checked':''} ${disabled}>
+        <span class="sequence-source-image">${preview(s,null)}<span class="sequence-picked">用于裁剪</span></span>
+      </label><div class="sequence-source-caption"><span title="${escapeText(s.relative_path)}">${escapeText(s.original_name)}</span><button class="text-button" data-group-action="zoom" data-id="${escapeText(id)}" aria-label="放大 ${escapeText(s.original_name)}">放大</button></div>
+      <details class="sequence-source-meta"><summary>${s.width} × ${s.height} · ${s.bit_depth} 位</summary><p>${escapeText(s.relative_path)}</p></details></div>`;
+  }
   function sequenceHtml(disabled) {
-    return `<div class="intake-heading"><div><h1>配置 Fig 与蛋白顺序</h1><p>从采集组 01 起按顺序自动分配。每个 Fig 填一次 N，下方只需选择裁剪原图。</p></div><button class="button subtle" data-group-action="import" ${disabled} ${dirty()||state.intake.workflow?'disabled':''}>添加图片文件夹</button></div>
-      ${state.intake.workflow?.editing?'<p class="intake-help">正在创建新的执行修订。受影响当前结果会过期，原图、历史运行和旧输出保留。</p>':''}
+    return `<div class="intake-heading"><div><h1>配置本次实验</h1><p>填写 Fig 和蛋白名，再选择每个采集组用于裁剪的原图。</p></div><button class="button subtle" data-group-action="import" ${disabled} ${dirty()||state.intake.workflow?'disabled':''}>添加图片文件夹</button></div>
+      ${state.intake.workflow?.editing?'<p class="intake-help">正在创建新的执行修订；原图和历史结果保留。</p>':''}
       ${conflict?'<p class="intake-conflict" role="alert">后台清单已改变，本地输入保留；请核对后重新载入。</p>':''}
       ${state.intake.issues?.length?`<details class="intake-conflict"><summary>${state.intake.issues.length} 个文件读取失败</summary><ul>${state.intake.issues.map(i=>`<li>${escapeText(i)}</li>`).join('')}</ul></details>`:''}
-      <section class="sequence-figures" aria-label="Fig 与蛋白顺序"><div class="intake-section-heading"><h2>本次 Fig</h2><button class="button subtle" data-group-action="add-fig" ${disabled}>新增 Fig</button></div>
-      ${draft.figures.map((f,i)=>`<fieldset class="sequence-figure"><legend>${escapeText(f.label || `Fig ${i+1}`)}</legend><div class="sequence-figure-fields"><label>Fig 名称<input type="text" data-group-field="fig-label" data-id="${escapeText(f.figure_id)}" value="${escapeText(f.label)}" maxlength="120" ${disabled}></label><label>泳道数 N<input type="number" min="1" max="96" step="1" data-group-field="lanes" data-id="${escapeText(f.figure_id)}" value="${f.lane_count ?? ''}" placeholder="包含空槽，不含 Marker" ${disabled}></label><label class="sequence-proteins">蛋白名称 · 每行一个<textarea data-group-field="proteins" data-id="${escapeText(f.figure_id)}" rows="3" spellcheck="false" placeholder="如：SLC3A2&#10;GAPDH" ${disabled}>${escapeText(draft.sequence.filter(p=>p.figure_id===f.figure_id).map(p=>p.label).join('\n'))}</textarea></label></div><div class="sequence-figure-footer"><p data-sequence-range="${escapeText(f.figure_id)}"></p><div><button class="text-button" data-group-action="fig-up" data-id="${escapeText(f.figure_id)}" ${disabled} ${i===0?'disabled':''}>上移</button><button class="text-button" data-group-action="fig-down" data-id="${escapeText(f.figure_id)}" ${disabled} ${i===draft.figures.length-1?'disabled':''}>下移</button><button class="text-button" data-group-action="remove-fig" data-id="${escapeText(f.figure_id)}" ${disabled}>删除 Fig</button></div></div></fieldset>`).join('') || '<p class="intake-empty">点击“新增 Fig”，填写 Fig 名称、N 和蛋白顺序；支持直接粘贴多行蛋白名。</p>'}</section>
-      <div class="grouped-toolbar sequence-toolbar"><h2>选择裁剪原图</h2><button class="text-button" data-group-action="discover" ${disabled} ${dirty()||state.intake.workflow?'disabled':''}>识别来源与参考图</button>${(state.intake.reference_group_candidates||[]).some(id=>!referenceIds().has(id))?`<button class="text-button" data-group-action="separate-reference" ${disabled}>单列已识别的参考结果（预览）</button>`:''}<label class="grouped-search">查找采集组<input type="search" data-group-search value="${escapeText(filter)}" placeholder="文件名、目录或蛋白名"></label></div><p class="intake-help">组内图片平等并排；点击图片可放大。蛋白名中的逗号和斜杠按原文字保留。</p>
-      <div class="grouped-grid">${visible().map(g=>`<section class="grouped-card" data-group-id="${escapeText(g.group_id)}"><div class="grouped-card-title"><h3>${escapeText(groupName(g))}</h3><p>${escapeText(groupDirectory(g))}</p></div><p class="sequence-binding" data-sequence-binding="${escapeText(g.group_id)}"></p><div class="grouped-images">${g.source_ids.map(id=>{const s=source(id);if(!s)return '';return `<div class="grouped-image ${g.selected_source_id===id?'chosen':''}"><button class="grouped-zoom" data-group-action="zoom" data-id="${escapeText(id)}" aria-label="放大 ${escapeText(s.original_name)}">${preview(s,null)}</button><label><input type="radio" name="group-${escapeText(g.group_id)}" data-group-source="${escapeText(id)}" data-id="${escapeText(g.group_id)}" ${g.selected_source_id===id?'checked':''} ${disabled}>用于裁剪</label><strong>${escapeText(s.original_name)}</strong><small>${escapeText(s.relative_path)}</small><small>${s.width} × ${s.height} · ${s.bit_depth} 位</small></div>`;}).join('')}</div><div class="grouped-card-footer"><span>${g.selected_source_id?'已选裁剪原图':'尚未选择裁剪原图'}</span><button class="text-button" data-group-action="unpick" data-id="${escapeText(g.group_id)}" ${disabled} ${!g.selected_source_id?'disabled':''}>取消选择</button></div></section>`).join('') || '<p class="intake-empty">没有匹配的采集组；清除筛选可查看全部。</p>'}</div>
+      <section class="sequence-figures" aria-label="Fig 与蛋白顺序"><div class="sequence-labels" aria-hidden="true"><span>Fig 名称</span><span>泳道数 N</span><span>蛋白名 · 按顺序，每行一个</span><span>自动分配</span><span></span></div>
+      ${draft.figures.map((f,i)=>sequenceFigure(f,i,disabled)).join('') || '<p class="intake-empty">新建 Fig，填写名称、N 和蛋白名。</p>'}
+      <div class="sequence-add"><button class="text-button" data-group-action="add-fig" ${disabled}>＋ 添加 Fig</button><small>蛋白顺序跨 Fig 连续对应采集组，名称中的标点保留。</small></div></section>
+      <div class="grouped-toolbar sequence-toolbar"><h2>选择原图</h2><label class="grouped-search">查找采集组<input type="search" data-group-search value="${escapeText(filter)}" placeholder="文件名、目录或蛋白名"></label><details class="sequence-options"><summary>来源选项</summary><div><button class="text-button" data-group-action="discover" ${disabled} ${dirty()||state.intake.workflow?'disabled':''}>识别来源与参考图</button>${(state.intake.reference_group_candidates||[]).some(id=>!referenceIds().has(id))?`<button class="text-button" data-group-action="separate-reference" ${disabled}>单列已识别的参考结果（预览）</button>`:''}</div></details></div>
+      <div class="sequence-groups">${visible().map(g=>`<section class="sequence-group" data-group-id="${escapeText(g.group_id)}"><div class="sequence-group-identity"><h3 data-sequence-protein="${escapeText(g.group_id)}">${escapeText(g.protein_label||groupName(g))}</h3><p>${escapeText(groupName(g))}</p><p class="sequence-binding" data-sequence-binding="${escapeText(g.group_id)}"></p><button class="text-button" data-group-action="unpick" data-id="${escapeText(g.group_id)}" ${disabled} ${!g.selected_source_id?'disabled':''}>${g.selected_source_id?'取消选择':'待选原图'}</button></div><div class="sequence-group-images">${g.source_ids.map(id=>sequenceSource(g,id,disabled)).join('')}</div></section>`).join('') || '<p class="intake-empty">没有匹配的采集组；清除筛选可查看全部。</p>'}</div>
       ${referencePanel(disabled)}
       <footer class="grouped-save sequence-save"><strong data-group-summary></strong><p data-group-status role="status"></p><button class="text-button" data-group-action="locate">定位待补项</button><label data-sequence-remaining><input type="checkbox" data-group-exclude ${disabled}><span data-sequence-remaining-label></span></label><p class="sequence-output">输出位置：${escapeText(state.intake.outputParent || '项目目录 / outputs')} · 自动创建独立子目录 <button class="text-button" data-group-action="output-parent" ${disabled}>更改</button></p><details><summary>相同原图复用</summary><label><input type="checkbox" data-group-reuse ${reuse?'checked':''} ${disabled}>明确允许相同原图内容用于多个蛋白</label></details><div><button class="text-button" data-group-action="reload" ${state.busy||pending?.startId||(!dirty()&&!conflict)?'disabled':''}>放弃修改并重新载入</button><button class="button subtle" data-group-action="save">保存草稿</button><button class="button primary" data-group-action="start">开始自动处理</button></div></footer>`;
   }
@@ -297,7 +322,13 @@ window.intakeGroups = (() => {
       if (action==='discover' && !dirty()) send('intake_discover',guard());
       if (action==='import' && !dirty()) send('intake_import_folder',guard());
       reflow(); render(root);
+      if(action==='add-fig'){
+        const input=$$('[data-group-field="fig-label"]',root).find(el=>el.dataset.id===bulkFigure);
+        input?.scrollIntoView({block:'nearest'});input?.focus();input?.select();
+      }
     });
   }
-  return {sync,reset,render,bind,hasDraft:dirty};
+  function activate(action){const button=document.querySelector(`#intake-workspace [data-group-action="${action}"]`);if(button&&!button.disabled)button.click();}
+  const startState=()=>({available:sequential()&&!!draft,disabled:locked()||!!readiness(),count:entries().length,figures:draft?.figures.length||0,locked:locked(),dirty:dirty()});
+  return {sync,reset,render,bind,hasDraft:dirty,activate,startState};
 })();

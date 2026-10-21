@@ -52,6 +52,8 @@ def propose_anchored_lanes(
     pixels: NDArray[np.uint8 | np.uint16],
     targets: tuple[LaneROI, ...],
     polarity: Polarity = "dark",
+    *,
+    limits: tuple[LaneROI, ...] = (),
 ) -> tuple[AnchoredLaneProposal, ...]:
     """Try the first fully supported context, never rank trials by larger area.
 
@@ -59,9 +61,18 @@ def propose_anchored_lanes(
     No x expansion, display transform, source mutation or weak-target borrowing.
     Bounds remain local to proposal.roi, which may differ from target in y only.
     """
+    if limits and (
+        len(limits) != len(targets)
+        or any(
+            (limit.x0, limit.x1) != (target.x0, target.x1)
+            or not 0 <= limit.y0 <= target.y0 < target.y1 <= limit.y1 <= pixels.shape[0]
+            for target, limit in zip(targets, limits, strict=True)
+        )
+    ):
+        raise ValueError("采样限制必须包含对应原目标并保持原X范围")
     originals = propose_background_lanes(pixels, targets, polarity)
     results: list[AnchoredLaneProposal] = []
-    for target, original in zip(targets, originals, strict=True):
+    for index, (target, original) in enumerate(zip(targets, originals, strict=True)):
         chosen = AnchoredLaneProposal(target, original)
         band = original.bands[0]
         if band.bounds is None or band.notes != (
@@ -78,6 +89,8 @@ def propose_anchored_lanes(
             if context == previous:
                 continue
             previous = context
+            if limits and not limits[index].y0 <= context.y0 < context.y1 <= limits[index].y1:
+                continue
             candidate = propose_background_lanes(pixels, (context,), polarity)[0]
             candidate_band = candidate.bands[0]
             if (

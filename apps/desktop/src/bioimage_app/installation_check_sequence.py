@@ -168,8 +168,12 @@ def verify_sequence_installation(report_path: Path, *, automatic: bool = False) 
                     "last_status": observed_status,
                     "corrected_rows": sorted(corrected),
                     "limitations": (
-                        "Synthetic uint16 constant images, explicit source ROI, N=4/5. "
-                        "Engineering page/worker/output checks; not scientific accuracy, "
+                        (
+                            "Synthetic uint16 paired-guide images, automatic crop, N=4/5. "
+                            if automatic
+                            else "Synthetic uint16 constant images, explicit source ROI, N=4/5. "
+                        )
+                        + "Engineering page/worker/output checks; not scientific accuracy, "
                         "physical input/DPI or clean Windows acceptance."
                     ),
                 },
@@ -355,7 +359,7 @@ def verify_sequence_installation(report_path: Path, *, automatic: bool = False) 
                             if (
                                 crop.raw_crop is None
                                 or not crop.geometry_ready
-                                or (automatic and (crop.policy != "intake_crop@2" or crop.reviewed))
+                                or (automatic and (crop.policy != "intake_crop@3" or crop.reviewed))
                                 or len(crop.slots) != row.lane_count
                             ):
                                 raise ValueError("Missing original crop or fixed slots")
@@ -384,7 +388,7 @@ def verify_sequence_installation(report_path: Path, *, automatic: bool = False) 
                                 )
                                 if frame is None or abs(abs(frame.angle_degrees) - 3) > 1:
                                     raise ValueError("Small-angle correction was lost")
-                                if crop.geometry_policy != "instrument_guided_geometry@1":
+                                if crop.geometry_policy != "instrument_guided_geometry@2":
                                     raise ValueError(
                                         "Diagnostic did not exercise paired-guide path"
                                     )

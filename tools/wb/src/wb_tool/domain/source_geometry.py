@@ -128,7 +128,7 @@ def _centers(energy: NDArray[np.float64], height: int) -> tuple[list[float], lis
     return [float(np.median(g)) for g in stable], [len(g) for g in stable], width
 
 
-def _filled_membrane(pixels: NDArray[np.uint8 | np.uint16]) -> tuple[LaneROI | None, bool]:
+def filled_membrane(pixels: NDArray[np.uint8 | np.uint16]) -> tuple[LaneROI | None, bool]:
     """Recover a tilted contour rejected because internal bands reduced raw occupancy."""
     step = max(1, ceil(max(pixels.shape) / 256))
     sample = pixels[::step, ::step].astype(np.float64)
@@ -190,7 +190,7 @@ def detect_source_geometry(
         else detection_membrane(pixels, initial, cancelled)
     )
     if membrane is None and guidance is None:
-        membrane, multiple = _filled_membrane(pixels)
+        membrane, multiple = filled_membrane(pixels)
         if membrane is not None:
             old_flags = ("filled_membrane_contour",) + (("multiple_membranes",) if multiple else ())
     flags = ["crop_policy:source_geometry@2", "automatic_geometry_unreviewed", *old_flags]

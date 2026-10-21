@@ -8,9 +8,10 @@ from typing import Literal
 from pydantic import ConfigDict, Field, model_validator
 from tool_contracts.api import AssetRef
 
+from wb_tool.application.analysis import AnalysisRequest
 from wb_tool.application.document import DocumentIO
 from wb_tool.application.figure_project import FigureRow
-from wb_tool.application.intake_crop import WBIntakeCropProject
+from wb_tool.application.intake_crop import IntakeCropEvidence, WBIntakeCropProject
 from wb_tool.application.intake_execution import planned_intake_slots
 from wb_tool.application.intake_workflow import (
     IntakeWorkflowLedger,
@@ -100,6 +101,48 @@ def intake_figure_digest(project: WBIntakeCropProject, figure_id: str) -> str:
     return sha256(json.dumps(values, sort_keys=True).encode()).hexdigest()
 
 
+def apply_intake_sampling_review(
+    evidence: IntakeCropEvidence, request: AnalysisRequest
+) -> AnalysisRequest:
+    """Carry local geometric uncertainty into actual measurement quality, not display flags."""
+    grid = evidence.fixed_grid
+    if grid is None:
+        return request
+    note = "boundary_review:local_signal_ambiguity"
+    return replace(
+        request,
+        lanes=tuple(
+            replace(
+                lane,
+                bands=tuple(
+                    replace(b, detection_notes=tuple(dict.fromkeys((*b.detection_notes, note))))
+                    for b in lane.bands
+                ),
+            )
+            if i in grid.review_positions
+            else lane
+            for i, lane in enumerate(request.lanes, 1)
+        ),
+    )
+
+
+def intake_sampling_current(evidence: IntakeCropEvidence, request: AnalysisRequest) -> bool:
+    grid = evidence.fixed_grid
+    if grid is None:
+        return True
+    return len(grid.sampling_limits) == len(request.lanes) and all(
+        (lane.roi.x0, lane.roi.x1) == (limit.x0, limit.x1)
+        and limit.y0 <= lane.roi.y0 < lane.roi.y1 <= limit.y1
+        and (
+            i not in grid.review_positions
+            or all(
+                "boundary_review:local_signal_ambiguity" in b.detection_notes for b in lane.bands
+            )
+        )
+        for i, (lane, limit) in enumerate(zip(request.lanes, grid.sampling_limits, strict=True), 1)
+    )
+
+
 def _current_intake_plan(project: WBIntakeCropProject, plan: ProjectRowAnalysis) -> bool:
     evidence = next((e for e in project.intake_crops if e.row_id == plan.row_id), None)
     if evidence is None or not analysis_is_current(project, plan):
@@ -114,6 +157,7 @@ def _current_intake_plan(project: WBIntakeCropProject, plan: ProjectRowAnalysis)
         and plan.request.quant_policy == "anchored_background@1"
         and tuple(lane.target_roi for lane in plan.request.lanes) == targets
         and len(targets) == evidence.lane_count
+        and intake_sampling_current(evidence, plan.request)
     )
 
 

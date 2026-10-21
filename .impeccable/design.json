@@ -147,6 +147,32 @@
       "web-body": {
         "purpose": "13px body; compact labels have an 11px minimum after the 8/9/10px replacements."
       }
+    },
+    "t073BatchWorkbench": {
+      "scope": ".intake-project",
+      "source": [
+        "apps/desktop/src/bioimage_app/web_ui/intake_workbench.css",
+        "apps/desktop/src/bioimage_app/web_ui/intake_views.js"
+      ],
+      "surface": ".impeccable/surfaces/t073-batch-workbench.md",
+      "colors": {
+        "ink": "#22332f",
+        "muted": "#64716d",
+        "accent": "#087e71",
+        "ground": "#f4f6f5",
+        "canvas": "#e9ede9",
+        "line": "#e2e8e4"
+      },
+      "layout": {
+        "projectBar": "56px",
+        "stageBar": "58px",
+        "objects": "215px",
+        "inspector": "268px",
+        "drawerBreakpoint": "1050px",
+        "compactObjects": "184px"
+      },
+      "motion": "140–200ms controls only; system preference and body.reduce-motion disable transitions",
+      "validation": "Local synthetic prototype/Qt captures and interaction tests; final commit and installed verification tracked by T073, no scientific accuracy claim."
     }
   },
   "components": [],

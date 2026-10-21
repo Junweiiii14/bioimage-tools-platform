@@ -51,11 +51,12 @@ function render(){
   if(window.intakeWorkspace?.renderActive())return;
   if(window.groupReview?.renderActive())return;
   renderSources();renderCanvas();renderInspector();if(mode==='quant')renderQuant();if(mode==='results')renderResults();$$('[data-action="reanalyze"], [data-action="compose"], [data-edit-row]').forEach(button=>button.disabled=!!state.busy||!!state.intake&&!(state.intake.figureEnabled&&button.hasAttribute('data-edit-row')));
-  if(!$('#drawer').hidden&&$('#drawer').dataset.inspector==='true'){const focused=document.activeElement,editingLane=focused?.matches('[data-lane-count]'),typedValue=editingLane?focused.value:null,control=focused?.matches('[data-lane-count]')?'[data-lane-count]':focused?.dataset.action?'[data-action="'+focused.dataset.action+'"]':null;$('#drawer-content').innerHTML=$('#inspector-content').innerHTML+$('#inspector-action').innerHTML;if(control){const replacement=$(control,$('#drawer-content'));if(editingLane&&replacement)replacement.value=typedValue;replacement?.focus();}}
+  if(!$('#drawer').hidden&&$('#drawer').dataset.inspector==='true'&&!window.intakeWorkspace?.syncInspectorDrawer()&&!document.activeElement?.matches('[data-intake-rotation]')){const focused=document.activeElement,editingLane=focused?.matches('[data-lane-count]'),typedValue=editingLane?focused.value:null,control=focused?.matches('[data-lane-count]')?'[data-lane-count]':focused?.dataset.action?'[data-action="'+focused.dataset.action+'"]':null;$('#drawer-content').innerHTML=$('#inspector-content').innerHTML+$('#inspector-action').innerHTML;if(control){const replacement=$(control,$('#drawer-content'));if(editingLane&&replacement)replacement.value=typedValue;replacement?.focus();}}
   const first=state.rows.find(r=>r.preview&&r.roi)||state.rows.find(r=>r.preview);
   if(first){$('#home-image').src=state.montage||first.preview;$('#recent-image').src=first.preview;$('#recent-name').textContent=state.projectName;$('#recent-description').textContent=`${state.rows.length} 张原图 · ${state.rows.filter(r=>r.roi).length} 张已有自动裁剪 · 自动裁图记录`;}
 }
 function renderSources(){
+ if(window.intakeWorkspace?.renderSourceList())return;
  const focusedSource=state.intake?.automation&&$('#source-list').contains(document.activeElement)?document.activeElement.dataset.row:null;
  const grouped=mode==='quant';$('.source-panel').classList.toggle('quant-sources',grouped);$('.source-panel .panel-heading h2').firstChild.nodeValue=grouped?'Fig 分组 ':'项目原图 ';$('#source-search').placeholder=grouped?'查找 Fig 或条带…':'查找原图…';$('#source-search').setAttribute('aria-label',grouped?'查找 Fig 或条带':'查找原图');if(grouped){renderQuantSources();return;}
   const filtered=state.rows.filter(r=>(filter!=='attention'||needsAttention(r))&&r.name.toLowerCase().includes(search.toLowerCase()));
@@ -64,8 +65,8 @@ function renderSources(){
 }
 function renderCanvas(){
  const r=row();$('#source-image').style.clipPath=quantImageClip();$('.main-panel').classList.toggle('quant-mode',mode==='quant');$('#quant-profile').hidden=mode!=='quant';$('#quant-lanes').hidden=mode!=='quant';$('#image-stage').hidden=mode==='results';$('#result-stage').hidden=mode!=='results';
- $('#image-title').textContent=mode==='results'?'测量结果':mode==='layout'?'当前拼图':mode==='quant'?(quantDetail?quantRowTitle(r):(quantData()?.group?.figure||r?.fig||'当前 Fig')+' · 整组灰度定量'):r?.name||'选择一张原图';$('#source-image').alt=mode==='layout'||(mode==='quant'&&!quantDetail)?'Fig 标注拼图':r?.name||'当前原图';
- $('#image-subtitle').textContent=mode==='quant'?(!quantDetail?'同一泳道贯穿组内条带 · 点击曲线分段查看原图依据':r?'原图：'+r.name+' · '+r.width+' × '+r.height+' px':'添加原图后选择测量区域与泳道数'):mode==='results'?`${state.rows.length} 张原图 · 有效信号与待复核积分独立呈现`:mode==='layout'?(state.montage?'原图裁剪的组合预览 · 显示变换不进入定量':'等待生成当前版本拼图'):r?`${r.width} × ${r.height} px  ·  ${r.bitDepth||'原始'} 位  ·  ${r.lanes} 个泳道`:'查看自动识别结果，在图上完成调整';
+ $('#image-title').textContent=mode==='results'?'测量结果':mode==='layout'?'当前拼图':mode==='quant'?(quantDetail?quantRowTitle(r):(quantData()?.group?.figure||r?.fig||'当前 Fig')+' · 整组灰度定量'):(state.intake?r?.protein||r?.name:r?.name)||'选择一张原图';$('#source-image').alt=mode==='layout'||(mode==='quant'&&!quantDetail)?'Fig 标注拼图':r?.name||'当前原图';
+ $('#image-subtitle').textContent=mode==='quant'?(!quantDetail?'同一泳道贯穿组内条带 · 点击曲线分段查看原图依据':r?'原图：'+r.name+' · '+r.width+' × '+r.height+' px':'添加原图后选择测量区域与泳道数'):mode==='results'?`${state.rows.length} 张原图 · 有效信号与待复核积分独立呈现`:mode==='layout'?(state.montage?'原图裁剪的组合预览 · 显示变换不进入定量':'等待生成当前版本拼图'):r?(state.intake?`${r.fig} · ${r.name} · ${r.lanes} 个泳道`:`${r.width} × ${r.height} px  ·  ${r.bitDepth||'原始'} 位  ·  ${r.lanes} 个泳道`):'查看自动识别结果，在图上完成调整';
  $('#stage-label').textContent=mode==='quant'&&!quantDetail?'Fig 标注拼图 · 原像素映射':mode==='layout'?'拼图预览':focusCrop?'原图 · 聚焦裁剪区域':'原始图像';
  $('#canvas-hint').textContent=mode==='quant'?(quantDetail?'拖动框体或曲线边界调整 · 可返回整组':'选择泳道 · 点击曲线分段查看原图与封底'):mode==='results'?'选择结果查看完整原因':mode==='layout'?(state.montage?(state.intake?.figureEnabled?'点击图块回到对应原图':'点击拼图中的图片，返回对应原图调整'):'当前版本拼图尚未生成'):r&&!r.roi?'在原图上拖出裁剪区域 · 无需填写坐标':'拖动边框调整裁剪 · 滚轮缩放 · 方向键微调';
  $('.image-actions').hidden=mode==='results';$$('.image-actions [data-action=undo],.image-actions [data-action=redo]').forEach(b=>b.hidden=mode==='quant');$('#overlay-toggle').hidden=mode!=='review';
@@ -188,7 +189,7 @@ function action(name,element){
  case 'folder-sources':showFolderSources();break;
  case 'include-folder-source':send('include_folder_source',{index:Number(element.dataset.index),reportId:element.dataset.reportId});closeDrawer();break;
  case 'advanced':advanced(element.dataset.section);break;
- case 'inspect':openDrawer($('#inspector-title').textContent,$('#inspector-content').innerHTML+$('#inspector-action').innerHTML);$('#drawer').dataset.inspector='true';break;
+ case 'inspect':if(window.intakeWorkspace?.inspectMeasurement())break;openDrawer($('#inspector-title').textContent,$('#inspector-content').innerHTML+$('#inspector-action').innerHTML);$('#drawer').dataset.inspector='true';window.intakeWorkspace?.syncInspectorDrawer();break;
  case 'close-drawer':closeDrawer();break;
  case 'return_crop':{const r=row();if(bridge&&r&&!state.busy)send(name,{...quantIdentity(),revision:state.revision,locate:element.dataset.locate==='true'});else if(!bridge)toast('请在桌面工作台回存原图裁剪。');break;}
  case 'return-layout':if(state.busy)return;closeDrawer();switchMode('layout');break;
