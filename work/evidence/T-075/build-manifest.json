@@ -1,0 +1,42 @@
+{
+  "schema": 2,
+  "method": "private-cpython-locked-wheels",
+  "commit": "5c56f5509e8ad9381420e26af059e9c60501ebbb",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "runtime_source": "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12.14-windows-x86_64-none",
+  "uv_lock_sha256": "9fcdb76ce3bb5413b7db86ec27544942b9787e9508503e6677bbaea721bb2b71",
+  "runtime_python_sha256": "f7ab44f15f6067dc0613fb2b2aeff1287d4fa90b6fbe719f3574055bb11904ab",
+  "launcher_sha256": "e81240f6953a5ed696447b9138f17ae6efe1b4f9850182e18b27bff3aee345fd",
+  "compile_exit": 0,
+  "release_channel": "wb-ui-system-test",
+  "minimum_windows": "10.0.17763",
+  "architecture": "x86_64",
+  "msvc_runtime": {
+    "concrt140.dll": "2e401d56f18221e2374aef2ffc31c2afc3f9a2b6ff0c5f48f361a567ffb88cca",
+    "msvcp140.dll": "f6f1d55bfd64027820ddce48f9cd8cf46d53bfa34047e6acf4ef348d492a05cb",
+    "msvcp140_1.dll": "2be87527c41e1ba8aff48e326e0adcd4743516e0bbcc9304986c726e27de6aca",
+    "msvcp140_2.dll": "6a72ed8a87eae1671640bd1ca98eccb989f1772ae46ab84594e385bf6d4ac4fb",
+    "msvcp140_codecvt_ids.dll": "5bf7277ca4f6da70667c8d922aeba632e64be2551dadb87fd798a0a47ca08718",
+    "vcamp140.dll": "96fe9a0cdec0e8a598824dd0906a963df208d8bb9da8c70d1d42ccd93f3d0407",
+    "vccorlib140.dll": "fc26d511ead8dc3a370ead6b0de08f1fd8081a56a1aa50d33742e8bed7f4908d",
+    "vcomp140.dll": "2fdb11b0c9524cdb1ac107d3c5d4f052ec1dce16a736ea423cfe28c1f07ea904",
+    "vcruntime140.dll": "a36e0cb185eb89533ed96d4568138f86a1315756a8b2644c5963a8ce23e32101",
+    "vcruntime140_1.dll": "302b1e160e858602490a55e32ae2e29ddfc0bec2a188e19550cb655cdaa58f9c"
+  },
+  "wheels": {
+    "bioimage_app-0.14.0-py3-none-any.whl": "b447be3991c659337681b93f0e7546fbb33772c2f05a1808097831c0a2e6fc72",
+    "platform_runtime-0.2.0-py3-none-any.whl": "092804daeba179e7207ec05b0e609c2cb61ba1498ce0d6a10db5ec7f56c4fb84",
+    "tool_contracts-0.1.0-py3-none-any.whl": "aa1990ace6c5dbe4663fa8223a13b47c3d896be1ebc188c5d4c90b9a81aa4366",
+    "wb_tool-0.19.0-py3-none-any.whl": "1f91826f5626c01af760a51bf0e3b15265453435e6e1431cfe313184a4cbff03"
+  },
+  "distribution_id": "BioImageTools.WB.UISystemTest",
+  "settings_namespace": "UISystemTest",
+  "acceptance": "candidate-only; clean Win10/DPI/scientific holdout pending",
+  "installer_exit": 0,
+  "artifacts": {
+    "BioImage-WB-x64-T075-Test-5c56f5509e8a-Setup.exe": {
+      "sha256": "bba57fa3e16c72149f3776aabbe370f7937aff6e209d078db4e812742bc7224c",
+      "size": 383816611
+    }
+  }
+}

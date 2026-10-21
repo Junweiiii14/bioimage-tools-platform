@@ -1747,15 +1747,22 @@ def test_rotation_preview_and_one_real_click_commit(
     )
     assert isinstance(coordinates_json, str)
     coordinates = TypeAdapter(tuple[float, float]).validate_json(coordinates_json)
-    assert javascript(
+    interaction_json = javascript(
         window,
         qtbot,
-        "angleInput.value==='4.8' && document.elementFromPoint("
+        "(()=>{const hit=document.elementFromPoint("
         + str(coordinates[0])
         + ","
         + str(coordinates[1])
-        + ")?.matches('[data-intake-crop-action=run]')",
+        + ");return JSON.stringify({value:angleInput.value,"
+        "runHit:!!hit?.matches('[data-intake-crop-action=run]'),"
+        "active:document.activeElement?.outerHTML,hit:hit?.outerHTML,"
+        "connected:angleInput.isConnected,fonts:document.fonts.status,"
+        "viewport:[innerWidth,innerHeight],animations:document.getAnimations().length})})()",
     )
+    assert isinstance(interaction_json, str)
+    interaction = json.loads(interaction_json)
+    assert interaction["value"] == "4.8" and interaction["runHit"], interaction
     QTest.mouseClick(
         focus,
         Qt.MouseButton.LeftButton,

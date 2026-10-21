@@ -137,6 +137,9 @@ def main() -> int:
         return value["result"]
 
     def capture(path: Path) -> None:
+        # Freeze the preview session receipt before static comparison. Its normal
+        # 500ms position refresh otherwise races the toolbar render.
+        javascript("previewAdapter.channel.session('refresh','{}');true")
         result = cdp("Page.captureScreenshot", {"format": "png", "fromSurface": True})
         path.write_bytes(base64.b64decode(result["data"], validate=True))
 
@@ -282,6 +285,7 @@ def main() -> int:
     (output / "report.json").write_text(
         json.dumps(
             {
+                "fixture_settle": "preview session refresh before static capture",
                 "chromium": qWebEngineChromiumVersion(),
                 "qt_platform": os.environ.get("QT_QPA_PLATFORM"),
                 "chromium_flags": os.environ.get("QTWEBENGINE_CHROMIUM_FLAGS"),

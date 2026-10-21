@@ -1,0 +1,334 @@
+{
+  "candidateCommit": "5c56f5509e8ad9381420e26af059e9c60501ebbb",
+  "fixture": "preview session refresh before static capture",
+  "images": [
+    {
+      "image": "1440-crop.png",
+      "size": [
+        2160,
+        1350
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "4eb8be9f2c4c8862021d94abad1c2dcb666040317dee2d2dbae7957a6fe7fb5e",
+      "installedSha256": "4eb8be9f2c4c8862021d94abad1c2dcb666040317dee2d2dbae7957a6fe7fb5e"
+    },
+    {
+      "image": "1440-home.png",
+      "size": [
+        2160,
+        1350
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "527e5180c71cb12635b29cee613a523753625dc3e845fc62e126aca72e211dfe",
+      "installedSha256": "527e5180c71cb12635b29cee613a523753625dc3e845fc62e126aca72e211dfe"
+    },
+    {
+      "image": "1440-layout.png",
+      "size": [
+        2160,
+        1350
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "7a5fe7528c2441bf28a28ba726bbec71745148610b7fe489a00d2e3c7e2e85f3",
+      "installedSha256": "7a5fe7528c2441bf28a28ba726bbec71745148610b7fe489a00d2e3c7e2e85f3"
+    },
+    {
+      "image": "1440-metadata.png",
+      "size": [
+        2160,
+        1350
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "2f1d0450a6d70eb55de58732e1066d6191da31d0151aa2128cfa55d9d6dab432",
+      "installedSha256": "2f1d0450a6d70eb55de58732e1066d6191da31d0151aa2128cfa55d9d6dab432"
+    },
+    {
+      "image": "1440-normalization.png",
+      "size": [
+        2160,
+        1350
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "011aa06a2efeb17a4e629cbcea8eaf575304a820b0fc8345fc7f5753c803ffd9",
+      "installedSha256": "011aa06a2efeb17a4e629cbcea8eaf575304a820b0fc8345fc7f5753c803ffd9"
+    },
+    {
+      "image": "1440-ocr.png",
+      "size": [
+        2160,
+        1350
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "51cdd6938ee9a46579a4cebbc43e493e902f4fec408c6077faeeb9654eb72e4e",
+      "installedSha256": "51cdd6938ee9a46579a4cebbc43e493e902f4fec408c6077faeeb9654eb72e4e"
+    },
+    {
+      "image": "1440-preparation.png",
+      "size": [
+        2160,
+        1350
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "b8345a162baf179339f1f35049a30ebc9c599425b3bc8ef23bc95edbb49298db",
+      "installedSha256": "b8345a162baf179339f1f35049a30ebc9c599425b3bc8ef23bc95edbb49298db"
+    },
+    {
+      "image": "1440-quant.png",
+      "size": [
+        2160,
+        1350
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "37dbe7a9f1afe9f8622ac28369651ecb2da75eab9b252751ba987544514ee4b6",
+      "installedSha256": "37dbe7a9f1afe9f8622ac28369651ecb2da75eab9b252751ba987544514ee4b6"
+    },
+    {
+      "image": "1440-results.png",
+      "size": [
+        2160,
+        1350
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "5a9b0e40aea0e01a7e2df90155262e82261b23938a381098be4c7ec3679cef8d",
+      "installedSha256": "5a9b0e40aea0e01a7e2df90155262e82261b23938a381098be4c7ec3679cef8d"
+    },
+    {
+      "image": "1440-settings.png",
+      "size": [
+        2160,
+        1350
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "766ad6a8785d225c61cfb9b4011f4b1eb5ca86972a15ecd1c824482cb4788902",
+      "installedSha256": "766ad6a8785d225c61cfb9b4011f4b1eb5ca86972a15ecd1c824482cb4788902"
+    },
+    {
+      "image": "1440-template.png",
+      "size": [
+        2160,
+        1350
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "9fe0059ec85edcf0f6fd5568b7162e6eb3a01153bdf643bd5ef7e0df20cc6d71",
+      "installedSha256": "9fe0059ec85edcf0f6fd5568b7162e6eb3a01153bdf643bd5ef7e0df20cc6d71"
+    },
+    {
+      "image": "960-crop.png",
+      "size": [
+        1440,
+        960
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "eb93beb9eea9c91692ae34d940d91f880911c98f6af2013e8453cbdb65a95c85",
+      "installedSha256": "eb93beb9eea9c91692ae34d940d91f880911c98f6af2013e8453cbdb65a95c85"
+    },
+    {
+      "image": "960-home.png",
+      "size": [
+        1440,
+        960
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "cda4a86d863ed7faa76f1e96883a2242fa328c36a229df5d663ba384dc38392a",
+      "installedSha256": "cda4a86d863ed7faa76f1e96883a2242fa328c36a229df5d663ba384dc38392a"
+    },
+    {
+      "image": "960-layout.png",
+      "size": [
+        1440,
+        960
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "eeb037fd1a1b76b0700cefd9c556e60f1b67978f07220643a425ac0851dd1966",
+      "installedSha256": "eeb037fd1a1b76b0700cefd9c556e60f1b67978f07220643a425ac0851dd1966"
+    },
+    {
+      "image": "960-metadata.png",
+      "size": [
+        1440,
+        960
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "73f9dc6ce7501dd506bfb231942533e8579b05b0ffa7f6aae341dbf50d4b64eb",
+      "installedSha256": "73f9dc6ce7501dd506bfb231942533e8579b05b0ffa7f6aae341dbf50d4b64eb"
+    },
+    {
+      "image": "960-normalization.png",
+      "size": [
+        1440,
+        960
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "198be07bf01dd7a12cd4db32c094db16a03fbc5ff0f4d494bb5b65f52f67d9d4",
+      "installedSha256": "198be07bf01dd7a12cd4db32c094db16a03fbc5ff0f4d494bb5b65f52f67d9d4"
+    },
+    {
+      "image": "960-ocr.png",
+      "size": [
+        1440,
+        960
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "a48dce0c28dae755b30272d8ba0ebfaa5ef54d817cef21e8f9be98554f0e4cfc",
+      "installedSha256": "a48dce0c28dae755b30272d8ba0ebfaa5ef54d817cef21e8f9be98554f0e4cfc"
+    },
+    {
+      "image": "960-preparation.png",
+      "size": [
+        1440,
+        960
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "d2e97137dd50d7853885d969c0b82f83c70c778b6793ce173380fd9b5e8273e9",
+      "installedSha256": "d2e97137dd50d7853885d969c0b82f83c70c778b6793ce173380fd9b5e8273e9"
+    },
+    {
+      "image": "960-quant.png",
+      "size": [
+        1440,
+        960
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "a2437fd794e758e9c21e2033494e212469da7d10f1958b9b7b630c62c2bf8c2a",
+      "installedSha256": "a2437fd794e758e9c21e2033494e212469da7d10f1958b9b7b630c62c2bf8c2a"
+    },
+    {
+      "image": "960-results.png",
+      "size": [
+        1440,
+        960
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "84d955a582698b4e6bef949f89024e3b195afcdce912e82115dd5fd17281313e",
+      "installedSha256": "84d955a582698b4e6bef949f89024e3b195afcdce912e82115dd5fd17281313e"
+    },
+    {
+      "image": "960-settings.png",
+      "size": [
+        1440,
+        960
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "a311f1a45786d59bf7dff13366deb28a83a19fbfb091cd180f2c390c0a8c7ac7",
+      "installedSha256": "a311f1a45786d59bf7dff13366deb28a83a19fbfb091cd180f2c390c0a8c7ac7"
+    },
+    {
+      "image": "960-template.png",
+      "size": [
+        1440,
+        960
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "2581ffd287930ade0147d5bdb248e1f2f53b2d26f145c8353637b1d19d047445",
+      "installedSha256": "2581ffd287930ade0147d5bdb248e1f2f53b2d26f145c8353637b1d19d047445"
+    },
+    {
+      "image": "theme-ember.png",
+      "size": [
+        2160,
+        1350
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "839ffeb26f0dbed94f7a66d8fcf8d04c135392c6cb89b62b3e2fc2ab2c7f0b3b",
+      "installedSha256": "839ffeb26f0dbed94f7a66d8fcf8d04c135392c6cb89b62b3e2fc2ab2c7f0b3b"
+    },
+    {
+      "image": "theme-forest.png",
+      "size": [
+        2160,
+        1350
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "0c8356eede108bfb6c71cd4bb0c3137604e8b8f616d8ca402ce575b456a57f23",
+      "installedSha256": "0c8356eede108bfb6c71cd4bb0c3137604e8b8f616d8ca402ce575b456a57f23"
+    },
+    {
+      "image": "theme-iris.png",
+      "size": [
+        2160,
+        1350
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "1dce0bc7630d3a11ea00eb46ec6c56e130637c8e1755b9cecdbd3964191d6a4c",
+      "installedSha256": "1dce0bc7630d3a11ea00eb46ec6c56e130637c8e1755b9cecdbd3964191d6a4c"
+    },
+    {
+      "image": "theme-neutral.png",
+      "size": [
+        2160,
+        1350
+      ],
+      "equal": true,
+      "changedBounds": null,
+      "sourceSha256": "5e19a70a35a46ccf6e7778e34248fd9d5afd61af23647d63ffe0780c07d3207f",
+      "installedSha256": "5e19a70a35a46ccf6e7778e34248fd9d5afd61af23647d63ffe0780c07d3207f"
+    }
+  ],
+  "recordsEqual": true,
+  "source": {
+    "frameCallbackIntervals": 109,
+    "medianMs": 16.700000000000728,
+    "p95Ms": 16.799999999999272,
+    "maxMs": 16.799999999999272,
+    "console": [],
+    "dpr": 1.5,
+    "chromium": "140.0.7339.225",
+    "platform": "windows",
+    "scale": "1",
+    "chromiumFlags": ""
+  },
+  "installed": {
+    "frameCallbackIntervals": 109,
+    "medianMs": 16.69999999999709,
+    "p95Ms": 16.700000000000728,
+    "maxMs": 16.799999999999272,
+    "console": [],
+    "dpr": 1.5,
+    "chromium": "140.0.7339.225",
+    "platform": "windows",
+    "scale": "1",
+    "chromiumFlags": ""
+  },
+  "highDpi": {
+    "frameCallbackIntervals": 109,
+    "medianMs": 16.699999999999818,
+    "p95Ms": 16.799999999999272,
+    "maxMs": 16.800000000000182,
+    "console": [],
+    "dpr": 2.25,
+    "chromium": "140.0.7339.225",
+    "platform": "windows",
+    "scale": "1.5",
+    "chromiumFlags": ""
+  },
+  "recordedFrames": 278,
+  "recordedSeconds": 7.98876690864563,
+  "actionsEqual": true,
+  "limitations": "Frame callbacks and CDP screencast on this Windows host, not physical input latency or all target GPU/DPI proof.",
+  "passed": true
+}

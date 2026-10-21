@@ -1,0 +1,30 @@
+{
+  "run": 39657811667,
+  "runNumber": 180,
+  "candidateCommit": "5c56f5509e8ad9381420e26af059e9c60501ebbb",
+  "mergeCommit": "1bcec693b6ee96466a7687230c35579fc879adb2",
+  "url": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/39657811667",
+  "windows": {
+    "job": 119423218848,
+    "conclusion": "failure",
+    "testsPassed": 1191,
+    "testsFailed": 1,
+    "seconds": 746.36,
+    "pytestExit": 1,
+    "failure": "test_rotation_preview_and_one_real_click_commit[False]: unchanged combined exact angle value and hit assertion; original log lacks branch diagnostic",
+    "logSha256": "d70523647d6927c33af134195b865a2a3aea1d27d079eeeb07f1aeb431dcf706"
+  },
+  "linux": {
+    "job": 119423218306,
+    "conclusion": "cancelled",
+    "failure": "15-minute runner timeout during test_repeated_window_close_and_collection, waitUntil resources_closed; 60-second Python stack in worker retire/storage emit/Qt event loop; no precise native lock evidence",
+    "logSha256": "f48c40d9b88a43c9ed4d7904c9acd45f93397abe455e27bd49e19c38e57c3fda"
+  },
+  "desktopEnvironment": "success",
+  "rulesContext": {
+    "run": 39657811534,
+    "conclusion": "success"
+  },
+  "wheelReached": false,
+  "response": "Preserve failures, add atomic branch diagnostics without changing expected 4.8 or real click requirement, targeted local 3 passed 4.57s; no timeout increase, skips, gate changes or product change. Root causes not established."
+}

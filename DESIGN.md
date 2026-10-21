@@ -207,7 +207,7 @@ components:
 
 以稳定的操作位置和明亮的科学画布组织复杂实验流程。墨绿外壳负责项目身份，酸橙标出当前主要动作；留白让来源、Fig、蛋白和泳道的关系更容易辨认。界面可以有温度与动感，原图、坐标、曲线和数值必须保持严谨。
 
-这份规范对应 T075 已构建候选基准 `edafe65`，继承 T074 `0376f23` 的最新业务结构；后续安装问题仍在修正，该提交不是最终交付声明。正式入口为 `WebWorkbenchWindow`；HTML 预览与桌面加载同一套 `apps/desktop/src/bioimage_app/web_ui` 资源，通过不同数据适配器运行。不能另写安装版样式来掩盖差异。
+这份规范对应 T075 最终候选 `5c56f55`，继承 T074 `0376f23` 的最新业务结构；前端资源自 `e8b034e` 未变。安装及同源还原证据已核对，CI 与交付独审仍待完成，不据此宣告 M6 完成。正式入口为 `WebWorkbenchWindow`；HTML 预览与桌面加载同一套 `apps/desktop/src/bioimage_app/web_ui` 资源，通过不同数据适配器运行。不能另写安装版样式来掩盖差异。
 
 **Key Characteristics:**
 
@@ -302,11 +302,13 @@ components:
 
 每个节点只保留一个当前 Web Animation；取消、完成、页面退出清理资源，反向抽屉从当前 computed style 接续。静止界面不运行持续装饰动画；后台活动提示仍应表达真实工作状态。
 
-当前源码基准位于 `.local/t075-final-source`，对应 `edafe65`：Qt 6.12 / Chromium 140.0.7339.225，Windows 原生平台、DPR 1.5，未设置禁用 GPU 参数，控制台为空。1440 × 900 与 960 × 640 共 22 张页面图，加四主题图，共 26 张；`interactions.mp4`、274 帧记录及 `pointer-actions.json` 保留真实 CDP 指针移动。旧 offscreen 抓图与 69 帧记录不再作为当前基准；本机记录也不等于所有目标机的性能保证。
+当前基准为最终候选 `5c56f5509e8ad9381420e26af059e9c60501ebbb`。`.local/t075-final-source-stable` 与 `.local/t075-final-installed` 在相同状态下的 26 张 PNG 逐像素相等，字体、尺寸、文案和状态 records 完全相等；34 项前端资源在源码、wheel 与安装目录一致，7780 项安装载荷逐文件一致。证据分别见 `.local/t075-final-fidelity.json`、`.local/t075-final-resources.json` 和 `.local/t075-final-installed-payload.json`；旧候选与 offscreen 材料保留为历史，不作为当前基准。
 
-代码独审在 `1d872bf` 的限定范围内通过；四项视觉问题及随后裁剪标注直接回归，在 `.local/t075-finish-review-edafe65.md` 中完成独立复核并获 `ship`。该结论限于所评修正，不代表整个产品验收。`edafe65` 的 source / wheel 34 项前端资源完全一致（`.local/t075-final-source-wheel.json`）；新候选已安装，7780 项载荷逐文件匹配（`.local/t075-installed-payload.json`），installed supervision 的 19 项检查通过，记录为 `C:/Users/70236/AppData/Local/BioImage-WB-UI-System-Test/Diagnostics/20261022-024554-11cdac9495f74b4bbb495150cb1fce94.json`。
+安装版使用私有 Python；四类高级工具的保存、导出、重开、跨窗口 appearance 和中文 IME 共 3 项基线测试通过；独审后另补新修订发出且网页确实收到时的输入保护，1 项 3.91s 通过，产品模块严格来自安装目录（`.local/t075-5c56f55-installed-acceptance.json` / `.xml`）。19 项 installed supervision 自检通过，见 `C:/Users/70236/AppData/Local/BioImage-WB-UI-System-Test/Diagnostics/20261022-030631-76ad97d8f3a4428ea17e2235b58168a3.json`。先前高级工具入口问题已经修正，失败记录仍保留。
 
-安装版高级工具仍在修正入口修订同步和加载错误反馈；高级业务、源码与安装版录屏对照及必需 CI 继续待完成。M6 尚未完成，不得用局部独审、载荷一致或源码录屏代替完整验收，也不得降级定稿效果来通过验收。
+安装录屏包含 278 帧，记录跨度约 7.99s 并保留尾帧；源码与安装版动作序列相等，含真实 CDP `mouseMoved`。环境为 Qt 6.12 / Chromium 140.0.7339.225、Windows 原生平台，未禁用 GPU，控制台为空。本机 DPR 1.5 与 2.25 短场景各记录 109 个帧回调间隔，中位 16.7ms、P95 16.7–16.8ms。这是帧回调与录屏证据，不能推导物理输入到显示的端到端延迟，或所有显卡、缩放与目标机表现。
+
+代码增量独审绑定 `5c56f55` 并获 `ACCEPTED`（`.local/t075-code-review-5c56f55.md`）；之前四项视觉修正及裁剪标注直接回归的限定范围 `ship` 结论保留（`.local/t075-finish-review-edafe65.md`）。本机候选交付独审通过；CI180 Windows一项角度输入/命中断言失败、Linux关闭回收挂起，必需CI仍未通过，M6继续收尾。历史失败、干净 Win10、物理 DPI、科学留出和 native UNKNOWN 缺口继续保留，不用本机局部证据替代。
 
 ## Do's and Don'ts
 
