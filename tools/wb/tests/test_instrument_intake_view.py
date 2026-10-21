@@ -1,5 +1,7 @@
 """The existing host view must not drop unassigned intake assets or reinterpret confirmations."""
 
+from pathlib import Path
+
 import pytest
 from pytestqt.qtbot import QtBot
 from wb_tool.api import (
@@ -85,3 +87,24 @@ def test_intake_labels_roundtrip_without_legacy_string_reparsing(
     assert restored.intake == project.intake
     assert restored.rows[0].figure == figure and restored.rows[0].protein == protein
     assert restored.figure_order == (figure,)
+
+
+def test_host_view_keeps_saved_grid_through_snapshot_and_reopen(
+    qtbot: QtBot, owned_widgets: WidgetOwner, tmp_path: Path
+) -> None:
+    from wb_tool.api import IntakeGrid, WBIntakeGridProject, revise_intake_grid
+
+    from tools.wb.tests.test_intake_output import full_files
+
+    project, _, _ = full_files(tmp_path)
+    updated = revise_intake_grid(project, IntakeGrid(columns=1, gap=17, order=("b", "a")))
+    view = create_figure_project_view()
+    owned_widgets(view)
+    view.set_project(updated)
+    snapshot = view.project(revision=updated.revision + 1)
+    assert isinstance(snapshot, WBIntakeGridProject)
+    assert snapshot.grid == updated.grid
+    assert snapshot.analyses == updated.analyses
+    view.set_project(read_figure_project(snapshot.model_dump_json().encode()))
+    reopened = view.project()
+    assert isinstance(reopened, WBIntakeGridProject) and reopened.grid == updated.grid

@@ -28,3 +28,6 @@
 
 - 054a163安装退出0；PS5.1安装版相关流程首轮退出1（120.094秒），报告 `C:/Users/70236/AppData/Local/BioImage-WB-Supervision-Test/Diagnostics/20261021-223103-ae139788e801481f8ee173a76edf12ea.json`。封底已真实重算并产生measure/export第二次提交；单Fig导出通过，网格order网页JSON数组被strict tuple拒绝。首败不销账。
 - 4d21f59改为JSON边界验证，不放宽严格标量；新增bridge数组/分数列数回归1过、定向Pyright通过。将从复核固定提交重建并只复验失败相关流程；旧安装候选和报告保留。
+
+- 9483ebc安装复验退出1（10.469秒）：网格保存已成功但视图project()重建遗漏grid，预览退回默认。源码带实际值最小复现确认；figure_view补保留grid，新增保存/快照/重开回归1过，Pyright通过。
+- 仅针对该实际失败先做源码同链复验：.local/grid-failure-fixed.json，19项具名checks通过，8.891秒，退出0；全PNG/TIFF像素相同、预览缩放一致、schema15重开保持。此证据不冒充安装版通过。修复需最终增量独审并重建安装复验。

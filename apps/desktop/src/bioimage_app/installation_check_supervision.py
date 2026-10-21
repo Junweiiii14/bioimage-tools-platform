@@ -129,7 +129,16 @@ class SupervisionCheck:
                 or list(project.grid.order) != expected
                 or [f["figure_id"] for f in manifest["figures"]] != expected
             ):
-                raise ValueError("Grid persistence or preview order differs")
+                raise ValueError(
+                    "Grid persistence or preview order differs: "
+                    + json.dumps(
+                        {
+                            "grid": project.grid.model_dump(mode="json"),
+                            "figures": manifest["figures"],
+                            "expected": expected,
+                        }
+                    )
+                )
             self.preview = rendered.rgb
             self.size = rendered.width, rendered.height
             self.export_name = "all.png"
