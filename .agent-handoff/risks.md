@@ -1,5 +1,7 @@
 # Risks, Blockers, And Unknowns
 
+当前执行指针为 [T074](../work/tasks/T-074-curves-fig-grid.md)。以下为历史逐轮记录；旧版本通过不迁移到T074，历史未解决科学/Win10/DPI及原生UNKNOWN仍保留。
+
 - T072：首本地外层observer因父PID复用误收昨天OneDrive.Sync.Service并停止；微软签名同exe已重启并核运行，未全面验同步状态。原失败保留。新版helper经非作者Accepted，CIM微秒身份+出生顺序、删除所有自动终止，只观察并对timeout/残留报失败；随包新轮0，产品字节不变。轮询不能证明捕获所有短命后代。原27/10 dirty、旧交付和原图/历史保持。最终产物边界见T072 evidence。
 - T072自动策略只在可靠几何继续，现有19已见组4满足保守条件，其余需人工；不得宣称全部真实图无需复核或科学准确率。干净Win10/物理DPI/科学留出及旧native UNKNOWN仍保留。
 

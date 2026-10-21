@@ -1,5 +1,7 @@
 # Task Backlog
 
+当前执行指针为 [T074](../work/tasks/T-074-curves-fig-grid.md)。以下为历史逐轮记录；旧版本通过不迁移到T074，历史未解决科学/Win10/DPI及原生UNKNOWN仍保留。
+
 - [x] T072获批六项及预览高清修复：产品44a独审/PR32四检查→main0630604，独立新测试版已安装及四流程/PS5.1新轮/7753载荷校验；交付审计/记录见T072任务。本轮不自动扩展新产品或清理旧树。
 - [ ] T072诊断P3文字：automatic报告limitations仍沿用旧constantimages/explicitROI描述，实际17命名checks与新合成模式为准，交付已明示；未来获批产品改动时修文字，不因此默改已冻结包。
 

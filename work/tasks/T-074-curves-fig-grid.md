@@ -14,3 +14,17 @@
 - 测试预期变化：点击Fig不跳裁剪是本需求；曲线不再压缩采样，断言完整2048点、基线/填色及草稿保存。无容差/skip/门禁/依赖修改。
 - pyright受影响模块通过；最终格式/静态检查与安装流程待记录。规则回执 work/evidence/T-074/rules-context.json。
 - 阶段4未完成：最终提交独审、PR/CI、独立测试版与一次安装流程。GitHub PR20/5/4依赖升级、Issue6及历史分支仅列处置建议，不操作。
+
+
+## 最终候选与审查修复
+
+- 产品dbd29ed独立Accepted；安装诊断054a163独立Accepted，详见 evidence/T-074/review.md。
+- 审查发现后只补相应回归：来源/ROI过期草稿2过；后台2048预览1过；实际Fig排序迁移（替换/保留空草稿）2过；重算失败草稿放弃1过。首新增夹具缺source/覆盖页面壳失败已修正，真实初败保留；未扩大成全量。
+- 首CI7117f11两平台在新增测试tifffile.imread未完整类型处失败，改用TiffFile.asarray，定向类型通过；规则回执因module-map更新过期，真实重新加载并检查通过。未削弱门禁。
+- Ruff/format/策略提交钩子通过；Impeccable一次检测0反模式，CSS既有字号/色值建议保留，未为本轮扩大设计重写。handoff容量检查0 warning。
+- PR35已创建并推送，保持草稿；最新必需CI排队。旧中间提交CI取消/完成状态不当作最终通过。
+- 固定054a163安装包构建退出0，SHA256 b8d7346d094b4e221cdbecd42e7eab3c09cc4212fb027851c8cea93a5e488f0f，361769464字节。路径 .local/releases/runtime-054a1630c560/；dbd29ed早期构建仅保留历史，未验收交付。
+- 最终安装/单次相关流程仍待记录；未合并PR，未关闭Issue或删除分支。
+
+- 054a163安装退出0；PS5.1安装版相关流程首轮退出1（120.094秒），报告 `C:/Users/70236/AppData/Local/BioImage-WB-Supervision-Test/Diagnostics/20261021-223103-ae139788e801481f8ee173a76edf12ea.json`。封底已真实重算并产生measure/export第二次提交；单Fig导出通过，网格order网页JSON数组被strict tuple拒绝。首败不销账。
+- 4d21f59改为JSON边界验证，不放宽严格标量；新增bridge数组/分数列数回归1过、定向Pyright通过。将从复核固定提交重建并只复验失败相关流程；旧安装候选和报告保留。
