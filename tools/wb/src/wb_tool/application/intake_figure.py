@@ -48,7 +48,7 @@ def _ready(project: WBIntakeCropProject, figure_id: str) -> None:
         if (
             steps["crop", row.row_id] != "done"
             or crop is None
-            or not crop.reviewed
+            or not crop.geometry_ready
             or crop.raw_crop is None
             or row.source is None
             or row.roi != crop.crop

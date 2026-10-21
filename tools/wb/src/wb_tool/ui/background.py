@@ -208,7 +208,7 @@ class _Work(QObject):
                     raise ValueError("缺少固定N裁剪项目")
                 if job.operation == "intake_crop_propose":
                     value = propose_intake_crop(
-                        job.path, job.document, job.row_id, cancelled=cancel
+                        job.path, job.document, job.row_id, sources=job.sources, cancelled=cancel
                     )
                 else:
                     value = export_intake_crop(

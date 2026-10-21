@@ -18,6 +18,7 @@ from tooling.qt_test_lifecycle import close_and_dispose_window
         ("wb-execution-test", "E7Test"),
         ("wb-grouped-intake-test", "GroupedIntakeTest"),
         ("wb-fig-sequence-test", "FigSequenceTest"),
+        ("wb-automatic-flow-test", "AutomaticFlowTest"),
         ("unknown", "Platform"),
     ],
 )

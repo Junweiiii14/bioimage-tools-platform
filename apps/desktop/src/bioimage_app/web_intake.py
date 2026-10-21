@@ -1,6 +1,7 @@
 """Typed command boundary for the instrument planning page."""
 
 import json
+import math
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, cast
 
@@ -39,6 +40,18 @@ from wb_tool.api import (
 
 if TYPE_CHECKING:
     from bioimage_app.web_bridge import WorkbenchBridge
+
+
+def _display_angle(data: dict[str, object]) -> float | None:
+    value = data.get("displayAngle")
+    if value is None:
+        return None
+    if type(value) not in (int, float) or not isinstance(value, (int, float)):
+        raise ValueError("显示纠偏角度须为数值")
+    angle = float(value)
+    if not math.isfinite(angle) or abs(angle) > 10:
+        raise ValueError("显示纠偏角度须为 -10 至 10 度")
+    return angle
 
 
 def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str, object]) -> None:
@@ -284,7 +297,12 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
         def resume(current: WBFigureProject) -> WBIntakeCropProject:
             if not isinstance(current, WBIntakeCropProject) or intake_digest(current) != digest:
                 raise ValueError("当前输入已改变，修正草稿保留")
-            return continue_intake_sequence(current, expected_digest=workflow_digest, crop=crop)
+            return continue_intake_sequence(
+                current,
+                expected_digest=workflow_digest,
+                crop=crop,
+                display_angle=_display_angle(data),
+            )
 
         generation, epoch = host.view.generation, bridge.session_epoch
         host.save(
@@ -311,6 +329,21 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
         if not isinstance(workflow_digest, str) or intake_digest(project) != digest:
             raise ValueError("请核对当前输出快照摘要")
         host.intake_workflow.publish_snapshot(workflow_digest)
+        return
+    if action == "intake_export_table":
+        if intake_digest(project) != digest or not isinstance(project, WBIntakeOutputProject):
+            raise ValueError("结果表输入已变化，请重新核对")
+        host.view.analysis.export_requested.emit()
+        return
+    if action == "intake_measurement_preview":
+        figure_id = data.get("figureId")
+        if (
+            not isinstance(project, WBIntakeFigureProject)
+            or not isinstance(figure_id, str)
+            or intake_digest(project) != digest
+        ):
+            raise ValueError("请选择当前已保存的 Fig 图片")
+        host.intake_workflow.presentation.request(project, figure_id)
         return
     if action == "intake_view_figure":
         workflow_digest, figure_id = data.get("workflowDigest"), data.get("figureId")
@@ -360,6 +393,7 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
                 row_id,
                 LaneROI(row_id, x, y, x + width, y + height),
                 expected_digest=workflow_digest,
+                display_angle=_display_angle(data),
             )
         else:
             stage = data.get("stage") if action == "intake_stage_retry" else "crop"

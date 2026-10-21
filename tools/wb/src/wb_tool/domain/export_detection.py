@@ -119,8 +119,8 @@ def guided_signal_regions(
     """White-light contour constrains suggestions only, using signal-frame intensities."""
     if signal.shape != guide.shape:
         return ()
-    membrane, _ = detection_membrane(guide, CropDetectionSettings(1, 2, "dark"), lambda: False)
-    if membrane is None:
+    membrane, flags = detection_membrane(guide, CropDetectionSettings(1, 2, "dark"), lambda: False)
+    if membrane is None or "multiple_membranes" in flags:
         return ()
     plane = source_detection_plane(guide, membrane)
     height, width = plane.values.shape
@@ -138,7 +138,7 @@ def guided_signal_regions(
     if float(profile.max()) <= 0:
         return ()
     peaks, _ = peak_functions.find_peaks(
-        profile, prominence=float(profile.max()) * 0.18, distance=max(3, height // 8)
+        profile, prominence=float(profile.max()) * 0.18, distance=2
     )
     result: list[tuple[int, int, int, int, tuple[int, ...], float]] = []
     for peak in peaks:

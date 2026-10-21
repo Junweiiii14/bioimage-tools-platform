@@ -1,6 +1,7 @@
 """Fixed manifest slots and reviewable source geometry, separate from measurements."""
 
 from dataclasses import replace
+from math import cos, isfinite, radians, sin
 from typing import Literal
 
 from pydantic import ConfigDict, Field, model_validator
@@ -36,9 +37,84 @@ class IntakeCropFile(DocumentIO):
     size_bytes: int = Field(gt=0, le=512 * 1024 * 1024)
 
 
+def intake_crop_companion_assets(
+    project: "WBIntakeCropProject", row_id: str
+) -> tuple[AssetRef, ...]:
+    source_id = next(
+        (a.source_id for a in project.intake.assignments if a.protein_id == row_id), None
+    )
+    if source_id is None:
+        return ()
+    group = (
+        next((g for g in project.intake.grouping.groups if g.selected_source_id == source_id), None)
+        if project.intake.grouping
+        else None
+    )
+    if group is None or len(group.source_ids) != 3:
+        return ()
+    peers = tuple(s for s in project.intake.sources if s.source_id in group.source_ids)
+    if len(peers) != 3 or len({(s.width, s.height) for s in peers}) != 1:
+        return ()
+    return tuple(s.asset for s in peers if s.source_id != source_id)
+
+
+def automatic_intake_crop_allowed(evidence: "IntakeCropEvidence") -> bool:
+    """Geometry-only policy v2; never infer loading, identity or valid signal."""
+    detection = evidence.detection
+    if (
+        detection is None
+        or detection.algorithm_id not in {"source_geometry@2", "instrument_guided_geometry@1"}
+        or len(detection.candidates) != 1
+        or evidence.selected_index != 0
+        or evidence.geometry_policy != detection.algorithm_id
+    ):
+        return False
+    candidate = detection.candidates[0]
+    return bool(
+        evidence.crop == replace(candidate.roi, lane_id=evidence.row_id)
+        and detection.settings.lane_count == evidence.lane_count
+        and len(candidate.lane_rois) == evidence.lane_count
+        and tuple(s.roi for s in evidence.slots)
+        == tuple(
+            replace(r, lane_id=s.slot_id)
+            for s, r in zip(evidence.slots, candidate.lane_rois, strict=True)
+        )
+        and candidate.display_frame is not None
+        and candidate.display_frame.width > 0
+        and candidate.display_frame.height > 0
+        and all(
+            isfinite(value)
+            for value in (
+                candidate.display_frame.center_x,
+                candidate.display_frame.center_y,
+                candidate.display_frame.width,
+                candidate.display_frame.height,
+                candidate.display_frame.angle_degrees,
+            )
+        )
+        and abs(candidate.display_frame.angle_degrees) <= 10
+        and all(
+            candidate.roi.x0 - 1e-7 <= x <= candidate.roi.x1 + 1e-7
+            and candidate.roi.y0 - 1e-7 <= y <= candidate.roi.y1 + 1e-7
+            for x, y in (
+                (
+                    candidate.display_frame.center_x
+                    + cos(radians(candidate.display_frame.angle_degrees)) * u
+                    - sin(radians(candidate.display_frame.angle_degrees)) * v,
+                    candidate.display_frame.center_y
+                    + sin(radians(candidate.display_frame.angle_degrees)) * u
+                    + cos(radians(candidate.display_frame.angle_degrees)) * v,
+                )
+                for u in (-candidate.display_frame.width / 2, candidate.display_frame.width / 2)
+                for v in (-candidate.display_frame.height / 2, candidate.display_frame.height / 2)
+            )
+        )
+    )
+
+
 class IntakeCropEvidence(DocumentIO):
     model_config = ConfigDict(revalidate_instances="always")
-    policy: Literal["intake_crop@1"] = "intake_crop@1"
+    policy: Literal["intake_crop@1", "intake_crop@2"] = "intake_crop@1"
     row_id: str = Field(min_length=1, max_length=80)
     source_sha256: str = Field(pattern="^[0-9a-f]{64}$")
     source_revision: int = Field(ge=0)
@@ -50,7 +126,14 @@ class IntakeCropEvidence(DocumentIO):
     reviewed: bool = False
     raw_crop: AssetRef | None = None
     reason: str = Field(default="", max_length=2000)
-    geometry_policy: Literal["source_geometry@2", "explicit_original_roi@1"] = "source_geometry@2"
+    geometry_policy: Literal[
+        "source_geometry@2", "explicit_original_roi@1", "instrument_guided_geometry@1"
+    ] = "source_geometry@2"
+
+    @property
+    def geometry_ready(self) -> bool:
+        """Accepted machine geometry remains distinct from human review."""
+        return self.reviewed or self.policy == "intake_crop@2"
 
     @model_validator(mode="after")
     def coherent(self) -> "IntakeCropEvidence":
@@ -83,8 +166,12 @@ class IntakeCropEvidence(DocumentIO):
                 raise ValueError("槽位不能丢失裁剪末端")
         if any((s.roi is None) != (s.signal == "unlocated") for s in self.slots):
             raise ValueError("未定位槽位不能伪装为信号状态")
-        if self.raw_crop is not None and not self.reviewed:
+        if self.raw_crop is not None and not self.geometry_ready:
             raise ValueError("未经明确审核不能发布原值裁剪")
+        if self.policy == "intake_crop@2" and (
+            self.reviewed or not automatic_intake_crop_allowed(self)
+        ):
+            raise ValueError("自动采纳须有唯一完整原图几何，不能冒充人工审核")
         if self.selected_index is not None and (
             self.detection is None or self.selected_index >= len(self.detection.candidates)
         ):
@@ -144,13 +231,30 @@ class WBIntakeCropProject(WBIntakeWorkflowProject):
                 raise ValueError("检测证据尺寸或固定N与原图不一致")
             if evidence.reviewed and (row.roi != evidence.crop or not row.reviewed):
                 raise ValueError("已审核裁剪须与当前行几何一致")
+            if evidence.policy == "intake_crop@2" and (row.roi != evidence.crop or row.reviewed):
+                raise ValueError("自动采纳几何须与原图行一致且保持未人工审核")
+            if (
+                evidence.policy == "intake_crop@2"
+                and evidence.detection is not None
+                and evidence.detection.algorithm_id == "instrument_guided_geometry@1"
+            ):
+                companions = {
+                    asset.sha256 for asset in intake_crop_companion_assets(self, row.row_id)
+                }
+                declared = {
+                    flag.split(":", 1)[1]
+                    for flag in evidence.detection.flags
+                    if flag.startswith(("guide_sha256:", "guide_peer_sha256:"))
+                }
+                if len(companions) != 2 or declared != companions:
+                    raise ValueError("辅助定位必须绑定同组全部已校验原图资产")
         evidence_by_row = {e.row_id: e for e in self.intake_crops}
         for step in self.workflow.steps:
             if step.stage in {"compose", "measure"} and step.status in {"running", "done"}:
                 members = [p for p in self.intake.proteins if p.figure_id == step.target_id]
                 if any(
                     (e := evidence_by_row.get(p.protein_id)) is None
-                    or not e.reviewed
+                    or not e.geometry_ready
                     or e.raw_crop is None
                     for p in members
                 ):
@@ -203,6 +307,9 @@ def make_intake_crop_evidence(
         source_revision=project.revision,
         lane_count=row.lane_count,
         detection=detection,
+        geometry_policy="instrument_guided_geometry@1"
+        if detection.algorithm_id == "instrument_guided_geometry@1"
+        else "source_geometry@2",
         selected_index=0 if located else None,
         crop=replace(candidate.roi, lane_id=row_id) if located and candidate else None,
         slots=slots,
@@ -213,7 +320,12 @@ def make_intake_crop_evidence(
 
 
 def review_intake_crop(
-    project: WBIntakeCropProject, row_id: str, crop: LaneROI, *, expected_digest: str
+    project: WBIntakeCropProject,
+    row_id: str,
+    crop: LaneROI,
+    *,
+    expected_digest: str,
+    display_angle: float | None = None,
 ) -> WBIntakeCropProject:
     """Explicitly confirm an original rectangle, then require a fresh owned crop attempt."""
     if project.workflow.editing:
@@ -271,6 +383,27 @@ def review_intake_crop(
         geometry_policy="explicit_original_roi@1",
         reason="人工明确确认原图范围；槽位信号状态待原像素测量，不推断未上样",
     )
+    # An explicit angle edits display sampling only. New geometry drops stale
+    # orientation; a same-geometry confirmation can retain its detected frame.
+    existing = next((s.display_frame for s in reset.composition.slices if s.row_id == row_id), None)
+    frame = existing if crop == previous.crop else None
+    if display_angle is not None:
+        from wb_tool.application.laboratory_layout import DisplayFrame
+
+        if not isfinite(display_angle) or abs(display_angle) > 10:
+            raise ValueError("显示纠偏角度须为 -10 至 10 度")
+        frame = None
+        if display_angle:
+            c, s = abs(cos(radians(display_angle))), abs(sin(radians(display_angle)))
+            width, height = crop.width, crop.y1 - crop.y0
+            scale = min(width / (width * c + height * s), height / (width * s + height * c))
+            frame = DisplayFrame(
+                center_x=(crop.x0 + crop.x1) / 2,
+                center_y=(crop.y0 + crop.y1) / 2,
+                width=width * scale,
+                height=height * scale,
+                angle_degrees=display_angle,
+            )
     return type(project).model_validate(
         {
             **dict(reset),
@@ -279,6 +412,21 @@ def review_intake_crop(
                 for r in reset.rows
             ),
             "intake_crops": (*[e for e in project.intake_crops if e.row_id != row_id], evidence),
+            "layout_style": reset.layout_style.model_copy(
+                update={"display_policy": "standard_lane_ratio@1"}
+            )
+            if frame
+            else reset.layout_style,
+            "composition": reset.composition.model_copy(
+                update={
+                    "slices": tuple(
+                        segment.model_copy(update={"display_frame": frame})
+                        if segment.row_id == row_id
+                        else segment
+                        for segment in reset.composition.slices
+                    )
+                }
+            ),
         }
     )
 
@@ -306,11 +454,75 @@ def record_intake_crop_proposal(
     )
 
 
+def accept_automatic_intake_crop(
+    project: WBIntakeCropProject, ticket: IntakeWorkflowTicket, evidence: IntakeCropEvidence
+) -> WBIntakeCropProject:
+    """Retire detection's ticket, then freeze accepted geometry for a fresh export claim."""
+    from wb_tool.application.intake_workflow import approve_intake_workflow
+    from wb_tool.application.laboratory_layout import DisplayFrame
+
+    if project.workflow.policy != "intake_workflow@3" or not automatic_intake_crop_allowed(
+        evidence
+    ):
+        raise ValueError("自动定位仍需明确范围")
+    recorded = record_intake_crop_proposal(project, ticket, evidence)
+    if recorded.workflow.cancel_requested:
+        return recorded
+    reset = retry_intake_workflow_step(
+        recorded, "crop", evidence.row_id, expected_digest=intake_workflow_digest(recorded)
+    )
+    accepted = IntakeCropEvidence.model_validate(
+        {**dict(evidence), "policy": "intake_crop@2", "reason": "已自动采纳完整定位"}
+    )
+    assert evidence.detection is not None
+    frame = evidence.detection.candidates[0].display_frame
+    assert frame is not None
+    display = DisplayFrame(
+        center_x=frame.center_x,
+        center_y=frame.center_y,
+        width=frame.width,
+        height=frame.height,
+        angle_degrees=frame.angle_degrees,
+    )
+    updated = type(project).model_validate(
+        {
+            **dict(reset),
+            "rows": tuple(
+                row.model_copy(update={"roi": evidence.crop, "reviewed": False})
+                if row.row_id == evidence.row_id
+                else row
+                for row in reset.rows
+            ),
+            "intake_crops": tuple(
+                accepted if item.row_id == evidence.row_id else item
+                for item in recorded.intake_crops
+            ),
+            "layout_style": reset.layout_style.model_copy(
+                update={"display_policy": "standard_lane_ratio@1"}
+            ),
+            "composition": reset.composition.model_copy(
+                update={
+                    "slices": tuple(
+                        segment.model_copy(update={"display_frame": display})
+                        if segment.row_id == evidence.row_id
+                        and segment.first_lane == 1
+                        and segment.last_lane == evidence.lane_count
+                        else segment
+                        for segment in reset.composition.slices
+                    )
+                }
+            ),
+        }
+    )
+    approved = approve_intake_workflow(updated, expected_digest=intake_workflow_digest(updated))
+    return type(project).model_validate(dict(approved))
+
+
 def complete_intake_crop(
     project: WBIntakeCropProject, ticket: IntakeWorkflowTicket, raw_crop: AssetRef
 ) -> WBIntakeCropProject:
     evidence = next((e for e in project.intake_crops if e.row_id == ticket.target_id), None)
-    if ticket.stage != "crop" or evidence is None or not evidence.reviewed:
+    if ticket.stage != "crop" or evidence is None or not evidence.geometry_ready:
         raise ValueError("原值裁剪完成需要明确审核的同一行几何")
     finished = finish_intake_workflow_step(project, ticket, "done")
     if not isinstance(finished, WBIntakeCropProject):

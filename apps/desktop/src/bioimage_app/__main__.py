@@ -13,6 +13,12 @@ for variable in (
 
 
 def main() -> int:
+    if len(sys.argv) == 3 and sys.argv[1] == "--verify-automatic-flow-installation":
+        from pathlib import Path
+
+        from bioimage_app.installation_check_sequence import verify_sequence_installation
+
+        return verify_sequence_installation(Path(sys.argv[2]), automatic=True)
     if len(sys.argv) == 3 and sys.argv[1] == "--verify-sequence-installation":
         from pathlib import Path
 

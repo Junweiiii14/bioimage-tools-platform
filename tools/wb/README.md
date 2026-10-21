@@ -9,6 +9,13 @@ See `../../docs/contracts/wb-intake-crop-v1.md` and `../../work/tasks/T-056-fixe
 
 # WB 数值核心
 
+T072 adds versioned `intake_crop@2` geometry acceptance for explicitly started whole
+batches. Machine acceptance retains `reviewed=false`, exact original slot geometry,
+and original-sample crops. Existing oriented frames feed display-only straightening;
+manual angle edits and reset retain quantitative source coordinates. Old @1 evidence
+and project schemas remain readable; older readers reject the unknown @2 policy.
+Contract: `../../docs/contracts/wb-intake-automatic-crop-v2.md`.
+
 T065新增明确执行后裁剪修正 `revise_completed_intake_crop`：新修订只使所属Fig及当前输出过期，旧修订、运行和产物保留；见 `../../docs/contracts/wb-intake-revision-v1.md`。目标区域由采集组明确选择并传入原坐标固定N复核，不自动成为已审核结果。
 
 T064清单v3支持采集组草稿，未知N/未选源可持久化，完整组投影到原有稳定执行身份；原清单v1/v2 wire shape和历史编辑入口保留。公开契约见 `../../docs/contracts/wb-intake-grouping-v1.md`；实现/验收状态见任务，不把草稿保存等同科学确认。

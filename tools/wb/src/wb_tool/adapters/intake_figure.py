@@ -51,7 +51,9 @@ def prepare_intake_figure(
     if len(paths) != len(sources):
         raise ValueError("Fig来源路径重复")
     projection = intake_figure_projection(project, ticket.target_id)
-    rendered = render_figure(projection, sources, cancelled=cancelled)
+    # The projection has already checked every member's v1 review or v2 machine
+    # provenance. Keep row.reviewed false for automatically accepted geometry.
+    rendered = render_figure(projection, sources, require_review=False, cancelled=cancelled)
     plans: list[ProjectRowAnalysis] = []
     crops = {e.row_id: e for e in project.intake_crops}
     for row in intake_figure_rows(project, ticket.target_id):

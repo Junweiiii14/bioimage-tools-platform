@@ -252,7 +252,7 @@ def export_intake_outputs(
                     )
                     # Preserve each manual segment and its original-coordinate provenance.
                     projection = intake_figure_projection(project, figure.figure_id)
-                    layout = plan_laboratory_layout(projection)
+                    layout = plan_laboratory_layout(projection, require_review=False)
                     original = load_tiff(frozen_paths[row.source.asset.sha256])
                     segments = [
                         s

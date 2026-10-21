@@ -205,7 +205,12 @@ def revise_intake_grouping(
 
 
 def revise_completed_intake_crop(
-    project: WBIntakeCropProject, row_id: str, crop: LaneROI, *, expected_digest: str
+    project: WBIntakeCropProject,
+    row_id: str,
+    crop: LaneROI,
+    *,
+    expected_digest: str,
+    display_angle: float | None = None,
 ) -> WBIntakeCropProject:
     """Revoke only this row's crop, its Fig's derived results, and current export approval.
 
@@ -246,5 +251,9 @@ def revise_completed_intake_crop(
         )
     reset_project = type(project).model_validate(fields)
     return review_intake_crop(
-        reset_project, row_id, crop, expected_digest=intake_workflow_digest(reset_project)
+        reset_project,
+        row_id,
+        crop,
+        expected_digest=intake_workflow_digest(reset_project),
+        display_angle=display_angle,
     )

@@ -48,9 +48,7 @@ def render_figure(
 
     if isinstance(project, WBIntakeOutputProject):
         projection = intake_archive_projection(project)
-        rendered = render_figure(
-            projection, sources, require_review=require_review, cancelled=cancelled
-        )
+        rendered = render_figure(projection, sources, require_review=False, cancelled=cancelled)
         manifest = json.loads(rendered.manifest_json)
         indices = {row.row_id: i for i, row in enumerate(project.rows, 1)}
         for record in manifest["rows"]:
