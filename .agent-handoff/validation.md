@@ -1,6 +1,6 @@
 # Validation Index
 
-当前T071产品PR30已按四检查合main710bb85；两平台979/全wheel/OCR/check0，新独立包已安装并通过三流程/PS5.1/7751载荷校验，最终交付审计与文档收尾见[T071](../work/tasks/T-071-fig-sequence-automation.md)及[交付](../docs/wb-fig-sequence-delivery.md)。以下T069/T060为历史记录，保留当时状态，不作当前指针。
+当前T072产品44a独审Accepted、PR32四检查集成main0630604；两平台1013与本机1013/全部wheel/OCR/check0，新独立AutomaticFlowTest安装/四流程/PS5.1新轮/7753载荷通过，最终审计及收尾见[T072](../work/tasks/T-072-automatic-flow-repair.md)和[交付](../docs/wb-automatic-flow-repair-delivery.md)。首外层观察器误停OneDrive已重启，失败/修复证据保留，非产品静默改包。以下T071/T069/T060均为历史记录。
 
 
 历史T069交付状态来源是work/tasks/T-069-grouped-intake-offline.md；当时见[采集组交付记录](../docs/wb-grouped-intake-delivery.md)与T069 evidence。PR28最终956两平台/全部wheel/OCR/四检查0；冻结main6080867本机新安装、双流程/PS5.1/7749载荷及独立交付审查通过。以下T060等均为当时历史证据，不覆盖原失败或外部验收缺口。旧索引替换前已逐字节复制/校验，保留于[validation-20261020-e7-closeout.md](archive/validation-20261020-e7-closeout.md)，更早历史按其链接继续可查。

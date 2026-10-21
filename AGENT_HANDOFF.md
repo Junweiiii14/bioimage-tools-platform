@@ -46,8 +46,8 @@
 
 ## Current Pointer
 
-- 当前任务：[T-071](work/tasks/T-071-fig-sequence-automation.md)；完整获批方案已登记目标，产品PR30已集成main710bb85，新[T071离线候选](docs/wb-fig-sequence-delivery.md)已构建/安装/三流程/PS5.1及载荷校验，最终交付审计Accepted，证据随本次文档PR集成，见任务。
-- 活动树：`C:/Users/70236/.codex/worktrees/wb-fig-sequence/bioimage-tools-platform`，收尾分支codex/fig-sequence-delivery。二进制冻结main710bb85；旧wb-grouped-intake/codex/fig-sequence-plan全部dirty与其他树保留，T069仍冻结6080867。
+- 当前任务：[T-072](work/tasks/T-072-automatic-flow-repair.md)；获批自动裁图/纠偏/灰度图/结果表/提示精简及高清预览修复，产品独审44a342e Accepted、PR32四检查合main0630604。新[T072离线候选](docs/wb-automatic-flow-repair-delivery.md)已安装、四流程/PS5.1新轮/7753载荷核验，最终产物审计和收尾状态见任务。
+- 活动树：`C:/Users/70236/.codex/worktrees/wb-auto-flow-repair/bioimage-tools-platform`，收尾分支codex/t072-delivery。二进制冻结main0630604；旧主树27与grouped树10份dirty/原图/历史/T071和其他安装保持，活动树忽略证据保留，不自动归档删除。
 - E0–E7及T061已经工程集成，见[验收索引](docs/wb-execution-acceptance.md)与任务。干净Win10/物理DPI/科学留出仍独立待验，不宣称正式发布。
 - t051树T062原型与交接未提交资料保留，桌面批准原型为BioImage-导入分组交互原型/index.html。历史ResearchVault树不作为当前开发入口。
 - 当前状态与下一步：`.agent-handoff/snapshot.md`；风险：`.agent-handoff/risks.md`；长期待办：`.agent-handoff/backlog.md`。
