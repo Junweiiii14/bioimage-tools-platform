@@ -1,0 +1,31 @@
+{
+  "run": 39660837328,
+  "runNumber": 181,
+  "head": "697c4287b4e35f048939828652bfe064e70e9718",
+  "candidateCommit": "5c56f5509e8ad9381420e26af059e9c60501ebbb",
+  "productTreeEqualToCandidate": true,
+  "url": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/39660837328",
+  "conclusion": "success",
+  "windows": {
+    "job": 119433080046,
+    "conclusion": "success",
+    "testsPassed": 1192,
+    "seconds": 692.49,
+    "pytestExit": 0,
+    "wheelChecksCompleted": true,
+    "logSha256": "3d03605777f95fdfd1de7a3b9ef2581117557e9eccb91fc792f1be82cc244fbc"
+  },
+  "linux": {
+    "job": 119433079915,
+    "conclusion": "success",
+    "testsPassed": 1192,
+    "seconds": 480.61,
+    "debuggerExit": 0,
+    "wheelChecksCompleted": true,
+    "logSha256": "d27bb9b0cd3dcdd67838cad7aec2efa7262721e4b76c7f3899a2c597a8f2ebda"
+  },
+  "desktopEnvironment": {"job": 119433079670, "conclusion": "success"},
+  "rulesContext": {"run": 39660837322, "conclusion": "success"},
+  "optionalNativeCase": "skipped by existing workflow condition; not a required check",
+  "scope": "Required checks succeeded at the diagnostic head. CI180 failures remain UNKNOWN; no product repair is inferred from this later success. No timeout, expectation, skip, lock or gate was weakened. Final documentation head must independently have all required checks successful before goal completion."
+}

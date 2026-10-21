@@ -59,3 +59,9 @@ T074最终：569674a独审后构建，安装版PS5.1相关流程19checks/10.875�
 T074当前e47af46：并排概览4项相关UI回归通过；独审指出拖动过期后补1项通过。导航竞态2项定向通过；新安装19checks/11.141秒/exit0。旧569/c3c9安装结论只作历史；最终CI看PR35当前HEAD。
 
 T074当前c90b0e5：整个Fig矩阵跨蛋白选择、缺项草稿恢复定向通过；独审Accepted。86c9包态重开超时保留，修诊断position回执后c90新包19checks/11.437秒/exit0。源码9.219秒仅定位。CI旧夹具/等待修复不改全部done断言；最终HEAD以PR35为准。
+
+## 2026-10-22 T075 候选交付
+
+5c56f55构建/安装0，34前端source/wheel/install相同、7780载荷相同；Windows原生Qt6.12/Chromium140、DPR1.5固定26图逐像素与records相同，高缩放2.25。实际安装私有Python四高级工具/跨窗/IME基线3项20.75s、强制新revision IME另1项3.91s，19项selfcheck11.391s均0；代码/视觉限定范围与本机交付独审Accepted。动态278帧/约7.99s；3次CDP点击下一帧19.2/13.5/9.6ms，不是物理延迟保证。桌面完整交付目录已建立。
+
+CI180真实失败：Windows1191过1败746.36s/child1、Linux关闭回收15min取消，均未到wheel；根因UNKNOWN。697c428只添加原子失败字段与捕获正常刷新诊断，原断言/timeout/gate及产品不变，独审Accepted；本机相关3项4.57s、WSL4项6.83s通过。CI181/run39660837328：Windows1192/692.49s/child0；Linux1192/480.61s/debugger0，全部隔离wheel/真实OCR、规则143和桌面依赖成功。最后证据提交必须核对当前HEAD成功，最终在线记录在.local/t075-final-ci.json；旧失败、科学留出/干净Win10/物理DPI/native UNKNOWN不销账。

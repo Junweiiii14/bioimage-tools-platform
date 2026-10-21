@@ -1,7 +1,7 @@
 # Risks, Blockers, And Unknowns
 
 当前执行指针为 [T075](../work/tasks/T-075-ui-system.md)。以下旧版本证据不迁移为T075通过；历史科学/Win10/DPI及原生UNKNOWN保留。
-- T075：本机同源还原/安装及交付独审已通过，但CI180 Windows角度输入/真实命中单项失败，Linux既有重复关闭回收挂起；原日志保留，尚未归因，不标整项完成。旧D3D及native UNKNOWN继续保留；新的有效CDP对照不能证明所有硬件稳定。
+- T075：本机同源还原/安装及交付独审通过；697c428的CI181两平台1192项与全部wheel/四检查成功，最终文档提交另核当前HEAD CI。CI180 Windows角度输入/真实命中单项失败与Linux既有重复关闭回收挂起仍未归因，原日志保留；后继通过不表示根因修复。旧D3D及native UNKNOWN继续保留；有效CDP对照不能证明所有硬件稳定。
 
 - T072：首本地外层observer因父PID复用误收昨天OneDrive.Sync.Service并停止；微软签名同exe已重启并核运行，未全面验同步状态。原失败保留。新版helper经非作者Accepted，CIM微秒身份+出生顺序、删除所有自动终止，只观察并对timeout/残留报失败；随包新轮0，产品字节不变。轮询不能证明捕获所有短命后代。原27/10 dirty、旧交付和原图/历史保持。最终产物边界见T072 evidence。
 - T072自动策略只在可靠几何继续，现有19已见组4满足保守条件，其余需人工；不得宣称全部真实图无需复核或科学准确率。干净Win10/物理DPI/科学留出及旧native UNKNOWN仍保留。

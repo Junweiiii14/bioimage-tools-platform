@@ -1160,7 +1160,7 @@
       "task": "work/tasks/T-075-ui-system.md",
       "baseCommit": "0376f23ccbf8b8047d532ec7708a1fa85581c087",
       "branch": "codex/t075-ui-system",
-      "state": "最终候选5c56f55本机安装/还原/交付独审通过；CI180 Windows一项角度输入/命中断言失败、Linux关闭回收挂起，必需CI未通过，M6未完成。",
+      "state": "候选5c56f55本机安装/还原/交付独审通过，697c428的CI181四项必要检查全部成功。最终证据提交仍须通过当前HEAD检查才结束目标；CI180根因UNKNOWN保持。",
       "sources": [
         "apps/desktop/src/bioimage_app/web_ui/design_tokens.css",
         "apps/desktop/src/bioimage_app/web_ui/components.css",
@@ -1178,11 +1178,10 @@
       "frontendUnchangedSince": "e8b034e970f687e47929987e5f2e800531d7b70f"
     },
     "verification": {
-      "status": "ci-failure-investigation",
+      "status": "candidate-accepted-final-record-ci-required",
       "staticEvidence": ".local/t075-final-fidelity.json：source-stable与installed的26张PNG逐像素相等，字体/尺寸/文案/状态records完全相等；当前候选5c56f55。",
       "notValidated": [
-        "必需CI全部通过",
-        "M6完成"
+        "最终证据提交当前HEAD的必需CI（在线结果在.local/t075-final-ci.json及桌面验收记录；全部成功后目标完成）"
       ],
       "constraints": [
         "旧页面保留布局契约规则，不宣称旧CSS已全部清零。",
@@ -1226,7 +1225,7 @@
         "tests": "3 passed：四类高级工具保存/导出/重开、跨窗口appearance、中文IME；私有Python，产品模块来源严格安装目录。",
         "supervisionReport": "C:/Users/70236/AppData/Local/BioImage-WB-UI-System-Test/Diagnostics/20261022-030631-76ad97d8f3a4428ea17e2235b58168a3.json",
         "supervision": "supervision_installed@1：phase=passed，19项，errors=[]；仅诊断范围。",
-        "remaining": "CI180失败已记录，继续诊断与必需CI；M6仍未完成。",
+        "remaining": "无待改产品或重建内容；最后证据提交的必要CI及有限文档复核是目标完成闸门。CI180旧失败不销账。",
         "imeRefresh": "原3项不追溯增强；独审后另以新revision断言stateChanged发出并由网页收到，再验证组合输入节点/焦点/光标/草稿，1 passed 3.91s。"
       },
       "fidelity": {
@@ -1253,7 +1252,8 @@
           16.8
         ],
         "scope": "本机短场景帧回调与CDP录屏；不是物理端到端延迟或所有显卡/DPI/目标机保证。"
-      }
+      },
+      "ciEvidence": "work/evidence/T-075/ci-181.json；两平台1192项、全部隔离wheel、规则与桌面依赖success。产品与候选5c56f55相同。"
     },
     "previewBoundary": {
       "reservedBottom": "48px",

@@ -46,7 +46,7 @@
 
 ## Current Pointer
 
-- 当前任务：[T-075](work/tasks/T-075-ui-system.md)，完整实施用户已批准的企业级前端综合方案；目标 ACTIVE。
+- 当前任务：[T-075](work/tasks/T-075-ui-system.md)，实施与本机候选交付检查完成；最后证据提交的必需 CI 全部成功后完成目标。此前目标 ACTIVE，恢复时先查询实际目标/PR 状态，不重复重建。
 - 活动树 `C:/Users/70236/.codex/worktrees/wb-ui-system/bioimage-tools-platform`；分支 `codex/t075-ui-system`，最新产品基线 T074 `0376f23`。
 - 状态和下一步以 `.agent-handoff/snapshot.md` 与任务为准。旧目录、原图、历史结果和旧安装保留。
 - 本机科学留出、干净Win10、物理DPI及历史 native UNKNOWN 持续单列；不能以旧版本证据代替本轮安装验收。
