@@ -12,3 +12,6 @@
 - 4d21f59 JSON边界增量静态Accepted；9483ebc仅新增文档，产品内容一致。后续实际安装发现view快照遗漏grid，修复审查另记，不沿用旧结论。
 
 - 569674a：view.project保留grid及对应保存/重开回归、诊断失败现场补充，增量静态Accepted。最终包态19checks通过记录在delivery.md；不混同审查与自验。
+
+- b963ecb仅交付文档Accepted；后续CI发现180ms发布漏compose的竞态。8fee7d8审查指出初始连接遗漏，c3c9bd9补完整生命周期后Accepted。
+- 854b539并排概览增量审查指出拖动缺ROI/revision绑定；e47af46补齐后静态Accepted。最终安装19checks/11.141秒通过，独审未代替安装或CI。
