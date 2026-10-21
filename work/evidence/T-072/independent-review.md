@@ -33,3 +33,7 @@ uv run --locked --no-sync pytest tools/wb/tests/test_intake_automatic_crop.py to
 四独立安装诊断passed、父OS0、无观察残留/开发路径。PS5.1随包新轮56.548s/OS0，四报告完整，helper SHA6b87d4ba3ece553cb07881913433c963385f7ee609fdb0f8f8604c2fd863a0a9完全无自动终止；轮询不证明采全短命后代。原外层失败/原helper/四报告/恢复证据递归保留，OneDrive新PID37916为微软有效签名同exe，不证明同步状态。原27/10 dirty、T071 clean三树HEAD/status/文件SHA与旧交付三摘要一致。
 
 P3陈旧limitations文案已由evidence-notes/交付文档明确，不改冻结包。干净Win10/物理DPI/科学留出未验。审查未改文件、未跑新GUI、未启动或终止进程；后补审计文档单独追加重算清单，原证据不可回写。
+
+## 收尾测试同步增量 Accepted
+
+非作者/root/t072_commit_review绑定base be38a0f3de05981b26be57162cf72f47ff40f543、head a65f2d79e7aab2d06f99adfc532302ec7834d072，未发现问题。仅补异步结果页/可见表/9行完整到达的等待；原9行、尺寸、可见性、阶段屏障、重开及原图保持断言、10秒截止全部保持，无门禁/产品/安装包改动。独立核对两平台原失败均为可见表抢读1行占位，并运行两个相关E2E：2passed15.66s、实际退出0。未改文件或操作用户应用；不代替新头完整CI。后继提交仅记录此结论，测试字节不变；最终必需检查及合并事实以[PR33](https://github.com/Junweiiii14/bioimage-tools-platform/pull/33)精确head的服务器记录为准。

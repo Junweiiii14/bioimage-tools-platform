@@ -15,4 +15,4 @@ PR首次2726673规则门禁失败为module-map更新后旧receipt；真实重载
 
 收尾文档头be38a0f的quality39539807356两平台均失败于既有双Fig人工暂停/继续E2E：Linux/job119024721386为1012passed/1failed328.68s，Windows/job119024721030为1012passed/1failed625.64s、原child1。两者在`tests/test_instrument_intake_desktop.py:1463`读到可见表格的1行占位，预期仍为9行；尚未运行后续wheel，因此本轮不能计为完整通过。原始两日志保留在`.local/t072/ci-closeout-{linux,windows}-first.log`。
 
-该测试只等待mode切到results，未等待异步快照到达。仅把等待条件补为results模式、表格可见且完整9行到齐，仍保留原9行/尺寸/可见性/阶段屏障/重开/原图保持断言、原10秒截止；未变预期/容差/skip/xfail或产品代码。编辑前真实重载T072回执增tests范围。Windows/CPython3.12.14、offscreen/disable-gpu定向复跑该E2E与可靠定位无确认E2E，2passed17.54s、实际退出0；Ruff检查/格式/diff0。绑定提交独审与PR33最终四必需检查仍待完成，失败不由定向成功抹去。冻结main0630604安装器及其已验产品字节不变。
+该测试只等待mode切到results，未等待异步快照到达。仅把等待条件补为results模式、表格可见且完整9行到齐，仍保留原9行/尺寸/可见性/阶段屏障/重开/原图保持断言、原10秒截止；未变预期/容差/skip/xfail或产品代码。编辑前真实重载T072回执增tests范围。Windows/CPython3.12.14、offscreen/disable-gpu定向复跑该E2E与可靠定位无确认E2E，2passed17.54s、实际退出0；Ruff检查/格式/diff0。非作者绑定a65f2d79e7aab2d06f99adfc532302ec7834d072 Accepted、独立两相关2passed15.66s/退出0。后继仅补结论记录；[PR33](https://github.com/Junweiiii14/bioimage-tools-platform/pull/33)最终head的四必需检查与merge以服务器记录为准，未全部SUCCESS不得合并，不以产品旧头通过代替。原失败不由定向成功抹去。冻结main0630604安装器及其已验产品字节不变。
