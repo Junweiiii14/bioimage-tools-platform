@@ -89,6 +89,7 @@ class FigureProjectWindow(QMainWindow):
     closed = Signal()
     workspace_opened = Signal(str)
     measurement_progress = Signal(str)
+    intake_stage_committed = Signal()
 
     def __init__(self) -> None:
         super().__init__()

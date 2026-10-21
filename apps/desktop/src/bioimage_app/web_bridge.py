@@ -79,6 +79,7 @@ class WorkbenchBridge(QObject):
         self.host.automatic.finished.disconnect(self._automatic_completed)
         self.host = host
         self.host.automatic.finished.connect(self._automatic_completed)
+        self.host.intake_stage_committed.connect(self.publish)
         self._previous = ""
         self._previous_progress = ""
         self._published_key = None

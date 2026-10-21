@@ -374,6 +374,8 @@ class IntakeWorkflowSession:
         if self._cancelled:
             self._failed_stage(ticket, "执行在启动前取消")
             return
+        # Publish the saved claim before fast stages can finish between timer ticks.
+        host.intake_stage_committed.emit()
         if ticket.stage == "compose":
             self._compose(ticket)
             return
