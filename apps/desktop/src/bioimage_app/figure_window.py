@@ -796,6 +796,7 @@ class FigureProjectWindow(QMainWindow):
         command: StorageCommand,
         *,
         recognize: bool = False,
+        after: Callable[[], None] | None = None,
     ) -> None:
         if self._abort_ocr_import(generation):
             return
@@ -843,7 +844,7 @@ class FigureProjectWindow(QMainWindow):
                     self.view.ocr.set_preview(raster)
                     if recognize:
                         self._busy = False
-                        self.recognize_project()
+                        self.recognize_project(after=after)
                     else:
                         self._done("拼图已导入；识别Fig/行名后逐行关联原图。")
 
@@ -853,8 +854,14 @@ class FigureProjectWindow(QMainWindow):
 
         self._storage(command, imported)
 
-    def recognize_composed_figure(self) -> None:
+    def recognize_composed_figure(self, *, after: Callable[[], None] | None = None) -> None:
         if self._busy or not self._workspace:
+            return
+        try:
+            current = self.view.project()
+            prepare_workbench_revision(current, expected_digest=workbench_project_digest(current))
+        except ValueError as error:
+            self._error(str(error))
             return
 
         def saved() -> None:
@@ -886,6 +893,7 @@ class FigureProjectWindow(QMainWindow):
                         source_sha256=reply.value.sha256,
                     ),
                     recognize=True,
+                    after=after,
                 )
 
             self._wb(
@@ -901,13 +909,14 @@ class FigureProjectWindow(QMainWindow):
 
         self.save(after=saved)
 
-    def recognize_project(self) -> None:
+    def recognize_project(self, *, after: Callable[[], None] | None = None) -> None:
         if self._busy or not self._workspace:
             return
         try:
             project = self.view.project()
             if not isinstance(project, WBProjectOCR) or project.ocr is None:
                 raise ValueError("请先导入独立拼图")
+            prepare_workbench_revision(project, expected_digest=workbench_project_digest(project))
         except ValueError as error:
             self._error(str(error))
             return
@@ -918,7 +927,7 @@ class FigureProjectWindow(QMainWindow):
                 return
             project = self.view.project()
             assert isinstance(project, WBProjectOCR)
-            self._start_ocr(project)
+            self._start_ocr(project, after=after)
 
         self.save(after=saved)
 
@@ -971,13 +980,9 @@ class FigureProjectWindow(QMainWindow):
 
                 self._wb(WBJob("ocr_preview", path=self._paths[ocr.source.sha256]), previewed)
             elif completion.loaded is None:
-                self._busy = False
                 message = "识别未更新，之前关联保留：" + (completion.error or completion.state)
-                self.operation_error = message
-                if self._closing:
-                    self._done(message)
-                else:
-                    self.refresh_ocr_table(message)
+                # Do not start a second operation that can erase this terminal failure.
+                self._error(message)
             else:
                 loaded = completion.loaded
 
@@ -999,7 +1004,9 @@ class FigureProjectWindow(QMainWindow):
                         if self._closing:
                             self._done("OCR识别已保存")
                         else:
-                            self.refresh_ocr_table("OCR完成；请校正名称、关联原图并确认。")
+                            self.refresh_ocr_table(
+                                "OCR完成；请校正名称、关联原图并确认。", after=after
+                            )
 
                     def install(current: WBFigureProject) -> WBProjectOCR:
                         if (
@@ -1033,7 +1040,13 @@ class FigureProjectWindow(QMainWindow):
                     installed,
                 )
 
-        session.finished.connect(completed)
+        def safely_completed(completion: ProjectOCRCompletion) -> None:
+            try:
+                completed(completion)
+            except (ValueError, TypeError, OSError) as error:
+                self._error(str(error))
+
+        session.finished.connect(safely_completed)
         session.start(project, self._workspace, restore=restore)
         if self._closing:
             session.cancel()

@@ -2,6 +2,7 @@
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 const paths = {
+  sidebar:'M3 3h18v18H3zM15 3v18',
   grid:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',
   lanes:'M4 5h16v14H4zM8 8v8M12 8v8M16 8v8',
   help:'M9 9a3 3 0 0 1 6 0c0 2-3 2-3 4M12 17h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z',

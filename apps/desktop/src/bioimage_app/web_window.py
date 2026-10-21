@@ -381,9 +381,6 @@ class WebWorkbenchWindow(QMainWindow):
         self.host.prepare_shutdown(save_changes=not self._discard)
         self.host.shutdown_requested = True
         self.host.close()
-        if time.monotonic() - self._appearance_refresh > 1:
-            self.appearance.refresh()
-            self._appearance_refresh = time.monotonic()
         self._check_close_failure()
 
     def _reply(self, choice: str) -> None:
@@ -498,6 +495,9 @@ class WebWorkbenchWindow(QMainWindow):
         self._publish_session()
 
     def _poll_session(self) -> None:
+        if time.monotonic() - self._appearance_refresh > 1:
+            self.appearance.refresh()
+            self._appearance_refresh = time.monotonic()
         self._check_close_failure()
         if self._stage == "cancel" and not self.host.operation_busy:
             # Cancellation can leave submitted results, unsaved edits, and UI drafts.

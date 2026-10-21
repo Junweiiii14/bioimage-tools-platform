@@ -7,9 +7,10 @@ from typing import Any
 
 import pytest
 from bioimage_app.figure_window import FigureProjectWindow
+from bioimage_app.project_ocr import ProjectOCRCompletion, ProjectOCRSession
 from bioimage_app.web_bridge import WorkbenchBridge
 from bioimage_app.web_window import WebWorkbenchWindow
-from PySide6.QtCore import QSettings
+from PySide6.QtCore import QSettings, QTimer
 from pytestqt.qtbot import QtBot
 from wb_tool.api import WBNormalizedProject, WBProjectOCR
 
@@ -44,7 +45,9 @@ def test_web_advanced_save_reopen_and_import_receipts(
 
     bridge.advancedStateChanged.connect(receive)
 
-    def command(operation: str, value: dict[str, object]) -> dict[str, Any]:
+    def command(
+        operation: str, value: dict[str, object], *, expected: str = "done"
+    ) -> dict[str, Any]:
         request = f"request-{len(replies)}"
         manager.command(
             {
@@ -66,7 +69,7 @@ def test_web_advanced_save_reopen_and_import_receipts(
         response = next(
             r for r in reversed(replies) if r["requestId"] == request and r["status"] != "pending"
         )
-        assert response["status"] == "done", response.get("error")
+        assert response["status"] == expected, response.get("error")
         return response["data"]
 
     data = command("open", {"section": "metadata"})
@@ -139,6 +142,23 @@ def test_web_advanced_save_reopen_and_import_receipts(
     host.load_document(saved.project_id)
     qtbot.waitUntil(lambda: not host.operation_busy, timeout=20000)
     assert host.view.project() == saved
+
+    # A failed recognition must remain failed after all auxiliary callbacks settle.
+    def failed_ocr(
+        session: ProjectOCRSession, project: WBProjectOCR, workspace: str, *, restore: bool = False
+    ) -> None:
+        QTimer.singleShot(
+            0, lambda: session.finished.emit(ProjectOCRCompletion(error="OCR engine unavailable"))
+        )
+
+    with monkeypatch.context() as patch:
+        patch.setattr(ProjectOCRSession, "start", failed_ocr)
+        command("ocr_recognize", {}, expected="failed")
+    assert "OCR engine unavailable" in replies[-1]["error"]
+    assert isinstance(saved, WBProjectOCR)
+    current = host.view.project()
+    assert isinstance(current, WBProjectOCR) and current.ocr == saved.ocr
+    assert not host.operation_busy
     # A previously loaded table cannot survive even a non-scientific draft revision.
     command("tables_refresh", {})
     assert manager.snapshot()["tables"]

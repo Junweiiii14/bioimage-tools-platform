@@ -215,6 +215,26 @@ def main() -> int:
         javascript("closeDrawer();previewAdapter.channel.session('home','{}');true")
         pause(400)
         cdp("Page.startScreencast", {"format": "jpeg", "quality": 90, "everyNthFrame": 1})
+        art = json.loads(
+            javascript(
+                "JSON.stringify(document.querySelector('.home-art').getBoundingClientRect())"
+            )
+        )
+        pointer_actions: list[dict[str, Any]] = []
+        for x, y in ((0.2, 0.3), (0.5, 0.5), (0.8, 0.65), (0.3, 0.7)):
+            position = {
+                "type": "mouseMoved",
+                "x": art["x"] + art["width"] * x,
+                "y": art["y"] + art["height"] * y,
+            }
+            cdp("Input.dispatchMouseEvent", position)
+            pointer_actions.append(position)
+            pause(200)
+        cdp("Input.dispatchMouseEvent", {"type": "mouseMoved", "x": 5, "y": 5})
+        pause(300)
+        (output / "pointer-actions.json").write_text(
+            json.dumps(pointer_actions, indent=2), encoding="utf-8"
+        )
         actions = [
             ("home focus", "document.querySelector('.home-art').focus()", 600),
             ("project", "previewAdapter.openProject(false)", 600),

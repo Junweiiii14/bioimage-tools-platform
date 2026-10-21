@@ -213,6 +213,8 @@ class AdvancedCommands:
                 "font_import",
                 "ocr_import",
                 "template_import",
+                "ocr_recognize",
+                "ocr_composed",
             }
         ) and not self._saved:
             error = error or "未收到完整保存回执，编辑保留，请重试。"
@@ -561,6 +563,11 @@ class AdvancedCommands:
         host.operation_error = ""
         self._committing = False
         self._saved = False
+
+        def saved_recognition() -> None:
+            if host is self.bridge.host and epoch == self.bridge.session_epoch:
+                self._saved = True
+
         if operation == "metadata_import":
 
             def received(book: MetadataBook) -> None:
@@ -583,9 +590,9 @@ class AdvancedCommands:
         elif operation == "ocr_import":
             host.import_ocr_image(file)
         elif operation == "ocr_recognize":
-            host.recognize_project()
+            host.recognize_project(after=saved_recognition)
         elif operation == "ocr_composed":
-            host.recognize_composed_figure()
+            host.recognize_composed_figure(after=saved_recognition)
         elif operation == "template_preview":
             host.compose()
         elif operation == "figure_export":

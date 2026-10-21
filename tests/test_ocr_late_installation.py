@@ -17,6 +17,7 @@ from wb_tool.api import (
     WBFigureProject,
     WBProjectOCR,
     install_project_recognition,
+    prepare_workbench_revision,
     read_figure_project,
     read_project_ocr_result,
 )
@@ -226,6 +227,7 @@ def test_ocr_association_save_failure_preserves_old_and_allows_explicit_retry(
     old_text = window.view.ocr.raw.toPlainText()
     old_save = Workspace.save_draft
     rejected: list[WBProjectOCR] = []
+    receipts: list[str] = []
 
     def fail_candidate(
         store: Workspace,
@@ -250,14 +252,16 @@ def test_ocr_association_save_failure_preserves_old_and_allows_explicit_retry(
         )
 
     monkeypatch.setattr(Workspace, "save_draft", fail_candidate)
-    window.recognize_project()
+    window.recognize_project(after=lambda: receipts.append("saved"))
     qtbot.waitUntil(lambda: not window.operation_busy, timeout=30000)
     assert len(rejected) == 1
+    assert receipts == []
     assert "OCR association save failure" in window.view.status.text()
     assert ocr_project(window).ocr == old.ocr and window.view.ocr.raw.toPlainText() == old_text
     monkeypatch.undo()
-    window.recognize_project()
+    window.recognize_project(after=lambda: receipts.append("saved"))
     qtbot.waitUntil(lambda: not window.operation_busy, timeout=30000)
+    assert receipts == ["saved"]
     final = window.view.project()
     assert isinstance(final, WBProjectOCR) and final.ocr and final.ocr.run
     assert final.ocr != old.ocr
@@ -270,3 +274,33 @@ def test_ocr_association_save_failure_preserves_old_and_allows_explicit_retry(
         assert store.get_run(failed_candidate.ocr.run.run_id) == failed_candidate.ocr.run
         saved = read_figure_project(store.read_asset(store.load_draft(old.project_id).asset))
         assert isinstance(saved, WBProjectOCR) and saved.ocr == final.ocr
+
+
+@pytest.mark.parametrize("reject_call", [1, 2])
+def test_ocr_revision_guard_failure_ends_operation(
+    qtbot: QtBot,
+    tmp_path: Path,
+    windows: Callable[[], "FigureProjectWindow"],
+    monkeypatch: pytest.MonkeyPatch,
+    reject_call: int,
+) -> None:
+    """The preflight and Qt completion paths both retain the prior association."""
+    window = windows()
+    old = recognized_project(window, qtbot, tmp_path)
+    calls = 0
+    receipts: list[str] = []
+
+    def guarded(project: WBFigureProject, *, expected_digest: str) -> WBFigureProject:
+        nonlocal calls
+        calls += 1
+        if calls == reject_call:
+            raise ValueError("grouping revision must be confirmed before OCR")
+        return prepare_workbench_revision(project, expected_digest=expected_digest)
+
+    monkeypatch.setattr("bioimage_app.figure_window.prepare_workbench_revision", guarded)
+    window.recognize_project(after=lambda: receipts.append("saved"))
+    qtbot.waitUntil(lambda: not window.operation_busy, timeout=30000)
+    assert calls == reject_call
+    assert receipts == []
+    assert "grouping revision must be confirmed" in window.operation_error
+    assert ocr_project(window).ocr == old.ocr

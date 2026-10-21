@@ -10,6 +10,7 @@ from pytestqt.qtbot import QtBot
 
 from tests.test_intake_web_ui import intake_page as intake_page
 from tests.test_intake_web_ui import javascript
+from tooling.qt_test_lifecycle import close_and_dispose_window
 
 
 def test_appearance_persists_and_refreshes_other_window_without_project_data(
@@ -38,6 +39,35 @@ def test_corrupt_preferences_are_preserved(tmp_path: Path) -> None:
     appearance = WorkbenchAppearance(settings)
     assert appearance.error and appearance.values == DEFAULTS
     assert settings.value(KEY) == original
+
+
+def test_open_windows_receive_theme_from_host_timer(qtbot: QtBot, tmp_path: Path) -> None:
+    path = str(tmp_path / "windows.ini")
+    windows = [
+        WebWorkbenchWindow(settings=QSettings(path, QSettings.Format.IniFormat)) for _ in range(2)
+    ]
+    try:
+        for window in windows:
+            window.show()
+            qtbot.waitUntil(
+                lambda window=window: javascript(window, qtbot, "!!window.desktopSession") is True
+            )
+        javascript(
+            windows[0],
+            qtbot,
+            "workbenchAppearance.open();document.querySelector('[data-appearance-theme=iris]').click();true",
+        )
+        qtbot.waitUntil(lambda: windows[0].appearance.values["theme"] == "iris", timeout=10000)
+        qtbot.waitUntil(lambda: windows[1].appearance.values["theme"] == "iris", timeout=10000)
+        assert javascript(windows[1], qtbot, "document.documentElement.dataset.theme") == "iris"
+    finally:
+        for window in windows:
+            close_and_dispose_window(
+                window,
+                qtbot,
+                resources_closed=lambda window=window: window.host.resources_closed,
+                timeout=20000,
+            )
 
 
 def test_failed_write_rolls_back_and_is_not_a_successful_receipt(tmp_path: Path) -> None:
