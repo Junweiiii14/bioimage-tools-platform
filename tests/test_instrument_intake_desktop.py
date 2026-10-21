@@ -1556,6 +1556,19 @@ def test_reliable_sequence_needs_no_crop_confirmations_and_shows_images_and_tabl
     """)
         is True
     )
+    # A JS click returns before its WebChannel start request is acknowledged.
+    qtbot.waitUntil(
+        lambda: window.bridge.sequence_response.get("status") == "started", timeout=10000
+    )
+
+    # Individual asset/save operations may be idle between real workflow stages.
+    def terminal() -> bool:
+        project = current(window)
+        return isinstance(project, WBIntakeOutputProject) and all(
+            step.status not in {"pending", "running"} for step in project.workflow.steps
+        )
+
+    qtbot.waitUntil(terminal, timeout=20000)
     wait_saved(window, qtbot)
     finished = current(window)
     assert isinstance(finished, WBIntakeOutputProject), window.host.view.status.text()

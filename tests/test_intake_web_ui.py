@@ -2012,3 +2012,75 @@ def test_batch_lane_overview_cards_open_bounded_editor_and_drag_preview(
     """,
     )
     assert javascript(window, qtbot, "!intakeQuant.hasDraft()")
+
+
+def test_fig_matrix_shows_all_proteins_and_waits_for_selected_row_snapshot(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        """
+      const matrixLanes=id=>Array.from({length:2},(_,i)=>({lane:i+1,roi:{y:10},
+        profile:[0,2,5,2,0],bands:[{id:'target',start:0,end:4,
+        baselineStart:0,baselineEnd:0,reason:''}]}));
+      window.matrixA=matrixLanes('a');window.matrixB=matrixLanes('b');
+      window.matrixRows=[{rowId:'protein-a',lanes:matrixA},{rowId:'protein-b',lanes:matrixB}];
+      setState({selectedId:'protein-a',rows:[
+          {id:'protein-a',sourceId:'a',protein:'A',fig:'Fig 1',lanes:2},
+          {id:'protein-b',sourceId:'b',protein:'B',fig:'Fig 1',lanes:2}],
+        quant:{rowId:'protein-a',revision:1,sourceId:'a',status:'ready',lanes:matrixA,
+          group:{rows:matrixRows}},
+        intake:{...state.intake,cropEnabled:true,figureEnabled:true,crops:[],
+          figures:[{figure_id:'fig-a',label:'Fig 1',lane_count:2}],
+          proteins:[{protein_id:'protein-a',figure_id:'fig-a',label:'A'},
+            {protein_id:'protein-b',figure_id:'fig-a',label:'B'}],
+          figuresReady:[{figure_id:'fig-a',row_ids:['protein-a','protein-b'],
+            image:{sha256:'fig'}}],
+          workflow:{policy:'intake_workflow@3',digest:'matrix',steps:[]}}});
+      switchMode('quant');true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        """
+      document.querySelectorAll('.intake-figure-curves .intake-curve-card').length===4 &&
+      document.querySelectorAll('.intake-curve-protein').length===2
+    """,
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      document.querySelector('[data-iq-row="protein-b"][data-iq-lane="2"]').click();true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        """
+      state.selectedId==='protein-b' && !document.querySelector('[data-iq-field]') &&
+      !sent.some(x=>x.action==='quant_edit')
+    """,
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      setState({quant:{rowId:'protein-b',revision:1,sourceId:'b',status:'ready',
+        lanes:matrixB,group:{rows:matrixRows}}});
+      const matrixInput=document.querySelector('[data-iq-field=baselineStart]');
+      matrixInput.value='1';matrixInput.dispatchEvent(new Event('change',{bubbles:true}));
+      document.querySelector('[data-iq-action=save]').click();true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        """
+      sent.at(-1).action==='quant_edit' && sent.at(-1).payload.id==='protein-b' &&
+      sent.at(-1).payload.lane===2 && document.querySelectorAll('.intake-curve-card').length===4
+    """,
+    )

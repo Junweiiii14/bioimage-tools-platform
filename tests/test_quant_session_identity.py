@@ -44,6 +44,7 @@ def test_quant_edit_rejects_prior_session_before_mutating(
                 set_project=forbidden,
             ),
             automatic=SimpleNamespace(finished=SimpleNamespace(connect=connection)),
+            intake_stage_committed=SimpleNamespace(connect=connection),
             analyze_project=forbidden,
             analyze_manual_target=forbidden,
             project_results=[],

@@ -19,13 +19,6 @@ window.intakeViews = (() => {
     return points;
   }
 
-  function profiles(members, selectedRowId, quant) {
-    const protein=members.find(p=>p.protein_id===selectedRowId);
-    const lanes=protein?quant?.group?.rows?.find(r=>r.rowId===protein.protein_id)?.lanes||[]:[];
-    const available=lanes.filter(l=>l.profile?.length>1&&l.profile.every(Number.isFinite));
-    return window.intakeQuant.markup(available, protein);
-  }
-
   function figureList(intake, selectedId, selectedRowId) {
     return `<aside class="intake-figure-list" aria-label="Fig 与蛋白"><h2>本次实验</h2>${intake.figures.map(fig=>`
       <section class="intake-object-group"><h3>${escapeText(fig.label)} <small>N=${fig.lane_count}</small></h3>
@@ -39,7 +32,7 @@ window.intakeViews = (() => {
     return `<div class="intake-measure-workspace">${figureList(intake,selected?.figure_id,selectedRowId)}
       <section class="intake-measure-main"><header class="canvas-heading"><div><h1>原像素定量</h1><p>${escapeText(fig?.label || '等待成图')} · ${members.length} 个蛋白 · ${fig?.lane_count || 0} 个泳道</p></div><label class="intake-figure-select">查看 Fig<select data-intake-measure-figure>${(intake.figuresReady||[]).map(f=>`<option value="${escapeText(f.figure_id)}" ${f===selected?'selected':''}>${escapeText(intake.figures.find(x=>x.figure_id===f.figure_id)?.label||f.figure_id)}</option>`).join('')}</select></label></header>
         <section class="intake-measure-image" aria-label="当前 Fig 与测量区域"><span class="intake-measure-caption">Fig 图像与原图槽位映射</span><div class="intake-measure-viewport">${image}</div><div class="floating-tools"><button class="icon-button" data-intake-measure-zoom="out" aria-label="缩小 Fig">${icon('minus')}</button><button class="zoom-label" data-intake-measure-zoom="fit">适应窗口</button><button class="icon-button" data-intake-measure-zoom="in" aria-label="放大 Fig">${icon('plus')}</button></div></section>
-        ${profiles(members,selectedRowId,quant)}<p class="intake-measure-foot">查看图像对应位置 · 显示缩放不影响原像素计算</p>
+        ${window.intakeQuant.figureMarkup(fig,members,quant)}<p class="intake-measure-foot">查看图像对应位置 · 显示缩放不影响原像素计算</p>
       </section>
       <aside class="intake-measure-inspector" aria-label="蛋白与测量状态"><h2>测量记录</h2>${members.map(p=>{
         const values=cells.filter(c=>c.rowId===p.protein_id);

@@ -31,7 +31,7 @@ window.intakeQuant = (() => {
     item.undo.push({...item.value}); item.redo=[];item.value={...item.value,...next};item.submitted=false;
     drafts.set(s.id,item);
   }
-  function markup(lanes, protein) {
+  function markup(lanes, protein, editorOnly=false) {
     const context=[state.projectId,state.sessionEpoch,protein?.protein_id].join(':');
     if(context!==selectionKey){selected=null;drag=null;selectionKey=context;}
     const current=quantData();
@@ -61,12 +61,30 @@ window.intakeQuant = (() => {
       <div class="intake-stage-actions"><button class="button subtle" data-iq-action="undo" ${!item?.undo.length||state.busy?'disabled':''}>撤销</button><button class="button subtle" data-iq-action="redo" ${!item?.redo.length||state.busy?'disabled':''}>重做</button><button class="button subtle" data-iq-action="discard" ${!item||state.busy?'disabled':''}>放弃调整</button><button class="button primary" data-iq-action="save" ${!item||state.busy||!bridge?'disabled':''}>保存并重算</button></div><p role="status">${item?'调整草稿尚未完成重算；当前结果不代表此草稿。':'已提交曲线；坐标为泳道内原像素位置。'}</p>`:''}
       ${qualityContent([{reason:band.reason,label:'泳道 '+lane.lane}])}</section>`;
     }).join('');
+    if(editorOnly)return warning+(body?`<section class="intake-figure-editor"><header><strong>${escapeText(row()?.fig||'')} · 蛋白 ${escapeText(protein.label)} · 泳道 ${selected}</strong><button class="text-button" data-iq-action="all">收起调整</button></header>${body}</section>`:'');
     return `<section class="intake-profile-panel"><header><strong>${escapeText(row()?.fig||'')} · 蛋白 ${escapeText(protein.label)} · ${lanes.length} 条泳道</strong><button class="text-button" data-iq-action="all">全部泳道概览</button></header><p class="intake-curve-help">每张图对应一条泳道，横轴为条带高度 y（原像素）。各图独立纵轴；点选曲线调整该泳道的峰底与积分范围。</p>${warning}<div class="intake-curve-overview">${cards}</div>${body||(!cards?'<p>等待已提交的原像素曲线。</p>':'<p>点击上方任意泳道曲线开始调整。</p>')}</section>`;
+  }
+  function figureMarkup(fig,members,quant) {
+    if(!fig)return '<section class="intake-profile-panel"><p>等待 Fig 曲线。</p></section>';
+    const rows=quant?.group?.rows||[],n=fig.lane_count||0;
+    const protein=members.find(p=>p.protein_id===row()?.id);
+    const selectedLanes=rows.find(r=>r.rowId===protein?.protein_id)?.lanes||[];
+    const editor=protein?markup(selectedLanes,protein,true):'';
+    const columns=Array.from({length:n},(_,i)=>`<strong class="intake-curve-column">泳道 ${i+1}</strong>`).join('');
+    const matrix=members.map(p=>{
+      const lanes=rows.find(r=>r.rowId===p.protein_id)?.lanes||[];
+      return `<strong class="intake-curve-protein">${escapeText(p.label)}</strong>`+Array.from({length:n},(_,i)=>{
+        const lane=lanes.find(l=>l.lane===i+1),band=lane?.bands?.[0];
+        if(!band||!lane.profile?.length||!lane.profile.every(Number.isFinite))return '<div class="intake-curve-missing">等待该泳道已提交曲线</div>';
+        return `<button class="intake-curve-card" data-iq-row="${escapeText(p.protein_id)}" data-iq-lane="${lane.lane}" aria-label="${escapeText(fig.label)} · 蛋白 ${escapeText(p.label)} · 泳道 ${lane.lane}，调整封底" aria-pressed="${p.protein_id===row()?.id&&lane.lane===selected}">${manualQuant.chart(lane,band,false)}<span>0–${lane.profile.length-1} y 像素${band.reason?' · 需复核':''}</span></button>`;
+      }).join('');
+    }).join('');
+    return `<section class="intake-profile-panel"><header><strong>${escapeText(fig.label)} · ${members.length} 个蛋白 × ${n} 条泳道</strong><button class="text-button" data-iq-action="all">整组概览</button></header><p class="intake-curve-help">行对应蛋白，列对应泳道。每格为已提交的单泳道 y 剖面（独立纵轴）；点击任意曲线调整对应封底，草稿显示在下方编辑区。</p><div class="intake-figure-curves-scroll"><div class="intake-figure-curves" style="grid-template-columns:64px repeat(${n},minmax(150px,1fr))"><strong>蛋白</strong>${columns}${matrix}</div></div>${editor}</section>`;
   }
   const refresh=()=>window.intakeWorkspace.renderActive();
   document.addEventListener('click',event=>{
     const lane=event.target.closest('[data-iq-lane]');
-    if(lane){selected=Number(lane.dataset.iqLane);refresh();return;}
+    if(lane&&!lane.disabled){selected=Number(lane.dataset.iqLane);const target=lane.dataset.iqRow;if(target&&target!==row()?.id){selectionKey=[state.projectId,state.sessionEpoch,target].join(':');select(target);}else refresh();requestAnimationFrame(()=>document.querySelector('.intake-figure-editor')?.scrollIntoView({block:'nearest'}));return;}
     const action=event.target.closest('[data-iq-action]')?.dataset.iqAction;
     if(!action)return;
     if(action==='all'){selected=null;refresh();return;}
@@ -130,5 +148,5 @@ window.intakeQuant = (() => {
     value=k==='start'?Math.max(0,Math.min(v.end-1,value)):k==='end'?Math.max(v.start+1,Math.min(s.lane.profile.length-1,value)):Math.max(0,value);
     change({[k]:value});refresh();document.querySelector(`[data-iq-point="${k}"]`)?.focus();
   });
-  return {markup,hasDraft:()=>drafts.size>0,reset:()=>{drafts.clear();selected=null;drag=null;selectionKey=null;},selectedLane:()=>selected};
+  return {markup,figureMarkup,hasDraft:()=>drafts.size>0,reset:()=>{drafts.clear();selected=null;drag=null;selectionKey=null;},selectedLane:()=>selected};
 })();
