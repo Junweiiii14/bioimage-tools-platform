@@ -10,3 +10,9 @@
 首check-v1保留1007passed/1failed856.36s：新增E2E在表可见、数据快照未到时读占位1行，修正为等待完整10行后仍断言10。没有降低数值/容差、增加skip/xfail或改门禁。早期GPU context lost/停滞轮次、原有手工坐标/native UNKNOWN继续保留；后继通过不证明这些历史根因全部已明。
 
 PR首次2726673规则门禁失败为module-map更新后旧receipt；真实重载读取后bc0a90e修哈希，后继规则SUCCESS。没有删除回执或改检查状态。产品PR：[32](https://github.com/Junweiiii14/bioimage-tools-platform/pull/32)。精确原日志随本机交付验证目录保留，不提交安装包或私图。
+
+## 收尾 PR33 的结果表同步修正
+
+收尾文档头be38a0f的quality39539807356两平台均失败于既有双Fig人工暂停/继续E2E：Linux/job119024721386为1012passed/1failed328.68s，Windows/job119024721030为1012passed/1failed625.64s、原child1。两者在`tests/test_instrument_intake_desktop.py:1463`读到可见表格的1行占位，预期仍为9行；尚未运行后续wheel，因此本轮不能计为完整通过。原始两日志保留在`.local/t072/ci-closeout-{linux,windows}-first.log`。
+
+该测试只等待mode切到results，未等待异步快照到达。仅把等待条件补为results模式、表格可见且完整9行到齐，仍保留原9行/尺寸/可见性/阶段屏障/重开/原图保持断言、原10秒截止；未变预期/容差/skip/xfail或产品代码。编辑前真实重载T072回执增tests范围。Windows/CPython3.12.14、offscreen/disable-gpu定向复跑该E2E与可靠定位无确认E2E，2passed17.54s、实际退出0；Ruff检查/格式/diff0。绑定提交独审与PR33最终四必需检查仍待完成，失败不由定向成功抹去。冻结main0630604安装器及其已验产品字节不变。
