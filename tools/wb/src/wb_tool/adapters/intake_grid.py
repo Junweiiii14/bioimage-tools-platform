@@ -74,3 +74,19 @@ def render_intake_grid(
         "rows": [],
     }
     return FigureRender(width, height, rgb, json.dumps(manifest))
+
+
+def grid_preview(rendered: FigureRender) -> FigureRender:
+    """Bound GUI encoding work while retaining the exact full layout and scale."""
+    with Image.frombytes("RGB", (rendered.width, rendered.height), rendered.rgb) as image:
+        image.thumbnail((2048, 2048), Image.Resampling.LANCZOS)
+        width, height = image.size
+        rgb = image.tobytes()
+    manifest = json.loads(rendered.manifest_json)
+    manifest["preview_binding"] = {
+        "full_width": rendered.width,
+        "full_height": rendered.height,
+        "scale_x": width / rendered.width,
+        "scale_y": height / rendered.height,
+    }
+    return FigureRender(width, height, rgb, json.dumps(manifest))

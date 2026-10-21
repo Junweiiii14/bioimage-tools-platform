@@ -501,11 +501,19 @@ window.intakeWorkspace = (() => {
     paintedMarkup.set($('#drawer-content'),$('.intake-measure-inspector').innerHTML);
     $('#drawer').dataset.intakeView='measurement';return true;
   }
+  function layoutState() {
+    const id=chosenFigureId||state.intake?.displayFigureId;
+    const ready=new Set((state.intake?.figuresReady||[]).map(f=>f.figure_id));
+    const complete=id==='__all__'?state.intake.figures.every(f=>ready.has(f.figure_id)):ready.has(id);
+    const label=id==='__all__'?'全部 Fig 总图':state.intake?.figures.find(f=>f.figure_id===id)?.label||'当前拼图';
+    return {id,label,complete,show:complete&&id===state.intake?.displayFigureId};
+  }
   function chooseFigure(id) {
     chosenFigureId=id;noteBrowse();
-    if(mode!=='layout')switchMode('layout');else requestFigure();
+    if(mode!=='layout')switchMode('layout');else{requestFigure();render();}
   }
   function requestFigure() {
+    if(chosenFigureId&&!layoutState().complete)return;
     if(chosenFigureId==='__all__'){
       if(!state.busy)send('intake_grid_preview',cropGuard());
       return;
@@ -516,13 +524,13 @@ window.intakeWorkspace = (() => {
   }
   function renderFigureInspector() {
     if(!state.intake?.figureEnabled||!['layout','results'].includes(mode))return false;
-    const figureId=state.intake.displayFigureId||chosenFigureId;
+    const figureId=chosenFigureId||state.intake.displayFigureId;
     const fig=state.intake.figures.find(f=>f.figure_id===figureId);
     const members=state.intake.proteins.filter(p=>p.figure_id===figureId);
     $('#inspector-title').textContent=mode==='layout'?'已保存的 Fig':'原像素测量记录';
     $('#review-badge').textContent=mode==='layout'?(state.montage?'显示成图':'等待成图'):'数值与状态分列';
     $('#review-badge').className='status-badge';
-    $('#inspector-content').innerHTML=mode==='layout'?`<section class="inspect-section"><h3>${escapeText(state.intake.displayFigureId==='__all__'?'全部 Fig 总图':fig?.label||'选择已完成的 Fig')}</h3><p>完整 Fig 已保存；选择蛋白行可定位；修改裁剪使用下方明确入口。</p><div class="intake-source-links">${members.map(p=>`<button class="text-button full" data-intake-crop-action="source" data-id="${escapeText(p.protein_id)}" ${state.busy?'disabled':''}>修改裁剪：${escapeText(targetName(p.protein_id))}</button>`).join('')}</div></section><section class="inspect-section"><h3>其他已保存成图</h3><div class="intake-source-links">${(state.intake.figuresReady||[]).map(f=>`<button class="text-button full" data-intake-crop-action="figure" data-id="${escapeText(f.figure_id)}" ${state.busy?'disabled':''}>${escapeText(state.intake.figures.find(x=>x.figure_id===f.figure_id)?.label||f.figure_id)}</button>`).join('')||'<p>完整 Fig 原值裁剪完成后，继续处理即可成图。</p>'}</div></section>`:`<section class="inspect-section"><h3>结果与原图一一对应</h3><p>按 Fig、蛋白和泳道查看数值与状态。</p><details><summary>数值与状态说明</summary><p>未检测、失败或未计算保留为空；待复核积分与有效信号分列。运行完成不表示科学准确率已验收。</p></details></section>`;
+    $('#inspector-content').innerHTML=mode==='layout'?`<section class="inspect-section"><h3>${escapeText(figureId==='__all__'?'全部 Fig 总图':fig?.label||'选择已完成的 Fig')}</h3><p>完整 Fig 已保存；选择蛋白行可定位；修改裁剪使用下方明确入口。</p><div class="intake-source-links">${members.map(p=>`<button class="text-button full" data-intake-crop-action="source" data-id="${escapeText(p.protein_id)}" ${state.busy?'disabled':''}>修改裁剪：${escapeText(targetName(p.protein_id))}</button>`).join('')}</div></section><section class="inspect-section"><h3>其他已保存成图</h3><div class="intake-source-links">${(state.intake.figuresReady||[]).map(f=>`<button class="text-button full" data-intake-crop-action="figure" data-id="${escapeText(f.figure_id)}" ${state.busy?'disabled':''}>${escapeText(state.intake.figures.find(x=>x.figure_id===f.figure_id)?.label||f.figure_id)}</button>`).join('')||'<p>完整 Fig 原值裁剪完成后，继续处理即可成图。</p>'}</div></section>`:`<section class="inspect-section"><h3>结果与原图一一对应</h3><p>按 Fig、蛋白和泳道查看数值与状态。</p><details><summary>数值与状态说明</summary><p>未检测、失败或未计算保留为空；待复核积分与有效信号分列。运行完成不表示科学准确率已验收。</p></details></section>`;
     $('#inspector-action').innerHTML=`${mode==='layout'?'<button class="button primary full" data-intake-crop-action="results">查看测量记录</button>':''}<button class="button subtle full" data-intake-crop-action="back">返回阶段与异常</button>`;
     if(mode==='layout')$('#inspector-content').insertAdjacentHTML('beforeend',window.intakeGrid.inspector());
     $('#inspector-content').insertAdjacentHTML('beforeend',outputInfo());
@@ -838,5 +846,5 @@ window.intakeWorkspace = (() => {
       cropDrafts.delete(r.id); cropPending.delete(r.id); syncCrops(); render();
     }
   });
-  return {chooseFigure, sync, updateChrome, renderActive, hasDraft, reset, stageCrop, undoCrop, renderCropInspector, cropEditable, allowedModes, requestFigure, renderFigureInspector, renderIntakeResults, followBatch, noteBrowse, renderSourceList, inspectMeasurement, syncInspectorDrawer};
+  return {layoutState,chooseFigure, sync, updateChrome, renderActive, hasDraft, reset, stageCrop, undoCrop, renderCropInspector, cropEditable, allowedModes, requestFigure, renderFigureInspector, renderIntakeResults, followBatch, noteBrowse, renderSourceList, inspectMeasurement, syncInspectorDrawer};
 })();

@@ -128,6 +128,7 @@ class SupervisionCheck:
                 return False
             for name in ("all.png", "all.tiff"):
                 with Image.open(self.root / name) as image:
+                    image.thumbnail((2048, 2048), Image.Resampling.LANCZOS)
                     if image.size != self.size or image.convert("RGB").tobytes() != self.preview:
                         raise ValueError("Export pixels differ from the visible grid")
             return True

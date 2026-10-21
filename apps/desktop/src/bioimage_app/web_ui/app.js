@@ -6,7 +6,7 @@ const paths = {
   lanes:'M4 5h16v14H4zM8 8v8M12 8v8M16 8v8',
   help:'M9 9a3 3 0 0 1 6 0c0 2-3 2-3 4M12 17h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z',
   settings:'m9 3-1 3-3 1-2 3 2 3 1 3 3 1 3 2 3-2 3-1 1-3 2-3-2-3-3-1-1-3H9ZM15 11a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
-  chevron:'m9 5 7 7-7 7', 'chevron-down':'m6 9 6 6 6-6',check:'m5 12 4 4L19 6',plus:'M12 5v14M5 12h14',minus:'M5 12h14',
+  chevron:'m9 5 7 7-7 7', 'chevron-down':'m6 9 6 6 6-6','chevron-up':'m6 15 6-6 6 6',check:'m5 12 4 4L19 6',plus:'M12 5v14M5 12h14',minus:'M5 12h14',
   download:'M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5',upload:'M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5',arrow:'M4 12h15m-6-6 6 6-6 6',
   folder:'M3 6h7l2 3h9v11H3V6Z',scan:'M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5M7 8h10v8H7z',layout:'M3 3h18v18H3zM3 9h18M9 9v12',table:'M3 3h18v18H3zM3 9h18M3 15h18M9 3v18',sliders:'M4 7h16M4 17h16M8 4v6M16 14v6',search:'M10 17a7 7 0 1 1 0-14 7 7 0 0 1 0 14Zm5-2 6 6',shield:'m12 3 8 3v6c0 5-8 9-8 9S4 17 4 12V6l8-3Zm-4 9 3 3 5-6',undo:'M4 10h10a6 6 0 0 1 0 12M4 10l5-5M4 10l5 5',redo:'M20 10H10a6 6 0 0 0 0 12m16-12-5-5m5 5-5 5',focus:'M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5M8 12h8M12 8v8',expand:'M3 9V3h6M15 3h6v6M21 15v6h-6M9 21H3v-6',image:'M3 3h18v18H3zM3 17l6-6 4 4 3-3 5 5M15 7h.01',mouse:'M12 3a6 6 0 0 0-6 6v6a6 6 0 0 0 12 0V9a6 6 0 0 0-6-6ZM12 3v6',layers:'m12 3 10 6-10 6L2 9l10-6ZM2 13l10 6 10-6M2 17l10 6 10-6',close:'m6 6 12 12M6 18 18 6',warning:'m12 3 10 18H2L12 3ZM12 9v5m0 3h.01',spark:'M12 2v4m0 12v4M2 12h4m12 0h4M5 5l3 3m8 8 3 3M5 19l3-3m8-8 3-3',file:'M5 3h9l5 5v13H5V3Zm9 0v6h5M8 13h8M8 17h6',curve:'M3 19h18M3 19V3M4 16c4 0 3-10 7-10s2 10 10 10',eye:'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Zm13 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z'
 };
@@ -64,14 +64,16 @@ function renderSources(){
  if(focusedSource)$$('[data-row]',$('#source-list')).find(b=>b.dataset.row===focusedSource)?.focus({preventScroll:true});
 }
 function renderCanvas(){
+ const layout=state.intake?.figureEnabled&&mode==='layout'?intakeWorkspace.layoutState():null;
  const r=row();$('#source-image').style.clipPath=quantImageClip();$('.main-panel').classList.toggle('quant-mode',mode==='quant');$('#quant-profile').hidden=mode!=='quant';$('#quant-lanes').hidden=mode!=='quant';$('#image-stage').hidden=mode==='results';$('#result-stage').hidden=mode!=='results';
- $('#image-title').textContent=mode==='results'?'测量结果':mode==='layout'?'当前拼图':mode==='quant'?(quantDetail?quantRowTitle(r):(quantData()?.group?.figure||r?.fig||'当前 Fig')+' · 整组灰度定量'):(state.intake?r?.protein||r?.name:r?.name)||'选择一张原图';$('#source-image').alt=mode==='layout'||(mode==='quant'&&!quantDetail)?'Fig 标注拼图':r?.name||'当前原图';
+ $('#image-title').textContent=mode==='results'?'测量结果':mode==='layout'?(layout?.label||'当前拼图'):mode==='quant'?(quantDetail?quantRowTitle(r):(quantData()?.group?.figure||r?.fig||'当前 Fig')+' · 整组灰度定量'):(state.intake?r?.protein||r?.name:r?.name)||'选择一张原图';$('#source-image').alt=mode==='layout'||(mode==='quant'&&!quantDetail)?'Fig 标注拼图':r?.name||'当前原图';
  $('#image-subtitle').textContent=mode==='quant'?(!quantDetail?'同一泳道贯穿组内条带 · 点击曲线分段查看原图依据':r?'原图：'+r.name+' · '+r.width+' × '+r.height+' px':'添加原图后选择测量区域与泳道数'):mode==='results'?`${state.rows.length} 张原图 · 有效信号与待复核积分独立呈现`:mode==='layout'?(state.montage?'原图裁剪的组合预览 · 显示变换不进入定量':'等待生成当前版本拼图'):r?(state.intake?`${r.fig} · ${r.name} · ${r.lanes} 个泳道`:`${r.width} × ${r.height} px  ·  ${r.bitDepth||'原始'} 位  ·  ${r.lanes} 个泳道`):'查看自动识别结果，在图上完成调整';
  $('#stage-label').textContent=mode==='quant'&&!quantDetail?'Fig 标注拼图 · 原像素映射':mode==='layout'?'拼图预览':focusCrop?'原图 · 聚焦裁剪区域':'原始图像';
- $('#canvas-hint').textContent=mode==='quant'?(quantDetail?'拖动框体或曲线边界调整 · 可返回整组':'选择泳道 · 点击曲线分段查看原图与封底'):mode==='results'?'选择结果查看完整原因':mode==='layout'?(state.montage?(state.intake?.figureEnabled?'点击图块回到对应原图':'点击拼图中的图片，返回对应原图调整'):'当前版本拼图尚未生成'):r&&!r.roi?'在原图上拖出裁剪区域 · 无需填写坐标':'拖动边框调整裁剪 · 滚轮缩放 · 方向键微调';
+ $('#canvas-hint').textContent=mode==='quant'?(quantDetail?'拖动框体或曲线边界调整 · 可返回整组':'选择泳道 · 点击曲线分段查看原图与封底'):mode==='results'?'选择结果查看完整原因':mode==='layout'?(state.montage?(state.intake?.figureEnabled?'点击图块定位蛋白；修改裁剪使用右侧入口':'点击拼图中的图片，返回对应原图调整'):'当前版本拼图尚未生成'):r&&!r.roi?'在原图上拖出裁剪区域 · 无需填写坐标':'拖动边框调整裁剪 · 滚轮缩放 · 方向键微调';
  $('.image-actions').hidden=mode==='results';$$('.image-actions [data-action=undo],.image-actions [data-action=redo]').forEach(b=>b.hidden=mode==='quant');$('#overlay-toggle').hidden=mode!=='review';
- const src=mode==='layout'?state.montage:(mode==='quant'&&!quantDetail)?(quantData()?.group?.sourceSheet?r?.preview:state.montage):r?.preview;
+ const src=mode==='layout'?(layout&&!layout.show?null:state.montage):(mode==='quant'&&!quantDetail)?(quantData()?.group?.sourceSheet?r?.preview:state.montage):r?.preview;
  $('#empty-image').hidden=!!src;$('#image-transform').hidden=!src;$('#empty-image h3').textContent=mode==='layout'?'拼图尚未就绪':'从一张原图开始';$('#empty-image p').textContent=mode==='layout'?(state.busy?'正在更新，请稍候。':'可更新拼图，或从右侧异常列表返回原图调整。'):'选择项目中的原图，或打开界面预览。';$('#empty-image button').hidden=mode==='layout';
+ if(layout&&!layout.show){$('#empty-image h3').textContent=layout.label;$('#empty-image p').textContent=layout.complete?'正在读取所选成图…':'成图尚未完成；请在右侧查看缺项并完成处理。';}
  if(mode==='quant'&&!quantDetail){$('#empty-image h3').textContent='当前 Fig 拼图尚未就绪';$('#empty-image p').textContent=state.busy?'正在更新，请稍候。':'返回拼图生成当前版本标注图，再按 Fig 查看灰度。';$('#empty-image button').hidden=true;}
  if(!src){$('#crop-overlay').hidden=true;$('#montage-regions').hidden=true;return;}
  if(imageKey!==src){imageKey=src;$('#source-image').src=src;}

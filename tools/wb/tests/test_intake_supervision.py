@@ -56,7 +56,8 @@ def test_grid_roundtrip_keeps_single_fig_evidence_and_exact_pixels(tmp_path: Pat
         publish_rendered_image(rendered, 300, str(tmp_path / f"all.{suffix}"))
     with Image.open(tmp_path / "all.png") as image:
         assert np.array_equal(np.asarray(image), pixels)
-    assert np.array_equal(tifffile.imread(tmp_path / "all.tiff"), pixels)
+    with tifffile.TiffFile(tmp_path / "all.tiff") as image:
+        assert np.array_equal(image.asarray(), pixels)
     with pytest.raises(FileExistsError):
         publish_rendered_image(rendered, 300, str(tmp_path / "all.png"))
     with pytest.raises(ValueError):
@@ -126,3 +127,46 @@ def test_batch_baseline_edit_matches_independent_request_without_touching_pixels
     original = load_tiff(next(p.path for p in paths if p.sha256 == request.source_sha256))
     assert analyze_annotations(original, actual.request) == analyze_annotations(original, request)
     assert replace(actual.request, lanes=plan.request.lanes) == plan.request
+
+
+def test_grid_order_survives_regrouping_with_changed_fig_ids(tmp_path: Path) -> None:
+    from wb_tool.api import begin_intake_group_revision, intake_digest, revise_intake_grouping
+
+    from tools.wb.tests.test_intake_group_revision import grouped_full
+
+    project, _, _ = grouped_full(tmp_path)
+    grid = revise_intake_grid(project, IntakeGrid(columns=1, order=("b", "a")))
+    editing = begin_intake_group_revision(grid, expected_digest=intake_digest(grid))
+    grouping = editing.intake.grouping
+    assert grouping is not None
+    changed = grouping.model_copy(
+        update={
+            "figures": tuple(
+                f.model_copy(update={"figure_id": "c"}) if f.figure_id == "a" else f
+                for f in grouping.figures
+            ),
+            "groups": tuple(
+                g.model_copy(update={"figure_id": "c"}) if g.figure_id == "a" else g
+                for g in grouping.groups
+            ),
+        }
+    )
+    result = revise_intake_grouping(editing, changed, expected_digest=intake_digest(editing))
+    assert isinstance(result, WBIntakeGridProject)
+    assert result.grid.order == ("b", "c")
+    assert result.grid.columns == 1
+    assert grid.grid.order == ("b", "a")
+
+
+def test_aggregate_preview_bounds_gui_pixels_but_preserves_full_layout() -> None:
+    from wb_tool.adapters.intake_grid import grid_preview
+    from wb_tool.api import FigureRender
+
+    manifest = {"aggregate": {"columns": 1}, "figures": [{"x": 0, "y": 0, "width": 3000}]}
+    full = FigureRender(3000, 2, bytes([17, 28, 39]) * 6000, json.dumps(manifest))
+    preview = grid_preview(full)
+    assert max(preview.width, preview.height) == 2048
+    actual = json.loads(preview.manifest_json)
+    assert actual["figures"] == manifest["figures"]
+    assert actual["preview_binding"]["full_width"] == 3000
+    assert full.width == 3000 and len(full.rgb) == 18000

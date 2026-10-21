@@ -7,24 +7,27 @@ window.intakeQuant = (() => {
   const fields = ['start', 'end', 'baselineStart', 'baselineEnd'];
   const values = band => Object.fromEntries(fields.map(k => [k, band?.[k]]));
   const key = (lane, band) => [state.projectId,state.sessionEpoch,row()?.id,row()?.sourceId,lane.lane,band.id].join(':');
+  const geometry=lane=>JSON.stringify([lane.roi,lane.targetRoi]);
   function entry(lane, band) {
     const id=key(lane,band), actual=values(band);
     let item=drafts.get(id);
+    if(item&&(item.sourceId!==row()?.sourceId||item.geometry!==geometry(lane)))item=null;
+    if(item&&!item.submitted&&item.revision!==quantData()?.revision&&fields.some(k=>actual[k]!==item.original[k]))item=null;
+    if(item?.submitted&&fields.every(k=>actual[k]===item.value[k]))item.revision=quantData().revision;
     if(item?.submitted && !state.busy && quantData()?.status==='ready' && fields.every(k=>actual[k]===item.value[k])) {
       drafts.delete(id); item=null;
     }
     return {id,item,actual};
   }
   function selection() {
-    const cached=[...drafts.values()].find(i=>i.project===state.projectId&&i.epoch===state.sessionEpoch&&i.rowId===row()?.id&&i.lane.lane===selected);
-    const lane=quantData()?.lanes?.find(l=>l.lane===selected)||cached?.lane, band=lane?.bands?.[0];
+    const lane=quantData()?.lanes?.find(l=>l.lane===selected), band=lane?.bands?.[0];
     if(!lane||!band)return null;
     const result=entry(lane,band);
     return {lane:lane.profile?.length?lane:result.item?.lane||lane,band,...result};
   }
   function change(next) {
     const s=selection();if(!s||state.busy)return;
-    const item=s.item||{value:s.actual,undo:[],redo:[],revision:quantData().revision,lane:structuredClone(s.lane),rowId:row().id,project:state.projectId,epoch:state.sessionEpoch};
+    const item=s.item||{value:s.actual,original:s.actual,sourceId:row().sourceId,geometry:geometry(s.lane),undo:[],redo:[],revision:quantData().revision,lane:structuredClone(s.lane),rowId:row().id,project:state.projectId,epoch:state.sessionEpoch};
     item.undo.push({...item.value}); item.redo=[];item.value={...item.value,...next};item.submitted=false;
     drafts.set(s.id,item);
   }
@@ -32,19 +35,21 @@ window.intakeQuant = (() => {
     const current=quantData();
     if(!protein||current?.rowId!==protein.protein_id)return '<section class="intake-profile-panel"><p>等待所选蛋白的已提交曲线…</p></section>';
     lanes=[...lanes];
-    for(const item of drafts.values())if(item.project===state.projectId&&item.epoch===state.sessionEpoch&&item.rowId===protein.protein_id&&!lanes.some(l=>l.lane===item.lane.lane))lanes.push(item.lane);
+    const applicable=new Set(lanes.flatMap(l=>l.bands?.[0]&&entry(l,l.bands[0]).item?[entry(l,l.bands[0]).id]:[]));
+    const stale=[...drafts].filter(([id,item])=>item.project===state.projectId&&item.epoch===state.sessionEpoch&&item.rowId===protein.protein_id&&!applicable.has(id));
+    const warning=stale.length?'<p role="status">有旧来源或旧范围的调整草稿，未应用到当前曲线。</p><button class="text-button" data-iq-action="discard-stale">丢弃过期草稿</button>':'';
     const chosen=lanes.find(l=>l.lane===selected);
     const visible=chosen?[chosen]:lanes;
     const body=visible.map(lane=>{
       const band=lane.bands?.[0];if(!band)return '';
       const {item,actual}=entry(lane,band), effective={...band,...(item?.value||actual)};
       const editable=!!chosen;
-      return `<section class="intake-quant-lane"><button class="text-button" data-iq-lane="${lane.lane}">泳道 ${lane.lane}${editable?'':' · 放大调整'}</button>${manualQuant.chart({...lane,bands:[effective]},effective,editable).replaceAll('data-quant-point','data-iq-point')}
+      return `<section class="intake-quant-lane"><button class="text-button" data-iq-lane="${lane.lane}">泳道 ${lane.lane}${editable?'':' · 放大调整'}</button>${manualQuant.chart({...(!lane.profile?.length&&item?item.lane:lane),bands:[effective]},effective,editable).replaceAll('data-quant-point','data-iq-point')}
       ${editable?`<div class="quant-fields">${fields.map(k=>`<label class="quant-field">${({start:'积分起点 y',end:'积分终点 y',baselineStart:'起点封底',baselineEnd:'终点封底'})[k]}<input type="number" data-iq-field="${k}" value="${effective[k]??''}" step="${k.startsWith('baseline')?'.1':'1'}" ${state.busy?'disabled':''}></label>`).join('')}</div>
       <div class="intake-stage-actions"><button class="button subtle" data-iq-action="undo" ${!item?.undo.length||state.busy?'disabled':''}>撤销</button><button class="button subtle" data-iq-action="redo" ${!item?.redo.length||state.busy?'disabled':''}>重做</button><button class="button subtle" data-iq-action="discard" ${!item||state.busy?'disabled':''}>放弃调整</button><button class="button primary" data-iq-action="save" ${!item||state.busy||!bridge?'disabled':''}>保存并重算</button></div><p role="status">${item?'调整草稿尚未完成重算；当前结果不代表此草稿。':'已提交曲线；坐标为泳道内原像素位置。'}</p>`:''}
       ${qualityContent([{reason:band.reason,label:'泳道 '+lane.lane}])}</section>`;
     }).join('');
-    return `<section class="intake-profile-panel"><header><strong>${escapeText(protein.label)} · 灰度峰与封底</strong><button class="text-button" data-iq-action="all">全部泳道</button></header>${body||'<p>等待已提交的原像素曲线。</p>'}</section>`;
+    return `<section class="intake-profile-panel"><header><strong>${escapeText(protein.label)} · 灰度峰与封底</strong><button class="text-button" data-iq-action="all">全部泳道</button></header>${warning}${body||'<p>等待已提交的原像素曲线。</p>'}</section>`;
   }
   const refresh=()=>window.intakeWorkspace.renderActive();
   document.addEventListener('click',event=>{
@@ -53,6 +58,11 @@ window.intakeQuant = (() => {
     const action=event.target.closest('[data-iq-action]')?.dataset.iqAction;
     if(!action)return;
     if(action==='all'){selected=null;refresh();return;}
+    if(action==='discard-stale'&&!state.busy){
+      const valid=new Set((quantData()?.lanes||[]).flatMap(l=>l.bands?.[0]&&entry(l,l.bands[0]).item?[entry(l,l.bands[0]).id]:[]));
+      for(const [id,item] of drafts)if(item.rowId===row()?.id&&!valid.has(id))drafts.delete(id);
+      refresh();return;
+    }
     const s=selection();if(!s?.item||state.busy)return;
     const item=s.item;
     if(action==='discard')drafts.delete(s.id);

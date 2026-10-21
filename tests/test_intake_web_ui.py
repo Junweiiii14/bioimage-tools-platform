@@ -1853,3 +1853,49 @@ def test_grid_draft_order_save_and_missing_export(
     assert javascript(window, qtbot, "mode==='layout'&&intakeGrid.hasDraft()")
     javascript(window, qtbot, "intakeGrid.reset();true")
     assert javascript(window, qtbot, "!intakeGrid.hasDraft()")
+
+
+@pytest.mark.parametrize("changed", ["source", "geometry"])
+def test_batch_curve_draft_cannot_fill_changed_source_or_geometry(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot, changed: str
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        """
+      window.draftLane={lane:1,roi:{y:0,height:3},profile:[0,10,0],
+        bands:[{id:'target',start:0,end:2,baselineStart:0,baselineEnd:0}]};
+      setState({selectedId:'protein-a',rows:[{id:'protein-a',sourceId:'src',
+        protein:'A',fig:'Fig 1',lanes:6}],
+        quant:{rowId:'protein-a',revision:1,status:'ready',
+        lanes:[draftLane]}});
+      const protein={protein_id:'protein-a',label:'A'};
+      document.querySelector('#inspector-content').innerHTML=intakeQuant.markup([draftLane],protein);
+      document.querySelector('[data-iq-lane]').click();
+      document.querySelector('#inspector-content').innerHTML=intakeQuant.markup([draftLane],protein);
+      const input=document.querySelector('[data-iq-field=baselineStart]');input.value='1';
+      input.dispatchEvent(new Event('change',{bubbles:true}));true
+    """,
+    )
+    mutation = (
+        "state.rows.find(r=>r.id==='protein-a').sourceId='new-source';"
+        if changed == "source"
+        else "draftLane.roi={y:4,height:3};"
+    )
+    javascript(
+        window,
+        qtbot,
+        mutation
+        + """
+      draftLane.profile=[];state.quant.lanes=[draftLane];
+      document.querySelector('#inspector-content').innerHTML=intakeQuant.markup(
+        [draftLane],{protein_id:'protein-a',label:'A'});true
+    """,
+    )
+    assert javascript(window, qtbot, "!!document.querySelector('[data-iq-action=discard-stale]')")
+    assert javascript(window, qtbot, "!document.querySelector('#inspector-content .quant-curve')")
+    javascript(
+        window, qtbot, "document.querySelector('[data-iq-action=discard-stale]').click();true"
+    )
+    assert javascript(window, qtbot, "!intakeQuant.hasDraft()")

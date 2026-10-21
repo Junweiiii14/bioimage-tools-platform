@@ -168,7 +168,7 @@ class _Work(QObject):
             }:
                 from wb_tool.adapters.figure_image_export import publish_rendered_image
                 from wb_tool.adapters.intake_figure import load_intake_figure_render
-                from wb_tool.adapters.intake_grid import render_intake_grid
+                from wb_tool.adapters.intake_grid import grid_preview, render_intake_grid
                 from wb_tool.application.intake_output import WBIntakeOutputProject
 
                 if not isinstance(job.document, WBIntakeOutputProject):
@@ -179,7 +179,7 @@ class _Work(QObject):
                     else render_intake_grid(job.document, job.sources, cancelled=cancel)
                 )
                 value = (
-                    rendered
+                    grid_preview(rendered)
                     if job.operation == "intake_grid_preview"
                     else str(
                         publish_rendered_image(
