@@ -15,3 +15,5 @@
 
 - b963ecb仅交付文档Accepted；后续CI发现180ms发布漏compose的竞态。8fee7d8审查指出初始连接遗漏，c3c9bd9补完整生命周期后Accepted。
 - 854b539并排概览增量审查指出拖动缺ROI/revision绑定；e47af46补齐后静态Accepted。最终安装19checks/11.141秒通过，独审未代替安装或CI。
+
+- 0e6febb最终文档独审Accepted；后续用户明确整个Fig矩阵，24fc24c审查指出缺项草稿入口，86c9ad6补齐后Accepted。c90b0e5诊断位置回执与重开确认态观测增量Accepted，不降结果断言。

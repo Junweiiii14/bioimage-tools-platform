@@ -1,6 +1,19 @@
 # T074 固定提交安装交付
 
-## 当前：e47af46（用户实测后的并排泳道与编辑入口修复）
+## 当前：c90b0e5（整个 Fig 曲线矩阵）
+
+- 产品矩阵86c9ad6及诊断增量c90b0e5独立Accepted；从固定c90b0e5389df构建，构建/安装退出0。
+- 包：.local/releases/runtime-c90b0e5389df/BioImage-WB-x64-T074-Test-c90b0e5389df-Setup.exe
+- 包SHA256：700547fd54453c0980124bcbc551a6c46eda8e2bcfbe66d61c99ac6279dcdb96；361774840字节。
+- PS5.1实际安装版19checks/11.437秒/exit0，报告phase=passed/errors=[]。
+- 报告：C:/Users/70236/AppData/Local/BioImage-WB-Supervision-Test/Diagnostics/20261021-233526-7f4f88ccca704939b95952982f332db4.json
+- 报告SHA256：fbfac5310629eda67b452854c044b7e0e65e89ac68cd8349e4e9e5b9212d5085。
+- 整个Fig矩阵显示全部蛋白行×泳道列，点击格子待正确row快照才编辑；缺项保留草稿恢复按钮。既有4项UI、跨蛋白矩阵1项、失败后收起/恢复1项定向通过，不改科学算法。
+- 86c9ad6安装流程在导出后reopen超时120.094秒，失败报告20261021-232730-4ded29126c6d4a0fb077ee00887135cb.json保留。源码观测9.219秒通过仅作定位；诊断改为同步网页position回执后再重开，遇确认态明确失败，不自动丢草稿。当前c90b0e5已实际包态复验通过。
+- 0e6febb Linux1158过18败，17项旧宿主夹具补新增信号，1项流程由idle改等真实started+workflow终态后仍断言全部done；相关19过及失败项定向1过，完成/图像/输出断言不削弱。最终CI以PR35当前HEAD为准。
+
+
+## 历史：e47af46（用户实测后的并排泳道与编辑入口修复）
 
 - 产品/构建源 e47af464c0b1（完整SHA见build-manifest），独立审查Accepted。构建退出0、安装退出0。
 - 包：.local/releases/runtime-e47af464c0b1/BioImage-WB-x64-T074-Test-e47af464c0b1-Setup.exe
