@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="desktop_session.css">
   <link rel="stylesheet" href="intake.css">
   <link rel="stylesheet" href="shortcuts.css">
+  <link rel="stylesheet" href="intake_workbench.css">
 </head>
 <body>
   <aside class="platform-rail" aria-label="工具平台">
@@ -19,6 +20,7 @@
   </aside>
   <div class="app-shell">
     <header class="project-header">
+      <button class="intake-brand" data-action="home" aria-label="BioImage 工作台" hidden><svg viewBox="0 0 32 32" fill="none"><path d="M7 5h10a7 7 0 0 1 0 14H7V5Z M7 13h12a7 7 0 1 1 0 14H7V13Z" stroke="currentColor" stroke-width="2"/></svg><span>BioImage</span></button>
       <div class="breadcrumb"><button data-action="home">工作台</button><i data-icon="chevron"></i><span>WB 自动化</span><span class="header-divider"></span><strong id="project-name">新建实验项目</strong></div>
       <div class="header-actions"><details id="session-menu"><summary>文件</summary><nav><button data-session="new_intake_folder">新建仪器导入项目…</button><button data-session="new">新建灰度项目</button><button data-session="open">打开已有项目…</button><button data-session="save">保存项目</button><button data-action="shortcut-settings">快捷键设置…</button><button data-session="home">关闭项目并返回首页</button><button data-session="exit">退出软件</button></nav></details><span id="save-status" class="save-status"><i data-icon="check"></i>就绪</span><span id="runtime-badge" class="runtime-badge">网页预览</span><button class="button subtle" data-action="import"><i data-icon="plus"></i><span>添加原图</span></button><button class="button primary" data-action="export"><i data-icon="download"></i><span>导出结果</span></button></div>
     </header>
@@ -32,7 +34,7 @@
       <p class="home-note" id="home-note">网页用于界面与交互预览。真实导入、计算和导出由同源桌面版执行。</p>
     </main>
     <div id="work-view" class="work-view">
-      <nav class="mode-bar" aria-label="工作模式"><div class="mode-tabs" role="tablist"><span class="mode-indicator"></span><button class="mode-tab" data-mode="intake" role="tab" aria-selected="false" hidden><i data-icon="folder"></i>导入与分配</button><button class="mode-tab active" data-mode="review" role="tab" aria-selected="true"><i data-icon="scan"></i>原图裁剪</button><button class="mode-tab" data-mode="layout" role="tab" aria-selected="false"><i data-icon="layout"></i>拼图排版</button><button class="mode-tab" data-mode="quant" role="tab" aria-selected="false"><i data-icon="curve"></i>灰度定量</button><button class="mode-tab" data-mode="results" role="tab" aria-selected="false"><i data-icon="table"></i>结果</button></div><div class="mode-actions"><button class="text-button compact-inspect" data-action="inspect"><i data-icon="eye"></i>裁图详情</button><button class="text-button" data-action="tools"><i data-icon="sliders"></i><span>项目工具</span><i data-icon="chevron-down"></i></button></div></nav>
+      <nav class="mode-bar" aria-label="工作模式"><div class="mode-tabs" role="tablist"><span class="mode-indicator"></span><button class="mode-tab" data-mode="intake" role="tab" aria-selected="false" hidden><i data-icon="folder"></i>导入与分配</button><button class="mode-tab active" data-mode="review" role="tab" aria-selected="true"><i data-icon="scan"></i>原图裁剪</button><button class="mode-tab" data-mode="layout" role="tab" aria-selected="false"><i data-icon="layout"></i>拼图排版</button><button class="mode-tab" data-mode="quant" role="tab" aria-selected="false"><i data-icon="curve"></i>灰度定量</button><button class="mode-tab" data-mode="results" role="tab" aria-selected="false"><i data-icon="table"></i>结果</button></div><div class="mode-actions"><button class="text-button compact-inspect" data-action="inspect"><i data-icon="eye"></i>裁图详情</button><button class="text-button" data-action="tools" aria-label="项目工具"><i data-icon="sliders"></i><span>项目工具</span><i data-icon="chevron-down"></i></button></div></nav>
       <div class="workspace">
         <aside class="source-panel" aria-label="项目原图"><div class="panel-heading"><h2>项目原图 <span id="source-count">0</span></h2><button class="icon-button" data-action="import" aria-label="添加原图"><i data-icon="plus"></i></button></div><div class="source-filters" role="group" aria-label="筛选原图"><button class="active" data-filter="all">全部</button><button data-filter="attention">裁图异常 <span id="attention-count">0</span></button></div><label class="search-field"><i data-icon="search"></i><input id="source-search" type="search" placeholder="查找原图…" aria-label="查找原图"></label><div id="source-list" class="source-list"></div><div class="source-footer"><i data-icon="shield"></i><div><strong>原图始终保留</strong><small>调整仅影响当前分析草稿</small></div></div></aside>
         <section class="main-panel" aria-label="图像与结果工作区">
@@ -61,6 +63,7 @@
   <script src="manual_lanes.js" defer></script>
   <script src="group_review.js" defer></script>
   <script src="intake_groups.js" defer></script>
+  <script src="intake_views.js" defer></script>
   <script src="intake.js" defer></script>
   <script src="desktop_session.js" defer></script>
   <script src="shortcuts.js" defer></script>

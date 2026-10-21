@@ -9,11 +9,25 @@ window.intakeWorkspace = (() => {
   $('.workspace').before(root);
   const progress = document.createElement('section');
   const resultStage = $('#result-stage'), resultParent = resultStage.parentElement;
+  const paintedMarkup = new WeakMap();
+  function updateMarkup(container, markup) {
+    if(paintedMarkup.get(container)===markup)return;
+    const focused=container.contains(document.activeElement)?document.activeElement:null;
+    const attributes=focused?[...focused.attributes].filter(a=>a.name==='id'||a.name.startsWith('data-')):[];
+    const selector=attributes.map(a=>`[${a.name}="${CSS.escape(a.value)}"]`).join('');
+    const occurrence=selector?$$(selector,container).indexOf(focused):-1;
+    const opened=$$('details',container).map(el=>[el.querySelector('summary')?.textContent,el.open]);
+    const top=container.scrollTop,left=container.scrollLeft;
+    container.innerHTML=markup;paintedMarkup.set(container,markup);
+    $$('details',container).forEach((el,index)=>{if(opened[index]?.[0]===el.querySelector('summary')?.textContent)el.open=opened[index][1];});
+    if(selector)$$(selector,container)[occurrence]?.focus({preventScroll:true});
+    container.scrollTop=top;container.scrollLeft=left;
+  }
   progress.id = 'intake-batch-progress';progress.hidden = true;
   progress.setAttribute('aria-label','整批处理进度');root.before(progress);
   let followed = '', browsing = false, composing = false, navigating = false;
   const batchPolicy = () => state.intake?.workflow?.policy === 'intake_workflow@3';
-  const batchReason = value => /signal_orientation_insufficient/.test(value||'')?'条带方向证据不足，请核对原图范围和角度后继续。':/signal_orientation_ambiguous/.test(value||'')?'条带方向不一致，请核对本次目标和角度后继续。':/signal_rows_ambiguous|signal_target_overlap|guide_multiple_membranes/.test(value||'')?'当前范围包含多个可能目标，请明确本次条带范围后继续。':/guided_target_ambiguous/.test(value||'')?'检测到多个条带区域，请在原图明确本次目标范围后继续。':/explicit_lane_count_conflicts|guided_target_not_supported/.test(value||'')?'尚未取得与 N 一致的完整条带，请核对 N 或在原图明确范围后继续。':/crop_policy|automatic_geometry|membrane_not_found|no_reliable_membrane/.test(value||'') ? '未能确定完整裁剪范围，请在对应原图框选包含全部样本槽位的整行范围，保存后继续。' : value || '';
+  const batchReason = value => /source_width_estimate_conflicts_with_support|fixed_grid_clips_target_support/.test(value||'')?'当前槽宽无法容纳完整信号，请核对条带与标记的分界后保存范围。':/additional_signal_at_target_row/.test(value||'')?'目标附近还有未能排除的信号，请核对完整范围后继续。':/group_signal_coordinates_unverified/.test(value||'')?'同组图片的位置证据不一致，请在所选原图核对范围。':/target_frame_exceeds_membrane/.test(value||'')?'范围超出可确认的膜内区域，请调整裁剪框。':/lane_spacing_ambiguous|lane_shape_ambiguous/.test(value||'')?'泳道结构尚不明确，请核对全部 N 个槽位。':/signal_orientation_insufficient/.test(value||'')?'条带方向证据不足，请核对原图范围和角度后继续。':/signal_orientation_ambiguous/.test(value||'')?'条带方向不一致，请核对本次目标和角度后继续。':/signal_rows_ambiguous|signal_target_overlap|guide_multiple_membranes/.test(value||'')?'当前范围包含多个可能目标，请明确本次条带范围后继续。':/guided_target_ambiguous/.test(value||'')?'检测到多个条带区域，请在原图明确本次目标范围后继续。':/explicit_lane_count_conflicts|guided_target_not_supported/.test(value||'')?'尚未取得与 N 一致的完整条带，请核对 N 或在原图明确范围后继续。':/crop_policy|automatic_geometry|membrane_not_found|no_reliable_membrane/.test(value||'') ? '未能确定完整裁剪范围，请在对应原图框选包含全部样本槽位的整行范围，保存后继续。' : value || '';
   function noteBrowse(){if(batchPolicy()&&state.intake?.automation?.follow&&!navigating){browsing=true;renderProgress();}}
   const phaseNames = {crop:'原图裁剪',compose:'完整 Fig 拼图',measure:'原像素定量',export:'结果输出',complete:'统一结果'};
   const live = document.createElement('div');
@@ -31,6 +45,8 @@ window.intakeWorkspace = (() => {
   let cropSavedRow = null, cropFocusAction = null, chosenFigureId = null;
   let resultPage = 0, stagePage = 0;
   let previewRequested = '';
+  let cropInspectorRow = null;
+  const originalTabs = new Map($$('.mode-tab').map(tab=>[tab,tab.innerHTML]));
   let discoveryKey = '', discoveryDirty = false;
   const discoveryChoices = new Map();
   const copyPlan = intake => ({
@@ -52,7 +68,7 @@ window.intakeWorkspace = (() => {
   };
 
   function reset() {
-    if(resultStage.parentElement===root)resultParent.append(resultStage);
+    if(root.contains(resultStage))resultParent.append(resultStage);
     previewRequested='';
     followed = '';browsing = false;composing = false;progress.hidden = true;
     window.intakeGroups.reset();
@@ -137,7 +153,7 @@ window.intakeWorkspace = (() => {
     const evidence=state.intake?.crops?.find(e=>e.row_id===id);
     return !!step && (['needs_review','failed','cancelled','interrupted','done'].includes(step.status) || step.status==='pending'&&evidence?.reviewed&&!evidence.raw_crop);
   }
-  function stageCrop(next, before) {
+  function stageCrop(next, before, paint = true) {
     const r = row();
     if (!r || state.busy || !state.intake?.cropEnabled) return;
     if (!cropEditable(r.id)) { r.roi = before; render(); return; }
@@ -150,7 +166,7 @@ window.intakeWorkspace = (() => {
     draft.angleHistory=(draft.angleHistory||[]).slice(0,draft.index);draft.angleHistory.push(draft.displayAngle);
     draft.roi = {...next}; r.roi = draft.roi; r.draft = true;
     live.textContent = '裁剪草稿已调整，确认后才保存；尚未生成原值裁剪。';
-    render();
+    if (paint) render();
   }
   function undoCrop(redo) {
     const r = row(), draft = r && cropDrafts.get(r.id);
@@ -162,6 +178,15 @@ window.intakeWorkspace = (() => {
     render();
   }
   function renderCropInspector(r) {
+    const focused = document.activeElement;
+    // A progress snapshot must not replace the input under a user's caret/IME.
+    // The change handler commits its draft without replacing a pressed action.
+    if(cropInspectorRow===r?.id&&focused?.matches('[data-intake-rotation]')){
+      focused.disabled=!!state.busy||!cropEditable(r.id);
+      drawRotationPreview(r,state.intake.crops?.find(e=>e.row_id===r.id),cropDrafts.get(r.id));
+      return;
+    }
+    cropInspectorRow=r?.id;
     const actionFocus = document.activeElement?.dataset.intakeCropAction;
     if (actionFocus) cropFocusAction = actionFocus;
     else if (!$('.inspector').contains(document.activeElement)) cropFocusAction = null;
@@ -170,10 +195,10 @@ window.intakeWorkspace = (() => {
     const draft = r && cropDrafts.get(r.id);
     const correcting = step?.status === 'done';
     const reviewable = r && cropEditable(r.id);
-    $('#inspector-title').textContent = '原图裁剪复核';
-    $('#review-badge').textContent = evidence?.raw_crop ? '原值已保存' : '待核对';
+    $('#inspector-title').textContent = '裁剪信息';
+    $('#review-badge').textContent = draft ? '未保存' : evidence?.raw_crop ? '原值已保存' : step?.status==='needs_review' ? '需调整' : '待处理';
     $('#review-badge').className = 'status-badge '+(evidence?.raw_crop?'ok':'pending');
-    $('#inspector-content').innerHTML = `<section class="inspect-section"><h3>${r?escapeText(targetName(r.id)):'请选择蛋白行'}</h3>${dataPair('固定槽位数',r?.lanes||0)}${dataPair('裁图',evidence?.raw_crop?(evidence.policy==='intake_crop@2'?'自动定位已保存':'已保存'):'待处理')}${draft?.conflict||step?.status==='needs_review'||step?.status==='failed'?`<p class="row-reason" role="status">${escapeText(draft?.conflict?'后台输入已改变，草稿保留；放弃后重新核对。':batchReason(evidence?.reason))}</p>`:''}<details><summary>范围与槽位说明</summary><p>在原图调整整行范围。手动确认按固定 N 等宽分割；无信号槽位保留。</p><p>${escapeText(evidence?.reason||'尚未定位')}</p></details></section>`;
+    $('#inspector-content').innerHTML = `<section class="inspect-section"><h3>${r?escapeText(targetName(r.id)):'请选择蛋白行'}</h3>${dataPair('固定槽位数',r?.lanes||0)}${dataPair('裁图',evidence?.raw_crop?(['intake_crop@2','intake_crop@3'].includes(evidence.policy)?'自动定位已保存':'已保存'):'待处理')}${draft?.conflict||step?.status==='needs_review'||step?.status==='failed'?`<p class="row-reason" role="status">${escapeText(draft?.conflict?'后台输入已改变，草稿保留；放弃后重新核对。':batchReason(evidence?.reason))}</p>`:''}<details><summary>范围与槽位说明</summary><p>在原图调整整行范围。手动确认按固定 N 等宽分割；无信号槽位保留。</p><p>${escapeText(evidence?.reason||'尚未定位')}</p></details></section>`;
     if(r?.roi){
       const angle=draft?.displayAngle??evidence?.displayFrame?.angle_degrees??0;
       $('#inspector-content').insertAdjacentHTML('beforeend',`<section class="inspect-section"><h3>裁图纠偏</h3><canvas class="intake-rotation-preview" aria-label="纠偏后的裁图预览"></canvas><label>角度（度）<input data-intake-rotation type="number" min="-10" max="10" step="0.1" value="${Number(angle).toFixed(2)}" ${state.busy||!reviewable?'disabled':''}></label><button class="text-button" data-intake-reset-rotation ${state.busy||!reviewable?'disabled':''}>恢复不旋转</button><small>纠偏用于显示与拼图；定量范围保持原图坐标。</small></section>`);
@@ -187,6 +212,7 @@ window.intakeWorkspace = (() => {
       const resume=$('[data-intake-crop-action="run"]');
       resume.textContent='保存范围并继续自动处理';resume.className='button primary full';
       resume.disabled=!!state.busy||!r?.roi||!evidence||!reviewable||!!draft?.conflict||!!cropPending.size;
+      if(correcting&&!draft){saveOnly.hidden=true;resume.hidden=true;$('#inspector-action').insertAdjacentHTML('afterbegin','<p class="intake-saved-note">此图已保存，无需确认。</p>');}
     }
     const focus = cropSavedRow === r?.id ? 'run' : cropFocusAction;
     cropSavedRow = null;
@@ -198,26 +224,48 @@ window.intakeWorkspace = (() => {
     if (cropPending.size && state.status && live.textContent !== state.status) live.textContent = state.status;
   }
   function drawRotationPreview(r,evidence,draft){
-    const canvas=$('.intake-rotation-preview');if(!canvas||!r.preview)return;
+    const canvases=$$('.intake-rotation-preview');if(!canvases.length||!r?.preview||!r.roi)return;
     const roi=r.roi,angle=draft?.displayAngle??evidence?.displayFrame?.angle_degrees??0;
     const rad=angle*Math.PI/180,c=Math.cos(rad),s=Math.sin(rad);
     const factor=Math.min(roi.width/(roi.width*Math.abs(c)+roi.height*Math.abs(s)),roi.height/(roi.width*Math.abs(s)+roi.height*Math.abs(c)));
     const frame=draft?.displayAngle==null&&evidence?.displayFrame&&JSON.stringify(roi)===JSON.stringify(cropBox(evidence.crop))?evidence.displayFrame:{center_x:roi.x+roi.width/2,center_y:roi.y+roi.height/2,width:roi.width*factor,height:roi.height*factor};
     const width=Math.min(420,Math.round(frame.width)),height=Math.max(1,Math.round(width*frame.height/frame.width));
-    canvas.width=width;canvas.height=height;
-    const image=new Image();image.onload=()=>{
-      if(!canvas.isConnected)return;
-      const ctx=canvas.getContext('2d'),sx=width/frame.width,sy=height/frame.height;
-      ctx.setTransform(sx*c,-sy*s,sx*s,sy*c,width/2-sx*(c*frame.center_x+s*frame.center_y),height/2+sy*(s*frame.center_x-c*frame.center_y));
-      ctx.drawImage(image,0,0,r.width,r.height);
-    };image.src=r.preview;
+    for(const canvas of canvases){
+      const paint=Symbol();rotationPaints.set(canvas,paint);
+      canvas.width=width;canvas.height=height;
+      const image=new Image();image.onload=()=>{
+        if(!canvas.isConnected||rotationPaints.get(canvas)!==paint)return;
+        const ctx=canvas.getContext('2d'),sx=width/frame.width,sy=height/frame.height;
+        ctx.setTransform(sx*c,-sy*s,sx*s,sy*c,width/2-sx*(c*frame.center_x+s*frame.center_y),height/2+sy*(s*frame.center_x-c*frame.center_y));
+        ctx.drawImage(image,0,0,r.width,r.height);
+      };image.src=r.preview;
+    }
   }
-  function stageRotation(value){
+  const rotationPaints=new WeakMap();
+  function syncInspectorDrawer() {
+    if(!state.intake?.cropEnabled||mode!=='review')return false;
+    const focused=document.activeElement;
+    if(!focused?.matches('[data-intake-rotation]'))updateMarkup($('#drawer-content'),$('#inspector-content').innerHTML+$('#inspector-action').innerHTML);
+    const r=row();
+    drawRotationPreview(r,state.intake.crops?.find(e=>e.row_id===r?.id),cropDrafts.get(r?.id));
+    return true;
+  }
+  function stageRotation(value, paint = true){
     const r=row(),angle=Number(value);
     if(value===''||!r?.roi||state.busy||!cropEditable(r.id)||!Number.isFinite(angle)||Math.abs(angle)>10)return;
-    stageCrop({...r.roi},r.roi);const draft=cropDrafts.get(r.id);draft.displayAngle=angle;draft.angleHistory[draft.index]=angle;render();
+    stageCrop({...r.roi},r.roi,false);const draft=cropDrafts.get(r.id);draft.displayAngle=angle;draft.angleHistory[draft.index]=angle;
+    if(paint){render();return;}
+    // Number inputs emit change between a button's mousedown and mouseup.
+    // Keep those DOM nodes alive so that the same press can finish its click.
+    $('#review-badge').textContent='未保存';
+    $$('[data-intake-crop-action="discard"]').forEach(button=>button.disabled=false);
+    $$('[data-intake-crop-action="confirm"]').forEach(button=>{button.hidden=false;button.disabled=false;});
+    $$('[data-intake-crop-action="run"]').forEach(button=>{button.hidden=false;button.disabled=!batchPolicy()||!!cropPending.size;});
+    $$('.intake-saved-note').forEach(note=>note.remove());
+    drawRotationPreview(r,state.intake.crops?.find(e=>e.row_id===r.id),draft);
+    updateChrome();renderSourceList();
   }
-  document.addEventListener('change',event=>{if(event.target.matches('[data-intake-rotation]'))stageRotation(event.target.value);});
+  document.addEventListener('change',event=>{if(event.target.matches('[data-intake-rotation]'))stageRotation(event.target.value,false);});
   document.addEventListener('click',event=>{if(event.target.closest('[data-intake-reset-rotation]'))stageRotation(0);});
   function cropActions(step) {
     if (!state.intake.cropEnabled) return '';
@@ -251,14 +299,90 @@ window.intakeWorkspace = (() => {
     }
     browsing=false;followed='';send('intake_sequence_continue',payload);
   }
+  const topAction=document.createElement('button');
+  topAction.id='intake-primary';topAction.className='button primary';topAction.hidden=true;
+  $('.mode-bar').append(topAction);
+  const topSummary=document.createElement('span');topSummary.className='intake-top-summary';topSummary.hidden=true;topAction.before(topSummary);
+  const newFigure=document.createElement('button');newFigure.className='text-button';newFigure.id='intake-new-figure';newFigure.textContent='新建 Fig';newFigure.hidden=true;
+  $('.header-actions').prepend(newFigure);
+  newFigure.addEventListener('click',()=>window.intakeGroups.activate('add-fig'));
+  topAction.addEventListener('click',()=>{
+    if(topAction.disabled)return;
+    if(!batchPolicy()||state.intake.workflow.editing){window.intakeGroups.activate('start');return;}
+    if(state.busy){action('cancel');return;}
+    if(state.intake.automation?.complete){if(!hasDraft())send('intake_export_table',guard());return;}
+    resumeBatch();
+  });
+  function updateChrome(){
+    const active=!!state.intake;
+    $('.compact-inspect').hidden=active&&['intake','results'].includes(mode);
+    document.body.classList.toggle('intake-project',active);
+    $('.intake-brand').hidden=!active;
+    const configuration=active&&(!state.intake.workflow||state.intake.workflow.editing);
+    const setup=configuration?window.intakeGroups.startState():null;
+    const batch=active&&batchPolicy()&&!state.intake.workflow.editing;
+    topAction.hidden=topSummary.hidden=!(setup?.available||batch);
+    newFigure.hidden=!setup?.available;newFigure.disabled=!!setup?.locked;
+    if(setup?.available){
+      topAction.textContent='开始自动处理';topAction.disabled=setup.disabled;
+      topSummary.textContent=`${setup.count} 个蛋白 · ${setup.figures} 个 Fig`;
+    }else if(batch){
+      const a=state.intake.automation;
+      const current=state.intake.workflow.steps.find(s=>s.stage==='crop'&&s.target_id===row()?.id);
+      const reviewing=mode==='review'&&(current?.status==='needs_review'||cropDrafts.has(row()?.id));
+      topAction.textContent=state.busy?'暂停处理':a?.complete?'导出结果表':reviewing?'保存范围并继续':'继续自动处理';
+      topAction.disabled=!bridge||!!cropPending.size||!!(a?.complete&&hasDraft())||!!(state.busy&&!a?.phase);
+      topSummary.textContent=`${state.intake.proteins.length} 个蛋白 · ${state.intake.figures.length} 个 Fig`;
+    }
+    const keys=['intake','review','layout','quant','results'];
+    const labels=['配置原图','自动裁图','拼图排版','灰度定量','结果表'];
+    $$('.mode-tab').forEach(tab=>{
+      if(!active){if(tab.querySelector('.mode-step'))tab.innerHTML=originalTabs.get(tab);tab.classList.remove('stage-complete');return;}
+      const index=keys.indexOf(tab.dataset.mode);if(index<0)return;
+      if(!tab.querySelector('.mode-step'))tab.innerHTML=`<span class="mode-step"></span><span>${labels[index]}</span>`;
+      const stage=['','crop','compose','measure','export'][index];
+      const steps=state.intake.workflow?.steps.filter(s=>s.stage===stage)||[];
+      const done=index===0?!!state.intake.workflow&&!state.intake.workflow.editing:steps.length>0&&steps.every(s=>s.status==='done');
+      tab.querySelector('.mode-step').textContent=done?'✓':index+1;
+      tab.classList.toggle('stage-complete',done);
+    });
+  }
   function renderProgress() {
+    updateChrome();
     const a=state.intake?.automation;
     progress.hidden=!batchPolicy()||!!state.intake.workflow.editing;
     if(progress.hidden)return;
-    const focus=document.activeElement?.dataset.batchAction;
-    const steps=state.intake.workflow.steps;
-    progress.innerHTML=`<div><strong>${escapeText(a?.complete?'处理完成':phaseNames[a?.phase]||'等待继续')}</strong><span>${escapeText(a?.phase==='crop'?targetName(a.targetId):state.intake.figures.find(f=>f.figure_id===a?.targetId)?.label||'')}</span><p role="status">${escapeText(batchReason(a?.reason)|| (state.busy?'正在处理并保存当前阶段':a?.complete?'全部阶段与结果目录已保存':'已暂停；核对当前对象后继续'))}</p>${a?.reason&&batchReason(a.reason)!==a.reason?`<details><summary>处理详情</summary><p>${escapeText(a.reason)}</p></details>`:''}</div><ol>${['crop','compose','measure','export'].map(stage=>{const items=steps.filter(s=>s.stage===stage),retained=items.filter(s=>s.status==='done'&&a?.retained?.some(r=>r.stage===stage&&r.targetId===s.target_id)).length;return `<li ${a?.phase===stage?'aria-current="step"':''}>${phaseNames[stage]} <strong>${items.filter(s=>s.status==='done').length}/${items.length}</strong>${retained?`<small>保留/复用 ${retained}</small>`:''}</li>`;}).join('')}</ol><div><button class="text-button" data-batch-action="follow">${browsing?'跟随当前阶段':'暂停自动切页'}</button><button class="button primary" data-batch-action="resume" ${state.busy||a?.complete||!bridge?'disabled':''}>继续自动处理</button></div>`;
-    if(focus)progress.querySelector(`[data-batch-action="${focus}"]`)?.focus({preventScroll:true});
+    if(!progress.firstElementChild)progress.innerHTML='<span class="process-dot"></span><p role="status"></p><details><summary>处理详情</summary><div></div></details><button class="text-button" data-batch-action="follow"></button>';
+    progress.classList.toggle('needs-attention',!!a?.paused&&!a?.complete);
+    const target=a?.phase==='crop'?targetName(a.targetId):state.intake.figures.find(f=>f.figure_id===a?.targetId)?.label||'';
+    const message=batchReason(a?.reason)||(a?.complete?'全部阶段与结果目录已保存':state.busy?'正在处理并保存':'已暂停，已保存步骤保留');
+    progress.querySelector('p').textContent=[phaseNames[a?.phase]||'等待继续',target,message].filter(Boolean).join(' · ');
+    progress.querySelector('details>div').textContent=[...['crop','compose','measure','export'].map(stage=>{const steps=state.intake.workflow.steps.filter(s=>s.stage===stage);return `${phaseNames[stage]} ${steps.filter(s=>s.status==='done').length}/${steps.length}`;}),a?.reason||''].filter(Boolean).join('；');
+    progress.querySelector('[data-batch-action="follow"]').textContent=browsing?'跟随当前阶段':'暂停自动切页';
+  }
+  function renderSourceList() {
+    if(!state.intake?.cropEnabled)return false;
+    const list=$('#source-list'),focused=list.contains(document.activeElement)?document.activeElement.dataset.row:null;
+    const query=$('#source-search').value.trim().toLocaleLowerCase();
+    $('.source-panel').classList.remove('quant-sources');
+    $('.source-panel .panel-heading h2').firstChild.nodeValue='Fig 与蛋白 ';
+    $('#source-search').placeholder='查找蛋白或 Fig…';
+    $('#source-search').setAttribute('aria-label','查找蛋白或 Fig');
+    const attention=$('[data-filter="attention"]').classList.contains('active');
+    list.innerHTML=state.intake.figures.map(fig=>{
+      const proteins=state.intake.proteins.filter(p=>p.figure_id===fig.figure_id).filter(p=>{
+        const r=state.rows.find(r=>r.id===p.protein_id);
+        return r&&(!attention||needsAttention(r))&&`${fig.label} ${p.label} ${r.name}`.toLocaleLowerCase().includes(query);
+      });
+      if(!proteins.length)return '';
+      return `<section class="intake-object-group"><h3>${escapeText(fig.label)}</h3>${proteins.map(p=>{
+        const r=state.rows.find(r=>r.id===p.protein_id),s=state.intake.workflow?.steps.find(s=>s.stage==='crop'&&s.target_id===r.id);
+        const label=r.draft?'未保存':s?.status==='done'?'已保存':s?.status==='running'?'处理中':s?.status==='needs_review'?'需调整':'待处理';
+        return `<button class="source-item intake-object ${r.id===row()?.id?'active':''}" data-row="${escapeText(r.id)}" aria-pressed="${r.id===row()?.id}" title="${escapeText(r.name)}">${r.preview?`<img class="source-thumb" src="${escapeText(r.preview)}" alt="">`:''}<span class="source-copy"><strong>${escapeText(p.label)}</strong><small class="${s?.status==='done'&&!r.draft?'reviewed':''}">${label}</small></span></button>`;
+      }).join('')}</section>`;
+    }).join('')||'<p class="empty-list">没有符合条件的蛋白。</p>';
+    if(focused)$$('[data-row]',list).find(b=>b.dataset.row===focused)?.focus({preventScroll:true});
+    return true;
   }
   function followBatch() {
     const a=state.intake?.automation;
@@ -283,8 +407,19 @@ window.intakeWorkspace = (() => {
   document.addEventListener('compositionstart',()=>{composing=true;});
   document.addEventListener('compositionend',()=>{composing=false;});
   document.addEventListener('focusout',()=>{queueMicrotask(followBatch);});
+  let measureZoom=1,measureFigure=null,measurementMarkup='';
+  function fitMeasurement(){
+    const viewport=$('.intake-measure-viewport'),raster=$('.intake-measure-raster');
+    if(!viewport||!raster)return;
+    const image=raster.querySelector('img');
+    if(!image.naturalWidth){image.onload=fitMeasurement;return;}
+    const fit=Math.min((viewport.clientWidth-48)/image.naturalWidth,(viewport.clientHeight-48)/image.naturalHeight);
+    const width=Math.max(1,image.naturalWidth*fit*measureZoom);
+    raster.style.width=width+'px';raster.style.marginTop=Math.max(0,(viewport.clientHeight-48-width*image.naturalHeight/image.naturalWidth)/2)+'px';
+    $('[data-intake-measure-zoom="fit"]').textContent=measureZoom===1?'适应窗口':Math.round(measureZoom*100)+'%';
+  }
+  window.addEventListener('resize',()=>requestAnimationFrame(fitMeasurement));
   function renderBatchMeasurement() {
-    const steps=state.intake.workflow.steps.filter(s=>s.stage==='measure');
     const figures=state.intake.figuresReady||[];
     const selected=figures.find(f=>f.figure_id===chosenFigureId)||figures[0];
     const preview=state.intake.measurementPreview;
@@ -306,18 +441,42 @@ window.intakeWorkspace = (() => {
         return `<polygon points="${points}" data-row-id="${escapeText(evidence.row_id)}"><title>${escapeText(targetName(evidence.row_id))} · 泳道 ${s.position}</title></polygon>`;
       });
     }).join('');
-    root.innerHTML=`<div class="intake-heading"><h1>原像素定量</h1><label>查看 Fig <select data-intake-measure-figure>${figures.map(f=>`<option value="${escapeText(f.figure_id)}" ${f===selected?'selected':''}>${escapeText(state.intake.figures.find(x=>x.figure_id===f.figure_id)?.label||f.figure_id)}</option>`).join('')}</select></label></div><div class="intake-measure-layout"><section class="intake-measure-image" aria-label="当前 Fig 与测量区域">${current?.image?`<div class="intake-measure-raster"><img src="${escapeText(current.image)}" alt="${escapeText(state.intake.figures.find(f=>f.figure_id===selected.figure_id)?.label||'Fig')} · ${escapeText(members.map(p=>p.label).join('、'))}"><svg viewBox="0 0 ${current.width} ${current.height}" aria-label="原图测量区域映射">${outlines}</svg></div>`:`<p role="status">${escapeText(current?.error||(!selected?'尚无已保存的 Fig 图片':current?.loading?'正在加载 Fig 图片…':'正在读取已保存的 Fig…'))}</p>${current?.error?'<button class="button subtle" data-intake-preview-retry>重新加载图片</button>':''}`}</section><aside><h2>蛋白与测量状态</h2>${members.map(p=>{const cells=state.cells.filter(c=>c.rowId===p.protein_id);return `<section class="inspect-section"><h3>${escapeText(p.label)}</h3><p>${cells.length} 个固定泳道 · 已提交 ${cells.filter(c=>c.rawIntegral!=null).length} 项</p><button class="text-button" data-intake-crop-action="source" data-id="${escapeText(p.protein_id)}" ${state.busy?'disabled':''}>查看原图与范围</button></section>`;}).join('')}</aside></div><details class="intake-measure-stages"><summary>查看整批测量进度</summary><ol class="batch-measurements">${steps.map(s=>`<li><strong>${escapeText(state.intake.figures.find(f=>f.figure_id===s.target_id)?.label||s.target_id)}</strong><span>${escapeText({pending:'等待计算',running:'正在计算',done:'运行已提交',needs_review:'需要复核',failed:'失败',cancelled:'已取消',interrupted:'未完整提交'}[s.status]||s.status)}</span>${s.reason?`<p>${escapeText(s.reason)}</p>`:''}</li>`).join('')}</ol></details>`;
+    const markup=window.intakeViews.measurement({intake:state.intake,selected,current,members,outlines,cells:state.cells,busy:state.busy,selectedRowId:row()?.id,quant:state.quant});
+    if(markup!==measurementMarkup||!$('.intake-measure-workspace',root)){
+      const focused=root.contains(document.activeElement)?document.activeElement:null;
+      const attributes=['data-intake-measure-select','data-intake-measure-protein','data-intake-measure-zoom','data-intake-measure-figure','data-intake-preview-retry','data-intake-crop-action','data-id'];
+      const selector=focused?attributes.filter(name=>focused.hasAttribute(name)).map(name=>`[${name}="${CSS.escape(focused.getAttribute(name))}"]`).join(''):'';
+      root.innerHTML=markup;measurementMarkup=markup;
+      if(selector)$(selector,root)?.focus({preventScroll:true});
+    }
+    if(!$('#drawer').hidden&&$('#drawer').dataset.intakeView==='measurement')updateMarkup($('#drawer-content'),$('.intake-measure-inspector').innerHTML);
+    if(measureFigure!==selected?.figure_id){measureZoom=1;measureFigure=selected?.figure_id;}
+    requestAnimationFrame(fitMeasurement);
+
   }
   root.addEventListener('change',event=>{
     if(event.target.matches('[data-intake-measure-figure]')){
-      chosenFigureId=event.target.value;noteBrowse();renderBatchMeasurement();
+      chosenFigureId=event.target.value;noteBrowse();
+      const member=state.intake.proteins.find(p=>p.figure_id===chosenFigureId);
+      if(member)select(member.protein_id);else renderBatchMeasurement();
     }
   });
   root.addEventListener('click',event=>{
+    const figure=event.target.closest('[data-intake-measure-select]');
+    if(figure){chosenFigureId=figure.dataset.intakeMeasureSelect;noteBrowse();select(figure.dataset.intakeMeasureProtein);}
+    const zoomControl=event.target.closest('[data-intake-measure-zoom]');
+    if(zoomControl){const action=zoomControl.dataset.intakeMeasureZoom;measureZoom=action==='fit'?1:Math.max(.25,Math.min(8,measureZoom*(action==='in'?1.25:.8)));fitMeasurement();}
     if(event.target.closest('[data-intake-preview-retry]')){previewRequested='';renderBatchMeasurement();}
     if(event.target.closest('[data-intake-table-export]')&&!state.busy&&!hasDraft())send('intake_export_table',guard());
   });
   const runnable = () => (state.intake?.workflow?.pending_ready ?? state.intake?.workflow?.steps.filter(s=>s.stage==='crop'&&s.status==='pending').length ?? 0)>0;
+  function inspectMeasurement(){
+    $('#drawer').dataset.intakeView='';
+    if(!batchPolicy()||mode!=='quant')return false;
+    openDrawer('测量记录',$('.intake-measure-inspector').innerHTML);
+    paintedMarkup.set($('#drawer-content'),$('.intake-measure-inspector').innerHTML);
+    $('#drawer').dataset.intakeView='measurement';return true;
+  }
   function requestFigure() {
     const figures=state.intake?.figuresReady||[];
     const selected=figures.find(f=>f.figure_id===chosenFigureId)||figures.find(f=>f.row_ids.includes(row()?.id))||figures[0];
@@ -349,8 +508,8 @@ window.intakeWorkspace = (() => {
     const labels={valid:'有效',quality_review:'质量待复核',not_detected:'未检测到',invalid:'无效',excluded:'已排除',not_run:'待计算',unconfigured:'待配置',pending_review:'待复核',failed:'失败',cancelled:'已取消',interrupted:'未完整提交',result_unavailable:'结果不可用',missing_source:'缺少原图',stale:'输入已变化'};
     $('.result-intro h3').textContent='原像素测量记录';
     $('.result-intro p').textContent='完整 Fig 保存后计算 · 缺失和失败留空 · 原始积分不等于有效信号';
-    $('.results-scroll thead').innerHTML='<tr><th>Fig / 蛋白行</th><th>固定槽位</th><th>有效信号</th><th>原始积分</th><th>状态</th></tr>';
-    $('#results-body').innerHTML=state.cells.slice(start,start+pageSize).map(c=>`<tr><td><button class="text-button full" data-intake-crop-action="source" data-id="${escapeText(c.rowId)}" ${state.busy?'disabled':''}>${escapeText(targetName(c.rowId))}</button></td><td>${c.lane}</td><td>${number(c.value)}</td><td>${number(c.rawIntegral)}</td><td><span class="result-state">${escapeText(labels[c.status]||'待处理')}</span>${c.reason?(c.status==='valid'?`<details><summary>计算说明</summary><p>${escapeText(c.reason)}</p></details>`:`<small>${escapeText(c.reason)}</small>`):''}</td></tr>`).join('')||'<tr><td colspan="5">尚无测量记录；请先复核原图，再继续处理完整 Fig。</td></tr>';
+    $('.results-scroll thead',resultStage).innerHTML='<tr><th>Fig / 蛋白行</th><th>固定槽位</th><th>有效信号</th><th>原始积分</th><th>状态</th></tr>';
+    updateMarkup($('#results-body'),state.cells.slice(start,start+pageSize).map(c=>`<tr><td><button class="text-button full" data-intake-crop-action="source" data-id="${escapeText(c.rowId)}" data-record-lane="${c.lane}" ${state.busy?'disabled':''}>${escapeText(targetName(c.rowId))}</button></td><td>${c.lane}</td><td>${number(c.value)}</td><td>${number(c.rawIntegral)}</td><td><span class="result-state">${escapeText(labels[c.status]||'待处理')}</span>${c.reason?(c.status==='valid'?`<details><summary>计算说明</summary><p>${escapeText(c.reason)}</p></details>`:`<small>${escapeText(c.reason)}</small>`):''}</td></tr>`).join('')||'<tr><td colspan="5">尚无测量记录；请先复核原图，再继续处理完整 Fig。</td></tr>');
     $('#result-count').textContent=`${state.cells.length} 个固定槽位记录${pages>1?` · 第 ${start+1}–${Math.min(start+pageSize,state.cells.length)} 项`:''}`;
     $('.table-footer>span:last-child').innerHTML=pages>1?`<button class="text-button" data-intake-crop-action="previous-results" ${resultPage===0||state.busy?'disabled':''}>上一页</button><span role="status">第 ${resultPage+1} / ${pages} 页</span><button class="text-button" data-intake-crop-action="next-results" ${resultPage===pages-1||state.busy?'disabled':''}>下一页</button>`:'输出包在结果输出阶段生成';
   }
@@ -475,21 +634,26 @@ window.intakeWorkspace = (() => {
     renderProgress();
     const measuring=batchPolicy()&&mode==='quant';
     const showingResults=batchPolicy()&&mode==='results';
-    if(!showingResults&&resultStage.parentElement===root)resultParent.append(resultStage);
+    if(!showingResults&&root.contains(resultStage))resultParent.append(resultStage);
     const active = (mode === 'intake'||measuring||showingResults) && !!state.intake;
     root.hidden = !active;
     document.body.classList.toggle('intake-active', active);
     document.body.classList.toggle('grouped-intake-active', active && !!state.intake?.grouped_draft && (!state.intake.workflow || state.intake.workflow.editing));
-    $$('.mode-tab').forEach(item => item.hidden = state.intake ? !allowedModes().includes(item.dataset.mode) : item.dataset.mode === 'intake');
+    $$('.mode-tab').forEach(item => {item.hidden=!state.intake&&item.dataset.mode==='intake';item.disabled=!!state.intake&&!allowedModes().includes(item.dataset.mode);});
     document.body.classList.toggle('intake-crop-active', !!state.intake?.cropEnabled && mode === 'review');
     root.classList.toggle('intake-results-active',showingResults);
+    root.classList.toggle('intake-measure-active',measuring);
     if (!active) return false;
     if(measuring){renderBatchMeasurement();return true;}
     if(showingResults){
-      if(resultStage.parentElement===root)resultParent.append(resultStage);
-      root.innerHTML=`<div class="intake-heading"><h1>全部 Fig 测量结果</h1><button class="button primary" data-intake-table-export ${state.busy||hasDraft()?'disabled':''}>导出 Excel / CSV</button></div>`;
-      root.append(resultStage);resultStage.hidden=false;renderIntakeResults();
-      root.insertAdjacentHTML('beforeend',outputInfo());return true;
+      if(!$('.intake-full-records',root)){
+        root.innerHTML='<div class="intake-heading"><div><h1>本次结果</h1><p>选择蛋白可返回对应原图与范围。</p></div><button class="button subtle" data-intake-table-export>导出 Excel / CSV</button></div><div data-intake-result-grid></div><details class="intake-full-records"><summary>完整测量记录 · 有效信号与状态</summary></details><div data-intake-result-output></div>';
+        $('.intake-full-records',root).append(resultStage);
+      }
+      $('[data-intake-table-export]',root).disabled=state.busy||hasDraft();
+      updateMarkup($('[data-intake-result-grid]',root),window.intakeViews.results({intake:state.intake,cells:state.cells,busy:state.busy}));
+      resultStage.hidden=false;renderIntakeResults();
+      updateMarkup($('[data-intake-result-output]',root),outputInfo());return true;
     }
     if ((!state.intake.workflow || state.intake.workflow.editing) && state.intake.grouped_draft) {
       const returned = renderedWorkflow === true;
@@ -641,5 +805,5 @@ window.intakeWorkspace = (() => {
       cropDrafts.delete(r.id); cropPending.delete(r.id); syncCrops(); render();
     }
   });
-  return {sync, renderActive, hasDraft, reset, stageCrop, undoCrop, renderCropInspector, cropEditable, allowedModes, requestFigure, renderFigureInspector, renderIntakeResults, followBatch, noteBrowse};
+  return {sync, updateChrome, renderActive, hasDraft, reset, stageCrop, undoCrop, renderCropInspector, cropEditable, allowedModes, requestFigure, renderFigureInspector, renderIntakeResults, followBatch, noteBrowse, renderSourceList, inspectMeasurement, syncInspectorDrawer};
 })();

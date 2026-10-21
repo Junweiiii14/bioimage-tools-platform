@@ -17,6 +17,7 @@ from wb_tool.application.intake_figure import (
     IntakeFigureEvidence,
     IntakeFigurePreparation,
     WBIntakeFigureProject,
+    apply_intake_sampling_review,
     intake_figure_digest,
     intake_figure_projection,
     intake_figure_rows,
@@ -80,12 +81,16 @@ def prepare_intake_figure(
             polarity=evidence.detection.settings.polarity if evidence.detection else "dark",
             empty_lanes=row.empty_lanes,
             lane_rois=geometry,
+            context_limits=evidence.fixed_grid.sampling_limits if evidence.fixed_grid else (),
             quant_policy="anchored_background@1",
             cancelled=cancelled,
         )
         plans.append(
             ProjectRowAnalysis(
-                row_id=row.row_id, crop=row.roi, empty_lanes=row.empty_lanes, request=request
+                row_id=row.row_id,
+                crop=row.roi,
+                empty_lanes=row.empty_lanes,
+                request=apply_intake_sampling_review(evidence, request),
             )
         )
     output = publish_rendered_image(

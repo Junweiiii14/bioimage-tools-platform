@@ -1519,7 +1519,9 @@ def test_reliable_sequence_needs_no_crop_confirmations_and_shows_images_and_tabl
     root = tmp_path / "reliable-raw"
     root.mkdir()
     for index, angle in enumerate((3, -3), 1):
-        tifffile.imwrite(root / f"Sample{index}_123456 (1).tiff", membrane(angle=angle))
+        tifffile.imwrite(
+            root / f"Sample{index}_123456 (1).tiff", membrane(angle=angle, marker=False)
+        )
     originals = {p: p.read_bytes() for p in root.iterdir()}
     start(window, qtbot, root)
 
@@ -1561,7 +1563,7 @@ def test_reliable_sequence_needs_no_crop_confirmations_and_shows_images_and_tabl
         window.host.view.status.text()
     )
     assert all(
-        e.policy == "intake_crop@2" and not e.reviewed and e.raw_crop for e in finished.intake_crops
+        e.policy == "intake_crop@3" and not e.reviewed and e.raw_crop for e in finished.intake_crops
     )
     assert all(not row.reviewed for row in finished.rows)
     assert all(a.run and a.run.state == "succeeded" for a in finished.analyses)

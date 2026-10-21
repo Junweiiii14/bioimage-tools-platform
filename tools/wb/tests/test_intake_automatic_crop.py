@@ -163,7 +163,10 @@ def test_reliable_geometry_auto_exports_exact_pixels_and_straightens_display(
     tmp_path: Path, angle: float
 ) -> None:
     path = tmp_path / "raw.tiff"
-    pixels = membrane(angle=angle)
+    # Automatic geometry no longer infers Marker identity from a source-only
+    # doublet. Keep this pixel/rotation positive oracle unambiguous; the original
+    # marker scene remains a separate mandatory-pause regression below.
+    pixels = membrane(angle=angle, marker=False)
     tifffile.imwrite(path, pixels)
     original = path.read_bytes()
     p, ticket = claim_intake_workflow_step(prepared(path), session_key="detection")
@@ -172,7 +175,7 @@ def test_reliable_geometry_auto_exports_exact_pixels_and_straightens_display(
     assert automatic_intake_crop_allowed(proposal)
     accepted = accept_automatic_intake_crop(p, ticket, proposal)
     e = accepted.intake_crops[0]
-    assert e.policy == "intake_crop@2" and e.geometry_ready and not e.reviewed
+    assert e.policy == "intake_crop@3" and e.geometry_ready and not e.reviewed
     assert not accepted.rows[0].reviewed and accepted.rows[0].roi == e.crop
     frame = accepted.composition.slices[0].display_frame
     assert frame and abs(frame.angle_degrees - angle) < 1
@@ -214,7 +217,7 @@ def test_reliable_geometry_auto_exports_exact_pixels_and_straightens_display(
     assert path.read_bytes() == original
 
 
-@pytest.mark.parametrize("kind", ["blank", "wrong-n", "large-angle"])
+@pytest.mark.parametrize("kind", ["blank", "wrong-n", "large-angle", "unverified-marker"])
 def test_uncertain_geometry_still_pauses(tmp_path: Path, kind: str) -> None:
     path = tmp_path / "raw.tiff"
     pixels = (
@@ -238,7 +241,7 @@ def test_uncertain_geometry_still_pauses(tmp_path: Path, kind: str) -> None:
 
 def test_cancel_and_forged_machine_evidence_cannot_become_ready(tmp_path: Path) -> None:
     path = tmp_path / "raw.tiff"
-    tifffile.imwrite(path, membrane(angle=3))
+    tifffile.imwrite(path, membrane(angle=3, marker=False))
     p, ticket = claim_intake_workflow_step(prepared(path), session_key="d")
     assert isinstance(p, WBIntakeCropProject) and ticket
     e = propose_intake_crop(str(path), p, "r")
@@ -247,7 +250,7 @@ def test_cancel_and_forged_machine_evidence_cannot_become_ready(tmp_path: Path) 
     result = accept_automatic_intake_crop(cancelled, ticket, e)
     assert not result.intake_crops and result.workflow.steps[0].status == "cancelled"
     with pytest.raises(ValueError):
-        type(e).model_validate({**dict(e), "policy": "intake_crop@2", "selected_index": None})
+        type(e).model_validate({**dict(e), "policy": "intake_crop@3", "selected_index": None})
 
 
 @pytest.mark.parametrize("angle", [-10, 0, 10])

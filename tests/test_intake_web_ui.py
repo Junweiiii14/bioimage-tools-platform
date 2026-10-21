@@ -7,7 +7,9 @@ from uuid import uuid4
 
 import pytest
 from bioimage_app.web_window import WebWorkbenchWindow
-from PySide6.QtCore import QSettings
+from pydantic import TypeAdapter
+from PySide6.QtCore import QPoint, QSettings, Qt
+from PySide6.QtTest import QTest
 from pytestqt.qtbot import QtBot
 
 from tooling.qt_test_lifecycle import close_and_dispose_window
@@ -100,7 +102,7 @@ def test_sequence_top_fields_assign_across_figs_and_start_once(
       source_ids:['source-'+s],figure_id:null,protein_label:'',selected_source_id:null,
       region_index:null,reuse_confirmed:false}))}}});
       window.fill=(e,v)=>{e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));};
-      document.querySelector('[data-group-action=add-fig]').click();
+      document.querySelector('#intake-new-figure').click();
       fill(document.querySelector('[data-group-field=lanes]'),'4');
       fill(document.querySelector('[data-group-field=proteins]'),' A/B\\n\\n');true
     """,
@@ -114,7 +116,7 @@ def test_sequence_top_fields_assign_across_figs_and_start_once(
         window,
         qtbot,
         """
-      document.querySelector('[data-group-action=add-fig]').click();
+      document.querySelector('#intake-new-figure').click();
       fill(document.querySelectorAll('[data-group-field=lanes]')[1],'5');
       fill(document.querySelectorAll('[data-group-field=proteins]')[1],'D');
       document.querySelectorAll('[data-group-source]')[0].click();
@@ -145,8 +147,12 @@ def test_sequence_top_fields_assign_across_figs_and_start_once(
       document.querySelector('[data-group-search]').blur();true
     """,
     )
-    assert javascript(window, qtbot, "document.querySelectorAll('.grouped-card').length") == 1
-    javascript(window, qtbot, "document.querySelector('[data-group-action=start]').click();true")
+    assert javascript(window, qtbot, "document.querySelectorAll('[data-group-id]').length") == 1
+    assert (
+        javascript(window, qtbot, "document.querySelectorAll('.mode-tab:not([hidden])').length")
+        == 5
+    )
+    javascript(window, qtbot, "document.querySelector('#intake-primary').click();true")
     raw = javascript(window, qtbot, "JSON.stringify(sent)")
     assert isinstance(raw, str)
     commands = json.loads(raw)
@@ -156,6 +162,9 @@ def test_sequence_top_fields_assign_across_figs_and_start_once(
     assert [g["selected_source_id"] for g in grouping["groups"]] == ["source-a", "source-b"]
     assert [f["lane_count"] for f in grouping["figures"]] == [4, 5]
     assert javascript(window, qtbot, "document.querySelector('[data-group-action=start]').disabled")
+    assert javascript(window, qtbot, "document.querySelector('#intake-primary').disabled")
+    javascript(window, qtbot, "document.querySelector('#intake-primary').click();true")
+    assert javascript(window, qtbot, "sent.length") == 1
 
 
 def test_batch_navigation_follows_real_phase_but_preserves_human_draft(
@@ -267,6 +276,139 @@ def test_rotation_draft_late_save_preserves_newer_angle_and_can_reset(
     javascript(window, qtbot, "intakeWorkspace.undoCrop(false);true")
     assert javascript(
         window, qtbot, "document.querySelector('[data-intake-rotation]').value==='2.00'"
+    )
+
+
+def test_batch_progress_preserves_uncommitted_rotation_input_and_drawer_focus(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        """
+      setState({selectedId:'protein-a',rows:[{id:'protein-a',name:'raw.tif',protein:'Actin',
+        width:180,height:90,lanes:6,roi:{x:20,y:20,width:120,height:16}}],
+        intake:{...state.intake,cropEnabled:true,figureEnabled:true,crops:[{row_id:'protein-a',
+          crop:{x0:20,y0:20,x1:140,y1:36},reason:'guided_target_ambiguous'}],
+          workflow:{policy:'intake_workflow@3',digest:'focus',steps:[{
+            stage:'crop',target_id:'protein-a',status:'needs_review'}]}}});
+      switchMode('review');
+      window.typedAngle=document.querySelector('[data-intake-rotation]');
+      typedAngle.focus();typedAngle.value='7.2';
+      setState({status:'background progress'});true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "document.activeElement===typedAngle && typedAngle.isConnected && typedAngle.value==='7.2'",
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      typedAngle.dispatchEvent(new Event('change',{bubbles:true}));
+      typedAngle.blur();action('inspect');
+      window.drawerAngle=document.querySelector('#drawer-content [data-intake-rotation]');
+      drawerAngle.focus();drawerAngle.value='4.8';setState({status:'another progress'});true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "document.activeElement===drawerAngle && drawerAngle.isConnected && "
+        "drawerAngle.value==='4.8'",
+    )
+    assert javascript(window, qtbot, "intakeWorkspace.hasDraft() && sent.length===0")
+
+
+def test_batch_result_grid_keeps_headers_zero_and_missing_separate_from_full_records(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        """
+      setState({cells:[{rowId:'protein-a',lane:1,value:0,rawIntegral:0,status:'valid'},
+        {rowId:'protein-a',lane:2,value:null,rawIntegral:20,status:'quality_review',reason:'背景待复核'},
+        {rowId:'protein-a',lane:3,value:null,rawIntegral:null,status:'failed',reason:'失败'}],
+        intake:{...state.intake,cropEnabled:true,figureEnabled:true,crops:[],
+          workflow:{policy:'intake_workflow@3',digest:'results',steps:[]}}});
+      switchMode('results');true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('.intake-result-grid thead').innerText.includes('泳道 6')",
+    )
+    javascript(window, qtbot, "document.querySelector('.intake-full-records summary').click();true")
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('#result-stage thead').innerText.includes('有效信号')",
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('.intake-result-grid tbody td:nth-child(3)').textContent==='0'",
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('.intake-result-grid tbody td:nth-child(4)').textContent==='20*'",
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('.intake-result-grid tbody td:nth-child(5)').textContent==='—'",
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('#results-body tr:nth-child(2) td:nth-child(3)').textContent==='—'",
+    )
+
+
+def test_batch_profiles_show_only_current_committed_row_and_keep_narrow_peak(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        """
+      const profile=Array.from({length:2048},(_,i)=>i===1001?100:0);
+      setState({selectedId:'protein-a',rows:[{id:'protein-a',protein:'A',fig:'Fig 1',lanes:6}],
+        quant:{group:{rows:[{rowId:'protein-a',lanes:[{lane:1,roi:{y:20},profile}]}]}},
+        intake:{...state.intake,cropEnabled:true,figureEnabled:true,crops:[],
+          figuresReady:[{figure_id:'fig-a',row_ids:['protein-a'],image:{sha256:'fig'}}],
+          workflow:{policy:'intake_workflow@3',digest:'profiles',steps:[]}}});
+      switchMode('quant');true
+    """,
+    )
+    assert javascript(
+        window, qtbot, "document.querySelectorAll('.intake-profile-grid polyline').length===1"
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('.intake-profile-grid polyline')"
+        ".getAttribute('points').includes(',12.00')",
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('.intake-profile-grid').textContent.includes('2067 px')",
+    )
+    javascript(window, qtbot, "setState({quant:{group:{rows:[{rowId:'other',lanes:[]}]}}});true")
+    assert javascript(
+        window,
+        qtbot,
+        "!document.querySelector('.intake-profile-grid polyline') && "
+        "document.querySelector('.intake-profile-panel').textContent.includes('等待')",
     )
 
 
@@ -926,6 +1068,28 @@ def test_completed_crop_requires_explicit_changed_draft_and_uses_revision_action
     assert javascript(
         window, qtbot, "document.querySelector('[data-intake-crop-action=confirm]').disabled"
     )
+    # An angle-only correction invalidates the top export action immediately,
+    # without replacing the inspector button between mouse down and mouse up.
+    javascript(
+        window,
+        qtbot,
+        "setState({intake:{...state.intake,automation:{complete:true},"
+        "workflow:{...state.intake.workflow,policy:'intake_workflow@3'}}});"
+        "window.savedButton=document.querySelector('[data-intake-crop-action=confirm]');"
+        "const angle=document.querySelector('[data-intake-rotation]');angle.value='4';"
+        "angle.dispatchEvent(new Event('change',{bubbles:true}));true",
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('#intake-primary').disabled && savedButton.isConnected && "
+        "document.querySelector('#review-badge').textContent==='未保存'",
+    )
+    javascript(
+        window,
+        qtbot,
+        "document.querySelector('[data-intake-crop-action=discard]').click();true",
+    )
     javascript(window, qtbot, "commitCrop({x:22,y:22,width:118,height:16},row().roi);true")
     assert javascript(
         window,
@@ -1429,3 +1593,168 @@ def test_manual_browsing_keeps_page_and_selection_until_follow_is_requested(
         "setState({intake:{...state.intake,automation:{...state.intake.automation,phase:'complete',complete:true}}});true",
     )
     assert javascript(w, qtbot, "mode==='results'")
+
+
+@pytest.mark.parametrize("narrow", [False, True])
+def test_rotation_preview_and_one_real_click_commit(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot, narrow: bool
+) -> None:
+    window = intake_page
+    window.resize(1024 if narrow else 1440, 900)
+    javascript(
+        window,
+        qtbot,
+        """
+      const image=document.createElement('canvas');image.width=180;image.height=90;
+      const ctx=image.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,180,90);
+      ctx.fillStyle='black';ctx.fillRect(25,25,100,5);
+      setState({selectedId:'protein-a',rows:[{id:'protein-a',name:'raw.tif',protein:'Actin',
+        preview:image.toDataURL(),width:180,height:90,lanes:6,roi:{x:20,y:20,width:120,height:16}}],
+        intake:{...state.intake,cropEnabled:true,figureEnabled:true,crops:[{row_id:'protein-a',
+          crop:{x0:20,y0:20,x1:140,y1:36},reason:'guided_target_ambiguous'}],
+          workflow:{policy:'intake_workflow@3',digest:'mouse',steps:[{
+            stage:'crop',target_id:'protein-a',status:'needs_review'}]}}});
+      switchMode('review');true
+    """,
+    )
+    if narrow:
+        assert javascript(
+            window,
+            qtbot,
+            "document.querySelector('.compact-inspect').getBoundingClientRect().width>0",
+        )
+        javascript(window, qtbot, "action('inspect');true")
+        qtbot.waitUntil(
+            lambda: (
+                javascript(
+                    window,
+                    qtbot,
+                    "document.querySelector('#drawer').getAnimations()"
+                    ".every(a=>a.playState==='finished')",
+                )
+                is True
+            )
+        )
+    scope = "#drawer-content " if narrow else "#inspector-content "
+    action_scope = "#drawer-content " if narrow else "#inspector-action "
+    qtbot.waitUntil(
+        lambda: (
+            javascript(
+                window,
+                qtbot,
+                "(()=>{const c=document.querySelector('"
+                + scope
+                + "canvas');return !!c && c.getContext('2d')"
+                ".getImageData(0,0,c.width,c.height).data.some(v=>v>0)})()",
+            )
+            is True
+        )
+    )
+    javascript(
+        window,
+        qtbot,
+        "window.angleInput=document.querySelector('"
+        + scope
+        + "[data-intake-rotation]');angleInput.focus();true",
+    )
+    focus = window.web.focusProxy()
+    assert focus is not None
+    QTest.keyClick(focus, Qt.Key.Key_A, Qt.KeyboardModifier.ControlModifier)
+    QTest.keyClicks(focus, "4.8")
+    coordinates_json = javascript(
+        window,
+        qtbot,
+        "(()=>{const r=document.querySelector('"
+        + action_scope
+        + "[data-intake-crop-action=run]').getBoundingClientRect();"
+        "return JSON.stringify([r.x+r.width/2,r.y+r.height/2])})()",
+    )
+    assert isinstance(coordinates_json, str)
+    coordinates = TypeAdapter(tuple[float, float]).validate_json(coordinates_json)
+    assert javascript(
+        window,
+        qtbot,
+        "angleInput.value==='4.8' && document.elementFromPoint("
+        + str(coordinates[0])
+        + ","
+        + str(coordinates[1])
+        + ")?.matches('[data-intake-crop-action=run]')",
+    )
+    QTest.mouseClick(
+        focus,
+        Qt.MouseButton.LeftButton,
+        pos=QPoint(round(coordinates[0]), round(coordinates[1])),
+    )
+    qtbot.waitUntil(lambda: javascript(window, qtbot, "sent.length===1") is True)
+    assert javascript(
+        window,
+        qtbot,
+        "sent[0].action==='intake_sequence_continue' && sent[0].payload.displayAngle===4.8",
+    )
+
+
+def test_results_reading_survives_background_updates(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        """
+      setState({cells:[{rowId:'protein-a',lane:1,value:42,rawIntegral:43,status:'valid',reason:'saved'}],
+        intake:{...state.intake,cropEnabled:true,figureEnabled:true,crops:[],
+          workflow:{policy:'intake_workflow@3',digest:'reading',steps:[]}}});switchMode('results');
+      document.querySelector('.intake-full-records').open=true;
+      document.querySelector('#results-body details').open=true;
+      window.readingButton=document.querySelector('#results-body button');readingButton.focus();
+      setState({status:'background progress'});true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "readingButton.isConnected && document.activeElement===readingButton && "
+        "document.querySelector('.intake-full-records').open && "
+        "document.querySelector('#results-body details').open",
+    )
+    javascript(window, qtbot, "setState({cells:[{...state.cells[0],rawIntegral:45}]});true")
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('.intake-full-records').open && "
+        "document.querySelector('#results-body details').open && "
+        "document.activeElement.matches('#results-body button') && "
+        "document.querySelector('#results-body').textContent.includes('45')",
+    )
+
+
+def test_narrow_measurement_details_are_visible_and_stable(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    window.resize(1024, 768)
+    javascript(
+        window,
+        qtbot,
+        """
+      setState({selectedId:'protein-a',rows:[{id:'protein-a',protein:'A',fig:'Fig 1',lanes:6}],
+        intake:{...state.intake,cropEnabled:true,figureEnabled:true,crops:[],
+          figuresReady:[{figure_id:'fig-a',row_ids:['protein-a'],image:{sha256:'fig'}}],
+          workflow:{policy:'intake_workflow@3',digest:'details',steps:[]}}});switchMode('quant');true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "document.querySelector('.compact-inspect').getBoundingClientRect().width>0 && "
+        "document.querySelector('[data-action=tools]').getBoundingClientRect().width>0",
+    )
+    javascript(
+        window,
+        qtbot,
+        "action('inspect');window.detailsButton=document.querySelector('#drawer-content button');"
+        "detailsButton.focus();setState({status:'background progress'});true",
+    )
+    assert javascript(
+        window, qtbot, "detailsButton.isConnected && document.activeElement===detailsButton"
+    )

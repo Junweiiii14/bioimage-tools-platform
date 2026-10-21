@@ -2,6 +2,12 @@ T061在WB原包内增加export_detection/discovery与清单v2证据，桌面inta
 
 # 模块地图
 
+T073增量：WB domain/fixed_lane_frame提供5N:4固定框，reliable_geometry提供
+已知N/槽宽整排对齐、小N与逐槽原像素几何（连通组件数不等于泳道数），
+adapter统一源图和三图身份复核，application intake_crop@3保留旧@1/@2读取。
+桌面intake_views.js与intake_workbench.css呈现顶部Fig配置、批次灰度与结果宽表。
+契约见[自动裁图v3](contracts/wb-intake-automatic-crop-v3.md)，实际状态见T073任务。
+
 T072增量：intake_crop@2自动采纳与人工review分离，既有方向框接入显示纠偏；
 桌面intake_presentation.py提供按Fig资产身份绑定的有界只读预览，灰度页图像/区域、
 统一可见结果表和直接导出接入原工作台；独立AutomaticFlowTest候选及可选真实流程诊断。

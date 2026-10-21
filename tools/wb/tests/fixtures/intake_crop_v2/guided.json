@@ -1,0 +1,661 @@
+{
+  "document_type": "wb_figure_project",
+  "schema_version": 13,
+  "project_id": "guided",
+  "name": "WB 项目",
+  "revision": 0,
+  "rows": [
+    {
+      "row_id": "group-67988353dffa17cd3892c9d6e3ee6c1a",
+      "source": {
+        "asset_id": "a1",
+        "relative_path": "assets/1.tiff",
+        "sha256": "af50718c5bfc7bae7f4b384c6349eb91ad1347ee07502768f9465baf020fc086",
+        "size_bytes": 4320256,
+        "schema_version": 1
+      },
+      "filename": "AKT_123456 (1).tiff",
+      "width": 1800,
+      "height": 1200,
+      "bit_depth": 16,
+      "figure": "Fig",
+      "protein": "AKT",
+      "lane_count": 5,
+      "empty_lanes": [],
+      "roi": {
+        "lane_id": "group-67988353dffa17cd3892c9d6e3ee6c1a",
+        "x0": 779,
+        "y0": 574,
+        "x1": 1023,
+        "y1": 627
+      },
+      "reviewed": false,
+      "notes": ""
+    }
+  ],
+  "figure_order": [
+    "Fig"
+  ],
+  "template": {
+    "schema_version": 1,
+    "name": "实验室行式模板",
+    "font": null,
+    "font_size": 18,
+    "label_width": 150,
+    "label_side": "left",
+    "crop_height": 60,
+    "row_gap": 10,
+    "figure_gap": 40,
+    "margin": 24,
+    "border": 1,
+    "columns": 3,
+    "dpi": 300,
+    "display_mapping": "bt601_uint16_div257@1"
+  },
+  "suggestions": [],
+  "analyses": [
+    {
+      "row_id": "group-67988353dffa17cd3892c9d6e3ee6c1a",
+      "crop": {
+        "lane_id": "group-67988353dffa17cd3892c9d6e3ee6c1a",
+        "x0": 779,
+        "y0": 574,
+        "x1": 1023,
+        "y1": 627
+      },
+      "empty_lanes": [],
+      "request": {
+        "source_sha256": "af50718c5bfc7bae7f4b384c6349eb91ad1347ee07502768f9465baf020fc086",
+        "revision": 0,
+        "polarity": "dark",
+        "lanes": [
+          {
+            "roi": {
+              "lane_id": "group-67988353dffa17cd3892c9d6e3ee6c1a:01",
+              "x0": 779,
+              "y0": 574,
+              "x1": 829,
+              "y1": 617
+            },
+            "bands": [
+              {
+                "band_id": "target",
+                "bounds": {
+                  "left": 12,
+                  "right": 30
+                },
+                "baseline": {
+                  "left_value": 15535.0,
+                  "right_value": 15535.0
+                },
+                "included": true,
+                "detection_notes": []
+              }
+            ],
+            "target_roi": {
+              "lane_id": "group-67988353dffa17cd3892c9d6e3ee6c1a:01",
+              "x0": 779,
+              "y0": 574,
+              "x1": 829,
+              "y1": 617
+            },
+            "context_expansion_percent": 0
+          },
+          {
+            "roi": {
+              "lane_id": "group-67988353dffa17cd3892c9d6e3ee6c1a:02",
+              "x0": 829,
+              "y0": 577,
+              "x1": 877,
+              "y1": 619
+            },
+            "bands": [
+              {
+                "band_id": "target",
+                "bounds": {
+                  "left": 12,
+                  "right": 29
+                },
+                "baseline": {
+                  "left_value": 15535.0,
+                  "right_value": 15535.0
+                },
+                "included": true,
+                "detection_notes": []
+              }
+            ],
+            "target_roi": {
+              "lane_id": "group-67988353dffa17cd3892c9d6e3ee6c1a:02",
+              "x0": 829,
+              "y0": 577,
+              "x1": 877,
+              "y1": 619
+            },
+            "context_expansion_percent": 0
+          },
+          {
+            "roi": {
+              "lane_id": "group-67988353dffa17cd3892c9d6e3ee6c1a:03",
+              "x0": 877,
+              "y0": 579,
+              "x1": 924,
+              "y1": 622
+            },
+            "bands": [
+              {
+                "band_id": "target",
+                "bounds": {
+                  "left": 12,
+                  "right": 30
+                },
+                "baseline": {
+                  "left_value": 15535.0,
+                  "right_value": 15535.0
+                },
+                "included": true,
+                "detection_notes": []
+              }
+            ],
+            "target_roi": {
+              "lane_id": "group-67988353dffa17cd3892c9d6e3ee6c1a:03",
+              "x0": 877,
+              "y0": 579,
+              "x1": 924,
+              "y1": 622
+            },
+            "context_expansion_percent": 0
+          },
+          {
+            "roi": {
+              "lane_id": "group-67988353dffa17cd3892c9d6e3ee6c1a:04",
+              "x0": 924,
+              "y0": 582,
+              "x1": 972,
+              "y1": 624
+            },
+            "bands": [
+              {
+                "band_id": "target",
+                "bounds": {
+                  "left": 12,
+                  "right": 29
+                },
+                "baseline": {
+                  "left_value": 15535.0,
+                  "right_value": 15535.0
+                },
+                "included": true,
+                "detection_notes": []
+              }
+            ],
+            "target_roi": {
+              "lane_id": "group-67988353dffa17cd3892c9d6e3ee6c1a:04",
+              "x0": 924,
+              "y0": 582,
+              "x1": 972,
+              "y1": 624
+            },
+            "context_expansion_percent": 0
+          },
+          {
+            "roi": {
+              "lane_id": "group-67988353dffa17cd3892c9d6e3ee6c1a:05",
+              "x0": 972,
+              "y0": 584,
+              "x1": 1023,
+              "y1": 627
+            },
+            "bands": [
+              {
+                "band_id": "target",
+                "bounds": {
+                  "left": 12,
+                  "right": 30
+                },
+                "baseline": {
+                  "left_value": 15535.0,
+                  "right_value": 15535.0
+                },
+                "included": true,
+                "detection_notes": []
+              }
+            ],
+            "target_roi": {
+              "lane_id": "group-67988353dffa17cd3892c9d6e3ee6c1a:05",
+              "x0": 972,
+              "y0": 584,
+              "x1": 1023,
+              "y1": 627
+            },
+            "context_expansion_percent": 0
+          }
+        ],
+        "geometry_policy": "anchored_context@1",
+        "quant_policy": "anchored_background@1"
+      },
+      "run": null
+    }
+  ],
+  "ocr": null,
+  "normalizations": [],
+  "archive_sources": [],
+  "imported_runs": [],
+  "layout_style": {
+    "schema_version": 1,
+    "display_policy": "standard_lane_ratio@1",
+    "lane_unit": 120,
+    "heading_size": 26,
+    "segment_gap": 8,
+    "label_alignment": "right",
+    "flow": "columns"
+  },
+  "composition": {
+    "schema_version": 1,
+    "slices": [
+      {
+        "display_frame": {
+          "center_x": 900.4990430513701,
+          "center_y": 600.026365773663,
+          "width": 240.0,
+          "height": 38.4,
+          "angle_degrees": 2.994366732416279
+        },
+        "row_id": "group-67988353dffa17cd3892c9d6e3ee6c1a",
+        "figure": "Fig",
+        "line": 1,
+        "position": 1,
+        "first_lane": 1,
+        "last_lane": 5
+      }
+    ],
+    "columns": [
+      {
+        "figure": "Fig",
+        "column": 1
+      }
+    ]
+  },
+  "automatic_rows": [],
+  "partition_sources": [],
+  "intake": {
+    "schema_version": 3,
+    "discovery": null,
+    "grouping": {
+      "schema_version": 1,
+      "figures": [
+        {
+          "figure_id": "f",
+          "label": "Fig",
+          "lane_count": 5
+        }
+      ],
+      "groups": [
+        {
+          "group_id": "group-67988353dffa17cd3892c9d6e3ee6c1a",
+          "source_ids": [
+            "s1",
+            "s2",
+            "s3"
+          ],
+          "figure_id": "f",
+          "protein_label": "AKT",
+          "selected_source_id": "s1",
+          "region_index": null,
+          "reuse_confirmed": false
+        }
+      ]
+    },
+    "figures": [
+      {
+        "figure_id": "f",
+        "label": "Fig",
+        "lane_count": 5
+      }
+    ],
+    "proteins": [
+      {
+        "protein_id": "group-67988353dffa17cd3892c9d6e3ee6c1a",
+        "figure_id": "f",
+        "label": "AKT"
+      }
+    ],
+    "sources": [
+      {
+        "source_id": "s1",
+        "asset": {
+          "asset_id": "a1",
+          "relative_path": "assets/1.tiff",
+          "sha256": "af50718c5bfc7bae7f4b384c6349eb91ad1347ee07502768f9465baf020fc086",
+          "size_bytes": 4320256,
+          "schema_version": 1
+        },
+        "original_name": "AKT_123456 (1).tiff",
+        "relative_path": "AKT_123456 (1).tiff",
+        "width": 1800,
+        "height": 1200,
+        "bit_depth": 16
+      },
+      {
+        "source_id": "s2",
+        "asset": {
+          "asset_id": "a2",
+          "relative_path": "assets/2.tiff",
+          "sha256": "55650f31a8da073b5bab588a5aa3fb725f7e92410ee2dcf30e1ae3cd16944be9",
+          "size_bytes": 4320256,
+          "schema_version": 1
+        },
+        "original_name": "AKT_123456 (2).tiff",
+        "relative_path": "AKT_123456 (2).tiff",
+        "width": 1800,
+        "height": 1200,
+        "bit_depth": 16
+      },
+      {
+        "source_id": "s3",
+        "asset": {
+          "asset_id": "a3",
+          "relative_path": "assets/3.tiff",
+          "sha256": "a2065268b0f8a46bfda4de0fcddc16cae1dfa5c31ffcba9ded16c2b15029d860",
+          "size_bytes": 4320256,
+          "schema_version": 1
+        },
+        "original_name": "AKT_123456 (3).tiff",
+        "relative_path": "AKT_123456 (3).tiff",
+        "width": 1800,
+        "height": 1200,
+        "bit_depth": 16
+      }
+    ],
+    "assignments": [
+      {
+        "protein_id": "group-67988353dffa17cd3892c9d6e3ee6c1a",
+        "source_id": "s1",
+        "reuse_confirmed": false
+      }
+    ],
+    "confirmed_digest": "5d032d0fa50091289ec4301278649303c8a7a7db78e4b2379d9b689cfc783f48"
+  },
+  "workflow": {
+    "policy": "intake_workflow@3",
+    "editing": false,
+    "intake_digest": "5d032d0fa50091289ec4301278649303c8a7a7db78e4b2379d9b689cfc783f48",
+    "approved": true,
+    "cancel_requested": false,
+    "steps": [
+      {
+        "stage": "crop",
+        "target_id": "group-67988353dffa17cd3892c9d6e3ee6c1a",
+        "status": "done",
+        "attempt": 2,
+        "claim_id": "ab998700c44f783b2038624f7f1d2a12eb1273c7e352accac343a8343e449e5e",
+        "input_digest": "cfcc89a98909f56129072cda714bbf063e7dc00146b14e22676e31cd656a3450",
+        "reason": ""
+      },
+      {
+        "stage": "compose",
+        "target_id": "f",
+        "status": "done",
+        "attempt": 1,
+        "claim_id": "b4a8e555cd059895e14ccab7ce8b58e7dc9cef207c396a80844dfcc0ef1b8c05",
+        "input_digest": "1ed6769d79f554d8191387f1e94048f4a4b457b36daf3e6ca81cdd954cb08d7a",
+        "reason": ""
+      },
+      {
+        "stage": "measure",
+        "target_id": "f",
+        "status": "pending",
+        "attempt": 0,
+        "claim_id": "",
+        "input_digest": "",
+        "reason": ""
+      },
+      {
+        "stage": "export",
+        "target_id": "guided",
+        "status": "pending",
+        "attempt": 0,
+        "claim_id": "",
+        "input_digest": "",
+        "reason": ""
+      }
+    ]
+  },
+  "intake_crops": [
+    {
+      "policy": "intake_crop@2",
+      "row_id": "group-67988353dffa17cd3892c9d6e3ee6c1a",
+      "source_sha256": "af50718c5bfc7bae7f4b384c6349eb91ad1347ee07502768f9465baf020fc086",
+      "source_revision": 0,
+      "lane_count": 5,
+      "detection": {
+        "settings": {
+          "lane_count": 5,
+          "crop_height": 53,
+          "polarity": "dark",
+          "left_marker": false,
+          "min_snr": 4.0,
+          "membrane_hint": null,
+          "include_membrane_edges": false
+        },
+        "width": 1800,
+        "height": 1200,
+        "membrane": {
+          "lane_id": "membrane",
+          "x0": 756,
+          "y0": 546,
+          "x1": 1045,
+          "y1": 655
+        },
+        "marker": null,
+        "sample_region": {
+          "lane_id": "candidate",
+          "x0": 779,
+          "y0": 574,
+          "x1": 1023,
+          "y1": 627
+        },
+        "candidates": [
+          {
+            "roi": {
+              "lane_id": "candidate",
+              "x0": 779,
+              "y0": 574,
+              "x1": 1023,
+              "y1": 627
+            },
+            "peak_y": 600,
+            "lane_snr": [
+              41999.9302039506,
+              41999.99142998857,
+              41999.96029506661,
+              41999.98474652538,
+              41999.925715382655
+            ],
+            "detected_lanes": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "weak_lanes": [],
+            "possible_empty_lanes": [],
+            "flags": [
+              "crop_policy:source_geometry@2",
+              "automatic_geometry_unreviewed",
+              "white_light_geometry_guide",
+              "angle_degrees:2.994367",
+              "center_support:70,70,70,70,70",
+              "explicit_lane_count"
+            ],
+            "lane_rois": [
+              {
+                "lane_id": "lane-1",
+                "x0": 779,
+                "y0": 574,
+                "x1": 829,
+                "y1": 617
+              },
+              {
+                "lane_id": "lane-2",
+                "x0": 829,
+                "y0": 577,
+                "x1": 877,
+                "y1": 619
+              },
+              {
+                "lane_id": "lane-3",
+                "x0": 877,
+                "y0": 579,
+                "x1": 924,
+                "y1": 622
+              },
+              {
+                "lane_id": "lane-4",
+                "x0": 924,
+                "y0": 582,
+                "x1": 972,
+                "y1": 624
+              },
+              {
+                "lane_id": "lane-5",
+                "x0": 972,
+                "y0": 584,
+                "x1": 1023,
+                "y1": 627
+              }
+            ],
+            "display_frame": {
+              "center_x": 900.4990430513701,
+              "center_y": 600.026365773663,
+              "width": 240.0,
+              "height": 38.4,
+              "angle_degrees": 2.994366732416279
+            }
+          }
+        ],
+        "flags": [
+          "crop_policy:source_geometry@2",
+          "automatic_geometry_unreviewed",
+          "white_light_geometry_guide",
+          "angle_degrees:2.994367",
+          "center_support:70,70,70,70,70",
+          "explicit_lane_count",
+          "signal_orientation_fit@1",
+          "signal_fit_residual:0.007972",
+          "guide_sha256:55650f31a8da073b5bab588a5aa3fb725f7e92410ee2dcf30e1ae3cd16944be9",
+          "guide_peer_sha256:a2065268b0f8a46bfda4de0fcddc16cae1dfa5c31ffcba9ded16c2b15029d860"
+        ],
+        "algorithm_id": "instrument_guided_geometry@1"
+      },
+      "selected_index": 0,
+      "crop": {
+        "lane_id": "group-67988353dffa17cd3892c9d6e3ee6c1a",
+        "x0": 779,
+        "y0": 574,
+        "x1": 1023,
+        "y1": 627
+      },
+      "slots": [
+        {
+          "slot_id": "503eb1bd53e5574d7958fd964ae301310bf350295d6a80bf1666c14490767530",
+          "position": 1,
+          "roi": {
+            "lane_id": "503eb1bd53e5574d7958fd964ae301310bf350295d6a80bf1666c14490767530",
+            "x0": 779,
+            "y0": 574,
+            "x1": 829,
+            "y1": 617
+          },
+          "signal": "detected"
+        },
+        {
+          "slot_id": "62a906ee1d68323aad452a0140e8fbb2a64be0cfb3dfa37fd1eb78e1711a24dd",
+          "position": 2,
+          "roi": {
+            "lane_id": "62a906ee1d68323aad452a0140e8fbb2a64be0cfb3dfa37fd1eb78e1711a24dd",
+            "x0": 829,
+            "y0": 577,
+            "x1": 877,
+            "y1": 619
+          },
+          "signal": "detected"
+        },
+        {
+          "slot_id": "c7d174fae7c4d84d0dc3b1f5fc22a409026856bbafc84fa8ced9f7815962dba4",
+          "position": 3,
+          "roi": {
+            "lane_id": "c7d174fae7c4d84d0dc3b1f5fc22a409026856bbafc84fa8ced9f7815962dba4",
+            "x0": 877,
+            "y0": 579,
+            "x1": 924,
+            "y1": 622
+          },
+          "signal": "detected"
+        },
+        {
+          "slot_id": "667a90af6b51c821c63ef805414a5aed2c1a55ba0614f38a3ae973af879e92c5",
+          "position": 4,
+          "roi": {
+            "lane_id": "667a90af6b51c821c63ef805414a5aed2c1a55ba0614f38a3ae973af879e92c5",
+            "x0": 924,
+            "y0": 582,
+            "x1": 972,
+            "y1": 624
+          },
+          "signal": "detected"
+        },
+        {
+          "slot_id": "78cc4344fb63be11280e1fc6f2d8b96baf65aa7360536faba6cdb299e3024da7",
+          "position": 5,
+          "roi": {
+            "lane_id": "78cc4344fb63be11280e1fc6f2d8b96baf65aa7360536faba6cdb299e3024da7",
+            "x0": 972,
+            "y0": 584,
+            "x1": 1023,
+            "y1": 627
+          },
+          "signal": "detected"
+        }
+      ],
+      "reviewed": false,
+      "raw_crop": {
+        "asset_id": "historic-crop",
+        "relative_path": "assets/crop.tiff",
+        "sha256": "0501feec7c217840b7b5c24125074013762b5286839fecd0564ee7b6177f1757",
+        "size_bytes": 26632,
+        "schema_version": 1
+      },
+      "reason": "已自动采纳完整定位",
+      "geometry_policy": "instrument_guided_geometry@1"
+    }
+  ],
+  "intake_figures": [
+    {
+      "policy": "intake_figure@1",
+      "figure_id": "f",
+      "row_ids": [
+        "group-67988353dffa17cd3892c9d6e3ee6c1a"
+      ],
+      "slot_ids": [
+        [
+          "503eb1bd53e5574d7958fd964ae301310bf350295d6a80bf1666c14490767530",
+          "62a906ee1d68323aad452a0140e8fbb2a64be0cfb3dfa37fd1eb78e1711a24dd",
+          "c7d174fae7c4d84d0dc3b1f5fc22a409026856bbafc84fa8ced9f7815962dba4",
+          "667a90af6b51c821c63ef805414a5aed2c1a55ba0614f38a3ae973af879e92c5",
+          "78cc4344fb63be11280e1fc6f2d8b96baf65aa7360536faba6cdb299e3024da7"
+        ]
+      ],
+      "input_digest": "b4af843ae07a6d0f5a63c8e2338f6e354bae51eaf8dc42c423d3ffa6eab72ac7",
+      "image": {
+        "asset_id": "historic-figure",
+        "relative_path": "assets/figure.png",
+        "sha256": "4e9a4f6eba2086357b6fe495a61c0ab3d95b19b03197406e07bca277a603758c",
+        "size_bytes": 8965,
+        "schema_version": 1
+      },
+      "width": 800,
+      "height": 192
+    }
+  ]
+}

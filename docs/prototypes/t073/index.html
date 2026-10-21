@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BioImage · 工作台交互预览 T073</title>
+  <link rel="stylesheet" href="workbench.css">
+  <script src="workbench.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#content">跳转到工作区</a>
+  <div class="workbench">
+    <header class="project-bar">
+      <a class="brand" href="#" aria-label="BioImage 工作台"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h7a5 5 0 0 1 0 10H6V3Zm0 7h8a5 5 0 0 1 0 10H6V10Z"/></svg><span>BioImage</span></a>
+      <span class="project-divider"></span><span class="project-name">WB 实验项目</span><span class="subtle desktop-only">/</span><span class="subtle desktop-only">2026.10.21</span>
+      <span class="spacer"></span><span id="save-state" class="save-state">示例草稿</span>
+      <button class="button quiet" id="new-fig">新建 Fig</button><button class="button quiet" id="settings">界面设置</button>
+    </header>
+    <nav class="stage-nav" aria-label="处理阶段">
+      <div id="stage-tabs" role="tablist" aria-label="工作页面"></div>
+      <div class="stage-action"><button class="button quiet" id="follow" hidden>跟随进度</button><span id="stage-summary">5 个蛋白 · 2 个 Fig</span><button class="button primary" id="primary-action">开始自动处理</button></div>
+    </nav>
+    <div id="process-line" class="process-line" aria-live="polite" hidden></div>
+    <main id="content" tabindex="-1"></main>
+    <footer class="preview-bar"><span><span class="preview-dot"></span>交互原型 · 合成图与示例数据，不执行科学计算</span><div><label><input id="simulate-ambiguity" type="checkbox">演示一次不确定定位</label><button class="text-button" id="reset-demo">重置示例</button><a href="design.html" target="_blank" rel="noopener">设计方案</a></div></footer>
+  </div>
+  <dialog id="settings-dialog" aria-labelledby="settings-title"><form method="dialog"><div class="dialog-heading"><h2 id="settings-title">界面设置</h2><button class="icon-button" aria-label="关闭设置" value="close">×</button></div><label class="setting"><span><strong>减少动效</strong><small>关闭控件过渡，保留状态文字。</small></span><input id="reduce-motion" type="checkbox"></label><p class="subtle">原型内容仅保留在当前页面。软件将使用实际项目和保存状态。</p><button class="button primary">完成</button></form></dialog>
+  <dialog id="image-dialog" aria-labelledby="image-dialog-title"><div class="dialog-heading"><h2 id="image-dialog-title">原图预览</h2><button class="icon-button" id="close-image" aria-label="关闭原图预览">×</button></div><img id="large-source" alt="合成原图放大预览"><p class="subtle">合成示例 · 960 × 420 px</p></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>

@@ -355,7 +355,7 @@ def verify_sequence_installation(report_path: Path, *, automatic: bool = False) 
                             if (
                                 crop.raw_crop is None
                                 or not crop.geometry_ready
-                                or (automatic and (crop.policy != "intake_crop@2" or crop.reviewed))
+                                or (automatic and (crop.policy != "intake_crop@3" or crop.reviewed))
                                 or len(crop.slots) != row.lane_count
                             ):
                                 raise ValueError("Missing original crop or fixed slots")

@@ -24,8 +24,43 @@ from wb_tool.domain.automatic import AutoWBSettings, detect_automatic_geometry
 from wb_tool.domain.crop_detection import CropCandidate, CropDetection, CropDetectionSettings
 from wb_tool.domain.export_detection import inspect_export
 from wb_tool.domain.grid import fixed_lane_grid
-from wb_tool.domain.instrument_geometry import detect_instrument_geometry
 from wb_tool.domain.lanes import LaneROI
+from wb_tool.domain.reliable_geometry import ReliableDetection, detect_reliable_geometry
+
+
+def _checked_geometry(
+    image: LoadedTiff,
+    guide: LoadedTiff,
+    lane_count: int,
+    target: LaneROI | None,
+    cancelled: Callable[[], bool],
+    *,
+    registration_target: bool = False,
+    lane_width: float | None = None,
+) -> CropDetection:
+    settings = AutoWBSettings(lane_count=lane_count, crop_policy="source_geometry@2")
+    return detect_reliable_geometry(
+        image.pixels,
+        guide.pixels,
+        settings,
+        target=target,
+        lane_width=lane_width,
+        width_is_estimate=lane_width is not None,
+        registration_target=registration_target,
+        exclude_guide_marks=image.sha256 != guide.sha256,
+        cancelled=cancelled,
+    )
+
+
+def _same_signal_coordinates(selected: CropDetection, peer: CropDetection) -> bool:
+    if len(selected.candidates) != 1 or len(peer.candidates) != 1:
+        return False
+    a, b = selected.candidates[0].lane_rois, peer.candidates[0].lane_rois
+    return len(a) == len(b) and all(
+        abs((x.x0 + x.x1 - y.x0 - y.x1) / 2) <= max(2, min(x.width, y.width) * 0.25)
+        and abs((x.y0 + x.y1 - y.y0 - y.y1) / 2) <= max(2, min(x.y1 - x.y0, y.y1 - y.y0) * 0.3)
+        for x, y in zip(a, b, strict=True)
+    )
 
 
 def propose_intake_crop(
@@ -52,21 +87,30 @@ def propose_intake_crop(
         AutoWBSettings(lane_count=row.lane_count, crop_policy="source_geometry@2"),
         cancelled=cancelled,
     )
-    if detection.candidates:
-        # A single legacy candidate does not establish signal direction or
-        # target uniqueness. Apply the independent signal checks to this path too.
-        checked = detect_instrument_geometry(
-            image.pixels,
-            image.pixels,
-            AutoWBSettings(lane_count=row.lane_count, crop_policy="source_geometry@2"),
-            cancelled=cancelled,
-        )
-        detection = replace(
-            checked,
-            algorithm_id="source_signal_geometry@1",
-            flags=tuple(f for f in checked.flags if f != "white_light_geometry_guide")
-            + ("source_signal_contour",),
-        )
+    legacy = detection
+    # Only an explicitly reviewed ROI of this very source is an exact pixel
+    # calibration. Equal Fig names/dimensions alone are not a scale mapping.
+    prior = next(
+        (
+            e
+            for e in project.intake_crops
+            if e.reviewed
+            and e.row_id == row_id
+            and e.crop is not None
+            and e.source_sha256 == image.sha256
+            and e.lane_count == row.lane_count
+        ),
+        None,
+    )
+    if prior is not None:
+        # A reviewed grid includes its origin and boundaries, not just width.
+        # Reanalysis cannot silently recenter it on asymmetric signal support.
+        return prior
+    width_estimate = (
+        legacy if len(legacy.candidates) == 1 and legacy.candidates[0].display_frame else None
+    )
+    seed = width_estimate.candidates[0].display_frame if width_estimate else None
+    lane_width = seed.width / row.lane_count if seed else None
     discovery = project.intake.discovery
     source_id = next(
         (b.source_id for b in project.intake.assignments if b.protein_id == row_id), None
@@ -89,10 +133,21 @@ def propose_intake_crop(
         observed = next(o for o in discovery.observations if o.source_id == selection.source_id)
         region = observed.regions[selection.region_index]
         target = LaneROI(row_id, region.x0, region.y0, region.x1, region.y1)
+    # Every new run uses the same independent gate, including N > 2 and images
+    # where the historical detector returned no candidate. Old geometry is only
+    # a retained manual proposal; it cannot short-circuit this validation.
+    checked = _checked_geometry(
+        image, image, row.lane_count, target, cancelled, lane_width=lane_width
+    )
+    detection = replace(
+        checked,
+        algorithm_id="source_signal_geometry@2",
+        flags=(*checked.flags, "source_signal_contour"),
+    )
     companions = intake_crop_companion_assets(project, row_id)
     if not detection.candidates and len(companions) == 2 and sources:
         paths = {item.sha256: item.path for item in sources}
-        dark: list[tuple[float, LoadedTiff]] = []
+        members = [image]
         for asset in companions:
             if cancelled():
                 raise ValueError("辅助定位已取消")
@@ -107,29 +162,62 @@ def propose_intake_crop(
                 or peer.source.stat().st_size != asset.size_bytes
             ):
                 raise ValueError("同组辅助定位资产身份或尺寸变化")
-            feature = inspect_export(peer.pixels)
-            if not feature.bright_background:
-                dark.append((feature.texture, peer))
+            members.append(peer)
+        dark = [
+            (feature.texture, member)
+            for member in members
+            if not (feature := inspect_export(member.pixels)).bright_background
+        ]
         dark.sort(key=lambda item: item[0])
         if len(dark) == 2 and dark[1][0] - dark[0][0] >= 0.03:
             guide, other = dark[0][1], dark[1][1]
-            detection = detect_instrument_geometry(
-                image.pixels,
-                guide.pixels,
-                AutoWBSettings(lane_count=row.lane_count, crop_policy="source_geometry@2"),
-                target=target,
-                cancelled=cancelled,
+            detection = _checked_geometry(
+                image, guide, row.lane_count, target, cancelled, lane_width=lane_width
             )
+            peer = next(
+                (member for member in members if member.sha256 not in {image.sha256, guide.sha256}),
+                None,
+            )
+            if detection.candidates:
+                corroborated = (
+                    _checked_geometry(
+                        peer,
+                        guide,
+                        row.lane_count,
+                        target or detection.candidates[0].roi,
+                        cancelled,
+                        registration_target=target is None,
+                        lane_width=lane_width,
+                    )
+                    if peer
+                    else None
+                )
+                if corroborated is None or not _same_signal_coordinates(detection, corroborated):
+                    detection = replace(
+                        detection,
+                        algorithm_id="export_signal_regions@1",
+                        flags=(
+                            *detection.flags,
+                            "independent_validation_failed",
+                            "group_signal_coordinates_unverified",
+                        ),
+                    )
+                else:
+                    detection = replace(
+                        detection, flags=(*detection.flags, "registered_signal_pair@1")
+                    )
             detection = replace(
                 detection,
                 flags=(
                     *detection.flags,
                     "guide_sha256:" + guide.sha256,
                     "guide_peer_sha256:" + other.sha256,
+                    *("verified_group_sha256:" + member.sha256 for member in members),
                 ),
             )
     if target is not None and not (
-        detection.algorithm_id == "instrument_guided_geometry@1" and detection.candidates
+        detection.algorithm_id in {"source_signal_geometry@2", "instrument_guided_geometry@2"}
+        and detection.candidates
     ):
         roi = target
         lanes = fixed_lane_grid(roi, row.lane_count)
@@ -159,9 +247,26 @@ def propose_intake_crop(
             flags,
             "export_signal_regions@1",
         )
+    if not detection.candidates and legacy.candidates:
+        # Keep useful manual geometry and every failed independent check. The
+        # legacy algorithm id deliberately cannot pass the automatic gate.
+        detection = replace(
+            legacy, flags=(*legacy.flags, "independent_validation_failed", *detection.flags)
+        )
     if cancelled():
         raise ValueError("固定N定位已取消")
-    return make_intake_crop_evidence(project, row_id, detection)
+    return make_intake_crop_evidence(
+        project,
+        row_id,
+        detection,
+        width_estimate=width_estimate if "fixed_width_grid@1" in detection.flags else None,
+        sampling_limits=detection.sampling_limits
+        if isinstance(detection, ReliableDetection)
+        else (),
+        review_positions=detection.review_positions
+        if isinstance(detection, ReliableDetection)
+        else (),
+    )
 
 
 def export_intake_crop(

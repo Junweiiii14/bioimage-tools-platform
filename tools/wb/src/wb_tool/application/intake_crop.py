@@ -2,9 +2,15 @@
 
 from dataclasses import replace
 from math import cos, isfinite, radians, sin
-from typing import Literal
+from typing import Literal, cast
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import (
+    ConfigDict,
+    Field,
+    SerializerFunctionWrapHandler,
+    model_serializer,
+    model_validator,
+)
 from tool_contracts.api import AssetRef
 
 from wb_tool.application.document import DocumentIO
@@ -37,6 +43,55 @@ class IntakeCropFile(DocumentIO):
     size_bytes: int = Field(gt=0, le=512 * 1024 * 1024)
 
 
+class IntakeWidthCalibration(DocumentIO):
+    """A frozen, explicitly reviewed original-coordinate width, not a preview."""
+
+    source_sha256: str = Field(pattern="^[0-9a-f]{64}$")
+    source_revision: int = Field(ge=0)
+    lane_count: int = Field(ge=1, le=96)
+    roi: LaneROI
+    image_width: int = Field(gt=0)
+    image_height: int = Field(gt=0)
+
+    @model_validator(mode="after")
+    def original_ratio(self) -> "IntakeWidthCalibration":
+        if (
+            self.roi.x1 > self.image_width
+            or self.roi.y1 > self.image_height
+            or self.roi.width < 2 * self.lane_count
+            or abs(self.roi.width / self.lane_count * 0.8 - (self.roi.y1 - self.roi.y0)) > 1
+        ):
+            raise ValueError("槽宽校准须为原图中已确认的5N:4范围")
+        return self
+
+
+class IntakeFixedGrid(DocumentIO):
+    policy: Literal["fixed_n_frame@1"] = "fixed_n_frame@1"
+    sampling_policy: Literal["source_axis_partition@1", "source_axis_partition@2"] = (
+        "source_axis_partition@1"
+    )
+    lane_width_pixels: float = Field(ge=2)
+    width_basis: Literal["source_row_estimate", "reviewed_source_roi"]
+    calibration: IntakeWidthCalibration | None = None
+    source_estimate: CropDetection | None = None
+    sampling_limits: tuple[LaneROI, ...] = Field(default=(), max_length=96)
+    review_positions: tuple[int, ...] = Field(default=(), max_length=96)
+
+    @model_validator(mode="after")
+    def provenance(self) -> "IntakeFixedGrid":
+        if (self.width_basis == "reviewed_source_roi") != (self.calibration is not None):
+            raise ValueError("固定槽宽须保留真实来源，不能把估计冒充人工校准")
+        if (
+            self.calibration is not None
+            and abs(
+                self.lane_width_pixels - self.calibration.roi.width / self.calibration.lane_count
+            )
+            > 1e-7
+        ):
+            raise ValueError("固定槽宽与原图校准不符")
+        return self
+
+
 def intake_crop_companion_assets(
     project: "WBIntakeCropProject", row_id: str
 ) -> tuple[AssetRef, ...]:
@@ -59,19 +114,86 @@ def intake_crop_companion_assets(
 
 
 def automatic_intake_crop_allowed(evidence: "IntakeCropEvidence") -> bool:
-    """Geometry-only policy v2; never infer loading, identity or valid signal."""
+    """Versioned geometry only; never infer loading, identity or valid signal."""
     detection = evidence.detection
     if (
         detection is None
         or detection.algorithm_id
-        not in {"source_signal_geometry@1", "instrument_guided_geometry@1"}
-        or "signal_orientation_fit@1" not in detection.flags
+        not in {
+            "source_signal_geometry@1",
+            "instrument_guided_geometry@1",
+            "source_signal_geometry@2",
+            "instrument_guided_geometry@2",
+        }
+        or not {
+            "signal_orientation_fit@1",
+            "signal_orientation_fit@2",
+            "unrotated_complete_geometry@1",
+        }.intersection(detection.flags)
         or len(detection.candidates) != 1
         or evidence.selected_index != 0
         or evidence.geometry_policy != detection.algorithm_id
     ):
         return False
     candidate = detection.candidates[0]
+    fixed_width = "fixed_width_grid@1" in detection.flags
+    if detection.algorithm_id.endswith("@2"):
+        grid = evidence.fixed_grid
+        frame = candidate.display_frame
+        if (
+            grid is None
+            or frame is None
+            or "fixed_n_frame@1" not in detection.flags
+            or grid.sampling_policy not in detection.flags
+            or len(grid.sampling_limits) != evidence.lane_count
+            or abs(frame.width - evidence.lane_count * grid.lane_width_pixels) > 1e-7
+            or abs(frame.height - 0.8 * grid.lane_width_pixels) > 1e-7
+        ):
+            return False
+        if fixed_width and grid.width_basis == "source_row_estimate":
+            estimate = grid.source_estimate
+            if (
+                estimate is None
+                or estimate.algorithm_id != "source_geometry@2"
+                or len(estimate.candidates) != 1
+                or estimate.settings.lane_count != evidence.lane_count
+                or (estimate.width, estimate.height) != (detection.width, detection.height)
+                or (seed := estimate.candidates[0].display_frame) is None
+            ):
+                return False
+            delta = grid.lane_width_pixels - seed.width / evidence.lane_count
+            if delta < -1e-7 or delta > seed.width / evidence.lane_count**2 * 0.5 + 1e-7:
+                return False
+            if delta > 1e-7 and "source_width_refined@1" not in detection.flags:
+                return False
+        if (calibration := grid.calibration) is not None and (
+            calibration.source_sha256 != evidence.source_sha256
+            or calibration.source_revision > evidence.source_revision
+            or calibration.lane_count != evidence.lane_count
+            or (calibration.image_width, calibration.image_height)
+            != (detection.width, detection.height)
+        ):
+            return False
+    if (
+        detection.algorithm_id == "instrument_guided_geometry@2"
+        and "registered_signal_pair@1" not in detection.flags
+    ):
+        return False
+    if detection.algorithm_id.endswith("@2") and (
+        (
+            not fixed_width
+            and (
+                candidate.possible_empty_lanes
+                or set(candidate.detected_lanes) | set(candidate.weak_lanes)
+                != set(range(1, evidence.lane_count + 1))
+            )
+        )
+        or (
+            "unrotated_complete_geometry@1" in detection.flags
+            and (candidate.display_frame is None or candidate.display_frame.angle_degrees != 0)
+        )
+    ):
+        return False
     return bool(
         evidence.crop == replace(candidate.roi, lane_id=evidence.row_id)
         and detection.settings.lane_count == evidence.lane_count
@@ -116,7 +238,7 @@ def automatic_intake_crop_allowed(evidence: "IntakeCropEvidence") -> bool:
 
 class IntakeCropEvidence(DocumentIO):
     model_config = ConfigDict(revalidate_instances="always")
-    policy: Literal["intake_crop@1", "intake_crop@2"] = "intake_crop@1"
+    policy: Literal["intake_crop@1", "intake_crop@2", "intake_crop@3"] = "intake_crop@1"
     row_id: str = Field(min_length=1, max_length=80)
     source_sha256: str = Field(pattern="^[0-9a-f]{64}$")
     source_revision: int = Field(ge=0)
@@ -128,17 +250,27 @@ class IntakeCropEvidence(DocumentIO):
     reviewed: bool = False
     raw_crop: AssetRef | None = None
     reason: str = Field(default="", max_length=2000)
+    fixed_grid: IntakeFixedGrid | None = None
     geometry_policy: Literal[
         "source_geometry@2",
         "explicit_original_roi@1",
         "instrument_guided_geometry@1",
         "source_signal_geometry@1",
+        "instrument_guided_geometry@2",
+        "source_signal_geometry@2",
     ] = "source_geometry@2"
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_shape(self, handler: SerializerFunctionWrapHandler) -> dict[str, object]:
+        result = cast(dict[str, object], handler(self))
+        if self.fixed_grid is None:
+            result.pop("fixed_grid", None)
+        return result
 
     @property
     def geometry_ready(self) -> bool:
         """Accepted machine geometry remains distinct from human review."""
-        return self.reviewed or self.policy == "intake_crop@2"
+        return self.reviewed or self.policy in {"intake_crop@2", "intake_crop@3"}
 
     @model_validator(mode="after")
     def coherent(self) -> "IntakeCropEvidence":
@@ -154,7 +286,15 @@ class IntakeCropEvidence(DocumentIO):
         else:
             if self.crop.lane_id != self.row_id:
                 raise ValueError("裁剪证据行身份不一致")
-            previous = self.crop.x0
+            bounded_sampling = (
+                self.fixed_grid is not None
+                and self.fixed_grid.sampling_policy == "source_axis_partition@2"
+                and self.geometry_policy.endswith("@2")
+            )
+            first = self.slots[0].roi
+            previous = first.x0 if bounded_sampling and first is not None else self.crop.x0
+            if previous < self.crop.x0:
+                raise ValueError("原值槽位不能超出裁剪范围")
             for slot in self.slots:
                 roi = slot.roi
                 if (
@@ -167,14 +307,34 @@ class IntakeCropEvidence(DocumentIO):
                 ):
                     raise ValueError("槽位须从左到右完整覆盖裁剪宽度且位于原坐标范围内")
                 previous = roi.x1
-            if previous != self.crop.x1:
+            if not bounded_sampling and previous != self.crop.x1:
                 raise ValueError("槽位不能丢失裁剪末端")
         if any((s.roi is None) != (s.signal == "unlocated") for s in self.slots):
             raise ValueError("未定位槽位不能伪装为信号状态")
+        if (grid := self.fixed_grid) is not None:
+            if tuple(sorted(set(grid.review_positions))) != grid.review_positions or any(
+                type(i) is not int or not 1 <= i <= self.lane_count for i in grid.review_positions
+            ):
+                raise ValueError("局部信号复核必须绑定唯一的固定槽位")
+            if grid.sampling_limits and (
+                self.detection is None
+                or len(grid.sampling_limits) != self.lane_count
+                or any(
+                    slot.roi is None
+                    or (limit.x0, limit.x1) != (slot.roi.x0, slot.roi.x1)
+                    or not limit.y0 <= slot.roi.y0 < slot.roi.y1 <= limit.y1
+                    or limit.x1 > self.detection.width
+                    or limit.y1 > self.detection.height
+                    for slot, limit in zip(self.slots, grid.sampling_limits, strict=True)
+                )
+            ):
+                raise ValueError("安全采样范围须绑定原图与完整槽位，不能截断目标")
         if self.raw_crop is not None and not self.geometry_ready:
             raise ValueError("未经明确审核不能发布原值裁剪")
-        if self.policy == "intake_crop@2" and (
-            self.reviewed or not automatic_intake_crop_allowed(self)
+        if self.policy in {"intake_crop@2", "intake_crop@3"} and (
+            self.reviewed
+            or not automatic_intake_crop_allowed(self)
+            or (self.policy == "intake_crop@3") != self.geometry_policy.endswith("@2")
         ):
             raise ValueError("自动采纳须有唯一完整原图几何，不能冒充人工审核")
         if self.selected_index is not None and (
@@ -236,7 +396,9 @@ class WBIntakeCropProject(WBIntakeWorkflowProject):
                 raise ValueError("检测证据尺寸或固定N与原图不一致")
             if evidence.reviewed and (row.roi != evidence.crop or not row.reviewed):
                 raise ValueError("已审核裁剪须与当前行几何一致")
-            if evidence.policy == "intake_crop@2" and (row.roi != evidence.crop or row.reviewed):
+            if evidence.policy in {"intake_crop@2", "intake_crop@3"} and (
+                row.roi != evidence.crop or row.reviewed
+            ):
                 raise ValueError("自动采纳几何须与原图行一致且保持未人工审核")
             if (
                 evidence.policy == "intake_crop@2"
@@ -253,6 +415,31 @@ class WBIntakeCropProject(WBIntakeWorkflowProject):
                 }
                 if len(companions) != 2 or declared != companions:
                     raise ValueError("辅助定位必须绑定同组全部已校验原图资产")
+            if (
+                evidence.policy == "intake_crop@3"
+                and evidence.detection is not None
+                and evidence.geometry_policy == "instrument_guided_geometry@2"
+            ):
+                companions = {
+                    asset.sha256 for asset in intake_crop_companion_assets(self, row.row_id)
+                }
+                declared = {
+                    flag.split(":", 1)[1]
+                    for flag in evidence.detection.flags
+                    if flag.startswith("verified_group_sha256:")
+                }
+                guides = {
+                    flag.split(":", 1)[1]
+                    for flag in evidence.detection.flags
+                    if flag.startswith("guide_sha256:")
+                }
+                if (
+                    len(companions) != 2
+                    or declared != companions | {row.source.sha256}
+                    or len(guides) != 1
+                    or not guides <= companions
+                ):
+                    raise ValueError("辅助定位必须核验完整三图，且白光不能替代所选来源")
         evidence_by_row = {e.row_id: e for e in self.intake_crops}
         for step in self.workflow.steps:
             if step.stage in {"compose", "measure"} and step.status in {"running", "done"}:
@@ -277,7 +464,14 @@ def prepare_intake_crops(project: WBIntakeWorkflowProject) -> WBIntakeCropProjec
 
 
 def make_intake_crop_evidence(
-    project: WBIntakeCropProject, row_id: str, detection: CropDetection
+    project: WBIntakeCropProject,
+    row_id: str,
+    detection: CropDetection,
+    *,
+    width_calibration: IntakeWidthCalibration | None = None,
+    width_estimate: CropDetection | None = None,
+    sampling_limits: tuple[LaneROI, ...] = (),
+    review_positions: tuple[int, ...] = (),
 ) -> IntakeCropEvidence:
     """Keep every slot even when no geometry can be located; never infer missing ends."""
     row = next((r for r in project.rows if r.row_id == row_id), None)
@@ -295,7 +489,9 @@ def make_intake_crop_evidence(
             if located and candidate
             else None,
             signal=(
-                "detected"
+                "undetermined"
+                if f"grid_signal_unresolved:{slot.position}" in detection.flags
+                else "detected"
                 if slot.position in candidate.detected_lanes
                 else "weak"
                 if slot.position in candidate.weak_lanes
@@ -312,7 +508,28 @@ def make_intake_crop_evidence(
         source_revision=project.revision,
         lane_count=row.lane_count,
         detection=detection,
-        geometry_policy="source_signal_geometry@1"
+        fixed_grid=IntakeFixedGrid(
+            sampling_policy=(
+                "source_axis_partition@2"
+                if "source_axis_partition@2" in detection.flags
+                else "source_axis_partition@1"
+            ),
+            lane_width_pixels=candidate.display_frame.width / row.lane_count,
+            width_basis="reviewed_source_roi"
+            if width_calibration is not None
+            else "source_row_estimate",
+            calibration=width_calibration,
+            source_estimate=width_estimate,
+            sampling_limits=sampling_limits,
+            review_positions=review_positions,
+        )
+        if candidate and candidate.display_frame and "fixed_n_frame@1" in detection.flags
+        else None,
+        geometry_policy="source_signal_geometry@2"
+        if detection.algorithm_id == "source_signal_geometry@2"
+        else "instrument_guided_geometry@2"
+        if detection.algorithm_id == "instrument_guided_geometry@2"
+        else "source_signal_geometry@1"
         if detection.algorithm_id == "source_signal_geometry@1"
         else (
             "instrument_guided_geometry@1"
@@ -322,7 +539,18 @@ def make_intake_crop_evidence(
         selected_index=0 if located else None,
         crop=replace(candidate.roi, lane_id=row_id) if located and candidate else None,
         slots=slots,
-        reason="自动定位建议未经审核；请核对Marker、首尾空槽和每个样本范围"
+        reason="已保留定位范围；请处理独立校验未通过的原因：" + ";".join(detection.flags)
+        if located and "independent_validation_failed" in detection.flags
+        else "定位已就绪"
+        if located
+        and detection.algorithm_id
+        in {
+            "source_signal_geometry@1",
+            "instrument_guided_geometry@1",
+            "source_signal_geometry@2",
+            "instrument_guided_geometry@2",
+        }
+        else "请核对裁剪范围"
         if located
         else "未取得完整固定N几何：" + ";".join(detection.flags),
     )
@@ -469,6 +697,16 @@ def accept_automatic_intake_crop(
         evidence
     ):
         raise ValueError("自动定位仍需明确范围")
+    calibration = evidence.fixed_grid.calibration if evidence.fixed_grid else None
+    if calibration is not None and not any(
+        old.reviewed
+        and old.source_sha256 == calibration.source_sha256
+        and old.source_revision == calibration.source_revision
+        and old.lane_count == calibration.lane_count
+        and old.crop == calibration.roi
+        for old in project.intake_crops
+    ):
+        raise ValueError("槽宽校准缺少当前项目中明确审核的原图依据")
     recorded = record_intake_crop_proposal(project, ticket, evidence)
     if recorded.workflow.cancel_requested:
         return recorded
@@ -476,7 +714,13 @@ def accept_automatic_intake_crop(
         recorded, "crop", evidence.row_id, expected_digest=intake_workflow_digest(recorded)
     )
     accepted = IntakeCropEvidence.model_validate(
-        {**dict(evidence), "policy": "intake_crop@2", "reason": "已自动采纳完整定位"}
+        {
+            **dict(evidence),
+            "policy": "intake_crop@3"
+            if evidence.geometry_policy.endswith("@2")
+            else "intake_crop@2",
+            "reason": "已自动采纳完整定位",
+        }
     )
     assert evidence.detection is not None
     frame = evidence.detection.candidates[0].display_frame

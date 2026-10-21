@@ -63,6 +63,7 @@ def suggest_analysis_for_crop(
     min_snr: float = 4.0,
     quant_policy: QuantPolicy = "legacy_bounds@1",
     lane_rois: tuple[LaneROI, ...] = (),
+    context_limits: tuple[LaneROI, ...] = (),
     cancelled: Callable[[], bool] = lambda: False,
 ) -> AnalysisRequest:
     """Suggest closed bounds on detection copies; measurement uses untouched original pixels.
@@ -82,7 +83,7 @@ def suggest_analysis_for_crop(
     if quant_policy == "anchored_background@1":
         from wb_tool.domain.anchored_context import propose_anchored_lanes
 
-        anchored = propose_anchored_lanes(image.pixels, geometry, polarity)
+        anchored = propose_anchored_lanes(image.pixels, geometry, polarity, limits=context_limits)
         for index, item in enumerate(anchored, 1):
             check_detection_cancelled(cancelled)
             band = item.proposal.bands[0]
