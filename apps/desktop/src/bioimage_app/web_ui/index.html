@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <title>BioImage · 图像工作台</title>
+  <title>BioImage · 工具平台</title>
   <script src="bootstrap.js"></script>
   <link rel="stylesheet" href="design_tokens.css">
   <link rel="stylesheet" href="styles.css">
@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="intake_workbench.css">
   <link rel="stylesheet" href="components.css">
   <link rel="stylesheet" href="advanced.css">
+  <link rel="stylesheet" href="platform_home.css">
 </head>
 <body>
   <aside class="platform-rail" aria-label="工具平台">
@@ -24,12 +25,28 @@
   </aside>
   <div class="app-shell">
     <header class="project-header">
-      <button class="intake-brand" data-action="home" aria-label="BioImage 工作台" hidden><svg viewBox="0 0 32 32" fill="none"><path d="M7 5h10a7 7 0 0 1 0 14H7V5Z M7 13h12a7 7 0 1 1 0 14H7V13Z" stroke="currentColor" stroke-width="2"/></svg><span>BioImage</span></button>
-      <div class="breadcrumb"><button data-action="home">工作台</button><i data-icon="chevron"></i><span>WB 自动化</span><span class="header-divider"></span><strong id="project-name">新建实验项目</strong></div>
-      <div class="header-actions"><button class="icon-button" data-action="settings" aria-label="外观与交互" title="外观与交互"><i data-icon="settings"></i></button><details id="session-menu"><summary>文件</summary><nav><button data-session="new_intake_folder">新建仪器导入项目…</button><button data-session="new">新建灰度项目</button><button data-session="open">打开已有项目…</button><button data-session="save">保存项目</button><button data-action="shortcut-settings">快捷键设置…</button><button data-session="home">关闭项目并返回首页</button><button data-session="exit">退出软件</button></nav></details><span id="save-status" class="save-status"><i data-icon="check"></i>就绪</span><span id="runtime-badge" class="runtime-badge">网页预览</span><button class="button subtle" data-action="import"><i data-icon="plus"></i><span>添加原图</span></button><button class="button primary" data-action="export"><i data-icon="download"></i><span>导出结果</span></button></div>
+      <button class="intake-brand" data-action="home" aria-label="返回 BioImage 工具平台" hidden><svg viewBox="0 0 32 32" fill="none"><path d="M7 5h10a7 7 0 0 1 0 14H7V5Z M7 13h12a7 7 0 1 1 0 14H7V13Z" stroke="currentColor" stroke-width="2"/></svg><span>BioImage</span></button>
+      <div class="breadcrumb"><button data-page="platform">工具平台</button><i id="breadcrumb-tool-separator" data-icon="chevron" hidden></i><button id="breadcrumb-tool" data-page="wb" hidden>WB</button><i id="breadcrumb-project-separator" data-icon="chevron" hidden></i><strong id="project-name" hidden>新建实验项目</strong></div>
+      <div class="header-actions"><button id="platform-open" class="button primary" data-session="open"><i data-icon="folder"></i>打开项目</button><button class="icon-button" data-action="settings" aria-label="外观与交互" title="外观与交互"><i data-icon="settings"></i></button><details id="session-menu"><summary>文件</summary><nav><button data-session="new_intake_folder">新建仪器导入项目…</button><button data-session="new">新建灰度项目</button><button data-session="open">打开已有项目…</button><button data-session="save">保存项目</button><button data-action="shortcut-settings">快捷键设置…</button><button data-session="home">关闭项目并返回 WB 首页</button><button data-session="exit">退出软件</button></nav></details><span id="save-status" class="save-status"><i data-icon="check"></i>就绪</span><span id="runtime-badge" class="runtime-badge">网页预览</span><button class="button subtle" data-action="import"><i data-icon="plus"></i><span>添加原图</span></button><button class="button primary" data-action="export"><i data-icon="download"></i><span>导出结果</span></button></div>
     </header>
+    <main id="platform-view" class="platform-view" aria-label="工具平台首页">
+      <header class="platform-intro"><div><h1>选择工具，开始工作。</h1><p>图像处理与分析，都在你的工作空间。</p></div></header>
+      <div class="platform-layout">
+        <section aria-labelledby="installed-tools-title"><div class="platform-section-title"><h2 id="installed-tools-title">已安装工具</h2><span>1</span></div>
+          <button class="installed-tool" data-page="wb" aria-label="进入 WB 图像处理">
+            <span class="tool-top"><span class="tool-symbol">WB</span><span class="tool-installed"><i data-icon="check"></i>已安装</span></span>
+            <span class="tool-description"><strong>WB 图像处理</strong><span>裁剪 · 拼图 · 灰度定量</span></span>
+            <span class="tool-bottom"><span class="tool-launch">进入 WB<i data-icon="arrow"></i></span><span class="tool-mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span></span>
+          </button>
+          <div class="platform-resume" data-resume-project hidden><div><small>当前打开 · WB</small><strong data-current-project-name></strong></div><button class="text-button" data-page="project">继续工作<i data-icon="arrow"></i></button></div>
+        </section>
+        <section class="platform-recents" aria-labelledby="platform-recents-title"><div class="platform-section-title"><h2 id="platform-recents-title">最近项目</h2></div><div id="platform-recents"><div class="platform-empty"><i data-icon="folder"></i><p>从工具创建项目，<br>或打开已有项目继续。</p><button class="text-button" data-session="open">打开项目<i data-icon="arrow"></i></button></div></div></section>
+      </div>
+      <p class="platform-foot"><i data-icon="shield"></i>本地工作空间 · 原始文件保留</p>
+    </main>
     <main id="home-view" class="home-view" hidden>
-      <div class="home-intro"><div><h1>专注实验，余下交给工作台。</h1><p>继续上次的工作，或从一组原图开始。</p></div></div>
+      <div class="home-intro"><div class="wb-home-title"><span class="tool-symbol">WB</span><div><h1>WB 图像处理</h1><p>从一组原图，到可追溯的成图与定量。</p></div></div></div>
+      <div class="platform-resume" data-resume-project hidden><div><small>当前项目</small><strong data-current-project-name></strong></div><button class="text-button" data-page="project">继续工作<i data-icon="arrow"></i></button></div>
       <section id="session-start"><div class="session-start-main"><div class="session-intake-entry"><div><h2>从原图到成图</h2><p>选入仪器文件夹，配置一次，自动完成裁剪、拼图与定量。</p></div><button class="button primary" data-session="new_intake_folder">选择仪器文件夹</button></div><details class="session-secondary"><summary>独立灰度与裁图</summary><div class="session-workflow"><label><input type="radio" name="session-workflow" value="quant" checked>灰度定量 <span>自动识别与手动框选</span></label><label><input type="radio" name="session-workflow" value="review">裁图与拼图</label></div><div class="session-entry-actions"><button class="button primary" data-action="quant_import" data-session="images">选择原图</button><button class="button subtle" data-action="import_folder" data-session="folder">选择原图文件夹</button></div><p class="session-hint">选择 TIFF 后自动创建独立项目，并直接进入工作页面。</p></details></div><div class="session-existing"><button class="home-art" data-session="open" aria-label="打开已有项目"><span class="home-paper"><header>Fig · WB</header><svg viewBox="0 0 260 110" aria-hidden="true"><g fill="#eceeeb"><path d="M55 8h195v24H55zM55 45h195v24H55zM55 82h195v24H55z"/></g><g stroke="#444" stroke-width="7"><path d="M68 20h18m19 0h18m19 0h18m19 0h18m19 0h18M68 57h18m19 0h18m19 0h18m19 0h18m19 0h18M68 94h18m19 0h18m19 0h18m19 0h18m19 0h18"/></g><g fill="#777"><path d="M0 17h38v4H0zM0 54h38v4H0zM0 91h38v4H0z"/></g></svg></span></button><span class="home-art-caption">版式示意 · 原图与结果均保留</span><i data-icon="folder"></i><h2>已有项目</h2><p>打开软件保存的项目文件夹，<br>恢复上次页面和 Fig 分组。</p><button class="button subtle" data-action="open_project" data-session="open">打开已有项目</button></div></section>
       <section class="recent-section"><div class="section-heading"><h2>最近项目</h2><span>保留上次工作位置</span></div><div id="session-recents"><p class="session-hint">打开或创建项目后，会在这里显示。</p></div></section>
       <div class="session-storage"><span id="session-project-parent">新项目保存到：文档 / BioImage / Projects</span><button class="text-button" data-session="location">更改保存位置</button></div>
@@ -37,7 +54,7 @@
       <button id="retry-location" class="button subtle" data-action="retry_location" hidden>重新选择项目保存位置</button>
       <p class="home-note" id="home-note">网页用于界面与交互预览。真实导入、计算和导出由同源桌面版执行。</p>
     </main>
-    <div id="work-view" class="work-view">
+    <div id="work-view" class="work-view" hidden>
       <nav class="mode-bar" aria-label="工作模式"><div class="mode-tabs" role="tablist"><span class="mode-indicator"></span><button class="mode-tab" data-mode="intake" role="tab" aria-selected="false" hidden><i data-icon="folder"></i>导入与分配</button><button class="mode-tab active" data-mode="review" role="tab" aria-selected="true"><i data-icon="scan"></i>原图裁剪</button><button class="mode-tab" data-mode="layout" role="tab" aria-selected="false"><i data-icon="layout"></i>拼图排版</button><button class="mode-tab" data-mode="quant" role="tab" aria-selected="false"><i data-icon="curve"></i>灰度定量</button><button class="mode-tab" data-mode="results" role="tab" aria-selected="false"><i data-icon="table"></i>结果</button></div><div class="mode-actions"><button class="icon-button" data-ui-collapse title="收起或展开工具区" aria-label="收起工具区" aria-pressed="false"><i data-icon="sidebar"></i></button><button class="text-button compact-inspect" data-action="inspect"><i data-icon="eye"></i>裁图详情</button><button class="text-button" data-action="tools" aria-label="项目工具"><i data-icon="sliders"></i><span>项目工具</span><i data-icon="chevron-down"></i></button></div></nav>
       <div class="workspace">
         <aside class="source-panel" aria-label="项目原图"><div class="panel-heading"><h2>项目原图 <span id="source-count">0</span></h2><button class="icon-button" data-action="import" aria-label="添加原图"><i data-icon="plus"></i></button></div><div class="source-filters" role="group" aria-label="筛选原图"><button class="active" data-filter="all">全部</button><button data-filter="attention">裁图异常 <span id="attention-count">0</span></button></div><label class="search-field"><i data-icon="search"></i><input id="source-search" type="search" placeholder="查找原图…" aria-label="查找原图"></label><div id="source-list" class="source-list"></div><div class="source-footer"><i data-icon="shield"></i><div><strong>原图始终保留</strong><small>调整仅影响当前分析草稿</small></div></div></aside>
@@ -74,6 +91,7 @@
   <script src="intake_grid.js" defer></script>
   <script src="intake.js" defer></script>
   <script src="advanced.js" defer></script>
+  <script src="platform_home.js" defer></script>
   <script src="desktop_session.js" defer></script>
   <script src="shortcuts.js" defer></script>
   <script src="interactions.js" defer></script>

@@ -3,7 +3,8 @@
 // Drafts remain bound to project/session/source/row/lane/band, never to list position.
 window.intakeQuant = (() => {
   const drafts = new Map();
-  let selected = null, drag = null, selectionKey = null, matrixAnchor=null;
+  let selected = null, drag = null, selectionKey = null, matrixAnchor=null, pendingEditor=null;
+  let previewCollapsed=false;
   const fields = ['start', 'end', 'baselineStart', 'baselineEnd'];
   const values = band => Object.fromEntries(fields.map(k => [k, band?.[k]]));
   const key = (lane, band) => [state.projectId,state.sessionEpoch,row()?.id,row()?.sourceId,lane.lane,band.id].join(':');
@@ -79,10 +80,10 @@ window.intakeQuant = (() => {
           const pending=[...drafts.values()].some(d=>d.project===state.projectId&&d.epoch===state.sessionEpoch&&d.rowId===p.protein_id&&d.lane?.lane===i+1);
           return pending?`<button class="intake-curve-missing" data-iq-row="${escapeText(p.protein_id)}" data-iq-lane="${i+1}">暂无已提交曲线 · 处理草稿</button>`:'<div class="intake-curve-missing">等待该泳道已提交曲线</div>';
         }
-        return `<button class="intake-curve-card" data-iq-row="${escapeText(p.protein_id)}" data-iq-lane="${lane.lane}" aria-label="${escapeText(fig.label)} · 蛋白 ${escapeText(p.label)} · 泳道 ${lane.lane}，调整封底" aria-pressed="${p.protein_id===row()?.id&&lane.lane===selected}">${manualQuant.chart(lane,band,false)}<span>0–${lane.profile.length-1} y 像素${band.reason?' · 需复核':''}</span></button>`;
+        return `<button class="intake-curve-card" data-iq-row="${escapeText(p.protein_id)}" data-iq-lane="${lane.lane}" aria-label="${escapeText(fig.label)} · 蛋白 ${escapeText(p.label)} · 泳道 ${lane.lane}，调整封底" aria-pressed="${p.protein_id===row()?.id&&lane.lane===selected}">${manualQuant.chart(lane,band,false)}<span>泳道 ${lane.lane} · 0–${lane.profile.length-1} y 像素${band.reason?' · 需复核':''}</span></button>`;
       }).join('');
     }).join('');
-    return `<section class="intake-profile-panel"><header><strong>${escapeText(fig.label)} · ${members.length} 个蛋白 × ${n} 条泳道</strong><button class="text-button" data-iq-action="all">整组概览</button></header><p class="intake-curve-help">行对应蛋白，列对应泳道。点击曲线调整封底。各格为已提交的 y 剖面，纵轴独立。</p><div class="intake-figure-curves-scroll"><div class="intake-figure-curves" style="grid-template-columns:64px repeat(${n},minmax(150px,1fr))"><strong>蛋白</strong>${columns}${matrix}</div></div>${editor}</section>`;
+    return `<section class="intake-profile-panel"><header><strong>${escapeText(fig.label)} · ${members.length} 个蛋白 × ${n} 条泳道</strong><button class="text-button" data-iq-action="all">整组概览</button></header><p class="intake-curve-help">行对应蛋白，列对应泳道 · Shift + 滚轮横向浏览 · 各格纵轴独立</p><div class="intake-figure-curves-scroll" tabindex="0" role="region" aria-label="${escapeText(fig.label)} 曲线矩阵，可左右滚动"><div class="intake-figure-curves" style="grid-template-columns:88px repeat(${n},minmax(150px,1fr))"><strong class="intake-curve-corner">蛋白</strong>${columns}${matrix}</div></div>${editor}</section>`;
   }
   function highlight(cell){
     const matrix=document.querySelector('.intake-figure-curves');if(!matrix)return;
@@ -95,12 +96,35 @@ window.intakeQuant = (() => {
   document.addEventListener('pointerout',event=>{if(event.target.closest('.intake-figure-curves')&&!event.relatedTarget?.closest?.('.intake-figure-curves'))highlight(null);});
   document.addEventListener('focusin',event=>{const cell=event.target.closest('.intake-figure-curves [data-iq-row]');if(cell)highlight(cell);});
   const refresh=()=>window.intakeWorkspace.renderActive();
+  const context=()=>[state.projectId,state.sessionEpoch].join(':');
+  // The selected protein may arrive in a later snapshot. Reveal only the matching
+  // editor, and never let a queued reveal move a different page or selection.
+  function afterRender(){
+    const pending=pendingEditor,editor=document.querySelector('.intake-figure-editor');
+    if(!pending||!editor||pending.context!==context()||pending.row!==row()?.id||selected!==Number(pending.lane))return;
+    pendingEditor=null;
+    requestAnimationFrame(()=>{
+      if(matrixAnchor!==pending||!editor.isConnected||mode!=='quant'||!platformHome.inProject())return;
+      const main=document.querySelector('.intake-measure-main'),heading=main?.querySelector('.canvas-heading');
+      if(!main)return;
+      const bounds=main.getBoundingClientRect(),box=editor.getBoundingClientRect(),inset=(heading?.offsetHeight||60)+24;
+      const top=box.top<bounds.top+inset||box.bottom>bounds.bottom?main.scrollTop+box.top-bounds.top-inset:main.scrollTop;
+      main.scrollTo({top,behavior:uiMotion.preference()==='reduced'?'instant':'smooth'});
+    });
+  }
+  document.addEventListener('wheel',event=>{
+    if(drag){event.preventDefault();return;}
+    const scroll=event.target.closest('.intake-figure-curves-scroll');
+    if(!scroll||!event.shiftKey||event.ctrlKey||!event.deltaY||Math.abs(event.deltaX)>Math.abs(event.deltaY))return;
+    event.preventDefault();scroll.scrollLeft+=event.deltaY*(event.deltaMode===1?20:event.deltaMode===2?scroll.clientWidth:1);
+  },{passive:false});
   document.addEventListener('click',event=>{
     const lane=event.target.closest('[data-iq-lane]');
-    if(lane&&!lane.disabled){const scroll=document.querySelector('.intake-figure-curves-scroll');matrixAnchor={row:lane.dataset.iqRow||row()?.id,lane:lane.dataset.iqLane,x:scroll?.scrollLeft||0,y:scroll?.scrollTop||0};selected=Number(lane.dataset.iqLane);const target=lane.dataset.iqRow;if(target&&target!==row()?.id){selectionKey=[state.projectId,state.sessionEpoch,target].join(':');select(target);}else refresh();requestAnimationFrame(()=>document.querySelector('.intake-figure-editor')?.scrollIntoView({block:'nearest'}));return;}
+    if(lane&&!lane.disabled){const scroll=document.querySelector('.intake-figure-curves-scroll'),main=document.querySelector('.intake-measure-main');matrixAnchor={context:context(),row:lane.dataset.iqRow||row()?.id,lane:lane.dataset.iqLane,x:scroll?.scrollLeft||0,y:main?.scrollTop||0};pendingEditor=matrixAnchor;selected=Number(lane.dataset.iqLane);const target=lane.dataset.iqRow;if(target&&target!==row()?.id){selectionKey=[state.projectId,state.sessionEpoch,target].join(':');select(target);}else refresh();return;}
     const action=event.target.closest('[data-iq-action]')?.dataset.iqAction;
     if(!action)return;
-    if(action==='all'){selected=null;refresh();requestAnimationFrame(()=>{const anchor=matrixAnchor;if(!anchor)return;const scroll=document.querySelector('.intake-figure-curves-scroll');if(scroll){scroll.scrollLeft=anchor.x;scroll.scrollTop=anchor.y;}document.querySelector(`[data-iq-row="${CSS.escape(anchor.row)}"][data-iq-lane="${anchor.lane}"]`)?.focus({preventScroll:true});});return;}
+    if(action==='toggle-preview'){previewCollapsed=!previewCollapsed;refresh();document.querySelector('[data-iq-action="toggle-preview"]')?.focus({preventScroll:true});return;}
+    if(action==='all'){selected=null;pendingEditor=null;const anchor=matrixAnchor;refresh();requestAnimationFrame(()=>{if(!anchor||anchor!==matrixAnchor||anchor.context!==context()||mode!=='quant'||!platformHome.inProject())return;const scroll=document.querySelector('.intake-figure-curves-scroll'),main=document.querySelector('.intake-measure-main');const cell=document.querySelector(`[data-iq-row="${CSS.escape(anchor.row)}"][data-iq-lane="${anchor.lane}"]`);if(!cell)return;if(scroll)scroll.scrollLeft=anchor.x;if(main)main.scrollTo({top:anchor.y,behavior:'instant'});cell.focus({preventScroll:true});});return;}
     if(action==='discard-stale'&&!state.busy){
       const valid=new Set((quantData()?.lanes||[]).flatMap(l=>l.bands?.[0]&&entry(l,l.bands[0]).item?[entry(l,l.bands[0]).id]:[]));
       for(const [id,item] of drafts)if(item.rowId===row()?.id&&!valid.has(id))drafts.delete(id);
@@ -161,5 +185,5 @@ window.intakeQuant = (() => {
     value=k==='start'?Math.max(0,Math.min(v.end-1,value)):k==='end'?Math.max(v.start+1,Math.min(s.lane.profile.length-1,value)):Math.max(0,value);
     change({[k]:value});refresh();document.querySelector(`[data-iq-point="${k}"]`)?.focus();
   });
-  return {markup,figureMarkup,hasDraft:()=>drafts.size>0,reset:()=>{drafts.clear();selected=null;drag=null;selectionKey=null;},selectedLane:()=>selected};
+  return {markup,figureMarkup,afterRender,previewCollapsed:()=>previewCollapsed,hasDraft:()=>drafts.size>0,reset:()=>{drafts.clear();selected=null;drag=null;selectionKey=null;matrixAnchor=null;pendingEditor=null;},selectedLane:()=>selected};
 })();

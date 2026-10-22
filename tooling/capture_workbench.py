@@ -25,6 +25,7 @@ def main() -> int:
     parser.add_argument("--probe", action="store_true")
     parser.add_argument("--record", action="store_true")
     parser.add_argument("--performance", action="store_true")
+    parser.add_argument("--platform-home", action="store_true")
     args = parser.parse_args()
     output: Path = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
@@ -54,7 +55,7 @@ def main() -> int:
     view.resize(1440, 900)
     view.show()
     url = QUrl.fromLocalFile(str(args.assets.resolve() / "index.html"))
-    url.setQuery("preview=1&view=home")
+    url.setQuery("preview=1&view=home" + ("&matrix=large" if args.platform_home else ""))
     view.setUrl(url)
 
     def pause(milliseconds: int) -> None:
@@ -140,6 +141,11 @@ def main() -> int:
         # Freeze the preview session receipt before static comparison. Its normal
         # 500ms position refresh otherwise races the toolbar render.
         javascript("previewAdapter.channel.session('refresh','{}');true")
+        # Offscreen rendering can retain a compositor frame from an entrance even
+        # after its wall-clock duration. Static evidence needs an explicit settled
+        # presentation; the separate screencast below retains real motion.
+        javascript("document.getAnimations().forEach(animation=>animation.finish());true")
+        pause(200)
         result = cdp("Page.captureScreenshot", {"format": "png", "fromSurface": True})
         path.write_bytes(base64.b64decode(result["data"], validate=True))
 
@@ -149,6 +155,7 @@ def main() -> int:
     records: list[dict[str, object]] = []
     cases = [
         ("home", ""),
+        ("wb-home", "platformHome.show('wb')"),
         ("preparation", "previewAdapter.openProject(true)"),
         ("crop", "previewAdapter.openProject(false);switchMode('review')"),
         ("layout", "switchMode('layout')"),
@@ -160,11 +167,32 @@ def main() -> int:
         ("normalization", "advancedWorkspace.open('normalization')"),
         ("settings", "workbenchAppearance.open()"),
     ]
+    if args.platform_home:
+        cases = [
+            ("platform", "platformHome.show('platform')"),
+            ("wb-home", "platformHome.show('wb')"),
+            (
+                "matrix-last",
+                "previewAdapter.openProject(false);"
+                "if(!intakeQuant.previewCollapsed())document.querySelector('[data-iq-action=toggle-preview]').click();"
+                "document.querySelector('.intake-measure-main').scrollTop=100000;"
+                "document.querySelector('.intake-figure-curves-scroll').scrollLeft=100000",
+            ),
+            (
+                "matrix-editor",
+                'document.querySelector(\'[data-iq-row="row-9"][data-iq-lane="18"]\').click();'
+                "setTimeout(()=>document.querySelector('.intake-measure-main').scrollTo("
+                "{top:100000,behavior:'instant'}),250)",
+            ),
+        ]
     if args.probe:
         cases = [("settings", "workbenchAppearance.open()")]
     for width, height in [(1440, 900)] if args.probe else [(1440, 900), (960, 640)]:
         view.resize(width, height)
-        javascript("closeDrawer();previewAdapter.channel.session('home','{}');true")
+        javascript(
+            "closeDrawer();previewAdapter.channel.session('home','{}');"
+            "platformHome.show('platform');true"
+        )
         pause(400)
         for name, command in cases:
             if command:
@@ -185,6 +213,7 @@ def main() -> int:
             )
             selector = javascript(
                 "document.querySelector('#drawer:not([hidden])')?'#drawer-title':"
+                "!document.querySelector('#platform-view').hidden?'#platform-view h1':"
                 "!document.querySelector('#home-view').hidden?'#home-view h1':"
                 "document.querySelector('#intake-workspace:not([hidden]) h1')?"
                 "'#intake-workspace h1':'#image-title'"
@@ -210,12 +239,17 @@ def main() -> int:
             + "\"]').click();closeDrawer();true"
         )
         pause(400)
+        if args.platform_home:
+            javascript("platformHome.show('platform');true")
+            pause(400)
         capture(output / ("theme-" + theme + ".png"))
         actual = javascript("document.documentElement.dataset.theme")
         if actual != theme:
             raise RuntimeError(f"Theme mismatch: requested {theme}, actual {actual}")
     if args.record:
-        javascript("closeDrawer();previewAdapter.channel.session('home','{}');true")
+        javascript(
+            "closeDrawer();previewAdapter.channel.session('home','{}');platformHome.show('wb');true"
+        )
         pause(400)
         cdp("Page.startScreencast", {"format": "jpeg", "quality": 90, "everyNthFrame": 1})
         art = json.loads(

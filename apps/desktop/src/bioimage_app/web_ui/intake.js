@@ -69,7 +69,7 @@ window.intakeWorkspace = (() => {
 
   function reset() {
     if(root.contains(resultStage))resultParent.append(resultStage);
-    previewRequested='';
+    previewRequested='';measurePositions.clear();measureContext='';
     followed = '';browsing = false;composing = false;progress.hidden = true;
     window.intakeGroups.reset();window.intakeQuant.reset();window.intakeGrid.reset();
     discoveryKey = ''; discoveryDirty = false; discoveryChoices.clear();
@@ -410,7 +410,7 @@ window.intakeWorkspace = (() => {
   }
   function followBatch() {
     const a=state.intake?.automation;
-    if(!a?.follow||!a.key||browsing||!batchPolicy()||hasDraft()||composing||drag||drawing||!$('#drawer').hidden||document.querySelector('dialog[open]')||document.activeElement?.matches('input,textarea,select,[contenteditable=true]'))return;
+    if((window.platformHome&&!platformHome.inProject())||!a?.follow||!a.key||browsing||!batchPolicy()||hasDraft()||composing||drag||drawing||!$('#drawer').hidden||document.querySelector('dialog[open]')||document.activeElement?.matches('input,textarea,select,[contenteditable=true]'))return;
     const event=JSON.stringify([key,a.key,a.phase,a.targetId,a.paused,a.complete]);
     if(event===followed)return;
     const next=a.complete?'results':a.phase==='crop'?'review':a.phase==='compose'?'layout':a.phase==='measure'?'quant':null;
@@ -431,7 +431,8 @@ window.intakeWorkspace = (() => {
   document.addEventListener('compositionstart',()=>{composing=true;});
   document.addEventListener('compositionend',()=>{composing=false;});
   document.addEventListener('focusout',()=>{queueMicrotask(followBatch);});
-  let measureZoom=1,measureFigure=null,measurementMarkup='';
+  let measureZoom=1,measureFigure=null,measurementMarkup='',measureContext='';
+  const measurePositions=new Map();
   function fitMeasurement(){
     const viewport=$('.intake-measure-viewport'),raster=$('.intake-measure-raster');
     if(!viewport||!raster)return;
@@ -469,7 +470,11 @@ window.intakeWorkspace = (() => {
     const markup=window.intakeViews.measurement({intake:state.intake,selected,current,members,outlines,cells:state.cells,busy:state.busy,selectedRowId:row()?.id,quant:state.quant});
     if(markup!==measurementMarkup||!$('.intake-measure-workspace',root)){
       const scrollSelectors=['.intake-measure-main','.intake-figure-list','.intake-measure-inspector','.intake-figure-curves-scroll','.intake-measure-viewport'];
-      const offsets=scrollSelectors.map(selector=>{const node=$(selector,root);return {selector,x:node?.scrollLeft||0,y:node?.scrollTop||0};});
+      const nextContext=[key,selected?.figure_id].join(':');
+      const currentOffsets=scrollSelectors.map(selector=>{const node=$(selector,root);return {selector,x:node?.scrollLeft||0,y:node?.scrollTop||0};});
+      if(measureContext&&$('.intake-measure-workspace',root))measurePositions.set(measureContext,currentOffsets);
+      const offsets=nextContext===measureContext?currentOffsets:measurePositions.get(nextContext)||[];
+      measureContext=nextContext;
       const focused=root.contains(document.activeElement)?document.activeElement:null;
       const attributes=['data-intake-measure-select','data-intake-measure-protein','data-intake-measure-zoom','data-intake-measure-figure','data-intake-preview-retry','data-intake-crop-action','data-id','data-iq-field','data-iq-row','data-iq-lane','data-iq-action'];
       const selector=focused?attributes.filter(name=>focused.hasAttribute(name)).map(name=>`[${name}="${CSS.escape(focused.getAttribute(name))}"]`).join(''):'';
@@ -482,6 +487,7 @@ window.intakeWorkspace = (() => {
     if(!$('#drawer').hidden&&$('#drawer').dataset.intakeView==='measurement')updateMarkup($('#drawer-content'),$('.intake-measure-inspector').innerHTML);
     if(measureFigure!==selected?.figure_id){measureZoom=1;measureFigure=selected?.figure_id;}
     requestAnimationFrame(fitMeasurement);
+    window.intakeQuant.afterRender();
 
   }
   root.addEventListener('change',event=>{

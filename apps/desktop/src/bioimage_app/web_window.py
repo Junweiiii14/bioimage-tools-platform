@@ -85,13 +85,13 @@ class WebWorkbenchWindow(QMainWindow):
             "wb-supervision-test",
             "wb-ui-system-test",
         }
-        self.setWindowTitle("BioImage WB · 候选版" if candidate else "BioImage · WB 工作台")
+        self.setWindowTitle("BioImage WB · 候选版" if candidate else "BioImage · 工具平台")
         if channel == "wb-reliable-crop-test":
             self.setWindowTitle("BioImage WB · 可靠裁图与界面测试版 T073")
         if channel == "wb-supervision-test":
             self.setWindowTitle("BioImage WB · 曲线与整版拼图测试版 T074")
         if channel == "wb-ui-system-test":
-            self.setWindowTitle("BioImage WB · 界面系统测试版 T075")
+            self.setWindowTitle("BioImage · 工具平台与 WB 界面测试版 T076")
         self.setWindowIcon(QIcon(str(Path(__file__).with_name("web_ui") / "bioimage.svg")))
         self.resize(1440, 940)
         settings_name = {

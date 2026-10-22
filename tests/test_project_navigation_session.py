@@ -78,6 +78,58 @@ def test_manual_import_routes_to_quant_and_records_only_real_project(
     assert original.read_bytes() == before
 
 
+def test_platform_browsing_keeps_owned_host_and_recent_switch_keeps_draft_guard(
+    session_window: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
+) -> None:
+    window = session_window
+    qtbot.waitUntil(
+        lambda: js(window, qtbot, "!!window.platformHome && !!window.desktopSession") is True
+    )
+    assert js(window, qtbot, "platformHome.current()") == "platform"
+    start(window, qtbot, source_at(tmp_path / "platform.tif"))
+    qtbot.waitUntil(lambda: js(window, qtbot, "mode") == "quant", timeout=10000)
+    owned_host, workspace = window.host, window.host.workspace_path
+    assert js(window, qtbot, "platformHome.show('platform');true") is True
+    window.bridge.publish()
+    window.bridge.session("refresh", "{}")
+    qtbot.wait(150)
+    assert js(window, qtbot, "platformHome.current()") == "platform"
+    assert window.host is owned_host and window.host.workspace_path == workspace
+    assert js(window, qtbot, "document.querySelector('.installed-tool').click();true") is True
+    assert js(window, qtbot, "platformHome.current()") == "wb"
+    assert js(window, qtbot, "platformHome.show('project');true") is True
+    assert js(window, qtbot, "mode") == "quant"
+    # The new recent-project surface delegates to the original host command; it
+    # cannot silently replace a session with an unapplied curve/ROI draft.
+    assert (
+        js(
+            window,
+            qtbot,
+            "manualQuant.active=true;manualQuant.current().n=row().lanes+1;"
+            "platformHome.show('platform');true",
+        )
+        is True
+    )
+    assert js(window, qtbot, "desktopSession.hasDraft()") is True
+    js(
+        window,
+        qtbot,
+        "document.querySelector('#platform-recents [data-session=recent]').click();true",
+    )
+    qtbot.waitUntil(lambda: window.shutdown_stage == "confirm_draft")
+    assert window.host is owned_host and window.host.workspace_path == workspace
+    window.bridge.session("reply", '{"choice":"return"}')
+    qtbot.waitUntil(lambda: window.shutdown_stage == "idle")
+    js(window, qtbot, "manualQuant.active=false;manualQuant.draft=null;true")
+    assert js(window, qtbot, "desktopSession.hasDraft()") is False
+    window.bridge.session(
+        "position",
+        json.dumps(
+            {"projectId": window.host.view.project().project_id, "mode": "quant", "draft": False}
+        ),
+    )
+
+
 def test_same_window_switch_saves_then_restores_mode_and_source(
     session_window: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
 ) -> None:

@@ -1,0 +1,41 @@
+/* The installed-tool catalogue belongs to the shell; tool actions stay in WB. */
+.platform-view{flex:1;min-height:0;overflow:auto;padding:48px max(var(--space-page),calc((100vw - 1232px)/2));background:var(--ground)}
+.platform-intro{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:40px}
+.platform-intro h1{font-size:32px;line-height:1.4;font-weight:600;letter-spacing:-.025em;margin:0 0 10px}
+.platform-intro p{font-size:14px;color:var(--muted);margin:0}
+.platform-layout{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(280px,1fr);gap:40px;align-items:start}
+.platform-section-title{display:flex;align-items:baseline;gap:10px;margin-bottom:16px}
+.platform-section-title h2{font-size:15px;font-weight:550;margin:0}.platform-section-title span{font-size:12px;color:var(--muted)}
+.installed-tool{display:flex;flex-direction:column;align-items:stretch;text-align:left;width:100%;min-height:350px;border:0;border-radius:16px;padding:32px;background:var(--rail);color:var(--shell-ink);cursor:pointer;overflow:hidden;position:relative}
+.tool-top{display:flex;align-items:center;justify-content:space-between;gap:16px}.tool-symbol{display:grid;place-items:center;width:64px;height:64px;border-radius:16px;background:var(--primary);color:var(--primary-ink);font-size:22px;font-weight:650;letter-spacing:-.025em}
+.tool-installed{font-size:12px;color:var(--shell-muted);display:flex;gap:6px;align-items:center}.tool-installed svg{width:15px;height:15px}
+.tool-description{margin-top:36px;display:block}.tool-description strong{display:block;font-size:26px;font-weight:550;letter-spacing:-.025em}.tool-description>span{display:block;margin-top:10px;font-size:14px;color:var(--shell-muted)}
+.tool-bottom{display:flex;justify-content:space-between;align-items:center;gap:24px;margin-top:auto;padding-top:38px}.tool-launch{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:550;color:var(--primary);white-space:nowrap}.tool-launch svg{width:20px;height:20px;transition:transform var(--normal) var(--ease)}
+.tool-mark{display:flex;gap:5px;align-items:center;color:var(--shell-muted);opacity:.8;transform:translate(var(--pointer-x,0px),var(--pointer-y,0px));transition:transform var(--normal) var(--ease);pointer-events:none}
+.tool-mark span{width:32px;height:5px;background:currentColor;border-radius:2px;transform:rotate(-25deg);transition:height var(--normal) var(--ease)}
+.installed-tool:hover .tool-launch svg,.installed-tool:focus-visible .tool-launch svg{transform:translateX(3px)}
+.installed-tool:hover .tool-mark span:nth-child(even),.installed-tool:focus-visible .tool-mark span:nth-child(even){height:12px}
+.installed-tool:focus-visible{outline-offset:5px}.installed-tool:active .tool-symbol{filter:brightness(.94)}
+.platform-recents .session-recent{padding:20px 4px;gap:12px;align-items:flex-start}.platform-recents .session-recent>span{display:none}.platform-recents .session-recent strong{display:block;overflow-wrap:anywhere;line-height:1.6}.platform-recents .session-recent p{line-height:1.7;margin-bottom:0}
+.platform-recents .session-recent>i{flex-shrink:0;width:18px;margin-top:3px}.platform-recents .session-recent>i:last-child{width:16px}.platform-recents .session-recent-wrap{gap:0;grid-template-columns:minmax(0,1fr) 32px}.platform-recents .quick-info-button{width:32px}
+.platform-empty{padding:36px 0;color:var(--muted);display:grid;gap:12px;justify-items:start}.platform-empty>i{width:28px;height:28px}.platform-empty p{font-size:13px;line-height:1.8;margin:0}
+.platform-resume{margin-top:20px;display:flex;gap:16px;align-items:center;padding:18px 0;border-bottom:1px solid var(--line)}.platform-resume>div{min-width:0;flex:1}.platform-resume small{font-size:12px;color:var(--muted)}.platform-resume strong{display:block;font-size:14px;font-weight:550;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.platform-resume>.text-button{flex-shrink:0}
+.platform-foot{margin-top:36px;display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}.platform-foot svg{width:16px;height:16px}
+.wb-home-title{display:flex;align-items:center;gap:18px}.wb-home-title .tool-symbol{width:48px;height:48px;font-size:18px;border-radius:12px}.home-intro .wb-home-title h1{font-size:28px;margin:0 0 5px}.home-intro .wb-home-title p{margin:0}
+body:not([data-surface="project"]) #intake-new-figure{display:none!important}
+body[data-surface="platform"] .breadcrumb{display:flex}body[data-surface="platform"] #platform-open{display:flex}
+.intake-measure-main{overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;scroll-padding-top:88px;padding-bottom:24px!important}
+.intake-measure-main>.canvas-heading{position:sticky;top:-16px;z-index:4;background:var(--ground);padding-top:16px!important;margin-top:-16px;box-sizing:content-box}
+.intake-figure-curves-scroll{overflow:auto;overscroll-behavior-x:contain;padding-bottom:8px;scroll-padding-left:96px;scrollbar-gutter:stable;outline-offset:-2px}
+.intake-figure-curves{width:max-content;min-width:100%}.intake-figure-curves>:is(.intake-curve-protein,.intake-curve-corner){position:sticky;left:0;z-index:2;background:var(--paper);padding:8px 6px;overflow-wrap:anywhere;box-shadow:6px 0 8px -8px var(--ink)}
+.intake-figure-curves>.intake-curve-protein.matrix-hover{background:var(--accent-light)}
+.intake-profile-panel{margin-bottom:8px}.intake-profile-panel>header{gap:12px;flex-wrap:wrap}.intake-figure-editor{scroll-margin-top:96px}.intake-quant-lane .quant-chart{touch-action:none}
+.intake-figure-editor>header{position:sticky;top:72px;z-index:3;background:var(--paper);padding-block:8px;flex-wrap:wrap}
+.intake-preview-toggle{align-self:flex-start;flex-shrink:0;margin:0 0 8px;gap:8px;display:flex}.intake-preview-toggle svg{width:16px;height:16px}
+.intake-measure-main.preview-collapsed .intake-measure-image{display:none}.intake-measure-main.preview-collapsed .intake-profile-panel{margin-top:0}
+@media(max-width:1100px){.platform-layout{gap:28px;grid-template-columns:minmax(0,1.5fr) minmax(260px,1fr)}.installed-tool{padding:28px}.platform-view{padding-top:32px}.platform-intro{margin-bottom:28px}}
+@media(max-width:800px){.platform-layout{grid-template-columns:1fr;gap:32px}.platform-view{padding:28px 24px}.platform-intro h1{font-size:26px}.installed-tool{min-height:300px}.tool-description{margin-top:26px}.platform-recents .session-recent{padding:16px 4px}.platform-intro{margin-bottom:28px}.project-header{gap:12px!important}.project-header .breadcrumb{padding-left:12px}.project-header .intake-brand{font-size:16px}.project-header #platform-open{padding-inline:12px}.header-actions{gap:8px}.intake-measure-main{padding-inline:16px}}
+@media(prefers-reduced-motion:reduce){.tool-mark,.tool-launch svg{transform:none!important}.tool-mark span{transition:none}}
+:root[data-motion="reduced"] .tool-mark,:root[data-motion="reduced"] .tool-launch svg{transform:none!important}
+.project-header .breadcrumb{display:flex}.project-header .breadcrumb>i:not([hidden]){display:block}
+@media(max-width:800px){.project-header .intake-brand>span{display:none}.project-header .breadcrumb{gap:8px}.project-header .breadcrumb strong{max-width:22vw}.header-actions>.save-status{display:none}}

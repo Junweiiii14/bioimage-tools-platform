@@ -3,7 +3,6 @@
 // Navigation and lifecycle messages never contain scientific results or file contents.
 const desktopSession = (() => {
   let recentKey='', channel=null, session={}, token=null, lastPosition='', timer=null, locked=false,epoch=0;
-  let homeFocus=null,homeScroll=0;
   const modal=()=>document.querySelector('#session-dialog');
   const button=(choice,label,primary=false)=>`<button class="button ${primary?'primary':'subtle'}" data-session-reply="${choice}">${label}</button>`;
   function hasDraft(){
@@ -32,7 +31,7 @@ const desktopSession = (() => {
     if(r.mode==='home'){
       token=r.token;lastPosition='';window.intakeWorkspace?.reset();window.advancedWorkspace?.reset();manualQuant.active=false;manualQuant.pendingImport=false;manualQuant.draft=null;manualLanes.key=null;
       state={projectName:'新建实验项目',rows:[],cells:[],selectedId:null,busy:false,status:'就绪',outputPath:'',montage:null,quant:null,projectId:'',intake:null};
-      completedKey=null;mode='review';$('#home-view').hidden=false;$('#work-view').hidden=true;render();$('#home-view').scrollTop=homeScroll;if(homeFocus?.isConnected)homeFocus.focus({preventScroll:true});window.uiMotion.enter($('#home-view'));return;
+      completedKey=null;mode='review';window.platformHome.closed();render();return;
     }
     if((!state.rows.length&&!state.intake)||state.busy||r.projectId!==state.projectId)return;
     token=r.token;lastPosition='';manualQuant.pendingImport=false;
@@ -49,17 +48,18 @@ const desktopSession = (() => {
     $('#project-name').textContent=active?state.projectName:'项目首页';
     $$('.header-actions>[data-action]').forEach(el=>el.hidden=el.dataset.action==='settings'?false:!active||!!state.intake);
     $('#save-status').textContent=session.saveState||'就绪';
+    window.platformHome.sync();
   }
   function renderSession(){
     renderChrome();
     $('#session-project-parent').textContent='新项目保存到：'+(session.projectParent||'文档 / BioImage / Projects');
     const recents=session.recents||[];
     const nextRecentKey=JSON.stringify(recents);if(nextRecentKey!==recentKey){recentKey=nextRecentKey;$('#session-recents').innerHTML=recents.length?recents.map((p,i)=>`<div class="session-recent-wrap"><button class="session-recent" data-preview-info="${escapeText((p.name||'WB 项目')+' · '+p.path)}" data-session="recent" data-index="${i}"><i data-icon="folder"></i><div><strong>${escapeText(p.name||'WB 项目')}</strong><p>上次停留：${({intake:'导入与分配',quant:'灰度定量',results:'结果',layout:'拼图排版',review:'原图裁剪'})[p.mode]||'灰度定量'}${p.figure?' · '+escapeText(p.figure):''}</p></div><span>继续工作</span><i data-icon="arrow"></i></button><button class="icon-button quick-info-button" data-quick-info="${escapeText((p.name||'WB 项目')+' · '+p.path)}" aria-label="查看项目详情"><i data-icon="file"></i></button></div>`).join(''):'<p class="session-hint">打开或创建项目后，会在这里显示。</p>';
-    icons($('#session-recents'));}
+    $('#platform-recents').innerHTML=recents.length?$('#session-recents').innerHTML:'<div class="platform-empty"><i data-icon="folder"></i><p>从工具创建项目，<br>或打开已有项目继续。</p><button class="text-button" data-session="open">打开项目<i data-icon="arrow"></i></button></div>';
+    icons($('#session-recents'));icons($('#platform-recents'));}
     const stage=session.stage||'idle';locked=['confirm_busy','confirm_dirty','confirm_draft','cancel','shutdown'].includes(stage);
     if(stage==='idle'||stage==='opening'){
       if(modal().open)modal().close();
-      if(stage==='opening'&&(state.rows.length||state.intake)){$('#home-view').hidden=true;$('#work-view').hidden=false;}
       if(channel)$('#save-status').textContent=session.saveState||'就绪';return;
     }
     const exiting=session.intent==='exit';let title='',actions='';
@@ -79,11 +79,9 @@ const desktopSession = (() => {
   document.addEventListener('click',event=>{
     const reply=event.target.closest('[data-session-reply]');if(reply){send('reply',{choice:reply.dataset.sessionReply});return;}
     let el=event.target.closest('[data-session]');
-    if(!el&&event.target.closest('[data-action=home]'))el=event.target.closest('[data-action=home]');
     if(!el||!channel)return;
     event.preventDefault();event.stopImmediatePropagation();position();$('#session-menu').open=false;
     const action=el.dataset.session||'home';
-    if(!$('#home-view').hidden){homeFocus=el;homeScroll=$('#home-view').scrollTop;}
     if(window.workbenchActions&&['save','open'].includes(action)){window.workbenchActions.invoke(`project.${action}`,{button:el});return;}
     const workflow=document.querySelector('[name=session-workflow]:checked')?.value||'quant';
     if(action==='images'){manualQuant.pendingImport=workflow==='quant';bridge.request(workflow==='quant'?'quant_import':'import','{}');}

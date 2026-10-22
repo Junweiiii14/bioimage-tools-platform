@@ -5,7 +5,6 @@
 .intake-brand { display: flex; align-items: center; gap: 9px; font-size: 17px; font-weight: 650; }
 .intake-brand svg { width: 25px; height: 25px; color: var(--accent); }
 .intake-project .breadcrumb { flex: 1; border-left: 1px solid var(--line); padding-left: 18px; }
-.intake-project .breadcrumb > :not(strong),
 .intake-project .header-actions > [data-action="import"],
 .intake-project .header-actions > [data-action="export"] { display: none; }
 .intake-project .breadcrumb strong { max-width: 36vw; font-size: 13px; }
