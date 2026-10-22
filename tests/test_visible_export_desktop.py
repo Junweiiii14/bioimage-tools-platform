@@ -168,6 +168,15 @@ def test_real_unreviewed_result_matches_both_exports(
             window.bridge.snapshot().get("error"),
         )
         assert "已导出" in window.host.view.status.text()
+        automatic_table = Path(project.intake_outputs[-1].destination) / ("measurements." + suffix)
+        if suffix == "csv":
+            assert destination.read_bytes() == automatic_table.read_bytes()
+        else:
+            # The separately saved export has a newer audit revision and ZIP timestamp.
+            # Its visible worksheet and formatting must be identical to automatic output.
+            with ZipFile(destination) as direct, ZipFile(automatic_table) as automatic:
+                for member in ("xl/worksheets/sheet1.xml", "xl/styles.xml"):
+                    assert direct.read(member) == automatic.read(member)
         qtbot.waitUntil(
             lambda: (
                 javascript(window, qtbot, "!state.busy&&state.cells.some(c=>c.rawIntegral!=null)")

@@ -466,7 +466,9 @@ def test_complete_output_requires_verified_runs_and_reexports_without_overwritin
     prepared = export_intake_outputs(active, paths, str(destination), runs=runs, ticket=ticket)
     assert prepared.complete is True and prepared.errors == ()
     rows = list(
-        csv.DictReader(StringIO((destination / "measurements.csv").read_text(encoding="utf-8-sig")))
+        csv.DictReader(
+            StringIO((destination / "measurement-audit.csv").read_text(encoding="utf-8-sig"))
+        )
     )
     assert len(rows) == 9
     assert len({row["稳定槽位 ID"] for row in rows}) == 9

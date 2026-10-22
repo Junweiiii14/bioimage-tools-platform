@@ -21,3 +21,5 @@
 Qt6.12 API核验（2026-10-23）：[QWebEngineView](https://doc.qt.io/qtforpython-6/PySide6/QtWebEngineWidgets/QWebEngineView.html)、[QDropEvent](https://doc.qt.io/qtforpython-6/PySide6/QtGui/QDropEvent.html)。本机 WebEngine/Qt URL事件及焦点子控件、真实后台存储/worker和文件验证见 T077；合成事件不等于物理 Explorer 鼠标或干净机/DPI验收。
 
 CSV显示舍入与页面Intl.NumberFormat的halfExpand一致（十进制中点远离零），保留负近零显示；XLSX保留raw double不预舍入。依据：[ECMA-402 NumberFormat](https://tc39.es/ecma402/#sec-torawfixed)，2026-10-23访问；显示舍入不进入定量。
+
+自动结果目录的measurements.csv/xlsx同样使用intake_visible_table@1；measurement-audit.csv/xlsx保留旧完整审计布局。index.json保留intake_output@1外层并新增table_policy，缺此字段的历史目录沿旧布局解释。project.zip内部旧source表及恢复校验不变，不迁移或重写历史目录。

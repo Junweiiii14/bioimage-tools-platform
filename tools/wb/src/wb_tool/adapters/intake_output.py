@@ -132,6 +132,7 @@ def export_intake_outputs(
     from wb_tool.adapters.figure_export import export_figure_bundle
     from wb_tool.adapters.figure_image_export import publish_rendered_image
     from wb_tool.adapters.intake_figure import load_intake_figure_render
+    from wb_tool.adapters.intake_table_export import intake_table_bytes
     from wb_tool.adapters.laboratory_figure import render_display_segment
     from wb_tool.adapters.project_evidence import verify_project_evidence
     from wb_tool.adapters.project_export import project_csv_bytes, project_xlsx_bytes
@@ -205,13 +206,13 @@ def export_intake_outputs(
             for record in verified.records
             if record["verification"] == "unavailable"
         )
-        for suffix, data in (
-            (".csv", project_csv_bytes(project, verified.results)),
-            (".xlsx", project_xlsx_bytes(project, verified.results)),
+        for name, suffix, data in (
+            ("measurements", ".csv", intake_table_bytes(project, verified.results, csv=True)),
+            ("measurements", ".xlsx", intake_table_bytes(project, verified.results)),
+            ("measurement-audit", ".csv", project_csv_bytes(project, verified.results)),
+            ("measurement-audit", ".xlsx", project_xlsx_bytes(project, verified.results)),
         ):
-            path = publish_table_bytes(
-                data, stage / ("measurements" + suffix), suffix, cancelled=cancelled
-            )
+            path = publish_table_bytes(data, stage / (name + suffix), suffix, cancelled=cancelled)
             if path.read_bytes() != data:
                 raise ValueError("结果表写后核验失败")
         crops = {item.row_id: item for item in project.intake_crops}
@@ -360,7 +361,9 @@ def export_intake_outputs(
             json.dumps(status, ensure_ascii=False, allow_nan=False), encoding="utf-8"
         )
         (stage / "README.txt").write_text(
-            "仪器清单结果快照\nCSV/XLSX按稳定Fig/蛋白行/槽位身份填表；空值不是零。\n"
+            "仪器清单结果快照\nmeasurements.csv/xlsx为结果页可见宽表（intake_visible_table@1）。\n"
+            "measurement-audit.csv/xlsx保留完整有效信号、原始积分、状态及来源审计。\n"
+            "CSV文字沿用text:前缀；去掉恰好一个前缀可还原文字。缺项不是零。\n"
             "assets保留原资产字节；显示PNG/TIFF不作为定量输入。\n"
             "完整恢复使用project.zip；如该文件缺失，请查看status.json，不代表完整输出成功。\n"
             "运行、科学质量与实验对应分别核对；未自动推断归一化。\n",
@@ -381,6 +384,7 @@ def export_intake_outputs(
                 )
         index = {
             "policy": "intake_output@1",
+            "table_policy": "intake_visible_table@1",
             "output_id": output_id,
             "project_id": project.project_id,
             "revision": project.revision,

@@ -1,3 +1,5 @@
+T077新增：新输出目录index.table_policy=intake_visible_table@1；measurements.csv/xlsx与结果页共用可见原始积分宽表，旧完整审计另存measurement-audit.csv/xlsx。旧无table_policy目录、project.zip内部表及恢复字节核验保持。详见[可见表v1](wb-visible-result-table-v1.md)。
+
 # 仪器清单身份填表与输出 v1
 
 E5/T058：schema14/intake_output@1/intake_table@1。旧schema1–13继续读取，旧表格列与

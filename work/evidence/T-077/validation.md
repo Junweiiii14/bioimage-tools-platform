@@ -27,3 +27,8 @@
 - rules-context首轮FAILURE：默认回执base=origin/main，而PR38实际base是T076 6b6afd5；按支持的--base参数重新加载全部适用规则与任务并生成回执，未手改回执、规则或成功状态。最终检查待CI。
 - Ruff/格式/Pyright、policy、Start-BioImage.ps1 --verify-launch、smoke-env均exit0。smoke-env仅环境，不外推安装验收。
 - 全合成安全素材已独立复制 .local/deliveries/WB-T077-safe-demo，106文件/5,425,611字节逐项SHA一致，原图shape300×700 uint16且像素集合为本测试生成值。尚无视频聊天，须等最终独审与CI。
+
+## 最终收口
+
+- ddc6290：20项/13.87s/0，独立20项/11.78s/0；5张有效截图，新增hover修复原浅底浅字问题，保持深底+outline。一次19过1失败定位为页面快照就绪条件不足，现等真实10个raw值入页面后保留原内容断言。
+- 自动结果目录也统一可见measurements.csv/xlsx；旧完整审计单列measurement-audit.csv/xlsx并写index.table_policy=intake_visible_table@1，ZIP内部旧表不动。既有9槽/数值/来源审计断言原样保留，仅改读取的新审计文件名；属于授权导出布局变更，非弱化答案。端到端比较自动与直接主表CSV字节、XLSX主表XML和styles，审计修订与容器时间戳可不同。初次整XLSX字节比较21过1败/11.39s/1，不是稳定容器不变量，已按实际主表/格式边界修正。
