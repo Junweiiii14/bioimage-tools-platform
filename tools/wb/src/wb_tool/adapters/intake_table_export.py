@@ -1,6 +1,7 @@
 """Export the visible wide table without changing archive table v1 semantics."""
 
 from collections.abc import Callable
+from decimal import ROUND_HALF_UP, Decimal, localcontext
 from io import BytesIO
 from pathlib import Path
 from xml.etree import ElementTree as ET
@@ -12,6 +13,16 @@ from wb_tool.adapters.worksheet_export import NS, publish_table_bytes, two_sheet
 from wb_tool.application.intake_output import WBIntakeOutputProject, fill_intake_table
 from wb_tool.application.intake_result_table import intake_visible_table
 from wb_tool.application.project_analysis import LoadedProjectResult
+
+
+def _display_number(value: float) -> str:
+    # Intl.NumberFormat's default halfExpand rounds decimal ties away from zero.
+    # Python .2f instead rounds the binary float with ties-to-even.
+    number = Decimal(str(value))
+    with localcontext() as context:
+        context.prec = max(32, number.adjusted() + 4)
+        rounded = number.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    return format(rounded, ",f").rstrip("0").rstrip(".")
 
 
 def intake_table_bytes(
@@ -27,7 +38,7 @@ def intake_table_bytes(
             tuple(
                 "—"
                 if v is None
-                else (f"{v:,.2f}".rstrip("0").rstrip(".") + ("*" if (ri, ci) in marks else ""))
+                else (_display_number(v) + ("*" if (ri, ci) in marks else ""))
                 if isinstance(v, float)
                 else v
                 for ci, v in enumerate(row)

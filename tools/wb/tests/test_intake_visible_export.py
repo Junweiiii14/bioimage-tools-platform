@@ -8,13 +8,34 @@ from xml.etree import ElementTree as ET
 from zipfile import ZipFile
 
 import pytest
-from wb_tool.adapters.intake_table_export import export_intake_table, intake_table_bytes
+from wb_tool.adapters.intake_table_export import (
+    _display_number,
+    export_intake_table,
+    intake_table_bytes,
+)
 from wb_tool.adapters.project_evidence import verify_project_evidence
 from wb_tool.adapters.project_export import project_table_rows
 from wb_tool.adapters.worksheet_export import NS
 from wb_tool.api import fill_intake_table, intake_visible_table
 
 from tools.wb.tests.test_intake_output import full_files
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        (1.005, "1.01"),
+        (2.675, "2.68"),
+        (1.125, "1.13"),
+        (-1.005, "-1.01"),
+        (-0.004, "-0"),
+        (123456.125, "123,456.13"),
+        (400.0, "400"),
+        (0.0, "0"),
+    ],
+)
+def test_csv_rounding_matches_intl_half_expand(value: float, expected: str) -> None:
+    assert _display_number(value) == expected
 
 
 def test_unreviewed_raw_values_order_quality_and_missing_survive_export(tmp_path: Path) -> None:
