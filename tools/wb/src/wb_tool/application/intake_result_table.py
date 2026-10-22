@@ -19,15 +19,18 @@ def intake_visible_table(
     count = max((f.lane_count for f in project.intake.figures), default=0)
     figures = {f.figure_id: f for f in project.intake.figures}
     by_position = {(c.row_id, c.lane_index): c for c in cells}
+    counts: dict[str, tuple[int, int]] = {}
+    for cell in cells:
+        present, warnings = counts.get(cell.row_id, (0, 0))
+        counts[cell.row_id] = present + 1, warnings + (cell.status != "valid")
     rows: list[tuple[str | float | None, ...]] = []
     quality: list[tuple[int, int]] = []
     for ri, protein in enumerate(project.intake.proteins):
         figure = figures[protein.figure_id]
-        values = [c for c in cells if c.row_id == protein.protein_id]
-        warnings = sum(c.status != "valid" for c in values)
+        present, warnings = counts.get(protein.protein_id, (0, 0))
         status = (
             "已完成"
-            if len(values) == figure.lane_count and not warnings
+            if present == figure.lane_count and not warnings
             else f"{warnings} 项需查看"
             if warnings
             else "待计算"

@@ -45,9 +45,10 @@ window.intakeViews = (() => {
   function results({intake, cells, busy}) {
     if(intake.visibleTable){
       const table=intake.visibleTable,marks=new Set(table.quality.map(([r,c])=>`${r}:${c}`));
+      const positions=new Map(cells.map(c=>[`${c.rowId}:${c.lane}`,c]));
       const body=table.rows.map((row,r)=>`<tr>${row.map((v,c)=>{
         const numeric=c>=2&&c<row.length-1;
-        const source=numeric?cells.find(cell=>cell.rowId===intake.proteins[r].protein_id&&cell.lane===c-1):null;
+        const source=numeric?positions.get(`${intake.proteins[r].protein_id}:${c-1}`):null;
         const title=numeric?(source?resultLabel(source.status)+(source.reason?'：'+source.reason:''):'没有已提交结果'):'';
         const content=c===1?`<button class="text-button" data-intake-crop-action="source" data-id="${escapeText(intake.proteins[r].protein_id)}" ${busy?'disabled':''}>${escapeText(v)}</button>`:numeric?number(v):c===row.length-1?`<span class="result-state">${escapeText(v)}</span>`:escapeText(v);
         return `<td class="${numeric?'intake-number':''}" title="${escapeText(title)}">${content}${marks.has(`${r}:${c}`)?'<sup>*</sup>':''}</td>`;
