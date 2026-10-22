@@ -168,19 +168,28 @@ def test_real_unreviewed_result_matches_both_exports(
         if suffix == "xlsx":
             with ZipFile(destination) as book:
                 sheet = ET.fromstring(book.read("xl/worksheets/sheet1.xml"))
+                styles = ET.fromstring(book.read("xl/styles.xml"))
+                formats = {
+                    item.get("numFmtId"): item.get("formatCode", "")
+                    for item in styles.findall(f"{NS}numFmts/{NS}numFmt")
+                }
+                cell_styles = styles.findall(f"{NS}cellXfs/{NS}xf")
                 exported: list[list[str]] = []
                 for row in sheet.findall(f"{NS}sheetData/{NS}row"):
                     values: list[str] = []
                     for cell in row:
                         v = cell.findtext(f"{NS}v")
-                        values.append(
-                            (
-                                f"{float(v):,.2f}".rstrip("0").rstrip(".")
-                                + ("*" if cell.get("s") == "3" else "")
+                        if v is not None:
+                            code = formats[cell_styles[int(cell.get("s", "0"))].get("numFmtId")]
+                            assert "#" not in code.split(".")[-1] if "." in code else True
+                            digits = (
+                                len(code.removesuffix('"*"').split(".")[1]) if "." in code else 0
                             )
-                            if v is not None
-                            else cell.findtext(f"{NS}is/{NS}t", "")
-                        )
+                            values.append(
+                                format(float(v), f",.{digits}f") + ("*" if '"*"' in code else "")
+                            )
+                        else:
+                            values.append(cell.findtext(f"{NS}is/{NS}t", ""))
                     exported.append(values)
                 assert exported == visible
                 assert b'numFmtId="165"' in book.read("xl/styles.xml")

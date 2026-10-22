@@ -19,3 +19,11 @@
 ## 范围限制
 
 现有971d860安装目录未重建；运行修正版用本活动树Start-BioImage.ps1及锁定环境。未合并main/发布。干净Win10、物理Explorer鼠标/DPI、科学留出和历史native UNKNOWN保留。CSV沿用文字前缀协议，不虚称支持工作簿样式。
+
+## 扩展回归与独审修正
+
+- 95项扩展最终：.local/T077-targeted-final.xml/log，95 passed /97.01s /exit0；覆盖既有平台、导入、WebUI及输出/归档兼容。随后仅两处一次索引优化和显示格式修正，相关11项/8.18s/exit0复验；最终全门禁由PR38当前HEAD CI执行。
+- 独审已复现CSV中点与Intl不一致（1.005/2.675/1.125），4ca8f50改Decimal(str)+ROUND_HALF_UP，8边界+2适配器10项/2.28s/0。不改变raw值和定量。XLSX由有可选小数点的格式改成按每值可见位数明确0/1/2位，质量星号各有格式；端到端测试现读取实际numFmt选择解释格式后逐格比对，不再忽略工作簿格式。
+- rules-context首轮FAILURE：默认回执base=origin/main，而PR38实际base是T076 6b6afd5；按支持的--base参数重新加载全部适用规则与任务并生成回执，未手改回执、规则或成功状态。最终检查待CI。
+- Ruff/格式/Pyright、policy、Start-BioImage.ps1 --verify-launch、smoke-env均exit0。smoke-env仅环境，不外推安装验收。
+- 全合成安全素材已独立复制 .local/deliveries/WB-T077-safe-demo，106文件/5,425,611字节逐项SHA一致，原图shape300×700 uint16且像素集合为本测试生成值。尚无视频聊天，须等最终独审与CI。

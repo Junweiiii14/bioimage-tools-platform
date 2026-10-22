@@ -25,6 +25,48 @@ def _display_number(value: float) -> str:
     return format(rounded, ",f").rstrip("0").rstrip(".")
 
 
+def _xlsx_styles() -> bytes:
+    root = ET.Element("styleSheet", xmlns=NS)
+    formats = ET.SubElement(root, "numFmts", count="6")
+    for index in range(6):
+        digits = index % 3
+        code = "#,##0" + ("." + "0" * digits if digits else "")
+        if index >= 3:
+            code += '"*"'
+        ET.SubElement(formats, "numFmt", numFmtId=str(164 + index), formatCode=code)
+    fonts = ET.SubElement(root, "fonts", count="2")
+    for bold in (False, True):
+        font = ET.SubElement(fonts, "font")
+        if bold:
+            ET.SubElement(font, "b")
+        ET.SubElement(font, "sz", val="11")
+        ET.SubElement(font, "name", val="Calibri")
+    fills = ET.SubElement(root, "fills", count="3")
+    for pattern in ("none", "gray125", "solid"):
+        fill = ET.SubElement(fills, "fill")
+        definition = ET.SubElement(fill, "patternFill", patternType=pattern)
+        if pattern == "solid":
+            ET.SubElement(definition, "fgColor", rgb="FFE9EEE6")
+            ET.SubElement(definition, "bgColor", indexed="64")
+    ET.SubElement(ET.SubElement(root, "borders", count="1"), "border")
+    normal = {"numFmtId": "0", "fontId": "0", "fillId": "0", "borderId": "0"}
+    ET.SubElement(ET.SubElement(root, "cellStyleXfs", count="1"), "xf", normal)
+    styles = ET.SubElement(root, "cellXfs", count="8")
+    ET.SubElement(styles, "xf", normal)
+    ET.SubElement(
+        styles, "xf", normal | {"fontId": "1", "fillId": "2", "applyFont": "1", "applyFill": "1"}
+    )
+    for index in range(6):
+        style = ET.SubElement(
+            styles,
+            "xf",
+            normal
+            | {"numFmtId": str(164 + index), "applyNumberFormat": "1", "applyAlignment": "1"},
+        )
+        ET.SubElement(style, "alignment", horizontal="right")
+    return ET.tostring(root, encoding="utf-8", xml_declaration=True)
+
+
 def intake_table_bytes(
     project: WBIntakeOutputProject, results: tuple[LoadedProjectResult, ...], *, csv: bool = False
 ) -> bytes:
@@ -60,16 +102,13 @@ def intake_table_bytes(
                 root = ET.fromstring(data)
                 for ri, row in enumerate(root.findall(f"{{{NS}}}sheetData/{{{NS}}}row")):
                     for ci, cell in enumerate(row):
-                        cell.set(
-                            "s",
-                            "1"
-                            if ri == 0
-                            else "3"
-                            if (ri - 1, ci) in marks
-                            else "2"
-                            if cell.find(f"{{{NS}}}v") is not None
-                            else "0",
-                        )
+                        value = cell.findtext(f"{{{NS}}}v")
+                        style = 1 if ri == 0 else 0
+                        if ri and value is not None:
+                            shown = _display_number(float(value))
+                            digits = len(shown.split(".")[1]) if "." in shown else 0
+                            style = 2 + digits + (3 if (ri - 1, ci) in marks else 0)
+                        cell.set("s", str(style))
                 data = ET.tostring(root, encoding="utf-8", xml_declaration=True)
             elif name == "xl/_rels/workbook.xml.rels":
                 root = ET.fromstring(data)
@@ -91,56 +130,7 @@ def intake_table_bytes(
                 )
                 data = ET.tostring(root, encoding="utf-8", xml_declaration=True)
             target.writestr(name, data)
-        target.writestr(
-            "xl/styles.xml",
-            f'''<styleSheet xmlns="{NS}">
-<numFmts count="2">
-<numFmt numFmtId="164" formatCode='#,##0.##'/>
-<numFmt numFmtId="165" formatCode='#,##0.##&quot;*&quot;'/>
-</numFmts>
-<fonts count="2">
-<font>
-<sz val="11"/>
-<name val="Calibri"/>
-</font>
-<font>
-<b/>
-<sz val="11"/>
-<name val="Calibri"/>
-</font>
-</fonts>
-<fills count="3">
-<fill>
-<patternFill patternType="none"/>
-</fill>
-<fill>
-<patternFill patternType="gray125"/>
-</fill>
-<fill>
-<patternFill patternType="solid">
-<fgColor rgb="FFE9EEE6"/>
-<bgColor indexed="64"/>
-</patternFill>
-</fill>
-</fills>
-<borders count="1">
-<border/>
-</borders>
-<cellStyleXfs count="1">
-<xf numFmtId="0" fontId="0" fillId="0" borderId="0"/>
-</cellStyleXfs>
-<cellXfs count="4">
-<xf numFmtId="0" fontId="0" fillId="0" borderId="0"/>
-<xf numFmtId="0" fontId="1" fillId="2" borderId="0" applyFont="1" applyFill="1"/>
-<xf numFmtId="164" fontId="0" fillId="0" borderId="0" applyNumberFormat="1">
-<alignment horizontal="right"/>
-</xf>
-<xf numFmtId="165" fontId="0" fillId="0" borderId="0" applyNumberFormat="1">
-<alignment horizontal="right"/>
-</xf>
-</cellXfs>
-</styleSheet>''',
-        )
+        target.writestr("xl/styles.xml", _xlsx_styles())
     return output.getvalue()
 
 

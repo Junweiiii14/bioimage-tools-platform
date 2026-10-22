@@ -64,11 +64,13 @@ def test_unreviewed_raw_values_order_quality_and_missing_survive_export(tmp_path
                     assert cell.findtext(f"{{{NS}}}is/{{{NS}}}t") == "—"
                 else:
                     assert float(cell.findtext(f"{{{NS}}}v", "nan")) == value
-                    assert cell.get("s") == ("3" if (ri - 1, ci) in table.quality else "2")
+                    assert cell.get("s") == ("5" if (ri - 1, ci) in table.quality else "2")
         assert not sheet.findall(f".//{{{NS}}}f")
         styles = ET.fromstring(book.read("xl/styles.xml"))
         number_style = styles.find(f"{{{NS}}}numFmts/{{{NS}}}numFmt")
-        assert number_style is not None and number_style.get("formatCode") == "#,##0.##"
+        assert number_style is not None and number_style.get("formatCode") == "#,##0"
+        formats = [f.get("formatCode") for f in styles.findall(f"{{{NS}}}numFmts/{{{NS}}}numFmt")]
+        assert formats == ["#,##0", "#,##0.0", "#,##0.00", '#,##0"*"', '#,##0.0"*"', '#,##0.00"*"']
         assert book.read("xl/worksheets/sheet2.xml")
     csv_rows = list(
         csv.reader(StringIO(intake_table_bytes(project, results, csv=True).decode("utf-8-sig")))
