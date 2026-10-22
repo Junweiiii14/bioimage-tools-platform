@@ -100,13 +100,14 @@ window.intakeQuant = (() => {
   // The selected protein may arrive in a later snapshot. Reveal only the matching
   // editor, and never let a queued reveal move a different page or selection.
   function afterRender(){
-    const pending=pendingEditor,editor=document.querySelector('.intake-figure-editor');
-    if(!pending||!editor||pending.context!==context()||pending.row!==row()?.id||selected!==Number(pending.lane))return;
-    pendingEditor=null;
+    const pending=pendingEditor;
+    if(!pending||pending.context!==context()||pending.row!==row()?.id||selected!==Number(pending.lane))return;
     requestAnimationFrame(()=>{
-      if(matrixAnchor!==pending||!editor.isConnected||mode!=='quant'||!platformHome.inProject())return;
+      if(pendingEditor!==pending||matrixAnchor!==pending||pending.context!==context()||pending.row!==row()?.id||selected!==Number(pending.lane)||mode!=='quant'||!platformHome.inProject())return;
+      const editor=document.querySelector('.intake-figure-editor');
       const main=document.querySelector('.intake-measure-main'),heading=main?.querySelector('.canvas-heading');
-      if(!main)return;
+      if(!main||!editor)return;
+      pendingEditor=null;
       const bounds=main.getBoundingClientRect(),box=editor.getBoundingClientRect(),inset=(heading?.offsetHeight||60)+24;
       const top=box.top<bounds.top+inset||box.bottom>bounds.bottom?main.scrollTop+box.top-bounds.top-inset:main.scrollTop;
       main.scrollTo({top,behavior:uiMotion.preference()==='reduced'?'instant':'smooth'});

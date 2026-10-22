@@ -81,6 +81,45 @@ def large_matrix(window: WebWorkbenchWindow, qtbot: QtBot) -> None:
     )
 
 
+def test_matrix_editor_reveal_uses_current_dom_after_consecutive_snapshots(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    large_matrix(window, qtbot)
+    qtbot.waitUntil(
+        lambda: javascript(window, qtbot, "document.getAnimations().length===0") is True
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      document.documentElement.dataset.motion='reduced';
+      document.querySelector('[data-iq-action=toggle-preview]').click();
+      const main=document.querySelector('.intake-measure-main');
+      main.scrollTop=main.scrollHeight;
+      document.querySelector('.intake-figure-curves-scroll').scrollLeft=100000;
+      window.beforeReveal=main.scrollTop;
+      document.querySelector('[data-iq-row="p-9"][data-iq-lane="18"]').click();
+      setState({busy:true});setState({busy:false});true
+    """,
+    )
+    qtbot.waitUntil(
+        lambda: (
+            javascript(
+                window,
+                qtbot,
+                """(()=>{
+          const main=document.querySelector('.intake-measure-main');
+          const input=document.querySelector('.intake-figure-editor input');
+          if(!input)return false;const r=input.getBoundingClientRect();
+          return main.scrollTop>beforeReveal && r.bottom<=main.getBoundingClientRect().bottom &&
+            input.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));})()""",
+            )
+            is True
+        )
+    )
+
+
 @pytest.mark.parametrize("size,zoom", [((1440, 900), 1.0), ((960, 640), 1.0), ((1440, 960), 1.5)])
 def test_large_matrix_last_cell_editor_and_restored_position_are_reachable(
     intake_page: WebWorkbenchWindow, qtbot: QtBot, size: tuple[int, int], zoom: float

@@ -11,6 +11,7 @@ import tifffile
 from bioimage_app.project_navigation import ProjectNavigation
 from bioimage_app.web_window import WebWorkbenchWindow
 from PySide6.QtCore import QSettings
+from PySide6.QtWidgets import QFileDialog
 from pytestqt.qtbot import QtBot
 
 from tooling.qt_test_lifecycle import close_and_dispose_window
@@ -128,6 +129,80 @@ def test_platform_browsing_keeps_owned_host_and_recent_switch_keeps_draft_guard(
             {"projectId": window.host.view.project().project_id, "mode": "quant", "draft": False}
         ),
     )
+
+
+@pytest.mark.parametrize("entry", ["images", "folder"])
+@pytest.mark.parametrize("workflow", ["quant", "review"])
+def test_wb_home_new_project_keeps_existing_project_and_draft_until_confirmed(
+    session_window: WebWorkbenchWindow,
+    qtbot: QtBot,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    entry: str,
+    workflow: str,
+) -> None:
+    window = session_window
+    original = source_at(tmp_path / "first.tif")
+    start(window, qtbot, original)
+    qtbot.waitUntil(lambda: js(window, qtbot, "mode") == "quant", timeout=10000)
+    old_host, workspace = window.host, window.host.workspace_path
+    project_id = old_host.view.project().project_id
+    second_parent = tmp_path / "second"
+    second_parent.mkdir()
+    second = source_at(second_parent / "second.tif")
+
+    def choose_images(*args: object, **kwargs: object) -> tuple[list[str], str]:
+        return [str(second)], ""
+
+    def choose_folder(*args: object, **kwargs: object) -> str:
+        return str(second.parent)
+
+    monkeypatch.setattr(QFileDialog, "getOpenFileNames", choose_images)
+    monkeypatch.setattr(QFileDialog, "getExistingDirectory", choose_folder)
+    click = (
+        "platformHome.show('wb');document.querySelector('.session-secondary').open=true;"
+        f"document.querySelector('[name=session-workflow][value={workflow}]').checked=true;"
+        f"document.querySelector('[data-session={entry}]').click();true"
+    )
+    js(window, qtbot, "manualQuant.active=true;manualQuant.current().n=row().lanes+1;true")
+    try:
+        assert js(window, qtbot, "desktopSession.hasDraft()") is True
+        js(window, qtbot, click)
+        qtbot.waitUntil(lambda: window.shutdown_stage == "confirm_draft")
+        assert window.host is old_host and window.host.workspace_path == workspace
+        assert len(old_host.view.project().rows) == 1
+        assert js(window, qtbot, "desktopSession.hasDraft()") is True
+        window.bridge.session("reply", '{"choice":"return"}')
+        qtbot.waitUntil(lambda: window.shutdown_stage == "idle")
+        assert window.host is old_host and window.host.view.project().project_id == project_id
+        if entry == "images" and workflow == "quant":
+            js(window, qtbot, click)
+            qtbot.waitUntil(lambda: window.shutdown_stage == "confirm_draft")
+            window.bridge.session("reply", '{"choice":"discard"}')
+            qtbot.waitUntil(
+                lambda: (
+                    window.host is not old_host
+                    and window.shutdown_stage == "idle"
+                    and not window.host.operation_busy
+                    and len(window.host.view.project().rows) == 1
+                ),
+                timeout=25000,
+            )
+            assert window.host.workspace_path != workspace
+            assert window.host.view.project().project_id != project_id
+            assert Path(workspace).is_dir() and original.is_file() and second.is_file()
+    finally:
+        js(window, qtbot, "manualQuant.active=false;manualQuant.draft=null;true")
+        window.bridge.session(
+            "position",
+            json.dumps(
+                {
+                    "projectId": window.host.view.project().project_id,
+                    "mode": "quant",
+                    "draft": False,
+                }
+            ),
+        )
 
 
 def test_same_window_switch_saves_then_restores_mode_and_source(

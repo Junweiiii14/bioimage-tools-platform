@@ -84,8 +84,7 @@ const desktopSession = (() => {
     const action=el.dataset.session||'home';
     if(window.workbenchActions&&['save','open'].includes(action)){window.workbenchActions.invoke(`project.${action}`,{button:el});return;}
     const workflow=document.querySelector('[name=session-workflow]:checked')?.value||'quant';
-    if(action==='images'){manualQuant.pendingImport=workflow==='quant';bridge.request(workflow==='quant'?'quant_import':'import','{}');}
-    else if(action==='folder'&&workflow!=='quant')bridge.request('import_folder','{}');
+    if(action==='images'||action==='folder')send(`new_${action}`,{workflow});
     else send(action,action==='recent'?{index:Number(el.dataset.index)}:{});
   },true);
   modal().addEventListener('cancel',event=>{event.preventDefault();if(!['shutdown','cancel'].includes(session.stage))send('reply',{choice:'return'});});

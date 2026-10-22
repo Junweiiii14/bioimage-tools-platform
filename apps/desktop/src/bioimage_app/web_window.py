@@ -188,7 +188,24 @@ class WebWorkbenchWindow(QMainWindow):
         self.session_timer.start()
 
     def choose(self, action: str) -> None:
-        if action in {"new_intake_folder", "intake_import_folder"}:
+        if action in {
+            "new_quant_images",
+            "new_review_images",
+            "new_quant_folder",
+            "new_review_folder",
+        }:
+            if action.endswith("_folder"):
+                directory = QFileDialog.getExistingDirectory(self, "选择 TIFF 原图文件夹")
+                paths = [directory] if directory else []
+            else:
+                paths, _ = QFileDialog.getOpenFileNames(
+                    self, "选择 WB 原图", "", "TIFF 原图 (*.tif *.tiff)"
+                )
+            if paths:
+                self.start_from_images(
+                    [Path(path) for path in paths], automatic=action.startswith("new_review_")
+                )
+        elif action in {"new_intake_folder", "intake_import_folder"}:
             directory = QFileDialog.getExistingDirectory(self, "选择仪器直接导出的 TIFF 文件夹")
             if directory:
                 if action == "intake_import_folder" and self.host.workspace_path:
@@ -446,6 +463,11 @@ class WebWorkbenchWindow(QMainWindow):
                     self.start_from_images([Path(self._last_open_path)], automatic=False)
             elif action == "new":
                 self._request_transition("new", lambda: self.choose("quant_import"))
+            elif action in {"new_images", "new_folder"}:
+                workflow = data.get("workflow", "quant")
+                if not isinstance(workflow, str) or workflow not in {"quant", "review"}:
+                    raise ValueError("新项目处理方式无效")
+                self.choose(f"new_{workflow}_{action.removeprefix('new_')}")
             elif action == "new_intake_folder":
                 self._request_transition("new", lambda: self.choose("new_intake_folder"))
             elif action == "folder":
