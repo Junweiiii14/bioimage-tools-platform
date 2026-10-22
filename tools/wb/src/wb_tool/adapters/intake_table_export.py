@@ -15,7 +15,7 @@ from wb_tool.application.intake_result_table import intake_visible_table
 from wb_tool.application.project_analysis import LoadedProjectResult
 
 
-def _display_number(value: float) -> str:
+def display_intake_number(value: float) -> str:
     # Intl.NumberFormat's default halfExpand rounds decimal ties away from zero.
     # Python .2f instead rounds the binary float with ties-to-even.
     number = Decimal(str(value))
@@ -80,7 +80,7 @@ def intake_table_bytes(
             tuple(
                 "—"
                 if v is None
-                else (_display_number(v) + ("*" if (ri, ci) in marks else ""))
+                else (display_intake_number(v) + ("*" if (ri, ci) in marks else ""))
                 if isinstance(v, float)
                 else v
                 for ci, v in enumerate(row)
@@ -105,7 +105,7 @@ def intake_table_bytes(
                         value = cell.findtext(f"{{{NS}}}v")
                         style = 1 if ri == 0 else 0
                         if ri and value is not None:
-                            shown = _display_number(float(value))
+                            shown = display_intake_number(float(value))
                             digits = len(shown.split(".")[1]) if "." in shown else 0
                             style = 2 + digits + (3 if (ri - 1, ci) in marks else 0)
                         cell.set("s", str(style))

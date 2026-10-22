@@ -9,7 +9,7 @@ from zipfile import ZipFile
 
 import pytest
 from wb_tool.adapters.intake_table_export import (
-    _display_number,
+    display_intake_number,
     export_intake_table,
     intake_table_bytes,
 )
@@ -35,7 +35,7 @@ from tools.wb.tests.test_intake_output import full_files
     ],
 )
 def test_csv_rounding_matches_intl_half_expand(value: float, expected: str) -> None:
-    assert _display_number(value) == expected
+    assert display_intake_number(value) == expected
 
 
 def test_unreviewed_raw_values_order_quality_and_missing_survive_export(tmp_path: Path) -> None:
