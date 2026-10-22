@@ -24,6 +24,7 @@ from wb_tool.api import WBIntakeProject
 
 from bioimage_app.appearance import WorkbenchAppearance
 from bioimage_app.figure_window import FigureProjectWindow
+from bioimage_app.folder_drop import FolderDropView, folder_paths
 from bioimage_app.project_navigation import MODES, ProjectNavigation
 from bioimage_app.shortcuts import WorkbenchShortcuts
 from bioimage_app.source_origins import SourceOrigins
@@ -135,7 +136,9 @@ class WebWorkbenchWindow(QMainWindow):
         self.host.automatic.quant_policy = "anchored_background@1"
         self.host.closed.connect(self._backend_closed)
         self.host.workspace_opened.connect(self._workspace_ready)
-        self.web = QWebEngineView(self)
+        self.web = FolderDropView(
+            self, self._folder_dropped, lambda: (id(self.host), self.bridge.session_epoch)
+        )
         index = (asset_directory or Path(__file__).with_name("web_ui")) / "index.html"
         page = LocalWorkbenchPage(index, self.web)
         background = {
@@ -186,6 +189,17 @@ class WebWorkbenchWindow(QMainWindow):
         self.session_timer.setInterval(150)
         self.session_timer.timeout.connect(self._poll_session)
         self.session_timer.start()
+
+    def _folder_dropped(self, urls: tuple[QUrl, ...]) -> None:
+        try:
+            if self._closing or self._starting or self._stage != "idle" or self.host.operation_busy:
+                raise ValueError("当前任务仍在处理中，请完成或取消后再拖入文件夹。")
+            paths = folder_paths(urls)
+            self.start_from_images(paths, automatic=False, intake=True, folders_only=True)
+        except (ValueError, OSError) as error:
+            self.web.page().runJavaScript(
+                "window.folderDrop?.message(" + json.dumps(str(error)) + ")"
+            )
 
     def choose(self, action: str) -> None:
         if action in {
@@ -279,11 +293,19 @@ class WebWorkbenchWindow(QMainWindow):
                 self.host.load_document(document_id)
 
     def start_from_images(
-        self, paths: list[Path], *, automatic: bool = True, intake: bool = False
+        self,
+        paths: list[Path],
+        *,
+        automatic: bool = True,
+        intake: bool = False,
+        folders_only: bool = False,
     ) -> None:
         if self.host.workspace_path:
             self._request_transition(
-                "new", lambda: self.start_from_images(paths, automatic=automatic, intake=intake)
+                "new",
+                lambda: self.start_from_images(
+                    paths, automatic=automatic, intake=intake, folders_only=folders_only
+                ),
             )
             return
         self._starting = True
@@ -297,6 +319,7 @@ class WebWorkbenchWindow(QMainWindow):
             project_parent=Path(parent) if parent else None,
             automatic=automatic,
             intake=intake,
+            folders_only=folders_only,
         )
 
     def closeEvent(self, event: QCloseEvent) -> None:

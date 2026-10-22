@@ -1,3 +1,5 @@
+T077：intake_visible_table@1 是可见原始积分宽表的独立显示/导出投影，旧归档表语义保持；实际验证及限制见 T077 任务与可见结果表v1契约。
+
 T075新增工作台明确修订公开用例 prepare_workbench_revision / apply_workbench_metadata / revise_workbench_figure_order；不改变算法与项目schema，保留历史并撤回相应阶段批准。契约见 ../../docs/contracts/wb-workbench-revision-v1.md。
 
 T074 当前增量与契约：`../../docs/contracts/wb-intake-supervision-v1.md`。下列为既有版本说明，不代表本轮验证。

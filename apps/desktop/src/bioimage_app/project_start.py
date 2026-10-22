@@ -24,17 +24,26 @@ class ProjectSelectionJob(QThread):
     """Owner reads result only after finished; cancellation never publishes a workspace."""
 
     def __init__(
-        self, paths: list[Path], parent: Path, cancellation: Event, *, automatic: bool = True
+        self,
+        paths: list[Path],
+        parent: Path,
+        cancellation: Event,
+        *,
+        automatic: bool = True,
+        folders_only: bool = False,
     ) -> None:
         super().__init__()
         self.paths = list(paths)
         self.destination_parent = parent
         self.cancellation = cancellation
         self.automatic = automatic
+        self.folders_only = folders_only
         self.result = ProjectSelection()
 
     def run(self) -> None:
         try:
+            if self.folders_only and any(not path.is_dir() for path in self.paths):
+                raise ValueError("拖入项包含文件或无效目录；请拖入可访问的原图文件夹。")
             report = b""
             selected = self.paths
             if self.automatic and len(self.paths) == 1 and self.paths[0].is_dir():

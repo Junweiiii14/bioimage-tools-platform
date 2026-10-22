@@ -68,6 +68,7 @@ class _Work(QObject):
                 job.operation
                 in (
                     "project_export",
+                    "intake_table_export",
                     "project_ocr_export",
                     "project_normalization_export",
                     "quant_export",
@@ -399,6 +400,17 @@ class _Work(QObject):
                     raise ValueError("缺少定量项目")
                 value = str(
                     export_wbquant_table(
+                        job.document, job.project_results, job.destination, cancelled=cancel
+                    )
+                )
+            elif job.operation == "intake_table_export":
+                from wb_tool.adapters.intake_table_export import export_intake_table
+                from wb_tool.application.intake_output import WBIntakeOutputProject
+
+                if not isinstance(job.document, WBIntakeOutputProject):
+                    raise ValueError("缺少仪器结果项目")
+                value = str(
+                    export_intake_table(
                         job.document, job.project_results, job.destination, cancelled=cancel
                     )
                 )

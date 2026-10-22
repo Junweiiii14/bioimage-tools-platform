@@ -56,3 +56,18 @@ window.platformHome = (() => {
   sync();
   return {show,sync,closed,inProject:()=>view==='project',current:()=>view};
 })();
+
+window.folderDrop = (() => {
+  const clear=()=>$$('[data-folder-drop].folder-drop-active').forEach(el=>el.classList.remove('folder-drop-active'));
+  function target(x,y,hover){
+    clear();
+    const el=document.elementFromPoint(x,y)?.closest('[data-folder-drop]');
+    const accepted=platformHome.current()==='platform'&&!!el&&!document.querySelector('dialog[open]');
+    if(accepted&&hover)el.classList.add('folder-drop-active');
+    return accepted;
+  }
+  function message(text){$('#folder-drop-status').textContent=text;toast(text);}
+  window.addEventListener('blur',clear);
+  document.addEventListener('drop',clear);
+  return {target,clear,message};
+})();

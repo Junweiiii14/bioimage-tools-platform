@@ -333,7 +333,7 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
     if action == "intake_export_table":
         if intake_digest(project) != digest or not isinstance(project, WBIntakeOutputProject):
             raise ValueError("结果表输入已变化，请重新核对")
-        host.view.analysis.export_requested.emit()
+        host.choose_intake_table_export()
         return
     if action == "intake_measurement_preview":
         figure_id = data.get("figureId")

@@ -159,6 +159,7 @@ from wb_tool.application.intake_output import (
     prepare_intake_outputs,
     record_intake_output,
 )
+from wb_tool.application.intake_result_table import IntakeVisibleTable, intake_visible_table
 from wb_tool.application.intake_revision import (
     begin_intake_group_revision,
     confirm_intake_group_revision,
@@ -366,6 +367,8 @@ __all__ = [
     "install_export_discovery",
     "accept_export_selections",
     "export_intake_outputs",
+    "intake_visible_table",
+    "IntakeVisibleTable",
     "IntakeOutputEvidence",
     "IntakeOutputPreparation",
     "IntakeResultCell",

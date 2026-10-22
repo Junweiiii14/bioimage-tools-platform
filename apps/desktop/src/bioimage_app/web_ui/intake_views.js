@@ -43,6 +43,17 @@ window.intakeViews = (() => {
   }
 
   function results({intake, cells, busy}) {
+    if(intake.visibleTable){
+      const table=intake.visibleTable,marks=new Set(table.quality.map(([r,c])=>`${r}:${c}`));
+      const body=table.rows.map((row,r)=>`<tr>${row.map((v,c)=>{
+        const numeric=c>=2&&c<row.length-1;
+        const source=numeric?cells.find(cell=>cell.rowId===intake.proteins[r].protein_id&&cell.lane===c-1):null;
+        const title=numeric?(source?resultLabel(source.status)+(source.reason?'：'+source.reason:''):'没有已提交结果'):'';
+        const content=c===1?`<button class="text-button" data-intake-crop-action="source" data-id="${escapeText(intake.proteins[r].protein_id)}" ${busy?'disabled':''}>${escapeText(v)}</button>`:numeric?number(v):c===row.length-1?`<span class="result-state">${escapeText(v)}</span>`:escapeText(v);
+        return `<td class="${numeric?'intake-number':''}" title="${escapeText(title)}">${content}${marks.has(`${r}:${c}`)?'<sup>*</sup>':''}</td>`;
+      }).join('')}</tr>`).join('');
+      return `<section class="intake-result-grid"><div class="intake-result-toolbar"><strong>原始灰度积分</strong><span>按 Fig、蛋白与泳道排列</span></div><div class="results-scroll"><table><thead><tr>${table.headers.map((h,c)=>`<th class="${c>=2&&c<table.headers.length-1?'intake-number':''}">${escapeText(h)}</th>`).join('')}</tr></thead><tbody>${body||'<tr><td>尚无已配置的蛋白</td></tr>'}</tbody></table></div><p class="intake-result-note">— 表示无已提交值；* 表示质量待复核。展开完整记录可查看有效信号与具体原因。</p></section>`;
+    }
     const maxN=Math.max(0,...intake.figures.map(f=>f.lane_count||0));
     const body=intake.proteins.map(p=>{
       const fig=intake.figures.find(f=>f.figure_id===p.figure_id);

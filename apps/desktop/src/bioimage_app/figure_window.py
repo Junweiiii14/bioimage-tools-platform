@@ -44,6 +44,7 @@ from wb_tool.api import (
     ReturnedCrop,
     WBAnalysisProject,
     WBFigureProject,
+    WBIntakeOutputProject,
     WBIntakeProject,
     WBIntakeWorkflowProject,
     WBJob,
@@ -407,6 +408,7 @@ class FigureProjectWindow(QMainWindow):
         *,
         automatic: bool = True,
         intake: bool = False,
+        folders_only: bool = False,
     ) -> None:
         """Select originals first; decode before any workspace or recent entry is created."""
         if not paths or self._busy or self._workspace or self._closing:
@@ -425,6 +427,7 @@ class FigureProjectWindow(QMainWindow):
             project_parent or default_project_parent(),
             self._cancellation,
             automatic=automatic,
+            folders_only=folders_only,
         )
         self._selection_job = job
 
@@ -1415,6 +1418,16 @@ class FigureProjectWindow(QMainWindow):
         if destination:
             self.export_project_table(destination, normalization=True)
 
+    def choose_intake_table_export(self) -> None:
+        destination, _ = QFileDialog.getSaveFileName(
+            self,
+            "导出可见结果表",
+            "WB结果.xlsx",
+            "Excel (*.xlsx);;CSV（文字采用text:前缀） (*.csv)",
+        )
+        if destination:
+            self.export_project_table(destination, visible_intake=True)
+
     def export_project_table(
         self,
         destination: str,
@@ -1422,6 +1435,7 @@ class FigureProjectWindow(QMainWindow):
         ocr: bool = False,
         normalization: bool = False,
         quant: bool = False,
+        visible_intake: bool = False,
         ocr_labels: bool | None = None,
     ) -> None:
         if self._busy or not self._workspace:
@@ -1432,7 +1446,9 @@ class FigureProjectWindow(QMainWindow):
             self._start()
             self._export_with_evidence(
                 WBJob(
-                    "quant_export"
+                    "intake_table_export"
+                    if visible_intake
+                    else "quant_export"
                     if quant
                     else "project_normalization_export"
                     if normalization
@@ -2188,7 +2204,9 @@ class FigureProjectWindow(QMainWindow):
                     # result presentation. Rebuild from verified runs before any
                     # follow-up (including display-only compose), even when no
                     # scientific parameters changed.
-                    if isinstance(project, WBIntakeProject):
+                    if isinstance(project, WBIntakeProject) and not isinstance(
+                        project, WBIntakeOutputProject
+                    ):
                         self._done("导入清单已保存，可重新打开。")
                         if after:
                             after()

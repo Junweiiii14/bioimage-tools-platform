@@ -33,11 +33,12 @@
       <header class="platform-intro"><div><h1>选择工具，开始工作。</h1><p>图像处理与分析，都在你的工作空间。</p></div></header>
       <div class="platform-layout">
         <section aria-labelledby="installed-tools-title"><div class="platform-section-title"><h2 id="installed-tools-title">已安装工具</h2><span>1</span></div>
-          <button class="installed-tool" data-page="wb" aria-label="进入 WB 图像处理">
+          <button class="installed-tool" data-page="wb" data-folder-drop aria-label="进入 WB 图像处理，可拖入原图文件夹" aria-describedby="folder-drop-status">
             <span class="tool-top"><span class="tool-symbol">WB</span><span class="tool-installed"><i data-icon="check"></i>已安装</span></span>
             <span class="tool-description"><strong>WB 图像处理</strong><span>裁剪 · 拼图 · 灰度定量</span></span>
             <span class="tool-bottom"><span class="tool-launch">进入 WB<i data-icon="arrow"></i></span><span class="tool-mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span></span>
           </button>
+          <p id="folder-drop-status" class="folder-drop-status" role="status">可将一个或多个本机原图文件夹拖到 WB 入口，创建仪器导入项目。</p>
           <div class="platform-resume" data-resume-project hidden><div><small>当前打开 · WB</small><strong data-current-project-name></strong></div><button class="text-button" data-page="project">继续工作<i data-icon="arrow"></i></button></div>
         </section>
         <section class="platform-recents" aria-labelledby="platform-recents-title"><div class="platform-section-title"><h2 id="platform-recents-title">最近项目</h2></div><div id="platform-recents"><div class="platform-empty"><i data-icon="folder"></i><p>从工具创建项目，<br>或打开已有项目继续。</p><button class="text-button" data-session="open">打开项目<i data-icon="arrow"></i></button></div></div></section>

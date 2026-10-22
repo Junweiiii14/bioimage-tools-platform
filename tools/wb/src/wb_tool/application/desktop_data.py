@@ -91,6 +91,7 @@ class WBJob:
         "project_result",
         "project_table",
         "project_export",
+        "intake_table_export",
         "quant_export",
         "quant_replan",
         "quant_group_reset",

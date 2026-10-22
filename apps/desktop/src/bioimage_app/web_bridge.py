@@ -372,6 +372,14 @@ class WorkbenchBridge(QObject):
                             }
                         )
         cells = [cell_state(c) for c in view.analysis.result_view.cells]
+        if intake is not None and isinstance(project, WBIntakeProject):
+            from dataclasses import asdict
+
+            from wb_tool.api import intake_visible_table
+
+            intake["visibleTable"] = asdict(
+                intake_visible_table(project, view.analysis.result_view.cells)
+            )
         rows: list[dict[str, object]] = []
         crop_steps = (
             {s.target_id: s.status for s in project.workflow.steps if s.stage == "crop"}
