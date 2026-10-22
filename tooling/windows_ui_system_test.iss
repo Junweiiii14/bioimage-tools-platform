@@ -12,7 +12,7 @@
 ; Separate identity: never upgrade the original or any prior test candidate.
 AppId=BioImageTools.WB.UISystemTest
 AppName=BioImage WB（界面系统测试版）
-AppVersion=0.14.0-T075-{#BuildCommit}
+AppVersion=0.14.0-T076-{#BuildCommit}
 AppPublisher=BioImage Tools
 DefaultDirName={localappdata}\Programs\BioImage WB 界面系统测试版
 DefaultGroupName=BioImage WB（界面系统测试版）
@@ -21,7 +21,7 @@ MinVersion=10.0.17763
 ArchitecturesAllowed=x64os
 ArchitecturesInstallIn64BitMode=x64os
 OutputDir={#InstallerOutput}
-OutputBaseFilename=BioImage-WB-x64-T075-Test-{#BuildCommit}-Setup
+OutputBaseFilename=BioImage-WB-x64-T076-Test-{#BuildCommit}-Setup
 SetupIconFile={#AppSource}\bioimage.ico
 UninstallDisplayIcon={app}\BioImageWB-Candidate.exe
 Compression=lzma2/fast
@@ -33,7 +33,7 @@ DisableProgramGroupPage=yes
 DisableWelcomePage=yes
 DisableDirPage=yes
 InfoBeforeFile=windows_ui_system_test_readme.txt
-VersionInfoVersion=0.14.0.75
+VersionInfoVersion=0.14.0.76
 
 [Files]
 Source: "{#AppSource}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs

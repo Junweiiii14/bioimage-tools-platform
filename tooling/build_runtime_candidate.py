@@ -50,7 +50,7 @@ def main() -> int:
         help="Build the isolated fixed-grid crop and redesigned workbench test distribution",
     )
     profiles.add_argument(
-        "--ui-system-test", action="store_true", help="Build isolated T075 UI system candidate"
+        "--ui-system-test", action="store_true", help="Build isolated UI system candidate"
     )
     args = parser.parse_args()
     if subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT).strip():
