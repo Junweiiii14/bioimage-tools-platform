@@ -31,4 +31,18 @@
 
 最终证据提交推送后须等待当前 HEAD 的 Windows / Linux foundation、desktop-environment、rules-context 四检查。结果落 `.local/t076-final-ci.json` 并复制桌面交付目录；成功前任务不完成。没有将旧 T075 CI 替代本轮。PR 基于最新 `codex/t075-ui-system`，不自动合并。
 
-桌面预览 `BioImage-平台首页预览-T076-d3aff15` 使用合成数据，不执行科研重算。没有新安装器或替换安装；原 T075 5c56f55 候选保持。干净 Win10、物理 DPI / IME、科学留出及历史 Qt/D3D/native UNKNOWN 继续保留。≤800px 单列源码存在，高缩放行为回归覆盖有效窄内容区，但本轮静态截图只覆盖 960 / 1440。
+桌面预览 `BioImage-平台首页预览-T076-d3aff15` 使用合成数据，不执行科研重算。这是用户验收前的 HTML 阶段边界；用户随后追加实际安装，971d860 新目录已安装并更新入口，旧5c56f55目录保留。实际安装检查见 installation.md，不能由预览推出。干净 Win10、物理 DPI / IME、科学留出及历史 Qt/D3D/native UNKNOWN 继续保留。≤800px 单列源码存在，高缩放行为回归覆盖有效窄内容区，但本轮静态截图只覆盖 960 / 1440。
+
+## 用户验收后的安装增量
+
+用户已批准首页样式并明确要求安装到软件。971d860私有运行库/安装/资源与实际运行检查见 [installation.md](installation.md)；产品UI仍与d3aff15一致。原893e0ad的quality因新提交自动取消，不报告该次全量通过。最终HEAD另等四必要检查。
+
+安装交付独审 `install-review-971d860.md`：Accepted，审查者独立核对完整载荷/资源、旧样本、真实入口/注册/用户窗口及12图像素；安装测试是作者运行并由审查者核验，不误称审查者重跑。
+
+## CI 首轮失败与启动等待修正
+
+971d860 的 quality/run39722326751 Linux：1201 passed / 1 failed / 500.09s，debugger exit1，尚未到 wheel 安装步骤；原始 `.local/t076-ci-971-linux.log` 保留。失败为 `test_open_windows_receive_theme_from_host_timer` 等宿主主题 iris 超时10秒。
+
+原测试只等 `!!window.desktopSession`，其 JS 对象先于异步 QWebChannel 连接建立；此时外观请求可进入仅供预览的 localStorage 路径，无法检验跨窗口宿主持久化。现改为等 `!!window.desktopSession?.shortcutState()`，即实际宿主首个会话快照到达。未延长等待/提交超时，未删除两个宿主值或页面主题断言，未改变产品、门禁或安装资源。此改动修正准备条件，不以推断冒充已捕获的 CI 原始异步时序。
+
+Windows 定向：`QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu uv run --locked --no-sync pytest tests/test_workbench_appearance.py::test_open_windows_receive_theme_from_host_timer -q --tb=short`，1 passed / 4.18s / exit0，`.local/t076-theme-ready-test.log`。最终完整 CI 与该增量独审须另核，后继成功不抹除首轮失败。

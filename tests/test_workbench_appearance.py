@@ -49,8 +49,12 @@ def test_open_windows_receive_theme_from_host_timer(qtbot: QtBot, tmp_path: Path
     try:
         for window in windows:
             window.show()
+            # The JS object exists before QWebChannel connects. Wait for the host's
+            # initial session snapshot so this exercises persistence, not preview.
             qtbot.waitUntil(
-                lambda window=window: javascript(window, qtbot, "!!window.desktopSession") is True
+                lambda window=window: (
+                    javascript(window, qtbot, "!!window.desktopSession?.shortcutState()") is True
+                )
             )
         javascript(
             windows[0],

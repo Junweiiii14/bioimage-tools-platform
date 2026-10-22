@@ -1,7 +1,7 @@
 # Risks, Blockers, And Unknowns
 
 当前执行指针为 [T076](../work/tasks/T-076-platform-home-scroll.md)。以下旧版本证据不迁移为当前通过。
-- T076：源码+HTML、软件渲染回归和有限静态独审通过；最终 HEAD CI 另核。用户追加实际安装，尚待安装检查，不能把预览当安装验收。首次 GPU canvas/曲线失败及 GLES/mailbox 诊断保留；后继 disable-gpu 通过不等于硬件根因修复。物理 DPI/延迟、干净 Win10、科学留出保留。
+- T076：源码+HTML、软件渲染回归和有限静态独审通过；最终 HEAD CI 另核。首轮Linux跨窗口测试1201过1败，改等真实宿主快照；实际CI时序未捕获，不抹除失败。用户追加的971d860新目录安装及独立运行检查已通过、安装交付独审Accepted；旧目录保持，当前通道卸载注册已转新版；不能外推干净目标机。首次 GPU canvas/曲线失败及 GLES/mailbox 诊断保留；后继 disable-gpu 通过不等于硬件根因修复。物理 DPI/延迟、干净 Win10、科学留出保留。
 - T075：7fcb819 CI182 四必要检查 success、两平台1192/wheel完成、goal complete；冻结安装5c56f55保持。CI180 Windows角度/命中和Linux重复关闭挂起仍 UNKNOWN；原日志保留。CDP对照不证明全部硬件稳定。
 
 - T072：首本地外层observer因父PID复用误收昨天OneDrive.Sync.Service并停止；微软签名同exe已重启并核运行，未全面验同步状态。原失败保留。新版helper经非作者Accepted，CIM微秒身份+出生顺序、删除所有自动终止，只观察并对timeout/残留报失败；随包新轮0，产品字节不变。轮询不能证明捕获所有短命后代。原27/10 dirty、旧交付和原图/历史保持。最终产物边界见T072 evidence。

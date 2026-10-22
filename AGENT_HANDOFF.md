@@ -46,7 +46,7 @@
 
 ## Current Pointer
 
-- 当前任务：[T-076](work/tasks/T-076-platform-home-scroll.md)，工具平台首页与整 Fig 曲线矩阵；实现、HTML、代码/有限视觉独审已完成，最终 HEAD 必需 CI 状态须实时核对。
+- 当前任务：[T-076](work/tasks/T-076-platform-home-scroll.md)，工具平台首页与整 Fig 曲线矩阵；实现、HTML、代码/有限视觉独审及971d860实际安装检查已完成；安装交付独审Accepted；最终启动等待测试/证据增量复核与HEAD CI须实时核对。
 - 活动树 `C:/Users/70236/.codex/worktrees/wb-ui-system/bioimage-tools-platform`；分支 `codex/t076-platform-home-scroll`，最新基线 T075 `7fcb819`。T075 goal 已完成，本轮没有新 goal。
 - 状态和下一步以 `.agent-handoff/snapshot.md` 与任务为准。旧工作树、原图、历史、预览和安装保留；用户已验收首页并追加 T076 实际安装授权；旧目录保留、更新现用桌面入口。
 - 本机科学留出、干净 Win10、物理 DPI 及历史 native UNKNOWN 持续单列；不以旧版本证据代替本轮检查。
