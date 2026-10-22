@@ -32,3 +32,10 @@
 
 - ddc6290：20项/13.87s/0，独立20项/11.78s/0；5张有效截图，新增hover修复原浅底浅字问题，保持深底+outline。一次19过1失败定位为页面快照就绪条件不足，现等真实10个raw值入页面后保留原内容断言。
 - 自动结果目录也统一可见measurements.csv/xlsx；旧完整审计单列measurement-audit.csv/xlsx并写index.table_policy=intake_visible_table@1，ZIP内部旧表不动。既有9槽/数值/来源审计断言原样保留，仅改读取的新审计文件名；属于授权导出布局变更，非弱化答案。端到端比较自动与直接主表CSV字节、XLSX主表XML和styles，审计修订与容器时间戳可不同。初次整XLSX字节比较21过1败/11.39s/1，不是稳定容器不变量，已按实际主表/格式边界修正。
+
+## 最终绑定证据
+
+- 产品c32ad11，作者输出/旧恢复相关22 passed /11.67s /exit0；非作者24 passed /12.16s /exit0，独立39成员及严格旧ZIP恢复相等。独审Accepted、有限静态ship，报告已随本次证据提交；之后只有Markdown/交接变化时该产品结论仍以产品文件相同为条件。
+- 最终安全演示目录改为.local/deliveries/WB-T077-safe-demo-c32ad11（旧副本保留），108文件/5,432,183字节逐项SHA相同，包含新自动可见表与独立审计。启动指针检查仍exit0。
+- PR38：当前产品HEAD规则回执/桌面环境SUCCESS，Windows/Linux完整CI运行中；最终证据HEAD必须实时核验，不在此写未发生的成功。最终JSON存.local/T077-final-ci.json；缺codex/codex-automation两个标签，未伪造存在或另造标签。
+- 本地未再运行dev.py check --all，完整全量/隔离wheel由最终必需CI执行；未运行audit（无依赖变化）、干净机/物理Explorer/OLE/外部表格软件验收，均不写通过。
