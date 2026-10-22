@@ -1,7 +1,8 @@
 # Task Backlog
 
-当前执行指针为 [T075](../work/tasks/T-075-ui-system.md)。以下旧版本证据不迁移为T075通过；历史科学/Win10/DPI及原生UNKNOWN保留。
-- [ ] T075最终闸门：M1–M6实施、本机还原/安装/交付独审及697c428的CI181四检查全部成功。仅剩最后证据提交当前HEAD的必要CI核对与目标完成；结果在.local/t075-final-ci.json/桌面验收记录。全部成功即完成本项，无需再次改代码/构建。CI180根因UNKNOWN保持，不把后继通过当根因修复；不自动合并/公开发布。
+当前执行指针为 [T076](../work/tasks/T-076-platform-home-scroll.md)。旧版本证据不迁移为当前通过。
+- [ ] T076 最后闸门：已审产品 d3aff15、同源 HTML、56 项回归与资源一致性完成；最终提交四必要 CI 全成功即完成，实时证据 `.local/t076-final-ci.json` / 桌面预览目录。失败则继续，禁止自动合并或发布。
+- [x] T075：最新 7fcb819 的 CI182 两平台 1192、全部 wheel/四必要检查成功，最终交付独审 Accepted、goal complete；T075 安装候选保留。CI180/native 根因 UNKNOWN 未销账。
 
 - [x] T072获批六项及预览高清修复：产品44a独审/PR32四检查→main0630604，独立新测试版已安装及四流程/PS5.1新轮/7753载荷校验；交付审计/记录见T072任务。本轮不自动扩展新产品或清理旧树。
 - [ ] T072诊断P3文字：automatic报告limitations仍沿用旧constantimages/explicitROI描述，实际17命名checks与新合成模式为准，交付已明示；未来获批产品改动时修文字，不因此默改已冻结包。

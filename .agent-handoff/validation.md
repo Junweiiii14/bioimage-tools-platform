@@ -1,6 +1,6 @@
 # Validation Index
 
-当前 T075 检查见 work/evidence/T-075/validation.md 与任务；下列T072及以前记录均为历史，不代表当前通过。
+当前 T076 检查见 work/evidence/T-076/validation.md 与任务；以下旧版本记录均为历史，不代表当前通过。
 
 当前T072产品44a独审Accepted、PR32四检查集成main0630604；两平台1013与本机1013/全部wheel/OCR/check0，新独立AutomaticFlowTest安装/四流程/PS5.1新轮/7753载荷通过，最终审计及收尾见[T072](../work/tasks/T-072-automatic-flow-repair.md)和[交付](../docs/wb-automatic-flow-repair-delivery.md)。首外层观察器误停OneDrive已重启，失败/修复证据保留，非产品静默改包。以下T071/T069/T060均为历史记录。
 
@@ -65,3 +65,9 @@ T074当前c90b0e5：整个Fig矩阵跨蛋白选择、缺项草稿恢复定向通
 5c56f55构建/安装0，34前端source/wheel/install相同、7780载荷相同；Windows原生Qt6.12/Chromium140、DPR1.5固定26图逐像素与records相同，高缩放2.25。实际安装私有Python四高级工具/跨窗/IME基线3项20.75s、强制新revision IME另1项3.91s，19项selfcheck11.391s均0；代码/视觉限定范围与本机交付独审Accepted。动态278帧/约7.99s；3次CDP点击下一帧19.2/13.5/9.6ms，不是物理延迟保证。桌面完整交付目录已建立。
 
 CI180真实失败：Windows1191过1败746.36s/child1、Linux关闭回收15min取消，均未到wheel；根因UNKNOWN。697c428只添加原子失败字段与捕获正常刷新诊断，原断言/timeout/gate及产品不变，独审Accepted；本机相关3项4.57s、WSL4项6.83s通过。CI181/run39660837328：Windows1192/692.49s/child0；Linux1192/480.61s/debugger0，全部隔离wheel/真实OCR、规则143和桌面依赖成功。最后证据提交必须核对当前HEAD成功，最终在线记录在.local/t075-final-ci.json；旧失败、科学留出/干净Win10/物理DPI/native UNKNOWN不销账。
+
+## 2026-10-22 T076 平台首页与矩阵滚动
+
+- 最新基线7fcb819，产品d3aff15：作者56项37.80s/0，独审21项19.06s/0；代码Accepted，12图有限视觉ship。Ruff/格式/Pyright/提交policy通过。
+- 源码/wheel/桌面HTML36前端文件一致；直接file入口/字体/两处指针反馈/快速导航/矩阵末格烟测0。初次失败、修正与边界见 work/evidence/T-076/validation.md。
+- 当前HEAD四必要CI成功后保存.local/t076-final-ci.json/桌面验收；未替换现有T075安装，不以预览推安装/科学/硬件验收。

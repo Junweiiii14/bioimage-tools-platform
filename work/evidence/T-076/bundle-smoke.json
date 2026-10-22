@@ -1,0 +1,14 @@
+{
+  "productCommit": "d3aff15d53bf04c822976af0dd6b261f2b4dd6a1",
+  "bundle": "C:\\Users\\70236\\Desktop\\BioImage-平台首页预览-T076-d3aff15",
+  "checks": [
+    "file entry redirect and local font",
+    "platform pointer feedback and stable hitbox",
+    "WB original pointer transform",
+    "rapid navigation final state",
+    "large matrix file entry and last cell hit"
+  ],
+  "console": [],
+  "result": "pass",
+  "environment": "Windows QtWebEngine offscreen --disable-gpu; programmatic pointer events, not physical latency"
+}

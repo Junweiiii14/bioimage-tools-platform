@@ -46,7 +46,7 @@
 
 ## Current Pointer
 
-- 当前任务：[T-075](work/tasks/T-075-ui-system.md)，实施与本机候选交付检查完成；最后证据提交的必需 CI 全部成功后完成目标。此前目标 ACTIVE，恢复时先查询实际目标/PR 状态，不重复重建。
-- 活动树 `C:/Users/70236/.codex/worktrees/wb-ui-system/bioimage-tools-platform`；分支 `codex/t075-ui-system`，最新产品基线 T074 `0376f23`。
-- 状态和下一步以 `.agent-handoff/snapshot.md` 与任务为准。旧目录、原图、历史结果和旧安装保留。
-- 本机科学留出、干净Win10、物理DPI及历史 native UNKNOWN 持续单列；不能以旧版本证据代替本轮安装验收。
+- 当前任务：[T-076](work/tasks/T-076-platform-home-scroll.md)，工具平台首页与整 Fig 曲线矩阵；实现、HTML、代码/有限视觉独审已完成，最终 HEAD 必需 CI 状态须实时核对。
+- 活动树 `C:/Users/70236/.codex/worktrees/wb-ui-system/bioimage-tools-platform`；分支 `codex/t076-platform-home-scroll`，最新基线 T075 `7fcb819`。T075 goal 已完成，本轮没有新 goal。
+- 状态和下一步以 `.agent-handoff/snapshot.md` 与任务为准。旧工作树、原图、历史、预览和安装保留；T076 本轮不替换安装。
+- 本机科学留出、干净 Win10、物理 DPI 及历史 native UNKNOWN 持续单列；不以旧版本证据代替本轮检查。
