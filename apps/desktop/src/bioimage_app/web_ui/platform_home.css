@@ -1,6 +1,6 @@
 /* The installed-tool catalogue belongs to the shell; tool actions stay in WB. */
 .folder-drop-status{font-size:13px;line-height:1.7;color:var(--muted);margin:12px 0 0}
-.installed-tool.folder-drop-active{outline:2px dashed var(--accent);outline-offset:4px;background:var(--accent-light)}
+.installed-tool.folder-drop-active{outline:2px dashed var(--accent);outline-offset:4px}
 .platform-view{flex:1;min-height:0;overflow:auto;padding:48px max(var(--space-page),calc((100vw - 1232px)/2));background:var(--ground)}
 .platform-intro{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:40px}
 .platform-intro h1{font-size:32px;line-height:1.4;font-weight:600;letter-spacing:-.025em;margin:0 0 10px}

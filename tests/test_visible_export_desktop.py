@@ -49,6 +49,14 @@ def test_real_unreviewed_result_matches_both_exports(
     if capture:
         Path(capture).mkdir(parents=True, exist_ok=True)
         capture_frame(window, qtbot, Path(capture) / "platform-1440.png")
+        javascript(
+            window,
+            qtbot,
+            "const r=document.querySelector('[data-folder-drop]').getBoundingClientRect();"
+            "folderDrop.target(r.x+r.width/2,r.y+r.height/2,true);true",
+        )
+        capture_frame(window, qtbot, Path(capture) / "platform-hover-1440.png")
+        javascript(window, qtbot, "folderDrop.clear();true")
         window.resize(960, 640)
         qtbot.waitUntil(lambda: javascript(window, qtbot, "innerWidth<=960") is True)
         capture_frame(window, qtbot, Path(capture) / "platform-960.png")
@@ -105,6 +113,7 @@ def test_real_unreviewed_result_matches_both_exports(
                 window,
                 qtbot,
                 "mode==='results'&&!!state.intake.visibleTable&&"
+                "!state.busy&&state.cells.filter(c=>c.rawIntegral!=null).length===10&&"
                 "document.querySelector('.results-scroll table')?.checkVisibility()",
             )
             is True
