@@ -1,8 +1,10 @@
 # 生物图像工具平台
 
-当前开发入口：[T074任务](work/tasks/T-074-curves-fig-grid.md) → [曲线与整版拼图说明](docs/wb-supervision-delivery.md) → [交接索引](AGENT_HANDOFF.md)。本轮从 main 91dd985 建立独立分支，完成封底调整、单 Fig 浏览与全部 Fig 网格输出；交付状态以任务记录为准。
+当前交付入口：[T079实验室离线发行](work/tasks/T-079-laboratory-offline-delivery.md) → [实验室部署说明](docs/wb-laboratory-delivery.md) → [交接索引](AGENT_HANDOFF.md)。本轮收拢T074–T077的曲线、整版拼图、界面系统、文件夹拖入与未审核导出整改，并提供包含运行环境的Windows x64安装器。
 
-T071–T073 是历史版本及证据，旧测试结果不作为本轮通过证明。WB仍处于本机工程测试阶段；科学留出、干净Win10、物理DPI和正式发布未完成。开发范围保持WB，IF/IHC不自动扩展。
+历史版本及证据保留，旧检查不作为本轮通过证明。实验室发行的实际安装验证、源码集成和目标机限制以T079记录为准；科学留出、干净Win10与物理DPI验收另列。开发范围保持WB，IF/IHC不自动扩展。
+
+实验室使用者运行随附Setup.exe即可安装，包含私有Python、Qt/WebEngine、本地OCR模型和VC运行库，无需开发环境或Office。安装目标为Windows10 1809+或Windows11的x64机器，按当前用户安装；首次部署运行开始菜单环境自检并用合成练习素材核对流程。构建配方为 `python -m tooling.build_runtime_candidate --laboratory --iscc <固定编译器> --gcc <固定编译器>`；只从干净提交构建，安装器通过实验室交付包分发，不自动公开上传二进制。
 
 最初的 [V3.0 技术方案](生物图像工具平台与全AI长期迭代技术方案.pdf) 保持原样，首次提交可追溯。
 当前WB采用Windows本地Python/PySide6、独立计算进程及单仓库分包；IF/IHC保留为后续单独任务。目标机验收缺口单列，已授权WB技术栈继续完成工程交付。

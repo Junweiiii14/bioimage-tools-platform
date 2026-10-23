@@ -1,0 +1,22 @@
+{
+  "retrieved": "2026-10-23",
+  "reason": "Locked runtime wheels omit license text; preserve upstream fixed-tag licenses without modification.",
+  "licenses": [
+    {
+      "distribution": "rapidocr",
+      "version": "3.9.2",
+      "file": "rapidocr-3.9.2-LICENSE.txt",
+      "source": "https://raw.githubusercontent.com/RapidAI/RapidOCR/v3.9.2/LICENSE",
+      "sha256": "3e0af25fdd06aa9586ae97adb00ea927ebe5a3805ac77d2d3a81ce5f55693333",
+      "root_notice_files": []
+    },
+    {
+      "distribution": "flatbuffers",
+      "version": "25.12.19",
+      "file": "flatbuffers-25.12.19-LICENSE.txt",
+      "source": "https://raw.githubusercontent.com/google/flatbuffers/v25.12.19/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "root_notice_files": []
+    }
+  ]
+}

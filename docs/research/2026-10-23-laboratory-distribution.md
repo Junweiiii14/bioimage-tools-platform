@@ -12,6 +12,7 @@
 - [Inno PrivilegesRequired](https://jrsoftware.org/ishelp/topic_setup_privilegesrequired.htm)：lowest 不请求管理员权限，适合每位普通用户独立安装。
 - [Inno UninstallDelete](https://jrsoftware.org/ishelp/topic_uninstalldeletesection.htm)：禁止用全目录通配清理安装目录，避免误删用户文件。新安装器不设置此项；本机旧包使用自身卸载程序，再核对剩余数据。
 - 私有运行库、许可证和启动器的既有来源见 [2026-10-19 配方研究](2026-10-19-windows-candidate-packaging.md)。编译器继续使用既有固定 Inno6.7.3/MinGW，不混入研究聊天新安装工具。
+- 交付独审发现锁定的 RapidOCR3.9.2 / FlatBuffers25.12.19 wheel 未携带许可证全文。补充原始 [RapidOCR v3.9.2 LICENSE](https://raw.githubusercontent.com/RapidAI/RapidOCR/v3.9.2/LICENSE) 和 [FlatBuffers v25.12.19 LICENSE](https://raw.githubusercontent.com/google/flatbuffers/v25.12.19/LICENSE)，保留版权与原始字节；固定来源/摘要在 `tooling/third_party_notices/sources.json`。同 tag 根目录 API 未列出 NOTICE。构建检查已安装版本及摘要，不悄悄套用于未来升级；没有改依赖锁或上游软件。
 
 ## 验收方法与限制
 

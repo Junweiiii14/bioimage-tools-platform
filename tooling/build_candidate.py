@@ -56,6 +56,19 @@ def licenses(output: Path) -> None:
     python_license = Path(sys.base_prefix) / "LICENSE.txt"
     if python_license.is_file():
         shutil.copyfile(python_license, output / "Python-LICENSE.txt")
+    supplements = ROOT / "tooling/third_party_notices"
+    provenance = supplements / "sources.json"
+    for notice in json.loads(provenance.read_text(encoding="utf-8"))["licenses"]:
+        name = notice["distribution"]
+        if importlib.metadata.version(name) != notice["version"]:
+            raise RuntimeError(f"Supplemental license version mismatch: {name}")
+        source = supplements / notice["file"]
+        if digest(source) != notice["sha256"]:
+            raise RuntimeError(f"Supplemental license digest mismatch: {name}")
+        destination = output / name / "UPSTREAM-LICENSE.txt"
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, destination)
+    shutil.copyfile(provenance, output / "supplemental-sources.json")
 
 
 def main() -> int:
