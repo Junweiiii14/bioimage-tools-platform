@@ -45,3 +45,6 @@ Windows同run全部1265通过/796.59s、全部wheel及末尾Governance成功日�
 原日志保留ignored .local/T080/package/closeout-linux-failure.log及closeout-windows-failure.log。此修正无产品/依赖/安装器变化，安装包仍绑定79b9db9。首次提交因未激活pre-commit失败；恢复项目venv PATH后实际三钩子通过提交，未绕过。
 
 独审受控探针仅确认“真实sessionStateChanged晚quant route能将已可见review overlay隐藏”。人工fresh-token对照与宿主position回报token不一致，新顺序对照未全部通过，不能当成新的产品失败或对照成功；首探针停止整个session_timer和清理参数错误也如实保留。停止扩展探针，不以其覆盖5项真实测试通过。5c788d3源码增量独审Accepted，完整探针与边界见closeout-independent-review.md；原CI唯一根因仍未证实。
+
+
+cd62be8 的 CI39941601014：Linux1265/495.24s及全部wheel成功；Windows1264过1失败/618.94s（不是超时），手动泳道真实拖动期望35,40,20,40而实际39,43,16,37，终点55,80一致。原日志closeout-windows-final.log保留。测试原先仅等两RAF，motion.js进入动画320ms仍可能改变DOMRect；image_point到真实pointerdown之间重取rect，存在布局竞争。新增10秒内等待动画自然结束，再按原两RAF/真实Qt手势执行，abs1不变，附实际dragging起点/rect失败诊断；不finish/cancel动画。现场未采样rect，唯一根因未证实。定向原测试1通过9.10s；Ruff格式首次要求重排后修正，Ruff/Pyright0。独立审查认可该最小就绪修正，未新增人工探针。产品和安装器字节继续保持，后继准确HEAD仍须完整CI。

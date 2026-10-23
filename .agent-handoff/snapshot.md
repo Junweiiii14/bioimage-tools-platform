@@ -8,5 +8,5 @@
 - 原180/PNG39文件及历史未改；21相关来源诊断全自动，两个真实开发项目完整输出。80%独立整项目正确率缺留出/人工真值，未验证，不能用单图放行冒充；干净Win10/所有员工硬件/物理DPI/外部Excel/旧native与GPU根因UNKNOWN保留。
 - 原ResearchVault dirty树、wb-ui-system视频树、旧T079桌面WB和WB.zip、WB-归档-20261023-T079、唯一重建引用runtime-e97d721e7993均保护。禁止重试曾自动审批阻止的旧注册删除。
 - 视频聊天01a16507-01a9-7830-b7d3-cd674efc477b已存在，不重复创建/调度/未经授权发消息。后续只处理本次收尾，不自动扩展产品路线图。
-- PR41首轮Linux1264过1setup超时；Windows1265/全部wheel日志过但15min取消。5c788d3等待初始quant路由消费、保留实际手势断言；foundation20min不减检查。新HEAD待独审/四CI。
+- PR41首轮Linux1264过1setup超时；Windows1265/全部wheel日志过但15min取消。5c788d3等待初始quant路由消费、保留实际手势断言；foundation20min不减检查。cd62be8 Linux1265及wheel成功，Windows1264过1manual-lane坐标setup失败；后继只补动画自然结束等待，abs1/真实事件保持，定向1过，产品不变。最终HEAD待独审/四CI。
 - 下一步：本收尾PR正常必需检查/合入；核最终包仍同SHA后完成目标并交付链接。无需重复构建/已过Qt测试。
