@@ -157,6 +157,11 @@ def prepared(path: Path, count: int = 5) -> WBIntakeCropProject:
             prepare_intake_workflow(p, expected_digest=intake_digest(p), batch_stages=True)
         )
     )
+    # These frozen T072-T080 cases verify historical geometry policies. New
+    # batches use v5; preserve the old route here instead of rewriting its oracle.
+    p = type(p).model_validate(
+        {**dict(p), "workflow": {**dict(p.workflow), "policy": "intake_workflow@4"}}
+    )
     return type(p).model_validate(
         dict(approve_intake_workflow(p, expected_digest=intake_workflow_digest(p)))
     )

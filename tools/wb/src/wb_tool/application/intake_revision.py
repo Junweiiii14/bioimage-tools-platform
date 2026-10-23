@@ -40,7 +40,8 @@ def begin_intake_group_revision(
                 {
                     **dict(project.workflow),
                     "policy": project.workflow.policy
-                    if project.workflow.policy in {"intake_workflow@3", "intake_workflow@4"}
+                    if project.workflow.policy
+                    in {"intake_workflow@3", "intake_workflow@4", "intake_workflow@5"}
                     else "intake_workflow@2",
                     "editing": True,
                     "approved": False,
@@ -65,8 +66,8 @@ def confirm_intake_group_revision(
                 update={
                     "editing": False,
                     "policy": (
-                        "intake_workflow@3"
-                        if project.workflow.policy == "intake_workflow@3"
+                        project.workflow.policy
+                        if project.workflow.policy in {"intake_workflow@3", "intake_workflow@5"}
                         else "intake_workflow@4"
                     )
                     if project.intake.grouping and project.intake.grouping.schema_version == 2

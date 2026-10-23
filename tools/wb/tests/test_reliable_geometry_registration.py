@@ -118,6 +118,10 @@ def grouped_arrays(
             prepare_intake_workflow(p, expected_digest=intake_digest(p), batch_stages=True)
         )
     )
+    # Registration compatibility fixtures retain the T080 algorithm route.
+    p = type(p).model_validate(
+        {**dict(p), "workflow": {**dict(p.workflow), "policy": "intake_workflow@4"}}
+    )
     p = approve_intake_workflow(p, expected_digest=intake_workflow_digest(p))
     assert isinstance(p, WBIntakeCropProject)
     return p, tuple(sources), p.rows[0].row_id

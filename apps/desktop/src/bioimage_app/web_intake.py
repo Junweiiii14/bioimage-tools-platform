@@ -21,6 +21,7 @@ from wb_tool.api import (
     WBJob,
     WBReply,
     accept_export_selections,
+    adopt_intake_crop_barrier,
     assign_intake_sources,
     begin_intake_group_revision,
     confirm_intake,
@@ -30,6 +31,7 @@ from wb_tool.api import (
     intake_workflow_digest,
     prepare_intake_sequence,
     replace_intake_plan,
+    require_intake_crop_barrier,
     retry_intake_workflow_step,
     return_to_intake_editing,
     review_intake_crop,
@@ -302,6 +304,7 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
                 expected_digest=workflow_digest,
                 crop=crop,
                 display_angle=_display_angle(data),
+                use_crop_barrier=data.get("cropBarrier") is True,
             )
 
         generation, epoch = host.view.generation, bridge.session_epoch
@@ -333,6 +336,7 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
     if action == "intake_export_table":
         if intake_digest(project) != digest or not isinstance(project, WBIntakeOutputProject):
             raise ValueError("结果表输入已变化，请重新核对")
+        require_intake_crop_barrier(project)
         host.choose_intake_table_export()
         return
     if action == "intake_measurement_preview":
@@ -403,11 +407,16 @@ def apply_intake_command(bridge: "WorkbenchBridge", action: str, data: dict[str,
                 raise ValueError("此项目没有身份输出阶段")
             if stage != "crop" and not isinstance(project, WBIntakeFigureProject):
                 raise ValueError("此项目没有完整Fig阶段")
+            retry_project = (
+                adopt_intake_crop_barrier(project, expected_digest=workflow_digest)
+                if data.get("cropBarrier") is True
+                else project
+            )
             retried = retry_intake_workflow_step(
-                project,
+                retry_project,
                 cast(Literal["crop", "compose", "measure", "export"], stage),
                 row_id,
-                expected_digest=workflow_digest,
+                expected_digest=intake_workflow_digest(retry_project),
             )
             if not isinstance(retried, WBIntakeCropProject):
                 raise ValueError("固定N裁剪项目类型无效")

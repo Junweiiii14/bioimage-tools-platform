@@ -28,7 +28,11 @@ from wb_tool.domain.grid import fixed_lane_grid
 from wb_tool.domain.lanes import LaneROI
 
 COMMON_GEOMETRY = frozenset({"source_common_band_geometry@1", "guided_common_band_geometry@1"})
-AUTOMATIC_POLICIES = frozenset({"intake_crop@2", "intake_crop@3", "intake_crop@4"})
+PROMINENT_GEOMETRY = frozenset(
+    {"source_prominent_band_geometry@1", "guided_prominent_band_geometry@1"}
+)
+ROW_GEOMETRY = COMMON_GEOMETRY | PROMINENT_GEOMETRY
+AUTOMATIC_POLICIES = frozenset({"intake_crop@2", "intake_crop@3", "intake_crop@4", "intake_crop@5"})
 
 
 class IntakeCropSlot(DocumentIO):
@@ -69,7 +73,7 @@ class IntakeWidthCalibration(DocumentIO):
 
 
 class IntakeFixedGrid(DocumentIO):
-    policy: Literal["fixed_n_frame@1"] = "fixed_n_frame@1"
+    policy: Literal["fixed_n_frame@1", "fixed_n_frame@2"] = "fixed_n_frame@1"
     sampling_policy: Literal["source_axis_partition@1", "source_axis_partition@2"] = (
         "source_axis_partition@1"
     )
@@ -129,6 +133,8 @@ def automatic_intake_crop_allowed(evidence: "IntakeCropEvidence") -> bool:
             "instrument_guided_geometry@2",
             "source_common_band_geometry@1",
             "guided_common_band_geometry@1",
+            "source_prominent_band_geometry@1",
+            "guided_prominent_band_geometry@1",
         }
         or not {
             "signal_orientation_fit@1",
@@ -143,8 +149,16 @@ def automatic_intake_crop_allowed(evidence: "IntakeCropEvidence") -> bool:
         return False
     candidate = detection.candidates[0]
     fixed_width = "fixed_width_grid@1" in detection.flags
-    common = detection.algorithm_id in COMMON_GEOMETRY
-    if common and "common_band_row@1" not in detection.flags:
+    common = detection.algorithm_id in ROW_GEOMETRY
+    if (
+        common
+        and (
+            "prominent_band_row@1"
+            if detection.algorithm_id in PROMINENT_GEOMETRY
+            else "common_band_row@1"
+        )
+        not in detection.flags
+    ):
         return False
     if detection.algorithm_id.endswith("@2") or common:
         grid = evidence.fixed_grid
@@ -152,11 +166,19 @@ def automatic_intake_crop_allowed(evidence: "IntakeCropEvidence") -> bool:
         if (
             grid is None
             or frame is None
-            or "fixed_n_frame@1" not in detection.flags
+            or (
+                grid.policy != "fixed_n_frame@2" or "fixed_n_frame@2" not in detection.flags
+                if detection.algorithm_id in PROMINENT_GEOMETRY
+                else grid.policy != "fixed_n_frame@1" or "fixed_n_frame@1" not in detection.flags
+            )
             or grid.sampling_policy not in detection.flags
             or len(grid.sampling_limits) != evidence.lane_count
             or abs(frame.width - evidence.lane_count * grid.lane_width_pixels) > 1e-7
-            or abs(frame.height - 0.8 * grid.lane_width_pixels) > 1e-7
+            or (
+                "prominent_envelope_frame@1" not in detection.flags
+                if detection.algorithm_id in PROMINENT_GEOMETRY
+                else abs(frame.height - 0.8 * grid.lane_width_pixels) > 1e-7
+            )
         ):
             return False
         if fixed_width and grid.width_basis == "source_row_estimate":
@@ -252,6 +274,7 @@ class IntakeCropEvidence(DocumentIO):
         "intake_crop@2",
         "intake_crop@3",
         "intake_crop@4",
+        "intake_crop@5",
         "intake_crop_display_review@1",
     ] = "intake_crop@1"
     row_id: str = Field(min_length=1, max_length=80)
@@ -275,6 +298,8 @@ class IntakeCropEvidence(DocumentIO):
         "source_signal_geometry@2",
         "source_common_band_geometry@1",
         "guided_common_band_geometry@1",
+        "source_prominent_band_geometry@1",
+        "guided_prominent_band_geometry@1",
     ] = "source_geometry@2"
 
     @model_serializer(mode="wrap")
@@ -306,7 +331,7 @@ class IntakeCropEvidence(DocumentIO):
             bounded_sampling = (
                 self.fixed_grid is not None
                 and self.fixed_grid.sampling_policy == "source_axis_partition@2"
-                and (self.geometry_policy.endswith("@2") or self.geometry_policy in COMMON_GEOMETRY)
+                and (self.geometry_policy.endswith("@2") or self.geometry_policy in ROW_GEOMETRY)
             )
             first = self.slots[0].roi
             previous = first.x0 if bounded_sampling and first is not None else self.crop.x0
@@ -355,6 +380,7 @@ class IntakeCropEvidence(DocumentIO):
             or not automatic_intake_crop_allowed(self)
             or (self.policy == "intake_crop@3") != self.geometry_policy.endswith("@2")
             or (self.policy == "intake_crop@4") != (self.geometry_policy in COMMON_GEOMETRY)
+            or (self.policy == "intake_crop@5") != (self.geometry_policy in PROMINENT_GEOMETRY)
         ):
             raise ValueError("自动采纳须有唯一完整原图几何，不能冒充人工审核")
         if self.selected_index is not None and (
@@ -435,10 +461,19 @@ class WBIntakeCropProject(WBIntakeWorkflowProject):
                     raise ValueError("辅助定位必须绑定同组全部已校验原图资产")
             if (
                 evidence.policy
-                in {"intake_crop@3", "intake_crop@4", "intake_crop_display_review@1"}
+                in {
+                    "intake_crop@3",
+                    "intake_crop@4",
+                    "intake_crop@5",
+                    "intake_crop_display_review@1",
+                }
                 and evidence.detection is not None
                 and evidence.geometry_policy
-                in {"instrument_guided_geometry@2", "guided_common_band_geometry@1"}
+                in {
+                    "instrument_guided_geometry@2",
+                    "guided_common_band_geometry@1",
+                    "guided_prominent_band_geometry@1",
+                }
             ):
                 companions = {
                     asset.sha256 for asset in intake_crop_companion_assets(self, row.row_id)
@@ -529,6 +564,9 @@ def make_intake_crop_evidence(
         lane_count=row.lane_count,
         detection=detection,
         fixed_grid=IntakeFixedGrid(
+            policy="fixed_n_frame@2"
+            if detection.algorithm_id in PROMINENT_GEOMETRY
+            else "fixed_n_frame@1",
             sampling_policy=(
                 "source_axis_partition@2"
                 if "source_axis_partition@2" in detection.flags
@@ -543,9 +581,15 @@ def make_intake_crop_evidence(
             sampling_limits=sampling_limits,
             review_positions=review_positions,
         )
-        if candidate and candidate.display_frame and "fixed_n_frame@1" in detection.flags
+        if candidate
+        and candidate.display_frame
+        and {"fixed_n_frame@1", "fixed_n_frame@2"}.intersection(detection.flags)
         else None,
-        geometry_policy="source_common_band_geometry@1"
+        geometry_policy="source_prominent_band_geometry@1"
+        if detection.algorithm_id == "source_prominent_band_geometry@1"
+        else "guided_prominent_band_geometry@1"
+        if detection.algorithm_id == "guided_prominent_band_geometry@1"
+        else "source_common_band_geometry@1"
         if detection.algorithm_id == "source_common_band_geometry@1"
         else "guided_common_band_geometry@1"
         if detection.algorithm_id == "guided_common_band_geometry@1"
@@ -575,6 +619,8 @@ def make_intake_crop_evidence(
             "instrument_guided_geometry@2",
             "source_common_band_geometry@1",
             "guided_common_band_geometry@1",
+            "source_prominent_band_geometry@1",
+            "guided_prominent_band_geometry@1",
         }
         else "请核对裁剪范围"
         if located
@@ -742,9 +788,11 @@ def accept_automatic_intake_crop(
     from wb_tool.application.intake_workflow import approve_intake_workflow
     from wb_tool.application.laboratory_layout import DisplayFrame
 
-    if project.workflow.policy not in {"intake_workflow@3", "intake_workflow@4"} or not (
-        automatic_intake_crop_allowed(evidence)
-    ):
+    if project.workflow.policy not in {
+        "intake_workflow@3",
+        "intake_workflow@4",
+        "intake_workflow@5",
+    } or not (automatic_intake_crop_allowed(evidence)):
         raise ValueError("自动定位仍需明确范围")
     calibration = evidence.fixed_grid.calibration if evidence.fixed_grid else None
     if calibration is not None and not any(
@@ -765,7 +813,9 @@ def accept_automatic_intake_crop(
     accepted = IntakeCropEvidence.model_validate(
         {
             **dict(evidence),
-            "policy": "intake_crop@4"
+            "policy": "intake_crop@5"
+            if evidence.geometry_policy in PROMINENT_GEOMETRY
+            else "intake_crop@4"
             if evidence.geometry_policy in COMMON_GEOMETRY
             else "intake_crop@3"
             if evidence.geometry_policy.endswith("@2")

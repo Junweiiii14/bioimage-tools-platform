@@ -215,7 +215,11 @@ def verify_sequence_installation(
             try:
                 if not isinstance(
                     project, WBIntakeWorkflowProject
-                ) or project.workflow.policy not in {"intake_workflow@3", "intake_workflow@4"}:
+                ) or project.workflow.policy not in {
+                    "intake_workflow@3",
+                    "intake_workflow@4",
+                    "intake_workflow@5",
+                }:
                     return
                 steps = project.workflow.steps
                 for step in steps:
@@ -228,6 +232,20 @@ def verify_sequence_installation(
                         "export": ("crop", "compose", "measure"),
                     }[step.stage]
                     prerequisites = [s for s in steps if s.stage in earlier]
+                    if project.workflow.policy == "intake_workflow@5":
+                        prerequisites = [
+                            s
+                            for s in prerequisites
+                            if s.stage == "crop"
+                            or step.stage == "export"
+                            or (s.stage == "compose" and s.target_id == step.target_id)
+                        ]
+                        if step.stage != "crop" and (
+                            not isinstance(project, WBIntakeCropProject)
+                            or any(e.raw_crop is None for e in project.intake_crops)
+                            or len(project.intake_crops) != len(project.rows)
+                        ):
+                            errors.append("Downstream work began without every saved raw crop")
                     if project.workflow.policy == "intake_workflow@4":
                         if step.stage == "export":
                             statuses = {(s.stage, s.target_id): s.status for s in steps}

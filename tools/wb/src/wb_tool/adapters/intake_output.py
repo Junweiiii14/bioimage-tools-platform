@@ -24,6 +24,7 @@ from wb_tool.application.intake_output import (
 )
 from wb_tool.application.intake_workflow import (
     IntakeWorkflowTicket,
+    require_intake_crop_barrier,
     validate_intake_workflow_ticket,
 )
 from wb_tool.application.laboratory_layout import (
@@ -147,6 +148,7 @@ def export_intake_outputs(
     from wb_tool.adapters.worksheet_export import publish_table_bytes
 
     project = type(project).model_validate(dict(project))
+    require_intake_crop_barrier(project)
     if ticket is not None:
         validate_intake_workflow_ticket(project, ticket)
         if ticket.stage != "export":

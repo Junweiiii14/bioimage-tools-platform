@@ -63,7 +63,11 @@ class IntakeWorkflowLedger(DocumentIO):
     model_config = ConfigDict(revalidate_instances="always")
 
     policy: Literal[
-        "intake_workflow@1", "intake_workflow@2", "intake_workflow@3", "intake_workflow@4"
+        "intake_workflow@1",
+        "intake_workflow@2",
+        "intake_workflow@3",
+        "intake_workflow@4",
+        "intake_workflow@5",
     ] = "intake_workflow@1"
     editing: bool = False
     intake_digest: str = Field(pattern="^[0-9a-f]{64}$")
@@ -81,7 +85,13 @@ class IntakeWorkflowLedger(DocumentIO):
     @model_validator(mode="after")
     def editing_is_explicit(self) -> "IntakeWorkflowLedger":
         if self.editing and (
-            self.policy not in {"intake_workflow@2", "intake_workflow@3", "intake_workflow@4"}
+            self.policy
+            not in {
+                "intake_workflow@2",
+                "intake_workflow@3",
+                "intake_workflow@4",
+                "intake_workflow@5",
+            }
             or self.approved
             or any(s.status == "running" for s in self.steps)
         ):
@@ -155,6 +165,13 @@ def _prerequisites(
     *,
     batch: bool = True,
 ) -> bool:
+    if (
+        batch
+        and project.workflow.policy == "intake_workflow@5"
+        and step.stage != "crop"
+        and not _all_crops_committed(project)
+    ):
+        return False
     if batch and project.workflow.policy == "intake_workflow@3":
         order = {"crop": 0, "compose": 1, "measure": 2, "export": 3}
         if any(
@@ -183,6 +200,50 @@ def _prerequisites(
     return all(statuses["measure", f.figure_id] == "done" for f in project.intake.figures)
 
 
+def _all_crops_committed(project: WBIntakeWorkflowProject) -> bool:
+    # Import locally: crop evidence extends this ledger's schema. A done ledger
+    # entry alone must never authorize downstream work without the saved asset.
+    from wb_tool.application.intake_crop import WBIntakeCropProject
+
+    if not isinstance(project, WBIntakeCropProject):
+        return False
+    crops = {e.row_id: e for e in project.intake_crops}
+    steps = {(s.stage, s.target_id): s.status for s in project.workflow.steps}
+    return bool(project.rows) and all(
+        steps["crop", row.row_id] == "done"
+        and (evidence := crops.get(row.row_id)) is not None
+        and evidence.geometry_ready
+        and evidence.raw_crop is not None
+        and row.source is not None
+        and evidence.source_sha256 == row.source.sha256
+        and evidence.crop == row.roi
+        for row in project.rows
+    )
+
+
+def adopt_intake_crop_barrier(
+    project: WBIntakeWorkflowProject, *, expected_digest: str
+) -> WBIntakeWorkflowProject:
+    """Explicit continuation revision; reopening never rewrites legacy policy/history."""
+    if expected_digest != intake_workflow_digest(project):
+        raise ValueError("阶段输入已变化，请重新核对")
+    if project.workflow.editing or any(s.status == "running" for s in project.workflow.steps):
+        raise ValueError("请等待当前阶段退出并确认清单后采用整批裁剪规则")
+    if project.workflow.policy != "intake_workflow@4" or all(
+        s.status == "done" for s in project.workflow.steps
+    ):
+        return project
+    return _replace_ledger(project, policy="intake_workflow@5", approved=False)
+
+
+def require_intake_crop_barrier(project: WBIntakeWorkflowProject) -> None:
+    """Check the v5 publication barrier before any new file or directory is created."""
+    if project.workflow.policy == "intake_workflow@5":
+        type(project).model_validate(dict(project))
+        if not _all_crops_committed(project):
+            raise ValueError("本批仍有未完成的原值裁剪，请先完成全部裁剪再输出")
+
+
 def _replace_ledger(project: WBIntakeWorkflowProject, **changes: object) -> WBIntakeWorkflowProject:
     ledger = IntakeWorkflowLedger.model_validate({**dict(project.workflow), **changes})
     return type(project).model_validate({**dict(project), "workflow": ledger})
@@ -204,7 +265,7 @@ def prepare_intake_workflow(
             **dict(project),
             "schema_version": 11,
             "workflow": IntakeWorkflowLedger(
-                policy="intake_workflow@4" if batch_stages else "intake_workflow@1",
+                policy="intake_workflow@5" if batch_stages else "intake_workflow@1",
                 intake_digest=plan.intake_digest,
                 steps=tuple(
                     IntakeWorkflowStep(stage=s, target_id=t) for s, t in _addresses(project)
@@ -268,7 +329,7 @@ def claim_intake_workflow_step(
         and (stage_filter is None or s.stage == stage_filter)
         and _prerequisites(project, s, statuses)
     ]
-    if project.workflow.policy in {"intake_workflow@3", "intake_workflow@4"}:
+    if project.workflow.policy in {"intake_workflow@3", "intake_workflow@4", "intake_workflow@5"}:
         order = {"crop": 0, "compose": 1, "measure": 2, "export": 3}
         pending.sort(key=lambda s: order[s.stage])
     else:
@@ -407,6 +468,7 @@ def intake_workflow_snapshot(project: WBIntakeWorkflowProject) -> dict[str, obje
         "digest": intake_workflow_digest(project),
         "stages_finished": all(s.status == "done" for s in project.workflow.steps),
         "ready_count": sum(s.status == "done" for s in project.workflow.steps),
+        "crop_barrier_ready": _all_crops_committed(project),
         "pending_ready": 0
         if project.workflow.editing
         or (

@@ -1929,8 +1929,29 @@ def test_v4_blocked_first_fig_keeps_second_running_then_repairs_without_repeatin
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    from bioimage_app import web_intake
+
     from tools.wb.tests.test_source_geometry import membrane
 
+    def legacy_sequence(
+        project: WBIntakeProject,
+        grouping: IntakeGrouping,
+        *,
+        expected_digest: str,
+        allow_reuse: bool = False,
+    ) -> WBIntakeWorkflowProject:
+        prepared = prepare_intake_sequence(
+            project, grouping, expected_digest=expected_digest, allow_reuse=allow_reuse
+        )
+        return type(prepared).model_validate(
+            {
+                **dict(prepared),
+                "workflow": {**dict(prepared.workflow), "policy": "intake_workflow@4"},
+            }
+        )
+
+    # Existing v4 records retain partial-Fig behavior; new batches use v5.
+    monkeypatch.setattr(web_intake, "prepare_intake_sequence", legacy_sequence)
     window = intake_window
     advance = cast(Callable[[IntakeWorkflowSession], None], vars(IntakeWorkflowSession)["_advance"])
     paused = False
@@ -2070,4 +2091,104 @@ def test_v4_blocked_first_fig_keeps_second_running_then_repairs_without_repeatin
         if (key := (step.stage, step.target_id)) in before_steps
     } == before_steps
     assert (old_root / "项目恢复.zip").read_bytes() == old_zip
+    assert all(p.read_bytes() == data for p, data in originals.items())
+
+
+def test_v5_attempts_remaining_crop_then_pauses_before_any_fig_or_output(
+    intake_window: WebWorkbenchWindow,
+    qtbot: QtBot,
+    tmp_path: Path,
+) -> None:
+    from tools.wb.tests.test_source_geometry import membrane
+
+    window = intake_window
+    root = tmp_path / "batch-crop-barrier"
+    make_source(root / "A_flat_123456 (1).tiff")
+    tifffile.imwrite(root / "B_signal_123456 (1).tiff", membrane(angle=3, marker=False))
+    originals = {p: p.read_bytes() for p in root.iterdir()}
+    start(window, qtbot, root)
+    initial = current(window)
+    grouping = intake_grouping(initial)
+    selected = IntakeGrouping.model_validate(
+        {
+            **dict(grouping),
+            "groups": tuple(
+                g.model_copy(update={"selected_source_id": g.source_ids[0]})
+                for g in grouping.groups
+            ),
+        }
+    )
+    configured = configure_intake_sequence(
+        selected,
+        (
+            IntakeDraftFigure(figure_id="blocked", label="Fig 1", lane_count=5),
+            IntakeDraftFigure(figure_id="good", label="Fig 2", lane_count=5),
+        ),
+        (
+            IntakeSequenceProtein(entry_id="p1", figure_id="blocked", label="P1"),
+            IntakeSequenceProtein(entry_id="p2", figure_id="good", label="Good protein"),
+        ),
+    )
+    request(
+        window,
+        "intake_sequence_start",
+        grouping=configured.model_dump(mode="json"),
+        requestId="v5-barrier",
+    )
+    qtbot.waitUntil(
+        lambda: window.bridge.sequence_response.get("status") == "started", timeout=10000
+    )
+
+    def crops_finished() -> bool:
+        p = current(window)
+        return isinstance(p, WBIntakeCropProject) and all(
+            s.status in {"done", "needs_review", "failed"}
+            for s in p.workflow.steps
+            if s.stage == "crop"
+        )
+
+    qtbot.waitUntil(crops_finished, timeout=30000)
+    wait_saved(window, qtbot)
+    paused = current(window)
+    assert isinstance(paused, WBIntakeCropProject)
+    assert paused.workflow.policy == "intake_workflow@5"
+    bad, good = paused.rows
+    steps = {(s.stage, s.target_id): s for s in paused.workflow.steps}
+    assert steps["crop", bad.row_id].status == "needs_review"
+    assert steps["crop", good.row_id].status == "done"
+    assert all(
+        s.status == "pending" and s.attempt == 0 for s in paused.workflow.steps if s.stage != "crop"
+    )
+    assert not paused.analyses
+    saved_crop = next(e for e in paused.intake_crops if e.row_id == good.row_id)
+    assert saved_crop.raw_crop is not None
+    saved_step = steps["crop", good.row_id]
+    request(window, "intake_export", workflowDigest=intake_workflow_digest(paused))
+    assert "全部裁剪" in str(window.bridge.snapshot()["status"])
+    assert current(window) == paused
+    request(
+        window,
+        "intake_sequence_continue",
+        workflowDigest=intake_workflow_digest(paused),
+        cropBarrier=True,
+        rowId=bad.row_id,
+        roi={"x": 20, "y": 20, "width": 100, "height": 25},
+    )
+    qtbot.waitUntil(
+        lambda: (
+            isinstance(current(window), WBIntakeOutputProject)
+            and bool(cast(WBIntakeOutputProject, current(window)).intake_outputs)
+        ),
+        timeout=30000,
+    )
+    wait_saved(window, qtbot)
+    completed = current(window)
+    assert isinstance(completed, WBIntakeOutputProject)
+    assert completed.intake_outputs[-1].complete
+    assert all(s.status == "done" for s in completed.workflow.steps)
+    assert (
+        next(s for s in completed.workflow.steps if (s.stage, s.target_id) == ("crop", good.row_id))
+        == saved_step
+    )
+    assert next(e for e in completed.intake_crops if e.row_id == good.row_id) == saved_crop
     assert all(p.read_bytes() == data for p, data in originals.items())

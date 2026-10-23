@@ -12,6 +12,7 @@ from wb_tool.adapters.project_export import project_table_rows
 from wb_tool.adapters.worksheet_export import NS, publish_table_bytes, two_sheet_xlsx_bytes
 from wb_tool.application.intake_output import WBIntakeOutputProject, fill_intake_table
 from wb_tool.application.intake_result_table import intake_visible_table
+from wb_tool.application.intake_workflow import require_intake_crop_barrier
 from wb_tool.application.project_analysis import LoadedProjectResult
 
 
@@ -147,6 +148,7 @@ def export_intake_table(
     *,
     cancelled: Callable[[], bool] = lambda: False,
 ) -> Path:
+    require_intake_crop_barrier(project)
     suffix = Path(destination).suffix.lower()
     if suffix not in {".csv", ".xlsx"}:
         raise ValueError("请选择新的 .xlsx 或 .csv 文件")

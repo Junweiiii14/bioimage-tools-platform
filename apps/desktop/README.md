@@ -1,3 +1,5 @@
+T081：顺序批次接入 `intake_workflow@5` 全批原值裁剪门槛；界面继续/重试可明确升级已有 v4 草稿，未完成裁剪时其他行继续尝试，后续页面及导出暂停。安装诊断同步验证全部原值裁剪依赖。见 `../../docs/contracts/wb-intake-workflow-v5.md`。
+
 T077：平台 WB 入口支持本机目录原生拖入，复用新建仪器项目及草稿保护；最终结果页导出共用可见宽表，保存后重建结果展示。契约见 docs/contracts/wb-visible-result-table-v1.md。
 
 T079：`--laboratory` 生成独立实验室离线发行，通道 `wb-laboratory`、设置 `Laboratory`；只改包装标题/身份，不改计算或项目格式。安装、目标机范围与清理证据见 T079 任务；诊断契约见 `docs/contracts/wb-installed-diagnostics-v1.md`。

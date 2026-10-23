@@ -18,6 +18,7 @@ from wb_tool.application.intake_revision import (
 )
 from wb_tool.application.intake_workflow import (
     WBIntakeWorkflowProject,
+    adopt_intake_crop_barrier,
     intake_workflow_digest,
     intake_workflow_snapshot,
     prepare_intake_workflow,
@@ -58,10 +59,12 @@ def continue_intake_sequence(
     expected_digest: str,
     crop: LaneROI | None = None,
     display_angle: float | None = None,
+    use_crop_barrier: bool = False,
 ) -> WBIntakeCropProject:
     """Explicitly save one human correction or retry the first blocked batch item."""
     if (
-        project.workflow.policy not in {"intake_workflow@3", "intake_workflow@4"}
+        project.workflow.policy
+        not in {"intake_workflow@3", "intake_workflow@4", "intake_workflow@5"}
         or project.workflow.editing
     ):
         raise ValueError("请先确认当前整批执行计划")
@@ -69,6 +72,10 @@ def continue_intake_sequence(
         raise ValueError("阶段输入已变化，请重新核对")
     if any(s.status == "running" for s in project.workflow.steps):
         raise ValueError("请等待当前阶段退出")
+    if use_crop_barrier:
+        upgraded = adopt_intake_crop_barrier(project, expected_digest=expected_digest)
+        project = type(project).model_validate(dict(upgraded))
+        expected_digest = intake_workflow_digest(project)
     if crop is not None:
         selected = next(
             (
@@ -89,7 +96,7 @@ def continue_intake_sequence(
             display_angle=display_angle,
         )
     if (
-        project.workflow.policy == "intake_workflow@4"
+        project.workflow.policy in {"intake_workflow@4", "intake_workflow@5"}
         and intake_workflow_snapshot(project)["pending_ready"]
     ):
         return project
