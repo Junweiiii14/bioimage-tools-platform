@@ -268,7 +268,8 @@ def full_files(
     project = review_intake_crop(
         project,
         "b1",
-        LaneROI("b1", 0, 10, 120, 60),
+        # Rotation retains its chosen size in v2 and needs actual source margins.
+        LaneROI("b1", 4, 10, 116, 60) if native_frame else LaneROI("b1", 0, 10, 120, 60),
         expected_digest=intake_workflow_digest(project),
         display_angle=3 if native_frame else None,
     )

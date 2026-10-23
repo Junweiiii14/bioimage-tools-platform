@@ -21,6 +21,7 @@ from wb_tool.application.intake_workflow import (
     validate_intake_workflow_ticket,
 )
 from wb_tool.domain.automatic import AutoWBSettings, detect_automatic_geometry
+from wb_tool.domain.common_band_geometry import detect_common_band_geometry
 from wb_tool.domain.crop_detection import CropCandidate, CropDetection, CropDetectionSettings
 from wb_tool.domain.export_detection import inspect_export
 from wb_tool.domain.grid import fixed_lane_grid
@@ -145,6 +146,8 @@ def propose_intake_crop(
         flags=(*checked.flags, "source_signal_contour"),
     )
     companions = intake_crop_companion_assets(project, row_id)
+    common_guide = image
+    verified_members: tuple[LoadedTiff, ...] = ()
     if (
         len(companions) == 2
         and sources
@@ -175,6 +178,7 @@ def propose_intake_crop(
         dark.sort(key=lambda item: item[0])
         if len(dark) == 2 and dark[1][0] - dark[0][0] >= 0.03:
             guide, other = dark[0][1], dark[1][1]
+            common_guide, verified_members = guide, tuple(members)
             detection = _checked_geometry(
                 image, guide, row.lane_count, target, cancelled, lane_width=lane_width
             )
@@ -219,8 +223,69 @@ def propose_intake_crop(
                     *("verified_group_sha256:" + member.sha256 for member in members),
                 ),
             )
+    # Preserve previously reliable geometry and its frozen v3 semantics. The
+    # new common-band policy is independent evidence, not a success flag added
+    # to a rejected old candidate. It deliberately ignores distant weak rows.
+    if not detection.candidates or detection.algorithm_id not in {
+        "source_signal_geometry@2",
+        "instrument_guided_geometry@2",
+    }:
+        common = detect_common_band_geometry(
+            image.pixels,
+            common_guide.pixels,
+            AutoWBSettings(lane_count=row.lane_count, crop_policy="source_geometry@2"),
+            target=target,
+            cancelled=cancelled,
+        )
+        if common.candidates:
+            common = replace(
+                common,
+                algorithm_id="source_common_band_geometry@1"
+                if common_guide.sha256 == image.sha256
+                else "guided_common_band_geometry@1",
+            )
+            if verified_members:
+                peer = next(
+                    (
+                        m
+                        for m in verified_members
+                        if m.sha256 not in {image.sha256, common_guide.sha256}
+                    ),
+                    None,
+                )
+                corroborated = (
+                    detect_common_band_geometry(
+                        peer.pixels,
+                        common_guide.pixels,
+                        AutoWBSettings(lane_count=row.lane_count, crop_policy="source_geometry@2"),
+                        target=target,
+                        cancelled=cancelled,
+                    )
+                    if peer
+                    else None
+                )
+                common = replace(
+                    common,
+                    flags=(
+                        *common.flags,
+                        "guide_sha256:" + common_guide.sha256,
+                        *("verified_group_sha256:" + m.sha256 for m in verified_members),
+                        "registered_signal_pair@1"
+                        if corroborated and _same_signal_coordinates(common, corroborated)
+                        else "companion_coordinates_unconfirmed",
+                    ),
+                )
+            detection = common
+        elif not detection.candidates:
+            detection = replace(detection, flags=(*detection.flags, *common.flags))
     if target is not None and not (
-        detection.algorithm_id in {"source_signal_geometry@2", "instrument_guided_geometry@2"}
+        detection.algorithm_id
+        in {
+            "source_signal_geometry@2",
+            "instrument_guided_geometry@2",
+            "source_common_band_geometry@1",
+            "guided_common_band_geometry@1",
+        }
         and detection.candidates
     ):
         roi = target

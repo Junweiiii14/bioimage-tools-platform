@@ -39,8 +39,8 @@ def begin_intake_group_revision(
             "workflow": IntakeWorkflowLedger.model_validate(
                 {
                     **dict(project.workflow),
-                    "policy": "intake_workflow@3"
-                    if project.workflow.policy == "intake_workflow@3"
+                    "policy": project.workflow.policy
+                    if project.workflow.policy in {"intake_workflow@3", "intake_workflow@4"}
                     else "intake_workflow@2",
                     "editing": True,
                     "approved": False,
@@ -64,7 +64,11 @@ def confirm_intake_group_revision(
             "workflow": project.workflow.model_copy(
                 update={
                     "editing": False,
-                    "policy": "intake_workflow@3"
+                    "policy": (
+                        "intake_workflow@3"
+                        if project.workflow.policy == "intake_workflow@3"
+                        else "intake_workflow@4"
+                    )
                     if project.intake.grouping and project.intake.grouping.schema_version == 2
                     else project.workflow.policy,
                 }

@@ -14,9 +14,14 @@ class IntakeVisibleTable:
 
 
 def intake_visible_table(
-    project: WBIntakeProject, cells: tuple[ProjectTableCell, ...]
+    project: WBIntakeProject, cells: tuple[ProjectTableCell, ...], *, figure_id: str = ""
 ) -> IntakeVisibleTable:
-    count = max((f.lane_count for f in project.intake.figures), default=0)
+    if figure_id and not any(f.figure_id == figure_id for f in project.intake.figures):
+        raise ValueError("结果表Fig身份不存在")
+    count = max(
+        (f.lane_count for f in project.intake.figures if not figure_id or f.figure_id == figure_id),
+        default=0,
+    )
     figures = {f.figure_id: f for f in project.intake.figures}
     by_position = {(c.row_id, c.lane_index): c for c in cells}
     counts: dict[str, tuple[int, int]] = {}
@@ -25,7 +30,10 @@ def intake_visible_table(
         counts[cell.row_id] = present + 1, warnings + (cell.status != "valid")
     rows: list[tuple[str | float | None, ...]] = []
     quality: list[tuple[int, int]] = []
-    for ri, protein in enumerate(project.intake.proteins):
+    proteins = tuple(
+        p for p in project.intake.proteins if not figure_id or p.figure_id == figure_id
+    )
+    for ri, protein in enumerate(proteins):
         figure = figures[protein.figure_id]
         present, warnings = counts.get(protein.protein_id, (0, 0))
         status = (

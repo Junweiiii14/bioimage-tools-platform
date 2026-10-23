@@ -26,7 +26,7 @@ window.intakeWorkspace = (() => {
   progress.id = 'intake-batch-progress';progress.hidden = true;
   progress.setAttribute('aria-label','整批处理进度');root.before(progress);
   let followed = '', browsing = false, composing = false, navigating = false;
-  const batchPolicy = () => state.intake?.workflow?.policy === 'intake_workflow@3';
+  const batchPolicy = () => ['intake_workflow@3','intake_workflow@4'].includes(state.intake?.workflow?.policy);
   const batchReason = value => /source_width_estimate_conflicts_with_support|fixed_grid_clips_target_support/.test(value||'')?'当前槽宽无法容纳完整信号，请核对条带与标记的分界后保存范围。':/additional_signal_at_target_row/.test(value||'')?'目标附近还有未能排除的信号，请核对完整范围后继续。':/group_signal_coordinates_unverified/.test(value||'')?'同组图片的位置证据不一致，请在所选原图核对范围。':/target_frame_exceeds_membrane/.test(value||'')?'范围超出可确认的膜内区域，请调整裁剪框。':/lane_spacing_ambiguous|lane_shape_ambiguous/.test(value||'')?'泳道结构尚不明确，请核对全部 N 个槽位。':/signal_orientation_insufficient/.test(value||'')?'条带方向证据不足，请核对原图范围和角度后继续。':/signal_orientation_ambiguous/.test(value||'')?'条带方向不一致，请核对本次目标和角度后继续。':/signal_rows_ambiguous|signal_target_overlap|guide_multiple_membranes/.test(value||'')?'当前范围包含多个可能目标，请明确本次条带范围后继续。':/guided_target_ambiguous/.test(value||'')?'检测到多个条带区域，请在原图明确本次目标范围后继续。':/explicit_lane_count_conflicts|guided_target_not_supported/.test(value||'')?'尚未取得与 N 一致的完整条带，请核对 N 或在原图明确范围后继续。':/crop_policy|automatic_geometry|membrane_not_found|no_reliable_membrane/.test(value||'') ? '未能确定完整裁剪范围，请在对应原图框选包含全部样本槽位的整行范围，保存后继续。' : value || '';
   function noteBrowse(){if(batchPolicy()&&state.intake?.automation?.follow&&!navigating){browsing=true;renderProgress();}}
   const phaseNames = {crop:'原图裁剪',compose:'完整 Fig 拼图',measure:'原像素定量',export:'结果输出',complete:'统一结果'};
@@ -41,7 +41,8 @@ window.intakeWorkspace = (() => {
   let renderedWorkflow = null, focusAction = null;
   let key = '', baseDigest = '', basePlan = '', draft = null, batch = [], selected = new Set();
   let conflict = false, pending = null, replace = false, allowReuse = false, filter = '';
-  const cropDrafts = new Map(), cropPending = new Map();
+  const cropDrafts = new Map(), cropPending = new Map(), rotationErrors = new Map();
+  let rotationEdit = null, rotationPreview = null;
   let cropSavedRow = null, cropFocusAction = null, chosenFigureId = null;
   let resultPage = 0, stagePage = 0;
   let previewRequested = '';
@@ -55,7 +56,7 @@ window.intakeWorkspace = (() => {
   });
   const planText = value => JSON.stringify(copyPlan(value));
   const planDirty = () => !!draft && planText(draft) !== basePlan;
-  const hasDraft = () => window.intakeGrid.hasDraft() || window.intakeQuant.hasDraft() || window.intakeGroups.hasDraft() || discoveryDirty || planDirty() || batch.length > 0 || cropDrafts.size > 0;
+  const hasDraft = () => window.intakeGrid.hasDraft() || window.intakeQuant.hasDraft() || window.intakeGroups.hasDraft() || discoveryDirty || planDirty() || batch.length > 0 || cropDrafts.size > 0 || rotationErrors.size > 0;
   const guard = () => ({projectId: state.projectId, sessionEpoch: state.sessionEpoch, digest: baseDigest});
   const uid = () => crypto.randomUUID();
   const source = id => state.intake?.sources.find(item => item.source_id === id);
@@ -73,7 +74,7 @@ window.intakeWorkspace = (() => {
     followed = '';browsing = false;composing = false;progress.hidden = true;
     window.intakeGroups.reset();window.intakeQuant.reset();window.intakeGrid.reset();
     discoveryKey = ''; discoveryDirty = false; discoveryChoices.clear();
-    cropDrafts.clear(); cropPending.clear();
+    cropDrafts.clear(); cropPending.clear(); rotationErrors.clear(); rotationEdit=null; rotationPreview=null;
     cropSavedRow = null;
     cropFocusAction = null; chosenFigureId = null; resultPage = 0; stagePage = 0;
     renderedWorkflow = null; focusAction = null; live.textContent = '';navigating=false;
@@ -119,13 +120,14 @@ window.intakeWorkspace = (() => {
   const cropGuard = () => ({...guard(), workflowDigest:state.intake.workflow.digest});
   function syncCrops() {
     if (!state.intake?.cropEnabled) return;
+    if(rotationPreview&&(!sameCropIdentity(rotationPreview.identity)||rotationPreview.digest!==state.intake.workflow.digest))rotationPreview=null;
     for (const r of state.rows) {
       const evidence = state.intake.crops?.find(e => e.row_id === r.id);
       const submitted = cropPending.get(r.id);
       const step = state.intake.workflow.steps.find(s=>s.stage==='crop'&&s.target_id===r.id);
       if (submitted && evidence?.reviewed && (submitted.displayAngle==null||Math.abs((evidence.displayFrame?.angle_degrees||0)-submitted.displayAngle)<1e-7) && (step?.status === 'pending' || batchPolicy() && ['running','done'].includes(step?.status)) && submitted.digest !== state.intake.workflow.digest && JSON.stringify(cropBox(evidence.crop)) === JSON.stringify(submitted.roi)) {
         const newer=cropDrafts.get(r.id);
-        if(newer && (JSON.stringify(newer.roi)!==JSON.stringify(submitted.roi)||(newer.displayAngle??null)!==(submitted.displayAngle??null))) {
+        if(newer && (JSON.stringify(newer.roi)!==JSON.stringify(submitted.roi)||(newer.displayAngle??evidence.displayFrame?.angle_degrees??0)!==(submitted.displayAngle??0))) {
           newer.original={...submitted.roi};newer.digest=state.intake.workflow.digest;newer.conflict=false;
           newer.history=[{...submitted.roi},{...newer.roi}];newer.angleHistory=[submitted.displayAngle,newer.displayAngle];newer.index=1;
           live.textContent='已保存提交的范围；之后的新调整仍保留为草稿。';
@@ -151,7 +153,7 @@ window.intakeWorkspace = (() => {
     if (state.intake?.workflow?.editing) return false;
     const step = state.intake?.workflow?.steps.find(s=>s.stage==='crop'&&s.target_id===id);
     const evidence=state.intake?.crops?.find(e=>e.row_id===id);
-    return !!step && (['needs_review','failed','cancelled','interrupted','done'].includes(step.status) || step.status==='pending'&&evidence?.reviewed&&!evidence.raw_crop);
+    return !!step && (['needs_review','failed','cancelled','interrupted','done'].includes(step.status) || step.status==='pending'&&evidence?.reviewed&&(!evidence.raw_crop||evidence.policy==='intake_crop_display_review@1'));
   }
   function stageCrop(next, before, paint = true) {
     const r = row();
@@ -173,6 +175,7 @@ window.intakeWorkspace = (() => {
     if (!draft || state.busy || state.intake?.workflow?.editing) return;
     const index = draft.index + (redo ? 1 : -1);
     if (index < 0 || index >= draft.history.length) return;
+    rotationEdit=null;rotationPreview=null;rotationErrors.delete(r.id);
     draft.index = index; draft.roi = draft.history[index]; r.roi = draft.roi;
     draft.displayAngle=draft.angleHistory?.[index];
     render();
@@ -183,18 +186,21 @@ window.intakeWorkspace = (() => {
     const draft=r&&cropDrafts.get(r.id),correcting=step?.status==='done';
     // Legacy cropPending tracks the saved-snapshot acknowledgement, not an
     // active request; failed saves must retain the original retry action.
-    const locked=!!state.busy||!r?.roi||!evidence||!cropEditable(r.id)||!!draft?.conflict||(batchPolicy()&&!!cropPending.size);
-    const saved=batchPolicy()&&correcting&&!draft;
+    const rotationProblem=rotationError(r);
+    const locked=!!state.busy||!r?.roi||!evidence||!cropEditable(r.id)||!!draft?.conflict||!!rotationProblem||(batchPolicy()&&!!cropPending.size);
+    const saved=batchPolicy()&&correcting&&!draft&&!rotationErrors.has(r?.id);
     $$('[data-intake-crop-action="confirm"]').forEach(button=>{
       button.disabled=locked||((correcting||step?.status==='pending')&&!draft);button.hidden=saved;
     });
     $$('[data-intake-crop-action="run"]').forEach(button=>{
       button.disabled=batchPolicy()?locked:!!state.busy||hasDraft()||!runnable();button.hidden=saved;
     });
-    $$('[data-intake-crop-action="discard"]').forEach(button=>button.disabled=!!state.busy||!draft);
+    $$('[data-intake-crop-action="discard"]').forEach(button=>button.disabled=!!state.busy||(!draft&&!rotationErrors.has(r?.id)));
     const notice=draft?.conflict?'后台输入已改变，草稿保留；放弃后重新核对。':
       ['needs_review','failed'].includes(step?.status)?batchReason(evidence?.reason):'';
     $$('[data-intake-crop-notice]').forEach(node=>{node.textContent=notice;node.hidden=!notice;});
+    $$('[data-intake-rotation-error]').forEach(node=>{node.textContent=rotationProblem;node.hidden=!rotationProblem;});
+    $$('[data-intake-rotation]').forEach(input=>input.setAttribute('aria-invalid',String(!!rotationProblem)));
     if(!saved)$$('.intake-saved-note').forEach(note=>note.remove());
   }
   function renderCropInspector(r) {
@@ -219,10 +225,11 @@ window.intakeWorkspace = (() => {
     $('#inspector-title').textContent = '裁剪信息';
     $('#review-badge').textContent = draft ? '未保存' : evidence?.raw_crop ? '原值已保存' : step?.status==='needs_review' ? '需调整' : '待处理';
     $('#review-badge').className = 'status-badge '+(evidence?.raw_crop?'ok':'pending');
-    $('#inspector-content').innerHTML = `<section class="inspect-section"><h3>${r?escapeText(targetName(r.id)):'请选择蛋白行'}</h3>${dataPair('固定槽位数',r?.lanes||0)}${dataPair('裁图',evidence?.raw_crop?(['intake_crop@2','intake_crop@3'].includes(evidence.policy)?'自动定位已保存':'已保存'):'待处理')}<p class="row-reason" data-intake-crop-notice role="status" hidden></p><details><summary>范围与槽位说明</summary><p>在原图调整整行范围。手动确认按固定 N 等宽分割；无信号槽位保留。</p><p>${escapeText(evidence?.reason||'尚未定位')}</p></details></section>`;
+    $('#inspector-content').innerHTML = `<section class="inspect-section"><h3>${r?escapeText(targetName(r.id)):'请选择蛋白行'}</h3>${dataPair('固定槽位数',r?.lanes||0)}${dataPair('裁图',evidence?.raw_crop?(['intake_crop@2','intake_crop@3','intake_crop@4'].includes(evidence.policy)?'自动定位已保存':'已保存'):'待处理')}<p class="row-reason" data-intake-crop-notice role="status" hidden></p><details><summary>范围与槽位说明</summary><p>在原图调整整行范围。手动确认按固定 N 等宽分割；无信号槽位保留。</p><p>${escapeText(evidence?.reason||'尚未定位')}</p></details></section>`;
     if(r?.roi){
-      const angle=draft?.displayAngle??evidence?.displayFrame?.angle_degrees??0;
-      $('#inspector-content').insertAdjacentHTML('beforeend',`<section class="inspect-section"><h3>裁图纠偏</h3><canvas class="intake-rotation-preview" aria-label="纠偏后的裁图预览"></canvas><label class="field">角度（度）<input data-intake-rotation type="number" min="-10" max="10" step="0.1" value="${Number(angle).toFixed(2)}" ${state.busy||!reviewable?'disabled':''}></label><button class="text-button" data-intake-reset-rotation ${state.busy||!reviewable?'disabled':''}>恢复不旋转</button><small>纠偏用于显示与拼图；定量范围保持原图坐标。</small></section>`);
+      const angle=rotationFrame(r).angle_degrees;
+      const angleValue=rotationErrors.has(r.id)?escapeText(rotationErrors.get(r.id)):Number(angle).toFixed(2);
+      $('#inspector-content').insertAdjacentHTML('beforeend',`<section class="inspect-section"><h3>裁图纠偏</h3><canvas class="intake-rotation-preview" aria-label="纠偏后的裁图预览"></canvas><label class="field">角度（度）<input data-intake-rotation type="number" min="-30" max="30" step="0.1" value="${angleValue}" ${state.busy||!reviewable?'disabled':''}></label><button class="text-button" data-intake-reset-rotation ${state.busy||!reviewable?'disabled':''}>恢复不旋转</button><p class="row-reason rotation-error" data-intake-rotation-error role="status" hidden></p><small>拖动主图旋转柄或输入 −30° 至 30°。实线为显示与拼图范围，虚线为原图定量范围；旋转不改变灰度数值。</small></section>`);
       drawRotationPreview(r,evidence,draft);
     }
     if(batchPolicy()&&evidence?.reason&&batchReason(evidence.reason)!==evidence.reason)$('#inspector-content').insertAdjacentHTML('beforeend',`<details class="inspect-section"><summary>处理详情</summary><p class="row-reason">${escapeText(evidence.reason)}</p></details>`);
@@ -244,16 +251,33 @@ window.intakeWorkspace = (() => {
     }
     if (cropPending.size && state.status && live.textContent !== state.status) live.textContent = state.status;
   }
-  function drawRotationPreview(r,evidence,draft){
+  function rotationFrame(r=row()) {
+    if(!r?.roi||!state.intake?.cropEnabled)return null;
+    const roi=r.roi,evidence=state.intake.crops?.find(e=>e.row_id===r.id),saved=cropBox(evidence?.crop);
+    const sameRoi=saved&&['x','y','width','height'].every(k=>roi[k]===saved[k]);
+    const base={center_x:roi.x+roi.width/2,center_y:roi.y+roi.height/2,width:roi.width,height:roi.height,...(sameRoi?evidence.displayFrame:null)};
+    const preview=rotationPreview&&sameCropIdentity(rotationPreview.identity)&&rotationPreview.digest===state.intake.workflow.digest?rotationPreview.angle:null;
+    return {...base,angle_degrees:preview??cropDrafts.get(r.id)?.displayAngle??evidence?.displayFrame?.angle_degrees??0};
+  }
+  function rotationCorners(frame) {
+    const rad=frame.angle_degrees*Math.PI/180,c=Math.cos(rad),s=Math.sin(rad);
+    return [[-1,-1],[1,-1],[1,1],[-1,1]].map(([x,y])=>({x:frame.center_x+x*frame.width/2*c-y*frame.height/2*s,y:frame.center_y+x*frame.width/2*s+y*frame.height/2*c}));
+  }
+  function rotationError(r=row()) {
+    if(!r?.roi)return '';
+    if(rotationErrors.has(r.id))return '请输入 −30° 至 30° 之间的有效角度。';
+    const frame=rotationFrame(r);if(!frame)return '';
+    return rotationCorners(frame).some(p=>p.x< -1e-7||p.y< -1e-7||p.x>r.width+1e-7||p.y>r.height+1e-7)?'旋转后的显示框超出原图。请移动或缩小范围，或减小角度后保存。':'';
+  }
+  function drawRotationPreview(r){
     const canvases=$$('.intake-rotation-preview');if(!canvases.length||!r?.preview||!r.roi)return;
-    const roi=r.roi,angle=draft?.displayAngle??evidence?.displayFrame?.angle_degrees??0;
+    const frame=rotationFrame(r),angle=frame.angle_degrees;
     const rad=angle*Math.PI/180,c=Math.cos(rad),s=Math.sin(rad);
-    const factor=Math.min(roi.width/(roi.width*Math.abs(c)+roi.height*Math.abs(s)),roi.height/(roi.width*Math.abs(s)+roi.height*Math.abs(c)));
-    const frame=draft?.displayAngle==null&&evidence?.displayFrame&&JSON.stringify(roi)===JSON.stringify(cropBox(evidence.crop))?evidence.displayFrame:{center_x:roi.x+roi.width/2,center_y:roi.y+roi.height/2,width:roi.width*factor,height:roi.height*factor};
     const width=Math.min(420,Math.round(frame.width)),height=Math.max(1,Math.round(width*frame.height/frame.width));
     for(const canvas of canvases){
       const paint=Symbol();rotationPaints.set(canvas,paint);
       canvas.width=width;canvas.height=height;
+      canvas.hidden=!!rotationError(r);if(canvas.hidden)continue;
       const image=new Image();image.onload=()=>{
         if(!canvas.isConnected||rotationPaints.get(canvas)!==paint)return;
         const ctx=canvas.getContext('2d'),sx=width/frame.width,sy=height/frame.height;
@@ -271,19 +295,38 @@ window.intakeWorkspace = (() => {
     drawRotationPreview(r,state.intake.crops?.find(e=>e.row_id===r?.id),cropDrafts.get(r?.id));
     return true;
   }
-  function stageRotation(value, paint = true){
+  function paintRotation(r=row(),refit=true) {
+    syncCropControls(r);drawRotationPreview(r);if(refit)fitImage();
+  }
+  function previewRotation(angle=null,refit=true) {
+    rotationPreview=angle==null?null:{angle,identity:cropIdentity(),digest:state.intake.workflow.digest};
+    if(angle!=null)rotationErrors.delete(row()?.id);
+    const frame=rotationFrame();if(frame)$$('[data-intake-rotation]').forEach(input=>{if(input!==document.activeElement)input.value=frame.angle_degrees.toFixed(2);});
+    paintRotation(row(),refit);
+  }
+  function stageRotation(value, paint = true, input = null){
     const r=row(),angle=Number(value);
-    if(value===''||!r?.roi||state.busy||!cropEditable(r.id)||!Number.isFinite(angle)||Math.abs(angle)>10)return;
-    stageCrop({...r.roi},r.roi,false);const draft=cropDrafts.get(r.id);draft.displayAngle=angle;draft.angleHistory[draft.index]=angle;
+    if(!r?.roi||state.busy||!cropEditable(r.id))return;
+    rotationPreview=null;
+    if(value===''||!Number.isFinite(angle)||Math.abs(angle)>30){rotationErrors.set(r.id,String(value));paintRotation(r);updateChrome();return;}
+    rotationErrors.delete(r.id);
+    let draft=cropDrafts.get(r.id);
+    if(angle!==rotationFrame(r).angle_degrees){
+      if(!input||rotationEdit?.input!==input||rotationEdit.draft!==draft||rotationEdit.index!==draft?.index){
+        stageCrop({...r.roi},r.roi,false);draft=cropDrafts.get(r.id);
+        rotationEdit=input?{input,draft,index:draft.index}:null;
+      }
+      draft.displayAngle=angle;draft.angleHistory[draft.index]=angle;
+    }
     if(paint){render();return;}
     // Number inputs emit change between a button's mousedown and mouseup.
     // Keep those DOM nodes alive so that the same press can finish its click.
-    $('#review-badge').textContent='未保存';
-    syncCropControls(r);
-    drawRotationPreview(r,state.intake.crops?.find(e=>e.row_id===r.id),draft);
+    if(draft)$('#review-badge').textContent='未保存';
+    paintRotation(r);
     updateChrome();renderSourceList();
   }
-  document.addEventListener('change',event=>{if(event.target.matches('[data-intake-rotation]'))stageRotation(event.target.value,false);});
+  document.addEventListener('input',event=>{if(event.target.matches('[data-intake-rotation]'))stageRotation(event.target.value,false,event.target);});
+  document.addEventListener('change',event=>{if(event.target.matches('[data-intake-rotation]')){stageRotation(event.target.value,false,event.target);rotationEdit=null;}});
   document.addEventListener('click',event=>{if(event.target.closest('[data-intake-reset-rotation]'))stageRotation(0);});
   function cropActions(step) {
     if (!state.intake.cropEnabled) return '';
@@ -306,13 +349,13 @@ window.intakeWorkspace = (() => {
     if(state.busy||!bridge||!batchPolicy())return;
     const r=row(),step=state.intake.workflow.steps.find(s=>s.stage==='crop'&&s.target_id===r?.id);
     const correcting=mode==='review'&&r?.roi&&cropEditable(r.id)&&(step?.status!=='done'||cropDrafts.has(r.id));
-    if(hasDraft()&&(!correcting||[...cropDrafts.keys()].some(id=>id!==r.id)||window.intakeGroups.hasDraft()||planDirty()||discoveryDirty||batch.length)){toast('请先保存或放弃其他草稿。');return;}
+    if(hasDraft()&&(!correcting||[...cropDrafts.keys(),...rotationErrors.keys()].some(id=>id!==r.id)||window.intakeGroups.hasDraft()||planDirty()||discoveryDirty||batch.length)){toast('请先保存或放弃其他草稿。');return;}
     const blocked=state.intake.workflow.steps.find(s=>s.stage==='crop'&&s.status==='needs_review');
-    if(!correcting&&blocked){select(blocked.target_id);switchMode('review');toast('请在此原图确认裁剪范围后继续。');return;}
+    if(!correcting&&blocked&&(state.intake.workflow.policy!=='intake_workflow@4'||!state.intake.workflow.pending_ready)){select(blocked.target_id);switchMode('review');toast('请在此原图确认裁剪范围后继续。');return;}
     const payload=cropGuard();
     if(correcting){
-      if(cropDrafts.get(r.id)?.conflict)return;
-      payload.rowId=r.id;payload.roi={...r.roi};payload.displayAngle=cropDrafts.get(r.id)?.displayAngle;
+      if(cropDrafts.get(r.id)?.conflict||rotationError(r))return;
+      payload.rowId=r.id;payload.roi={...r.roi};payload.displayAngle=rotationFrame(r).angle_degrees;
       cropPending.set(r.id,{roi:{...r.roi},displayAngle:payload.displayAngle,digest:state.intake.workflow.digest});
     }
     browsing=false;followed='';send('intake_sequence_continue',payload);
@@ -321,6 +364,9 @@ window.intakeWorkspace = (() => {
   topAction.id='intake-primary';topAction.className='button primary';topAction.hidden=true;
   $('.mode-bar').append(topAction);
   const topSummary=document.createElement('span');topSummary.className='intake-top-summary';topSummary.hidden=true;topAction.before(topSummary);
+  const deliveryBar=document.createElement('section');
+  deliveryBar.className='intake-delivery-bar';deliveryBar.hidden=true;deliveryBar.setAttribute('aria-label','项目交付');
+  $('.mode-bar').after(deliveryBar);
   const newFigure=document.createElement('button');newFigure.className='text-button';newFigure.id='intake-new-figure';newFigure.textContent='新建 Fig';newFigure.hidden=true;
   $('.header-actions').prepend(newFigure);
   newFigure.addEventListener('click',()=>window.intakeGroups.activate('add-fig'));
@@ -328,7 +374,7 @@ window.intakeWorkspace = (() => {
     if(topAction.disabled)return;
     if(!batchPolicy()||state.intake.workflow.editing){window.intakeGroups.activate('start');return;}
     if(state.busy){action('cancel');return;}
-    if(state.intake.automation?.complete){if(!hasDraft())send('intake_export_table',guard());return;}
+    if(state.intake.automation?.complete){if(!hasDraft())send('intake_export',cropGuard());return;}
     resumeBatch();
   });
   function updateChrome(){
@@ -348,10 +394,12 @@ window.intakeWorkspace = (() => {
       const a=state.intake.automation;
       const current=state.intake.workflow.steps.find(s=>s.stage==='crop'&&s.target_id===row()?.id);
       const reviewing=mode==='review'&&(current?.status==='needs_review'||cropDrafts.has(row()?.id));
-      topAction.textContent=state.busy?'暂停处理':a?.complete?'导出结果表':reviewing?'保存范围并继续':'继续自动处理';
+      topAction.textContent=state.busy?'暂停处理':a?.complete?'导出完整项目':reviewing?'保存范围并继续':'继续自动处理';
       topAction.disabled=!bridge||!!cropPending.size||!!(a?.complete&&hasDraft())||!!(state.busy&&!a?.phase);
       topSummary.textContent=`${state.intake.proteins.length} 个蛋白 · ${state.intake.figures.length} 个 Fig`;
     }
+    renderDeliveryBar();
+    if(!deliveryBar.hidden&&state.intake?.automation?.complete&&!state.busy)topAction.hidden=topSummary.hidden=true;
     const keys=['intake','review','layout','quant','results'];
     const labels=['配置原图','自动裁图','拼图排版','灰度定量','结果表'];
     $$('.mode-tab').forEach(tab=>{
@@ -364,6 +412,16 @@ window.intakeWorkspace = (() => {
       tab.querySelector('.mode-step').textContent=done?'✓':index+1;
       tab.classList.toggle('stage-complete',done);
     });
+  }
+  function renderDeliveryBar(){
+    deliveryBar.hidden=!state.intake?.outputEnabled||!['layout','results'].includes(mode);
+    if(deliveryBar.hidden)return;
+    const ready=new Set((state.intake.figuresReady||[]).map(f=>f.figure_id));
+    const missing=state.intake.figures.filter(f=>!ready.has(f.figure_id)).length;
+    const draft=hasDraft(),locked=state.busy||!bridge;
+    const reason=draft?'请先保存或放弃当前修改。':missing?`完整拼图还需 ${missing} 个 Fig 成图。`:'包含所有 Fig；原图、裁图、拼图与灰度表按组收纳。';
+    const directory=state.intake.delivery?.rootPath||state.intake.output?.path;
+    updateMarkup(deliveryBar,`<div class="intake-delivery-copy"><strong>完整项目交付</strong><p role="status">${escapeText(reason)}</p></div><div class="intake-delivery-actions"><button class="button primary" data-intake-crop-action="export" ${locked||draft?'disabled':''}>导出完整项目</button><button class="button subtle" data-ig-export="all" ${locked||draft||missing?'disabled':''}>导出完整拼图</button><button class="button subtle" data-intake-table-export ${locked||draft?'disabled':''}>导出灰度表</button><button class="text-button" data-intake-open-directory ${locked||!directory?'disabled':''}>打开项目目录</button></div>`);
   }
   function renderProgress() {
     updateChrome();
@@ -535,6 +593,7 @@ window.intakeWorkspace = (() => {
     if(selected&&!state.busy)send('intake_view_figure',{...cropGuard(),figureId:selected.figure_id});
   }
   function renderFigureInspector() {
+    renderDeliveryBar();
     if(!state.intake?.figureEnabled||!['layout','results'].includes(mode))return false;
     const figureId=chosenFigureId||state.intake.displayFigureId;
     const fig=state.intake.figures.find(f=>f.figure_id===figureId);
@@ -552,7 +611,7 @@ window.intakeWorkspace = (() => {
     if(!state.intake?.outputEnabled)return '';
     const output=state.intake.output, latest=(state.intake.outputs||[]).find(item=>item.destination===output?.path);
     const status=output?.path?(output.committed?(output.current===false?'历史快照已保留；当前输入已变化，需要重新输出':latest?.complete?'完整快照已登记':'部分快照已登记，未完成项仍需处理'):(state.busy?'目录已发布，正在登记项目':'目录已发布，项目尚未登记；已生成文件保留')):'完整批次完成后自动输出；也可先保存含未完成项的快照。';
-    return `<section class="inspect-section intake-output-info"><h3>结果快照</h3><p role="status">${escapeText(status)}</p>${output?.path?`<p class="intake-output-path">${escapeText(output.path)}</p>`:''}<details><summary>快照包含什么</summary><p>每次保存到新目录，包含 CSV / Excel、裁图、Fig、状态报告和恢复归档。</p></details>${latest?.errors?.length?`<details><summary>${latest.errors.length} 项缺口</summary><ul>${latest.errors.map(error=>`<li>${escapeText(error)}</li>`).join('')}</ul></details>`:''}<button class="button subtle full" data-intake-crop-action="export" ${state.busy||hasDraft()||!bridge?'disabled':''}>${output?.path?'重新导出到新目录':'保存当前结果快照'}</button></section>`;
+    return `<section class="inspect-section intake-output-info"><h3>完整项目文件夹</h3><p role="status">${escapeText(status)}</p>${output?.path?`<p class="intake-output-path">${escapeText(output.path)}</p>`:''}<details><summary>项目包含什么</summary><p>每次导出到新目录，包含全部组内原图、原值裁图与展示图、单 Fig 与完整拼图、灰度总表与分组表，以及项目恢复包。</p></details>${latest?.errors?.length?`<details><summary>${latest.errors.length} 项缺口</summary><ul>${latest.errors.map(error=>`<li>${escapeText(error)}</li>`).join('')}</ul></details>`:''}<button class="button subtle full" data-intake-crop-action="export" ${state.busy||hasDraft()||!bridge?'disabled':''}>${output?.path?'重新导出到新目录':'导出完整项目'}</button></section>`;
   }
   function renderIntakeResults() {
     const pageSize=200, pages=Math.max(1,Math.ceil(state.cells.length/pageSize));
@@ -805,7 +864,7 @@ window.intakeWorkspace = (() => {
     } else if (action === 'remove-new-protein' && !state.intake.proteins.some(protein => protein.protein_id === item.dataset.id)) {
       focusFigure = draft.proteins.find(protein => protein.protein_id === item.dataset.id)?.figure_id;
       draft.proteins = draft.proteins.filter(protein => protein.protein_id !== item.dataset.id);
-    } else if (action === 'reload') { discoveryChoices.clear(); discoveryDirty=false; for (const r of state.rows) { const local=cropDrafts.get(r.id); if(local){r.roi=local.original;r.draft=false;} } cropDrafts.clear(); cropPending.clear(); syncCrops(); draft = copyPlan(state.intake); basePlan = planText(state.intake); baseDigest = state.intake.digest; batch = []; selected.clear(); conflict = false; pending = null; }
+    } else if (action === 'reload') { discoveryChoices.clear(); discoveryDirty=false; for (const r of state.rows) { const local=cropDrafts.get(r.id); if(local){r.roi=local.original;r.draft=false;} } cropDrafts.clear(); cropPending.clear(); rotationErrors.clear(); rotationEdit=null;rotationPreview=null;syncCrops(); draft = copyPlan(state.intake); basePlan = planText(state.intake); baseDigest = state.intake.digest; batch = []; selected.clear(); conflict = false; pending = null; }
     else if (action === 'stage') { for (const source_id of selected) if (!batch.some(binding => binding.source_id === source_id)) batch.push({source_id, protein_id: ''}); selected.clear(); }
     else if (action === 'duplicate') batch.splice(Number(item.dataset.index) + 1, 0, {source_id: batch[Number(item.dataset.index)].source_id, protein_id: ''});
     else if (action === 'remove-binding') batch.splice(Number(item.dataset.index), 1);
@@ -835,6 +894,10 @@ window.intakeWorkspace = (() => {
     if (focusFigure) $$('[data-intake=add-protein]', root).find(button => button.dataset.id === focusFigure)?.focus();
   });
   document.addEventListener('click', event => {
+    const openDirectory=event.target.closest('[data-intake-open-directory]');
+    if(openDirectory&&!openDirectory.disabled&&!state.busy){send('intake_open_directory',guard());return;}
+    const tableExport=event.target.closest('.intake-delivery-bar [data-intake-table-export]');
+    if(tableExport&&!tableExport.disabled&&!state.busy&&!hasDraft()){send('intake_export_table',guard());return;}
     const button = event.target.closest('[data-intake-crop-action]');
     if (!button || button.disabled || !state.intake?.cropEnabled) return;
     const action = button.dataset.intakeCropAction, r = row();
@@ -845,18 +908,18 @@ window.intakeWorkspace = (() => {
     if(action==='source'&&!state.busy){select(button.dataset.id);switchMode('review');return;}
     if(action==='figure'&&!state.busy){chosenFigureId=button.dataset.id;switchMode('layout');return;}
     if (!r || state.busy) return;
-    if (action === 'confirm' && r.roi && !cropDrafts.get(r.id)?.conflict) {
+    if (action === 'confirm' && r.roi && !cropDrafts.get(r.id)?.conflict && !rotationError(r)) {
       const completed=state.intake.workflow.steps.some(s=>s.stage==='crop'&&s.target_id===r.id&&s.status==='done');
       if (completed && !cropDrafts.has(r.id)) return;
-      const displayAngle=cropDrafts.get(r.id)?.displayAngle;
+      const displayAngle=rotationFrame(r).angle_degrees;
       cropPending.set(r.id,{roi:{...r.roi},displayAngle,digest:state.intake.workflow.digest});
       send(completed?'intake_crop_revise':'intake_crop_review',{...cropGuard(),rowId:r.id,roi:{...r.roi},displayAngle});
     } else if (action === 'run' && batchPolicy()) resumeBatch();
     else if (action === 'run' && !hasDraft()) send('intake_run',cropGuard());
     else if (action === 'discard') {
-      const draft = cropDrafts.get(r.id); r.roi = draft?.original || null; r.draft = false;
-      cropDrafts.delete(r.id); cropPending.delete(r.id); syncCrops(); render();
+      const draft = cropDrafts.get(r.id); r.roi = draft ? draft.original : r.roi; r.draft = false;
+      cropDrafts.delete(r.id); cropPending.delete(r.id); rotationErrors.delete(r.id); rotationEdit=null;rotationPreview=null;syncCrops(); render();
     }
   });
-  return {expectFigure:id=>{chosenFigureId=id;noteBrowse();},layoutState,chooseFigure, sync, updateChrome, renderActive, hasDraft, reset, stageCrop, undoCrop, renderCropInspector, cropEditable, allowedModes, requestFigure, renderFigureInspector, renderIntakeResults, followBatch, noteBrowse, renderSourceList, inspectMeasurement, syncInspectorDrawer};
+  return {expectFigure:id=>{chosenFigureId=id;noteBrowse();},layoutState,chooseFigure, sync, updateChrome, renderActive, hasDraft, reset, stageCrop, undoCrop, rotationFrame, rotationCorners, rotationError, stageRotation, previewRotation, renderCropInspector, cropEditable, allowedModes, requestFigure, renderFigureInspector, renderIntakeResults, followBatch, noteBrowse, renderSourceList, inspectMeasurement, syncInspectorDrawer};
 })();

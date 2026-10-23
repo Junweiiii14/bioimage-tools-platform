@@ -16,6 +16,7 @@ from wb_tool.application.document import DocumentIO
 from wb_tool.application.figure_project import WBFigureProject
 from wb_tool.application.instrument_intake import (
     WBIntakeProject,
+    intake_computation_manifest,
     intake_digest,
     intake_project_rows,
     validate_intake_complete,
@@ -61,9 +62,9 @@ class IntakeWorkflowStep(DocumentIO):
 class IntakeWorkflowLedger(DocumentIO):
     model_config = ConfigDict(revalidate_instances="always")
 
-    policy: Literal["intake_workflow@1", "intake_workflow@2", "intake_workflow@3"] = (
-        "intake_workflow@1"
-    )
+    policy: Literal[
+        "intake_workflow@1", "intake_workflow@2", "intake_workflow@3", "intake_workflow@4"
+    ] = "intake_workflow@1"
     editing: bool = False
     intake_digest: str = Field(pattern="^[0-9a-f]{64}$")
     approved: bool = False
@@ -80,7 +81,7 @@ class IntakeWorkflowLedger(DocumentIO):
     @model_validator(mode="after")
     def editing_is_explicit(self) -> "IntakeWorkflowLedger":
         if self.editing and (
-            self.policy not in {"intake_workflow@2", "intake_workflow@3"}
+            self.policy not in {"intake_workflow@2", "intake_workflow@3", "intake_workflow@4"}
             or self.approved
             or any(s.status == "running" for s in self.steps)
         ):
@@ -168,6 +169,17 @@ def _prerequisites(
         return bool(rows) and all(statuses["crop", row.protein_id] == "done" for row in rows)
     if step.stage == "measure":
         return statuses["compose", step.target_id] == "done"
+    if batch and project.workflow.policy == "intake_workflow@4":
+        # Publish an honest partial snapshot after every currently runnable group
+        # has drained. A blocked Fig never suppresses another Fig's valid work.
+        return not any(
+            s.stage != "export"
+            and (
+                s.status == "running"
+                or (s.status == "pending" and _prerequisites(project, s, statuses, batch=False))
+            )
+            for s in project.workflow.steps
+        )
     return all(statuses["measure", f.figure_id] == "done" for f in project.intake.figures)
 
 
@@ -192,7 +204,7 @@ def prepare_intake_workflow(
             **dict(project),
             "schema_version": 11,
             "workflow": IntakeWorkflowLedger(
-                policy="intake_workflow@3" if batch_stages else "intake_workflow@1",
+                policy="intake_workflow@4" if batch_stages else "intake_workflow@1",
                 intake_digest=plan.intake_digest,
                 steps=tuple(
                     IntakeWorkflowStep(stage=s, target_id=t) for s, t in _addresses(project)
@@ -205,7 +217,9 @@ def prepare_intake_workflow(
 def _inputs_digest(project: WBIntakeWorkflowProject) -> str:
     # Saving changes revision only. Executor outputs must be merged after finishing
     # the owned ticket against these frozen inputs, never into a running snapshot.
-    return _hash(project.model_dump(mode="json", exclude={"workflow", "revision"}))
+    fields = project.model_dump(mode="json", exclude={"workflow", "revision"})
+    fields["intake"] = intake_computation_manifest(fields["intake"])
+    return _hash(fields)
 
 
 def intake_workflow_digest(project: WBIntakeWorkflowProject) -> str:
@@ -254,7 +268,7 @@ def claim_intake_workflow_step(
         and (stage_filter is None or s.stage == stage_filter)
         and _prerequisites(project, s, statuses)
     ]
-    if project.workflow.policy == "intake_workflow@3":
+    if project.workflow.policy in {"intake_workflow@3", "intake_workflow@4"}:
         order = {"crop": 0, "compose": 1, "measure": 2, "export": 3}
         pending.sort(key=lambda s: order[s.stage])
     else:

@@ -80,6 +80,8 @@ class CropDetection:
         "source_signal_geometry@1",
         "instrument_guided_geometry@2",
         "source_signal_geometry@2",
+        "source_common_band_geometry@1",
+        "guided_common_band_geometry@1",
     ] = ALGORITHM
 
 

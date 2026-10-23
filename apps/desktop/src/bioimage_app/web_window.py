@@ -6,8 +6,9 @@ import time
 from collections.abc import Callable
 from pathlib import Path
 from typing import cast
+from uuid import uuid4
 
-from PySide6.QtCore import QSettings, Qt, QTimer, QUrl, Slot
+from PySide6.QtCore import QSettings, QStandardPaths, Qt, QTimer, QUrl, Slot
 from PySide6.QtGui import QCloseEvent, QColor, QIcon
 from PySide6.QtWebChannel import QWebChannel
 from PySide6.QtWebEngineCore import (
@@ -266,12 +267,19 @@ class WebWorkbenchWindow(QMainWindow):
                 else:
                     self.start_from_images([Path(path)])
         elif action == "open_project":
-            path = QFileDialog.getExistingDirectory(self, "打开已有 BioImage 项目")
+            path = QFileDialog.getExistingDirectory(self, "打开项目文件夹（工作区或完整导出项目）")
             if path:
                 self.open_project(path)
+        elif action == "restore_project":
+            path, _ = QFileDialog.getOpenFileName(self, "打开项目恢复包", "", "项目恢复包 (*.zip)")
+            if path:
+                self.open_delivery(path)
 
     def open_project(self, path: str) -> None:
         """Open persisted project data, rather than only its storage container."""
+        if (Path(path) / ".wb-delivery.json").is_file() or Path(path).suffix.casefold() == ".zip":
+            self.open_delivery(path)
+            return
         if self.host.workspace_path:
             self._request_transition("open", lambda: self.open_project(path))
             return
@@ -286,6 +294,29 @@ class WebWorkbenchWindow(QMainWindow):
         self._stage = "opening"
         self._message = "正在打开项目并校验原图与历史结果…"
         self.host.open_workspace(path)
+
+    def open_delivery(self, path: str) -> None:
+        """Restore into a fresh local workspace and enter the same main UI."""
+        if self.host.workspace_path:
+            self._request_transition("open", lambda: self.open_delivery(path))
+            return
+        if self.host.operation_busy or self.host.is_closing:
+            raise ValueError("当前任务仍在处理中，请稍候或取消")
+        default = (
+            Path(QStandardPaths.writableLocation(QStandardPaths.StandardLocation.DocumentsLocation))
+            / "BioImage"
+            / "Projects"
+        )
+        parent = Path(str(self.settings.value("project_parent", str(default))))
+        parent.mkdir(parents=True, exist_ok=True)
+        destination = parent / ("恢复项目_" + uuid4().hex[:12])
+        self._restore = {}
+        self._last_open_path = ""
+        self._target_mode = "intake"
+        self._starting = True
+        self._stage = "opening"
+        self._message = "正在核验完整项目并恢复到新的工作区…"
+        self.host.restore_archive(path, str(destination))
 
     def _workspace_ready(self, _path: str) -> None:
         if self.host.documents.count() > 1:
@@ -484,6 +515,8 @@ class WebWorkbenchWindow(QMainWindow):
                 self.open_project(str(recent[index]["path"]))
             elif action == "open":
                 self.choose("open_project")
+            elif action == "restore":
+                self.choose("restore_project")
             elif action == "new_from_folder":
                 if self._last_open_path and not self.host.workspace_path:
                     self.start_from_images([Path(self._last_open_path)], automatic=False)

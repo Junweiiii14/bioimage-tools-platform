@@ -21,6 +21,7 @@ from wb_tool.application.document import WBDocument, WBWorksheetDocument, read_w
 from wb_tool.application.figure_project import FigurePNG, FigureRender, WBFigureProject
 from wb_tool.application.figure_template import LoadedFigureTemplate
 from wb_tool.application.intake_crop import IntakeCropEvidence, IntakeCropFile
+from wb_tool.application.intake_delivery import IntakeDeliveryReceipt
 from wb_tool.application.intake_figure import IntakeFigurePreparation
 from wb_tool.application.intake_output import IntakeOutputPreparation
 from wb_tool.application.project_analysis import (
@@ -96,6 +97,7 @@ class _Work(QObject):
                 | CropSuggestion
                 | IntakeCropEvidence
                 | IntakeCropFile
+                | IntakeDeliveryReceipt
                 | IntakeFigurePreparation
                 | IntakeOutputPreparation
                 | LoadedProjectResult
@@ -160,6 +162,15 @@ class _Work(QObject):
                 value = approve_intake_workflow(
                     prepared, expected_digest=intake_workflow_digest(prepared)
                 )
+                if job.path and job.destination:
+                    from wb_tool.adapters.intake_delivery import select_intake_delivery
+
+                    value = select_intake_delivery(
+                        value,
+                        workspace_path=job.path,
+                        output_parent=job.destination,
+                        cancelled=cancel,
+                    )
                 if cancel():
                     raise ValueError("裁剪执行准备已取消")
             elif job.operation in {
@@ -188,21 +199,47 @@ class _Work(QObject):
                         )
                     )
                 )
-            elif job.operation == "intake_output_export":
+            elif job.operation == "intake_delivery_materialize":
+                from wb_tool.adapters.intake_delivery import materialize_intake_delivery
+                from wb_tool.application.instrument_intake import WBIntakeProject
+
+                if not isinstance(job.document, WBIntakeProject):
+                    raise ValueError("整理项目需要当前仪器清单")
+                value = materialize_intake_delivery(
+                    job.document,
+                    job.sources,
+                    workspace_path=job.path,
+                    row_id=job.row_id,
+                    cancelled=cancel,
+                )
+            elif job.operation in {"intake_output_export", "intake_delivery_finalize"}:
                 from wb_tool.adapters.intake_output import export_intake_outputs
                 from wb_tool.application.intake_output import WBIntakeOutputProject
                 from wb_tool.application.intake_workflow import IntakeWorkflowTicket
 
                 if not isinstance(job.document, WBIntakeOutputProject):
                     raise ValueError("输出需要当前版本仪器清单项目")
-                value = export_intake_outputs(
-                    job.document,
-                    job.sources,
-                    job.destination,
-                    runs=job.archive_runs or (),
-                    ticket=IntakeWorkflowTicket.model_validate_json(job.data) if job.data else None,
-                    cancelled=cancel,
-                )
+                ticket = IntakeWorkflowTicket.model_validate_json(job.data) if job.data else None
+                if job.operation == "intake_delivery_finalize":
+                    from wb_tool.adapters.intake_delivery import finalize_intake_delivery
+
+                    value = finalize_intake_delivery(
+                        job.document,
+                        job.sources,
+                        workspace_path=job.path,
+                        runs=job.archive_runs or (),
+                        ticket=ticket,
+                        cancelled=cancel,
+                    )
+                else:
+                    value = export_intake_outputs(
+                        job.document,
+                        job.sources,
+                        job.destination,
+                        runs=job.archive_runs or (),
+                        ticket=ticket,
+                        cancelled=cancel,
+                    )
             elif job.operation == "intake_figure_preview":
                 from wb_tool.adapters.intake_figure import load_intake_figure_preview
                 from wb_tool.application.intake_figure import WBIntakeFigureProject

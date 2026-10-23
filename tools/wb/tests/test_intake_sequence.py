@@ -118,7 +118,7 @@ def test_one_submission_is_pure_and_compiles_exact_sequence_before_any_attempt()
     grouping = configuration(project, ("A", "B"))
     prepared = prepare_intake_sequence(project, grouping, expected_digest=intake_digest(project))
     assert project.model_dump_json() == original
-    assert prepared.workflow.policy == "intake_workflow@3"
+    assert prepared.workflow.policy == "intake_workflow@4"
     assert all(s.status == "pending" and s.attempt == 0 for s in prepared.workflow.steps)
     assert prepared.intake.grouping == grouping
     assert read_figure_project(prepared.model_dump_json().encode()) == prepared
@@ -132,6 +132,10 @@ def test_continue_requires_human_crop_review_and_retries_only_one_blocked_item()
     project = pool()
     prepared = prepare_intake_sequence(
         project, configuration(project, ("A", "B")), expected_digest=intake_digest(project)
+    )
+    # Preserve the historical strict policy's explicit review/retry behavior.
+    prepared = type(prepared).model_validate(
+        {**dict(prepared), "workflow": {**dict(prepared.workflow), "policy": "intake_workflow@3"}}
     )
     crop = prepare_intake_crops(prepared)
     approved = approve_intake_workflow(crop, expected_digest=intake_workflow_digest(crop))
@@ -163,7 +167,7 @@ def test_one_submission_confirms_an_explicit_sequence_revision_without_mutating_
         grouping.sequence or (),
     )
     revised = prepare_intake_sequence(editing, renamed, expected_digest=intake_digest(editing))
-    assert not revised.workflow.editing and revised.workflow.policy == "intake_workflow@3"
+    assert not revised.workflow.editing and revised.workflow.policy == "intake_workflow@4"
     assert revised.intake.figures[0].label == "Renamed"
     assert prepared.model_dump_json() == history
     assert [(g.group_id, g.selected_source_id) for g in renamed.groups] == [
@@ -345,3 +349,98 @@ def test_batch_review_pauses_other_figs_and_retry_resumes_owned_attempt() -> Non
     project = approve_intake_workflow(project, expected_digest=intake_workflow_digest(project))
     _, retry = claim_intake_workflow_step(project, session_key="batch")
     assert retry is not None and retry.target_id == "r1" and retry.attempt == 2
+
+
+@pytest.mark.parametrize("outcome", ["needs_review", "failed"])
+def test_v4_skips_only_blocked_fig_and_claims_partial_export_after_runnable_work(
+    outcome: str,
+) -> None:
+    old = batch_workflow()
+    historical = old.model_dump_json()
+    project = type(old).model_validate(
+        {**dict(old), "workflow": {**dict(old.workflow), "policy": "intake_workflow@4"}}
+    )
+    active, ticket = claim_intake_workflow_step(project, session_key="resilient")
+    assert ticket is not None and (ticket.stage, ticket.target_id) == ("crop", "r1")
+    project = finish_intake_workflow_step(
+        active,
+        ticket,
+        "needs_review" if outcome == "needs_review" else "failed",
+        reason="unresolved source",
+    )
+    observed: list[tuple[str, str]] = []
+    for _ in range(3):
+        active, ticket = claim_intake_workflow_step(project, session_key="resilient")
+        assert ticket is not None
+        observed.append((ticket.stage, ticket.target_id))
+        project = finish_intake_workflow_step(active, ticket, "done")
+    assert observed == [("crop", "r2"), ("compose", "f2"), ("measure", "f2")]
+    # This stage-only schema11 fixture has no output payload; the UI deliberately
+    # does not advertise an export until schema14+ evidence exists.
+    assert intake_workflow_snapshot(project)["pending_ready"] == 0
+    active, ticket = claim_intake_workflow_step(project, session_key="resilient")
+    assert ticket is not None and ticket.stage == "export"
+    # Stage-only fixture makes no scientific success claim. Real partial export is
+    # covered through the desktop worker/storage test.
+    project = finish_intake_workflow_step(active, ticket, "failed", reason="partial output")
+    assert claim_intake_workflow_step(project, session_key="resilient")[1] is None
+    assert not intake_workflow_snapshot(project)["stages_finished"]
+    assert old.model_dump_json() == historical
+    repaired = retry_intake_workflow_step(
+        project, "crop", "r1", expected_digest=intake_workflow_digest(project)
+    )
+    repaired = approve_intake_workflow(repaired, expected_digest=intake_workflow_digest(repaired))
+    _, ticket = claim_intake_workflow_step(repaired, session_key="repaired")
+    assert ticket is not None and ticket.target_id == "r1" and ticket.attempt == 2
+    assert all(s.status == "done" for s in repaired.workflow.steps if s.target_id in {"r2", "f2"})
+
+
+def test_v4_measurement_failure_keeps_next_fig_runnable() -> None:
+    old = batch_workflow()
+    project = type(old).model_validate(
+        {**dict(old), "workflow": {**dict(old.workflow), "policy": "intake_workflow@4"}}
+    )
+    for _ in range(4):
+        active, ticket = claim_intake_workflow_step(project, session_key="measurement")
+        assert ticket is not None
+        project = finish_intake_workflow_step(active, ticket, "done")
+    active, ticket = claim_intake_workflow_step(project, session_key="measurement")
+    assert ticket is not None and (ticket.stage, ticket.target_id) == ("measure", "f1")
+    project = finish_intake_workflow_step(active, ticket, "failed", reason="worker failed")
+    _, ticket = claim_intake_workflow_step(project, session_key="measurement")
+    assert ticket is not None and (ticket.stage, ticket.target_id) == ("measure", "f2")
+
+
+@pytest.mark.parametrize("policy", ["intake_workflow@3", "intake_workflow@4"])
+def test_continue_after_reopen_prioritizes_runnable_v4_work_without_retrying_review(
+    policy: str,
+) -> None:
+    old = batch_workflow()
+    project = prepare_intake_crops(
+        type(old).model_validate(
+            {**dict(old), "workflow": {**dict(old.workflow), "policy": policy}}
+        )
+    )
+    active, ticket = claim_intake_workflow_step(project, session_key="before-reopen")
+    assert ticket is not None
+    blocked = finish_intake_workflow_step(active, ticket, "needs_review", reason="manual review")
+    reopened = read_figure_project(blocked.model_dump_json().encode())
+    assert isinstance(reopened, WBIntakeCropProject)
+    before = reopened.model_dump_json()
+    if policy == "intake_workflow@3":
+        with pytest.raises(ValueError, match="确认裁剪范围"):
+            continue_intake_sequence(reopened, expected_digest=intake_workflow_digest(reopened))
+        return
+    with pytest.raises(ValueError, match="阶段输入已变化"):
+        continue_intake_sequence(reopened, expected_digest="stale")
+    resumed = continue_intake_sequence(reopened, expected_digest=intake_workflow_digest(reopened))
+    assert resumed is reopened and resumed.model_dump_json() == before
+    active, next_ticket = claim_intake_workflow_step(resumed, session_key="after-reopen")
+    assert next_ticket is not None and next_ticket.target_id == "r2"
+    assert active.workflow.steps[0] == reopened.workflow.steps[0]
+    drained = finish_intake_workflow_step(
+        active, next_ticket, "needs_review", reason="second manual review"
+    )
+    assert isinstance(drained, WBIntakeCropProject)
+    with pytest.raises(ValueError, match="确认裁剪范围"):
+        continue_intake_sequence(drained, expected_digest=intake_workflow_digest(drained))

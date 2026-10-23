@@ -80,6 +80,13 @@ def _publish(stage: Path, target: Path, check: Callable[[], None]) -> None:
         raise ValueError(f"输出发布未完成：{target}；未完成标记保留。{error}") from error
 
 
+def copy_intake_output_asset(
+    source: str, target: Path, asset: AssetRef, cancelled: Callable[[], bool]
+) -> None:
+    """Shared verified copier for owned snapshot and incremental delivery staging files."""
+    _copy(source, target, asset, cancelled)
+
+
 def _freeze_runs(
     project: WBIntakeOutputProject,
     supplied: tuple[ArchiveRunEvidence, ...],

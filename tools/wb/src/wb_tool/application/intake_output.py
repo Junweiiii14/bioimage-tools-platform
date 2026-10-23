@@ -9,6 +9,7 @@ from pydantic import ConfigDict, Field, model_validator
 from tool_contracts.api import AssetRef
 
 from wb_tool.application.document import DocumentIO
+from wb_tool.application.instrument_intake import intake_computation_manifest
 from wb_tool.application.intake_execution import planned_intake_slots
 from wb_tool.application.intake_figure import WBIntakeFigureProject
 from wb_tool.application.intake_workflow import (
@@ -47,6 +48,7 @@ def intake_output_digest(project: WBIntakeFigureProject) -> str:
             "imported_runs",
         },
     )
+    fields["intake"] = intake_computation_manifest(fields["intake"])
     return sha256(json.dumps(_content(fields), sort_keys=True).encode()).hexdigest()
 
 

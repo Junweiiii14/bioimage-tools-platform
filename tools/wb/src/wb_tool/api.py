@@ -14,6 +14,11 @@ from wb_tool.adapters.automatic import automatic_project_row
 from wb_tool.adapters.automatic_export import discover_tiffs
 from wb_tool.adapters.export_discovery import discover_exports
 from wb_tool.adapters.intake_crop import export_intake_crop, propose_intake_crop
+from wb_tool.adapters.intake_delivery import (
+    finalize_intake_delivery,
+    inspect_intake_delivery,
+    materialize_intake_delivery,
+)
 from wb_tool.adapters.intake_figure import load_intake_figure_preview, prepare_intake_figure
 from wb_tool.adapters.intake_output import export_intake_outputs
 from wb_tool.adapters.metadata_input import read_metadata_file
@@ -121,6 +126,13 @@ from wb_tool.application.intake_crop import (
     prepare_intake_crops,
     record_intake_crop_proposal,
     review_intake_crop,
+)
+from wb_tool.application.intake_delivery import (
+    IntakeDeliveryPlan,
+    IntakeDeliveryReceipt,
+    IntakeDeliveryState,
+    plan_intake_delivery,
+    prepare_intake_delivery,
 )
 from wb_tool.application.intake_execution import (
     IntakeExecutionPlan,
@@ -338,6 +350,14 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "IntakeDeliveryPlan",
+    "IntakeDeliveryReceipt",
+    "IntakeDeliveryState",
+    "plan_intake_delivery",
+    "prepare_intake_delivery",
+    "materialize_intake_delivery",
+    "finalize_intake_delivery",
+    "inspect_intake_delivery",
     "apply_workbench_metadata",
     "prepare_workbench_revision",
     "revise_workbench_figure_order",

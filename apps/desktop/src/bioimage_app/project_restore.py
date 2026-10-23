@@ -9,7 +9,7 @@ from threading import Event
 from platform_runtime.api import Workspace
 from PySide6.QtCore import QObject, Qt, QThread, QTimer, Signal, Slot
 from tool_contracts.api import AssetRef
-from wb_tool.api import restore_staged_project, stage_project_archive
+from wb_tool.api import inspect_intake_delivery, restore_staged_project, stage_project_archive
 
 
 @dataclass(frozen=True)
@@ -68,6 +68,11 @@ def restore_archive_workspace(
     if target.exists():
         raise FileExistsError("恢复目标已存在，请选择新的目录")
     _cancel(cancellation)
+    if Path(source).is_dir():
+        # Full delivery folders are portable outputs, not native SQLite workspaces.
+        # Member hashing belongs on this worker before the existing ZIP restore.
+        source = inspect_intake_delivery(source, cancelled=cancellation.is_set)
+        _cancel(cancellation)
     with TemporaryDirectory(prefix=".wb-restore-", dir=target.parent) as temporary:
         owned = Path(temporary).resolve()
         staged = stage_project_archive(

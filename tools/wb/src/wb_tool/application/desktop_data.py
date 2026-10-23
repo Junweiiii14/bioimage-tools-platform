@@ -19,6 +19,7 @@ from wb_tool.application.figure_project import (
 )
 from wb_tool.application.figure_template import LoadedFigureTemplate
 from wb_tool.application.intake_crop import IntakeCropEvidence, IntakeCropFile
+from wb_tool.application.intake_delivery import IntakeDeliveryReceipt
 from wb_tool.application.intake_figure import IntakeFigurePreparation
 from wb_tool.application.intake_output import IntakeOutputPreparation
 from wb_tool.application.project_analysis import (
@@ -64,6 +65,8 @@ class WBJob:
         "intake_figure_prepare",
         "intake_figure_preview",
         "intake_output_export",
+        "intake_delivery_materialize",
+        "intake_delivery_finalize",
         "intake_grid_preview",
         "intake_grid_export",
         "intake_single_export",
@@ -153,6 +156,7 @@ class WBReply:
         | CropSuggestion
         | IntakeCropEvidence
         | IntakeCropFile
+        | IntakeDeliveryReceipt
         | IntakeFigurePreparation
         | IntakeOutputPreparation
         | LoadedProjectResult
