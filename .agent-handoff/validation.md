@@ -83,3 +83,7 @@ CI180真实失败：Windows1191过1败746.36s/child1、Linux关闭回收15min取
 ## 2026-10-23 T077 最终独立验证
 
 产品c32ad11作者22项11.67s/0、非作者24项12.16s/0；独立39成员摘要和严格旧ZIP恢复相等；5静态Qt图ship。PR38最终HEAD四必要CI运行事实只认.local/T077-final-ci.json，未完不能写成功。没有本地重跑全量、安装/物理目标机或外部表格软件验收。
+
+## 2026-10-24 T081 本机完整交付
+
+f1e6142准确独审/四CI：双平台1295（Linux509.77s/Windows756.69s）与全部wheel成功；新包真实升级0、7793载荷/209源码SHA、双模式自检0、37安装态53.91s/163模块来源SHA通过，真实180恢复27/9/4/27。201文件产物独审Accepted，WinPS5.1实际解压、校验器恢复执行0、桌面tree/ZIP一致；初publisher1保留并定位维护PS7模块路径，未改全局设置或包字节。最终文档HEAD独审/CI/merge仍按task谓词与final-closeout核真，不提前写通过。环境/命令/退出码及限制见work/evidence/T-081/final-delivery.md。

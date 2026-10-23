@@ -1,6 +1,6 @@
 # T-081 明显条带裁剪与整批裁剪阶段门槛
 
-- 状态：执行中；2026-10-23用户明确批准修改方案、目标模式自主推进至独审/CI/正常合入/新离线包实际安装交付，不反复确认不过度测试。
+- 状态：本机实现、安装及桌面交付验收完成；下述最终闭合条件全部满足时 complete，否则 in-progress。2026-10-23 用户已授权自主推进至独审、必需检查、正常合入和交付，不反复确认、不过度测试。
 - 基线：main d08b16bc0f632ee08f4d621f255469c416046593；已安装/上一包产品79b9db9；活动树wb-lab-installer，分支codex/t081-prominent-crop。T080闭合真实收据.local/T080/package/final-closeout.json，旧snapshot待更新内容不能当当前阻断。
 - 最新约定覆盖早先方案：填写N是裁剪必须满足的数量；不采用按实际明显数改N的提议。明显程度最高的一行直接选，两行接近也选最高，不固定上下；保留完整N空间与A到C中间原始像素/弱空间距，不剪接。弱/缺失不转有效零，不从图像猜蛋白或样本对应。
 - 目标：首先核对用户真实180目录漏裁路径，前两个Fig、GAPDH_161202_0_7_0_0 (1).tiff及大倾角；提高明显主行自动定位，阴影杂质降分；有效裁剪必须保存真实原值资产。某行失败继续其他行crop，但所有本批必需crop真实完成前禁止compose/measure/export；修正后继续，保留成功原值及历史。
@@ -16,3 +16,14 @@
 - P5 R1实际安装、自检与33项通过后，真实截图额外发现恢复图片类型遗漏，产物独审Blocked，未交付安装包。现于codex/t081-restore-auxiliary-tiff/base b591补齐typed source/crop/Fig恢复类型，四个真实反例先红、30定向绿；R2准确独审/CI/重建和实际安装继续，不能标完成。详见restore-image-roles。
 
 - R2首c3df CI：Linux1295及wheel/规则/桌面成功；Windows1294pass/1fail是第二次关闭前未等待真实后台空闲。受控真实读表原测试红、补齐空闲与新未保存编辑前置后3pass；所有精确状态和3000/20000ms时限不变，产品/门禁未改。具体CI后台操作UNKNOWN，见ci-session-precondition。等待新精确提交独审/四CI，未据初失败构建。
+
+
+## 最终冻结与闭合条件
+
+- 最终产品/安装源码 f1e6142ab41e16c66cfeb3d33958ab3a364581b1 已绑定非作者 Accepted，四必需CI SUCCESS（Linux1295/509.77s、Windows1295/756.69s，全部隔离wheel）。算法主改 PR42 已合main b59123e，恢复修复及本记录在 [PR43](https://github.com/Junweiiii14/bioimage-tools-platform/pull/43) 集成。
+- R2真实构建/稳定路径升级 exit0；7793安装文件/209产品源码逐SHA相同、双模式自检、37安装态定向53.91s、163实际模块源摘要通过；真实180重开27原图/9原值裁图/4PNG/27缩略图通过。产物非作者Accepted、201文件ZIP校验及桌面真实PS5.1解压完成，详见 [final-delivery](../evidence/T-081/final-delivery.md)。
+- 交付：桌面 WB-T081.zip、WB-T081 文件夹；私有180完整项目 WB-180-T081（127文件）。原始39输入/旧工程/旧包/dirty源码和视频树保持。包中只有合成练习，无私有原图。未新建功能、视频聊天或调度。
+- 首次桌面发布命令 exit1：原生解压与tree核验已成功，随后校验器在维护终端继承PS7模块路径而找不到Get-FileHash。原日志保持；独审Accepted的恢复helper只隔离校验子进程到WinPS5.1内置Modules，重核现有树/ZIP后实际checker exit0，不重写字节/重解压/删除。不能把首次publisher写成通过。
+- 完成必须同时成立：冻结产品的源码与产物独审Accepted、四CI成功、安装/双自检/37项及全部图片恢复通过、桌面ZIP和目录与产物SHA完全相同；本收尾记录的准确HEAD另经非作者独审和四必需CI SUCCESS后 PR43 正常merge（不绕过规则）；冻结产品到最终收尾HEAD的 apps/packages/tools/tooling/锁/测试/CI无变更，合并main树相同，工作树干净。
+- 最终可机读收据 `.local/T081/package/r2/final-closeout.json` 只在上述条件全部核实后创建，绑定冻结产品HEAD、最终文档HEAD、四CI链接及main合入SHA；不存在或任一条件失败时不得标goal complete。文档不能预先声称自身未来HEAD CI已过。包内维护收据绑定真实构建f1，不改称最终文档HEAD。
+- 80%独立项目100%自动裁剪、干净Win10/全部员工设备/物理DPI、原生退出/GPU历史UNKNOWN继续未验或未知；本机通过不外推。完整归档恢复的active export按既有契约interrupted，选新输出位置继续，已完成裁剪/测量保持。

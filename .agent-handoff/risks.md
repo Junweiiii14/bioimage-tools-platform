@@ -2,7 +2,7 @@
 
 - T080：产品79b9db9/PR40四CI及本机新包实际安装、双模式自检、27安装态UI/恢复、201成员独审/桌面交付完成。Win10干净机/全部员工设备/物理DPI与独立科学80%项目率未验；安装UI mailbox提示保留，不宣称GPU根因修复。证据work/evidence/T-080/final-delivery.md。
 
-当前执行指针为 [T081](../work/tasks/T-081-prominent-crop-stage-barrier.md)。源码真实UI已验，准确提交独审/CI和新包安装尚待完成；独立科学准确率及全部目标机未验。以下旧版本证据/当时保留状态不迁移为当前通过或当前安装清单。
+当前执行指针为 [T081](../work/tasks/T-081-prominent-crop-stage-barrier.md)。f1源码独审/四CI及R2本机安装交付已验；最终记录HEAD独审/四CI/PR43正常合入按任务闭合谓词及final-closeout真实收据核对。独立科学准确率及全部目标机未验。以下旧版本证据/当时保留状态不迁移为当前通过或当前安装清单。
 - T079实验室包本机已验，目标干净Win10/全部工作人员机器/物理输入DPI/科学真值未验；未签名，首次部署自检。最终GitHub合入/桌面冻结仅依任务闭合谓词和精确收据。旧安装已备份后整理，原图/历史/dirty源与视频活动树保留。额外孤立WB-Quant登记删除被自动审批阻止，仅返回blocked by policy，登记保留，不换工具绕过。
 - T079首轮62d Linux完整1222过1败是序列测试读取claim中间态，500ms控制延迟可复现；8d1889b修后端/网页终态同步，原断言/时限保持，独立750ms1过。Windows首轮1223完整成功不替代新HEAD CI；GPU/mailbox及历史原生UNKNOWN不据此销账。
 - T077产品独审/实际输出通过；最终PR38 HEAD CI另核。物理Explorer/OLE鼠标、外部Excel/WPS/LibreOffice显示、干净Win10/DPI未验。测试期GPU/mailbox、可选QWebSocket截图0xc0000139诊断与原始失败保留，不认定原生根因已修复；本轮无新安装。
@@ -129,3 +129,5 @@
 - 独立结果目录和异常局部暂停已实现；独立灰度OCR作为正式功能保留，可选发行未另行批准。独立仪器留出/真值、干净目标Win10及物理DPI仍未验，开发图/合成图与本机Win11成功不代替这些验收。
 
 2026-10-20 CI收尾：main0f的910/762.24s及wheel功能通过后清理遭15分钟取消，整命令未通过；旧main3b702/590.48s后原退出0xc0000005/wheel未跑，原因UNKNOWN。原306四CI通过不销旧失败。仅foundation TEMP/TMP同盘与实际路径诊断实验，保留时限/测试/退出检查；新head待绑定独审及四CI。详见work/evidence/T-060/ci-temp-filesystem.md。
+
+- T081：初CI/native未知、R1辅助图片恢复缺陷及Blocked、首publisher环境冲突exit1均保留。R2类型修复/真实37安装态/27+9+4+27恢复和201文件交付通过，不证明历史原生根因已修复或80%独立项目科学成功率。校验环境恢复仅进程局部隔离，无全局设置更改。详见T081 final-delivery。
