@@ -46,6 +46,6 @@
 
 ## Current Pointer
 
-- 当前任务：[T080](work/tasks/T-080-common-band-crop-evidence-plan.md)，常见明显条带算法、旋转、完整命名项目目录及重建离线安装交付，用户已授权目标模式持续实施。活动树wb-lab-installer；状态以任务为准。
+- 当前任务：[T080](work/tasks/T-080-common-band-crop-evidence-plan.md)，常见条带、旋转、完整Fig项目及离线包已完成本机安装交付；产品79b9db9/PR40，最终证据final-delivery.md。活动树wb-lab-installer仅收尾文档PR；状态以任务为准。
 - T079旧快照保留在.agent-handoff/archive/T079-before-T080-snapshot.md，归档、dirty树及清理引用载荷继续保护。
 - 旧T077指针归档.agent-handoff/archive/T077-before-T079-snapshot.md；视频研究是另一个已启动独立聊天，其wb-ui-system树整体保留。旧安装/生成物按本轮备份证明清理；旧dirty源码、原图/历史保持，不能沿用旧“安装保留”指针。

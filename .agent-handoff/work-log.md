@@ -1,9 +1,5 @@
 # Current Work Log
 
-## 2026-10-18 CI012 远端Linux与fixture销毁
-
-3e5cee3 Linux约29% OCR时SIGSEGV，真实非GUI线程QWidget析构；未最终通过。精准fixtureclose/wait后deleteLater/waitinvalid，回归红1/2.87秒、新11项25.58秒0。受控holder环窗口后台GC旧Aborted/3，先GUI销毁0，不能认定原对象身份。产品代码不变、旧证据保留；提交绑定独审及远端734全检待做，详见ci012-fixture-lifetime.md。
-
 ## 2026-10-18 CI012 有范围的测试窗口管理
 
 精确清点Web/平台/共享fixture，统一仅显式自有窗口的异步close/wait→GUI销毁，不动产品/全局GC/Qt根，保留业务断言与原时限。67项157.28秒0、全类型/静态0，总736。c5 Linux735/133.44秒及wheel/dev0，Windows待；925 Linux失败/Windows取消分别保留。待本批绑定独审/最后备份push/最终736远端，实际结论写issue6/ignored receipt不重复文档触发全检循环。
@@ -153,3 +149,7 @@ T076用户验收首页后追加实际安装授权：971d860构建/显式新DIR�
 用户追加安装与清理的完整记录见archive/work-log-20261023T030547970497Z.md及T079任务/evidence。efd最终包本机验证通过，旧版已备份整理；精确HEAD CI、正常PR39合入与桌面冻结按任务闭合谓词实时核。视频活动树/旧dirty源、原图和历史结果保留。
 
 T079首轮62d91b0 CI Windows1223完整/wheel0，Linux1222过1败：测试在下一crop已保存running的短暂间隙过早断言暂停。500ms控制延迟原红/后端等待中间仍红/双端终态绿与正常相邻2过，独立750ms1过；8d1889b仅测试同步，不动包装/公式/锁/原断言或时限。原日志/失败保持，新最终HEAD需全门禁，见T079验证与绑定独审。
+
+## 2026-10-23 T080 产品与离线安装交付
+
+79b9db9独审Accepted，PR40四必需CI成功后合main a464660，完整树相同。Windows1265首轮全过后总时限取消wheel，失败作业一次重跑成功，未改门禁。完整包实际更新安装/用户文件保持、7791载荷及207源码SHA、随包双模式、27安装态UI、201成员及ZIP独审与桌面复制均通过。最终证据work/evidence/T-080/final-delivery.md，全部限制保留。收尾只改文档，不重建已验包。
