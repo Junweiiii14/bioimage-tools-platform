@@ -14,3 +14,5 @@
 - P4首CI：1eb780c独审Accepted；Windows2fail/1289pass是验收仍要求旧policy3/guided2，三个精确版本期望已迁移到新契约，原值/N/页面/worker断言保持。限定两失败路径分别通过，详见ci-policy-migration。新准确提交独审/CI/合入和安装仍待完成。
 - P4完成：81d8d87精确独审Accepted，四CI success，双平台1291与全部wheel；PR42正常merge main b59123e，树相同。初Linux20min窗口关闭取消UNKNOWN及Windows失败均保留。
 - P5 R1实际安装、自检与33项通过后，真实截图额外发现恢复图片类型遗漏，产物独审Blocked，未交付安装包。现于codex/t081-restore-auxiliary-tiff/base b591补齐typed source/crop/Fig恢复类型，四个真实反例先红、30定向绿；R2准确独审/CI/重建和实际安装继续，不能标完成。详见restore-image-roles。
+
+- R2首c3df CI：Linux1295及wheel/规则/桌面成功；Windows1294pass/1fail是第二次关闭前未等待真实后台空闲。受控真实读表原测试红、补齐空闲与新未保存编辑前置后3pass；所有精确状态和3000/20000ms时限不变，产品/门禁未改。具体CI后台操作UNKNOWN，见ci-session-precondition。等待新精确提交独审/四CI，未据初失败构建。

@@ -373,6 +373,14 @@ def test_busy_cancel_rechecks_draft_then_unsaved_changes_before_shutdown(
     window.bridge.session("reply", '{"choice":"return"}')
     assert window.isVisible() and window.host.has_unsaved_changes
     window.host.pause_auto_save(True)
+    # Returning may resume real async work; pausing the timer does not drain it.
+    qtbot.waitUntil(
+        lambda: window.shutdown_stage == "idle" and not window.host.operation_busy,
+        timeout=3000,
+    )
+    # Exercise a fresh unsaved edit after any resumed save/read has finished.
+    window.host.view.generation += 1
+    assert window.host.has_unsaved_changes
     window.close()
     assert window.shutdown_stage == "confirm_dirty"
     window.bridge.session("reply", '{"choice":"save"}')
