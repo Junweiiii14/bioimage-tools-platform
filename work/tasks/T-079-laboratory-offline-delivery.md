@@ -27,8 +27,11 @@
 
 ## 最终冻结与完成判据
 
+- 最终记录HEAD62d91b0首轮CI：Linux 1failed/1222passed，真实网页顺序测试在第二crop已claim的短暂running状态读取过早，期望needs_review；完整原日志.local/T079-linux-initial.log保留。停止merge/冻结，先做有界延迟反例核实，再只修测试观察终态同步，不改产品/原断言/门禁时限；须新增绑定独审和新准确HEAD完整CI，不能重跑到绿掩盖首败。
+- 测试同步修复8d1889b：作者500ms控制延迟红1failed/2.46s→中间仅后端等待按钮assert仍失败→后端及网页精确终态绿1passed/6.80s，正常相邻2passed/14.10s，原断言/20s/10s不变。非作者独立750ms同反例1passed/7.15s，绑定独审见新增报告。首轮Windows1223/全部wheel/check0保留；新最终HEAD仍全量CI。
+
 - 最终包装efd8d4f8fa9cd6c3b86a291d49ede9ad54bb971b，修正安装说明为一次一个目录，并补固定上游版本许可证；源修复非作者复核Accepted。实际新包383860684字节，SHA256 `571a66b3e214ea2167c2208e19b8c399c0e46ef7aef3c6548fd457f456b18b8b`。更新安装/PS5.1两模式/19项安装态测试均exit0；7788文件和204源文件SHA一致。详见 [validation](../evidence/T-079/validation.md) 与绑定新候选的独立交付报告。
 - 完成需同时满足：最终交付独审Accepted；PR39包含本记录的最终HEAD四必需检查SUCCESS且正常merge合main；旧35–38已真实收拢/关闭，远端只删已合入且无活动PR/工作分支；桌面最终文件夹和ZIP已冻结并逐文件/ZIP成员校验，随附准确HEAD CI收据。实时证据为 `.local/T079-final-ci.json`、`.local/t079-github-cleanup.json`、`.local/t079-final-delivery.json` 与 [PR39](https://github.com/Junweiiii14/bioimage-tools-platform/pull/39)，缺任一项保持未完成，不引用旧HEAD CI。
 - 交付目标：桌面“BioImage-WB-实验室安装包-20261023”与“BioImage-WB-Lab-Windows-x64-20261023.zip”。包内Setup、两份中文说明、环境自检入口、SHA校验器、合成原图/完整示例项目/结果、版本/许可/验证记录齐备。不公开二进制；不购买签名或更改单位安全策略。
-- 收尾提交仅文档/证据/指针，必须核产品/配方相对efd无差异。冻结目录外另有不可变e97构建payload用于清理重建引用；视频树整体保持，历史源码/dirty成果不删。不能把“清理旧版”解释为删除所有历史记录。
+- 收尾提交含文档/证据/指针及上述有证据的单项测试同步修复，必须核产品/配方/锁相对efd无差异，测试差异单独审。冻结目录外另有不可变e97构建payload用于清理重建引用；视频树整体保持，历史源码/dirty成果不删。不能把“清理旧版”解释为删除所有历史记录。
 - 本次手动追加交付不复制功能或视频聊天，不新建调度；原一次性自动化记录按真实最终结果补记。

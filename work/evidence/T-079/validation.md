@@ -63,6 +63,14 @@ PS5.1新报告：`%LOCALAPPDATA%/BioImage-WB-Laboratory/Diagnostics/20261023-105
 
 ## 最终集成和交付闭合
 
+首轮记录HEAD62d91b0的 [quality39893355292](https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/39893355292) 真实失败保留：Windows1223passed/729.46s、全部隔离wheel/check0；Linux1failed/1222passed/463.71s、原pytest/GDB退出1。Linux失败为 `test_sequence_real_page_two_figs_pause_continue_stage_barriers_and_reopen` 在下一crop claim已经保存、执行回调尚未完成的短暂 `['done','running']` 状态读取，而原断言要求 `['done','needs_review']`。原日志 `.local/T079-linux-initial.log` 与Windows日志已从真实job API保存；初次gh run view因整组未结束尚无法提供日志，不把其空文件作证据。
+
+Linux原日志481425字节、SHA256 `ef0eafb351baf168f2d89a830b9b847e1063e3c927ec353ceaaafd21de7e1f8e`；Windows235183字节、SHA256 `251c5320b99ce3e4e0753ff9aed2782042e7cbdbad0014a6d218f1765ff8e2df`。
+
+仅修该测试同步，提交 **8d1889bca2f6fa5ab6a9291ad6a85f79076d0fe6**：通用wait_saved只验证idle/无dirty，不能表示阶段暂停；改为当前已保存精确crop终态、对应网页快照终态，以及最终输出全部done。原状态、类型、attempt、阶段屏障快照、真实worker/完整输出、原图/历史ZIP断言均保持，原20s/网页10s时限保持，没有skip/xfail、重试或延长时限，不改产品/安装包/公式/锁/门禁。
+
+作者私有500ms QTimer延迟第二crop执行，真实捕获claim已存、busy=false、dirty=false；原测试精确复现同一断言失败1failed/2.46s/exit1。首次仅后端终态等待仍在第二轮网页run按钮disabled断言失败1failed/2.51s/exit1；保留失败并补匹配网页快照等待，原按钮断言不删。最终同一延迟1passed/6.80s/exit0；正常目标及相邻完整自动路径2passed/14.10s/exit0。Ruff/format/Pyright strict/真实precommit均0。非作者另用独立750ms反例完成1passed/7.15s并核原断言，绑定独审见 `ci-sequence-boundary-review-8d1889b.md`；新最终文档HEAD仍须两平台完整CI，不能沿用首轮Windows或早期head成功。
+
 正常集成PR为 [#39](https://github.com/Junweiiii14/bioimage-tools-platform/pull/39)。**仅包含最终证据文档的准确PR HEAD四必需检查全SUCCESS、独审Accepted、merge commit真实合入main后才算GitHub整理完成**；e97/efd较早CI不替代最终HEAD。`.local/T079-final-ci.json`和实际GitHub为实时证据，未运行的native-case不写通过。合入后再关闭被替代的35–38并只清理可证明已合入、无活动工作/PR的远端分支，保留独立依赖PR。
 
 最终桌面文件夹/ZIP在上述条件满足后冻结，补入精确CI收据和验证说明，生成逐文件SHA清单、ZIP CRC/成员SHA核验与最终外部收据；不更改已审安装器、许可、示例或校验器。最终摘要以桌面冻结收据为准，不把当前staging预览称已交付。视频研究聊天已在原授权下创建，本轮保留其活动树，不复制新聊天、不新建调度。
