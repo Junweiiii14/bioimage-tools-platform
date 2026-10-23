@@ -32,7 +32,7 @@ DisableProgramGroupPage=yes
 DisableWelcomePage=no
 DisableDirPage=auto
 InfoBeforeFile=windows_laboratory_readme.txt
-VersionInfoVersion=0.14.0.79
+VersionInfoVersion=0.14.0.80
 
 [Files]
 Source: "{#AppSource}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs

@@ -49,8 +49,8 @@ def _display_angle(data: dict[str, object]) -> float | None:
     if type(value) not in (int, float) or not isinstance(value, (int, float)):
         raise ValueError("显示纠偏角度须为数值")
     angle = float(value)
-    if not math.isfinite(angle) or abs(angle) > 10:
-        raise ValueError("显示纠偏角度须为 -10 至 10 度")
+    if not math.isfinite(angle) or abs(angle) > 30:
+        raise ValueError("显示纠偏角度须为 -30 至 30 度")
     return angle
 
 

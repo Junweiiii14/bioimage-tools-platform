@@ -14,6 +14,7 @@ from wb_tool.application.discovery import ExportDiscovery, ExportSelection
 from wb_tool.application.document import DocumentIO
 from wb_tool.application.fig_quant import WBPartitionProject
 from wb_tool.application.figure_project import FigureRow, WBFigureProject
+from wb_tool.application.intake_delivery import IntakeDeliveryState
 from wb_tool.application.intake_grouping import (
     IntakeAcquisitionGroup,
     IntakeGrouping,
@@ -119,7 +120,8 @@ def grouping_plan(
 
 
 class IntakeManifest(DocumentIO):
-    schema_version: int = Field(default=1, ge=1, le=4)
+    schema_version: int = Field(default=1, ge=1, le=5)
+    delivery: IntakeDeliveryState | None = None
     discovery: ExportDiscovery | None = None
     grouping: IntakeGrouping | None = None
     figures: tuple[IntakeFigure, ...] = Field(default=(), max_length=512)
@@ -131,6 +133,8 @@ class IntakeManifest(DocumentIO):
     @model_serializer(mode="wrap")
     def serialize_manifest(self, handler: SerializerFunctionWrapHandler) -> dict[str, object]:
         fields = cast(dict[str, object], handler(self))
+        if self.schema_version < 5:
+            fields.pop("delivery", None)
         if self.schema_version == 1:
             fields.pop("discovery", None)
         if self.schema_version < 3:
@@ -142,11 +146,16 @@ class IntakeManifest(DocumentIO):
         figures = {figure.figure_id: figure for figure in self.figures}
         proteins = {protein.protein_id: protein for protein in self.proteins}
         sources = {source.source_id: source for source in self.sources}
-        if self.schema_version == 1 and self.discovery is not None:
+        if (self.schema_version == 5) != (self.delivery is not None):
+            raise ValueError("项目交付状态必须使用清单格式v5")
+        logical_version = (
+            self.delivery.legacy_schema_version if self.delivery else self.schema_version
+        )
+        if logical_version == 1 and self.discovery is not None:
             raise ValueError("识别建议必须使用清单格式v2")
         if self.grouping is not None:
             required_version = 4 if self.grouping.schema_version == 2 else 3
-            if self.schema_version != required_version:
+            if logical_version != required_version:
                 raise ValueError(f"采集组草稿必须使用清单格式v{required_version}")
             if any(
                 sid not in sources for group in self.grouping.groups for sid in group.source_ids
@@ -205,10 +214,27 @@ class IntakeManifest(DocumentIO):
         return self
 
 
+def intake_computation_manifest(fields: dict[str, object]) -> dict[str, object]:
+    """Delivery locations/receipts are not scientific inputs; preserve old digest bytes."""
+    if fields.get("schema_version") != 5:
+        return fields
+    copied = dict(fields)
+    delivery = cast(dict[str, object], copied.pop("delivery"))
+    version = cast(int, delivery["legacy_schema_version"])
+    copied["schema_version"] = version
+    if version < 3:
+        copied.pop("grouping", None)
+    if version == 1:
+        copied.pop("discovery", None)
+    return copied
+
+
 def intake_manifest_digest(project_id: str, manifest: IntakeManifest) -> str:
     data = {
         "project_id": project_id,
-        "intake": manifest.model_dump(mode="json", exclude={"confirmed_digest"}),
+        "intake": intake_computation_manifest(
+            manifest.model_dump(mode="json", exclude={"confirmed_digest"})
+        ),
     }
     return sha256(json.dumps(data, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()
 
@@ -640,13 +666,17 @@ def save_intake_grouping(
     figures_plan, proteins, bindings = grouping_plan(grouping)
     fields = dict(project.intake)
     fields.update(
-        schema_version=4 if grouping.schema_version == 2 else 3,
+        schema_version=5 if project.intake.delivery else 4 if grouping.schema_version == 2 else 3,
         grouping=grouping,
         figures=figures_plan,
         proteins=proteins,
         assignments=bindings,
         confirmed_digest="",
     )
+    if project.intake.delivery:
+        fields["delivery"] = project.intake.delivery.model_copy(
+            update={"legacy_schema_version": 4 if grouping.schema_version == 2 else 3}
+        )
     if project.intake.discovery is not None:
         fields["discovery"] = ExportDiscovery.model_validate(
             {**dict(project.intake.discovery), "selections": tuple(selections)}
@@ -667,6 +697,10 @@ def install_export_discovery(
         discovery=discovery,
         confirmed_digest="",
     )
+    if project.intake.delivery:
+        fields["delivery"] = project.intake.delivery.model_copy(
+            update={"legacy_schema_version": max(2, project.intake.delivery.legacy_schema_version)}
+        )
     if project.intake.grouping is not None:
         fields["grouping"] = IntakeGrouping.model_validate(
             {
@@ -710,11 +744,13 @@ def accept_export_selections(
         assignments.append(IntakeAssignment(protein_id=protein_id, source_id=item.source_id))
     fields = dict(project.intake)
     fields.update(
-        schema_version=2,
+        schema_version=5 if project.intake.delivery else 2,
         discovery=discovery,
         figures=tuple(figures.values()),
         proteins=tuple(proteins),
         assignments=tuple(assignments),
         confirmed_digest="",
     )
+    if project.intake.delivery:
+        fields["delivery"] = project.intake.delivery.model_copy(update={"legacy_schema_version": 2})
     return _updated(project, IntakeManifest.model_validate(fields))

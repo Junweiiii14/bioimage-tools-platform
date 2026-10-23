@@ -1,6 +1,7 @@
 """Serial intake stages: immutable claims, tool jobs, asset import, then CAS installation."""
 
 from collections.abc import Callable
+from os.path import normcase
 from pathlib import Path
 from tempfile import TemporaryDirectory, gettempdir
 from typing import TYPE_CHECKING
@@ -12,6 +13,7 @@ from wb_tool.api import (
     FigureSourcePath,
     IntakeCropEvidence,
     IntakeCropFile,
+    IntakeDeliveryReceipt,
     IntakeFigurePreparation,
     IntakeOutputPreparation,
     IntakeWorkflowTicket,
@@ -33,8 +35,10 @@ from wb_tool.api import (
     fail_intake_crop,
     finish_intake_workflow_step,
     intake_crop_companion_assets,
+    intake_digest,
     intake_output_digest,
     intake_workflow_digest,
+    prepare_intake_delivery,
     prepare_intake_measurement_revision,
     prepare_intake_outputs,
     project_assets,
@@ -71,13 +75,44 @@ class IntakeWorkflowSession:
         self._retained_runs: set[str] = set()
 
     def output_parent(self, project: WBFigureProject) -> str:
+        if isinstance(project, WBIntakeProject) and project.intake.delivery is not None:
+            state = project.intake.delivery
+            if normcase(str(Path(state.workspace_path).absolute())) == normcase(
+                str(Path(self.host.workspace_path).absolute())
+            ):
+                return state.output_parent
         if self._parent_context == (self.host.workspace_path, project.project_id):
             return self._output_parent
         return str(Path(self.host.workspace_path) / "outputs")
 
     def choose_output_parent(self, project: WBFigureProject, parent: str) -> None:
-        self._parent_context = self.host.workspace_path, project.project_id
-        self._output_parent = parent
+        host = self.host
+        if not isinstance(project, WBIntakeProject) or host.operation_busy or host.is_closing:
+            raise ValueError("当前项目不可修改输出位置")
+        generation, digest = host.view.generation, intake_digest(project)
+        workspace, project_id = host.workspace_path, project.project_id
+
+        def install(saved: WBFigureProject) -> WBIntakeProject:
+            if not isinstance(saved, WBIntakeProject) or intake_digest(saved) != digest:
+                raise ValueError("当前项目已改变，输出位置未保存")
+            return prepare_intake_delivery(
+                saved, output_parent=parent, workspace_path=workspace, delivery_id=uuid4().hex
+            )
+
+        def saved() -> None:
+            self._parent_context = workspace, project_id
+            self._output_parent = parent
+            host.finish_operation("输出位置已随项目保存；确认配置后创建命名项目目录。")
+
+        host.save(
+            transform=install,
+            after=saved,
+            install_guard=lambda: (
+                not host.is_closing
+                and host.workspace_path == workspace
+                and host.view.generation == generation
+            ),
+        )
 
     @property
     def presentation_key(self) -> tuple[object, ...]:
@@ -91,10 +126,10 @@ class IntakeWorkflowSession:
         )
 
     def batch_snapshot(self, project: WBIntakeProject) -> dict[str, object] | None:
-        if (
-            not isinstance(project, WBIntakeWorkflowProject)
-            or project.workflow.policy != "intake_workflow@3"
-        ):
+        if not isinstance(project, WBIntakeWorkflowProject) or project.workflow.policy not in {
+            "intake_workflow@3",
+            "intake_workflow@4",
+        }:
             return None
         order = {"crop": 0, "compose": 1, "measure": 2, "export": 3}
         remaining = sorted(
@@ -134,7 +169,9 @@ class IntakeWorkflowSession:
             "follow": bool(follows and not self._cancelled and not project.workflow.editing),
             "phase": current.stage if current else "complete",
             "targetId": current.target_id if current else "",
-            "paused": bool(blocked or (not self.host.operation_busy and remaining)),
+            "paused": bool(not self.host.operation_busy and (blocked or remaining))
+            if project.workflow.policy == "intake_workflow@4"
+            else bool(blocked or (not self.host.operation_busy and remaining)),
             "reason": blocked.reason if blocked else "",
             "complete": bool(not remaining and output_complete),
             "retained": [
@@ -146,21 +183,53 @@ class IntakeWorkflowSession:
     def cancel(self) -> None:
         self._cancelled = True
 
+    def delivery_snapshot(self, project: WBIntakeProject) -> dict[str, object] | None:
+        state = project.intake.delivery
+        if state is None:
+            return None
+        bound = normcase(str(Path(state.workspace_path).absolute())) == normcase(
+            str(Path(self.host.workspace_path).absolute())
+        )
+        path = str(Path(state.output_parent) / state.directory_name) if bound else ""
+        sealed = isinstance(project, WBIntakeOutputProject) and any(
+            e.destination == path for e in project.intake_outputs
+        )
+        materialized = self._output_context == (self.host.workspace_path, project.project_id) and (
+            self._output_path == path
+        )
+        return {
+            "directoryName": state.directory_name,
+            "workspaceBound": bound,
+            "rootPath": path,
+            "phase": "relocated"
+            if not bound
+            else "sealed"
+            if sealed
+            else "materialized"
+            if materialized
+            else "planned",
+        }
+
     def output_snapshot(self, project: WBIntakeOutputProject) -> dict[str, object]:
         current = intake_output_digest(project)
-        last = project.intake_outputs[-1] if project.intake_outputs else None
-        if self._output_context == (self.host.workspace_path, project.project_id):
-            last = next(
-                (e for e in project.intake_outputs if e.destination == self._output_path), None
-            )
-            return {
-                "path": self._output_path,
-                "committed": self._output_committed,
-                "current": bool(last and last.input_digest == current),
-            }
+        state = project.intake.delivery
+        local_state = state is not None and normcase(
+            str(Path(state.workspace_path).absolute())
+        ) == normcase(str(Path(self.host.workspace_path).absolute()))
+        active_path = (
+            str(Path(state.output_parent) / state.directory_name) if state and local_state else ""
+        )
+        if state is not None:
+            last = next((e for e in project.intake_outputs if e.destination == active_path), None)
+        else:
+            last = project.intake_outputs[-1] if project.intake_outputs else None
+        path = active_path or (last.destination if last else "")
+        follows = self._output_context == (self.host.workspace_path, project.project_id) and (
+            self._output_path == path
+        )
         return {
-            "path": last.destination if last else "",
-            "committed": bool(last),
+            "path": path,
+            "committed": self._output_committed if follows else bool(last),
             "current": bool(last and last.input_digest == current),
         }
 
@@ -177,6 +246,14 @@ class IntakeWorkflowSession:
             raise ValueError("输出输入已改变，请重新核对")
         self._key, self._cancelled = uuid4().hex, False
         prepared = prepare_intake_outputs(project)
+        prepared = prepare_intake_delivery(
+            prepared,
+            output_parent=self.output_parent(project),
+            workspace_path=host.workspace_path,
+            delivery_id=uuid4().hex,
+        )
+        if not isinstance(prepared, WBIntakeOutputProject):
+            raise ValueError("输出交付配置类型无效")
         step = next(s for s in prepared.workflow.steps if s.stage == "export")
         ticket: IntakeWorkflowTicket | None = None
         if step.status != "done" and all(
@@ -264,7 +341,7 @@ class IntakeWorkflowSession:
             raise ValueError("执行摘要已改变，请刷新后重试")
         self._key, self._cancelled = uuid4().hex, False
         key, generation = self._key, host.view.generation
-        if project.workflow.policy == "intake_workflow@3":
+        if project.workflow.policy in {"intake_workflow@3", "intake_workflow@4"}:
             self._batch_context = host.workspace_path, project.project_id
             self._batch_key = self._key
             self._retained_steps = {
@@ -279,12 +356,14 @@ class IntakeWorkflowSession:
             elif reply.error or not isinstance(reply.value, WBIntakeCropProject):
                 host.fail_operation(reply.error or "裁剪执行快照无效")
             else:
-                self._persist(reply.value, self._advance)
+                self._persist(reply.value, lambda: self._delivery_checkpoint("", self._advance))
 
         host.submit_tool_job(
             WBJob(
                 "intake_crop_prepare",
                 document=project,
+                path=host.workspace_path,
+                destination=self.output_parent(project),
                 data=expected_digest.encode("ascii"),
                 cancellation=host.cancellation,
             ),
@@ -325,6 +404,84 @@ class IntakeWorkflowSession:
                 not self._obsolete(key, generation) and (terminal_cancel or not self._cancelled)
             ),
         )
+
+    def _delivery_checkpoint(self, row_id: str, after: Callable[[], None]) -> None:
+        """Materialize only the current committed snapshot; no filesystem work on the GUI thread."""
+        host = self.host
+        project = host.view.project()
+        if not isinstance(project, WBIntakeCropProject) or project.intake.delivery is None:
+            host.fail_operation("缺少已保存的命名交付配置")
+            return
+        key, generation, revision = self._key, host.view.generation, project.revision
+        state = project.intake.delivery
+        pending = list(project_assets(project))
+        sources: list[FigureSourcePath] = []
+        host.begin_operation()
+        host.view.status.setText("正在按Fig和蛋白整理原图与已完成裁图…")
+
+        def stopped() -> bool:
+            if self._obsolete(key, generation) or host.view.project().revision != revision:
+                if key == self._key:
+                    host.finish_operation("旧项目整理回复未安装；已写入文件保留。")
+                return True
+            if self._cancelled or host.cancellation.is_set():
+                host.finish_operation("项目文件整理已取消；已提交原图与裁图保留。")
+                return True
+            return False
+
+        def completed(reply: WBReply) -> None:
+            if stopped():
+                return
+            value = reply.value
+            if reply.error or not isinstance(value, IntakeDeliveryReceipt):
+                host.fail_operation(reply.error or "项目文件整理未完成")
+            elif (
+                value.project_id != project.project_id
+                or value.delivery_id != state.delivery_id
+                or value.plan_digest != state.plan_digest
+                or value.row_id != row_id
+                or Path(value.destination) != Path(state.output_parent) / state.directory_name
+            ):
+                host.fail_operation("项目文件整理回复身份不一致")
+            else:
+                self._output_context = host.workspace_path, project.project_id
+                self._output_path, self._output_committed = value.destination, False
+                host.end_phase()
+                after()
+
+        def next_asset() -> None:
+            if stopped():
+                return
+            if not pending:
+                host.submit_tool_job(
+                    WBJob(
+                        "intake_delivery_materialize",
+                        document=project,
+                        sources=tuple(sources),
+                        path=host.workspace_path,
+                        row_id=row_id,
+                        cancellation=host.cancellation,
+                    ),
+                    completed,
+                    accept_errors=True,
+                )
+                return
+            asset = pending.pop(0)
+
+            def resolved(reply: StorageReply) -> None:
+                if stopped():
+                    return
+                if reply.error_code or not isinstance(reply.value, str):
+                    host.fail_operation(reply.message or "项目整理所需资产缺失")
+                    return
+                sources.append(FigureSourcePath(asset.sha256, reply.value))
+                next_asset()
+
+            host.submit_storage_job(
+                StorageCommand("asset", asset=asset), resolved, accept_errors=True
+            )
+
+        next_asset()
 
     def _advance(self) -> None:
         host = self.host
@@ -527,7 +684,7 @@ class IntakeWorkflowSession:
             elif evidence is not None:
                 updated = (
                     accept_automatic_intake_crop(project, ticket, evidence)
-                    if project.workflow.policy == "intake_workflow@3"
+                    if project.workflow.policy in {"intake_workflow@3", "intake_workflow@4"}
                     and automatic_intake_crop_allowed(evidence)
                     else record_intake_crop_proposal(project, ticket, evidence)
                 )
@@ -535,7 +692,12 @@ class IntakeWorkflowSession:
                 updated = complete_intake_crop(project, ticket, asset)
             else:
                 raise ValueError("裁剪回复没有明确结果")
-            self._persist(updated, self._advance, terminal_cancel=cancelled)
+            after = (
+                (lambda: self._delivery_checkpoint(ticket.target_id, self._advance))
+                if asset is not None and not error and not cancelled
+                else self._advance
+            )
+            self._persist(updated, after, terminal_cancel=cancelled)
         except ValueError as problem:
             host.fail_operation(str(problem))
 
@@ -675,10 +837,10 @@ class IntakeWorkflowSession:
         """Present the committed Fig without replacing the batch session identity."""
         host = self.host
         project = host.view.project()
-        if (
-            not isinstance(project, WBIntakeFigureProject)
-            or project.workflow.policy != "intake_workflow@3"
-        ):
+        if not isinstance(project, WBIntakeFigureProject) or project.workflow.policy not in {
+            "intake_workflow@3",
+            "intake_workflow@4",
+        }:
             self._advance()
             return
         evidence = next((e for e in project.intake_figures if e.figure_id == figure_id), None)
@@ -732,16 +894,11 @@ class IntakeWorkflowSession:
             host.fail_operation("缺少当前身份输出项目")
             return
         key, generation = self._key, host.view.generation
-        parent = Path(self.output_parent(project))
-        try:
-            parent.mkdir(exist_ok=True)
-        except OSError as error:
-            if ticket is not None:
-                self._failed_stage(ticket, str(error))
-            else:
-                host.fail_operation(str(error))
+        state = project.intake.delivery
+        if state is None:
+            host.fail_operation("缺少已保存的命名交付配置，请重新开始或输出当前快照")
             return
-        destination = parent / ("WB-intake-" + uuid4().hex)
+        destination = Path(state.output_parent) / state.directory_name
         pending = list(project_assets(project))
         sources: list[FigureSourcePath] = []
         published: IntakeOutputPreparation | None = None
@@ -780,8 +937,9 @@ class IntakeWorkflowSession:
             else:
                 host.submit_export_job(
                     WBJob(
-                        "intake_output_export",
+                        "intake_delivery_finalize",
                         document=project,
+                        path=host.workspace_path,
                         sources=tuple(sources),
                         destination=str(destination),
                         cancellation=host.cancellation,

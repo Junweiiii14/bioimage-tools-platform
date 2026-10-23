@@ -68,10 +68,14 @@ def _xlsx_styles() -> bytes:
 
 
 def intake_table_bytes(
-    project: WBIntakeOutputProject, results: tuple[LoadedProjectResult, ...], *, csv: bool = False
+    project: WBIntakeOutputProject,
+    results: tuple[LoadedProjectResult, ...],
+    *,
+    csv: bool = False,
+    figure_id: str = "",
 ) -> bytes:
     table = intake_visible_table(
-        project, tuple(i.cell for i in fill_intake_table(project, results))
+        project, tuple(i.cell for i in fill_intake_table(project, results)), figure_id=figure_id
     )
     marks = set(table.quality)
     if csv:
@@ -91,6 +95,8 @@ def intake_table_bytes(
     rows = tuple(tuple("—" if v is None else v for v in row) for row in table.rows)
     _, audit = project_table_rows(project, results)
     audit += (("主表视图", "intake_visible_table@1", "原始灰度积分，非归一化有效信号"),)
+    if figure_id:
+        audit += (("当前主表Fig ID", figure_id, "审计表保留完整项目来源"),)
     original = two_sheet_xlsx_bytes((table.headers, *rows), audit)
     output = BytesIO()
     rel_ns = "http://schemas.openxmlformats.org/package/2006/relationships"

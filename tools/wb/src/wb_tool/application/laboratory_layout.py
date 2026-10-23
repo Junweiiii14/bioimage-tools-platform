@@ -2,9 +2,9 @@
 
 from dataclasses import dataclass
 from math import cos, radians, sin
-from typing import Literal
+from typing import Literal, cast
 
-from pydantic import Field, model_validator
+from pydantic import Field, SerializerFunctionWrapHandler, model_serializer, model_validator
 
 from wb_tool.application.document import DocumentIO
 from wb_tool.application.figure_project import (
@@ -29,11 +29,19 @@ class FigureLayoutStyle(DocumentIO):
 
 
 class DisplayFrame(DocumentIO):
+    sampling_policy: Literal["within_roi@1", "within_source@2"] = "within_roi@1"
     center_x: float
     center_y: float
     width: float = Field(gt=0)
     height: float = Field(gt=0)
     angle_degrees: float = Field(ge=-30, le=30)
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_shape(self, handler: SerializerFunctionWrapHandler) -> dict[str, object]:
+        result = cast(dict[str, object], handler(self))
+        if self.sampling_policy == "within_roi@1":
+            result.pop("sampling_policy", None)
+        return result
 
     def corners(self) -> tuple[tuple[float, float], ...]:
         angle = radians(self.angle_degrees)
@@ -270,14 +278,15 @@ def _groups(
             roi = row.roi
             if row.source is None or roi is None:
                 raise ValueError("旋转显示框需要实际原图ROI")
+            source_frame = frame.sampling_policy == "within_source@2"
             if any(
-                x < max(0, roi.x0) - 1e-7
-                or x > min(row.width, roi.x1) + 1e-7
-                or y < max(0, roi.y0) - 1e-7
-                or y > min(row.height, roi.y1) + 1e-7
+                x < (0 if source_frame else max(0, roi.x0)) - 1e-7
+                or x > (row.width if source_frame else min(row.width, roi.x1)) + 1e-7
+                or y < (0 if source_frame else max(0, roi.y0)) - 1e-7
+                or y > (row.height if source_frame else min(row.height, roi.y1)) + 1e-7
                 for x, y in frame.corners()
             ):
-                raise ValueError("旋转显示框超出原图ROI边界")
+                raise ValueError("旋转显示框超出原图" if source_frame else "旋转显示框超出原图ROI")
         groups.setdefault(segment.figure, {}).setdefault(segment.line, []).append(segment)
     ordered: dict[str, list[list[FigureSlice]]] = {}
     for figure, lines in groups.items():

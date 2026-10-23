@@ -258,7 +258,7 @@ def verify_intake_installation(report_path: Path, *, grouped: bool = False) -> i
                 if phase == "home-restore" and not window.host.workspace_path:
                     phase = "archive"
                     window.host.restore_archive(
-                        str(Path(saved_outputs[0]) / "project.zip"), str(root / "中文恢复")
+                        str(Path(saved_outputs[0]) / "项目恢复.zip"), str(root / "中文恢复")
                     )
                     return
                 if not window.host.workspace_path or window.host.has_unsaved_changes:
@@ -448,9 +448,9 @@ def verify_intake_installation(report_path: Path, *, grouped: bool = False) -> i
                     index = json.loads((destination / "index.json").read_bytes())
                     if index["complete"] is not True or index["errors"]:
                         raise ValueError("Output index is incomplete")
-                    if not (destination / "measurements.xlsx").is_file():
+                    if not (destination / "灰度汇总.xlsx").is_file():
                         raise ValueError("XLSX output missing")
-                    original_zip = (destination / "project.zip").read_bytes()
+                    original_zip = (destination / "项目恢复.zip").read_bytes()
                     saved_outputs = tuple(item.destination for item in project.intake_outputs)
                     checks.append("complete-output")
                     workspace, epoch = window.host.workspace_path, window.bridge.session_epoch
@@ -473,7 +473,7 @@ def verify_intake_installation(report_path: Path, *, grouped: bool = False) -> i
                         len(project.intake_outputs) != 2
                         or not project.intake_outputs[-1].complete
                         or project.intake_outputs[-1].destination in saved_outputs
-                        or (Path(saved_outputs[0]) / "project.zip").read_bytes() != original_zip
+                        or (Path(saved_outputs[0]) / "项目恢复.zip").read_bytes() != original_zip
                     ):
                         raise ValueError("Repeated export replaced an old result")
                     checks.append("repeat-export-no-overwrite")
@@ -515,7 +515,7 @@ def verify_intake_installation(report_path: Path, *, grouped: bool = False) -> i
                         or not project.intake_outputs[-1].complete
                         or next(s for s in project.workflow.steps if s.stage == "export").status
                         != "done"
-                        or (Path(saved_outputs[0]) / "project.zip").read_bytes() != original_zip
+                        or (Path(saved_outputs[0]) / "项目恢复.zip").read_bytes() != original_zip
                     ):
                         raise ValueError("Imported batch failed output-only recovery")
                     checks.append("archive-resume-output")

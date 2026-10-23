@@ -19,6 +19,7 @@ from wb_tool.application.intake_revision import (
 from wb_tool.application.intake_workflow import (
     WBIntakeWorkflowProject,
     intake_workflow_digest,
+    intake_workflow_snapshot,
     prepare_intake_workflow,
     retry_intake_workflow_step,
 )
@@ -59,7 +60,10 @@ def continue_intake_sequence(
     display_angle: float | None = None,
 ) -> WBIntakeCropProject:
     """Explicitly save one human correction or retry the first blocked batch item."""
-    if project.workflow.policy != "intake_workflow@3" or project.workflow.editing:
+    if (
+        project.workflow.policy not in {"intake_workflow@3", "intake_workflow@4"}
+        or project.workflow.editing
+    ):
         raise ValueError("请先确认当前整批执行计划")
     if intake_workflow_digest(project) != expected_digest:
         raise ValueError("阶段输入已变化，请重新核对")
@@ -84,6 +88,11 @@ def continue_intake_sequence(
             expected_digest=expected_digest,
             display_angle=display_angle,
         )
+    if (
+        project.workflow.policy == "intake_workflow@4"
+        and intake_workflow_snapshot(project)["pending_ready"]
+    ):
+        return project
     order = {"crop": 0, "compose": 1, "measure": 2, "export": 3}
     blocked = sorted(
         (

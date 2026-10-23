@@ -19,6 +19,9 @@ from pytestqt.qtbot import QtBot
 from tool_contracts.api import AssetRef, DraftSnapshot, RunRecord
 from wb_tool.api import (
     FigureTemplate,
+    IntakeDraftFigure,
+    IntakeGrouping,
+    IntakeSequenceProtein,
     IntakeWorkflowTicket,
     PreviewRaster,
     ProjectRowAnalysis,
@@ -30,8 +33,12 @@ from wb_tool.api import (
     WBIntakeWorkflowProject,
     WBJob,
     WBReply,
+    configure_intake_sequence,
     intake_digest,
+    intake_grouping,
     intake_workflow_digest,
+    plan_intake_delivery,
+    prepare_intake_sequence,
     prepare_intake_workflow,
     propose_intake_crop,
     read_figure_project,
@@ -292,6 +299,12 @@ def test_fixed_n_crop_run_review_original_asset_and_reopen(
     make_source(root / "a.tif")
     make_source(root / "b.tif", 2000)
     start(window, qtbot, root)
+    parent = tmp_path / "实验室交付"
+    parent.mkdir()
+    window.host.intake_workflow.choose_output_parent(current(window), str(parent))
+    wait_saved(window, qtbot)
+    assert window.host.intake_workflow.output_parent(current(window)) == str(parent)
+    assert current(window).intake.delivery is not None and not list(parent.iterdir())
     plan(window, qtbot)
     before = current(window)
     request(
@@ -321,6 +334,12 @@ def test_fixed_n_crop_run_review_original_asset_and_reopen(
     assert all(len(e.slots) == 8 and e.crop is None for e in proposed.intake_crops)
     assert all(s.status == "needs_review" for s in proposed.workflow.steps if s.stage == "crop")
     assert not proposed.analyses and not proposed.automatic_rows
+    assert proposed.intake.delivery is not None
+    delivery = parent / proposed.intake.delivery.directory_name
+    paths = plan_intake_delivery(proposed)
+    assert all((delivery / f.directory).is_dir() for f in paths.figures)
+    assert len(list(delivery.rglob("原始图片/*.tif"))) == 2
+    assert not list(delivery.rglob("原值裁剪/*.tiff"))
     request(
         window,
         "intake_crop_review",
@@ -345,6 +364,18 @@ def test_fixed_n_crop_run_review_original_asset_and_reopen(
     assert next(s for s in finished.workflow.steps if s.target_id == "protein-a").status == "done"
     assert all(s.status == "pending" for s in finished.workflow.steps if s.stage != "crop")
     assert not finished.analyses
+    assert finished.intake.delivery == proposed.intake.delivery
+    assigned = list((delivery / paths.rows[0].directory / "原值裁剪").glob("*.tiff"))
+    assert len(assigned) == 1 and assigned[0].read_bytes() == raw_path.read_bytes()
+    assert len(list((delivery / paths.rows[0].directory / "展示图片").iterdir())) == 2
+    assert not list((delivery / paths.rows[1].directory / "原值裁剪").iterdir())
+    assert not (delivery / "index.json").exists()
+    assert window.host.intake_workflow.delivery_snapshot(finished) == {
+        "directoryName": delivery.name,
+        "workspaceBound": True,
+        "rootPath": str(delivery),
+        "phase": "materialized",
+    }
     statuses = {
         r["id"]: r["cropStatus"]
         for r in cast(list[dict[str, object]], window.bridge.snapshot()["rows"])
@@ -365,6 +396,8 @@ def test_fixed_n_crop_run_review_original_asset_and_reopen(
     wait_saved(window, qtbot)
     assert current(window).schema_version == 14
     assert current(window).rows[0].lane_count == 8
+    assert current(window).intake.delivery == finished.intake.delivery
+    assert window.host.intake_workflow.output_parent(current(window)) == str(parent)
 
 
 @pytest.mark.parametrize("mode", ["cancel_reply", "running_save_failure"])
@@ -548,7 +581,7 @@ def test_executed_grouping_incomplete_revision_is_durable_and_blocks_execution(
     wait_saved(window, qtbot)
     executed = current(window)
     assert isinstance(executed, WBIntakeCropProject)
-    assert any(s.attempt for s in executed.workflow.steps)
+    assert any(s.attempt for s in executed.workflow.steps), window.host.view.status.text()
     request(window, "intake_edit")
     wait_saved(window, qtbot)
     editing = current(window)
@@ -833,6 +866,65 @@ def test_font_assets_never_enter_thumbnail_decoder(
     monkeypatch.undo()
 
 
+def test_delivery_configuration_cas_failure_never_creates_output_directory(
+    intake_window: WebWorkbenchWindow,
+    qtbot: QtBot,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    window = intake_window
+    root = tmp_path / "raw"
+    make_source(root / "a.tif")
+    make_source(root / "b.tif", 2000)
+    start(window, qtbot, root)
+    plan(window, qtbot)
+    project = current(window)
+    request(
+        window,
+        "intake_assign",
+        bindings=[
+            {"protein_id": p.protein_id, "source_id": s.source_id}
+            for p, s in zip(project.intake.proteins, project.intake.sources, strict=True)
+        ],
+    )
+    wait_saved(window, qtbot)
+    request(window, "intake_confirm")
+    wait_saved(window, qtbot)
+    request(window, "intake_prepare")
+    wait_saved(window, qtbot)
+    before = current(window)
+    assert isinstance(before, WBIntakeWorkflowProject)
+    original = Workspace.save_draft
+
+    def failed(
+        store: Workspace,
+        document_id: str,
+        tool_id: str,
+        revision: int,
+        data: bytes,
+        *,
+        expected_previous_revision: int | None = None,
+    ) -> DraftSnapshot:
+        candidate = read_figure_project(data)
+        if isinstance(candidate, WBIntakeProject) and candidate.intake.delivery is not None:
+            raise OSError("injected delivery configuration CAS failure")
+        return original(
+            store,
+            document_id,
+            tool_id,
+            revision,
+            data,
+            expected_previous_revision=expected_previous_revision,
+        )
+
+    monkeypatch.setattr(Workspace, "save_draft", failed)
+    request(window, "intake_run", workflowDigest=intake_workflow_digest(before))
+    qtbot.waitUntil(lambda: not window.host.operation_busy, timeout=20000)
+    assert current(window) == before
+    assert not (Path(window.host.workspace_path) / "outputs").exists()
+    assert "delivery configuration CAS failure" in window.host.view.status.text()
+
+
 def reviewed_intake_fig(window: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path) -> None:
     root = tmp_path / "raw"
     make_source(root / "a.tif")
@@ -909,7 +1001,7 @@ def test_complete_intake_fig_is_saved_before_real_worker_and_restores_verified_r
     assert next(s for s in finished.workflow.steps if s.stage == "export").status == "done"
     assert len(finished.intake_outputs) == 1 and finished.intake_outputs[0].complete
     output = Path(finished.intake_outputs[0].destination)
-    assert (output / "project.zip").is_file() and (output / "measurements.xlsx").is_file()
+    assert (output / "项目恢复.zip").is_file() and (output / "灰度汇总.xlsx").is_file()
     index = json.loads((output / "index.json").read_bytes())
     assert index["complete"] is True and index["errors"] == []
     assert len(cast(list[object], window.bridge.snapshot()["cells"])) == 16
@@ -961,21 +1053,21 @@ def test_complete_intake_fig_is_saved_before_real_worker_and_restores_verified_r
     assert not restored.workflow.approved
     assert isinstance(restored, WBIntakeOutputProject)
     assert restored.intake_outputs == finished.intake_outputs
-    old_zip = (output / "project.zip").read_bytes()
+    old_zip = (output / "项目恢复.zip").read_bytes()
     request(window, "intake_export", workflowDigest=intake_workflow_digest(restored))
     wait_saved(window, qtbot)
     repeated = current(window)
     assert isinstance(repeated, WBIntakeOutputProject) and len(repeated.intake_outputs) == 2
     assert repeated.intake_outputs[-1].complete
     assert repeated.intake_outputs[-1].destination != str(output)
-    assert (output / "project.zip").read_bytes() == old_zip
+    assert (output / "项目恢复.zip").read_bytes() == old_zip
     assert len(window.host.project_results) == 2
     settings = QSettings(str(tmp_path / "restored-intake.ini"), QSettings.Format.IniFormat)
     fresh = WebWorkbenchWindow(settings=settings)
     fresh.show()
     try:
         target = tmp_path / "restored-intake"
-        fresh.host.restore_archive(str(output / "project.zip"), str(target))
+        fresh.host.restore_archive(str(output / "项目恢复.zip"), str(target))
         qtbot.waitUntil(lambda: fresh.host.workspace_path == str(target), timeout=20000)
         wait_saved(fresh, qtbot)
         imported = current(fresh)
@@ -994,7 +1086,7 @@ def test_complete_intake_fig_is_saved_before_real_worker_and_restores_verified_r
         assert isinstance(again, WBIntakeOutputProject)
         assert again.intake_outputs[-1].complete
         assert next(s for s in again.workflow.steps if s.stage == "export").status == "done"
-        assert (output / "project.zip").read_bytes() == old_zip
+        assert (output / "项目恢复.zip").read_bytes() == old_zip
     finally:
         close_and_dispose_window(
             fresh, qtbot, resources_closed=lambda: fresh.host.resources_closed, timeout=20000
@@ -1015,7 +1107,7 @@ def test_complete_intake_fig_is_saved_before_real_worker_and_restores_verified_r
     assert corrected.intake_outputs == repeated.intake_outputs
     assert corrected.revision > previous_revision
     assert window.host.intake_workflow.output_snapshot(corrected)["current"] is False
-    assert (output / "project.zip").read_bytes() == old_zip
+    assert (output / "项目恢复.zip").read_bytes() == old_zip
     old_replies: list[StorageReply] = []
     window.host.submit_storage_job(
         StorageCommand("load", document_id=corrected.project_id, revision=previous_revision),
@@ -1223,7 +1315,7 @@ def test_intake_output_failure_and_cancellation_never_fabricate_completion(
     def submit(
         job: WBJob, callback: Callable[[WBReply], None], *, accept_errors: bool = False
     ) -> None:
-        if fault == "late_cancel" and job.operation == "intake_output_export":
+        if fault == "late_cancel" and job.operation == "intake_delivery_finalize":
             original_export(
                 job, lambda reply: held.append((callback, reply)), accept_errors=accept_errors
             )
@@ -1257,10 +1349,11 @@ def test_intake_output_failure_and_cancellation_never_fabricate_completion(
     assert step.status != "done" and not final.intake_outputs
     assert len(window.host.project_results) == 2
     assert all(plan.run and plan.run.state == "succeeded" for plan in final.analyses)
-    folders = list((Path(window.host.workspace_path) / "outputs").glob("WB-intake-*"))
-    assert len(folders) == (1 if fault in {"output_save", "late_cancel"} else 0)
-    if folders:
-        assert (folders[0] / "project.zip").is_file()
+    folders = list((Path(window.host.workspace_path) / "outputs").iterdir())
+    assert len(folders) == 1  # Configuration and successful crops already exist before export.
+    assert (folders[0] / "index.json").exists() == (fault in {"output_save", "late_cancel"})
+    if fault in {"output_save", "late_cancel"}:
+        assert (folders[0] / "项目恢复.zip").is_file()
         assert window.host.intake_workflow.output_snapshot(final)["committed"] is False
     if fault in {"late_cancel", "cancel_before_export"}:
         assert step.status == "cancelled"
@@ -1270,7 +1363,7 @@ def test_intake_output_failure_and_cancellation_never_fabricate_completion(
         request(window, "intake_export", workflowDigest=intake_workflow_digest(final))
         assert not window.host.operation_busy
         assert current(window) == final
-        assert list((Path(window.host.workspace_path) / "outputs").glob("WB-intake-*")) == folders
+        assert list((Path(window.host.workspace_path) / "outputs").iterdir()) == folders
     monkeypatch.undo()
 
 
@@ -1329,6 +1422,29 @@ def test_sequence_real_page_two_figs_pause_continue_stage_barriers_and_reopen(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    from bioimage_app import web_intake
+
+    prepare_sequence = prepare_intake_sequence
+
+    def strict_legacy(
+        project: WBIntakeProject,
+        grouping: IntakeGrouping,
+        *,
+        expected_digest: str,
+        allow_reuse: bool = False,
+    ) -> WBIntakeWorkflowProject:
+        prepared = prepare_sequence(
+            project, grouping, expected_digest=expected_digest, allow_reuse=allow_reuse
+        )
+        return type(prepared).model_validate(
+            {
+                **dict(prepared),
+                "workflow": prepared.workflow.model_copy(update={"policy": "intake_workflow@3"}),
+            }
+        )
+
+    # Retain the historical strict-pause contract explicitly. New sequences use @4.
+    monkeypatch.setattr(web_intake, "prepare_intake_sequence", strict_legacy)
     window = intake_window
     root = tmp_path / "sequence-raw"
     a = make_source(root / "A_123456 (1).tif")
@@ -1515,7 +1631,7 @@ def test_sequence_real_page_two_figs_pause_continue_stage_barriers_and_reopen(
                 assert all(s["status"] == "done" for s in steps if s["stage"] in required)
     assert any(s.get("workflow") for s in snapshots)
     output = Path(finished.intake_outputs[0].destination)
-    old_zip = (output / "project.zip").read_bytes()
+    old_zip = (output / "项目恢复.zip").read_bytes()
     old_host = window.host
     window.open_project(window.host.workspace_path)
     qtbot.waitUntil(
@@ -1535,7 +1651,7 @@ def test_sequence_real_page_two_figs_pause_continue_stage_barriers_and_reopen(
         )["follow"]
         is False
     )
-    assert (output / "project.zip").read_bytes() == old_zip
+    assert (output / "项目恢复.zip").read_bytes() == old_zip
     assert all(p.read_bytes() == content for p, content in originals.items())
 
 
@@ -1632,7 +1748,7 @@ def test_reliable_sequence_needs_no_crop_confirmations_and_shows_images_and_tabl
     assert js("document.querySelector('#source-image').naturalHeight") == 300
     assert js("switchMode('results');true") is True
     assert js("document.querySelector('[data-intake-table-export]').checkVisibility()") is True
-    assert (Path(finished.intake_outputs[-1].destination) / "measurements.xlsx").is_file()
+    assert (Path(finished.intake_outputs[-1].destination) / "灰度汇总.xlsx").is_file()
     assert js("switchMode('quant');true") is True
     qtbot.waitUntil(
         lambda: (
@@ -1805,3 +1921,153 @@ def test_sequence_start_never_launches_before_exact_cas_commit(
         cast(dict[str, object], window.bridge.snapshot()["intake"])["sequenceResponse"],
     )
     assert response["status"] == "failed" and response["requestId"] == "one"
+
+
+def test_v4_blocked_first_fig_keeps_second_running_then_repairs_without_repeating_success(
+    intake_window: WebWorkbenchWindow,
+    qtbot: QtBot,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tools.wb.tests.test_source_geometry import membrane
+
+    window = intake_window
+    advance = cast(Callable[[IntakeWorkflowSession], None], vars(IntakeWorkflowSession)["_advance"])
+    paused = False
+
+    def stop_after_first_review(session: IntakeWorkflowSession) -> None:
+        nonlocal paused
+        project = session.host.view.project()
+        if (
+            not paused
+            and isinstance(project, WBIntakeCropProject)
+            and project.workflow.steps[0].status == "needs_review"
+        ):
+            # Stop between committed steps, so reopening exercises the public
+            # continue action with a blocked first Fig and untouched second Fig.
+            paused = True
+            session.host.finish_operation("test checkpoint before next independent Fig")
+            return
+        advance(session)
+
+    monkeypatch.setattr(IntakeWorkflowSession, "_advance", stop_after_first_review)
+    root = tmp_path / "independent-figs"
+    make_source(root / "A_flat_123456 (1).tiff")
+    tifffile.imwrite(root / "B_signal_123456 (1).tiff", membrane(angle=3, marker=False))
+    originals = {p: p.read_bytes() for p in root.iterdir()}
+    start(window, qtbot, root)
+    initial = current(window)
+    groups = intake_grouping(initial)
+    selected = IntakeGrouping.model_validate(
+        {
+            **dict(groups),
+            "groups": tuple(
+                g.model_copy(update={"selected_source_id": g.source_ids[0]}) for g in groups.groups
+            ),
+        }
+    )
+    config = configure_intake_sequence(
+        selected,
+        (
+            IntakeDraftFigure(figure_id="blocked", label="Fig 1", lane_count=5),
+            IntakeDraftFigure(figure_id="good", label="Fig 2", lane_count=5),
+        ),
+        (
+            IntakeSequenceProtein(entry_id="p1", figure_id="blocked", label="Needs review"),
+            IntakeSequenceProtein(entry_id="p2", figure_id="good", label="Good protein"),
+        ),
+    )
+    request(
+        window,
+        "intake_sequence_start",
+        grouping=config.model_dump(mode="json"),
+        requestId="v4-start",
+    )
+    qtbot.waitUntil(
+        lambda: window.bridge.sequence_response.get("status") == "started", timeout=10000
+    )
+    qtbot.waitUntil(lambda: paused and not window.host.operation_busy, timeout=20000)
+    wait_saved(window, qtbot)
+    stopped = current(window)
+    assert isinstance(stopped, WBIntakeCropProject)
+    blocked_step = stopped.workflow.steps[0]
+    assert blocked_step.status == "needs_review"
+    assert stopped.workflow.steps[1].status == "pending"
+    assert stopped.workflow.steps[1].attempt == 0
+    monkeypatch.setattr(IntakeWorkflowSession, "_advance", advance)
+    epoch = window.bridge.session_epoch
+    window.open_project(window.host.workspace_path)
+    qtbot.waitUntil(
+        lambda: window.bridge.session_epoch > epoch and window.shutdown_stage == "idle",
+        timeout=20000,
+    )
+    wait_saved(window, qtbot)
+    reopened = current(window)
+    assert isinstance(reopened, WBIntakeCropProject)
+    assert reopened.workflow.steps[0] == blocked_step
+    request(
+        window,
+        "intake_sequence_continue",
+        workflowDigest=intake_workflow_digest(reopened),
+    )
+
+    def has_outputs(count: int) -> bool:
+        p = current(window)
+        return isinstance(p, WBIntakeOutputProject) and len(p.intake_outputs) == count
+
+    qtbot.waitUntil(lambda: has_outputs(1), timeout=30000)
+    wait_saved(window, qtbot)
+    partial = current(window)
+    assert isinstance(partial, WBIntakeOutputProject), window.host.view.status.text()
+    assert partial.workflow.policy == "intake_workflow@4"
+    row_bad, row_good = partial.rows
+    steps = {(s.stage, s.target_id): s for s in partial.workflow.steps}
+    assert steps["crop", row_bad.row_id].status == "needs_review"
+    assert steps["crop", row_bad.row_id] == blocked_step
+    assert steps["compose", "blocked"].status == steps["measure", "blocked"].status == "pending"
+    assert all(steps[stage, "good"].status == "done" for stage in ("compose", "measure")), (
+        [(s.stage, s.target_id, s.status, s.reason) for s in partial.workflow.steps],
+        window.host.view.status.text(),
+    )
+    assert steps["crop", row_good.row_id].status == "done"
+    assert steps["export", partial.project_id].status == "failed"
+    assert not partial.intake_outputs[0].complete and partial.intake_outputs[0].errors
+    assert len(partial.analyses) == 1 and partial.analyses[0].row_id == row_good.row_id
+    successful_run = partial.analyses[0].run
+    assert successful_run is not None and successful_run.state == "succeeded" and successful_run.pid
+    before_steps = {
+        key: (step.attempt, step.claim_id)
+        for key, step in steps.items()
+        if key[1] in {row_good.row_id, "good"}
+    }
+    old_root = Path(partial.intake_outputs[0].destination)
+    old_zip = (old_root / "项目恢复.zip").read_bytes()
+    assert (old_root / "灰度汇总.xlsx").is_file()
+    manifest = json.loads((old_root / "index.json").read_bytes())
+    assert manifest["complete"] is False and manifest["errors"]
+    batch = window.host.intake_workflow.batch_snapshot(partial)
+    assert batch is not None and not batch["complete"]
+    assert all(p.read_bytes() == data for p, data in originals.items())
+
+    request(
+        window,
+        "intake_sequence_continue",
+        workflowDigest=intake_workflow_digest(partial),
+        rowId=row_bad.row_id,
+        roi={"x": 12, "y": 10, "width": 120, "height": 40},
+    )
+    qtbot.waitUntil(lambda: has_outputs(2), timeout=30000)
+    wait_saved(window, qtbot)
+    completed = current(window)
+    assert isinstance(completed, WBIntakeOutputProject), window.host.view.status.text()
+    assert all(s.status == "done" for s in completed.workflow.steps), window.host.view.status.text()
+    assert completed.intake_outputs[-1].complete
+    assert completed.intake_outputs[-1].destination != str(old_root)
+    assert next(p.run for p in completed.analyses if p.row_id == row_good.row_id) == successful_run
+    assert {
+        key: (step.attempt, step.claim_id)
+        for step in completed.workflow.steps
+        if (key := (step.stage, step.target_id)) in before_steps
+    } == before_steps
+    assert (old_root / "项目恢复.zip").read_bytes() == old_zip
+    assert all(p.read_bytes() == data for p, data in originals.items())

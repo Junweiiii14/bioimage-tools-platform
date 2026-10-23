@@ -1,6 +1,7 @@
 """Intake drafts preserve explicit identity choices across asynchronous snapshots."""
 
 import json
+import math
 from collections.abc import Iterator
 from pathlib import Path
 from uuid import uuid4
@@ -8,8 +9,10 @@ from uuid import uuid4
 import pytest
 from bioimage_app.web_window import WebWorkbenchWindow
 from pydantic import TypeAdapter
-from PySide6.QtCore import QPoint, QSettings, Qt
+from PySide6.QtCore import QEvent, QPoint, QPointF, QSettings, Qt
+from PySide6.QtGui import QMouseEvent
 from PySide6.QtTest import QTest
+from PySide6.QtWidgets import QApplication
 from pytestqt.qtbot import QtBot
 
 from tooling.qt_test_lifecycle import close_and_dispose_window
@@ -275,6 +278,7 @@ def test_rotation_draft_late_save_preserves_newer_angle_and_can_reset(
         window, qtbot, "document.querySelector('[data-intake-rotation]').value==='0.00'"
     )
     javascript(window, qtbot, "intakeWorkspace.undoCrop(false);true")
+    assert javascript(window, qtbot, "intakeWorkspace.rotationFrame().angle_degrees===2")
     assert javascript(
         window, qtbot, "document.querySelector('[data-intake-rotation]').value==='2.00'"
     )
@@ -1731,12 +1735,47 @@ def test_rotation_preview_and_one_real_click_commit(
         qtbot,
         "window.angleInput=document.querySelector('"
         + scope
-        + "[data-intake-rotation]');angleInput.focus();true",
+        + "[data-intake-rotation]');window.beforeRotationPixels=document.querySelector('"
+        + scope
+        + "canvas').toDataURL();angleInput.focus();true",
     )
     focus = window.web.focusProxy()
     assert focus is not None
     QTest.keyClick(focus, Qt.Key.Key_A, Qt.KeyboardModifier.ControlModifier)
     QTest.keyClicks(focus, "4.8")
+    # Input paints both actual surfaces before blur/change or a backend reply.
+    qtbot.waitUntil(
+        lambda: (
+            javascript(
+                window,
+                qtbot,
+                "angleInput.value==='4.8' && intakeWorkspace.rotationFrame().angle_degrees===4.8",
+            )
+            is True
+        )
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "Math.abs(new DOMMatrix(getComputedStyle(document.querySelector("
+        "'#display-frame-overlay')).transform).b-Math.sin(4.8*Math.PI/180))<0.00001 && "
+        "JSON.stringify(row().roi)==='"
+        + json.dumps({"x": 20, "y": 20, "width": 120, "height": 16}, separators=(",", ":"))
+        + "' && document.activeElement===angleInput",
+    )
+    qtbot.waitUntil(
+        lambda: (
+            javascript(
+                window,
+                qtbot,
+                "(()=>{const c=document.querySelector('" + scope + "canvas');"
+                "return c.width===120 && c.height===16 && "
+                "c.getContext('2d').getImageData(0,0,c.width,c.height).data.some(v=>v>0) && "
+                "c.toDataURL()!==beforeRotationPixels})()",
+            )
+            is True
+        )
+    )
     coordinates_json = javascript(
         window,
         qtbot,
@@ -1773,6 +1812,293 @@ def test_rotation_preview_and_one_real_click_commit(
         window,
         qtbot,
         "sent[0].action==='intake_sequence_continue' && sent[0].payload.displayAngle===4.8",
+    )
+
+
+def test_rotation_handle_changes_main_frame_and_preserves_saved_preview_size(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
+) -> None:
+    window = intake_page
+    window.resize(1440, 900)
+    javascript(
+        window,
+        qtbot,
+        """
+      const image=document.createElement('canvas');image.width=240;image.height=160;
+      const ctx=image.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,240,160);
+      ctx.translate(120,80);ctx.rotate(-17.5*Math.PI/180);ctx.fillStyle='black';
+      ctx.fillRect(-55,-2,110,4);
+      setState({selectedId:'protein-a',rows:[{id:'protein-a',sourceId:'synthetic-angle',
+        name:'synthetic.tif',protein:'Actin',preview:image.toDataURL(),width:240,height:160,
+        lanes:6,roi:{x:50,y:40,width:140,height:80}}],intake:{...state.intake,
+        cropEnabled:true,figureEnabled:true,crops:[{row_id:'protein-a',reviewed:true,
+          crop:{x0:50,y0:40,x1:190,y1:120},reason:'',raw_crop:{sha256:'synthetic'},
+          displayFrame:{center_x:120,center_y:80,width:120,height:16,angle_degrees:-17.5}}],
+        workflow:{policy:'intake_workflow@3',digest:'rotated-saved',steps:[{
+          stage:'crop',target_id:'protein-a',status:'done'}]}}});
+      switchMode('review');true
+    """,
+    )
+    # Check actual resampled pixels: the known tilted source line is level in the preview.
+    qtbot.waitUntil(
+        lambda: (
+            javascript(
+                window,
+                qtbot,
+                """(()=>{const c=document.querySelector('.intake-rotation-preview');
+          if(c.width!==120||c.height!==16)return false;
+          const data=c.getContext('2d').getImageData(0,0,120,16).data;
+          function center(start){let sum=0,n=0;for(let y=0;y<16;y++)for(let x=start;x<start+15;x++){
+            const p=(y*120+x)*4;if(data[p]<80&&data[p+3]===255){sum+=y;n++;}}
+            return n>20?sum/n:null;}
+          const a=center(15),b=center(90);return a!==null&&b!==null&&Math.abs(a-b)<.75;})()""",
+            )
+            is True
+        )
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "Math.abs(new DOMMatrix(getComputedStyle(document.querySelector("
+        "'#display-frame-overlay')).transform).b-Math.sin(-17.5*Math.PI/180))<.00001",
+    )
+    qtbot.waitUntil(
+        lambda: (
+            javascript(window, qtbot, "document.getAnimations().every(a=>a.playState==='finished')")
+            is True
+        )
+    )
+    coords_json = javascript(
+        window,
+        qtbot,
+        """(()=>{const h=document.querySelector('#crop-rotate-handle').getBoundingClientRect(),
+          image=document.querySelector('#image-transform').getBoundingClientRect();
+          const x=h.x+h.width/2,y=h.y+h.height/2,cx=image.x+image.width/2,cy=image.y+image.height/2,
+          rad=25.5*Math.PI/180,dx=x-cx,dy=y-cy;
+          return JSON.stringify([x,y,cx+dx*Math.cos(rad)-dy*Math.sin(rad),
+            cy+dx*Math.sin(rad)+dy*Math.cos(rad),cx,cy]);})()""",
+    )
+    assert isinstance(coords_json, str)
+    x, y, end_x, end_y, cx, cy = TypeAdapter(
+        tuple[float, float, float, float, float, float]
+    ).validate_json(coords_json)
+    # Native mouse positions are integer pixels; use the actual delivered points
+    # as the angle oracle rather than assuming fractional pointer precision.
+    expected_angle = -17.5 + math.degrees(
+        math.atan2(round(end_y) - cy, round(end_x) - cx) - math.atan2(round(y) - cy, round(x) - cx)
+    )
+    focus = window.web.focusProxy()
+    assert focus is not None
+    assert javascript(
+        window,
+        qtbot,
+        f"document.elementFromPoint({x},{y})?.closest('#crop-rotate-handle')!==null",
+    )
+    QTest.mouseMove(focus, QPoint(round(x), round(y)))
+    QTest.mousePress(focus, Qt.MouseButton.LeftButton, pos=QPoint(round(x), round(y)))
+    qtbot.waitUntil(lambda: javascript(window, qtbot, "drag?.handle==='rotate'") is True)
+    # The offscreen platform has no system cursor; send the held-button move
+    # through Qt's event path, which WebEngine translates to captured pointer events.
+    QApplication.sendEvent(
+        focus,
+        QMouseEvent(
+            QEvent.Type.MouseMove,
+            QPointF(round(end_x), round(end_y)),
+            QPointF(focus.mapToGlobal(QPoint(round(end_x), round(end_y)))),
+            Qt.MouseButton.NoButton,
+            Qt.MouseButton.LeftButton,
+            Qt.KeyboardModifier.NoModifier,
+        ),
+    )
+    qtbot.waitUntil(lambda: javascript(window, qtbot, "drag?.angle!==drag?.original") is True)
+    QTest.mouseRelease(focus, Qt.MouseButton.LeftButton, pos=QPoint(round(end_x), round(end_y)))
+    assert javascript(
+        window,
+        qtbot,
+        f"Math.abs(intakeWorkspace.rotationFrame().angle_degrees-({expected_angle}))<.11 && "
+        "intakeWorkspace.rotationFrame().width===120 && "
+        "intakeWorkspace.rotationFrame().height===16 && "
+        "JSON.stringify(row().roi)==='"
+        + json.dumps({"x": 50, "y": 40, "width": 140, "height": 80}, separators=(",", ":"))
+        + "' && sent.length===0",
+    ), javascript(
+        window,
+        qtbot,
+        "JSON.stringify({frame:intakeWorkspace.rotationFrame(),roi:row().roi,sent,drag})",
+    )
+    javascript(window, qtbot, "window.dragAngle=intakeWorkspace.rotationFrame().angle_degrees;true")
+    javascript(window, qtbot, "intakeWorkspace.undoCrop(false);true")
+    assert javascript(window, qtbot, "intakeWorkspace.rotationFrame().angle_degrees===-17.5")
+    javascript(window, qtbot, "intakeWorkspace.undoCrop(true);true")
+    assert javascript(window, qtbot, "intakeWorkspace.rotationFrame().angle_degrees===dragAngle")
+    javascript(window, qtbot, "document.querySelector('[data-intake-reset-rotation]').click();true")
+    qtbot.waitUntil(
+        lambda: (
+            javascript(
+                window,
+                qtbot,
+                "document.querySelector('#display-frame-overlay').style.transform==='rotate(0deg)'",
+            )
+            is True
+        )
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "intakeWorkspace.rotationFrame().angle_degrees===0 && "
+        "intakeWorkspace.rotationFrame().width===120 && "
+        "document.querySelector('#display-frame-overlay').style.transform==='rotate(0deg)'",
+    )
+    javascript(window, qtbot, "intakeWorkspace.undoCrop(false);true")
+    # Save acknowledgement and reopening the same evidence retain the oriented frame.
+    javascript(
+        window,
+        qtbot,
+        """
+      document.querySelector('[data-intake-crop-action=confirm]').click();
+      window.savedAngle=sent.at(-1).payload.displayAngle;
+      setState({intake:{...state.intake,crops:[{...state.intake.crops[0],
+        displayFrame:{...state.intake.crops[0].displayFrame,angle_degrees:savedAngle}}],
+        workflow:{...state.intake.workflow,digest:'rotation-ack'}}});
+      setState({sessionEpoch:state.sessionEpoch+1});switchMode('review');true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "!intakeWorkspace.hasDraft() && "
+        "savedAngle===dragAngle && "
+        "intakeWorkspace.rotationFrame().angle_degrees===savedAngle && "
+        "intakeWorkspace.rotationFrame().width===120 && "
+        "intakeWorkspace.rotationFrame().height===16",
+    )
+    qtbot.waitUntil(
+        lambda: (
+            javascript(
+                window,
+                qtbot,
+                "(()=>{const c=document.querySelector('.intake-rotation-preview');"
+                "return c.getContext('2d').getImageData(0,0,c.width,c.height)"
+                ".data.some(v=>v>0)})()",
+            )
+            is True
+        )
+    )
+    # Allow the native surface compositor to display the already-verified DOM
+    # before recording the visual evidence (the canvas readback above is separate).
+    QTest.qWait(150)
+    assert window.grab().save(str(tmp_path / "rotation-main-frame.png"))
+    javascript(
+        window,
+        qtbot,
+        "document.querySelector('#crop-rotate-handle').focus({preventScroll:true});true",
+    )
+    QTest.keyClick(focus, Qt.Key.Key_Right)
+    qtbot.waitUntil(
+        lambda: (
+            javascript(
+                window,
+                qtbot,
+                "Math.abs(intakeWorkspace.rotationFrame().angle_degrees-savedAngle-.1)<1e-7",
+            )
+            is True
+        )
+    )
+    # Ordinary axis-box editing remains available; undo restores the saved frame size.
+    javascript(
+        window, qtbot, "document.querySelector('#crop-overlay').focus({preventScroll:true});true"
+    )
+    QTest.keyClick(focus, Qt.Key.Key_Right)
+    qtbot.waitUntil(lambda: javascript(window, qtbot, "row().roi.x===51") is True)
+    assert javascript(
+        window,
+        qtbot,
+        "row().roi.x===51 && intakeWorkspace.rotationFrame().width===140 && "
+        "intakeWorkspace.rotationFrame().height===80",
+    )
+    javascript(window, qtbot, "intakeWorkspace.undoCrop(false);true")
+    assert javascript(
+        window, qtbot, "row().roi.x===50 && intakeWorkspace.rotationFrame().width===120"
+    )
+    # A late pointer release from a prior session cannot create a new draft.
+    coords_json = javascript(
+        window,
+        qtbot,
+        "(()=>{fitImage();const r=document.querySelector('#crop-rotate-handle')"
+        ".getBoundingClientRect();"
+        "return JSON.stringify([r.x+r.width/2,r.y+r.height/2])})()",
+    )
+    assert isinstance(coords_json, str)
+    x, y = TypeAdapter(tuple[float, float]).validate_json(coords_json)
+    QTest.mousePress(focus, Qt.MouseButton.LeftButton, pos=QPoint(round(x), round(y)))
+    qtbot.waitUntil(lambda: javascript(window, qtbot, "drag?.handle==='rotate'") is True)
+    javascript(window, qtbot, "setState({sessionEpoch:state.sessionEpoch+1});true")
+    QTest.mouseRelease(focus, Qt.MouseButton.LeftButton, pos=QPoint(round(x + 15), round(y)))
+    assert javascript(
+        window,
+        qtbot,
+        "!intakeWorkspace.hasDraft() && intakeWorkspace.rotationFrame().angle_degrees===savedAngle",
+    )
+
+
+def test_rotation_input_range_and_source_bounds_block_save_without_changing_roi(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        """
+      const image=document.createElement('canvas');image.width=180;image.height=90;
+      image.getContext('2d').fillRect(0,0,180,90);
+      setState({selectedId:'protein-a',rows:[{id:'protein-a',name:'edge.tif',protein:'Actin',
+        width:180,height:90,preview:image.toDataURL(),lanes:6,roi:{x:20,y:2,width:120,height:16}}],
+        intake:{...state.intake,cropEnabled:true,crops:[{row_id:'protein-a',
+          crop:{x0:20,y0:2,x1:140,y1:18},reason:''}],
+          workflow:{policy:'intake_workflow@3',digest:'bounds',steps:[{
+            stage:'crop',target_id:'protein-a',status:'needs_review'}]}}});
+      switchMode('review');window.input=document.querySelector('[data-intake-rotation]');
+      input.focus();input.value='31';input.dispatchEvent(new Event('input',{bubbles:true}));true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "input.min==='-30' && input.max==='30' && input.getAttribute('aria-invalid')==='true' && "
+        "document.querySelector('[data-intake-crop-action=run]').disabled && "
+        "intakeWorkspace.rotationFrame().angle_degrees===0",
+    )
+    javascript(
+        window,
+        qtbot,
+        "input.value='30';input.dispatchEvent(new Event('input',{bubbles:true}));true",
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "intakeWorkspace.rotationFrame().angle_degrees===30 && "
+        "document.querySelector('[data-intake-rotation-error]')"
+        ".textContent.includes('超出原图') && "
+        "document.querySelector('[data-intake-crop-action=confirm]').disabled && "
+        "document.querySelector('.intake-rotation-preview').hidden && "
+        "document.querySelector('#display-frame-overlay').classList.contains('invalid') && "
+        "JSON.stringify(row().roi)==='"
+        + json.dumps({"x": 20, "y": 2, "width": 120, "height": 16}, separators=(",", ":"))
+        + "'",
+    )
+    javascript(
+        window,
+        qtbot,
+        "document.querySelector('[data-intake-crop-action=confirm]').click();"
+        "document.querySelector('[data-intake-crop-action=run]').click();"
+        "input.blur();document.querySelector('[data-intake-reset-rotation]').click();true",
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "sent.length===0 && intakeWorkspace.rotationFrame().angle_degrees===0 && "
+        "!document.querySelector('[data-intake-crop-action=run]').disabled && "
+        "!document.querySelector('.intake-rotation-preview').hidden",
     )
 
 
@@ -1965,6 +2291,15 @@ def test_batch_lane_overview_cards_open_bounded_editor_and_drag_preview(
       document.querySelector('[data-iq-lane="3"] svg').dispatchEvent(
         new MouseEvent('click',{bubbles:true}));true
     """,
+    )
+    # Wait for stable layout before exact geometry assertions. The original
+    # Linux failure did not capture its individual cause; this is a timing guard.
+    qtbot.waitUntil(
+        lambda: (
+            javascript(window, qtbot, "document.getAnimations().every(a=>a.playState==='finished')")
+            is True
+        ),
+        timeout=10000,
     )
     assert javascript(
         window,

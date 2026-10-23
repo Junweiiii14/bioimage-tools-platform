@@ -222,7 +222,7 @@ def test_sequence_diagnostic_uses_real_page_workers_and_stage_navigation(tmp_pat
     assert all(mode in data["page_modes"] for mode in ("review", "layout", "quant", "results"))
     assert {
         "top-fields-one-start",
-        "whole-batch-pause",
+        "review-required-before-own-fig",
         "two-human-continues",
         "stage-barriers",
         "original-pixel-crops",

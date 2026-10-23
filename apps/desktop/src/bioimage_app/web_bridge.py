@@ -8,8 +8,8 @@ from collections.abc import Callable
 from hashlib import sha256
 from typing import cast
 
-from PySide6.QtCore import QBuffer, QIODevice, QObject, QTimer, Signal, Slot
-from PySide6.QtGui import QImage, QImageWriter
+from PySide6.QtCore import QBuffer, QIODevice, QObject, QTimer, QUrl, Signal, Slot
+from PySide6.QtGui import QDesktopServices, QImage, QImageWriter
 from wb_tool.api import (
     BandBounds,
     Baseline,
@@ -208,6 +208,7 @@ class WorkbenchBridge(QObject):
                 else IntakeGrid(columns=min(3, max(1, len(project.intake.figures))))
             ).model_dump(mode="json")
             intake["outputParent"] = self.host.intake_workflow.output_parent(project)
+            intake["delivery"] = self.host.intake_workflow.delivery_snapshot(project)
             intake["automation"] = self.host.intake_workflow.batch_snapshot(project)
             if (
                 self.sequence_response.get("projectId") == project.project_id
@@ -218,7 +219,7 @@ class WorkbenchBridge(QObject):
                     response["status"] = (
                         "saved"
                         if isinstance(project, WBIntakeWorkflowProject)
-                        and project.workflow.policy == "intake_workflow@3"
+                        and project.workflow.policy in {"intake_workflow@3", "intake_workflow@4"}
                         and not project.workflow.editing
                         else "failed"
                     )
@@ -601,6 +602,8 @@ class WorkbenchBridge(QObject):
                 "select",
                 "intake_import_folder",
                 "open_project",
+                "restore_project",
+                "intake_open_directory",
                 "retry_location",
             }:
                 raise ValueError("仪器清单项目请使用阶段执行、原图复核和已保存Fig入口")
@@ -647,10 +650,28 @@ class WorkbenchBridge(QObject):
                 "quant_import",
                 "import_folder",
                 "open_project",
+                "restore_project",
                 "retry_location",
                 "intake_import_folder",
             }:
                 self.choose(action)
+            elif action == "intake_open_directory":
+                from pathlib import Path
+
+                project = self.host.view.project()
+                if not isinstance(project, WBIntakeProject):
+                    raise ValueError("当前不是仪器项目")
+                delivery = project.intake.delivery
+                path = ""
+                if isinstance(project, WBIntakeOutputProject):
+                    output = self.host.intake_workflow.output_snapshot(project)
+                    path = str(output.get("path") or "")
+                if not path and delivery and delivery.workspace_path == self.host.workspace_path:
+                    path = str(Path(delivery.output_parent) / delivery.directory_name)
+                if not path or not Path(path).is_dir():
+                    raise ValueError("项目文件夹尚未建立，请先确认配置并开始处理")
+                if not QDesktopServices.openUrl(QUrl.fromLocalFile(path)):
+                    raise ValueError("系统未能打开项目文件夹：" + path)
             elif action == "include_folder_source":
                 self.host.automatic.include_discovered_source(
                     data.get("index"), data.get("reportId")

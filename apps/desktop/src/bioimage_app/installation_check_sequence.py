@@ -53,9 +53,12 @@ def verify_sequence_installation(
     from shiboken6 import isValid
     from wb_tool.api import (
         WBFigureProject,
+        WBIntakeCropProject,
         WBIntakeOutputProject,
         WBIntakeProject,
         WBIntakeWorkflowProject,
+        intake_workflow_digest,
+        intake_workflow_snapshot,
     )
 
     from bioimage_app.web_window import WebWorkbenchWindow
@@ -120,7 +123,7 @@ def verify_sequence_installation(
         observed_shutdown = ""
         required = {
             "top-fields-one-start",
-            "whole-batch-pause",
+            "review-required-before-own-fig",
             "two-human-continues",
             "stage-barriers",
             "real-workers",
@@ -134,7 +137,7 @@ def verify_sequence_installation(
             "owned-window-deleted",
         }
         if automatic:
-            required.difference_update(("whole-batch-pause", "two-human-continues"))
+            required.difference_update(("review-required-before-own-fig", "two-human-continues"))
             required.update(
                 (
                     "no-human-crop-confirmations",
@@ -210,10 +213,9 @@ def verify_sequence_installation(
 
         def observed(project: WBFigureProject) -> None:
             try:
-                if (
-                    not isinstance(project, WBIntakeWorkflowProject)
-                    or project.workflow.policy != "intake_workflow@3"
-                ):
+                if not isinstance(
+                    project, WBIntakeWorkflowProject
+                ) or project.workflow.policy not in {"intake_workflow@3", "intake_workflow@4"}:
                     return
                 steps = project.workflow.steps
                 for step in steps:
@@ -225,10 +227,51 @@ def verify_sequence_installation(
                         "measure": ("crop", "compose"),
                         "export": ("crop", "compose", "measure"),
                     }[step.stage]
-                    if any(s.status != "done" for s in steps if s.stage in earlier):
-                        errors.append(
-                            "Observed a running stage before its whole-batch prerequisites"
-                        )
+                    prerequisites = [s for s in steps if s.stage in earlier]
+                    if project.workflow.policy == "intake_workflow@4":
+                        if step.stage == "export":
+                            statuses = {(s.stage, s.target_id): s.status for s in steps}
+                            for other in steps:
+                                if other.stage == "export":
+                                    continue
+                                members = [
+                                    p.protein_id
+                                    for p in project.intake.proteins
+                                    if p.figure_id == other.target_id
+                                ]
+                                ready = (
+                                    other.stage == "crop"
+                                    or (
+                                        other.stage == "compose"
+                                        and bool(members)
+                                        and all(statuses["crop", row] == "done" for row in members)
+                                    )
+                                    or (
+                                        other.stage == "measure"
+                                        and statuses["compose", other.target_id] == "done"
+                                    )
+                                )
+                                if other.status == "running" or (
+                                    other.status == "pending" and ready
+                                ):
+                                    errors.append("Export began before runnable Fig work drained")
+                        members = {
+                            p.protein_id
+                            for p in project.intake.proteins
+                            if p.figure_id == step.target_id
+                        }
+                        prerequisites = [
+                            s
+                            for s in prerequisites
+                            if (step.stage == "compose" and s.target_id in members)
+                            or (
+                                step.stage == "measure"
+                                and s.stage == "compose"
+                                and s.target_id == step.target_id
+                            )
+                        ]
+                    if any(s.status != "done" for s in prerequisites):
+                        errors.append("Observed a running stage before its Fig prerequisites")
                     entry: dict[str, object] = {
                         "stage": step.stage,
                         "target": step.target_id,
@@ -347,10 +390,38 @@ def verify_sequence_installation(
                             raise ValueError(
                                 "Reliable geometry unexpectedly required human confirmation"
                             )
-                        if any(s.attempt for s in project.workflow.steps if s.stage != "crop"):
-                            raise ValueError("Whole batch advanced before all crop reviews")
-                        if "whole-batch-pause" not in checks:
-                            checks.append("whole-batch-pause")
+                        automation = window.host.intake_workflow.batch_snapshot(project)
+                        # UI I/O may briefly be idle between callbacks. The v4
+                        # ledger must also finish draining other work/partial export.
+                        if (
+                            not automation
+                            or not automation["paused"]
+                            or any(s.status == "running" for s in project.workflow.steps)
+                            or intake_workflow_snapshot(project)["pending_ready"]
+                        ):
+                            return
+                        blocked_fig = next(
+                            p.figure_id
+                            for p in project.intake.proteins
+                            if p.protein_id == blocked.target_id
+                        )
+                        if any(
+                            s.attempt
+                            for s in project.workflow.steps
+                            if s.stage in {"compose", "measure"} and s.target_id == blocked_fig
+                        ):
+                            raise ValueError("Blocked Fig advanced before its crop review")
+                        if isinstance(project, WBIntakeOutputProject) and any(
+                            output.complete for output in project.intake_outputs
+                        ):
+                            raise ValueError("Incomplete project was labelled complete")
+                        javascript(
+                            "select("
+                            + json.dumps(blocked.target_id)
+                            + ");switchMode('review');'selected'"
+                        )
+                        if "review-required-before-own-fig" not in checks:
+                            checks.append("review-required-before-own-fig")
                         phase = "review:" + blocked.target_id
                         js_value = None
                         review_submitted = False
@@ -430,26 +501,27 @@ def verify_sequence_installation(
                         ):
                             raise ValueError("Missing/flat signal was turned into valid zero")
                         checks.append("missing-is-not-zero")
-                        if (
-                            len(project.intake_outputs) != 1
-                            or not project.intake_outputs[0].complete
-                        ):
+                        if not project.intake_outputs or not project.intake_outputs[-1].complete:
                             raise ValueError("Output was not committed")
-                        output = Path(project.intake_outputs[0].destination)
+                        output = Path(project.intake_outputs[-1].destination)
                         index = json.loads((output / "index.json").read_bytes())
                         if (
                             not index["complete"]
                             or index["errors"]
-                            or not (output / "measurements.xlsx").is_file()
+                            or not (output / "灰度汇总.xlsx").is_file()
                         ):
                             raise ValueError("Output index or workbook incomplete")
-                        output_digest = sha256((output / "project.zip").read_bytes()).hexdigest()
+                        output_digest = sha256((output / "项目恢复.zip").read_bytes()).hexdigest()
                         checks.append("committed-output")
                         phase = "page-automatic" if automatic else "page-results"
                         js_value = None
                 elif phase.startswith("review:"):
                     target = phase.split(":", 1)[1]
-                    persisted = isinstance(project, WBIntakeOutputProject) and any(
+                    if isinstance(project, WBIntakeWorkflowProject) and any(
+                        s.status == "running" for s in project.workflow.steps
+                    ):
+                        return
+                    persisted = isinstance(project, WBIntakeCropProject) and any(
                         e.row_id == target and e.reviewed for e in project.intake_crops
                     )
                     if persisted:
@@ -461,17 +533,23 @@ def verify_sequence_installation(
                                 "Review click did not commit its correction: " + observed_status
                             )
                         javascript("sequenceOutstanding===0?'acknowledged':'pending'")
-                    elif js_value is True:
+                    # A source-selection callback is not a review-click receipt.
+                    elif js_value == "submitted":
                         review_submitted = True
                         js_value = None
                     else:
+                        if not isinstance(project, WBIntakeWorkflowProject):
+                            raise ValueError("Review lost its workflow snapshot")
                         javascript(
                             "(()=>{if(state.busy||sequenceOutstanding||mode!=='review'||row()?.id!=="
                             + json.dumps(target)
-                            + ")return false;"
+                            + "||state.intake?.workflow?.digest!=="
+                            + json.dumps(intake_workflow_digest(project))
+                            + "||state.intake.workflow.steps.some(s=>s.status==='running'))"
+                            "return 'waiting';"
                             "commitCrop({x:12,y:10,width:120,height:40},row().roi);"
                             "const b=document.querySelector('[data-intake-crop-action=run]');"
-                            "if(!b||b.disabled)return false;b.click();return true;})()"
+                            "if(!b||b.disabled)return 'waiting';b.click();return 'submitted';})()"
                         )
                 elif phase == "page-automatic":
                     if isinstance(js_value, str):
@@ -550,7 +628,7 @@ def verify_sequence_installation(
                     if (
                         automation["follow"]
                         or output is None
-                        or sha256((output / "project.zip").read_bytes()).hexdigest()
+                        or sha256((output / "项目恢复.zip").read_bytes()).hexdigest()
                         != output_digest
                     ):
                         raise ValueError("Reopen resumed navigation or changed old output")
