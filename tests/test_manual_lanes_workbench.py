@@ -156,8 +156,13 @@ def test_copy_manual_multipeak_history_new_group_save_and_reopen(
         )
         js("document.dispatchEvent(new KeyboardEvent('keyup',{code:'Space'}));true")
         assert js("!imagePan.space") is True
-        # Native details toggles may schedule layout. Observe its completed frames
-        # before mapping source points; do not loosen the original-coordinate oracle.
+        # Two frames alone do not settle animated layout after native details
+        # toggles. Wait for motion to finish before mapping a source point to a
+        # native pointer coordinate; retain the original-coordinate oracle.
+        qtbot.waitUntil(
+            lambda: js("document.getAnimations().every(a=>a.playState==='finished')") is True,
+            timeout=10000,
+        )
         js(
             "window.pointerLayoutReady=false;requestAnimationFrame(()=>{fitImage();"
             "requestAnimationFrame(()=>{window.pointerLayoutReady=true;});});true"
@@ -166,6 +171,7 @@ def test_copy_manual_multipeak_history_new_group_save_and_reopen(
         assert js("zoom===1.4") is True
         QTest.mousePress(target_widget, Qt.MouseButton.LeftButton, pos=image_point(35, 40))
         qtbot.waitUntil(lambda: js("Boolean(manualLanes.dragging)") is True)
+        pointer_start = js("JSON.stringify(manualLanes.dragging)")
         QTest.mouseMove(target_widget, image_point(55, 80))
         qtbot.waitUntil(lambda: js("Boolean(manualLanes.dragging?.next)") is True)
         QTest.mouseRelease(target_widget, Qt.MouseButton.LeftButton, pos=image_point(55, 80))
@@ -173,7 +179,9 @@ def test_copy_manual_multipeak_history_new_group_save_and_reopen(
         box = js("JSON.stringify(manualLanes.boxes[0])")
         assert isinstance(box, str)
         box = json.loads(box)
-        assert box == pytest.approx({"x": 35, "y": 40, "width": 20, "height": 40}, abs=1)
+        assert box == pytest.approx({"x": 35, "y": 40, "width": 20, "height": 40}, abs=1), (
+            pointer_start
+        )
         assert (
             js(
                 "manualLanes.boxes=[{x:5,y:0,width:20,height:120}];"

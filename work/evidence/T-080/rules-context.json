@@ -1,20 +1,13 @@
 {
   "schema": 1,
   "task": "T-080",
-  "base_commit": "2d2c9727ec93c7a625e46964696788f06f8f4834",
+  "base_commit": "a4646608a965202c38b0f1dee9dd45607a8c5bf7",
   "scopes": [
     ".agent-handoff",
-    ".local/T080",
+    ".github",
     "AGENT_HANDOFF.md",
-    "apps/desktop",
-    "docs/contracts",
-    "docs/module-map.md",
-    "docs/research",
     "tests",
-    "tooling",
-    "tools/wb",
-    "work/evidence/T-080",
-    "work/tasks"
+    "work"
   ],
   "rules": {
     "AGENTS.md": "3c5ce28cf9b92099025bd50db0821e94c90b5759dfb32d19e510da1774c4941f",
@@ -30,7 +23,7 @@
     "docs/ai-workflow.md": "8003be926d828df9eaf0398d77f463a9472316be021467e7f22fb63132063f70",
     "docs/architecture.md": "dabf3823b44d4af2f372fd5dc244747cb3cd7ff56abcfd13cf007721b8a0dbbd",
     "docs/coding-standards.md": "40fe9541a84163e6df6be9d2a57b836b9703471440f412bd16456f1ef0382d71",
-    "docs/module-map.md": "e32c2486f193190fbdb1962ba105cb3d4654b981fb40b4db4d1956c79b83821a",
+    "docs/module-map.md": "74c6f8653b80eb6e17f7377c2fa6640012dd5e5712e584f998157a81e9128e7a",
     "docs/research-protocol.md": "b1ab0f9bf291e50f5872e01147f7af2671fdc5885bf2f065c804c5f4a240aa51",
     "docs/runbooks/rule-enforcement.md": "43c1aafc0003f1901c4c35f4aa896cd520cf79dc96856019e11c1b095fc5c090"
   }

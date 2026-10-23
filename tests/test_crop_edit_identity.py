@@ -123,9 +123,23 @@ def test_real_page_cancels_old_drag_and_accepts_new_gesture(
             qtbot.waitUntil(lambda: bool(values), timeout=10000)
             return values[0]
 
+        # A native save can finish before the opening route reaches WebChannel.
+        # Consume that initial quant route before selecting review; otherwise a
+        # late route can undo our test setup while the ROI is already present.
+        qtbot.waitUntil(lambda: window.shutdown_stage == "idle", timeout=20000)
+        snapshot = window.bridge.snapshot()
+        initial_identity = json.dumps(
+            {"projectId": snapshot["projectId"], "sessionEpoch": snapshot["sessionEpoch"]}
+        )
         qtbot.waitUntil(
             lambda: (
-                js("typeof bridge!=='undefined' && bridge!==null && !!row()?.roi && !state.busy")
+                js(
+                    "(()=>{const expected=" + initial_identity + ";return "
+                    "typeof bridge!=='undefined' && bridge!==null && "
+                    "state.projectId===expected.projectId && "
+                    "state.sessionEpoch===expected.sessionEpoch && "
+                    "mode==='quant' && !!row()?.roi && !state.busy})()"
+                )
                 is True
             ),
             timeout=20000,
@@ -137,16 +151,28 @@ def test_real_page_cancels_old_drag_and_accepts_new_gesture(
             )
             is True
         )
-        qtbot.waitUntil(
-            lambda: (
+        try:
+            qtbot.waitUntil(
+                lambda: (
+                    js(
+                        "!$('#crop-overlay').hidden && "
+                        "$('#crop-overlay').getBoundingClientRect().width>0"
+                    )
+                    is True
+                ),
+                timeout=10000,
+            )
+        except qtbot.TimeoutError:
+            print("crop setup stage:", window.shutdown_stage)
+            print(
                 js(
-                    "!$('#crop-overlay').hidden && "
-                    "$('#crop-overlay').getBoundingClientRect().width>0"
+                    "JSON.stringify({mode,projectId:state.projectId,"
+                    "sessionEpoch:state.sessionEpoch,busy:state.busy,"
+                    "imageWidth:$('#source-image').naturalWidth,"
+                    "viewportWidth:$('#image-viewport').clientWidth})"
                 )
-                is True
-            ),
-            timeout=10000,
-        )
+            )
+            raise
 
         def start_gesture() -> None:
             # Freeze the native identity once. Poll only before sending an event;
