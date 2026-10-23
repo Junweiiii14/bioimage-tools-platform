@@ -1,12 +1,12 @@
 # 当前恢复指针
 
-- 当前任务T081：work/tasks/T-081-prominent-crop-stage-barrier.md，用户已批准目标模式推进至独审/CI/合入/新包实际安装交付。填写N是硬条件，覆盖早先不强求N提议；最高明显行自动选，接近不暂停，不固定上下，完整保留中间原图。
-- 活动树wb-lab-installer，codex/t081-prominent-crop，base main d08b16b。原ResearchVault dirty/视频树/原图/历史/旧交付均保护。
-- 目标流程：裁剪失败继续其余crop；全批必需crop真实完成前禁止compose/measure/export。新workflow@5及prominent geometry将版本化，旧历史不静默覆盖。
-- 已只读读取Laboratory最近用户工程revision41，快照及ref在ignored.local/T081/user-latest-project.json及user-latest-ref.json；未写用户工程。Fig1=2,Fig2=4，其前4crop needs_review，后续Fig3/4已继续。旧开发视觉配置4/2与其相反；用户已确认实际填反，正确Fig1N4、Fig2N2。新验证项目用确认N，原工程未写入。
-- root负责adapter/application crop接线/验证/交付；explain_crop_detector负责domain新策略与小型数值验证；explain_crop_gates负责workflow@5/继续迁移及barrier/UI；t080_final_review只读独审。共享树不并发Qt、不互改所属文件、不擅自commit。
-- T080已实际完成：PR41最终78e4baa四CI成功，合main d08b16b；产品/安装79b9db9，桌面T080完整包保持。真实收据.local/T080/package/final-closeout.json。旧snapshot归档，不据旧pending重复执行。
-- 下一步：冻结精确commit独审后正常PR+CI，冻结产品重建/实际安装验证；未完成不得标goal complete。80%独立项目科学准确率、干净Win10/全部员工设备等仍未验。
-
-- 实施进度：workflow@5和公开发布API全批barrier、prominent@1/crop@5/grid@2接线完成。94定向、类型/格式/边界及真实DOM的180项目通过（1passed51.95s）：正确N4/2/5/4、同原工程(1)source、9crop和所有后续完成、自动results；39原图SHA不变，9原值裁图逐像素一致。约−17°GAPDH明显主行视觉已核对。算法初败及直接桥调用页面跟随失败保留，精确导航顺序UNKNOWN，未改产品导航。证据work/evidence/T-081/validation.md。源码尚未提交/最终独审/CI，新包未构建安装。
-- 后续：源码1eb780c已非作者Accepted并开PR42。初CI Windows2fail/1289pass，3处验收旧policy精确期望迁移@5/guided prominent，算法不变；限定两失败路径分别通过，ci-policy-migration保留全部失败。新HEAD独审/四CI待，新包未构建。旧已安装程序已正常CloseMainWindow退出，无强杀。后续冻结准确提交构建，不绕过失败。
+- 当前任务：[T081](../work/tasks/T-081-prominent-crop-stage-barrier.md)。本机交付已验，最终状态仅据任务闭合谓词和 `.local/T081/package/r2/final-closeout.json`；收据未真实成立前目标仍active。
+- 活动树 wb-lab-installer，codex/t081-restore-auxiliary-tiff，base main b59123e。最终冻结产品/已安装 f1e6142ab41e16c66cfeb3d33958ab3a364581b1；PR42算法已合入，PR43包含恢复修复与最终记录。不要据旧T003/T080或归档pending指针重启工作。
+- 用户最新N硬约束：Fig1=4/Fig2=2（用户确认旧值填反）；Fig3=5/Fig4=4。选评分最高明显主行，不固定上方；完整保留内部弱/空原图。失败crop继续其余crop，全批有效资产提交前禁止compose/measure/export；版本prominent@1/crop@5/grid@2/workflow@5。
+- 真实180同原工程9来源正常DOM批次全完成，无手框；9原值裁图逐像素一致，39原始输入SHA保持。源码/包恢复27原图/9原值裁图/4Fig PNG/27缩略图均实际可读，0缩略图失败。
+- f1源码非作者Accepted/四CI SUCCESS（Linux1295/509.77s、Windows1295/756.69s及隔离wheel）。新包真实升级0/7793payload及209source SHA/双模式自检/37安装态53.91s/163模块来源全部通过，实际安装进程退出后0残留快照。
+- 桌面 `WB-T081.zip` 及 `WB-T081` 为Accepted的201文件离线包；私有 `WB-180-T081` 为127文件完整结果，与原输出一致。全部收据 `.local/T081/package/r2`，最终证据 work/evidence/T-081/final-delivery.md；恢复包导出interrupted是既有契约，选新输出继续，不能覆盖历史。
+- R1实际图片类型失败/产物Blocked和所有首CI失败保持。原首次publisher1是PS7维护模块路径污染PS5.1校验命令；已独审恢复helper隔离进程模块路径且实际0，全tree/ZIP相同，没有重解压/覆盖。旧Linux原生退出、特定CI后台操作、GPU/mailbox等UNKNOWN未销账。
+- 下一步仅核最终记录精确HEAD非作者独审+四CI并正常merge PR43，验证产品/配方/测试/锁无变更、main树同且clean，再生成真实final-closeout并结束目标；若收据已存在先核真，不重复构建/安装。当前没有新产品路线图任务。
+- 保留原ResearchVault dirty、视频活动树/原图/旧工程/历史结果/旧包；旧版整理已由T079另有真实归档，不在T081再次清理。视频聊天已启动，本轮不复制聊天或自动化。
+- 未验范围：80%独立项目100%自动通过/科学真值、干净Win10/每位员工设备、物理Explorer/OLE/DPI及所有GPU。环境目标Win10 1809+/Win11 x64，不承诺所有机器无条件通过。
