@@ -1,5 +1,7 @@
 T077：平台 WB 入口支持本机目录原生拖入，复用新建仪器项目及草稿保护；最终结果页导出共用可见宽表，保存后重建结果展示。契约见 docs/contracts/wb-visible-result-table-v1.md。
 
+T079：`--laboratory` 生成独立实验室离线发行，通道 `wb-laboratory`、设置 `Laboratory`；只改包装标题/身份，不改计算或项目格式。安装、目标机范围与清理证据见 T079 任务；诊断契约见 `docs/contracts/wb-installed-diagnostics-v1.md`。
+
 T075网页与HTML预览共用web_ui资源。appearance@1按发行通道保存；web_advanced通过公开WB用例及宿主后台CAS处理四类高级工具，保留原桌面兼容入口。独立--ui-system-test候选不覆盖旧安装。验收状态见T075。
 
 T061新增“识别导出组与条带”后台动作和集中复核；候选不自动填N或确认目标，保存重开保留证据。新测试候选显示为“图像识别测试版”，旧测试安装按用户授权在新版本首次启动前清理；实验项目/原图/历史结果不删。

@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "task": "T-079",
+  "base_commit": "91dd98554e0ce649e691c4fd656d2e3d8dbf7628",
+  "source_head": "eec9cd2e0893a2e847d08f151c5bcce27675a8ae",
+  "historical_receipts": {
+    "work/evidence/T-074/rules-context.json": "27d838eb4a852da244e928349cdaf1d4f7ec5d80",
+    "work/evidence/T-075/rules-context.json": "1d872bf2c09c9463b463f18412139da160f0be0d",
+    "work/evidence/T-076/rules-context.json": "e7eb3a2851efa8b43bbefb34b5b56ce8738a39fc",
+    "work/evidence/T-077/rules-context.json": "1e639ba30ecbb6ea40624f63f8f494ebc0bcfa7e"
+  }
+}

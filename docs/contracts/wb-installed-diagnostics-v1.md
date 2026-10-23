@@ -1,5 +1,28 @@
 # Installed diagnostics and E7 distribution v1
 
+## Laboratory distribution (T079)
+
+The mutually exclusive `--laboratory` build profile packages the same locked runtime
+and four wheels. Identity `BioImageTools.WB.Laboratory`, channel `wb-laboratory`,
+settings `BioImageTools/Laboratory`, executable `BioImageWB.exe`, per-user directory
+`Programs/BioImage WB 实验室版` and mandatory desktop/Start-menu shortcuts are distinct
+from the historical test channels. The window says `BioImage · WB 实验室版`.
+Installer schema2 manifest identifies the exact source commit, lock, wheels and
+runtime. This is a distribution identity, not a claim of universal-machine or
+scientific acceptance. Product schemas, algorithms and existing settings remain unchanged.
+
+Shipped `环境自检.cmd` runs Windows PowerShell 5.1 `selfcheck.ps1` using only the
+private executable. It serially checks independent grayscale/OCR and the current
+supervision workflow with unique reports under
+`%LOCALAPPDATA%/BioImage-WB-Laboratory/Diagnostics`. It holds a real process handle,
+requires exit0 and report phase `passed`, and reports a 180-second timeout as failure.
+It never scans or terminates unrelated processes. Synthetic data and software
+rendering diagnostics do not certify physical GPU/DPI/input or clean target Windows.
+The installer has no blanket user-data deletion rule and performs no old-version
+removal; the explicitly authorized local cleanup is a separate audited operation.
+
+See T079 for actual build/install/uninstall/reinstall verification and limitations.
+
 Normal application entry remains unchanged. Two explicit diagnostic switches accept a **new** report path and refuse overwrite:
 
 - `--verify-installation <new-report.json>`: existing independent grayscale, real durable worker, offline OCR, failure/reopen/cancel and shutdown checks.

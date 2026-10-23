@@ -24,6 +24,9 @@ def main() -> int:
     parser.add_argument("--gcc", required=True, type=Path)
     profiles = parser.add_mutually_exclusive_group()
     profiles.add_argument(
+        "--laboratory", action="store_true", help="Build the self-contained laboratory distribution"
+    )
+    profiles.add_argument(
         "--execution-test", action="store_true", help="Build the isolated E7 test distribution"
     )
     profiles.add_argument(
@@ -129,7 +132,9 @@ def main() -> int:
     for library in redistributables:
         shutil.copyfile(library, runtime / library.name)
     distribution = (
-        "windows_ui_system_test"
+        "windows_laboratory"
+        if args.laboratory
+        else "windows_ui_system_test"
         if args.ui_system_test
         else "windows_supervision_test"
         if args.supervision_test
@@ -146,7 +151,9 @@ def main() -> int:
         else "windows_test"
     )
     channel = (
-        "wb-ui-system-test"
+        "wb-laboratory"
+        if args.laboratory
+        else "wb-ui-system-test"
         if args.ui_system_test
         else "wb-supervision-test"
         if args.supervision_test
@@ -164,7 +171,10 @@ def main() -> int:
     )
     shutil.copyfile(ROOT / f"tooling/{distribution}_readme.txt", dist / "安装与使用说明.txt")
     shutil.copyfile(ROOT / f"tooling/{distribution}_selfcheck.ps1", dist / "selfcheck.ps1")
-    shutil.copyfile(ROOT / "tooling/windows_test_selfcheck.cmd", dist / "测试版环境自检.cmd")
+    shutil.copyfile(
+        ROOT / "tooling/windows_test_selfcheck.cmd",
+        dist / ("环境自检.cmd" if args.laboratory else "测试版环境自检.cmd"),
+    )
     # The lock's OCR wheel supplies models; verify bytes through the public API later.
     app_icon = dist / "bioimage.ico"
     icon(app_icon)
@@ -173,7 +183,7 @@ def main() -> int:
     windres = args.gcc.with_name("windres.exe")
     resource_object = output / "icon.o"
     run([str(windres), str(resource), str(resource_object)])
-    executable = dist / "BioImageWB-Candidate.exe"
+    executable = dist / ("BioImageWB.exe" if args.laboratory else "BioImageWB-Candidate.exe")
     run(
         [
             str(args.gcc),
@@ -228,7 +238,15 @@ def main() -> int:
         "wheels": {p.name: digest(p) for p in wheels.glob("*.whl")},
     }
     manifest_path = output / "build-manifest.json"
-    if args.execution_test:
+    if args.laboratory:
+        manifest.update(
+            schema=2,
+            distribution_id="BioImageTools.WB.Laboratory",
+            release_channel=channel,
+            settings_namespace="Laboratory",
+            acceptance="lab distribution; see verification and target-machine limits",
+        )
+    elif args.execution_test:
         manifest.update(
             schema=2,
             distribution_id="BioImageTools.WB.E7Test",
