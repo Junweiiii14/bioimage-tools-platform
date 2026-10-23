@@ -152,4 +152,4 @@ T079首轮62d91b0 CI Windows1223完整/wheel0，Linux1222过1败：测试在下�
 
 ## 2026-10-23 T080 产品与离线安装交付
 
-79b9db9独审Accepted，PR40四必需CI成功后合main a464660，完整树相同。Windows1265首轮全过后总时限取消wheel，失败作业一次重跑成功，未改门禁。完整包实际更新安装/用户文件保持、7791载荷及207源码SHA、随包双模式、27安装态UI、201成员及ZIP独审与桌面复制均通过。最终证据work/evidence/T-080/final-delivery.md，全部限制保留。收尾只改文档，不重建已验包。
+79b9db9独审Accepted，PR40四必需CI成功后合main a464660，完整树相同。Windows1265首轮全过后总时限取消wheel，失败作业一次重跑成功，未改门禁。完整包实际更新安装/用户文件保持、7791载荷及207源码SHA、随包双模式、27安装态UI、201成员及ZIP独审与桌面复制均通过。最终证据work/evidence/T-080/final-delivery.md，全部限制保留。收尾PR41首次Linux1264过1初始overlay超时、Windows1265及wheel过后15min取消；5c788d3修测试初始路由同步及foundation20min总预算，保留断言与失败日志，不改产品或重建已验包。

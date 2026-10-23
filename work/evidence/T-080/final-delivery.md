@@ -27,7 +27,7 @@ GitHub quality run39933901590：Linux1265测试/363.63s及全部隔离wheel成�
 - 安装器SHA256：`fcc63932b624a58d904b7f2985395bf4f3233463451b7fcd0a0e03e57ed08c5d`。
 - 完整ZIP：397029900 bytes；SHA256 `525d4a55af3460ec1273bf29e2956a98973e4d569b05e121069ac214bbd9460f`。
 - 本机真实收据：ignored `.local/T080/package/` 内 release-gate/preflight、install/installation、payload、selfcheck/selfcheck-receipt、installed-ui/acceptance、staging-receipt、desktop-delivery JSON及原始日志；产品与最终产物独审副本见本目录相应MD。
-- 构建命令：`uv run --locked --no-sync python -m tooling.build_runtime_candidate --laboratory --iscc <已固定Inno6.7.3> --gcc <已固定MinGW15.2.0>`，exit0；安装/载荷/自检/安装UI/staging/桌面复制命令均exit0，精确参数脚本和日志在上述ignored目录PLAN.md。本收尾仅文档，不重建或改动已验包。
+- 构建命令：`uv run --locked --no-sync python -m tooling.build_runtime_candidate --laboratory --iscc <已固定Inno6.7.3> --gcc <已固定MinGW15.2.0>`，exit0；安装/载荷/自检/安装UI/staging/桌面复制命令均exit0，精确参数脚本和日志在上述ignored目录PLAN.md。收尾包含文档、测试就绪同步及CI总预算修正；不重建或改动已验产品包。
 
 ## 真实限制
 
@@ -36,3 +36,12 @@ GitHub quality run39933901590：Linux1265测试/363.63s及全部隔离wheel成�
 给定两目录是开发素材：其两项目工程流程全部自动完成不等于独立科学真值通过。没有独立项目库/人工真值，整项目A/B/C泛化比例和80%目标未统计验证；21来源案例不能充作21独立项目。保留科学复核与事后修正能力，不声称通用100%正确。
 
 安装UI日志有SharedImageManager mailbox提示，27功能断言通过但不证明历史GPU/原生退出根因已根治。新包未商业签名；没有公开GitHub二进制发布、私图上传、再次创建视频聊天或周期任务。
+
+## 收尾 PR41 检查修正
+
+1fbf2dc 的 CI39939061612：Linux 1264通过/1失败（521.55s），test_crop_edit_identity的session参数在初始crop-overlay可见等待超时，尚未执行会话替换。现场没有mode快照，唯一根因未证实。本机原测试5通过/7.20s。
+代码检查和独审确认测试准备存在竞态：native保存结束不等于初始会话路由已消费；晚到的quant路由能覆盖测试刚选的review。5c788d3等待native idle、同项目/epoch网页quant路由，然后只切一次review；原overlay 10秒、真实pointerdown单次发送/拒绝必须失败、原像素和旧编辑拒绝断言保持，并增加失败诊断。修后5通过/5.64s，Ruff及Pyright退出0。
+Windows同run全部1265通过/796.59s、全部wheel及末尾Governance成功日志已出现，但作业15m1s取消，不能算CI通过。这是第二次全量通过而总预算不足，foundation预算15→20分钟经独审评估；检查内容、required名称、故障传播、测试超时均不改。新HEAD仍须正常四CI成功后合入。
+原日志保留ignored .local/T080/package/closeout-linux-failure.log及closeout-windows-failure.log。此修正无产品/依赖/安装器变化，安装包仍绑定79b9db9。首次提交因未激活pre-commit失败；恢复项目venv PATH后实际三钩子通过提交，未绕过。
+
+独审受控探针仅确认“真实sessionStateChanged晚quant route能将已可见review overlay隐藏”。人工fresh-token对照与宿主position回报token不一致，新顺序对照未全部通过，不能当成新的产品失败或对照成功；首探针停止整个session_timer和清理参数错误也如实保留。停止扩展探针，不以其覆盖5项真实测试通过。5c788d3源码增量独审Accepted，完整探针与边界见closeout-independent-review.md；原CI唯一根因仍未证实。
