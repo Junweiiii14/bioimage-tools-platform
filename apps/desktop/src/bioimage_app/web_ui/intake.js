@@ -26,7 +26,7 @@ window.intakeWorkspace = (() => {
   progress.id = 'intake-batch-progress';progress.hidden = true;
   progress.setAttribute('aria-label','整批处理进度');root.before(progress);
   let followed = '', browsing = false, composing = false, navigating = false;
-  const batchPolicy = () => ['intake_workflow@3','intake_workflow@4'].includes(state.intake?.workflow?.policy);
+  const batchPolicy = () => ['intake_workflow@3','intake_workflow@4','intake_workflow@5'].includes(state.intake?.workflow?.policy);
   const batchReason = value => /source_width_estimate_conflicts_with_support|fixed_grid_clips_target_support/.test(value||'')?'当前槽宽无法容纳完整信号，请核对条带与标记的分界后保存范围。':/additional_signal_at_target_row/.test(value||'')?'目标附近还有未能排除的信号，请核对完整范围后继续。':/group_signal_coordinates_unverified/.test(value||'')?'同组图片的位置证据不一致，请在所选原图核对范围。':/target_frame_exceeds_membrane/.test(value||'')?'范围超出可确认的膜内区域，请调整裁剪框。':/lane_spacing_ambiguous|lane_shape_ambiguous/.test(value||'')?'泳道结构尚不明确，请核对全部 N 个槽位。':/signal_orientation_insufficient/.test(value||'')?'条带方向证据不足，请核对原图范围和角度后继续。':/signal_orientation_ambiguous/.test(value||'')?'条带方向不一致，请核对本次目标和角度后继续。':/signal_rows_ambiguous|signal_target_overlap|guide_multiple_membranes/.test(value||'')?'当前范围包含多个可能目标，请明确本次条带范围后继续。':/guided_target_ambiguous/.test(value||'')?'检测到多个条带区域，请在原图明确本次目标范围后继续。':/explicit_lane_count_conflicts|guided_target_not_supported/.test(value||'')?'尚未取得与 N 一致的完整条带，请核对 N 或在原图明确范围后继续。':/crop_policy|automatic_geometry|membrane_not_found|no_reliable_membrane/.test(value||'') ? '未能确定完整裁剪范围，请在对应原图框选包含全部样本槽位的整行范围，保存后继续。' : value || '';
   function noteBrowse(){if(batchPolicy()&&state.intake?.automation?.follow&&!navigating){browsing=true;renderProgress();}}
   const phaseNames = {crop:'原图裁剪',compose:'完整 Fig 拼图',measure:'原像素定量',export:'结果输出',complete:'统一结果'};
@@ -117,7 +117,8 @@ window.intakeWorkspace = (() => {
   }
 
   const cropBox = roi => roi ? {x:roi.x0,y:roi.y0,width:roi.x1-roi.x0,height:roi.y1-roi.y0} : null;
-  const cropGuard = () => ({...guard(), workflowDigest:state.intake.workflow.digest});
+  const cropGuard = () => ({...guard(), workflowDigest:state.intake.workflow.digest, cropBarrier:true});
+  const cropBarrierBlocked = () => state.intake?.workflow?.policy==='intake_workflow@5'&&!state.intake.workflow.crop_barrier_ready;
   function syncCrops() {
     if (!state.intake?.cropEnabled) return;
     if(rotationPreview&&(!sameCropIdentity(rotationPreview.identity)||rotationPreview.digest!==state.intake.workflow.digest))rotationPreview=null;
@@ -344,14 +345,14 @@ window.intakeWorkspace = (() => {
     return `<span class="intake-stage-actions"><button class="text-button" data-intake="review-crop" data-id="${escapeText(step.target_id)}" ${state.busy?'disabled':''}>查看原图${reviewable?'并复核':''}</button>${reviewable?`<button class="text-button" data-intake="retry-crop" data-id="${escapeText(step.target_id)}" ${state.busy||hasDraft()?'disabled':''}>重试本行</button>`:''}</span>`;
   }
 
-  const allowedModes = () => state.intake?.workflow?.editing ? ['intake'] : ['intake', ...(state.intake?.cropEnabled?['review']:[]), ...(state.intake?.figureEnabled?['layout',...(batchPolicy()?['quant']:[]),'results']:[])];
+  const allowedModes = () => state.intake?.workflow?.editing ? ['intake'] : ['intake', ...(state.intake?.cropEnabled?['review']:[]), ...(state.intake?.figureEnabled&&!cropBarrierBlocked()?['layout',...(batchPolicy()?['quant']:[]),'results']:[])];
   function resumeBatch() {
     if(state.busy||!bridge||!batchPolicy())return;
     const r=row(),step=state.intake.workflow.steps.find(s=>s.stage==='crop'&&s.target_id===r?.id);
     const correcting=mode==='review'&&r?.roi&&cropEditable(r.id)&&(step?.status!=='done'||cropDrafts.has(r.id));
     if(hasDraft()&&(!correcting||[...cropDrafts.keys(),...rotationErrors.keys()].some(id=>id!==r.id)||window.intakeGroups.hasDraft()||planDirty()||discoveryDirty||batch.length)){toast('请先保存或放弃其他草稿。');return;}
     const blocked=state.intake.workflow.steps.find(s=>s.stage==='crop'&&s.status==='needs_review');
-    if(!correcting&&blocked&&(state.intake.workflow.policy!=='intake_workflow@4'||!state.intake.workflow.pending_ready)){select(blocked.target_id);switchMode('review');toast('请在此原图确认裁剪范围后继续。');return;}
+    if(!correcting&&blocked&&(!['intake_workflow@4','intake_workflow@5'].includes(state.intake.workflow.policy)||!state.intake.workflow.pending_ready)){select(blocked.target_id);switchMode('review');toast('请在此原图确认裁剪范围后继续。');return;}
     const payload=cropGuard();
     if(correcting){
       if(cropDrafts.get(r.id)?.conflict||rotationError(r))return;
@@ -394,7 +395,7 @@ window.intakeWorkspace = (() => {
       const a=state.intake.automation;
       const current=state.intake.workflow.steps.find(s=>s.stage==='crop'&&s.target_id===row()?.id);
       const reviewing=mode==='review'&&(current?.status==='needs_review'||cropDrafts.has(row()?.id));
-      topAction.textContent=state.busy?'暂停处理':a?.complete?'导出完整项目':reviewing?'保存范围并继续':'继续自动处理';
+      topAction.textContent=state.busy?'暂停处理':a?.complete?'导出完整项目':reviewing?'保存范围并继续':state.intake.workflow.policy==='intake_workflow@4'?'继续处理（先完成全部裁剪）':'继续自动处理';
       topAction.disabled=!bridge||!!cropPending.size||!!(a?.complete&&hasDraft())||!!(state.busy&&!a?.phase);
       topSummary.textContent=`${state.intake.proteins.length} 个蛋白 · ${state.intake.figures.length} 个 Fig`;
     }
@@ -418,7 +419,7 @@ window.intakeWorkspace = (() => {
     if(deliveryBar.hidden)return;
     const ready=new Set((state.intake.figuresReady||[]).map(f=>f.figure_id));
     const missing=state.intake.figures.filter(f=>!ready.has(f.figure_id)).length;
-    const draft=hasDraft(),locked=state.busy||!bridge;
+    const draft=hasDraft(),locked=state.busy||!bridge||cropBarrierBlocked();
     const reason=draft?'请先保存或放弃当前修改。':missing?`完整拼图还需 ${missing} 个 Fig 成图。`:'包含所有 Fig；原图、裁图、拼图与灰度表按组收纳。';
     const directory=state.intake.delivery?.rootPath||state.intake.output?.path;
     updateMarkup(deliveryBar,`<div class="intake-delivery-copy"><strong>完整项目交付</strong><p role="status">${escapeText(reason)}</p></div><div class="intake-delivery-actions"><button class="button primary" data-intake-crop-action="export" ${locked||draft?'disabled':''}>导出完整项目</button><button class="button subtle" data-ig-export="all" ${locked||draft||missing?'disabled':''}>导出完整拼图</button><button class="button subtle" data-intake-table-export ${locked||draft?'disabled':''}>导出灰度表</button><button class="text-button" data-intake-open-directory ${locked||!directory?'disabled':''}>打开项目目录</button></div>`);
@@ -610,8 +611,8 @@ window.intakeWorkspace = (() => {
   function outputInfo() {
     if(!state.intake?.outputEnabled)return '';
     const output=state.intake.output, latest=(state.intake.outputs||[]).find(item=>item.destination===output?.path);
-    const status=output?.path?(output.committed?(output.current===false?'历史快照已保留；当前输入已变化，需要重新输出':latest?.complete?'完整快照已登记':'部分快照已登记，未完成项仍需处理'):(state.busy?'目录已发布，正在登记项目':'目录已发布，项目尚未登记；已生成文件保留')):'完整批次完成后自动输出；也可先保存含未完成项的快照。';
-    return `<section class="inspect-section intake-output-info"><h3>完整项目文件夹</h3><p role="status">${escapeText(status)}</p>${output?.path?`<p class="intake-output-path">${escapeText(output.path)}</p>`:''}<details><summary>项目包含什么</summary><p>每次导出到新目录，包含全部组内原图、原值裁图与展示图、单 Fig 与完整拼图、灰度总表与分组表，以及项目恢复包。</p></details>${latest?.errors?.length?`<details><summary>${latest.errors.length} 项缺口</summary><ul>${latest.errors.map(error=>`<li>${escapeText(error)}</li>`).join('')}</ul></details>`:''}<button class="button subtle full" data-intake-crop-action="export" ${state.busy||hasDraft()||!bridge?'disabled':''}>${output?.path?'重新导出到新目录':'导出完整项目'}</button></section>`;
+    const status=output?.path?(output.committed?(output.current===false?'历史快照已保留；当前输入已变化，需要重新输出':latest?.complete?'完整快照已登记':'部分快照已登记，未完成项仍需处理'):(state.busy?'目录已发布，正在登记项目':'目录已发布，项目尚未登记；已生成文件保留')):(cropBarrierBlocked()?'全部原值裁剪完成后才能进入拼图、灰度及导出。':'完整批次完成后自动输出。');
+    return `<section class="inspect-section intake-output-info"><h3>完整项目文件夹</h3><p role="status">${escapeText(status)}</p>${output?.path?`<p class="intake-output-path">${escapeText(output.path)}</p>`:''}<details><summary>项目包含什么</summary><p>每次导出到新目录，包含全部组内原图、原值裁图与展示图、单 Fig 与完整拼图、灰度总表与分组表，以及项目恢复包。</p></details>${latest?.errors?.length?`<details><summary>${latest.errors.length} 项缺口</summary><ul>${latest.errors.map(error=>`<li>${escapeText(error)}</li>`).join('')}</ul></details>`:''}<button class="button subtle full" data-intake-crop-action="export" ${state.busy||hasDraft()||!bridge||cropBarrierBlocked()?'disabled':''}>${output?.path?'重新导出到新目录':'导出完整项目'}</button></section>`;
   }
   function renderIntakeResults() {
     const pageSize=200, pages=Math.max(1,Math.ceil(state.cells.length/pageSize));
@@ -915,7 +916,7 @@ window.intakeWorkspace = (() => {
       cropPending.set(r.id,{roi:{...r.roi},displayAngle,digest:state.intake.workflow.digest});
       send(completed?'intake_crop_revise':'intake_crop_review',{...cropGuard(),rowId:r.id,roi:{...r.roi},displayAngle});
     } else if (action === 'run' && batchPolicy()) resumeBatch();
-    else if (action === 'run' && !hasDraft()) send('intake_run',cropGuard());
+    else if (action === 'run' && !hasDraft()) {if(batchPolicy())resumeBatch();else send('intake_run',cropGuard());}
     else if (action === 'discard') {
       const draft = cropDrafts.get(r.id); r.roi = draft ? draft.original : r.roi; r.draft = false;
       cropDrafts.delete(r.id); cropPending.delete(r.id); rotationErrors.delete(r.id); rotationEdit=null;rotationPreview=null;syncCrops(); render();

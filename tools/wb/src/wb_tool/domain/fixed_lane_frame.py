@@ -35,6 +35,7 @@ def fixed_lane_frame(
     image_height: int,
     *,
     max_angle: float = 10,
+    frame_height: float | None = None,
 ) -> tuple[OrientedCrop, LaneROI, tuple[LaneROI, ...]]:
     """Construct known-N geometry without counting separate signal components.
 
@@ -53,7 +54,10 @@ def fixed_lane_frame(
         raise ValueError("固定网格角度策略须在0至30度内")
     if lane_width < 2 or abs(angle_degrees) > max_angle:
         raise ValueError("固定网格槽宽不足或角度超出小角度范围")
-    width, height = lane_count * lane_width, lane_width * 0.8
+    if frame_height is not None and (not isfinite(frame_height) or frame_height <= 0):
+        raise ValueError("固定网格显示高度须为有限正数")
+    width = lane_count * lane_width
+    height = lane_width * 0.8 if frame_height is None else frame_height
     c, s = cos(radians(angle_degrees)), sin(radians(angle_degrees))
     polygon = [
         (center_x + c * u - s * v, center_y + s * u + c * v)

@@ -215,7 +215,11 @@ def verify_sequence_installation(
             try:
                 if not isinstance(
                     project, WBIntakeWorkflowProject
-                ) or project.workflow.policy not in {"intake_workflow@3", "intake_workflow@4"}:
+                ) or project.workflow.policy not in {
+                    "intake_workflow@3",
+                    "intake_workflow@4",
+                    "intake_workflow@5",
+                }:
                     return
                 steps = project.workflow.steps
                 for step in steps:
@@ -228,6 +232,20 @@ def verify_sequence_installation(
                         "export": ("crop", "compose", "measure"),
                     }[step.stage]
                     prerequisites = [s for s in steps if s.stage in earlier]
+                    if project.workflow.policy == "intake_workflow@5":
+                        prerequisites = [
+                            s
+                            for s in prerequisites
+                            if s.stage == "crop"
+                            or step.stage == "export"
+                            or (s.stage == "compose" and s.target_id == step.target_id)
+                        ]
+                        if step.stage != "crop" and (
+                            not isinstance(project, WBIntakeCropProject)
+                            or any(e.raw_crop is None for e in project.intake_crops)
+                            or len(project.intake_crops) != len(project.rows)
+                        ):
+                            errors.append("Downstream work began without every saved raw crop")
                     if project.workflow.policy == "intake_workflow@4":
                         if step.stage == "export":
                             statuses = {(s.stage, s.target_id): s.status for s in steps}
@@ -448,7 +466,7 @@ def verify_sequence_installation(
                             if (
                                 crop.raw_crop is None
                                 or not crop.geometry_ready
-                                or (automatic and (crop.policy != "intake_crop@3" or crop.reviewed))
+                                or (automatic and (crop.policy != "intake_crop@5" or crop.reviewed))
                                 or len(crop.slots) != row.lane_count
                             ):
                                 raise ValueError("Missing original crop or fixed slots")
@@ -477,7 +495,7 @@ def verify_sequence_installation(
                                 )
                                 if frame is None or abs(abs(frame.angle_degrees) - 3) > 1:
                                     raise ValueError("Small-angle correction was lost")
-                                if crop.geometry_policy != "instrument_guided_geometry@2":
+                                if crop.geometry_policy != "guided_prominent_band_geometry@1":
                                     raise ValueError(
                                         "Diagnostic did not exercise paired-guide path"
                                     )

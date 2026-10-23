@@ -1,3 +1,5 @@
+T081：`domain/prominent_band_geometry.py`及双消费者`band_geometry_support.py`提供固定N明显主行排序；`intake_crop@5`与新workflow@5先完成全部原值裁剪再进入后续阶段。旧@4显式继续/重试迁移，历史不静默改写。见[明显裁图v5](contracts/wb-prominent-band-crop-v5.md)、[全批裁剪门槛v5](contracts/wb-intake-workflow-v5.md)及T081任务。
+
 T080：WB `domain/common_band_geometry.py`补充常见明显主行、连接核心与碎核的固定N定位；`intake_crop@4`及显式±30°显示采样版本保留旧算法/历史语义。`application/adapters/intake_delivery.py`负责按Fig/蛋白命名的阶段交付与标准ZIP恢复；宿主仍通过公开API后台执行及CAS。新`intake_workflow@4`在失败组之外继续就绪Fig并如实输出部分目录，旧@3严格暂停兼容。当前状态以T080任务为准，契约见[常见裁图v4](contracts/wb-common-band-crop-v4.md)、[完整项目交付](contracts/wb-intake-delivery-v1.md)与[工作流v4](contracts/wb-intake-workflow-v4.md)。
 
 T075：同源 web_ui 设计系统与 appearance@1 设置；web_advanced 对接 wb_tool.api/workbench_revision，保持最新Intake来源和版本语义。契约见 contracts/wb-workbench-revision-v1.md，完成状态见任务T075。

@@ -118,7 +118,7 @@ def test_one_submission_is_pure_and_compiles_exact_sequence_before_any_attempt()
     grouping = configuration(project, ("A", "B"))
     prepared = prepare_intake_sequence(project, grouping, expected_digest=intake_digest(project))
     assert project.model_dump_json() == original
-    assert prepared.workflow.policy == "intake_workflow@4"
+    assert prepared.workflow.policy == "intake_workflow@5"
     assert all(s.status == "pending" and s.attempt == 0 for s in prepared.workflow.steps)
     assert prepared.intake.grouping == grouping
     assert read_figure_project(prepared.model_dump_json().encode()) == prepared
@@ -167,7 +167,7 @@ def test_one_submission_confirms_an_explicit_sequence_revision_without_mutating_
         grouping.sequence or (),
     )
     revised = prepare_intake_sequence(editing, renamed, expected_digest=intake_digest(editing))
-    assert not revised.workflow.editing and revised.workflow.policy == "intake_workflow@4"
+    assert not revised.workflow.editing and revised.workflow.policy == "intake_workflow@5"
     assert revised.intake.figures[0].label == "Renamed"
     assert prepared.model_dump_json() == history
     assert [(g.group_id, g.selected_source_id) for g in renamed.groups] == [

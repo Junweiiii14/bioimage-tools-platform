@@ -219,7 +219,8 @@ class WorkbenchBridge(QObject):
                     response["status"] = (
                         "saved"
                         if isinstance(project, WBIntakeWorkflowProject)
-                        and project.workflow.policy in {"intake_workflow@3", "intake_workflow@4"}
+                        and project.workflow.policy
+                        in {"intake_workflow@3", "intake_workflow@4", "intake_workflow@5"}
                         and not project.workflow.editing
                         else "failed"
                     )

@@ -38,6 +38,7 @@ from wb_tool.api import (
     intake_digest,
     intake_output_digest,
     intake_workflow_digest,
+    intake_workflow_snapshot,
     prepare_intake_delivery,
     prepare_intake_measurement_revision,
     prepare_intake_outputs,
@@ -45,6 +46,7 @@ from wb_tool.api import (
     record_intake_crop_proposal,
     record_intake_output,
     request_intake_workflow_cancel,
+    require_intake_crop_barrier,
     retry_intake_workflow_step,
 )
 
@@ -129,6 +131,7 @@ class IntakeWorkflowSession:
         if not isinstance(project, WBIntakeWorkflowProject) or project.workflow.policy not in {
             "intake_workflow@3",
             "intake_workflow@4",
+            "intake_workflow@5",
         }:
             return None
         order = {"crop": 0, "compose": 1, "measure": 2, "export": 3}
@@ -170,7 +173,7 @@ class IntakeWorkflowSession:
             "phase": current.stage if current else "complete",
             "targetId": current.target_id if current else "",
             "paused": bool(not self.host.operation_busy and (blocked or remaining))
-            if project.workflow.policy == "intake_workflow@4"
+            if project.workflow.policy in {"intake_workflow@4", "intake_workflow@5"}
             else bool(blocked or (not self.host.operation_busy and remaining)),
             "reason": blocked.reason if blocked else "",
             "complete": bool(not remaining and output_complete),
@@ -244,6 +247,7 @@ class IntakeWorkflowSession:
             project, WBIntakeFigureProject
         ) or expected_digest != intake_workflow_digest(project):
             raise ValueError("输出输入已改变，请重新核对")
+        require_intake_crop_barrier(project)
         self._key, self._cancelled = uuid4().hex, False
         prepared = prepare_intake_outputs(project)
         prepared = prepare_intake_delivery(
@@ -341,7 +345,11 @@ class IntakeWorkflowSession:
             raise ValueError("执行摘要已改变，请刷新后重试")
         self._key, self._cancelled = uuid4().hex, False
         key, generation = self._key, host.view.generation
-        if project.workflow.policy in {"intake_workflow@3", "intake_workflow@4"}:
+        if project.workflow.policy in {
+            "intake_workflow@3",
+            "intake_workflow@4",
+            "intake_workflow@5",
+        }:
             self._batch_context = host.workspace_path, project.project_id
             self._batch_key = self._key
             self._retained_steps = {
@@ -498,6 +506,14 @@ class IntakeWorkflowSession:
                 raise ValueError("裁剪阶段返回无效快照")
             if ticket is None:
                 pending = sum(s.status != "done" for s in project.workflow.steps)
+                if (
+                    project.workflow.policy == "intake_workflow@5"
+                    and not intake_workflow_snapshot(project)["crop_barrier_ready"]
+                ):
+                    host.finish_operation(
+                        "其余原图已尝试裁剪；请修正未完成行，全部裁剪保存后再继续拼图和灰度。"
+                    )
+                    return
                 host.finish_operation(
                     f"阶段已保存；{pending} 项待复核或重试，其他完整Fig结果保留。"
                     if pending
@@ -684,7 +700,8 @@ class IntakeWorkflowSession:
             elif evidence is not None:
                 updated = (
                     accept_automatic_intake_crop(project, ticket, evidence)
-                    if project.workflow.policy in {"intake_workflow@3", "intake_workflow@4"}
+                    if project.workflow.policy
+                    in {"intake_workflow@3", "intake_workflow@4", "intake_workflow@5"}
                     and automatic_intake_crop_allowed(evidence)
                     else record_intake_crop_proposal(project, ticket, evidence)
                 )
@@ -840,6 +857,7 @@ class IntakeWorkflowSession:
         if not isinstance(project, WBIntakeFigureProject) or project.workflow.policy not in {
             "intake_workflow@3",
             "intake_workflow@4",
+            "intake_workflow@5",
         }:
             self._advance()
             return

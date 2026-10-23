@@ -26,6 +26,7 @@ from wb_tool.domain.crop_detection import CropCandidate, CropDetection, CropDete
 from wb_tool.domain.export_detection import inspect_export
 from wb_tool.domain.grid import fixed_lane_grid
 from wb_tool.domain.lanes import LaneROI
+from wb_tool.domain.prominent_band_geometry import detect_prominent_band_geometry
 from wb_tool.domain.reliable_geometry import ReliableDetection, detect_reliable_geometry
 
 
@@ -223,6 +224,59 @@ def propose_intake_crop(
                     *("verified_group_sha256:" + member.sha256 for member in members),
                 ),
             )
+    if project.workflow.policy == "intake_workflow@5":
+        # New batches always compare prominent source structure. An old detector
+        # accepting a regular shadow must not bypass the new row ranking.
+        prominent = detect_prominent_band_geometry(
+            image.pixels,
+            common_guide.pixels,
+            AutoWBSettings(lane_count=row.lane_count, crop_policy="source_geometry@2"),
+            target=target,
+            cancelled=cancelled,
+        )
+        if verified_members:
+            peer = next(
+                (
+                    m
+                    for m in verified_members
+                    if m.sha256 not in {image.sha256, common_guide.sha256}
+                ),
+                None,
+            )
+            corroborated = (
+                detect_prominent_band_geometry(
+                    peer.pixels,
+                    common_guide.pixels,
+                    AutoWBSettings(lane_count=row.lane_count, crop_policy="source_geometry@2"),
+                    target=target,
+                    cancelled=cancelled,
+                )
+                if peer and prominent.candidates
+                else None
+            )
+            prominent = replace(
+                prominent,
+                algorithm_id="source_prominent_band_geometry@1"
+                if common_guide.sha256 == image.sha256
+                else "guided_prominent_band_geometry@1",
+                flags=(
+                    *prominent.flags,
+                    "guide_sha256:" + common_guide.sha256,
+                    *("verified_group_sha256:" + m.sha256 for m in verified_members),
+                    "registered_signal_pair@1"
+                    if corroborated and _same_signal_coordinates(prominent, corroborated)
+                    else "companion_coordinates_unconfirmed",
+                ),
+            )
+        if cancelled():
+            raise ValueError("固定N定位已取消")
+        return make_intake_crop_evidence(
+            project,
+            row_id,
+            prominent,
+            sampling_limits=prominent.sampling_limits,
+            review_positions=prominent.review_positions,
+        )
     # Preserve previously reliable geometry and its frozen v3 semantics. The
     # new common-band policy is independent evidence, not a success flag added
     # to a rejected old candidate. It deliberately ignores distant weak rows.

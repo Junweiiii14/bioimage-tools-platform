@@ -291,7 +291,7 @@ def complete_intake_figure(
         old
         if (
             project.workflow.policy
-            in {"intake_workflow@2", "intake_workflow@3", "intake_workflow@4"}
+            in {"intake_workflow@2", "intake_workflow@3", "intake_workflow@4", "intake_workflow@5"}
             and (old := previous.get(plan.row_id)) is not None
             and _current_intake_plan(project, old)
             and old.crop == plan.crop

@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "task": "T-081",
+  "base_commit": "d08b16bc0f632ee08f4d621f255469c416046593",
+  "scopes": [
+    ".agent-handoff",
+    ".local/T081",
+    "AGENT_HANDOFF.md",
+    "apps/desktop",
+    "docs",
+    "tests",
+    "tooling",
+    "tools/wb",
+    "work"
+  ],
+  "rules": {
+    "AGENTS.md": "3c5ce28cf9b92099025bd50db0821e94c90b5759dfb32d19e510da1774c4941f",
+    "docs/ai-workflow.md": "8003be926d828df9eaf0398d77f463a9472316be021467e7f22fb63132063f70",
+    "docs/architecture.md": "dabf3823b44d4af2f372fd5dc244747cb3cd7ff56abcfd13cf007721b8a0dbbd",
+    "docs/coding-standards.md": "40fe9541a84163e6df6be9d2a57b836b9703471440f412bd16456f1ef0382d71",
+    "docs/module-map.md": "792d6e7efc4dbc4b24f51e8d1d24e464fff5fff17d553d8a42af3154565af07a",
+    "docs/research-protocol.md": "b1ab0f9bf291e50f5872e01147f7af2671fdc5885bf2f065c804c5f4a240aa51",
+    "docs/runbooks/rule-enforcement.md": "43c1aafc0003f1901c4c35f4aa896cd520cf79dc96856019e11c1b095fc5c090"
+  },
+  "base_rules": {
+    "AGENTS.md": "3c5ce28cf9b92099025bd50db0821e94c90b5759dfb32d19e510da1774c4941f",
+    "docs/ai-workflow.md": "8003be926d828df9eaf0398d77f463a9472316be021467e7f22fb63132063f70",
+    "docs/architecture.md": "dabf3823b44d4af2f372fd5dc244747cb3cd7ff56abcfd13cf007721b8a0dbbd",
+    "docs/coding-standards.md": "40fe9541a84163e6df6be9d2a57b836b9703471440f412bd16456f1ef0382d71",
+    "docs/module-map.md": "74c6f8653b80eb6e17f7377c2fa6640012dd5e5712e584f998157a81e9128e7a",
+    "docs/research-protocol.md": "b1ab0f9bf291e50f5872e01147f7af2671fdc5885bf2f065c804c5f4a240aa51",
+    "docs/runbooks/rule-enforcement.md": "43c1aafc0003f1901c4c35f4aa896cd520cf79dc96856019e11c1b095fc5c090"
+  }
+}

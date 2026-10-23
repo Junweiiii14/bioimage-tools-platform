@@ -1,3 +1,5 @@
+T081：新整批执行使用 `intake_workflow@5`：失败行不阻止其余行尝试裁剪，但全部当前原值裁剪资产完成前不进入拼图/灰度/输出。既有 v4 项目通过明确继续或重试创建 v5 修订，旧成功裁图及历史保留。见 `../../docs/contracts/wb-intake-workflow-v5.md`。
+
 T077：intake_visible_table@1 是可见原始积分宽表的独立显示/导出投影，旧归档表语义保持；实际验证及限制见 T077 任务与可见结果表v1契约。
 
 T075新增工作台明确修订公开用例 prepare_workbench_revision / apply_workbench_metadata / revise_workbench_figure_order；不改变算法与项目schema，保留历史并撤回相应阶段批准。契约见 ../../docs/contracts/wb-workbench-revision-v1.md。

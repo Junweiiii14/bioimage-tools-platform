@@ -78,12 +78,47 @@ def test_new_batch_can_continue_ready_groups_despite_another_review(
         intake_page,
         qtbot,
         "sent.length===1&&sent[0].action==='intake_sequence_continue'&&"
-        "sent[0].payload.workflowDigest==='remaining'",
+        "sent[0].payload.workflowDigest==='remaining'&&sent[0].payload.cropBarrier===true",
     )
 
 
-def test_visible_delivery_controls_and_unsaved_layout_guard(
+def test_v5_blocks_downstream_modes_until_all_original_crops_are_saved(
     intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    javascript(
+        intake_page,
+        qtbot,
+        """setState({intake:{...state.intake,confirmed:true,cropEnabled:true,
+        figureEnabled:true,outputEnabled:true,crops:[],
+        automation:{complete:false,paused:true,follow:false},
+        workflow:{policy:'intake_workflow@5',digest:'crop-barrier',pending_ready:1,
+        crop_barrier_ready:false,steps:[
+          {stage:'crop',target_id:'protein-a',status:'needs_review'},
+          {stage:'crop',target_id:'protein-b',status:'pending'}]}}});
+        sent=[];document.querySelector('#intake-primary').click();true""",
+    )
+    assert javascript(
+        intake_page,
+        qtbot,
+        "JSON.stringify(intakeWorkspace.allowedModes())===JSON.stringify(['intake','review'])",
+    )
+    assert javascript(
+        intake_page,
+        qtbot,
+        "sent.length===1&&sent[0].action==='intake_sequence_continue'&&"
+        "sent[0].payload.cropBarrier===true",
+    )
+    javascript(
+        intake_page,
+        qtbot,
+        "setState({intake:{...state.intake,workflow:{...state.intake.workflow,"
+        "crop_barrier_ready:true,pending_ready:1}}});true",
+    )
+    assert javascript(intake_page, qtbot, "intakeWorkspace.allowedModes().includes('quant')")
+
+
+def test_visible_delivery_controls_and_unsaved_layout_guard(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
 ) -> None:
     window = intake_page
     window.resize(1440, 900)
@@ -119,7 +154,7 @@ def test_visible_delivery_controls_and_unsaved_layout_guard(
         commands = json.loads(raw)
         assert len(commands) == 1 and commands[0]["action"] == action
         assert commands[0]["payload"]["projectId"] == "intake-project"
-    evidence = Path(".local/T080/delivery-ui")
+    evidence = tmp_path / "delivery-ui"
     evidence.mkdir(parents=True, exist_ok=True)
     qtbot.wait(150)  # Allow the native compositor to present the rendered results page.
     assert window.grab().save(str(evidence / "results-wide.png"))

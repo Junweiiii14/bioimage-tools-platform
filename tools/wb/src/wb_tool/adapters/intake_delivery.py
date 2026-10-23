@@ -24,7 +24,7 @@ from wb_tool.application.intake_delivery import (
     prepare_intake_delivery,
 )
 from wb_tool.application.intake_output import IntakeOutputPreparation, WBIntakeOutputProject
-from wb_tool.application.intake_workflow import IntakeWorkflowTicket
+from wb_tool.application.intake_workflow import IntakeWorkflowTicket, require_intake_crop_barrier
 from wb_tool.application.project_archive import ArchiveRunEvidence
 
 OWNER = ".wb-delivery.json"
@@ -291,7 +291,11 @@ def _coordinate_sources(project: WBIntakeCropProject, row: IntakeDeliveryRow) ->
     if (
         detection is not None
         and evidence.geometry_policy
-        in {"instrument_guided_geometry@2", "guided_common_band_geometry@1"}
+        in {
+            "instrument_guided_geometry@2",
+            "guided_common_band_geometry@1",
+            "guided_prominent_band_geometry@1",
+        }
         and "registered_signal_pair@1" in detection.flags
         and "group_signal_coordinates_unverified" not in detection.flags
     ):
@@ -575,6 +579,7 @@ def finalize_intake_delivery(
     from wb_tool.application.intake_execution import build_intake_execution_plan
     from wb_tool.application.project_archive import project_runs
 
+    require_intake_crop_barrier(project)
     materialize_intake_delivery(
         project, sources, workspace_path=workspace_path, cancelled=cancelled
     )
