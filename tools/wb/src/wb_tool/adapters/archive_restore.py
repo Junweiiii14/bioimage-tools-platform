@@ -38,6 +38,9 @@ from wb_tool.application.crop import CropRequest
 from wb_tool.application.crop_suggestions import read_figure_project
 from wb_tool.application.document import DocumentIO, check_document_json
 from wb_tool.application.figure_project import FigureSourcePath, WBFigureProject
+from wb_tool.application.instrument_intake import WBIntakeProject
+from wb_tool.application.intake_crop import WBIntakeCropProject
+from wb_tool.application.intake_figure import WBIntakeFigureProject
 from wb_tool.application.project_archive import ArchiveRunEvidence, project_runs
 from wb_tool.application.project_normalization import WBNormalizedProject
 from wb_tool.application.project_ocr import WBProjectOCR
@@ -136,9 +139,30 @@ def _tiff_budget(path: Path) -> None:
             raise ValueError("恢复TIFF超出3200万像素预算")
 
 
+def _png_budget(path: Path) -> None:
+    with Image.open(path, formats=("PNG",)) as image:
+        pixels = image.width * image.height
+        if pixels > 32_000_000:
+            raise ValueError("恢复PNG超出3200万像素预算")
+        sample_bytes = 4 if image.mode in {"I", "F"} else 2 if image.mode.startswith("I;16") else 1
+        if pixels * len(image.getbands()) * sample_bytes > MAX_MEMBER:
+            raise ValueError("恢复PNG解码超出512MiB预算")
+        image.verify()
+
+
 def _assets(project: WBFigureProject, entries: dict[str, ArchiveEntry]) -> dict[str, Path]:
     paths: dict[str, Path] = {}
     originals = {row.source.sha256 for row in project.rows if row.source}
+    # Persisted roles, rather than names or current row selection, define image formats.
+    if isinstance(project, WBIntakeProject):
+        originals.update(source.asset.sha256 for source in project.intake.sources)
+    if isinstance(project, WBIntakeCropProject):
+        originals.update(crop.raw_crop.sha256 for crop in project.intake_crops if crop.raw_crop)
+    figures: set[str] = (
+        {figure.image.sha256 for figure in project.intake_figures}
+        if isinstance(project, WBIntakeFigureProject)
+        else set()
+    )
     historical: set[str] = (
         {s.archive.sha256 for s in project.archive_sources}
         if isinstance(project, WBRestoredProject)
@@ -154,6 +178,8 @@ def _assets(project: WBFigureProject, entries: dict[str, ArchiveEntry]) -> dict[
         suffix = ".json"
         if asset.sha256 in originals:
             suffix = ".tif"
+        elif asset.sha256 in figures:
+            suffix = ".png"
         elif project.template.font and asset.sha256 == project.template.font.sha256:
             suffix = ".ttf"
         elif (
@@ -169,6 +195,8 @@ def _assets(project: WBFigureProject, entries: dict[str, ArchiveEntry]) -> dict[
         paths[asset.sha256] = path
         if suffix == ".tif":
             _tiff_budget(path)
+        elif suffix == ".png":
+            _png_budget(path)
     if isinstance(project, WBProjectOCR) and project.ocr:
         image = load_ocr_image(paths[project.ocr.source.sha256])
         if image.pixels.shape != (project.ocr.height, project.ocr.width):
