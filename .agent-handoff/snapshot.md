@@ -1,7 +1,10 @@
 # 当前恢复指针
 
-- 当前功能任务T077：work/tasks/T-077-folder-drop-visible-export.md。两项实现及绑定独审完成；按该任务完结谓词核最终HEAD四必要CI成功后结束并创建一次视频调研聊天。活动goal无token_budget。视频创建状态在.local/T077-video-start.json和自动化wb/memory.md。
-- 活动树 C:/Users/70236/.codex/worktrees/wb-ui-system/bioimage-tools-platform，分支codex/t077-folder-drop-visible-export；产品c32ad11106d0f49d1d7babc91d2f987bb2d3e12e。ResearchVault旧dirty树、旧结果及971d860安装保留；本轮不合并/发布或重建安装。
-- 拖入WB工具卡接既有仪器流程；直接及自动目录可见XLSX/CSV、完整审计分开，旧ZIP语义保持，保存后结果重建。作者22项、独审24项及严格旧恢复通过，5图有限ship。证据work/evidence/T-077；最终CI只认实时.local/T077-final-ci.json，不引用旧head成功。
-- 下一步仅完成最终PR38四必要CI及视频聊天（本地项目18e0faea-2e25-4716-a9ff-b65c870c5c03，gpt-6-astra/ultra）；不要扩其他产品功能或重复安排自动化。新聊天先create_goal；安全素材.local/deliveries/WB-T077-safe-demo-c32ad11。
-- T076完整指针归档archive/T076-before-T077-snapshot.md。科学留出、干净Win10、物理Explorer/OLE/DPI、外部表格软件及历史native UNKNOWN保留。本轮截图GPU/mailbox及可选QWebSocket探针诊断不认定为已修复；详见T077 validation。
+- 当前任务T079：work/tasks/T-079-laboratory-offline-delivery.md。用户追加完整实验室安装包、本地旧版清理及GitHub整理。任务内闭合谓词为唯一状态来源，旧自动化目标已完成不代表本轮提前结束。
+- 活动树 C:/Users/70236/.codex/worktrees/wb-lab-installer/bioimage-tools-platform；分支codex/t079-laboratory-delivery。包装efd8d4f8fa9cd6c3b86a291d49ede9ad54bb971b；T077科学/导出/目录入口字节保持。最新整合PR39，实际精确HEAD四必需CI/merge结果查.local/T079-final-ci.json和GitHub。
+- 普通用户实验室版Setup383860684字节，SHA571a66b3e214ea2167c2208e19b8c399c0e46ef7aef3c6548fd457f456b18b8b。本机Win11更新安装/PS5.1双自检/19安装态回归/7788载荷及204源SHA通过。初包e97独审两项问题已修进efd；最终绑定审查见work/evidence/T-079，不能沿用初包摘要。
+- 下一步/结束复核：最终交付独审、最终文档HEAD四CI成功→正常merge PR39→关闭被替代35–38及只删安全已合入远端分支→桌面文件夹/ZIP冻结、成员SHA检查。实时收据t079-github-cleanup.json、t079-final-delivery.json；任一步未过保持未完成。native-case未运行不写通过。
+- 本地旧版已按证明清理50目录、10卸载exit0、6桌面死链接；另6StartMenu死链接可恢复移动归档。私有归档 C:/Users/70236/ResearchVault/Codex-Workbench/WB-归档-20261023-T079；未知文件/dirty备份逐SHA独审通过。净可用空间约+24.07GiB；保留原dirty源树及e97清理payload引用，不删除唯一数据。孤立WB-Quant卸载登记额外删除被自动审批blocked by policy，保留。
+- 视频研究聊天01a16507-01a9-7830-b7d3-cd674efc477b已按原授权创建，gpt-6-astra/ultra；wb-ui-system当前codex/t078-video-research，整个树保护。不复制聊天、不发送未经授权新指令、不新建自动化；本轮追加结束后补wb/memory.md。
+- 目标Win10 1809+/Win11 x64；仅本机Win11验证，干净Win10/逐台硬件/物理Explorer/OLE/DPI/外部表格显示/独立科学真值未验。历史native/GPU/mailbox根因UNKNOWN不销账。目标机首次运行随包自检与合成练习；未商业签名，遵守IT策略。
+- 旧T077短指针完整归档archive/T077-before-T079-snapshot.md；历史任务与失败仍可查，不据旧“保持安装”指令重建副本。

@@ -1,6 +1,6 @@
 # T-079 实验室完整离线安装包与旧版本整理
 
-- 状态：in-progress；2026-10-23 用户明确要求制作可直接交给实验室工作人员的完整环境安装包，并同步清理本地旧版及整理 GitHub。
+- 状态：本机实现/验证完成；下述闭合条件全部满足时complete，否则in-progress。2026-10-23 用户明确要求制作可直接交给实验室工作人员的完整环境安装包，并同步清理本地旧版及整理 GitHub。
 - 基线：产品 c32ad11106d0f49d1d7babc91d2f987bb2d3e12e；证据 HEAD eec9cd2e0893a2e847d08f151c5bcce27675a8ae，四必需 CI 成功。保留正在进行的视频研究树，不从旧 ResearchVault dirty 树构建。
 - 活动树：C:/Users/70236/.codex/worktrees/wb-lab-installer/bioimage-tools-platform；独立分支 codex/t079-laboratory-delivery。
 
@@ -18,9 +18,17 @@
 
 ## 记录
 
-- 原 ResearchVault 树现有 25 项 dirty 保留；视频树 codex/t078-video-research 的未提交任务/证据保留。安装包和模型仅 ignored 交付目录，不提交大型生成物。
+- 原 ResearchVault 树完整展开27项dirty保持一致（普通目录合并显示25行），66个备份dirty源文件清理后SHA一致；视频树 codex/t078-video-research 的未提交任务/证据保留。安装包和模型仅ignored交付目录，不提交大型生成物。
 - 开始时 main=91dd985，PR35–38 OPEN，PR36–38 draft；另外三条依赖升级 PR 不自动混入产品交付。
 - e97d721 初包已在本机普通用户实际安装、自检两模式、19项安装载荷回归、原生窗口启动/正常退出、卸载重装与用户文件保留通过；全部7,785载荷文件和204源文件摘要一致。独审发现说明误写多目录与两个wheel缺许可证文本，均已修订，最终交付必须以重建包复验为准。依赖锁/科学计算不变。
 - 本机旧版清理执行 exit0：12旧程序目录、12桌面交付目录、26旧生成目录、6失效桌面链接移除；10真实卸载器 exit0，未知数据/改动与完整桌面包先归档并独立逐摘要复核。逻辑移除60,325,925,956字节，净可用空间增加25,846,796,288字节（硬链接/备份导致两者不同）。另6失效开始菜单链接已可恢复归档。完整私有记录在.local/t079-cleanup-result.json、t079-legacy-orphans.json；归档 C:/Users/70236/ResearchVault/Codex-Workbench/WB-归档-20261023-T079，不能公开提交。
 - 含额外旧卸载登记删除的命令在执行前被自动审批拒绝，仅返回“blocked by policy”；未换路径重试删除，孤立WB-Quant登记保留。6开始菜单链接随后采用可恢复移动归档，实际成功。
 - 当前仅本机Windows11 Home build26200 x64验收；干净Win10、逐台实验室硬件/物理DPI与Explorer输入、科学真值未验。自检与练习包用于目标机部署检查，不能据本机工程烟测保证所有电脑/实验准确率。
+
+## 最终冻结与完成判据
+
+- 最终包装efd8d4f8fa9cd6c3b86a291d49ede9ad54bb971b，修正安装说明为一次一个目录，并补固定上游版本许可证；源修复非作者复核Accepted。实际新包383860684字节，SHA256 `571a66b3e214ea2167c2208e19b8c399c0e46ef7aef3c6548fd457f456b18b8b`。更新安装/PS5.1两模式/19项安装态测试均exit0；7788文件和204源文件SHA一致。详见 [validation](../evidence/T-079/validation.md) 与绑定新候选的独立交付报告。
+- 完成需同时满足：最终交付独审Accepted；PR39包含本记录的最终HEAD四必需检查SUCCESS且正常merge合main；旧35–38已真实收拢/关闭，远端只删已合入且无活动PR/工作分支；桌面最终文件夹和ZIP已冻结并逐文件/ZIP成员校验，随附准确HEAD CI收据。实时证据为 `.local/T079-final-ci.json`、`.local/t079-github-cleanup.json`、`.local/t079-final-delivery.json` 与 [PR39](https://github.com/Junweiiii14/bioimage-tools-platform/pull/39)，缺任一项保持未完成，不引用旧HEAD CI。
+- 交付目标：桌面“BioImage-WB-实验室安装包-20261023”与“BioImage-WB-Lab-Windows-x64-20261023.zip”。包内Setup、两份中文说明、环境自检入口、SHA校验器、合成原图/完整示例项目/结果、版本/许可/验证记录齐备。不公开二进制；不购买签名或更改单位安全策略。
+- 收尾提交仅文档/证据/指针，必须核产品/配方相对efd无差异。冻结目录外另有不可变e97构建payload用于清理重建引用；视频树整体保持，历史源码/dirty成果不删。不能把“清理旧版”解释为删除所有历史记录。
+- 本次手动追加交付不复制功能或视频聊天，不新建调度；原一次性自动化记录按真实最终结果补记。

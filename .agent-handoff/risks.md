@@ -1,6 +1,7 @@
 # Risks, Blockers, And Unknowns
 
-当前执行指针为 [T077](../work/tasks/T-077-folder-drop-visible-export.md)。以下旧版本证据不迁移为当前通过。
+当前执行指针为 [T079](../work/tasks/T-079-laboratory-offline-delivery.md)。以下旧版本证据/当时保留状态不迁移为当前通过或当前安装清单。
+- T079实验室包本机已验，目标干净Win10/全部工作人员机器/物理输入DPI/科学真值未验；未签名，首次部署自检。最终GitHub合入/桌面冻结仅依任务闭合谓词和精确收据。旧安装已备份后整理，原图/历史/dirty源与视频活动树保留。额外孤立WB-Quant登记删除被自动审批阻止，仅返回blocked by policy，登记保留，不换工具绕过。
 - T077产品独审/实际输出通过；最终PR38 HEAD CI另核。物理Explorer/OLE鼠标、外部Excel/WPS/LibreOffice显示、干净Win10/DPI未验。测试期GPU/mailbox、可选QWebSocket截图0xc0000139诊断与原始失败保留，不认定原生根因已修复；本轮无新安装。
 - T076：源码+HTML、软件渲染回归和有限静态独审通过；最终 HEAD CI 另核。首轮Linux跨窗口测试1201过1败，改等真实宿主快照；实际CI时序未捕获，不抹除失败。用户追加的971d860新目录安装及独立运行检查已通过、安装交付独审Accepted；旧目录保持，当前通道卸载注册已转新版；不能外推干净目标机。首次 GPU canvas/曲线失败及 GLES/mailbox 诊断保留；后继 disable-gpu 通过不等于硬件根因修复。物理 DPI/延迟、干净 Win10、科学留出保留。
 - T075：7fcb819 CI182 四必要检查 success、两平台1192/wheel完成、goal complete；冻结安装5c56f55保持。CI180 Windows角度/命中和Linux重复关闭挂起仍 UNKNOWN；原日志保留。CDP对照不证明全部硬件稳定。

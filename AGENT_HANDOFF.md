@@ -46,5 +46,5 @@
 
 ## Current Pointer
 
-- 当前任务：[T077](work/tasks/T-077-folder-drop-visible-export.md)，平台目录拖入与未审核可见结果导出。活动树 wb-ui-system；状态/下一步以任务和snapshot为准。
-- 旧T076指针已归档到.agent-handoff/archive/T076-before-T077-snapshot.md。ResearchVault旧dirty内容与971d860安装保留；不覆盖原图/历史。
+- 当前任务：[T079](work/tasks/T-079-laboratory-offline-delivery.md)，实验室完整离线安装交付及本地/GitHub整理。活动树wb-lab-installer；状态及完成闭合条件以任务为准。
+- 旧T077指针归档.agent-handoff/archive/T077-before-T079-snapshot.md；视频研究是另一个已启动独立聊天，其wb-ui-system树整体保留。旧安装/生成物按本轮备份证明清理；旧dirty源码、原图/历史保持，不能沿用旧“安装保留”指针。

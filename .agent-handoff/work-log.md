@@ -1,9 +1,5 @@
 # Current Work Log
 
-## 2026-10-18 T044 阶段同步
-
-本地完整check/8图/独审完成后safe push，草稿PR #15依赖stage-08，main221a2df保持；原34未提交SHA/新allrefs bundle已核验，当前4文件另存外置。最终文档后继再备份/push，远端四项检查运行中，issue6开发日志随后记录真实结果；不改产品、不合main、不删除旧树/原图/旧结果。
-
 ## 2026-10-18 CI012 远端Linux与fixture销毁
 
 3e5cee3 Linux约29% OCR时SIGSEGV，真实非GUI线程QWidget析构；未最终通过。精准fixtureclose/wait后deleteLater/waitinvalid，回归红1/2.87秒、新11项25.58秒0。受控holder环窗口后台GC旧Aborted/3，先GUI销毁0，不能认定原对象身份。产品代码不变、旧证据保留；提交绑定独审及远端734全检待做，详见ci012-fixture-lifetime.md。
@@ -151,3 +147,7 @@ T076用户验收首页后追加实际安装授权：971d860构建/显式新DIR�
 ## 2026-10-23 T077 最终产品独审
 
 产品c32ad11：目录原生拖入；直接/自动结果可见宽表及独立审计；旧ZIP恢复保持。作者22项/独审24项/39成员严格恢复通过，设计记录有限ship。最终PR38证据HEAD CI实时核对后才创建一次视频聊天。详细失败和限制见T077。
+
+## 2026-10-23 T079 实验室交付收尾
+
+用户追加安装与清理的完整记录见archive/work-log-20261023T030547970497Z.md及T079任务/evidence。efd最终包本机验证通过，旧版已备份整理；精确HEAD CI、正常PR39合入与桌面冻结按任务闭合谓词实时核。视频活动树/旧dirty源、原图和历史结果保留。
