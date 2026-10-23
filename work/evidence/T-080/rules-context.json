@@ -4,17 +4,10 @@
   "base_commit": "a4646608a965202c38b0f1dee9dd45607a8c5bf7",
   "scopes": [
     ".agent-handoff",
-    ".local/T080",
+    ".github",
     "AGENT_HANDOFF.md",
-    "apps/desktop",
-    "docs/contracts",
-    "docs/module-map.md",
-    "docs/research",
     "tests",
-    "tooling",
-    "tools/wb",
-    "work/evidence/T-080",
-    "work/tasks"
+    "work"
   ],
   "rules": {
     "AGENTS.md": "3c5ce28cf9b92099025bd50db0821e94c90b5759dfb32d19e510da1774c4941f",
