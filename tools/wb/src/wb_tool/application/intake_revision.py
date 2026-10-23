@@ -10,6 +10,7 @@ from wb_tool.application.instrument_intake import (
 from wb_tool.application.intake_crop import WBIntakeCropProject, review_intake_crop
 from wb_tool.application.intake_figure import WBIntakeFigureProject
 from wb_tool.application.intake_grouping import IntakeGrouping
+from wb_tool.application.intake_supervision import WBIntakeGridProject
 from wb_tool.application.intake_workflow import (
     IntakeWorkflowLedger,
     IntakeWorkflowStep,
@@ -150,6 +151,11 @@ def revise_intake_grouping(
         "rows": new_rows,
         "figure_order": edited.figure_order,
     }
+    if isinstance(project, WBIntakeGridProject) and project.grid.order:
+        active_ids = {f.figure_id for f in edited.intake.figures}
+        surviving = tuple(key for key in project.grid.order if key in active_ids)
+        appended = tuple(f.figure_id for f in edited.intake.figures if f.figure_id not in surviving)
+        fields["grid"] = project.grid.model_copy(update={"order": surviving + appended})
     retained_ids = {r.row_id for r in new_rows} - invalid_rows
     fields["analyses"] = tuple(p for p in project.analyses if p.row_id in retained_ids)
     if isinstance(project, WBIntakeCropProject):

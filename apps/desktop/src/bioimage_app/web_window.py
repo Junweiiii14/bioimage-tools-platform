@@ -8,11 +8,12 @@ from pathlib import Path
 from typing import cast
 
 from PySide6.QtCore import QSettings, Qt, QTimer, QUrl, Slot
-from PySide6.QtGui import QCloseEvent, QIcon
+from PySide6.QtGui import QCloseEvent, QColor, QIcon
 from PySide6.QtWebChannel import QWebChannel
 from PySide6.QtWebEngineCore import (
     QWebEnginePage,
     QWebEngineProfile,
+    QWebEngineScript,
     QWebEngineSettings,
     QWebEngineUrlRequestInfo,
     QWebEngineUrlRequestInterceptor,
@@ -21,7 +22,9 @@ from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import QApplication, QFileDialog, QMainWindow
 from wb_tool.api import WBIntakeProject
 
+from bioimage_app.appearance import WorkbenchAppearance
 from bioimage_app.figure_window import FigureProjectWindow
+from bioimage_app.folder_drop import FolderDropView, folder_paths
 from bioimage_app.project_navigation import MODES, ProjectNavigation
 from bioimage_app.shortcuts import WorkbenchShortcuts
 from bioimage_app.source_origins import SourceOrigins
@@ -80,10 +83,18 @@ class WebWorkbenchWindow(QMainWindow):
             "wb-fig-sequence-test",
             "wb-automatic-flow-test",
             "wb-reliable-crop-test",
+            "wb-supervision-test",
+            "wb-ui-system-test",
         }
-        self.setWindowTitle("BioImage WB · 候选版" if candidate else "BioImage · WB 工作台")
+        self.setWindowTitle("BioImage WB · 候选版" if candidate else "BioImage · 工具平台")
         if channel == "wb-reliable-crop-test":
             self.setWindowTitle("BioImage WB · 可靠裁图与界面测试版 T073")
+        if channel == "wb-supervision-test":
+            self.setWindowTitle("BioImage WB · 曲线与整版拼图测试版 T074")
+        if channel == "wb-ui-system-test":
+            self.setWindowTitle("BioImage · 工具平台与 WB 界面测试版 T076")
+        if channel == "wb-laboratory":
+            self.setWindowTitle("BioImage · WB 实验室版")
         self.setWindowIcon(QIcon(str(Path(__file__).with_name("web_ui") / "bioimage.svg")))
         self.resize(1440, 940)
         settings_name = {
@@ -94,9 +105,16 @@ class WebWorkbenchWindow(QMainWindow):
             "wb-fig-sequence-test": "FigSequenceTest",
             "wb-automatic-flow-test": "AutomaticFlowTest",
             "wb-reliable-crop-test": "ReliableCropTest",
+            "wb-supervision-test": "SupervisionTest",
+            "wb-ui-system-test": "UISystemTest",
+            "wb-laboratory": "Laboratory",
         }.get(channel or "", "Platform")
         self.settings = settings or QSettings("BioImageTools", settings_name)
         self.shortcuts = WorkbenchShortcuts(self.settings)
+        self.appearance = WorkbenchAppearance(self.settings)
+        self._appearance_refresh = 0.0
+        self._layout_error = ""
+        self._layout_receipt = ""
         self.navigation = ProjectNavigation(self.settings)
         self._stage = "idle"
         self._message = ""
@@ -121,9 +139,35 @@ class WebWorkbenchWindow(QMainWindow):
         self.host.automatic.quant_policy = "anchored_background@1"
         self.host.closed.connect(self._backend_closed)
         self.host.workspace_opened.connect(self._workspace_ready)
-        self.web = QWebEngineView(self)
+        self.web = FolderDropView(
+            self, self._folder_dropped, lambda: (id(self.host), self.bridge.session_epoch)
+        )
         index = (asset_directory or Path(__file__).with_name("web_ui")) / "index.html"
         page = LocalWorkbenchPage(index, self.web)
+        background = {
+            "forest": "#f1f3e9",
+            "ember": "#f4eee6",
+            "iris": "#eff1f8",
+            "neutral": "#f3f4f3",
+        }
+        page.setBackgroundColor(QColor(background[self.appearance.values["theme"]]))
+        bootstrap = QWebEngineScript()
+        bootstrap.setName("validated-workbench-preferences")
+        bootstrap.setInjectionPoint(QWebEngineScript.InjectionPoint.DocumentCreation)
+        bootstrap.setWorldId(QWebEngineScript.ScriptWorldId.MainWorld)
+        bootstrap.setSourceCode(
+            "window.__wbBootstrap="
+            + json.dumps(
+                {
+                    "appearance": self.appearance.values,
+                    "toolsCollapsed": self.settings.value(
+                        "workbench_tools_collapsed_v1", False, type=bool
+                    ),
+                }
+            )
+            + ";"
+        )
+        page.scripts().insert(bootstrap)
         self.web.setPage(page)
         self.asset_filter = LocalAssetFilter(index.parent, page)
         page.profile().setUrlRequestInterceptor(self.asset_filter)
@@ -149,8 +193,36 @@ class WebWorkbenchWindow(QMainWindow):
         self.session_timer.timeout.connect(self._poll_session)
         self.session_timer.start()
 
+    def _folder_dropped(self, urls: tuple[QUrl, ...]) -> None:
+        try:
+            if self._closing or self._starting or self._stage != "idle" or self.host.operation_busy:
+                raise ValueError("当前任务仍在处理中，请完成或取消后再拖入文件夹。")
+            paths = folder_paths(urls)
+            self.start_from_images(paths, automatic=False, intake=True, folders_only=True)
+        except (ValueError, OSError) as error:
+            self.web.page().runJavaScript(
+                "window.folderDrop?.message(" + json.dumps(str(error)) + ")"
+            )
+
     def choose(self, action: str) -> None:
-        if action in {"new_intake_folder", "intake_import_folder"}:
+        if action in {
+            "new_quant_images",
+            "new_review_images",
+            "new_quant_folder",
+            "new_review_folder",
+        }:
+            if action.endswith("_folder"):
+                directory = QFileDialog.getExistingDirectory(self, "选择 TIFF 原图文件夹")
+                paths = [directory] if directory else []
+            else:
+                paths, _ = QFileDialog.getOpenFileNames(
+                    self, "选择 WB 原图", "", "TIFF 原图 (*.tif *.tiff)"
+                )
+            if paths:
+                self.start_from_images(
+                    [Path(path) for path in paths], automatic=action.startswith("new_review_")
+                )
+        elif action in {"new_intake_folder", "intake_import_folder"}:
             directory = QFileDialog.getExistingDirectory(self, "选择仪器直接导出的 TIFF 文件夹")
             if directory:
                 if action == "intake_import_folder" and self.host.workspace_path:
@@ -224,11 +296,19 @@ class WebWorkbenchWindow(QMainWindow):
                 self.host.load_document(document_id)
 
     def start_from_images(
-        self, paths: list[Path], *, automatic: bool = True, intake: bool = False
+        self,
+        paths: list[Path],
+        *,
+        automatic: bool = True,
+        intake: bool = False,
+        folders_only: bool = False,
     ) -> None:
         if self.host.workspace_path:
             self._request_transition(
-                "new", lambda: self.start_from_images(paths, automatic=automatic, intake=intake)
+                "new",
+                lambda: self.start_from_images(
+                    paths, automatic=automatic, intake=intake, folders_only=folders_only
+                ),
             )
             return
         self._starting = True
@@ -242,6 +322,7 @@ class WebWorkbenchWindow(QMainWindow):
             project_parent=Path(parent) if parent else None,
             automatic=automatic,
             intake=intake,
+            folders_only=folders_only,
         )
 
     def closeEvent(self, event: QCloseEvent) -> None:
@@ -408,10 +489,39 @@ class WebWorkbenchWindow(QMainWindow):
                     self.start_from_images([Path(self._last_open_path)], automatic=False)
             elif action == "new":
                 self._request_transition("new", lambda: self.choose("quant_import"))
+            elif action in {"new_images", "new_folder"}:
+                workflow = data.get("workflow", "quant")
+                if not isinstance(workflow, str) or workflow not in {"quant", "review"}:
+                    raise ValueError("新项目处理方式无效")
+                self.choose(f"new_{workflow}_{action.removeprefix('new_')}")
             elif action == "new_intake_folder":
                 self._request_transition("new", lambda: self.choose("new_intake_folder"))
             elif action == "folder":
                 self.choose("quant_import_folder")
+            elif action == "appearance":
+                receipt = data.get("requestId")
+                if not isinstance(receipt, str) or not receipt or len(receipt) > 80:
+                    raise ValueError("外观保存身份无效")
+                self.appearance.update(data.get("values"), receipt, data.get("schema_version"))
+            elif action == "tools_layout":
+                receipt = data.get("requestId")
+                collapsed = data.get("collapsed")
+                if (
+                    not isinstance(receipt, str)
+                    or not receipt
+                    or len(receipt) > 80
+                    or type(collapsed) is not bool
+                ):
+                    raise ValueError("工具区设置无效")
+                self._layout_receipt = receipt
+                previous = self.settings.value("workbench_tools_collapsed_v1", False, type=bool)
+                self.settings.setValue("workbench_tools_collapsed_v1", collapsed)
+                self.settings.sync()
+                self._layout_error = ""
+                if self.settings.status() != QSettings.Status.NoError:
+                    self.settings.setValue("workbench_tools_collapsed_v1", previous)
+                    self.settings.sync()
+                    self._layout_error = "工具区布局保存失败，已恢复上次配置。"
             elif action == "shortcuts":
                 receipt = data.get("requestId")
                 if not isinstance(receipt, str) or not receipt or len(receipt) > 80:
@@ -433,6 +543,9 @@ class WebWorkbenchWindow(QMainWindow):
         self._publish_session()
 
     def _poll_session(self) -> None:
+        if time.monotonic() - self._appearance_refresh > 1:
+            self.appearance.refresh()
+            self._appearance_refresh = time.monotonic()
         self._check_close_failure()
         if self._stage == "cancel" and not self.host.operation_busy:
             # Cancellation can leave submitted results, unsaved edits, and UI drafts.
@@ -502,6 +615,14 @@ class WebWorkbenchWindow(QMainWindow):
                 "route": self._route,
                 "recents": self.navigation.recent(),
                 "shortcuts": self.shortcuts.snapshot(),
+                "appearance": self.appearance.snapshot(),
+                "layout": {
+                    "collapsed": self.settings.value(
+                        "workbench_tools_collapsed_v1", False, type=bool
+                    ),
+                    "receipt": self._layout_receipt,
+                    "error": self._layout_error,
+                },
                 "workspace": self.host.workspace_path,
                 "saveState": "处理中"
                 if self.host.operation_busy

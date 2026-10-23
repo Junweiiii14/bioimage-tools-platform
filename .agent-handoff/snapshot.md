@@ -1,15 +1,11 @@
-# Handoff Snapshot
+# 当前恢复指针
 
-- 当前任务唯一状态：[T073](../work/tasks/T-073-auto-crop-pause-diagnosis.md)，用户已批准六项修复，追加UI研究/方案/可交互HTML/软件一比一落实/前端专项审查，已创建完整计划目标。正在新工作树实施，非等待授权。
-- 活动树C:/Users/70236/.codex/worktrees/wb-reliable-crop-ui/bioimage-tools-platform，实施分支codex/t073-reliable-crop-ui，基线main941b424。T072产品44a独审/PR32→0630604，收尾PR33精确27811db四SUCCESS后已合941b424；安装冻结0630604不变。
-- 两平台各1013、本机1013/880.70s、全部wheel/真实OCR/PNG/check0；19已见组4自动15人工链180.688s0。原图/历史/局部修订/新旧输出/重开保持，非科学留出。
-- 新桌面BioImage-WB-自动流程修复测试版-T072，独立AutomaticFlowTest安装及四流程OS0、PS5.1新轮56.548s0、7753载荷一致。最终非作者产物审计绑定冻结main/installerSHA Accepted（71校验成员、309源码子集、4wheel178源文件）。详情见交付与T072 evidence。
-- 首外层observer因父PID复用误收昨天OneDrive.Sync.Service并停，微软签名同exe已重启确认；同步状态不作全验。原失败/原helper/恢复记录保留。新版仅观察、不自动终止，CIM微秒身份/出生顺序及独审11纯控制0，产品字节未改。轮询不声称采全短命后代。
-- 原主树27/旧grouped树10 dirty SHA/HEAD/status、T071 clean与旧安装/交付三SHA一致；.local/t072和桌面证据保留，不自动归档删除新树。T071冻结710bb、T069冻结608仍独立。
-- T073实际项目只读快照rev11：第一行N2被检测为3槽而暂停，疑似额外暗结构误计，人工后自动进入第二行；第二行唯一两泳道/−2.81°旧候选被后置膜校验丢弃。所选10张均被启发式分为merge，现有伙伴条件跳过白光；≥3组件方向门槛另使正常N2受限。详见任务/方案，私有证据仅.local/t073。30资产SHA保持，不动用户窗口。
-- 干净Win10/物理DPI/独立科学真值、旧native UNKNOWN及诊断P3旧文案保留。PR33首占位行失败不销账；最终两平台1013/Linux414.63s、Windows682.42s/child0及全部wheel/OCR通过，原日志.local/t072。当前恢复先核T073授权边界及新HEAD/dirty，不重复启动旧任务。
-
-- T073新增UI研究 docs/research/2026-10-21-wb-workbench-ui.md；HTML docs/prototypes/t073/index.html（本机127.0.0.1:8763，服务PID23608，IAB tab2已打开）。合成示例、N1–8、可配置/选图/自动阶段/必要暂停恢复/表格，显示角度仅交互示意；不是产品计算。原型首轮实际IAB1440/1024/390检查后修正图像缩略裁切和布局；最终完整确认/独立视觉审查未完成。
-- T073固定网格已提交a0e8e77，草稿PR34已创建：按N及原像素宽度整排对齐，W=Nw/H=.8w，允许模糊相连；实际膜轮廓、source_axis_partition@2和全部选定支持核验。最后只读all-ten-sampling-final-v1：第一行原人工框保持，其余9行8自动，1行标记与首带支持相连/宽度冲突仍暂停；不是科学准确率。原图/历史/旧dirty保持。
-- 已关闭UI预审问题；最后3项角度保存/主动作回归通过。独审指出背景扩展可读回干扰及局部bbox碎片质量丢失，现补sampling_limits/review_positions传实际请求及提交验证，待最终门禁和绑定提交独审。用户要求减少测试：仅受影响回归及PR/交付必需检查，不反复冒烟或复测无关UI。
-- 下一步：最终修复提交静态复核→PR34必需检查→main集成→独立安装交付。首a0e8e77两平台及本机1157过2败已保留；修复后定向及最终真实重放通过，不重复本地全量/冒烟。未构建/未交付；目标ACTIVE。
+- 当前任务T079：work/tasks/T-079-laboratory-offline-delivery.md。用户追加完整实验室安装包、本地旧版清理及GitHub整理。任务内闭合谓词为唯一状态来源，旧自动化目标已完成不代表本轮提前结束。
+- 活动树 C:/Users/70236/.codex/worktrees/wb-lab-installer/bioimage-tools-platform；分支codex/t079-laboratory-delivery。包装efd8d4f8fa9cd6c3b86a291d49ede9ad54bb971b；T077科学/导出/目录入口字节保持。最新整合PR39，实际精确HEAD四必需CI/merge结果查.local/T079-final-ci.json和GitHub。
+- 普通用户实验室版Setup383860684字节，SHA571a66b3e214ea2167c2208e19b8c399c0e46ef7aef3c6548fd457f456b18b8b。本机Win11更新安装/PS5.1双自检/19安装态回归/7788载荷及204源SHA通过。初包e97独审两项问题已修进efd；最终绑定审查见work/evidence/T-079，不能沿用初包摘要。
+- 下一步/结束复核：最终交付独审、最终文档HEAD四CI成功→正常merge PR39→关闭被替代35–38及只删安全已合入远端分支→桌面文件夹/ZIP冻结、成员SHA检查。实时收据t079-github-cleanup.json、t079-final-delivery.json；任一步未过保持未完成。native-case未运行不写通过。
+- 首轮62d91b0 CI Windows1223及wheel成功，Linux1222过1失败（过早读取下一crop running）。8d1889b仅修已保存/网页契约终态同步，原断言和时限保持；受控延迟旧红/新绿及独立750ms1过，详见T079 validation/绑定审查。原失败日志保留，新文档HEAD必须完整重检，包装efd不变。
+- 本地旧版已按证明清理50目录、10卸载exit0、6桌面死链接；另6StartMenu死链接可恢复移动归档。私有归档 C:/Users/70236/ResearchVault/Codex-Workbench/WB-归档-20261023-T079；未知文件/dirty备份逐SHA独审通过。净可用空间约+24.07GiB；保留原dirty源树及e97清理payload引用，不删除唯一数据。孤立WB-Quant卸载登记额外删除被自动审批blocked by policy，保留。
+- 视频研究聊天01a16507-01a9-7830-b7d3-cd674efc477b已按原授权创建，gpt-6-astra/ultra；wb-ui-system当前codex/t078-video-research，整个树保护。不复制聊天、不发送未经授权新指令、不新建自动化；本轮追加结束后补wb/memory.md。
+- 目标Win10 1809+/Win11 x64；仅本机Win11验证，干净Win10/逐台硬件/物理Explorer/OLE/DPI/外部表格显示/独立科学真值未验。历史native/GPU/mailbox根因UNKNOWN不销账。目标机首次运行随包自检与合成练习；未商业签名，遵守IT策略。
+- 旧T077短指针完整归档archive/T077-before-T079-snapshot.md；历史任务与失败仍可查，不据旧“保持安装”指令重建副本。

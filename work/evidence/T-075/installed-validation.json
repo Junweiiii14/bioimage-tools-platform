@@ -1,0 +1,96 @@
+{
+  "candidateCommit": "5c56f5509e8ad9381420e26af059e9c60501ebbb",
+  "installedDirectory": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB 界面系统测试版 5c56f55",
+  "installExit": 0,
+  "installLog": "C:\\Users\\70236\\.codex\\worktrees\\wb-ui-system\\bioimage-tools-platform\\.local\\t075-5c56f55-install.log",
+  "payload": {
+    "commit": "5c56f5509e8ad9381420e26af059e9c60501ebbb",
+    "source": "C:\\Users\\70236\\.codex\\worktrees\\wb-ui-system\\bioimage-tools-platform\\.local\\releases\\runtime-5c56f5509e8a\\app",
+    "installed": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB 界面系统测试版 5c56f55",
+    "count": 7780,
+    "missing": [],
+    "changed": [],
+    "equal": true
+  },
+  "payloadReportSha256": "92ec9dd71f99a96c5bf95493d483adcd66c4127c1b53dc4ec90982acdf1a84f5",
+  "runtime": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB 界面系统测试版 5c56f55\\runtime\\python.exe",
+  "origins": {
+    "bioimage_app": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB 界面系统测试版 5c56f55\\runtime\\Lib\\site-packages\\bioimage_app\\__init__.py",
+    "wb_tool": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB 界面系统测试版 5c56f55\\runtime\\Lib\\site-packages\\wb_tool\\__init__.py",
+    "platform_runtime": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB 界面系统测试版 5c56f55\\runtime\\Lib\\site-packages\\platform_runtime\\__init__.py",
+    "tool_contracts": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB 界面系统测试版 5c56f55\\runtime\\Lib\\site-packages\\tool_contracts\\__init__.py",
+    "PySide6": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB 界面系统测试版 5c56f55\\runtime\\Lib\\site-packages\\PySide6\\__init__.py"
+  },
+  "diskModulesVerified": 146,
+  "embeddedQtSupport": {
+    "PySide6.support.feature": "shibokensupport/feature.py",
+    "PySide6.support.signature": "shibokensupport/signature/__init__.py",
+    "PySide6.support.signature.mapping": "shibokensupport/signature/mapping.py",
+    "PySide6.support.signature.errorhandler": "shibokensupport/signature/errorhandler.py",
+    "PySide6.support.signature.layout": "shibokensupport/signature/layout.py",
+    "PySide6.support.signature.lib": "shibokensupport/signature/lib/__init__.py",
+    "PySide6.support.signature.parser": "shibokensupport/signature/parser.py",
+    "PySide6.support.signature.importhandler": "shibokensupport/signature/importhandler.py",
+    "PySide6.support.signature.lib.enum_sig": "shibokensupport/signature/lib/enum_sig.py",
+    "PySide6.support.signature.lib.pyi_generator": "shibokensupport/signature/lib/pyi_generator.py",
+    "PySide6.support.signature.lib.tool": "shibokensupport/signature/lib/tool.py"
+  },
+  "pytestExit": 0,
+  "tests": 3,
+  "seconds": 20.75,
+  "testScopes": [
+    "actual web template/metadata/OCR/normalization save/reopen/export",
+    "appearance host timer across two windows",
+    "synthetic Chinese composition field/focus/caret/draft baseline; initial publish may deduplicate"
+  ],
+  "acceptanceReport": "C:\\Users\\70236\\.codex\\worktrees\\wb-ui-system\\bioimage-tools-platform\\.local\\t075-5c56f55-installed-acceptance.json",
+  "acceptanceReportSha256": "ee29256cad4c2c8782d72024173a6892f598de2507a77b0ceb2bf6b0ba814805",
+  "acceptanceJUnitSha256": "6e6a657245f7db1a7ff3a6054c60ba54f320eb2395f6219b1931d4f51f67921b",
+  "supervision": {
+    "report": "C:\\Users\\70236\\AppData\\Local\\BioImage-WB-UI-System-Test\\Diagnostics\\20261022-030631-76ad97d8f3a4428ea17e2235b58168a3.json",
+    "reportSha256": "457976c3ea51d7c945e8d7e1562179dcabbb6cdf55e22504ac81ab2d1f024388",
+    "checks": [
+      "top-fields-one-start",
+      "no-human-crop-confirmations",
+      "real-workers",
+      "original-pixel-crops",
+      "display-correction",
+      "signal-direction-independent-of-guide",
+      "missing-is-not-zero",
+      "committed-output",
+      "original-preview-replaces-thumbnail",
+      "visible-gray-image",
+      "visible-results-table",
+      "automatic-navigation",
+      "stage-barriers",
+      "supervision-curve-grid-export",
+      "safe-reopen",
+      "grid-safe-reopen",
+      "originals-unchanged",
+      "owned-resources-closed",
+      "owned-window-deleted"
+    ],
+    "errors": [],
+    "phase": "passed",
+    "elapsed": 11.390999999945052,
+    "shutdown_stage": "shutdown",
+    "isolated_imports": true
+  },
+  "limitations": [
+    "Test harness borrows pytest dependencies only; all product/Qt disk modules and worker imports from installed private runtime.",
+    "Synthetic IME events do not prove physical keyboard/input-method compatibility.",
+    "Win11 local engineering acceptance; clean Win10, physical DPI and independent scientific holdout remain deferred.",
+    "Historic D3D/native UNKNOWN and passing-run SharedImage mailbox logs are retained."
+  ],
+  "changedSnapshotIme": {
+    "tests": 1,
+    "seconds": 3.91,
+    "pytestExit": 0,
+    "report": "C:\\Users\\70236\\.codex\\worktrees\\wb-ui-system\\bioimage-tools-platform\\.local\\t075-5c56f55-installed-ime-refresh-acceptance.json",
+    "reportSha256": "e1fae6104c50b1ba52f7969c03f4e89abeb4639191ee3aef1b1975e4aa98b740",
+    "junitSha256": "afb7762ee347317304c4e26b165b5f4f2edc7da4881b7417a5cebbdbb98fcbb1",
+    "method": "During active composition, increment fixture host revision, assert stateChanged emission payload and renderer state.revision consumption before checking same DOM/focus/value/caret/draft. No product changes.",
+    "helper": "C:\\Users\\70236\\.codex\\worktrees\\wb-ui-system\\bioimage-tools-platform\\.local\\test_t075_installed_ime.py",
+    "helperSha256": "5b74a1c8d15cf3eece35a3aece0b0df210abcfdc9d7921756cc4f74003705dfd"
+  }
+}

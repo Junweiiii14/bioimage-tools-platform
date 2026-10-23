@@ -159,6 +159,7 @@ from wb_tool.application.intake_output import (
     prepare_intake_outputs,
     record_intake_output,
 )
+from wb_tool.application.intake_result_table import IntakeVisibleTable, intake_visible_table
 from wb_tool.application.intake_revision import (
     begin_intake_group_revision,
     confirm_intake_group_revision,
@@ -166,6 +167,12 @@ from wb_tool.application.intake_revision import (
     revise_intake_grouping,
 )
 from wb_tool.application.intake_sequence import continue_intake_sequence, prepare_intake_sequence
+from wb_tool.application.intake_supervision import (
+    IntakeGrid,
+    WBIntakeGridProject,
+    revise_intake_grid,
+    revise_intake_quant,
+)
 from wb_tool.application.intake_workflow import (
     IntakeWorkflowLedger,
     IntakeWorkflowStep,
@@ -270,6 +277,12 @@ from wb_tool.application.project_restore import (
 )
 from wb_tool.application.quant_supervision import install_quant_request, update_quant_lane
 from wb_tool.application.standalone_quant import ManualQuantTarget, configure_manual_quantification
+from wb_tool.application.workbench_revision import (
+    apply_workbench_metadata,
+    prepare_workbench_revision,
+    revise_workbench_figure_order,
+    workbench_project_digest,
+)
 from wb_tool.application.worker_protocol import (
     AcceptedFrame,
     CancelFrame,
@@ -325,6 +338,14 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "apply_workbench_metadata",
+    "prepare_workbench_revision",
+    "revise_workbench_figure_order",
+    "workbench_project_digest",
+    "IntakeGrid",
+    "WBIntakeGridProject",
+    "revise_intake_grid",
+    "revise_intake_quant",
     "begin_intake_group_revision",
     "confirm_intake_group_revision",
     "revise_intake_grouping",
@@ -346,6 +367,8 @@ __all__ = [
     "install_export_discovery",
     "accept_export_selections",
     "export_intake_outputs",
+    "intake_visible_table",
+    "IntakeVisibleTable",
     "IntakeOutputEvidence",
     "IntakeOutputPreparation",
     "IntakeResultCell",

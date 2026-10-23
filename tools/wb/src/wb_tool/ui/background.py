@@ -68,6 +68,7 @@ class _Work(QObject):
                 job.operation
                 in (
                     "project_export",
+                    "intake_table_export",
                     "project_ocr_export",
                     "project_normalization_export",
                     "quant_export",
@@ -161,6 +162,32 @@ class _Work(QObject):
                 )
                 if cancel():
                     raise ValueError("裁剪执行准备已取消")
+            elif job.operation in {
+                "intake_grid_preview",
+                "intake_grid_export",
+                "intake_single_export",
+            }:
+                from wb_tool.adapters.figure_image_export import publish_rendered_image
+                from wb_tool.adapters.intake_figure import load_intake_figure_render
+                from wb_tool.adapters.intake_grid import grid_preview, render_intake_grid
+                from wb_tool.application.intake_output import WBIntakeOutputProject
+
+                if not isinstance(job.document, WBIntakeOutputProject):
+                    raise ValueError("缺少当前Fig输出项目")
+                rendered = (
+                    load_intake_figure_render(job.document, job.row_id, job.path, cancelled=cancel)
+                    if job.operation == "intake_single_export"
+                    else render_intake_grid(job.document, job.sources, cancelled=cancel)
+                )
+                value = (
+                    grid_preview(rendered)
+                    if job.operation == "intake_grid_preview"
+                    else str(
+                        publish_rendered_image(
+                            rendered, job.document.template.dpi, job.destination, cancelled=cancel
+                        )
+                    )
+                )
             elif job.operation == "intake_output_export":
                 from wb_tool.adapters.intake_output import export_intake_outputs
                 from wb_tool.application.intake_output import WBIntakeOutputProject
@@ -373,6 +400,17 @@ class _Work(QObject):
                     raise ValueError("缺少定量项目")
                 value = str(
                     export_wbquant_table(
+                        job.document, job.project_results, job.destination, cancelled=cancel
+                    )
+                )
+            elif job.operation == "intake_table_export":
+                from wb_tool.adapters.intake_table_export import export_intake_table
+                from wb_tool.application.intake_output import WBIntakeOutputProject
+
+                if not isinstance(job.document, WBIntakeOutputProject):
+                    raise ValueError("缺少仪器结果项目")
+                value = str(
+                    export_intake_table(
                         job.document, job.project_results, job.destination, cancelled=cancel
                     )
                 )

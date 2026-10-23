@@ -1,0 +1,118 @@
+{
+  "schema": 1,
+  "diagnostic": "supervision_installed@1",
+  "phase": "passed",
+  "failed_phase": "",
+  "shutdown_stage": "shutdown",
+  "checks": [
+    "top-fields-one-start",
+    "no-human-crop-confirmations",
+    "real-workers",
+    "original-pixel-crops",
+    "display-correction",
+    "signal-direction-independent-of-guide",
+    "missing-is-not-zero",
+    "committed-output",
+    "original-preview-replaces-thumbnail",
+    "visible-gray-image",
+    "visible-results-table",
+    "automatic-navigation",
+    "stage-barriers",
+    "supervision-curve-grid-export",
+    "safe-reopen",
+    "grid-safe-reopen",
+    "originals-unchanged",
+    "owned-resources-closed",
+    "owned-window-deleted"
+  ],
+  "errors": [],
+  "elapsed": 11.342999999999847,
+  "runtime_executable": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB 界面系统测试版 971d860\\runtime\\python.exe",
+  "package_file": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB 界面系统测试版 971d860\\runtime\\Lib\\site-packages\\bioimage_app\\installation_check_sequence.py",
+  "isolated_imports": true,
+  "release_channel": "wb-ui-system-test",
+  "worker_pids": [
+    13452,
+    25764
+  ],
+  "page_modes": [
+    "intake",
+    "intake",
+    "review",
+    "layout",
+    "quant",
+    "results"
+  ],
+  "stage_events": [
+    {
+      "stage": "crop",
+      "target": "group-f35ad5e501bb8e7b53cc935fa613e63f",
+      "attempt": 1,
+      "revision": 4
+    },
+    {
+      "stage": "crop",
+      "target": "group-f35ad5e501bb8e7b53cc935fa613e63f",
+      "attempt": 2,
+      "revision": 6
+    },
+    {
+      "stage": "crop",
+      "target": "group-0f45acced89efaa6eb1a21d1bb2bfc31",
+      "attempt": 1,
+      "revision": 8
+    },
+    {
+      "stage": "crop",
+      "target": "group-0f45acced89efaa6eb1a21d1bb2bfc31",
+      "attempt": 2,
+      "revision": 10
+    },
+    {
+      "stage": "compose",
+      "target": "949d4b33-336c-4c3b-93a8-3d8281ebdb1b",
+      "attempt": 1,
+      "revision": 12
+    },
+    {
+      "stage": "compose",
+      "target": "4cbb2cc1-0ff3-4fa4-979b-389fb02321f2",
+      "attempt": 1,
+      "revision": 14
+    },
+    {
+      "stage": "measure",
+      "target": "949d4b33-336c-4c3b-93a8-3d8281ebdb1b",
+      "attempt": 1,
+      "revision": 16
+    },
+    {
+      "stage": "measure",
+      "target": "4cbb2cc1-0ff3-4fa4-979b-389fb02321f2",
+      "attempt": 1,
+      "revision": 18
+    },
+    {
+      "stage": "export",
+      "target": "479d594293f24055b07f76af14851745",
+      "attempt": 1,
+      "revision": 20
+    },
+    {
+      "stage": "measure",
+      "target": "949d4b33-336c-4c3b-93a8-3d8281ebdb1b",
+      "attempt": 2,
+      "revision": 24
+    },
+    {
+      "stage": "export",
+      "target": "479d594293f24055b07f76af14851745",
+      "attempt": 2,
+      "revision": 26
+    }
+  ],
+  "stage_event_source": "committed-save-callback",
+  "last_status": "缩略图加载结束；0 张失败。",
+  "corrected_rows": [],
+  "limitations": "Synthetic uint16 paired-guide images, automatic crop, N=4/5. Engineering page/worker/output checks; not scientific accuracy, physical input/DPI or clean Windows acceptance."
+}

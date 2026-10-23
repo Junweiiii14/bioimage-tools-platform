@@ -1,5 +1,7 @@
 # Validation Index
 
+当前T079检查见 work/evidence/T-079/validation.md、独审和任务闭合谓词；efd包装实际更新/PS5.1双模式/19安装态/7788载荷及204源码SHA均0，最终PR39文档HEAD CI与merge/桌面冻结只认实时收据，未提前标过。以下旧版本均为历史，不代表当前安装/通过。
+
 当前T072产品44a独审Accepted、PR32四检查集成main0630604；两平台1013与本机1013/全部wheel/OCR/check0，新独立AutomaticFlowTest安装/四流程/PS5.1新轮/7753载荷通过，最终审计及收尾见[T072](../work/tasks/T-072-automatic-flow-repair.md)和[交付](../docs/wb-automatic-flow-repair-delivery.md)。首外层观察器误停OneDrive已重启，失败/修复证据保留，非产品静默改包。以下T071/T069/T060均为历史记录。
 
 
@@ -46,3 +48,38 @@ T065最终产品708d2d7：初审两P2和一UI文案修正，作者34/29.12s实�
 | 2026-10-21 | T073 首安全采样回归与全门禁 | sampling-safety-targeted / final-check-1 | 37过1败（测试构造原扩展约束），后修正；全门禁止于8项测试类型错，pytest/wheel未运行。日志.local/t073保留 |
 
 | 2026-10-21 | T073 a0e8e77全门禁与修复 | 本机/CI各1157过2败，wheel未执行；增量33项31过2败→仅失败2项通过 | 原科学失败修复，旧版本检查升级；GPU按CI软件渲染；最终真实1人工8自动1暂停，30SHA保持；不复跑全量/冒烟 |
+
+
+## 2026-10-21 T074
+
+受影响检查及真实初败/修复记录见 work/tasks/T-074-curves-fig-grid.md；产品dbd29ed和诊断054a163独立Accepted。新候选构建成功，安装/相关流程与最终CI尚待记录。不重复旧全量或冒烟。
+
+T074最终：569674a独审后构建，安装版PS5.1相关流程19checks/10.875秒/exit0；包态原路径及SHA见work/evidence/T-074/delivery.md。最终PR35门禁实时状态独立于历史记录。
+
+T074当前e47af46：并排概览4项相关UI回归通过；独审指出拖动过期后补1项通过。导航竞态2项定向通过；新安装19checks/11.141秒/exit0。旧569/c3c9安装结论只作历史；最终CI看PR35当前HEAD。
+
+T074当前c90b0e5：整个Fig矩阵跨蛋白选择、缺项草稿恢复定向通过；独审Accepted。86c9包态重开超时保留，修诊断position回执后c90新包19checks/11.437秒/exit0。源码9.219秒仅定位。CI旧夹具/等待修复不改全部done断言；最终HEAD以PR35为准。
+
+## 2026-10-22 T075 候选交付
+
+5c56f55构建/安装0，34前端source/wheel/install相同、7780载荷相同；Windows原生Qt6.12/Chromium140、DPR1.5固定26图逐像素与records相同，高缩放2.25。实际安装私有Python四高级工具/跨窗/IME基线3项20.75s、强制新revision IME另1项3.91s，19项selfcheck11.391s均0；代码/视觉限定范围与本机交付独审Accepted。动态278帧/约7.99s；3次CDP点击下一帧19.2/13.5/9.6ms，不是物理延迟保证。桌面完整交付目录已建立。
+
+CI180真实失败：Windows1191过1败746.36s/child1、Linux关闭回收15min取消，均未到wheel；根因UNKNOWN。697c428只添加原子失败字段与捕获正常刷新诊断，原断言/timeout/gate及产品不变，独审Accepted；本机相关3项4.57s、WSL4项6.83s通过。CI181/run39660837328：Windows1192/692.49s/child0；Linux1192/480.61s/debugger0，全部隔离wheel/真实OCR、规则143和桌面依赖成功。最后证据提交必须核对当前HEAD成功，最终在线记录在.local/t075-final-ci.json；旧失败、科学留出/干净Win10/物理DPI/native UNKNOWN不销账。
+
+## 2026-10-22 T076 平台首页与矩阵滚动
+
+- 最新基线7fcb819，产品d3aff15：作者56项37.80s/0，独审21项19.06s/0；代码Accepted，12图有限视觉ship。Ruff/格式/Pyright/提交policy通过。
+- 源码/wheel/桌面HTML36前端文件一致；直接file入口/字体/两处指针反馈/快速导航/矩阵末格烟测0。初次失败、修正与边界见 work/evidence/T-076/validation.md。
+- 当前HEAD四必要CI成功后保存.local/t076-final-ci.json/桌面验收；HTML阶段未替换T075安装，随后用户追加安装见下条；不以预览推安装/科学/硬件验收。
+
+- T076用户追加安装：971d860安装0，实际私有运行库19项26.97s/0，主链19检查11.343s/0，7782载荷/36前端一致；现用入口更新，旧目录保留。对照12图差异限定见installation.md。用户窗口已启动且保持，不自动关闭。
+
+- 安装交付独审971d860 Accepted。首轮Linux CI1201过1败500.09s/exit1，跨窗主题用例等真实首会话快照后Windows定向1过4.18s/0；不改变产品/资源/超时/断言。最终HEAD增量复核与CI单列。
+
+## 2026-10-23 T077
+
+12新增/原生桌面实际worker及导出回归13.25s/exit0，4张截图已打开；首扩展94过1夹具失败与截图/保存展示失败保留在T077 validation。最终独审/CI待执行。
+
+## 2026-10-23 T077 最终独立验证
+
+产品c32ad11作者22项11.67s/0、非作者24项12.16s/0；独立39成员摘要和严格旧ZIP恢复相等；5静态Qt图ship。PR38最终HEAD四必要CI运行事实只认.local/T077-final-ci.json，未完不能写成功。没有本地重跑全量、安装/物理目标机或外部表格软件验收。

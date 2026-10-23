@@ -32,6 +32,7 @@ from wb_tool.api import (
 )
 
 from bioimage_app.figure_window import FigureProjectWindow
+from bioimage_app.web_advanced import AdvancedCommands
 from bioimage_app.web_intake import apply_intake_command
 from bioimage_app.web_manual_quant import ManualQuantCommands
 from bioimage_app.web_quant import quant_snapshot
@@ -67,6 +68,7 @@ class WorkbenchBridge(QObject):
     progressChanged = Signal(str)
     sessionRequested = Signal(str, str)
     sessionStateChanged = Signal(str)
+    advancedStateChanged = Signal(str)
 
     @Slot(str, str)
     def session(self, action: str, payload: str = "{}") -> None:
@@ -76,9 +78,12 @@ class WorkbenchBridge(QObject):
     def replace_host(self, host: FigureProjectWindow) -> None:
         self.session_epoch += 1
         self.manual_commands = ManualQuantCommands(self)
+        self.advanced_commands = AdvancedCommands(self)
         self.host.automatic.finished.disconnect(self._automatic_completed)
+        self.host.intake_stage_committed.disconnect(self.publish)
         self.host = host
         self.host.automatic.finished.connect(self._automatic_completed)
+        self.host.intake_stage_committed.connect(self.publish)
         self._previous = ""
         self._previous_progress = ""
         self._published_key = None
@@ -119,7 +124,9 @@ class WorkbenchBridge(QObject):
         self._quant_overview: tuple[str, str] | None = None
         self._pending_source: tuple[str, str] | None = None
         self.manual_commands = ManualQuantCommands(self)
+        self.advanced_commands = AdvancedCommands(self)
         self.host.automatic.finished.connect(self._automatic_completed)
+        self.host.intake_stage_committed.connect(self.publish)
         self.timer = QTimer(self)
         self.timer.setInterval(180)
         self.timer.timeout.connect(self.publish)
@@ -193,6 +200,13 @@ class WorkbenchBridge(QObject):
                         )
                     intake["zoom"] = {"sourceId": source_id, "preview": self._intake_zoom}
             intake["issues"] = list(self.host.intake.issues)
+            from wb_tool.api import IntakeGrid, WBIntakeGridProject
+
+            intake["grid"] = (
+                project.grid
+                if isinstance(project, WBIntakeGridProject)
+                else IntakeGrid(columns=min(3, max(1, len(project.intake.figures))))
+            ).model_dump(mode="json")
             intake["outputParent"] = self.host.intake_workflow.output_parent(project)
             intake["automation"] = self.host.intake_workflow.batch_snapshot(project)
             if (
@@ -282,6 +296,8 @@ class WorkbenchBridge(QObject):
             ):
                 if intake_preview and intake is not None:
                     intake["displayFigureId"] = binding.get("figure_id")
+                if intake is not None and manifest.get("aggregate"):
+                    intake["displayFigureId"] = "__all__"
                 montage = self._montage
                 montage_width, montage_height = rendered.width, rendered.height
                 for item in manifest.get("rows", []):
@@ -356,6 +372,14 @@ class WorkbenchBridge(QObject):
                             }
                         )
         cells = [cell_state(c) for c in view.analysis.result_view.cells]
+        if intake is not None and isinstance(project, WBIntakeProject):
+            from dataclasses import asdict
+
+            from wb_tool.api import intake_visible_table
+
+            intake["visibleTable"] = asdict(
+                intake_visible_table(project, view.analysis.result_view.cells)
+            )
         rows: list[dict[str, object]] = []
         crop_steps = (
             {s.target_id: s.status for s in project.workflow.steps if s.stage == "crop"}
@@ -449,6 +473,7 @@ class WorkbenchBridge(QObject):
 
     @Slot()
     def publish(self) -> None:
+        self.advanced_commands.poll()
         if self.host.resources_closed:
             self.timer.stop()
             return
@@ -516,6 +541,8 @@ class WorkbenchBridge(QObject):
                 262144
                 if action
                 in {
+                    "advanced_ui",
+                    "intake_grid_save",
                     "intake_plan",
                     "intake_assign",
                     "intake_grouping",
@@ -537,12 +564,19 @@ class WorkbenchBridge(QObject):
             elif action == "cancel":
                 self._quant_overview = None
                 self.host.cancel()
+            elif action == "advanced_ui":
+                self.advanced_commands.command(data)
             elif self.host.is_closing or (
                 self.host.operation_busy
                 and action not in {"select", "quant_select", "intake_measurement_preview"}
             ):
                 raise ValueError("当前任务仍在处理中，请稍候或取消")
             elif isinstance(self.host.view.project(), WBIntakeProject) and action not in {
+                "quant_edit",
+                "intake_grid_save",
+                "intake_grid_preview",
+                "intake_grid_export",
+                "intake_single_export",
                 "intake_sequence_start",
                 "intake_choose_output",
                 "intake_grouping",
@@ -570,6 +604,15 @@ class WorkbenchBridge(QObject):
                 "retry_location",
             }:
                 raise ValueError("仪器清单项目请使用阶段执行、原图复核和已保存Fig入口")
+            elif action in {
+                "intake_grid_save",
+                "intake_grid_preview",
+                "intake_grid_export",
+                "intake_single_export",
+            }:
+                from bioimage_app.web_intake_supervision import apply_supervision
+
+                apply_supervision(self, action, data)
             elif action in {
                 "intake_sequence_start",
                 "intake_choose_output",
@@ -812,6 +855,10 @@ class WorkbenchBridge(QObject):
             self._error = ""
         except (ValueError, TypeError) as error:
             self._error = str(error)
+            if action == "advanced_ui":
+                request_id = data.get("requestId")
+                if isinstance(request_id, str) and 0 < len(request_id) <= 80:
+                    self.advanced_commands.emit(request_id, "failed", str(error))
             if action == "intake_sequence_start":
                 self.sequence_response = {
                     "projectId": data.get("projectId"),
@@ -1000,6 +1047,38 @@ class WorkbenchBridge(QObject):
                 baseline = Baseline(float(cast(float, raw[0])), float(cast(float, raw[1])))
         else:
             raise ValueError("缺少泳道范围或积分边界")
+        if isinstance(project, WBIntakeFigureProject):
+            from wb_tool.api import intake_workflow_digest, revise_intake_quant
+
+            if roi is not None or bounds is None or baseline is None:
+                raise ValueError("批处理曲线仅调整积分边界与封底；裁剪请使用明确入口")
+            updated_batch = revise_intake_quant(
+                project,
+                row.row_id,
+                annotation.roi.lane_id,
+                band_id=band_id,
+                bounds=bounds,
+                baseline=baseline,
+            )
+            generation, epoch = self.host.view.generation, self.session_epoch
+            self.host.save(
+                transform=lambda saved: type(updated_batch).model_validate(
+                    {
+                        **dict(updated_batch),
+                        "revision": saved.revision,
+                    }
+                ),
+                install_guard=lambda: (
+                    self.host.view.generation == generation
+                    and self.session_epoch == epoch
+                    and not self.host.is_closing
+                    and not self.host.cancellation.is_set()
+                ),
+                after=lambda: self.host.intake_workflow.start(
+                    intake_workflow_digest(cast(WBIntakeFigureProject, self.host.view.project()))
+                ),
+            )
+            return
         updated = update_quant_lane(
             project,
             row.row_id,

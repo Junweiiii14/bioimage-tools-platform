@@ -201,7 +201,8 @@ def test_batch_navigation_follows_real_phase_but_preserves_human_draft(
     javascript(
         window,
         qtbot,
-        "document.querySelector('[data-intake-crop-action=discard]').click();intakeWorkspace.followBatch();true",
+        "document.querySelector('[data-intake-crop-action=discard]').click();"
+        "intakeWorkspace.followBatch();true",
     )
     assert javascript(window, qtbot, "mode==='layout'")
     javascript(
@@ -404,8 +405,12 @@ def test_batch_profiles_show_only_current_committed_row_and_keep_narrow_peak(
         qtbot,
         """
       const profile=Array.from({length:2048},(_,i)=>i===1001?100:0);
-      setState({selectedId:'protein-a',rows:[{id:'protein-a',protein:'A',fig:'Fig 1',lanes:6}],
-        quant:{group:{rows:[{rowId:'protein-a',lanes:[{lane:1,roi:{y:20},profile}]}]}},
+      const lanes=[{lane:1,roi:{y:20},profile,bands:[{id:'target',start:998,end:1004,
+        baselineStart:0,baselineEnd:0,reason:''}]}];
+      setState({selectedId:'protein-a',rows:[{id:'protein-a',sourceId:'src',
+          protein:'A',fig:'Fig 1',lanes:6}],
+        quant:{rowId:'protein-a',revision:1,sourceId:'src',status:'ready',lanes,
+          group:{rows:[{rowId:'protein-a',lanes}]}},
         intake:{...state.intake,cropEnabled:true,figureEnabled:true,crops:[],
           figuresReady:[{figure_id:'fig-a',row_ids:['protein-a'],image:{sha256:'fig'}}],
           workflow:{policy:'intake_workflow@3',digest:'profiles',steps:[]}}});
@@ -413,25 +418,72 @@ def test_batch_profiles_show_only_current_committed_row_and_keep_narrow_peak(
     """,
     )
     assert javascript(
-        window, qtbot, "document.querySelectorAll('.intake-profile-grid polyline').length===1"
+        window, qtbot, "document.querySelectorAll('.intake-profile-panel .quant-curve').length===1"
     )
     assert javascript(
         window,
         qtbot,
-        "document.querySelector('.intake-profile-grid polyline')"
-        ".getAttribute('points').includes(',12.00')",
+        "!!document.querySelector('.intake-profile-panel .quant-baseline')"
+        " && !!document.querySelector('.intake-profile-panel .quant-fill')",
     )
     assert javascript(
         window,
         qtbot,
-        "document.querySelector('.intake-profile-grid').textContent.includes('2067 px')",
+        "document.querySelector('.intake-profile-panel .quant-curve')"
+        ".getAttribute('d').split('L').length===2048",
     )
+    javascript(
+        window,
+        qtbot,
+        "document.querySelector('[data-iq-lane]').click();"
+        "const input=document.querySelector('[data-iq-field=baselineStart]');input.value='3';"
+        "input.dispatchEvent(new Event('change',{bubbles:true}));true",
+    )
+    assert javascript(
+        window, qtbot, "intakeQuant.hasDraft() && !sent.some(x=>x.action==='quant_edit')"
+    )
+    javascript(window, qtbot, "document.querySelector('[data-iq-action=undo]').click();true")
+    assert javascript(
+        window, qtbot, "document.querySelector('[data-iq-field=baselineStart]').value==='0'"
+    )
+    javascript(
+        window,
+        qtbot,
+        "document.querySelector('[data-iq-action=redo]').click();"
+        "document.querySelector('[data-iq-action=save]').click();true",
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "sent.at(-1).action==='quant_edit'"
+        " && sent.at(-1).payload.baselineStart===3 && sent.at(-1).payload.id==='protein-a'",
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      state.quant.status='pending';state.quant.lanes[0].profile=[];
+      state.quant.lanes[0].bands[0].baselineStart=3;
+      intakeWorkspace.renderActive();
+      document.querySelector('[data-iq-action=all]').click();true
+    """,
+    )
+    assert javascript(
+        window, qtbot, "document.querySelector('[data-iq-lane]').textContent.includes('处理草稿')"
+    )
+    javascript(window, qtbot, "document.querySelector('[data-iq-lane]').click();true")
+    assert javascript(
+        window, qtbot, "!!document.querySelector('.intake-profile-panel .quant-curve')"
+    )
+    assert javascript(window, qtbot, "!document.querySelector('[data-iq-action=discard-stale]')")
+    javascript(window, qtbot, "document.querySelector('[data-iq-action=discard]').click();true")
+    assert javascript(window, qtbot, "!intakeQuant.hasDraft()")
     javascript(window, qtbot, "setState({quant:{group:{rows:[{rowId:'other',lanes:[]}]}}});true")
     assert javascript(
         window,
         qtbot,
-        "!document.querySelector('.intake-profile-grid polyline') && "
-        "document.querySelector('.intake-profile-panel').textContent.includes('等待')",
+        "!document.querySelector('.intake-profile-panel .quant-curve')"
+        " && document.querySelector('.intake-profile-panel').textContent.includes('等待')",
     )
 
 
@@ -606,7 +658,7 @@ def test_intake_fig_routes_preserve_saved_preview_results_and_source_identity(
         window, qtbot, "!document.querySelector('[data-edit-row=protein-b]').disabled"
     )
     javascript(window, qtbot, "document.querySelector('[data-edit-row=protein-b]').click();true")
-    assert javascript(window, qtbot, "mode==='review'&&state.selectedId==='protein-b'")
+    assert javascript(window, qtbot, "mode==='layout'&&state.selectedId==='protein-b'")
     javascript(window, qtbot, "switchMode('results');true")
     bridge_snapshot(window, qtbot, "({...state,status:'记录保持'})")
     assert javascript(window, qtbot, "mode==='results'")
@@ -683,7 +735,8 @@ def test_intake_fig_routes_preserve_saved_preview_results_and_source_identity(
     javascript(
         window,
         qtbot,
-        "switchMode('results');document.querySelector('[data-intake-crop-action=previous-results]').click();true",
+        "switchMode('results');"
+        "document.querySelector('[data-intake-crop-action=previous-results]').click();true",
     )
     assert javascript(window, qtbot, "document.querySelectorAll('#results-body tr').length") == 200
 
@@ -1596,8 +1649,8 @@ def test_manual_browsing_keeps_page_and_selection_until_follow_is_requested(
         w,
         qtbot,
         """
-      document.querySelector('[data-row=protein-b]').focus();
-      document.querySelector('[data-row=protein-b]').click();
+      document.querySelector('[data-ig-row=protein-b]').focus();
+      document.querySelector('[data-ig-row=protein-b]').click();
       setState({intake:{...state.intake,automation:{...state.intake.automation,
         phase:'measure',targetId:'fig-a'}}});true
     """,
@@ -1606,7 +1659,7 @@ def test_manual_browsing_keeps_page_and_selection_until_follow_is_requested(
         w,
         qtbot,
         "mode==='layout' && row().id==='protein-b' && "
-        "document.activeElement.dataset.row==='protein-b'",
+        "document.activeElement.dataset.igRow==='protein-b'",
     )
     javascript(w, qtbot, "document.querySelector('[data-batch-action=follow]').click();true")
     assert javascript(w, qtbot, "mode==='quant'")
@@ -1694,15 +1747,22 @@ def test_rotation_preview_and_one_real_click_commit(
     )
     assert isinstance(coordinates_json, str)
     coordinates = TypeAdapter(tuple[float, float]).validate_json(coordinates_json)
-    assert javascript(
+    interaction_json = javascript(
         window,
         qtbot,
-        "angleInput.value==='4.8' && document.elementFromPoint("
+        "(()=>{const hit=document.elementFromPoint("
         + str(coordinates[0])
         + ","
         + str(coordinates[1])
-        + ")?.matches('[data-intake-crop-action=run]')",
+        + ");return JSON.stringify({value:angleInput.value,"
+        "runHit:!!hit?.matches('[data-intake-crop-action=run]'),"
+        "active:document.activeElement?.outerHTML,hit:hit?.outerHTML,"
+        "connected:angleInput.isConnected,fonts:document.fonts.status,"
+        "viewport:[innerWidth,innerHeight],animations:document.getAnimations().length})})()",
     )
+    assert isinstance(interaction_json, str)
+    interaction = json.loads(interaction_json)
+    assert interaction["value"] == "4.8" and interaction["runHit"], interaction
     QTest.mouseClick(
         focus,
         Qt.MouseButton.LeftButton,
@@ -1780,4 +1840,258 @@ def test_narrow_measurement_details_are_visible_and_stable(
     )
     assert javascript(
         window, qtbot, "detailsButton.isConnected && document.activeElement===detailsButton"
+    )
+
+
+def test_grid_draft_order_save_and_missing_export(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        """
+      setState({intake:{...state.intake,confirmed:true,figureEnabled:true,cropEnabled:true,
+        outputEnabled:true,displayFigureId:'fig-a',grid:{columns:2,gap:40,order:[]},
+        figures:[{figure_id:'fig-a',label:'A',lane_count:6},
+                 {figure_id:'fig-b',label:'B',lane_count:6}],
+        figuresReady:[{figure_id:'fig-a',row_ids:['protein-a','protein-b']}],
+        workflow:{digest:'grid-guard',editing:false,steps:[]}}});
+      switchMode('layout');true
+    """,
+    )
+    assert javascript(window, qtbot, "document.querySelector('[data-ig-export=all]').disabled")
+    javascript(
+        window,
+        qtbot,
+        """
+      const field=document.querySelector('[data-ig-field=columns]');field.value='1';
+      field.dispatchEvent(new Event('change',{bubbles:true}));
+      document.querySelector('[data-ig-down="0"]').click();
+      document.querySelector('[data-ig-save]').click();true
+    """,
+    )
+    raw = javascript(window, qtbot, "JSON.stringify(sent.at(-1))")
+    assert isinstance(raw, str)
+    request = json.loads(raw)
+    assert request["action"] == "intake_grid_save"
+    assert request["payload"]["grid"] == {"columns": 1, "gap": 40, "order": ["fig-b", "fig-a"]}
+    assert request["payload"]["workflowDigest"] == "grid-guard"
+    assert javascript(window, qtbot, "mode==='layout'&&intakeGrid.hasDraft()")
+    javascript(window, qtbot, "intakeGrid.reset();true")
+    assert javascript(window, qtbot, "!intakeGrid.hasDraft()")
+
+
+@pytest.mark.parametrize("changed", ["source", "geometry"])
+def test_batch_curve_draft_cannot_fill_changed_source_or_geometry(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot, changed: str
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        """
+      window.draftLane={lane:1,roi:{y:0,height:3},profile:[0,10,0],
+        bands:[{id:'target',start:0,end:2,baselineStart:0,baselineEnd:0}]};
+      setState({selectedId:'protein-a',rows:[{id:'protein-a',sourceId:'src',
+        protein:'A',fig:'Fig 1',lanes:6}],
+        quant:{rowId:'protein-a',revision:1,status:'ready',
+        lanes:[draftLane]}});
+      const protein={protein_id:'protein-a',label:'A'};
+      document.querySelector('#inspector-content').innerHTML=intakeQuant.markup([draftLane],protein);
+      document.querySelector('[data-iq-lane]').click();
+      document.querySelector('#inspector-content').innerHTML=intakeQuant.markup([draftLane],protein);
+      const input=document.querySelector('[data-iq-field=baselineStart]');input.value='1';
+      input.dispatchEvent(new Event('change',{bubbles:true}));true
+    """,
+    )
+    mutation = (
+        "state.rows.find(r=>r.id==='protein-a').sourceId='new-source';"
+        if changed == "source"
+        else "draftLane.roi={y:4,height:3};"
+    )
+    javascript(
+        window,
+        qtbot,
+        mutation
+        + """
+      draftLane.profile=[];state.quant.lanes=[draftLane];
+      document.querySelector('#inspector-content').innerHTML=intakeQuant.markup(
+        [draftLane],{protein_id:'protein-a',label:'A'});true
+    """,
+    )
+    assert javascript(window, qtbot, "!!document.querySelector('[data-iq-action=discard-stale]')")
+    assert javascript(window, qtbot, "!document.querySelector('#inspector-content .quant-curve')")
+    javascript(
+        window, qtbot, "document.querySelector('[data-iq-action=discard-stale]').click();true"
+    )
+    assert javascript(window, qtbot, "!intakeQuant.hasDraft()")
+
+
+def test_batch_lane_overview_cards_open_bounded_editor_and_drag_preview(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        """
+      const lanes=Array.from({length:5},(_,i)=>({lane:i+1,roi:{y:20},
+        profile:[0,2,5,8,5,2,0],bands:[{id:'target',start:1,end:5,
+        baselineStart:1,baselineEnd:1,reason:''}]}));
+      setState({selectedId:'protein-a',rows:[{id:'protein-a',sourceId:'src',
+        protein:'A',fig:'Fig 1',lanes:5}],
+        quant:{rowId:'protein-a',revision:1,sourceId:'src',status:'ready',lanes,
+          group:{rows:[{rowId:'protein-a',lanes}]}},
+        intake:{...state.intake,cropEnabled:true,figureEnabled:true,crops:[],
+          figuresReady:[{figure_id:'fig-a',row_ids:['protein-a'],image:{sha256:'fig'}}],
+          workflow:{policy:'intake_workflow@3',digest:'profiles',steps:[]}}});
+      switchMode('quant');true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        """(()=>{
+      const cards=[...document.querySelectorAll('.intake-curve-card')];
+      return cards.length===5 && cards[1].offsetLeft>cards[0].offsetLeft &&
+        cards.every(c=>c.getBoundingClientRect().height<180) &&
+        !document.querySelector('[data-iq-point]');})()""",
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      document.querySelector('[data-iq-lane="3"] svg').dispatchEvent(
+        new MouseEvent('click',{bubbles:true}));true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        """
+      intakeQuant.selectedLane()===3 && document.querySelectorAll('[data-iq-point]').length===4 &&
+      document.querySelector('.intake-quant-lane .quant-chart').getBoundingClientRect().height===220
+    """,
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      const point=document.querySelector('[data-iq-point=baselineStart]');
+      const rect=point.closest('svg').getBoundingClientRect();
+      const capture=document.body.setPointerCapture;
+      document.body.setPointerCapture=()=>{};
+      point.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:1,
+        clientX:rect.left+100,clientY:rect.top+100}));
+      document.body.setPointerCapture=capture;
+      const baseline=()=>document.querySelector('.intake-quant-lane .quant-baseline');
+      window.dragBefore=baseline().getAttribute('d');
+      document.body.dispatchEvent(new PointerEvent('pointermove',{bubbles:true,pointerId:1,
+        clientX:rect.left+100,clientY:rect.top+70}));
+      window.dragChanged=dragBefore!==baseline().getAttribute('d');
+      document.body.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerId:1,
+        clientX:rect.left+100,clientY:rect.top+70}));true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        "dragChanged && intakeQuant.hasDraft() && !sent.some(x=>x.action==='quant_edit')",
+    )
+    javascript(window, qtbot, "document.querySelector('[data-iq-action=save]').click();true")
+    assert javascript(
+        window, qtbot, "sent.at(-1).action==='quant_edit' && sent.at(-1).payload.lane===3"
+    )
+
+    javascript(
+        window,
+        qtbot,
+        """
+      intakeQuant.reset();intakeWorkspace.renderActive();
+      document.querySelector('[data-iq-lane="1"]').click();
+      const stalePoint=document.querySelector('[data-iq-point=baselineStart]');
+      const staleRect=stalePoint.closest('svg').getBoundingClientRect();
+      const oldCapture=document.body.setPointerCapture;
+      document.body.setPointerCapture=()=>{};
+      stalePoint.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:2,
+        clientX:staleRect.left+100,clientY:staleRect.top+100}));
+      document.body.setPointerCapture=oldCapture;
+      state.quant.revision++;state.quant.lanes[0].roi={y:21};
+      document.body.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerId:2,
+        clientX:staleRect.left+100,clientY:staleRect.top+50}));true
+    """,
+    )
+    assert javascript(window, qtbot, "!intakeQuant.hasDraft()")
+
+
+def test_fig_matrix_shows_all_proteins_and_waits_for_selected_row_snapshot(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    javascript(
+        window,
+        qtbot,
+        """
+      const matrixLanes=id=>Array.from({length:2},(_,i)=>({lane:i+1,roi:{y:10},
+        profile:[0,2,5,2,0],bands:[{id:'target',start:0,end:4,
+        baselineStart:0,baselineEnd:0,reason:''}]}));
+      window.matrixA=matrixLanes('a');window.matrixB=matrixLanes('b');
+      window.matrixRows=[{rowId:'protein-a',lanes:matrixA},{rowId:'protein-b',lanes:matrixB}];
+      setState({selectedId:'protein-a',rows:[
+          {id:'protein-a',sourceId:'a',protein:'A',fig:'Fig 1',lanes:2},
+          {id:'protein-b',sourceId:'b',protein:'B',fig:'Fig 1',lanes:2}],
+        quant:{rowId:'protein-a',revision:1,sourceId:'a',status:'ready',lanes:matrixA,
+          group:{rows:matrixRows}},
+        intake:{...state.intake,cropEnabled:true,figureEnabled:true,crops:[],
+          figures:[{figure_id:'fig-a',label:'Fig 1',lane_count:2}],
+          proteins:[{protein_id:'protein-a',figure_id:'fig-a',label:'A'},
+            {protein_id:'protein-b',figure_id:'fig-a',label:'B'}],
+          figuresReady:[{figure_id:'fig-a',row_ids:['protein-a','protein-b'],
+            image:{sha256:'fig'}}],
+          workflow:{policy:'intake_workflow@3',digest:'matrix',steps:[]}}});
+      switchMode('quant');true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        """
+      document.querySelectorAll('.intake-figure-curves .intake-curve-card').length===4 &&
+      document.querySelectorAll('.intake-curve-protein').length===2
+    """,
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      document.querySelector('[data-iq-row="protein-b"][data-iq-lane="2"]').click();true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        """
+      state.selectedId==='protein-b' && !document.querySelector('[data-iq-field]') &&
+      !sent.some(x=>x.action==='quant_edit')
+    """,
+    )
+    javascript(
+        window,
+        qtbot,
+        """
+      setState({quant:{rowId:'protein-b',revision:1,sourceId:'b',status:'ready',
+        lanes:matrixB,group:{rows:matrixRows}}});
+      const matrixInput=document.querySelector('[data-iq-field=baselineStart]');
+      matrixInput.value='1';matrixInput.dispatchEvent(new Event('change',{bubbles:true}));
+      document.querySelector('[data-iq-action=save]').click();true
+    """,
+    )
+    assert javascript(
+        window,
+        qtbot,
+        """
+      sent.at(-1).action==='quant_edit' && sent.at(-1).payload.id==='protein-b' &&
+      sent.at(-1).payload.lane===2 && document.querySelectorAll('.intake-curve-card').length===4
+    """,
     )

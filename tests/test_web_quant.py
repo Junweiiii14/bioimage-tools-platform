@@ -50,6 +50,7 @@ def test_same_target_bridge_keeps_generation_and_manual_parameters(qtbot: QtBot)
             operation_busy=False,
             is_closing=False,
             automatic=SimpleNamespace(finished=SimpleNamespace(connect=ignore_connection)),
+            intake_stage_committed=SimpleNamespace(connect=ignore_connection),
         ),
     )
     bridge = NoErrorBridge(host, lambda _: None)
@@ -286,6 +287,7 @@ def test_quant_mutations_reject_old_session_before_install(
                 set_project=forbidden,
             ),
             automatic=SimpleNamespace(finished=SimpleNamespace(connect=connection)),
+            intake_stage_committed=SimpleNamespace(connect=connection),
             analyze_project=forbidden,
             analyze_manual_target=forbidden,
             project_results=[],

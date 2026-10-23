@@ -19,19 +19,6 @@ window.intakeViews = (() => {
     return points;
   }
 
-  function profiles(members, selectedRowId, quant) {
-    const protein=members.find(p=>p.protein_id===selectedRowId);
-    const lanes=protein?quant?.group?.rows?.find(r=>r.rowId===protein.protein_id)?.lanes||[]:[];
-    const available=lanes.filter(l=>l.profile?.length>1&&l.profile.every(Number.isFinite));
-    let low=0,high=0;
-    for(const lane of available)for(const value of lane.profile){low=Math.min(low,value);high=Math.max(high,value);}
-    const span=high-low||1;
-    return `<section class="intake-profile-panel" aria-label="当前蛋白的已提交泳道曲线"><header><strong>${escapeText(protein?.label||'当前蛋白')} · 泳道剖面</strong><span>${available.length?'原像素已提交曲线 · 同一纵轴':'等待当前蛋白的已提交结果'}</span></header><div class="intake-profile-grid">${available.map(lane=>{
-      const values=lane.profile,points=profilePoints(values).map(i=>`${(8+204*i/(values.length-1)).toFixed(2)},${(76-64*(values[i]-low)/span).toFixed(2)}`).join(' ');
-      return `<figure><figcaption>泳道 ${lane.lane}</figcaption><svg viewBox="0 0 220 92" role="img" aria-label="泳道 ${lane.lane} 原图纵向剖面，灰度范围 ${number(low)} 至 ${number(high)}"><path d="M8 8V76H212" class="profile-axis"/><polyline points="${points}"/><text x="8" y="90">${lane.roi.y}</text><text x="212" y="90" text-anchor="end">${lane.roi.y+values.length-1} px</text></svg></figure>`;
-    }).join('')}</div></section>`;
-  }
-
   function figureList(intake, selectedId, selectedRowId) {
     return `<aside class="intake-figure-list" aria-label="Fig 与蛋白"><h2>本次实验</h2>${intake.figures.map(fig=>`
       <section class="intake-object-group"><h3>${escapeText(fig.label)} <small>N=${fig.lane_count}</small></h3>
@@ -43,9 +30,10 @@ window.intakeViews = (() => {
     const fig=intake.figures.find(f=>f.figure_id===selected?.figure_id);
     const image=current?.image?`<div class="intake-measure-raster"><img src="${escapeText(current.image)}" alt="${escapeText(fig?.label || 'Fig')} · ${escapeText(members.map(p=>p.label).join('、'))}"><svg viewBox="0 0 ${current.width} ${current.height}" aria-label="原图测量区域映射">${outlines}</svg></div>`:`<div class="intake-measure-empty" role="status"><p>${escapeText(current?.error||(!selected?'尚无已保存的 Fig 图片':current?.loading?'正在加载 Fig 图片…':'正在读取已保存的 Fig…'))}</p>${current?.error?'<button class="button subtle" data-intake-preview-retry>重新加载图片</button>':''}</div>`;
     return `<div class="intake-measure-workspace">${figureList(intake,selected?.figure_id,selectedRowId)}
-      <section class="intake-measure-main"><header class="canvas-heading"><div><h1>原像素定量</h1><p>${escapeText(fig?.label || '等待成图')} · ${members.length} 个蛋白 · ${fig?.lane_count || 0} 个泳道</p></div><label class="intake-figure-select">查看 Fig<select data-intake-measure-figure>${(intake.figuresReady||[]).map(f=>`<option value="${escapeText(f.figure_id)}" ${f===selected?'selected':''}>${escapeText(intake.figures.find(x=>x.figure_id===f.figure_id)?.label||f.figure_id)}</option>`).join('')}</select></label></header>
-        <section class="intake-measure-image" aria-label="当前 Fig 与测量区域"><span class="intake-measure-caption">Fig 图像与原图槽位映射</span><div class="intake-measure-viewport">${image}</div><div class="floating-tools"><button class="icon-button" data-intake-measure-zoom="out" aria-label="缩小 Fig">${icon('minus')}</button><button class="zoom-label" data-intake-measure-zoom="fit">适应窗口</button><button class="icon-button" data-intake-measure-zoom="in" aria-label="放大 Fig">${icon('plus')}</button></div></section>
-        ${profiles(members,selectedRowId,quant)}<p class="intake-measure-foot">查看图像对应位置 · 显示缩放不影响原像素计算</p>
+      <section class="intake-measure-main ${window.intakeQuant.previewCollapsed()?'preview-collapsed':''}" tabindex="0" aria-label="Fig 图像与曲线，向下滚动查看全部蛋白"><header class="canvas-heading"><div><h1>原像素定量</h1><p>${escapeText(fig?.label || '等待成图')} · ${members.length} 个蛋白 · ${fig?.lane_count || 0} 个泳道</p></div><label class="intake-figure-select">查看 Fig<select data-intake-measure-figure>${(intake.figuresReady||[]).map(f=>`<option value="${escapeText(f.figure_id)}" ${f===selected?'selected':''}>${escapeText(intake.figures.find(x=>x.figure_id===f.figure_id)?.label||f.figure_id)}</option>`).join('')}</select></label></header>
+        <button class="text-button intake-preview-toggle" data-iq-action="toggle-preview" aria-expanded="${!window.intakeQuant.previewCollapsed()}" aria-controls="intake-fig-image">${icon(window.intakeQuant.previewCollapsed()?'chevron-down':'chevron-up')}${window.intakeQuant.previewCollapsed()?'展开 Fig 图像':'收起 Fig 图像'}</button>
+        <section id="intake-fig-image" class="intake-measure-image" aria-label="当前 Fig 与测量区域"><span class="intake-measure-caption">Fig 图像与原图槽位映射</span><div class="intake-measure-viewport">${image}</div><div class="floating-tools"><button class="icon-button" data-intake-measure-zoom="out" aria-label="缩小 Fig">${icon('minus')}</button><button class="zoom-label" data-intake-measure-zoom="fit">适应窗口</button><button class="icon-button" data-intake-measure-zoom="in" aria-label="放大 Fig">${icon('plus')}</button></div></section>
+        ${window.intakeQuant.figureMarkup(fig,members,quant)}<p class="intake-measure-foot">查看图像对应位置 · 显示缩放不影响原像素计算</p>
       </section>
       <aside class="intake-measure-inspector" aria-label="蛋白与测量状态"><h2>测量记录</h2>${members.map(p=>{
         const values=cells.filter(c=>c.rowId===p.protein_id);
@@ -55,6 +43,18 @@ window.intakeViews = (() => {
   }
 
   function results({intake, cells, busy}) {
+    if(intake.visibleTable){
+      const table=intake.visibleTable,marks=new Set(table.quality.map(([r,c])=>`${r}:${c}`));
+      const positions=new Map(cells.map(c=>[`${c.rowId}:${c.lane}`,c]));
+      const body=table.rows.map((row,r)=>`<tr>${row.map((v,c)=>{
+        const numeric=c>=2&&c<row.length-1;
+        const source=numeric?positions.get(`${intake.proteins[r].protein_id}:${c-1}`):null;
+        const title=numeric?(source?resultLabel(source.status)+(source.reason?'：'+source.reason:''):'没有已提交结果'):'';
+        const content=c===1?`<button class="text-button" data-intake-crop-action="source" data-id="${escapeText(intake.proteins[r].protein_id)}" ${busy?'disabled':''}>${escapeText(v)}</button>`:numeric?number(v):c===row.length-1?`<span class="result-state">${escapeText(v)}</span>`:escapeText(v);
+        return `<td class="${numeric?'intake-number':''}" title="${escapeText(title)}">${content}${marks.has(`${r}:${c}`)?'<sup>*</sup>':''}</td>`;
+      }).join('')}</tr>`).join('');
+      return `<section class="intake-result-grid"><div class="intake-result-toolbar"><strong>原始灰度积分</strong><span>按 Fig、蛋白与泳道排列</span></div><div class="results-scroll"><table><thead><tr>${table.headers.map((h,c)=>`<th class="${c>=2&&c<table.headers.length-1?'intake-number':''}">${escapeText(h)}</th>`).join('')}</tr></thead><tbody>${body||'<tr><td>尚无已配置的蛋白</td></tr>'}</tbody></table></div><p class="intake-result-note">— 表示无已提交值；* 表示质量待复核。展开完整记录可查看有效信号与具体原因。</p></section>`;
+    }
     const maxN=Math.max(0,...intake.figures.map(f=>f.lane_count||0));
     const body=intake.proteins.map(p=>{
       const fig=intake.figures.find(f=>f.figure_id===p.figure_id);

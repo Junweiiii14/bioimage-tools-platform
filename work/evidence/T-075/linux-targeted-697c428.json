@@ -1,0 +1,31 @@
+{
+  "head": "697c4287b4e35f048939828652bfe064e70e9718",
+  "environment": "WSL Ubuntu-22.04, separate /tmp/bioimage-t075-697c428/.venv; uv0.13.0 --locked --group desktop, CPython3.12.14, Qt6.12/Chromium140.0.7339.225",
+  "tests": [
+    "test_window_cancel_then_close_confirms_terminal",
+    "test_repeated_window_close_and_collection (20 cycles)",
+    "test_rotation_preview_and_one_real_click_commit[False]",
+    "test_rotation_preview_and_one_real_click_commit[True]"
+  ],
+  "passed": 4,
+  "seconds": 6.83,
+  "exit": 0,
+  "settings": {
+    "QT_QPA_PLATFORM": "offscreen",
+    "QTWEBENGINE_CHROMIUM_FLAGS": "--disable-gpu --no-sandbox",
+    "faulthandler_timeout": 30
+  },
+  "privateDependencies": [
+    "libnspr4_2:4.35-0ubuntu0.22.04.1_amd64.deb",
+    "libnss3_2:3.98-0ubuntu0.22.04.4_amd64.deb",
+    "libasound2_1.2.6.1-1ubuntu1.2_amd64.deb",
+    "libxkbfile1_1:1.1.0-1build3_amd64.deb"
+  ],
+  "dependencySource": "Already cached Debian packages from previous local diagnostic; extracted only to /tmp/bioimage-t075-697c428/private-deps, no system install or product/lock edits",
+  "initialEnvironmentErrors": [
+    "Missing libnspr4.so: no tests collected",
+    "First shell loop lost argument: dpkg-deb empty archive, exit1; replaced with explicit known package paths",
+    "Missing libxkbfile.so.1: no tests collected; extracted known cached package, successful Chromium import before actual tests"
+  ],
+  "scope": "Bounded Linux reproduction did not reproduce CI180; does not establish original native cause or substitute mandatory CI."
+}

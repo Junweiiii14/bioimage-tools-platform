@@ -20,6 +20,7 @@ from tooling.qt_test_lifecycle import close_and_dispose_window
         ("wb-fig-sequence-test", "FigSequenceTest"),
         ("wb-automatic-flow-test", "AutomaticFlowTest"),
         ("wb-reliable-crop-test", "ReliableCropTest"),
+        ("wb-laboratory", "Laboratory"),
         ("unknown", "Platform"),
     ],
 )
@@ -44,6 +45,8 @@ def test_distribution_constructor_never_reuses_another_settings_namespace(
     window.show()
     try:
         assert calls == [("BioImageTools", namespace)]
+        if channel == "wb-laboratory":
+            assert window.windowTitle() == "BioImage · WB 实验室版"
         window.settings.setValue("owned-regression", namespace)
         window.settings.sync()
         assert list(tmp_path.glob("*.ini")) == [tmp_path / (namespace + ".ini")]

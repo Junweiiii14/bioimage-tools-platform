@@ -1,3 +1,7 @@
+T075：同源 web_ui 设计系统与 appearance@1 设置；web_advanced 对接 wb_tool.api/workbench_revision，保持最新Intake来源和版本语义。契约见 contracts/wb-workbench-revision-v1.md，完成状态见任务T075。
+
+T074：intake_supervision 提供批次重测与 schema15 网格；intake_grid 渲染已保存 Fig；桌面 web_intake_supervision / intake_quant.js / intake_grid.js 提供保存、复核与浏览。契约见 [批次复核v1](contracts/wb-intake-supervision-v1.md)，当前状态见 T074 任务。下列 T073 及更早段落为历史模块演进。
+
 T061在WB原包内增加export_detection/discovery与清单v2证据，桌面intake页后台识别及集中确认；不扩展平台、不新增依赖。契约见[导出识别v1](contracts/wb-export-discovery-v1.md)。
 
 # 模块地图

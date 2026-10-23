@@ -46,29 +46,5 @@
 
 ## Current Pointer
 
-- 当前任务：[T-073](work/tasks/T-073-auto-crop-pause-diagnosis.md)；用户已批准六项修复并追加UI方案、HTML预览、同源软件落实与前端专项独审，目标持续至PR/新离线测试版。新树实施中，HTML初版已打开；实际产品修复尚未完成。
-- 活动树：`C:/Users/70236/.codex/worktrees/wb-reliable-crop-ui/bioimage-tools-platform`，实施分支codex/t073-reliable-crop-ui，基线main941b424（T072收尾PR33最终278四SUCCESS后集成）。T072新[离线候选](docs/wb-automatic-flow-repair-delivery.md)冻结main0630604、独审/安装通过；旧主树27与grouped树10份dirty/原图/历史/T071和其他安装保持，忽略证据保留，不自动归档删除。
-- E0–E7及T061已经工程集成，见[验收索引](docs/wb-execution-acceptance.md)与任务。干净Win10/物理DPI/科学留出仍独立待验，不宣称正式发布。
-- t051树T062原型与交接未提交资料保留，桌面批准原型为BioImage-导入分组交互原型/index.html。历史ResearchVault树不作为当前开发入口。
-- 当前状态与下一步：`.agent-handoff/snapshot.md`；风险：`.agent-handoff/risks.md`；长期待办：`.agent-handoff/backlog.md`。
-- 旧原生异常UNKNOWN与旧缓存清理被自动审批拒绝的残余继续保留；不得借新版本自动删除历史树、原图或项目结果。
-
-## Project Rule Targets
-
-- Codex / DeepSeek Harness project rules: `AGENTS.md`
-- 本仓库未启用 Claude Code 专属配置。
-
-## Closeout Rule
-
-For non-trivial work, update the relevant files before final response:
-
-- Always update `.agent-handoff/snapshot.md`.
-- Update `.agent-handoff/work-log.md` when files or task status changed.
-- Update `.agent-handoff/validation.md` when checks were run or intentionally skipped.
-- Update `.agent-handoff/decisions.md` when a durable decision was made.
-- Update `.agent-handoff/backlog.md` and `.agent-handoff/risks.md` when follow-ups, blockers, risks, or unknowns changed.
-- Run the handoff maintenance check and resolve hard-limit findings before final response.
-
-
-
-
+- 当前任务：[T079](work/tasks/T-079-laboratory-offline-delivery.md)，实验室完整离线安装交付及本地/GitHub整理。活动树wb-lab-installer；状态及完成闭合条件以任务为准。
+- 旧T077指针归档.agent-handoff/archive/T077-before-T079-snapshot.md；视频研究是另一个已启动独立聊天，其wb-ui-system树整体保留。旧安装/生成物按本轮备份证明清理；旧dirty源码、原图/历史保持，不能沿用旧“安装保留”指针。

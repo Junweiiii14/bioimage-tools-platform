@@ -1,0 +1,27 @@
+{
+  "samples": [
+    {
+      "selector": "[data-mode=layout]",
+      "handlerMs": 0.10000002384185791,
+      "nextFrameMs": 19.200000047683716,
+      "activeAnimations": 3,
+      "expected": true
+    },
+    {
+      "selector": ".header-actions [data-action=settings]",
+      "handlerMs": 0,
+      "nextFrameMs": 13.5,
+      "activeAnimations": 3,
+      "expected": true
+    },
+    {
+      "selector": "[data-appearance-theme=iris]",
+      "handlerMs": 0,
+      "nextFrameMs": 9.600000023841858,
+      "activeAnimations": 115,
+      "expected": true
+    }
+  ],
+  "metric": "browser click handler to next frame callback; CDP input; not physical input-to-photon latency",
+  "passed": true
+}

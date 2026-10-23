@@ -218,7 +218,9 @@ class IntakeWorkflowSession:
         host.begin_operation()
         host.view.status.setText("正在读取已保存的完整Fig…")
         index = next(i for i, r in enumerate(project.rows) if r.row_id == evidence.row_ids[0])
-        host.view.table.setCurrentCell(index, 0)
+        selected = host.view.selected_row()
+        if selected is None or selected.row_id not in evidence.row_ids:
+            host.view.table.setCurrentCell(index, 0)
 
         def loaded(reply: StorageReply) -> None:
             if self._obsolete(key, generation) or self._cancelled:
@@ -372,6 +374,8 @@ class IntakeWorkflowSession:
         if self._cancelled:
             self._failed_stage(ticket, "执行在启动前取消")
             return
+        # Publish the saved claim before fast stages can finish between timer ticks.
+        host.intake_stage_committed.emit()
         if ticket.stage == "compose":
             self._compose(ticket)
             return

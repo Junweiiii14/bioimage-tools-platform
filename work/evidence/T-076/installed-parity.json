@@ -1,0 +1,132 @@
+{
+  "approvedSourceCommit": "e7eb3a2851efa8b43bbefb34b5b56ce8738a39fc",
+  "installedCandidate": "971d860dec6686abfb72935bfdd22ab0c5b3e93f",
+  "captures": [
+    {
+      "file": "1440-matrix-editor.png",
+      "size": [
+        1440,
+        900
+      ],
+      "equal": false,
+      "differenceBounds": [
+        1197,
+        11,
+        1253,
+        14
+      ],
+      "changedPixels": 19,
+      "maxChannelDifference": 2
+    },
+    {
+      "file": "1440-matrix-last.png",
+      "size": [
+        1440,
+        900
+      ],
+      "equal": false,
+      "differenceBounds": [
+        1197,
+        11,
+        1253,
+        14
+      ],
+      "changedPixels": 19,
+      "maxChannelDifference": 2
+    },
+    {
+      "file": "1440-platform.png",
+      "size": [
+        1440,
+        900
+      ],
+      "equal": true,
+      "differenceBounds": null
+    },
+    {
+      "file": "1440-wb-home.png",
+      "size": [
+        1440,
+        900
+      ],
+      "equal": true,
+      "differenceBounds": null
+    },
+    {
+      "file": "960-matrix-editor.png",
+      "size": [
+        960,
+        640
+      ],
+      "equal": true,
+      "differenceBounds": null
+    },
+    {
+      "file": "960-matrix-last.png",
+      "size": [
+        960,
+        640
+      ],
+      "equal": true,
+      "differenceBounds": null
+    },
+    {
+      "file": "960-platform.png",
+      "size": [
+        960,
+        640
+      ],
+      "equal": true,
+      "differenceBounds": null
+    },
+    {
+      "file": "960-wb-home.png",
+      "size": [
+        960,
+        640
+      ],
+      "equal": true,
+      "differenceBounds": null
+    },
+    {
+      "file": "theme-ember.png",
+      "size": [
+        1440,
+        900
+      ],
+      "equal": true,
+      "differenceBounds": null
+    },
+    {
+      "file": "theme-forest.png",
+      "size": [
+        1440,
+        900
+      ],
+      "equal": true,
+      "differenceBounds": null
+    },
+    {
+      "file": "theme-iris.png",
+      "size": [
+        1440,
+        900
+      ],
+      "equal": true,
+      "differenceBounds": null
+    },
+    {
+      "file": "theme-neutral.png",
+      "size": [
+        1440,
+        900
+      ],
+      "equal": true,
+      "differenceBounds": null
+    }
+  ],
+  "allPixelsEqual": false,
+  "recordsEqual": true,
+  "installedConsole": [],
+  "assessment": "10/12 pixel-identical; other 2 each differ in 19 pixels with max RGB delta 2 only on rounded File button upper border; all recorded geometry/text/font/state equal. No image editing or product styling change."
+}

@@ -1,251 +1,329 @@
 ---
-name: BioImage 工具平台与 WB 证据工作台
-description: 网页与 QtWebEngine 同源的图像中心工作台，保留原生高级编辑器
+name: BioImage WB · T075
+description: 墨绿酸橙、明亮科学画布与稳定操作位置的 Windows 实验工作台。
 colors:
-  batch-ink: "#22332f"
-  batch-muted: "#64716d"
-  batch-accent: "#087e71"
-  batch-ground: "#f4f6f5"
-  batch-line: "#e2e8e4"
-  batch-canvas: "#e9ede9"
-  web-ink: "#20342f"
-  web-muted: "#58675f"
-  web-accent: "#087f72"
-  web-accent-hover: "#06675e"
-  web-accent-light: "#e7f3ef"
-  web-ground: "#f3f5f3"
-  web-line: "#e6ebe7"
-  web-rail: "#183c34"
-  web-warning: "#946220"
-  web-warning-bg: "#fbf4e7"
-  primary: "#256f82"
-  primary-hover: "#205e6e"
-  platform-primary-hover: "#1d5868"
-  window: "#f6f5f2"
-  surface: "#ffffff"
-  ink: "#202523"
-  platform-ink: "#242723"
-  muted: "#626b65"
-  disabled-ink: "#6b726d"
-  border: "#d9dcd5"
-  platform-border: "#d9dcd6"
-  hover-border: "#8badb3"
-  hover: "#edf3f3"
-  pressed: "#dce9eb"
-  selected: "#e3eef0"
-  selected-ink: "#174f60"
-  tab-selected: "#eaf1f2"
-  platform-selected: "#e8f0f1"
-  disabled-surface: "#eeefeb"
-  header: "#f3f4f0"
-  header-ink: "#505953"
-  grid: "#eaebe6"
-  splitter: "#e5e6e0"
-  canvas: "#252729"
+  ink: '#203b2e'
+  muted: '#52634c'
+  subtle: '#52634c'
+  accent: '#24745a'
+  accent-hover: '#185e47'
+  accent-light: '#e6efcf'
+  paper: '#fefff9'
+  ground: '#f1f3e9'
+  line: '#dce3d4'
+  rail: '#103c32'
+  shell-ink: '#eff3dc'
+  shell-muted: '#b4c9bc'
+  primary: '#d7ed82'
+  primary-ink: '#183d2c'
+  field: '#f7f9f0'
+  soft-header: '#e9efde'
+  warning: '#875719'
+  warning-bg: '#fbf1dd'
+  danger: '#a6372d'
+  danger-bg: '#fff0eb'
+  canvas: '#e8e9e7'
+  ember-ink: '#3d2d25'
+  ember-muted: '#765d50'
+  ember-subtle: '#765d50'
+  ember-accent: '#a94227'
+  ember-accent-hover: '#90351e'
+  ember-accent-light: '#f6ded0'
+  ember-paper: '#fffaf4'
+  ember-ground: '#f4eee6'
+  ember-line: '#e6d9ca'
+  ember-rail: '#302d2a'
+  ember-shell-ink: '#f8ece0'
+  ember-shell-muted: '#cbb6a5'
+  ember-primary: '#ff926b'
+  ember-primary-ink: '#3b2119'
+  ember-field: '#fcf4eb'
+  ember-soft-header: '#eee1d3'
+  iris-ink: '#293455'
+  iris-muted: '#5d6684'
+  iris-subtle: '#5d6684'
+  iris-accent: '#435cbe'
+  iris-accent-hover: '#32489f'
+  iris-accent-light: '#e2e8ff'
+  iris-paper: '#fcfdff'
+  iris-ground: '#eff1f8'
+  iris-line: '#dce0f0'
+  iris-rail: '#202c56'
+  iris-shell-ink: '#f0f2ff'
+  iris-shell-muted: '#c0c8e8'
+  iris-primary: '#b7cbff'
+  iris-primary-ink: '#202f59'
+  iris-field: '#f4f6fe'
+  iris-soft-header: '#e8ecf8'
+  neutral-ink: '#303332'
+  neutral-muted: '#616663'
+  neutral-subtle: '#616663'
+  neutral-accent: '#424845'
+  neutral-accent-hover: '#262b28'
+  neutral-accent-light: '#e8ebe8'
+  neutral-paper: '#fff'
+  neutral-ground: '#f3f4f3'
+  neutral-line: '#dce0dd'
+  neutral-rail: '#e9ece9'
+  neutral-shell-ink: '#303632'
+  neutral-shell-muted: '#57625b'
+  neutral-primary: '#343c36'
+  neutral-primary-ink: '#fff'
+  neutral-field: '#f7f8f7'
+  neutral-soft-header: '#edf0ed'
 typography:
-  web-body:
-    fontFamily: "Segoe UI Variable, Segoe UI, Microsoft YaHei UI, sans-serif"
-    fontSize: "13px"
-  platform-page:
-    fontFamily: "Microsoft YaHei UI"
-    fontSize: "28px"
+  home-title:
+    fontFamily: '"WB Sans", sans-serif'
+    fontSize: 36px
+    fontWeight: 550
+    lineHeight: 1.5
+    letterSpacing: -.025em
+  home-title-small:
+    fontFamily: '"WB Sans", sans-serif'
+    fontSize: 28px
+    fontWeight: 550
+    lineHeight: 1.5
+    letterSpacing: -.025em
+  canvas-title:
+    fontFamily: '"WB Sans", sans-serif'
+    fontSize: 20px
     fontWeight: 600
-  platform-brand:
-    fontFamily: "Microsoft YaHei UI"
-    fontSize: "23px"
-    fontWeight: 600
-  platform-tool:
-    fontFamily: "Microsoft YaHei UI"
-    fontSize: "22px"
-    fontWeight: 600
-  section:
-    fontFamily: "Microsoft YaHei UI"
-    fontSize: "15px"
-    fontWeight: 600
-  brand:
-    fontFamily: "Microsoft YaHei UI"
-    fontSize: "16px"
-    fontWeight: 600
-  project-name:
-    fontFamily: "Microsoft YaHei UI"
-    fontSize: "17px"
-    fontWeight: 600
+    lineHeight: 1.4
+    letterSpacing: normal
+  drawer-title:
+    fontFamily: '"WB Sans", sans-serif'
+    fontSize: 22px
+    fontWeight: 550
+    lineHeight: 1.5
+    letterSpacing: normal
+  section-title:
+    fontFamily: '"WB Sans", sans-serif'
+    fontSize: 16px
+    fontWeight: 550
+    lineHeight: 1.5
+    letterSpacing: normal
   body:
-    fontFamily: "Microsoft YaHei UI"
-    fontSize: "10pt"
-rounded:
-  control: "6px"
-  field: "4px"
-  platform-tool: "8px"
-spacing:
-  field-inset: "5px"
-  control-inset: "6px 10px"
-  column-gap: "12px"
-  rail-inset: "14px 12px"
-  platform-action-inset: "10px 14px"
-components:
+    fontFamily: '"WB Sans", sans-serif'
+    fontSize: 14px
+    fontWeight: 400
+    lineHeight: 1.5
+    letterSpacing: normal
   button:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.control}"
-    padding: "{spacing.control-inset}"
-  button-primary:
-    backgroundColor: "{colors.primary}"
-    textColor: "{colors.surface}"
-    rounded: "{rounded.control}"
-    padding: "{spacing.control-inset}"
-  button-disabled:
-    backgroundColor: "{colors.disabled-surface}"
-    textColor: "{colors.disabled-ink}"
+    fontFamily: '"WB Sans", sans-serif'
+    fontSize: 14px
+    fontWeight: 550
+    lineHeight: 1.5
+    letterSpacing: normal
   field:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.field}"
-    padding: "{spacing.field-inset}"
-  navigation-selected:
-    backgroundColor: "{colors.hover}"
-    textColor: "{colors.primary-hover}"
-    padding: "9px 24px"
-  platform-tool:
-    backgroundColor: "{colors.surface}"
-    rounded: "{rounded.platform-tool}"
-    padding: "24px"
+    fontFamily: '"WB Sans", sans-serif'
+    fontSize: 13px
+    fontWeight: 400
+    lineHeight: 1.5
+    letterSpacing: normal
+  auxiliary:
+    fontFamily: '"WB Sans", sans-serif'
+    fontSize: 12px
+    fontWeight: 400
+    lineHeight: 1.5
+    letterSpacing: normal
+rounded:
+  field-advanced: 6px
+  control: 8px
+  detail: 10px
+  panel: 12px
+  home-card: 16px
+  paper: 3px
+spacing:
+  page: 32px
+  group: 24px
+  inner: 16px
+  related: 8px
+  control: 40px
+  row: 16px
+  compact-page: 24px
+  compact-group: 16px
+  compact-inner: 12px
+  compact-related: 6px
+  compact-control: 32px
+  compact-row: 10px
+components:
+  button-primary:
+    backgroundColor: '{colors.primary}'
+    textColor: '{colors.primary-ink}'
+    typography: '{typography.button}'
+    rounded: '{rounded.control}'
+    padding: 4px 16px
+    height: '{spacing.control}'
+  button-subtle:
+    backgroundColor: '{colors.paper}'
+    textColor: '{colors.ink}'
+    typography: '{typography.button}'
+    rounded: '{rounded.control}'
+    padding: 4px 16px
+    height: '{spacing.control}'
+  button-text:
+    textColor: '{colors.accent}'
+    typography: '{typography.field}'
+    padding: 6px 0
+  field:
+    backgroundColor: '{colors.field}'
+    textColor: '{colors.ink}'
+    typography: '{typography.body}'
+    rounded: '{rounded.control}'
+    padding: 8px 10px
+  field-advanced:
+    backgroundColor: '{colors.field}'
+    textColor: '{colors.ink}'
+    typography: '{typography.field}'
+    rounded: '{rounded.field-advanced}'
+    padding: 8px 10px
+  mode-tab:
+    textColor: '{colors.muted}'
+    typography: '{typography.body}'
+    height: 62px
+    padding: 0 6px
+  token-chip:
+    textColor: '{colors.ink}'
+    typography: '{typography.field}'
+    rounded: '{rounded.field-advanced}'
+    padding: 6px 10px
+  preview-panel:
+    backgroundColor: '{colors.soft-header}'
+    rounded: '{rounded.panel}'
+    padding: 24px
+  quick-preview:
+    backgroundColor: '{colors.paper}'
+    textColor: '{colors.ink}'
+    typography: '{typography.auxiliary}'
+    rounded: '{rounded.detail}'
+    padding: 14px 16px
 ---
 
-# Design System: BioImage 工具平台与 WB 证据工作台
-
-## T073 批次工作台的局部规范
-
-用户批准简洁清晰的批次界面重构。`intake_workbench.css`中的`.intake-project`
-限定本轮规则：白色工具面、batch-ground工作区、batch-canvas图像台、batch-accent
-主动作。56px项目栏、58px五阶段栏；配置矩阵顶部Fig/N/蛋白，原图三列；
-处理区215px对象/弹性中央/268px属性，≤1050px属性进入详情抽屉、对象184px。
-24px配置/结果标题，20px图像标题，13–14px正文与按钮，11–12px辅助文字；
-沿用Windows系统中文UI字体。控件6px、图像台8px圆角，避免层层卡片。
-
-与独立HTML共用信息层级、色彩和操作顺序。真实软件另保留保存、历史、错误和
-完整记录状态，不能以示例隐藏这些功能。中央图像、曲线与数值不动画；控件反馈
-140–200ms，系统及应用减少动效关闭过渡。新Fig聚焦名称，文字输入/IME和主动
-浏览不抢页；图像缩放保留选择，失败保留草稿。
-
-代码依据：`web_ui/intake{,_groups,_views}.js`与`intake_workbench.css`；
-视觉证据为`.impeccable/review/t073-prototype`与`t073-software`本地合成截图，
-不代替科学/交付验证。此前原生高级窗口和独立灰度的规范保持各自范围；
-旧sidecar的默认入口/三模式历史描述漂移不在本轮顺手修复。
+# BioImage WB 设计系统
 
 ## Overview
 
-**Creative North Star: "证据工作台"**
+**Creative North Star: "舒展的实验工作台"**
 
-暖白工作区与白色控件面形成克制、平直的原生工作台。青绿强调当前选择与主要动作，深灰画布把注意力交给实验图像。沿用已批准 T-028 的 product-performs 方向：产品操作本身构成界面，专业数据和真实状态优先。
+以稳定的操作位置和明亮的科学画布组织复杂实验流程。墨绿外壳负责项目身份，酸橙标出当前主要动作；留白让来源、Fig、蛋白和泳道的关系更容易辨认。界面可以有温度与动感，原图、坐标、曲线和数值必须保持严谨。
 
-本记录从 T-029 实现提交 `0e2c09c` 的 `workbench_style.py`、`workbench_motion.py`、`platform_window.py` 及 WB UI 提取。局部控件保留自己的原生样式，未将所有画布颜色强制统一为壳层强调色。截图证据位于 `.local/deliveries/WB-workbench-20261016-002056/screenshots`；静态视觉审查的 ship 结论仅限静态界面，不代表动效、科学准确率或干净 Windows 验收。
-
-T-033 新增网页先行、QtWebEngine 加载同一 `web_ui` assets 的工作台。以下既有原生 tokens 与布局仍描述 Qt Widgets 高级窗口；`web-` tokens 来自 `web_ui/styles.css`，两者不强行合并。默认启动保留原生平台，`--web-workbench` 为显式同源入口。T-037 灰度曲线和积分监督已进入同源界面；OCR、模板和归一化等高级编辑器仍为原生。当前静态证据为 `.local/t033/desktop.png`、`home.png` 和 `mobile.png`，本记录不替代 T-033 的提交绑定验收。
+这份规范对应 T075 最终候选 `5c56f55`，继承 T074 `0376f23` 的最新业务结构；前端资源自 `e8b034e` 未变。安装、同源还原和交付独审已核对，CI181四项必需检查全部成功；最终证据提交仍须通过当前HEAD必需检查才结束目标。正式入口为 `WebWorkbenchWindow`；HTML 预览与桌面加载同一套 `apps/desktop/src/bioimage_app/web_ui` 资源，通过不同数据适配器运行。不能另写安装版样式来掩盖差异。
 
 **Key Characteristics:**
 
-- 暖白、平面、系统中文字体，图像占据中央主要空间。
-- 同源界面采用原图裁剪、拼图排版、灰度定量、结果导航；既有原生窗口保留三模式，辅助能力通过上下文入口到达。
-- 裁图就绪、人工审核记录和定量质量警告分别表达。
-- 动效只帮助导航定位与控件显现，图像和定量数值保持稳定。
+- 默认 forest / comfortable / expressive；四主题共用结构与业务语义。
+- 主操作稳定可见，低频细节原位展开，辅助信息在悬停、聚焦和点击时同样可达。
+- 准备页上方 Fig 配置、下方同组三图；定量保留整 Fig 的蛋白 × 泳道矩阵。
+- 连续反馈可以中断，提交不等待动画；科学证据不做装饰运动。
+
+当前来源为 `design_tokens.css`、`components.css`、`advanced.css`、`motion.js`、`appearance.js`、`interactions.js` 与 `desktop_session.js`，同时核对基础样式的继承。规范描述已落地的公共体系；旧页面残留规则、实际尺寸和完整动态效果仍须在集中验收中核实。任务状态只见 `work/tasks/T-075-ui-system.md`。
 
 ## Colors
 
-### Primary
+前置 token 是实际 CSS 值：不带主题前缀的键属于默认 forest；`ember-`、`iris-`、`neutral-` 为各主题覆盖。`warning`、`warning-bg`、`danger`、`danger-bg` 和 `canvas` 由四主题共享。`primary` 用于主要按钮，`accent` 用于选中、焦点和定位，二者不可混为一个颜色。
 
-`primary` 是主要动作、键盘焦点、导航指示线和任务进度的青绿。`primary-hover` 用于 WB 主按钮悬停和选中导航文字；平台入口保留自己的 `platform-primary-hover`。表格选中使用 `selected` / `selected-ink`，页签使用 `tab-selected`。
+| 配置 | 外壳 `rail` | 主操作 `primary` | 工作面 `paper` | 内容底 `ground` |
+|---|---|---|---|---|
+| forest · 墨绿 × 酸橙 | `#103c32` | `#d7ed82` | `#fefff9` | `#f1f3e9` |
+| ember · 炭黑 × 朱砂 | `#302d2a` | `#ff926b` | `#fffaf4` | `#f4eee6` |
+| iris · 深靛 × 冰蓝 | `#202c56` | `#b7cbff` | `#fcfdff` | `#eff1f8` |
+| neutral · 白灰 | `#e9ece9` | `#343c36` | `#fff` | `#f3f4f3` |
 
-### Neutral
+`ink` 是正文，`muted` / `subtle` 是辅助文字，`shell-ink` / `shell-muted` 是顶栏文字。`field` 承接可编辑区，`soft-header` 承接表头与分组，`line` 仅表达必要边界。主按钮悬停为 `color-mix(in srgb, var(--primary), var(--primary-ink) 8%)`，不是额外硬编码色板。
 
-`window` 是暖白底，`surface` 是白色操作面；`ink` 与 `muted` 建立正文和说明层级。平台正文与边框的局部差异分别记录为 `platform-ink` / `platform-border`。`header`、`grid` 和 `splitter` 保持数据结构可见。禁用按钮同时改变背景、文字和边框，不能仅靠降低透明度。
+**The Scientific Neutrality Rule.** 界面主题只改变工作台外观。原图、画布中的科学内容、源坐标、计算值和导出图像不继承主题；警告、错误、缺项和未保存状态同时保留文字或图标。
 
-**The Evidence Canvas Rule.** 画布配色和显示变换不进入原始像素或定量结果。
-
-画布的裁剪/泳道线为绿色，候选框为琥珀色；它们属于图上编辑语义，不是壳层成功/失败状态。局部绘制值留在 sidecar，不能从配色推断质量合格。
-
-网页使用 `web-` 色系：矿物白背景、深松绿平台栏、翡翠操作色，琥珀提示质量待复核；图像工作面为浅灰绿，原生深灰画布保持自己的语义。
+`.impeccable/design.json` 的八阶色带只用于规范面板展示，由实际颜色转换为 OKLCH 后生成；它们没有被应用代码采用，不是新的产品 token。
 
 ## Typography
 
-使用 `QFont("Microsoft YaHei UI", 10)` 的原生中文正文；Qt 负责缺失字体替代，代码没有显式 web fallback 栈。正文为点字号，标题为 QSS 像素字号，无固定行高或字距 token。平台页面、品牌、工具名形成三级标题；WB 项目名和分区标题维持紧凑阅读层级。模板字体与输出像素字号属于作品内容，不是应用 UI 字体。
+本地文件 `web_ui/fonts/NotoSansSC-VF.ttf` 以 CSS 家族 `WB Sans` 加载，覆盖 100–900 字重，`font-display:block`、`font-synthesis:none`。许可为 OFL-1.1；源仓库 `notofonts/noto-cjk` 固定提交 `f8d157532fbfaeda587e826d4cd5b21a49186f7c`，资源 SHA256 为 `d68bafcb48a2707749396aa12bbbd833cb70401f3a9a689fd2902c7e0d295964`。来源与许可随字体保存在 `web_ui/fonts`。
 
-网页字体采用前述 `web-body` fallback 栈；紧凑标签最小 11px（原 8/9/10px 已统一提高），标题由 CSS 设置，不能套用原生 Qt 点字号。
+正文 14px / 1.5；按钮 14px、550 字重；高级表单与表格 13px；辅助文字 12px。首页标题 36px、550 字重、字距 -.025em，小于等于 800px 时 28px。画布标题 20px / 1.4，抽屉标题 22px。表格数值使用 `tabular-nums`。主题缩略卡中的 8–10px 图形文字是 `aria-hidden` 的装饰缩略内容，不承载操作说明。
+
+**The One Font Rule.** 预览和安装版都加载同一 Noto Sans SC 文件及真实字重，禁止通过系统字体回退、合成粗体或安装版独立缩放解释差异。
+
+实验成图的项目字体与界面字体分别管理；本轮固定 UI 字体不能改变模板或科学导出的既有字体选择。科学数值格式遵循原业务契约，显示舍入不能回写计算记录。
 
 ## Layout
 
-同源网页桌面布局为 72px 平台栏、66px 项目顶栏、51px 模式栏，来源区 244px、中央至少 260px、复核区 296px。CSS 在 1600px、1180px、900px、620px 设置适配；窄屏隐藏辅助栏并通过抽屉访问，避免强行压缩三栏。网页布局不等于原生窗口布局。
+1440px 内容区是设计基准。默认页面边距 32px、主要分组 24px、组内 16px、关联内容 8px；紧凑 token 分别为 24 / 16 / 12 / 6px。常规控件 token 为 40px、紧凑为 32px，表格行内垂直留白为 16px / 10px。小窗口断点会进一步调整布局；紧凑模式不得删除内容、改变对象顺序或科学坐标。
 
-平台入口左栏宽 190，内容区边距左右 34、上 30、下 28，工具面板内边距 24。选择原图和拖放入口直接启动项目路径；保存位置以说明和可选调整呈现。
+顶栏和流程导航各 64px。首页在约 1160px 内容宽度内组织左右区域，默认 48px 栏间距，右侧成图装饰独立于稳定命中区。准备页保留上方 Fig / N / 蛋白配置、下方同组三张原图；裁剪维持来源、画布和工具区；定量优先呈现整个 Fig 的蛋白 × 泳道矩阵，并在矩阵后展开当前格的编辑区。结果按稳定身份局部更新。
 
-既有原生 WB 三种模式使用横向单层导航，单元格 132×38、列表高度 42。原生界面没有移动端断点。图像复核左栏 224、右栏 272，中央弹性扩展，栏间距 12；侧栏内边距左右 12、上下 14。原图画布最小 280×240。来源列表、图像与当前复核状态同步；泳道曲线、实验信息和高级检测按需展开。
+标准抽屉宽度 `min(520px, 100vw)`；模板、实验信息、OCR 和归一化采用 `min(1120px, calc(100vw - 32px))`，内容双栏比 1.2 : 1、间距 32px。标题与底部主操作保持独立，内容区滚动；高级表格表头吸顶并局部滚动，不能让保存按钮随长表消失。
 
-拼图使用不可折叠的三栏 splitter，初始分配 200/720/280，左操作栏最大宽 224，右设置栏最小宽 240。结果区左导航宽 136、右摘要宽 260，中间承载结果表。OCR、归一化、批量信息和高级原图数据保留独立上下文页面及返回入口，不再形成第二层顶层阶段。
+仅演示预览为底部工具栏保留 48px，工作区与抽屉止于该区域上方；正式产品无演示栏或这项留底。裁剪适配为状态标签、泳道编号和 ROI 外部标注留出显示空间，不改变原图坐标或 ROI 几何。
 
-截图包含 1440 与 1100 窗口的关键页面；实际像素尺寸受 Qt 缩放影响。滚动区和弹性中央区域承担窄窗适配，静态截图不证明所有 DPI 或任意尺寸均已验收。
+| 已实现条件 | 行为 |
+|---|---|
+| 宽度 ≤ 1100px | 压缩顶栏次要身份文字、导航间距；首页双栏间距 24px。 |
+| 宽度 ≤ 850px | 高级抽屉铺满内容宽度；高级内容改为单栏、间距 24px。 |
+| 宽度 ≤ 800px | 首页单栏；页面边距 token 20px、分组 16px；准备页三图通过局部水平滚动保留并排。 |
+| 高度 ≤ 720px | 收紧定量图像与标题高度，曲线卡图高由 64px 调为 56px。 |
+
+这些是新增公共层的断点，不表示旧科学工作区的所有局部断点已经移除。小窗口可达性与高缩放必须单独检查，不据此承诺完整移动科学工作流。
+
+**The Stable Position Rule.** 后台进度、保存回执和迟到请求不能抢走当前对象、草稿、输入焦点、滚动或选择。工具区只由用户主动收起，记住其选择。
 
 ## Elevation & Depth
 
-原生界面以平面色块、细边框和分隔柄组织层次，没有自绘装饰阴影。系统菜单保留原生表面行为。控件展开使用短暂透明度反馈，不移动画布或制造浮层深度。
+常驻面板用留白、底色和必要边界分组。阴影仅用于可悬停的来源图、首页成图、菜单、快速预览和浮层：来源图悬停 `0 6px 18px #14251c14`；快速预览 `0 10px 28px #14251c20`；抽屉 `-12px 0 48px #14251c18`。抽屉遮罩为 `#15251e30`，模糊 2px。
 
-网页用轻阴影标记按钮反馈、浮动工具和侧抽屉；抽屉背景遮罩有 3px blur。图像本身不加装饰性淡入。
+首页成图默认旋转 -2°；悬停回正并抬高 4px。丰富动效的鼠标跟随只作用于内部纸面，通过 requestAnimationFrame 合并指针更新，横移约 ±2px、上移 2–4px、倾斜约 ±2°。文字、容器和点击区域不随其移动。减少动态效果时移除纸面变换。
+
+**The Evidence Stays Still Rule.** 阴影和轻抬只帮助辨认可操作层。ROI、积分边界、曲线采样、原图像素和科学数值不使用弹跳、倾斜或数值滚动。
 
 ## Shapes
 
-按钮为轻圆角，输入更紧凑，平台工具面板圆角略大；具体值以上方 token 为准。三栏保持平直容器，不套叠装饰卡片。导航采用细线定位，画布框线和角点表达可编辑范围。
+常规按钮、输入与列表项圆角 8px；主面板、画布与主题卡 12px；来源图、工具入口与快速预览 10px；高级表单及 token 标签 6px；首页继续项目卡 16px。纸面预览保留 3px 小圆角以贴近成图对象。不要把全部区域套成重复卡片。
+
+选中通过边框、底色、勾选或短标签共同表达。公共键盘焦点为 `2px solid var(--accent)`，偏移 3px；科学画布内的句柄继续使用其专有描边反馈，不能改变数据几何来制造聚焦效果。
 
 ## Components
 
-### Buttons and Fields
+公共组件及可直接渲染的缩小示例见 `.impeccable/design.json`。示例继承产品 CSS token，并保留悬停、聚焦、按压状态；它们展示实际公共样式，不执行真实业务或替代整页验收。
 
-普通按钮白底细边框，悬停为浅青面及较深边框，按下进一步加深。键盘焦点按钮使用 2px 青绿边框；输入焦点变青绿边框。主要按钮青绿底白字，禁用后恢复灰色背景和文字。平台按钮内边距更宽，WB 保持紧凑。顶部项目名平时透明无边框，聚焦恢复白底描边。
+| 组件 / 场景 | 使用规则与当前实现 |
+|---|---|
+| 主要 / 次要按钮 | 同区域一个突出动作；主要按钮用 `primary`，次要用 `paper` 与边框。按压调低亮度，不移动命中区。禁用保留短说明与业务原因。 |
+| 输入与表格 | 字段正文 13–14px，辅助 12px；中文组合输入和草稿不被后台快照覆盖。高级表格固定表头；冲突让用户明确选择保留的值。 |
+| 流程导航 | 2px 选中线连续移动；切换保留对应来源、Fig、矩阵位置和局部滚动，不能为播放动画延迟命令。 |
+| 选择来源 | 原图区域悬停显示轻微阴影；选择同时更新边框、勾选和业务状态。图像本身无 opacity / transform 过渡。 |
+| 原位展开 | details 展开从当前高度继续，反向动作取消旧动画；退出更快，旧回调不能关闭新打开的面板。 |
+| 快速预览 | 来源、Fig 与首页最近项目共用提示层；指针停留 350ms 显示，键盘聚焦立即显示，信息按钮点击后固定到详情抽屉。最近项目卡的主点击继续打开项目。 |
+| 拼图与矩阵 | 排序显示当前拖动对象与落点；矩阵行列悬停帮助定位，选中格与下方编辑区相连。排序的完整让位动画仍以动态验收为准。 |
+| 外观设置 | 四张真实 token 缩略卡；选择立即预览，`appearance@1` 回执确认 QSettings 保存，跨发行通道隔离。失败恢复上次有效配置，可重试；不写入科研项目。 |
+| 保存 / 高级工具 | 模板、实验信息、OCR、归一化通过宿主命令复用业务用例。长内容与固定底部主操作分离；业务执行、修订校验、取消与真实保存不能被演示状态替代。 |
 
-### Navigation and Motion
+**The Real Receipt Rule.** 点击立即反馈，但只有收到对应请求的真实保存成功回执才显示完成。失败留在相关操作附近，恢复上次有效状态并提供重试。
 
-选中模式使用浅青背景及青绿文字，底部指示线由 `QPropertyAnimation` 在 180ms 内以 `OutCubic` 移动。新打开的指定控件面板在 140ms 内从 0.7 到 1.0 不透明度显现，同样使用 `OutCubic`；这是控件反馈，不是全页面淡入。切换、隐藏或重新显现先停止旧动画并恢复稳定状态。
+动效公共曲线为 `cubic-bezier(.2,.8,.2,1)`。即时反馈 120ms、普通选择及原位展开 220ms、主要进入和导航 320ms、抽屉退出 180ms。轻柔模式 CSS 普通/主要时长为 180ms，Web Animations API 时长上限 180ms；减少动态效果使用 CSS 60 / 80 / 80ms、API 上限 80ms，并关闭进入与抽屉的空间位移。系统 `prefers-reduced-motion` 优先于应用选项。
 
-**The Stable Evidence Rule.** 图像像素、曲线证据和定量数值不做淡入或数值插值。
+每个节点只保留一个当前 Web Animation；取消、完成、页面退出清理资源，反向抽屉从当前 computed style 接续。静止界面不运行持续装饰动画；后台活动提示仍应表达真实工作状态。
 
-应用 `QSettings.reduce_motion` 开启，或 Qt 的 `UI_AnimateCombo` 效果被关闭时，立即完成定位/显现。系统支持按 Qt 暴露的效果状态检测，不声称独立读取全部 Windows 动画偏好。按钮状态由 QSS 即时切换，无另造的过渡时长。
+当前基准为最终候选 `5c56f5509e8ad9381420e26af059e9c60501ebbb`。`.local/t075-final-source-stable` 与 `.local/t075-final-installed` 在相同状态下的 26 张 PNG 逐像素相等，字体、尺寸、文案和状态 records 完全相等；34 项前端资源在源码、wheel 与安装目录一致，7780 项安装载荷逐文件一致。证据分别见 `.local/t075-final-fidelity.json`、`.local/t075-final-resources.json` 和 `.local/t075-final-installed-payload.json`；旧候选与 offscreen 材料保留为历史，不作为当前基准。
 
-### Shared Web Workbench
+安装版使用私有 Python；四类高级工具的保存、导出、重开、跨窗口 appearance 和中文 IME 共 3 项基线测试通过；独审后另补新修订发出且网页确实收到时的输入保护，1 项 3.91s 通过，产品模块严格来自安装目录（`.local/t075-5c56f55-installed-acceptance.json` / `.xml`）。19 项 installed supervision 自检通过，见 `C:/Users/70236/AppData/Local/BioImage-WB-UI-System-Test/Diagnostics/20261022-030631-76ad97d8f3a4428ea17e2235b58168a3.json`。先前高级工具入口问题已经修正，失败记录仍保留。
 
-浏览器读取历史结果、编辑交互草稿；草稿修改不执行重算，不将旧结果冒充新结果。QtWebEngine 复用同一 assets，由本地 bridge 接入真实 backend。灰度监督在同源工作台内完成，OCR、模板等高级编辑仍打开原生窗口。模式指示线 260ms、抽屉入场 260ms 使用 `cubic-bezier(.16,1,.3,1)`，抽屉离场 150ms ease-in；按钮背景、文字和按下反馈 140ms、阴影 180ms。动效限于非图像控件，图像证据和数字不得插值；图像 opacity/transform 过渡已移除。
+安装录屏包含 278 帧，记录跨度约 7.99s 并保留尾帧；源码与安装版动作序列相等，含真实 CDP `mouseMoved`。环境为 Qt 6.12 / Chromium 140.0.7339.225、Windows 原生平台，未禁用 GPU，控制台为空。本机 DPR 1.5 与 2.25 短场景各记录 109 个帧回调间隔，中位 16.7ms、P95 16.7–16.8ms。这是帧回调与录屏证据，不能推导物理输入到显示的端到端延迟，或所有显卡、缩放与目标机表现。
 
-`prefers-reduced-motion: reduce` 或应用 `body.reduce-motion` 将动画/过渡缩为 1ms。抽屉使背景 inert，关闭后恢复触发点焦点；窄屏辅助信息通过抽屉进入。截图只能验证静态状态。
-
-网页裁剪保持宽高比 1.25 × 泳道数 n，四角点可拖动或使用方向键等比调整；默认高度步进 1 原像素，Shift 为 10，宽度按比例取整。裁剪框本身方向键平移。无 ROI 时可直接在原图上拖画比例范围，宽高至少各 4 原像素才提交。泳道数输入与加减按钮保持裁剪高度、调整宽度；宽度超出原图时提示先缩小裁剪框，不改变原图。浏览器保持草稿语义，桌面交由 backend 处理。
-
-### Image Review
-
-左栏显示缩略图、来源和真实处理状态，中间直接拖动裁剪框及角点。同源网页右栏显示泳道数 n、图像规格、定量质量说明和逐泳道摘要，主要动作是“返回拼图”。自动处理完成后进入拼图，正常裁图无需逐张确认；缺失裁图通过异常列表返回原图调整。裁图状态 cropStatus 与定量质量独立，裁图就绪不消除质量警告。灰度模式提供组曲线与原图积分监督；桌面修改泳道、积分边界或直线封底后自动重算，旧结果不能保持为当前有效结果。
-
-裁剪提交保持原像素半开坐标；缩放、平移和适应窗口仅影响显示。精确坐标和批量表是补充入口。自动结果不能自动标记人工审核，未检测、排除、失败和真实零值须可区分。
-
-### Fig Quantitation Supervision
-
-延续三栏与稳定证据画布：左侧按 Fig 组织条带，中央显示实际标注拼图及映射泳道，下方按原图分段显示曲线，右侧列出当前泳道的组内积分、质量状态和可展开原因。拼图上的泳道框依 sourceRoi 映射各自原图位置，不为视觉对齐改变定量坐标；曲线段间留白不参与积分。组映射不可用时显示具体原因并保留单条带入口。
-
-点击条带、曲线段或结果数值进入对应原图监督；范围和封底控件沿用现有强调色与焦点反馈，图像和数值不增加装饰过渡。导航顺序为裁图→拼图→灰度→结果，自动处理落点仍为拼图，无逐图确认。此为既有视觉体系的能力扩展，未改变 frontmatter tokens；能力验收以 T-037 主任务为准。
-
-### Tables, Context Tools and Outputs
-
-表头浅灰、网格轻，选中保持深字。既有窄摘要使用 4 位有效数字；T-037 灰度表与分组导出保留两位小数，计算记录保留完整精度，缺失值保空。原始积分待质量复核时单独呈现，不能等同有效信号或进入归一化。
-
-拼图预览保留适应窗口与 100%；同源网页按实际渲染图像区域建立可点击和键盘聚焦的命中区，点击返回对应原图，不按列表顺序推算位置。浏览器草稿不会更新历史拼图或定量。标签、分段、字体及模板设置保持可到达。结果页承载导出动作与输出位置，完整项目 ZIP、拼图 TIFF/PNG、定量表、OCR 表和归一化表保留实际能力。空态与失败文案说明下一步，不伪造完成。
+代码增量独审绑定 `5c56f55` 并获 `ACCEPTED`（`.local/t075-code-review-5c56f55.md`）；之前四项视觉修正及裁剪标注直接回归的限定范围 `ship` 结论保留（`.local/t075-finish-review-edafe65.md`）。本机候选交付及697c428诊断增量独审通过；CI181两平台各1192项、全部隔离wheel和四项必需检查成功。最终证据提交按任务完成条件核对。CI180 Windows一项角度输入/命中断言失败与Linux关闭回收挂起仍UNKNOWN；历史失败、干净 Win10、物理 DPI、科学留出和 native UNKNOWN 缺口继续保留，不用后继成功认定旧根因已修复。
 
 ## Do's and Don'ts
 
-### Do:
+**Do**
 
-- **Do** 从实际 CSS、Qt palette、QSS 和绘制实现提取角色。
-- **Do** 保持原图、来源、曲线、参数和当前结果一致。
-- **Do** 用明确文字区分裁图就绪、人工审核、质量警告、过期和失败。
-- **Do** 尊重应用减少动效和 Qt 暴露的系统效果偏好。
+- 以当前 T074 业务结构和 T075 同源资源为准，保留来源、单位、缺项、质量和未保存状态。
+- 使用同一 DOM、字体、SVG 与动效代码交付预览和安装版，并冻结数据、视口、DPR 与资源摘要。
+- 让主要动作、键盘焦点和当前对象可见；让辅助入口同时支持悬停、聚焦和点击。
+- 把保存中、已保存、失败、部分完成和人工审核分开表达。
+- 在真实 WebEngine 中核对快速切换、反向展开、中文输入、返回焦点与保存回执。
 
-### Don't:
+**Don't**
 
-- **Don't** 让高级坐标表成为默认图上操作，或把导航切换当作逐图确认要求。
-- **Don't** 把图像、曲线证据或定量数值加入装饰动画。
-- **Don't** 把截图、自动结果或裁剪确认当作科学验收证明。
-- **Don't** 把同源 assets 等同于高级能力全部网页化，或虚构全平台偏好检测。
+- 不要用旧预览或旧 Qt Widgets 界面替代最新正式工作台的视觉验收。
+- 不要用隐藏来源、单位或错误来降低信息密度，也不要把缺失、失败或未检测显示成零。
+- 不要让主题、密度或动效进入科研项目文件、原图或导出内容。
+- 不要给科学 ROI、积分边界、曲线和数值添加装饰动画，或让提交等待动画。
+- 不要将静态截图、软件渲染测试或资源相同等同于动态体验、硬件渲染或安装版验收通过。

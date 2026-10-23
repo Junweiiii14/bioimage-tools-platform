@@ -1,0 +1,17 @@
+{
+  "candidate": "971d860dec6686abfb72935bfdd22ab0c5b3e93f",
+  "runtime": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB 界面系统测试版 971d860\\runtime\\python.exe",
+  "origins": {
+    "bioimage_app": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB 界面系统测试版 971d860\\runtime\\Lib\\site-packages\\bioimage_app\\__init__.py",
+    "wb_tool": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB 界面系统测试版 971d860\\runtime\\Lib\\site-packages\\wb_tool\\__init__.py",
+    "platform_runtime": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB 界面系统测试版 971d860\\runtime\\Lib\\site-packages\\platform_runtime\\__init__.py",
+    "tool_contracts": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB 界面系统测试版 971d860\\runtime\\Lib\\site-packages\\tool_contracts\\__init__.py",
+    "PySide6": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB 界面系统测试版 971d860\\runtime\\Lib\\site-packages\\PySide6\\__init__.py"
+  },
+  "pytestExit": 0,
+  "testHarness": "source tests/pytest only; installed product, worker, Qt and runtime",
+  "loadedProductModuleCount": 146,
+  "passed": 19,
+  "seconds": 26.97,
+  "processExit": 0
+}

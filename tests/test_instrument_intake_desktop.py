@@ -1342,6 +1342,18 @@ def test_sequence_real_page_two_figs_pause_continue_stage_barriers_and_reopen(
         qtbot.waitUntil(lambda: bool(replies), timeout=10000)
         return replies[0]
 
+    def wait_crop_boundary(expected: list[str]) -> None:
+        # A saved claim may be idle before its queued execution callback starts.
+        qtbot.waitUntil(
+            lambda: (
+                not window.host.operation_busy
+                and not window.host.has_unsaved_changes
+                and isinstance(project := window.host.view.project(), WBIntakeCropProject)
+                and [s.status for s in project.workflow.steps if s.stage == "crop"] == expected
+            ),
+            timeout=20000,
+        )
+
     qtbot.waitUntil(
         lambda: (
             js(
@@ -1398,7 +1410,7 @@ def test_sequence_real_page_two_figs_pause_continue_stage_barriers_and_reopen(
         is True
     )
     js("document.querySelector('[data-group-action=start]').click();true")
-    wait_saved(window, qtbot)
+    wait_crop_boundary(["needs_review", "pending"])
     paused = current(window)
     assert isinstance(paused, WBIntakeCropProject), window.host.view.status.text()
     assert paused.workflow.policy == "intake_workflow@3"
@@ -1419,7 +1431,17 @@ def test_sequence_real_page_two_figs_pause_continue_stage_barriers_and_reopen(
     )
     assert js("row().id") == paused.rows[0].row_id
     for index in (0, 1):
-        qtbot.waitUntil(lambda: js("!state.busy") is True, timeout=10000)
+        expected_statuses = "needs_review,pending" if index == 0 else "done,needs_review"
+        qtbot.waitUntil(
+            lambda expected_statuses=expected_statuses: (
+                js(
+                    "!state.busy && state.intake.workflow.steps.filter(s=>s.stage==='crop')"
+                    ".map(s=>s.status).join(',')===" + json.dumps(expected_statuses)
+                )
+                is True
+            ),
+            timeout=10000,
+        )
         assert (
             js("""
           commitCrop({x:12,y:10,width:120,height:40},row().roi);
@@ -1428,8 +1450,8 @@ def test_sequence_real_page_two_figs_pause_continue_stage_barriers_and_reopen(
             is True
         ), window.host.view.status.text()
         js("document.querySelector('[data-intake-crop-action=run]').click();true")
-        wait_saved(window, qtbot)
         if index == 0:
+            wait_crop_boundary(["done", "needs_review"])
             halfway = current(window)
             assert isinstance(halfway, WBIntakeCropProject)
             assert [s.status for s in halfway.workflow.steps if s.stage == "crop"] == [
@@ -1439,6 +1461,16 @@ def test_sequence_real_page_two_figs_pause_continue_stage_barriers_and_reopen(
             assert all(s.attempt == 0 for s in halfway.workflow.steps if s.stage != "crop")
             qtbot.waitUntil(
                 lambda halfway=halfway: js("row().id") == halfway.rows[1].row_id, timeout=10000
+            )
+        else:
+            qtbot.waitUntil(
+                lambda: (
+                    not window.host.operation_busy
+                    and not window.host.has_unsaved_changes
+                    and isinstance(project := window.host.view.project(), WBIntakeOutputProject)
+                    and all(s.status == "done" for s in project.workflow.steps)
+                ),
+                timeout=20000,
             )
     finished = current(window)
     assert isinstance(finished, WBIntakeOutputProject), window.host.view.status.text()
@@ -1556,6 +1588,19 @@ def test_reliable_sequence_needs_no_crop_confirmations_and_shows_images_and_tabl
     """)
         is True
     )
+    # A JS click returns before its WebChannel start request is acknowledged.
+    qtbot.waitUntil(
+        lambda: window.bridge.sequence_response.get("status") == "started", timeout=10000
+    )
+
+    # Individual asset/save operations may be idle between real workflow stages.
+    def terminal() -> bool:
+        project = current(window)
+        return isinstance(project, WBIntakeOutputProject) and all(
+            step.status not in {"pending", "running"} for step in project.workflow.steps
+        )
+
+    qtbot.waitUntil(terminal, timeout=20000)
     wait_saved(window, qtbot)
     finished = current(window)
     assert isinstance(finished, WBIntakeOutputProject), window.host.view.status.text()

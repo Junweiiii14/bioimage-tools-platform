@@ -43,7 +43,9 @@ CONFIGURE = """(()=>{
 })()"""
 
 
-def verify_sequence_installation(report_path: Path, *, automatic: bool = False) -> int:
+def verify_sequence_installation(
+    report_path: Path, *, automatic: bool = False, supervision: bool = False
+) -> int:
     import numpy as np
     import tifffile
     from PySide6.QtCore import QSettings, QTimer
@@ -115,6 +117,7 @@ def verify_sequence_installation(report_path: Path, *, automatic: bool = False) 
         output_digest = ""
         run_ids: tuple[str, ...] = ()
         observed_status = ""
+        observed_shutdown = ""
         required = {
             "top-fields-one-start",
             "whole-batch-pause",
@@ -143,17 +146,23 @@ def verify_sequence_installation(report_path: Path, *, automatic: bool = False) 
                 )
             )
 
+        if supervision:
+            required.update(("supervision-curve-grid-export", "grid-safe-reopen"))
+
         def record() -> None:
             report.seek(0)
             report.truncate()
             json.dump(
                 {
                     "schema": 1,
-                    "diagnostic": "automatic_flow_installed@1"
+                    "diagnostic": "supervision_installed@1"
+                    if supervision
+                    else "automatic_flow_installed@1"
                     if automatic
                     else "fig_sequence_installed@1",
                     "phase": phase,
                     "failed_phase": failed_phase,
+                    "shutdown_stage": observed_shutdown,
                     "checks": checks,
                     "errors": errors,
                     "elapsed": time.monotonic() - started,
@@ -194,6 +203,10 @@ def verify_sequence_installation(report_path: Path, *, automatic: bool = False) 
             failed_phase = "construction"
             record()
             return 1
+
+        from bioimage_app.installation_check_supervision import SupervisionCheck
+
+        supervision_check = SupervisionCheck(window, root)
 
         def observed(project: WBFigureProject) -> None:
             try:
@@ -257,9 +270,10 @@ def verify_sequence_installation(report_path: Path, *, automatic: bool = False) 
 
         def poll() -> None:
             nonlocal phase, failed_phase, workspace, epoch, output, output_digest, run_ids
-            nonlocal modes, worker_pids, js_value, observed_status
+            nonlocal modes, worker_pids, js_value, observed_status, observed_shutdown
             nonlocal review_submitted
             try:
+                observed_shutdown = window.shutdown_stage
                 elapsed = time.monotonic() - started
                 if elapsed > 150:
                     errors.append("Owned diagnostic shutdown exceeded 150 seconds")
@@ -291,6 +305,10 @@ def verify_sequence_installation(report_path: Path, *, automatic: bool = False) 
                         phase = "dispose"
                         window.deleteLater()
                     return
+                if phase == "reopen" and window.shutdown_stage.startswith("confirm_"):
+                    raise ValueError(
+                        "Reopen requested a transition confirmation: " + window.shutdown_stage
+                    )
                 if pending_js or window.shutdown_stage != "idle" or window.host.operation_busy:
                     return
                 project = window.host.view.project()
@@ -505,10 +523,17 @@ def verify_sequence_installation(report_path: Path, *, automatic: bool = False) 
                             raise ValueError("Not every actual running batch stage was observed")
                         checks.extend(("automatic-navigation", "stage-barriers"))
                         workspace, epoch = window.host.workspace_path, window.bridge.session_epoch
-                        phase = "reopen"
-                        window.open_project(workspace)
+                        phase = "supervision" if supervision else "reopen"
+                        if not supervision:
+                            window.open_project(workspace)
                     else:
                         javascript("mode==='results'?JSON.stringify(sequenceModes):false")
+                elif phase == "supervision":
+                    if supervision_check.poll():
+                        checks.append("supervision-curve-grid-export")
+                        run_ids = tuple(p.run.run_id for p in project.analyses if p.run)
+                        phase = "reopen"
+                        window.open_project(workspace)
                 elif phase == "reopen":
                     if window.bridge.session_epoch <= epoch:
                         return
@@ -530,6 +555,16 @@ def verify_sequence_installation(report_path: Path, *, automatic: bool = False) 
                     ):
                         raise ValueError("Reopen resumed navigation or changed old output")
                     checks.append("safe-reopen")
+                    if supervision:
+                        from wb_tool.api import WBIntakeGridProject
+
+                        if (
+                            not isinstance(project, WBIntakeGridProject)
+                            or project.grid.columns != 1
+                            or project.grid.gap != 17
+                        ):
+                            raise ValueError("Saved grid changed on reopen")
+                        checks.append("grid-safe-reopen")
                     if any(
                         sha256(p.read_bytes()).hexdigest() != digest
                         for p, digest in originals.items()
@@ -548,7 +583,13 @@ def verify_sequence_installation(report_path: Path, *, automatic: bool = False) 
 
         timer = QTimer(app)
         timer.timeout.connect(poll)
-        with patch.object(window.host, "save", new=traced_save):
+        with (
+            patch.object(window.host, "save", new=traced_save),
+            patch(
+                "PySide6.QtWidgets.QFileDialog.getSaveFileName",
+                side_effect=supervision_check.destination,
+            ),
+        ):
             try:
                 window.show()
                 window.start_from_images([sources], intake=True)
