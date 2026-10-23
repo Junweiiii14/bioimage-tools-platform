@@ -2292,6 +2292,15 @@ def test_batch_lane_overview_cards_open_bounded_editor_and_drag_preview(
         new MouseEvent('click',{bubbles:true}));true
     """,
     )
+    # Wait for stable layout before exact geometry assertions. The original
+    # Linux failure did not capture its individual cause; this is a timing guard.
+    qtbot.waitUntil(
+        lambda: (
+            javascript(window, qtbot, "document.getAnimations().every(a=>a.playState==='finished')")
+            is True
+        ),
+        timeout=10000,
+    )
     assert javascript(
         window,
         qtbot,

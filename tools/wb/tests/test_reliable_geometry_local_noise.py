@@ -14,11 +14,14 @@ from wb_tool.api import (
     propose_intake_crop,
 )
 
+from tools.wb.tests.common_policy_assertions import assert_prominent_row
 from tools.wb.tests.test_intake_automatic_crop import prepared
 from tools.wb.tests.test_reliable_geometry_registration import grouped_arrays
 
 
-def _source_proposal(tmp_path: Path, pixels: NDArray[np.uint16], count: int, name: str) -> bool:
+def _source_proposal(
+    tmp_path: Path, pixels: NDArray[np.uint16], count: int, name: str, *, prominent: bool = False
+) -> bool:
     path = tmp_path / f"{name}.tiff"
     tifffile.imwrite(path, pixels)
     active, ticket = claim_intake_workflow_step(prepared(path, count=count), session_key=name)
@@ -26,6 +29,8 @@ def _source_proposal(tmp_path: Path, pixels: NDArray[np.uint16], count: int, nam
     assert ticket
     evidence = propose_intake_crop(str(path), active, "r")
     allowed = automatic_intake_crop_allowed(evidence)
+    if prominent:
+        assert_prominent_row(evidence, path, pixels, [(235, 116, 266, 125), (285, 116, 316, 125)])
     return allowed
 
 
@@ -46,7 +51,7 @@ def test_distant_correlated_texture_cannot_erase_locally_clean_terminal_band(
         pixels[(abs(xx - x) < 16) & (abs(yy - 120) < 5)] = value
     assert np.all(pixels[90:110, 335:366] == 50000)
     assert np.all(pixels[116:125, 335:366] == 49000)
-    assert not _source_proposal(tmp_path, pixels, 2, f"correlated_{amplitude}")
+    assert _source_proposal(tmp_path, pixels, 2, f"correlated_{amplitude}", prominent=True)
 
 
 @pytest.mark.parametrize("count", [2, 3])
@@ -78,7 +83,7 @@ def test_unfit_direction_retains_observed_third_component(tmp_path: Path, shape:
         pixels[117:123, 350] = 8000
     else:
         pixels[119:122, 350:352] = 8000
-    assert not _source_proposal(tmp_path, pixels, 2, shape)
+    assert _source_proposal(tmp_path, pixels, 2, shape, prominent=True)
 
 
 @pytest.mark.parametrize("extra_peer_row", [False, True])
@@ -102,6 +107,15 @@ def test_peer_target_must_not_turn_repeated_rows_into_registration_proof(
     allowed = automatic_intake_crop_allowed(evidence)
     if allowed:
         accepted = accept_automatic_intake_crop(active, ticket, evidence)
-        assert accepted.intake_crops[0].policy == "intake_crop@3"
+        assert accepted.intake_crops[0].policy == (
+            "intake_crop@4" if extra_peer_row else "intake_crop@3"
+        )
+        assert evidence.detection is not None
+        flags = evidence.detection.flags
+        assert ("registered_signal_pair@1" in flags) == (not extra_peer_row)
+        assert ("companion_coordinates_unconfirmed" in flags) == extra_peer_row
+        for slot, x in zip(evidence.slots, (275, 325), strict=True):
+            assert slot.roi and slot.roi.x0 <= x - 15 and slot.roi.x1 >= x + 16
+            assert slot.roi.y0 <= 111 and slot.roi.y1 >= 130
         assert accepted.intake_crops[0].geometry_ready and not accepted.intake_crops[0].reviewed
-    assert allowed == (not extra_peer_row)
+    assert allowed

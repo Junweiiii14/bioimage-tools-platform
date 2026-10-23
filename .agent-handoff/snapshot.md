@@ -1,7 +1,7 @@
 # 当前恢复指针
 
 - 当前任务T080：work/tasks/T-080-common-band-crop-evidence-plan.md；完整目标work/evidence/T-080/goal-plan.md。目标active，无token预算，用户授权自主完成算法、旋转、完整项目输出、独审/PR/CI和离线安装包。不停在研究或方案，不反复确认，不过度测试。
-- 活动树C:/Users/70236/.codex/worktrees/wb-lab-installer/bioimage-tools-platform，branch codex/t080-crop-evidence-plan，基线main2d2c9727ec93c7a625e46964696788f06f8f4834；T080尚未提交。原ResearchVault dirty树和wb-ui-system视频树保护。
+- 活动树C:/Users/70236/.codex/worktrees/wb-lab-installer/bioimage-tools-platform，branch codex/t080-crop-evidence-plan，基线main2d2c9727ec93c7a625e46964696788f06f8f4834；T080产品be0d0fa/审查f363f37已提交，PR40打开，最新CI修复待冻结。原ResearchVault dirty树和wb-ui-system视频树保护。
 - P1完成：180目录27TIFF/9组、3PNG及9SWED共39原文件SHA清单；PNG无损RGBA TIFF副本，原SHA不变。.local/T080/input-evidence/manifest.json。公开API21诊断case仅3自动，内参全拒；同组两个来源不是独立项目，不能用该比例代项目准确率。
 - 原因：明显核心被弱halo触边/高度、1–2px越界和远弱结构硬拒；PNG旧槽宽受整膜高度误导。2C GAPDH主信号约−17.4°，旧±10°无法覆盖。私有peer-diagnostics/findings.md及baseline/report.json保留。
 - P2：docs/research/2026-10-23-common-band-cropping.md；方案独审work/evidence/T-080/scientific-impact-review.md。五个短原型.local/T080/prototype-v1..v5；v1膜边、v2碎核截末端、v3峰点偏中心、v4连带半突出宽度失败均保留，v5修主行方向/碎核/谷分区。v5非产品，首带marker余量/核心覆盖及弱槽完整性需实际模块保证。
@@ -15,3 +15,5 @@
 - 待完成：产品实现→有限同集诊断/真实UI及完整项目导出恢复→绑定提交独审/完整必需CI/正常PR main→重建安装、安装态烟测及交付。未运行不写通过。来源路径/原图/安装包只存ignored，不上传。
 - T079桌面WB.zip与安装efd8d4保持；.local/releases/runtime-e97d721e7993是旧清理唯一重建引用，不删除。WB-归档-20261023-T079保留。孤立旧卸载登记删除曾被自动审批blocked by policy，禁止换工具重试。
 - 视频聊天01a16507-01a9-7830-b7d3-cd674efc477b已建立，不重复创建/调度/发未经授权消息。干净Win10、全部员工硬件、物理DPI、科学独立项目留出和历史native UNKNOWN仍未验。
+
+- 当前下一步（覆盖上文旧待冻结指针）：f363f37准确HEAD CI失败，两平台30/31旧策略/命名/schema/UI断言，证据ci-integration-failure.md。修复强条带误合并/doublet并按独审分类迁移policy4公共测试；71定向+1真实伙伴无裁图通过，真实v2回放21/21且39原文件不变。新修复未提交，最终独审/准确HEAD四CI/正常合入/实际安装交付仍待。Qt当前已结束；不能把旧Accepted/CI迁作新HEAD通过。

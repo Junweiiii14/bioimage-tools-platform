@@ -56,7 +56,7 @@ def test_implicit_registration_target_cannot_hide_a_narrower_second_row() -> Non
     assert "guided_target_ambiguous" in result.flags
 
 
-def _grouped(
+def grouped_offset(
     tmp_path: Path, *, merge_offset: int
 ) -> tuple[WBIntakeCropProject, tuple[FigureSourcePath, ...], str]:
     yy, xx = np.mgrid[:240, :600]
@@ -127,7 +127,7 @@ def grouped_arrays(
 def test_group_must_validate_registration_before_automatic_acceptance(
     tmp_path: Path, merge_offset: int
 ) -> None:
-    p, sources, row_id = _grouped(tmp_path, merge_offset=merge_offset)
+    p, sources, row_id = grouped_offset(tmp_path, merge_offset=merge_offset)
     active, ticket = claim_intake_workflow_step(p, session_key="review-group")
     assert isinstance(active, WBIntakeCropProject)
     assert ticket
@@ -135,7 +135,16 @@ def test_group_must_validate_registration_before_automatic_acceptance(
     allowed = automatic_intake_crop_allowed(evidence)
     if allowed:
         accepted = accept_automatic_intake_crop(active, ticket, evidence)
-        assert accepted.intake_crops[0].policy == "intake_crop@3"
+        assert accepted.intake_crops[0].policy == (
+            "intake_crop@4" if merge_offset else "intake_crop@3"
+        )
+        assert evidence.detection is not None
+        flags = evidence.detection.flags
+        assert ("registered_signal_pair@1" in flags) == (merge_offset == 0)
+        assert ("companion_coordinates_unconfirmed" in flags) == (merge_offset != 0)
+        for slot, x in zip(evidence.slots, (275, 325), strict=True):
+            assert slot.roi and slot.roi.x0 <= x - 15 and slot.roi.x1 >= x + 16
+            assert slot.roi.y0 <= 113 and slot.roi.y1 >= 128
         assert accepted.intake_crops[0].geometry_ready and not accepted.intake_crops[0].reviewed
         assert read_figure_project(accepted.model_dump_json().encode()) == accepted
         data = accepted.model_dump(mode="json")
@@ -148,4 +157,4 @@ def test_group_must_validate_registration_before_automatic_acceptance(
 
         with pytest.raises(ValueError):
             read_figure_project(json.dumps(data).encode())
-    assert allowed == (merge_offset == 0)
+    assert allowed

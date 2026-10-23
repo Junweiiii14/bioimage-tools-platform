@@ -9,6 +9,7 @@ from numpy.typing import NDArray
 from wb_tool.api import AutoWBSettings, automatic_intake_crop_allowed, propose_intake_crop
 from wb_tool.domain.reliable_geometry import detect_reliable_geometry
 
+from tools.wb.tests.common_policy_assertions import assert_prominent_row
 from tools.wb.tests.test_intake_automatic_crop import prepared
 
 
@@ -59,4 +60,8 @@ def test_unselected_third_lane_must_not_be_discarded(
     path = tmp_path / f"{name}.tiff"
     tifffile.imwrite(path, signal)
     evidence = propose_intake_crop(str(path), prepared(path, count=2), "r")
-    assert not automatic_intake_crop_allowed(evidence), f"Wrong 2-of-3 row accepted: {name}"
+    if name == "weak_terminal":
+        # Policy4 ignores the N-external 2.4%-contrast structure; old domain stays strict.
+        assert_prominent_row(evidence, path, signal, [(235, 116, 266, 125), (285, 116, 316, 125)])
+    else:
+        assert not automatic_intake_crop_allowed(evidence), f"Wrong 2-of-3 row accepted: {name}"

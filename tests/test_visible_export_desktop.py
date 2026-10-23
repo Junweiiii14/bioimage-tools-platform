@@ -131,7 +131,7 @@ def test_real_unreviewed_result_matches_both_exports(
     assert len(visible) == 3 and any("*" in value for row in visible[1:] for value in row[2:-1])
     cells = window.host.view.analysis.result_view.cells
     assert any(c.raw_integral is not None and c.value is None for c in cells)
-    original_zip = Path(project.intake_outputs[-1].destination, "project.zip").read_bytes()
+    original_zip = Path(project.intake_outputs[-1].destination, "项目恢复.zip").read_bytes()
     for suffix in ("xlsx", "csv"):
         destination = tmp_path / ("visible." + suffix)
 
@@ -168,7 +168,7 @@ def test_real_unreviewed_result_matches_both_exports(
             window.bridge.snapshot().get("error"),
         )
         assert "已导出" in window.host.view.status.text()
-        automatic_table = Path(project.intake_outputs[-1].destination) / ("measurements." + suffix)
+        automatic_table = Path(project.intake_outputs[-1].destination) / ("灰度汇总." + suffix)
         if suffix == "csv":
             assert destination.read_bytes() == automatic_table.read_bytes()
         else:
@@ -223,7 +223,7 @@ def test_real_unreviewed_result_matches_both_exports(
         if capture:
             (Path(capture) / destination.name).write_bytes(destination.read_bytes())
     assert {p: p.read_bytes() for p in root.iterdir()} == originals
-    assert Path(project.intake_outputs[-1].destination, "project.zip").read_bytes() == original_zip
+    assert Path(project.intake_outputs[-1].destination, "项目恢复.zip").read_bytes() == original_zip
     if capture:
         qtbot.waitUntil(
             lambda: (

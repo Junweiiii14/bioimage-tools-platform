@@ -419,3 +419,43 @@ def test_final_project_full_or_partial_and_standard_archive_restores(
     (root / "灰度汇总.csv").write_text("changed")
     with pytest.raises(ValueError, match="摘要不一致"):
         inspect_intake_delivery(str(root))
+
+
+def test_unregistered_common_policy_retains_peers_without_corresponding_crops(
+    tmp_path: Path,
+) -> None:
+    from wb_tool.api import accept_automatic_intake_crop
+
+    from tools.wb.tests.test_reliable_geometry_registration import grouped_offset
+
+    project, sources, row_id = grouped_offset(tmp_path, merge_offset=80)
+    active, ticket = claim_intake_workflow_step(project, session_key="unregistered-delivery")
+    assert isinstance(active, WBIntakeCropProject) and ticket is not None
+    evidence = propose_intake_crop(sources[0].path, active, row_id, sources=sources[1:])
+    active = accept_automatic_intake_crop(active, ticket, evidence)
+    assert active.intake_crops[0].policy == "intake_crop@4"
+    assert evidence.detection is not None
+    assert "companion_coordinates_unconfirmed" in evidence.detection.flags
+    assert "registered_signal_pair@1" not in evidence.detection.flags
+    active, ticket = claim_intake_workflow_step(active, session_key="unregistered-export")
+    assert isinstance(active, WBIntakeCropProject) and ticket is not None
+    raw_path = tmp_path / "raw.tiff"
+    export_intake_crop(sources[0].path, active, row_id, str(raw_path), ticket=ticket)
+    completed = complete_intake_crop(active, ticket, asset(raw_path))
+    completed = prepare_intake_delivery(
+        completed,
+        output_parent=str(tmp_path),
+        workspace_path=str(tmp_path / "work"),
+        delivery_id="e" * 32,
+    )
+    paths = (*sources, FigureSourcePath(asset(raw_path).sha256, str(raw_path)))
+    receipt = materialize_intake_delivery(completed, paths, workspace_path=str(tmp_path / "work"))
+    root = Path(receipt.destination)
+    row = plan_intake_delivery(completed).rows[0]
+    originals = list((root / row.directory / "原始图片").iterdir())
+    assert {load_tiff(p).sha256 for p in originals} == {p.sha256 for p in sources}
+    assert len(originals) == 3
+    assert len(list((root / row.directory / "原值裁剪").iterdir())) == 1
+    record = json.loads((root / row.directory / "裁剪与来源记录.json").read_bytes())
+    assert len(record["companions"]) == 2
+    assert all("未生成" in item["status"] for item in record["companions"])

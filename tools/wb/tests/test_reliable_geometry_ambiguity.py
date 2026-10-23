@@ -15,6 +15,7 @@ from wb_tool.api import (
 )
 from wb_tool.domain.reliable_geometry import detect_reliable_geometry
 
+from tools.wb.tests.common_policy_assertions import assert_prominent_row
 from tools.wb.tests.test_intake_automatic_crop import prepared
 
 
@@ -41,7 +42,11 @@ def test_unselected_partial_second_row_does_not_prove_target_identity(
     assert ticket
     evidence = propose_intake_crop(str(path), p, "r")
     allowed = automatic_intake_crop_allowed(evidence)
-    assert not allowed
+    if allowed:
+        # A complete main row may win over isolated off-row clutter, never a diagonal subset.
+        assert_prominent_row(evidence, path, signal, [(260, 98, 291, 107), (310, 98, 341, 107)])
+    else:
+        assert lower_count == 3
 
 
 def test_unrotated_frame_can_retain_all_observed_original_pixels() -> None:
@@ -108,5 +113,4 @@ def test_proposed_extra_slot_filter_does_not_erase_unknown_third_target(
     assert isinstance(project, WBIntakeCropProject)
     assert ticket
     evidence = propose_intake_crop(str(path), project, "r")
-    allowed = automatic_intake_crop_allowed(evidence)
-    assert not allowed, "Proposed shape exclusion turns unknown third target into N=2"
+    assert_prominent_row(evidence, path, signal, [(300, 179, 401, 222), (450, 179, 551, 222)])

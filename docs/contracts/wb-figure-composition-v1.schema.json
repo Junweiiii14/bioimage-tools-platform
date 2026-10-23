@@ -3,6 +3,15 @@
     "DisplayFrame": {
       "additionalProperties": false,
       "properties": {
+        "sampling_policy": {
+          "default": "within_roi@1",
+          "enum": [
+            "within_roi@1",
+            "within_source@2"
+          ],
+          "title": "Sampling Policy",
+          "type": "string"
+        },
         "center_x": {
           "title": "Center X",
           "type": "number"

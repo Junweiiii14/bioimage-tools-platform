@@ -83,7 +83,8 @@ def _marker_end(plane: DetectionPlane, valid: NDArray[np.bool_], scale: float) -
             prominence=max(1.0, float(vertical.max()) * 0.22),
             distance=max(2, round(scale * 0.35)),
         )
-        if len(ridges) >= 2:
+        # A sample doublet is insufficient evidence for a marker column.
+        if len(ridges) >= 3:
             # The old .45-scale expansion cut into an adjacent genuine band.
             # Follow the marker's own horizontal extent, with only a small cap.
             right = int(position)
@@ -180,7 +181,7 @@ def _choose_row(
             members = [
                 q
                 for q in cores
-                if abs(q.y - slope * q.x - intercept) <= max(2.0, min(q.height * 0.8, scale * 0.22))
+                if abs(q.y - slope * q.x - intercept) <= max(2.0, min(q.height, scale * 0.22))
             ]
             # Two parallel rows must not gain extra votes merely by crossing
             # a sloping hypothesis at the same sample X. Nearby fragments share
@@ -252,6 +253,13 @@ def _basin_centers(profile: FloatArray, scale: float, n: int) -> FloatArray:
                 / max(1.0, min(float(profile[peaks[j]]), float(profile[peaks[j + 1]])))
             ),
         )
+        valley_ratio = float(profile[boundaries[index]]) / max(
+            1.0, min(float(profile[peaks[index]]), float(profile[peaks[index + 1]]))
+        )
+        if valley_ratio < 0.5:
+            # Separate prominent basins are not fragments to merge merely to
+            # reach the requested N. Keep this as an explicit count conflict.
+            raise ValueError("common_prominent_slot_count_conflict")
         boundaries.pop(index)
         peaks = np.delete(
             peaks, index if profile[peaks[index]] < profile[peaks[index + 1]] else index + 1
@@ -271,8 +279,16 @@ def _slots(
     members: list[_Core], profile: FloatArray, scale: float, n: int
 ) -> tuple[FloatArray, tuple[int, ...]]:
     groups: list[list[_Core]] = []
+    gaps = np.diff([q.x for q in members])
+    positive_gaps = gaps[gaps > 1]
+    # Membrane width can overestimate pitch for a short row. Repeated observed
+    # separations must not be collapsed just because the membrane is broad.
+    fragment_distance = min(
+        scale * 0.55,
+        float(np.median(positive_gaps)) * 0.75 if len(positive_gaps) else scale * 0.55,
+    )
     for core in members:
-        if len(members) > n and groups and core.x - groups[-1][-1].x < scale * 0.55:
+        if len(members) > n and groups and core.x - groups[-1][-1].x < fragment_distance:
             groups[-1].append(core)
         else:
             groups.append([core])

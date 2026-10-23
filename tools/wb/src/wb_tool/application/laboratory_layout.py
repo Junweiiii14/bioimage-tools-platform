@@ -286,7 +286,7 @@ def _groups(
                 or y > (row.height if source_frame else min(row.height, roi.y1)) + 1e-7
                 for x, y in frame.corners()
             ):
-                raise ValueError("旋转显示框超出其已声明采样边界")
+                raise ValueError("旋转显示框超出原图" if source_frame else "旋转显示框超出原图ROI")
         groups.setdefault(segment.figure, {}).setdefault(segment.line, []).append(segment)
     ordered: dict[str, list[list[FigureSlice]]] = {}
     for figure, lines in groups.items():
