@@ -11,3 +11,4 @@
 
 - 已确认真实根因：原用户工程Fig1N2/Fig2N4填反，用户回复确认应4/2，后续新工程按此验证；原工程只读。workflow@4在4crop需复核时继续Fig3/4，是阶段问题实证。详细初诊、失败与进展见evidence及ignored .local/T081/progress.json。
 - P1–P3完成：prominent@1、crop@5、grid@2、workflow@5及公开发布API全批门槛实现；94定向与静态检查、实际同源180正常DOM入口9crop/4Fig/完整输出通过，无手工裁剪确认，39原图不变、9原值裁图逐像素一致。初始失败保留。下一步精确commit独审/四CI/PR合入和新包实际安装，未标最终完成。
+- P4首CI：1eb780c独审Accepted；Windows2fail/1289pass是验收仍要求旧policy3/guided2，三个精确版本期望已迁移到新契约，原值/N/页面/worker断言保持。限定两失败路径分别通过，详见ci-policy-migration。新准确提交独审/CI/合入和安装仍待完成。

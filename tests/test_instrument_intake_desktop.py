@@ -1724,7 +1724,7 @@ def test_reliable_sequence_needs_no_crop_confirmations_and_shows_images_and_tabl
         window.host.view.status.text()
     )
     assert all(
-        e.policy == "intake_crop@3" and not e.reviewed and e.raw_crop for e in finished.intake_crops
+        e.policy == "intake_crop@5" and not e.reviewed and e.raw_crop for e in finished.intake_crops
     )
     assert all(not row.reviewed for row in finished.rows)
     assert all(a.run and a.run.state == "succeeded" for a in finished.analyses)

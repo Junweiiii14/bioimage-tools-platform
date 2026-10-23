@@ -9,3 +9,4 @@
 - 下一步：冻结精确commit独审后正常PR+CI，冻结产品重建/实际安装验证；未完成不得标goal complete。80%独立项目科学准确率、干净Win10/全部员工设备等仍未验。
 
 - 实施进度：workflow@5和公开发布API全批barrier、prominent@1/crop@5/grid@2接线完成。94定向、类型/格式/边界及真实DOM的180项目通过（1passed51.95s）：正确N4/2/5/4、同原工程(1)source、9crop和所有后续完成、自动results；39原图SHA不变，9原值裁图逐像素一致。约−17°GAPDH明显主行视觉已核对。算法初败及直接桥调用页面跟随失败保留，精确导航顺序UNKNOWN，未改产品导航。证据work/evidence/T-081/validation.md。源码尚未提交/最终独审/CI，新包未构建安装。
+- 后续：源码1eb780c已非作者Accepted并开PR42。初CI Windows2fail/1289pass，3处验收旧policy精确期望迁移@5/guided prominent，算法不变；限定两失败路径分别通过，ci-policy-migration保留全部失败。新HEAD独审/四CI待，新包未构建。旧已安装程序已正常CloseMainWindow退出，无强杀。后续冻结准确提交构建，不绕过失败。

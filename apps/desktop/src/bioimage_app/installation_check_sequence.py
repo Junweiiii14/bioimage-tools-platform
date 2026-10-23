@@ -466,7 +466,7 @@ def verify_sequence_installation(
                             if (
                                 crop.raw_crop is None
                                 or not crop.geometry_ready
-                                or (automatic and (crop.policy != "intake_crop@3" or crop.reviewed))
+                                or (automatic and (crop.policy != "intake_crop@5" or crop.reviewed))
                                 or len(crop.slots) != row.lane_count
                             ):
                                 raise ValueError("Missing original crop or fixed slots")
@@ -495,7 +495,7 @@ def verify_sequence_installation(
                                 )
                                 if frame is None or abs(abs(frame.angle_degrees) - 3) > 1:
                                     raise ValueError("Small-angle correction was lost")
-                                if crop.geometry_policy != "instrument_guided_geometry@2":
+                                if crop.geometry_policy != "guided_prominent_band_geometry@1":
                                     raise ValueError(
                                         "Diagnostic did not exercise paired-guide path"
                                     )
