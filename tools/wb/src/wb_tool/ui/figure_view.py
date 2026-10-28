@@ -1663,7 +1663,9 @@ class FigureProjectView(QWidget):
         except ValueError as error:
             self.status.setText(f"无法恢复裁剪：{error}")
             return
-        if not self.select_row(row_id):
+        # Reselecting the same row would commit its edited geometry before undo
+        # can restore the original display frame against the retained baseline.
+        if self.selected_row_id != row_id and not self.select_row(row_id):
             return
         self._restoring_crop = True
         try:

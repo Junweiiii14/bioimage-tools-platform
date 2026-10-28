@@ -112,7 +112,7 @@ def test_anchored_snapshot_keeps_target_distinct_from_sampling_context() -> None
     host = cast(
         FigureProjectWindow,
         SimpleNamespace(
-            view=SimpleNamespace(project=lambda: project, selected_row=lambda: row, generation=0),
+            view=SimpleNamespace(project=lambda: project, selected_row_id=row.row_id, generation=0),
             project_results=[],
             operation_busy=False,
         ),
