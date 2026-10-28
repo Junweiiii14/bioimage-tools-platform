@@ -20,7 +20,17 @@ from tooling.qt_test_lifecycle import close_and_dispose_window
         ("wb-fig-sequence-test", "FigSequenceTest"),
         ("wb-automatic-flow-test", "AutomaticFlowTest"),
         ("wb-reliable-crop-test", "ReliableCropTest"),
+        ("wb-supervision-test", "SupervisionTest"),
+        ("wb-ui-system-test", "UISystemTest"),
         ("wb-laboratory", "Laboratory"),
+        ("wb-acceptance-t082-r11-a", "Acceptance-t082-r11-a"),
+        ("wb-acceptance-a", "Acceptance-a"),
+        ("wb-acceptance-" + "a" * 32, "Acceptance-" + "a" * 32),
+        ("wb-acceptance-" + "a" * 33, "Platform"),
+        ("wb-acceptance-", "Platform"),
+        ("wb-acceptance-../Laboratory", "Platform"),
+        ("wb-acceptance-Upper", "Platform"),
+        ("wb-acceptance-a\n", "Platform"),
         ("unknown", "Platform"),
     ],
 )
@@ -47,6 +57,8 @@ def test_distribution_constructor_never_reuses_another_settings_namespace(
         assert calls == [("BioImageTools", namespace)]
         if channel == "wb-laboratory":
             assert window.windowTitle() == "BioImage · WB 实验室版"
+        if namespace.startswith("Acceptance-"):
+            assert window.windowTitle() == "BioImage · WB 验收测试"
         window.settings.setValue("owned-regression", namespace)
         window.settings.sync()
         assert list(tmp_path.glob("*.ini")) == [tmp_path / (namespace + ".ini")]

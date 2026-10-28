@@ -8,21 +8,37 @@
   #error InstallerOutput is required
 #endif
 
+#ifdef AcceptanceId
+  #define ProductId "BioImageTools.WB.Acceptance." + AcceptanceId
+  #define ProductName "BioImage WB 验收 " + AcceptanceId
+  #define ProductExecutable "BioImageWB-Acceptance.exe"
+  #define VersionLabel "Acceptance-" + AcceptanceId
+  #define InstallerName "BioImage-WB-Acceptance-" + AcceptanceId
+  #define ProductReadme AppSource + "\安装与使用说明.txt"
+#else
+  #define ProductId "BioImageTools.WB.Laboratory"
+  #define ProductName "BioImage WB 实验室版"
+  #define ProductExecutable "BioImageWB.exe"
+  #define VersionLabel "Lab"
+  #define InstallerName "BioImage-WB-Lab"
+  #define ProductReadme "windows_laboratory_readme.txt"
+#endif
+
 [Setup]
-AppId=BioImageTools.WB.Laboratory
-AppName=BioImage WB 实验室版
-AppVersion=0.14.0-Lab-{#BuildCommit}
+AppId={#ProductId}
+AppName={#ProductName}
+AppVersion=0.14.0-{#VersionLabel}-{#BuildCommit}
 AppPublisher=BioImage Tools
-DefaultDirName={localappdata}\Programs\BioImage WB 实验室版
-DefaultGroupName=BioImage WB 实验室版
+DefaultDirName={localappdata}\Programs\{#ProductName}
+DefaultGroupName={#ProductName}
 PrivilegesRequired=lowest
 MinVersion=10.0.17763
 ArchitecturesAllowed=x64os
 ArchitecturesInstallIn64BitMode=x64os
 OutputDir={#InstallerOutput}
-OutputBaseFilename=BioImage-WB-Lab-Windows-x64-{#BuildCommit}-Setup
+OutputBaseFilename={#InstallerName}-Windows-x64-{#BuildCommit}-Setup
 SetupIconFile={#AppSource}\bioimage.ico
-UninstallDisplayIcon={app}\BioImageWB.exe
+UninstallDisplayIcon={app}\{#ProductExecutable}
 Compression=lzma2/fast
 SolidCompression=yes
 WizardStyle=modern
@@ -31,20 +47,20 @@ RestartApplications=no
 DisableProgramGroupPage=yes
 DisableWelcomePage=no
 DisableDirPage=auto
-InfoBeforeFile=windows_laboratory_readme.txt
+InfoBeforeFile={#ProductReadme}
 VersionInfoVersion=0.14.0.80
 
 [Files]
 Source: "{#AppSource}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{userdesktop}\BioImage WB 实验室版"; Filename: "{app}\BioImageWB.exe"; WorkingDir: "{app}"; AppUserModelID: BioImageTools.WB.Laboratory
-Name: "{userprograms}\BioImage WB 实验室版\BioImage WB 实验室版"; Filename: "{app}\BioImageWB.exe"; WorkingDir: "{app}"; AppUserModelID: BioImageTools.WB.Laboratory
-Name: "{userprograms}\BioImage WB 实验室版\环境自检"; Filename: "{app}\环境自检.cmd"; WorkingDir: "{app}"
-Name: "{userprograms}\BioImage WB 实验室版\安装与使用说明"; Filename: "{app}\安装与使用说明.txt"
-Name: "{userprograms}\BioImage WB 实验室版\卸载"; Filename: "{uninstallexe}"
+Name: "{userdesktop}\{#ProductName}"; Filename: "{app}\{#ProductExecutable}"; WorkingDir: "{app}"; AppUserModelID: {#ProductId}
+Name: "{userprograms}\{#ProductName}\{#ProductName}"; Filename: "{app}\{#ProductExecutable}"; WorkingDir: "{app}"; AppUserModelID: {#ProductId}
+Name: "{userprograms}\{#ProductName}\环境自检"; Filename: "{app}\环境自检.cmd"; WorkingDir: "{app}"
+Name: "{userprograms}\{#ProductName}\安装与使用说明"; Filename: "{app}\安装与使用说明.txt"
+Name: "{userprograms}\{#ProductName}\卸载"; Filename: "{uninstallexe}"
 
 [Run]
-Filename: "{app}\BioImageWB.exe"; Description: "启动 BioImage WB 实验室版"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#ProductExecutable}"; Description: "启动 {#ProductName}"; Flags: nowait postinstall skipifsilent
 
 ; No blanket UninstallDelete: user originals, projects and results survive uninstall.

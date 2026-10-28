@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import time
 from collections.abc import Callable
 from pathlib import Path
@@ -76,6 +77,7 @@ class WebWorkbenchWindow(QMainWindow):
     ) -> None:
         super().__init__()
         channel = os.environ.get("BIOIMAGE_RELEASE_CHANNEL")
+        acceptance = re.fullmatch(r"wb-acceptance-([a-z][a-z0-9-]{0,31})", channel or "")
         candidate = channel in {
             "candidate",
             "win10-test",
@@ -96,6 +98,8 @@ class WebWorkbenchWindow(QMainWindow):
             self.setWindowTitle("BioImage · 工具平台与 WB 界面测试版 T076")
         if channel == "wb-laboratory":
             self.setWindowTitle("BioImage · WB 实验室版")
+        if acceptance:
+            self.setWindowTitle("BioImage · WB 验收测试")
         self.setWindowIcon(QIcon(str(Path(__file__).with_name("web_ui") / "bioimage.svg")))
         self.resize(1440, 940)
         settings_name = {
@@ -110,6 +114,8 @@ class WebWorkbenchWindow(QMainWindow):
             "wb-ui-system-test": "UISystemTest",
             "wb-laboratory": "Laboratory",
         }.get(channel or "", "Platform")
+        if acceptance:
+            settings_name = "Acceptance-" + acceptance.group(1)
         self.settings = settings or QSettings("BioImageTools", settings_name)
         self.shortcuts = WorkbenchShortcuts(self.settings)
         self.appearance = WorkbenchAppearance(self.settings)

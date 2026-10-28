@@ -7,6 +7,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from tooling.acceptance_profile import acceptance_identity
 from tooling.build_candidate import ROOT, digest, icon, licenses
 from tooling.runtime_integrity import (
     PRODUCTS,
@@ -31,6 +32,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--iscc", required=True, type=Path)
     parser.add_argument("--gcc", required=True, type=Path)
+    parser.add_argument("--acceptance-id", help="Disposable identity; requires --laboratory")
     profiles = parser.add_mutually_exclusive_group()
     profiles.add_argument(
         "--laboratory", action="store_true", help="Build the self-contained laboratory distribution"
@@ -65,12 +67,16 @@ def main() -> int:
         "--ui-system-test", action="store_true", help="Build isolated UI system candidate"
     )
     args = parser.parse_args()
+    acceptance = acceptance_identity(args.acceptance_id) if args.acceptance_id is not None else None
+    if acceptance is not None and not args.laboratory:
+        parser.error("--acceptance-id requires --laboratory")
     if subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT).strip():
         raise RuntimeError("A committed, clean checkout is required")
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     toolchain = verify_toolchain(ROOT / "tooling/toolchain-lock.json", gcc=args.gcc, iscc=args.iscc)
     uv = str(toolchain.uv)
-    output = ROOT / ".local/releases" / ("runtime-" + commit[:12])
+    suffix = f"-acceptance-{args.acceptance_id}" if acceptance is not None else ""
+    output = ROOT / ".local/releases" / ("runtime-" + commit[:12] + suffix)
     output.mkdir(parents=True, exist_ok=False)
     dist = output / "app"
     runtime = dist / "runtime"
@@ -214,8 +220,32 @@ def main() -> int:
         if args.execution_test
         else "win10-test"
     )
+    if acceptance is not None:
+        channel = str(acceptance["release_channel"])
     shutil.copyfile(ROOT / f"tooling/{distribution}_readme.txt", dist / "安装与使用说明.txt")
+    if acceptance is not None:
+        readme_path = dist / "安装与使用说明.txt"
+        readme = readme_path.read_text(encoding="utf-8")
+        readme = readme.replace("BioImage WB 实验室版", str(acceptance["shortcut_name"]))
+        readme = readme.replace(
+            "BioImage-WB-Laboratory", f"BioImage-WB-Acceptance-{args.acceptance_id}"
+        )
+        readme_path.write_text(
+            "本目录仅用于独立、可弃的工程验收；不得替换在用实验室安装。\n\n" + readme,
+            encoding="utf-8",
+        )
     shutil.copyfile(ROOT / f"tooling/{distribution}_selfcheck.ps1", dist / "selfcheck.ps1")
+    if acceptance is not None:
+        selfcheck = (dist / "selfcheck.ps1").read_text(encoding="utf-8")
+        replacements = {
+            "BioImageWB.exe": str(acceptance["executable"]),
+            "BioImage-WB-Laboratory": f"BioImage-WB-Acceptance-{args.acceptance_id}",
+        }
+        for previous, replacement in replacements.items():
+            if selfcheck.count(previous) != 1:
+                raise RuntimeError("Laboratory selfcheck no longer has a unique identity marker")
+            selfcheck = selfcheck.replace(previous, replacement)
+        (dist / "selfcheck.ps1").write_text(selfcheck, encoding="utf-8")
     shutil.copyfile(
         ROOT / "tooling/windows_test_selfcheck.cmd",
         dist / ("环境自检.cmd" if args.laboratory else "测试版环境自检.cmd"),
@@ -229,6 +259,8 @@ def main() -> int:
     resource_object = output / "icon.o"
     run([str(windres), str(resource), str(resource_object)])
     executable = dist / ("BioImageWB.exe" if args.laboratory else "BioImageWB-Candidate.exe")
+    if acceptance is not None:
+        executable = dist / str(acceptance["executable"])
     run(
         [
             str(toolchain.gcc),
@@ -352,6 +384,9 @@ def main() -> int:
             settings_namespace="GroupedIntakeTest",
             acceptance="candidate-only; clean Win10/DPI/scientific holdout pending",
         )
+    if acceptance is not None:
+        manifest.update(acceptance)
+        manifest["acceptance"] = "disposable engineering test; not laboratory distribution"
     payload_manifest = dist / "payload-files.json"
     payload_manifest.write_text(
         json.dumps({"schema": 1, "commit": commit, "files": payload_inventory(dist)}, indent=2),
@@ -366,6 +401,7 @@ def main() -> int:
             "/DAppSource=" + str(dist),
             "/DBuildCommit=" + commit[:12],
             "/DInstallerOutput=" + str(output),
+            *([f"/DAcceptanceId={args.acceptance_id}"] if acceptance is not None else []),
             str(ROOT / f"tooling/{distribution}.iss"),
         ],
         log=output / "installer.log",

@@ -17,6 +17,8 @@
 
 manifest 记录：app/build/git/lock 摘要、Python/Qt/编译器、工具及算法版本、schema/协议/工作区支持范围、所有产物 SHA256、验证报告和已知限制。构建时间可变时不宣称字节级可复现，至少验证输入与行为可复现。
 
+新检出重复核验使用 [候选验证与独立 Windows 验收](candidate-acceptance.md)：`tooling.candidate_acceptance` 关联安装器/源码/payload 并保留失败与新报告恢复；PS5.1/7 使用 JSON 请求入口。可弃安装采用 `--laboratory --acceptance-id <安全ID>`，复用现有模板但隔离 AppId、设置、目录和启动器；只有 `/DIR` 的旧 laboratory 包不能用于本轮隔离安装。真实安装/升级/卸载与目标机矩阵仍单独记录，工具通过不等于目标机或科学验收通过。
+
 ## 回滚
 
 先保存不可变旧产物和迁移前副本。代码 revert 不能还原数据；新格式不被旧程序支持时使用迁移前副本或只读导出。恢复演练记录迁移后新操作是否丢失，不能隐藏这一代价。
