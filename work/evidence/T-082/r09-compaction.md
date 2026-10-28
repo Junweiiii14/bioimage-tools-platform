@@ -14,3 +14,5 @@
 非作者只读预审未发现阻断；独立Node VM取原244c5da与新setState函数，50组紧凑/旧完整、显式结果及partial输入比较等价，包括特殊rowId、顺序、失败、零和orphan，确认共享引用且不回写旧state嵌套对象。预审未运行GUI，尚不是准确提交Accepted。
 
 准确提交独审及同输入/环境/预算性能复测待执行；不能宣称已达预算或将R09结项。baseline及全部原始警告保留。
+
+后续准确提交独审 **Accepted**：`e6b78b4c4dd11d06245c01cdbcc3a1cbd44d1b34`，基线1fa590c。非作者确认差异与上述预审一致，cast仅类型断言不强制转换rowId；独立`test_workbench_snapshot_compaction.py test_web_bridge.py` **14 passed/14.94s/exit0**，diff check0，前后树clean。此结论限代码正确性和兼容；性能复测及有据条件处置另见r09-compaction-results.md与r09-disposition.md。
