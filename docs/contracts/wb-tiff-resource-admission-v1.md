@@ -16,6 +16,7 @@
 | --- | --- | --- |
 | `BIOIMAGE_TIFF_MAX_PIXELS` | 32,000,000 | 既有历史归档恢复支持上界及显示导出上界；不是从PNG压缩文件大小复制来的限制 |
 | `BIOIMAGE_TIFF_MAX_PEAK_BYTES` | 2,147,483,648（2GiB） | `coding-standards.md`的16GB/单计算任务起点；本机CIM实际16,496,738,304字节，单图缓冲预算约物理内存的13%，为UI、OCR模型、其他任务和系统留余量 |
+| `BIOIMAGE_TIFF_LZMA_MAX_MEMORY_BYTES` | 67,108,864（64MiB） | 单LZMA解码器的字典/状态上限；以memlimit执行并完整计入总预算，调整后仍须满足总预算 |
 
 可在启动进程前设置十进制正整数（不超过有符号64位上限）；未设置使用默认值，空值/负数/非整数失败，不静默回退。策略每次读取时取值，子进程继承启动环境。像素和内存两个条件必须同时满足；32M像素不是所有编码/通道组合均可读的承诺。
 
@@ -27,15 +28,24 @@
 
 像素路径的估算为：
 
-`P*C*B + P*(2*B + 7 + (RGB ? 24 : 0)) + 3*S + 3*G`
+`P*C*B + P*(2*B + 7 + (RGB ? 24 : 0)) + K*S + 3*G + D + H`
 
 - 原始解码数组 `P*C*B`。
 - 灰度/不可变bytes副本 `2*P*B`，饱和或alpha检查布尔数组 `P`，OCR uint16除法/uint8及不可变转换保守预留 `6*P`。
 - RGB额外 `24*P`：uint32三通道工作副本及运算中间量；有些阶段互斥，仍相加以避免低估。MINISWHITE不反相。
-- `S` 为单个最大解码块：tile采用完整padding后的width/length，strip采用图宽和`min(height, rowsperstrip)`；planar每块一个通道。三倍覆盖解码输出、临时工作和迭代时尚存的前块。拒绝非正块或3D tile。
+- `S` 为单个最大解码块：tile采用完整padding后的width/length，strip采用图宽和有效声明RowsPerStrip（含末块的完整条带padding；0xffffffff整体图像哨兵使用实际height）；planar每块一个通道。`K=3`覆盖解码输出、临时工作和前块；PackBits采用`K=12`覆盖锁定fallback先扩展Python整数引用列表再bytes的额外内存。拒绝非正块或3D tile。
 - `G=min(sum(databytecounts), 16MiB + max(databytecounts))`。锁定tifffile读取分组可能超出名义buffer一个块，并同时保留连续读数据、切片列表及下一组；三倍预留。小文件不假定实际分配完整16MiB。
+- `D`为LZMA配置的字典/状态上限，其余0；`H`为压缩输入每块128字节的预检摘要/索引预留（未压缩为0）。固定的小型解码器对象开销不表示总RSS可精确计算。
 
 调用 `page.asarray(maxworkers=1, buffersize=16MiB)`，禁止默认多线程同时解码大块。巨大tile/strip或编码字节声明同样参与预算，不能只检查可见像素。
+
+## 压缩流与头部不一致
+
+锁定环境没有原生imagecodecs，实际可用通道是NONE、Deflate（8/32946/50013）、PackBits（32773）、LZMA（34925）；缺失的LZW、JPEG和ZSTD不能因存在枚举就宣称可用，现明确在asarray前拒绝。将来加codec须单独核验有界解码。
+
+三个fallback均忽略传入out容量，且tifffile可能截断多余像素。因此在asarray前逐块读取压缩数据：Deflate用decompressobj/max_length、LZMA用max_length及memlimit，PackBits只扫描包长度、不展开列表。实际展开超出声明块大小、损坏或超字典预算即拒绝。LZMA拼接流计累计长度且先释放前一解码器，合法完整条带padding和FillOrder保持。
+
+预检保存原压缩字节的SHA256，恢复文件位置；当前独占TiffPage的decode回调在真正解码前核对同一块字节，避免预检与重读之间的变化绕过保护。finally恢复原回调，不修改全局TIFF.DECOMPRESSORS或跨页缓存。原文件读前后摘要检查继续执行。多一次有界压缩扫描有成本；不以元数据检查假装已限制真实展开。
 
 这是本读取路径可变图像/编码缓冲的保守估算，非进程RSS上限或操作系统隔离；Python/Qt/模型基线、TIFF元数据解析及第三方codec内部实现不是硬限制。受控异常由R01终态保护；系统终止/OOM killer不在必定回复承诺内。没有运行真实OOM实验。
 

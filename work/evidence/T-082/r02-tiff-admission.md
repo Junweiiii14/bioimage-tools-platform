@@ -23,3 +23,13 @@
 另两例为rotation canvas等待超时，伴SKIA写失败和GPU context lost。固定源码复验受影响101+UI3：2失败102通过/38.88s，两个宽/窄canvas例失败，旋转handle例通过。新进程局部`QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu`复验相同UI3：**3 passed / 7.01s / exit0**，未改等待时限、断言、应用代码或全局环境。只支持软件渲染下当前回归通过，不认定硬件GPU根因已修复。
 
 下一步：提交独审，最终冻结集成树运行全门禁（含wheel）。期间不再编辑该检查进程读取的源码。工程问题继续，不以旧失败或科学留出暂缺冻结其他条目。
+
+## 独审后压缩流补丁
+
+2fdbcfe独审Request changes，见r02-review.md。追加6个受控反例在该提交**6 failed / 39 deselected / 3.63s / exit1**，均仍进入禁止asarray探针；记录r02-codec-red.txt。先完成三个实际可用压缩通道的有界预检，之后才调用asarray；不依赖fallback的out参数。LZMA memlimit默认64MiB可配置，计入总预算；PackBits引用列表额外计入。摘要在每个实际decode调用前核对同一压缩块，防预检/重读竞态；只包装当前独占page，finally恢复，未改全局codec。
+
+最终67个输入案例（原39+28）包含Deflate三个编码、PackBits、LZMA膨胀/字典、FillOrder1/2、末条带padding/拼接LZMA、planar RGBA16跨tile、摘要不一致、21个无效配置及降低字典预算。连同数值/裁剪/OCR/后台同一受影响集：**129 passed / 20.88s / exit0**；Ruff检查/格式、严格定向Pyright均0。
+
+随后验证“拼接LZMA后4个零字节”的额外兼容假设，原生lzma.decompress同样报未完整结束，1失败66通过；没有把该无效流当必须兼容格式，更未修改底层codec。撤销这次试验代码/测试尾字节，恢复到129通过的源码字节；原padding/拼接例复验**1 passed / 66 deselected / 3.28s / exit0**。这不同于有效像素条带padding（继续保留）。全部未做真实OOM。
+
+当前状态：压缩补丁待准确提交独审，R02未标完成；R04只做入口/官方工具调研，还未修改JS或添加Node依赖。

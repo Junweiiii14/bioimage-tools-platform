@@ -1,9 +1,11 @@
 """Read quantitative TIFF pixels without changing the source or its bit depth."""
 
 import json
+import lzma
 import os
+import zlib
 from dataclasses import dataclass
-from hashlib import file_digest
+from hashlib import file_digest, sha256
 from pathlib import Path
 from typing import cast
 
@@ -13,6 +15,11 @@ from numpy.typing import NDArray
 
 DISPLAY_TIFF_SOFTWARE = "bioimage-wb figure_display@1"
 TIFF_DECODE_BUFFER_BYTES = 16 * 1024 * 1024
+LZMA_DECODER_BYTES = 64 * 1024 * 1024
+_BIT_REVERSE = bytes(int(f"{value:08b}"[::-1], 2) for value in range(256))
+_DecodeResult = tuple[
+    NDArray[np.generic] | None, tuple[int, int, int, int, int], tuple[int, int, int, int]
+]
 
 
 def _display_only(page: tifffile.TiffPage) -> bool:
@@ -56,6 +63,96 @@ def _resource_limit(name: str, default: int) -> int:
     return limit
 
 
+def _check_compressed_block(data: bytes, compression: int, limit: int, lzma_limit: int) -> None:
+    """Bound actual expansion before tifffile's codecs (which may ignore out)."""
+    if compression == 32773:  # PackBits: count packets without expanding an int list.
+        position = expanded = 0
+        while position < len(data):
+            control = data[position]
+            position += 1
+            if control == 128:  # NOP
+                continue
+            consumed = control + 1 if control < 128 else 1
+            expanded += control + 1 if control < 128 else 257 - control
+            position += consumed
+            if position > len(data) or expanded > limit:
+                raise ImageInputError("TIFF 压缩块损坏或展开尺寸超过声明预算")
+        return
+    try:
+        if compression == 34925:
+            remaining, expanded = data, 0
+            # Match concatenated LZMA streams without trusting only the first one.
+            while remaining:
+                lzma_decoder = lzma.LZMADecompressor(memlimit=lzma_limit)
+                expanded_data = lzma_decoder.decompress(remaining, max_length=limit - expanded + 1)
+                expanded += len(expanded_data)
+                complete = lzma_decoder.eof
+                remaining = lzma_decoder.unused_data
+                del lzma_decoder  # Do not overlap two decoder dictionaries.
+                if expanded > limit or not complete:
+                    raise ImageInputError("TIFF 压缩块损坏或展开尺寸超过声明预算")
+            return
+        zlib_decoder = zlib.decompressobj()
+        expanded_data = zlib_decoder.decompress(data, max_length=limit + 1)
+        if len(expanded_data) > limit or not zlib_decoder.eof:
+            raise ImageInputError("TIFF 压缩块损坏或展开尺寸超过声明预算")
+    except (lzma.LZMAError, zlib.error) as error:
+        raise ImageInputError("TIFF 压缩块损坏或超出 LZMA 解码内存预算") from error
+
+
+def _compressed_signatures(
+    page: tifffile.TiffPage, limit: int, lzma_limit: int
+) -> tuple[bytes | None, ...]:
+    """Preflight exact encoded bytes; retain identity across the later reread."""
+    stream = page.parent.filehandle
+    position = stream.tell()
+    signatures: list[bytes | None] = []
+    try:
+        for offset, count in zip(page.dataoffsets, page.databytecounts, strict=True):
+            if not offset or not count:  # tifffile's explicitly sparse segments
+                signatures.append(None)
+                continue
+            stream.seek(offset)
+            data = stream.read(count)
+            if len(data) != count:
+                raise ImageInputError("TIFF 压缩块不完整")
+            signatures.append(sha256(data).digest())
+            if page.fillorder == 2:
+                data = data.translate(_BIT_REVERSE)
+            _check_compressed_block(data, page.compression, limit, lzma_limit)
+    finally:
+        stream.seek(position)
+    return tuple(signatures)
+
+
+def _decode_admitted_page(
+    page: tifffile.TiffPage, segment_bytes: int, lzma_limit: int
+) -> NDArray[np.generic]:
+    if page.compression == 1:
+        return cast(
+            NDArray[np.generic], page.asarray(maxworkers=1, buffersize=TIFF_DECODE_BUFFER_BYTES)
+        )
+    signatures = _compressed_signatures(page, segment_bytes, lzma_limit)
+    decode = page.decode
+
+    def checked_decode(data: bytes | None, index: int, /, **kwargs: object) -> _DecodeResult:
+        if not 0 <= index < len(signatures):
+            raise ImageInputError("TIFF 压缩块索引改变")
+        if (sha256(data).digest() if data is not None else None) != signatures[index]:
+            raise ImageInputError("读取期间 TIFF 压缩块改变，请重新导入")
+        return decode(data, index, **kwargs)
+
+    # This owned page only: never change global codec registries. The callback
+    # checks the exact bytes being decoded, closing the preflight/reread race.
+    page.decode = checked_decode
+    try:
+        return cast(
+            NDArray[np.generic], page.asarray(maxworkers=1, buffersize=TIFF_DECODE_BUFFER_BYTES)
+        )
+    finally:
+        page.decode = decode
+
+
 def read_admitted_tiff_page(page: tifffile.TiffPage) -> NDArray[np.generic]:
     """Apply tiff_resource_admission@1 before decoding, including crop re-reads.
 
@@ -66,6 +163,7 @@ def read_admitted_tiff_page(page: tifffile.TiffPage) -> NDArray[np.generic]:
     """
     max_pixels = _resource_limit("BIOIMAGE_TIFF_MAX_PIXELS", 32_000_000)
     max_peak = _resource_limit("BIOIMAGE_TIFF_MAX_PEAK_BYTES", 2 * 1024**3)
+    lzma_limit = _resource_limit("BIOIMAGE_TIFF_LZMA_MAX_MEMORY_BYTES", LZMA_DECODER_BYTES)
     width, height = page.imagewidth, page.imagelength
     pixels = width * height
     if width <= 0 or height <= 0 or page.imagedepth != 1:
@@ -98,10 +196,22 @@ def read_admitted_tiff_page(page: tifffile.TiffPage) -> NDArray[np.generic]:
     raw_bytes = pixels * channels * sample_bytes
     if page.nbytes != raw_bytes:
         raise ImageInputError("TIFF 解码尺寸与元数据不一致")
+    if page.compression not in (1, 8, 32946, 50013, 32773, 34925):
+        raise ImageInputError("当前锁定环境不支持该 TIFF 压缩方式")
     # A padded tile can be much larger than the visible image. Include it even
     # for a tiny page; bounding visible pixels alone does not bound decoding.
     segment_width = page.tilewidth if page.is_tiled else width
     segment_height = page.tilelength if page.is_tiled else min(height, page.rowsperstrip)
+    if not page.is_tiled:
+        declared_rows = page.tags.get("RowsPerStrip")
+        if (
+            declared_rows is not None
+            and isinstance(declared_rows.value, int)
+            and 0 < declared_rows.value < 2**32 - 1
+        ):
+            # Preserve full-strip padding, including a final partial strip.
+            # TIFF's 0xffffffff whole-image sentinel is not a padding allocation.
+            segment_height = declared_rows.value
     if segment_width <= 0 or segment_height <= 0 or page.tiledepth != 1:
         raise ImageInputError("不支持该 TIFF 解码块尺寸")
     segment_channels = 1 if page.planarconfig == 2 else channels
@@ -117,14 +227,14 @@ def read_admitted_tiff_page(page: tifffile.TiffPage) -> NDArray[np.generic]:
     peak_bytes = (
         raw_bytes
         + pixels * (2 * sample_bytes + 7 + (24 if rgb else 0))
-        + 3 * segment_bytes
+        + (12 if page.compression == 32773 else 3) * segment_bytes
         + encoded_buffer
+        + (lzma_limit if page.compression == 34925 else 0)
+        + (128 * len(page.databytecounts) if page.compression != 1 else 0)
     )
     if peak_bytes > max_peak:
         raise ImageInputError(f"TIFF 超出估算峰值内存预算（{peak_bytes} > {max_peak}）；未解码输入")
-    return cast(
-        NDArray[np.generic], page.asarray(maxworkers=1, buffersize=TIFF_DECODE_BUFFER_BYTES)
-    )
+    return _decode_admitted_page(page, segment_bytes, lzma_limit)
 
 
 def is_generated_tiff(path: str | Path) -> bool:
