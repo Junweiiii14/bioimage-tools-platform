@@ -1471,19 +1471,32 @@ async function bootstrap() {
         script.onload = () =>
             new QWebChannel(qt.webChannelTransport, (channel) => {
                 bridge = channel.objects.workbench;
+                boundaryDiagnostics.connect(bridge);
                 window.desktopSession?.connect(bridge);
                 bridge.progressChanged?.connect((raw) => {
+                    let phase = 'parse';
                     try {
-                        window.groupReview?.progress(JSON.parse(raw));
-                    } catch {
-                        toast('进度状态读取失败');
+                        const next = channelObject(raw);
+                        phase = 'validate';
+                        if (typeof next.busy !== 'boolean' || typeof next.status !== 'string')
+                            throw new TypeError('Invalid progress');
+                        phase = 'render';
+                        window.groupReview?.progress(next);
+                        boundaryDiagnostics.recovered('progress');
+                    } catch (failure) {
+                        boundaryDiagnostics.report('progress', failure, { ...state, phase });
                     }
                 });
                 bridge.stateChanged.connect((raw) => {
+                    let phase = 'parse';
+                    let next;
                     try {
-                        const next = JSON.parse(raw);
+                        next = channelObject(raw);
+                        phase = 'validate';
+                        requireProjectState(next);
                         if (window.desktopSession && !window.desktopSession.acceptState(next))
                             return;
+                        phase = 'render';
                         const wasEmpty = !state.rows.length;
                         const sameProject =
                             state.projectId === next.projectId &&
@@ -1509,8 +1522,9 @@ async function bootstrap() {
                         )
                             switchMode('review');
                         window.desktopSession?.route();
-                    } catch {
-                        toast('项目状态无法读取，请重新打开项目。');
+                        boundaryDiagnostics.recovered('state');
+                    } catch (failure) {
+                        boundaryDiagnostics.report('state', failure, { ...(next || state), phase });
                     }
                 });
                 $('#home-note').textContent = '选择原图后自动创建独立项目，所有处理在本机执行。';

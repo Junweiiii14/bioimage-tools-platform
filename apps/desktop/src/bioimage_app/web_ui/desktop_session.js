@@ -203,18 +203,32 @@ const desktopSession = (() => {
         channel = bridgeObject;
         window.advancedWorkspace?.connect(bridgeObject);
         channel.sessionStateChanged.connect((raw) => {
+            let phase = 'parse';
+            const previous = session,
+                previousEpoch = epoch;
             try {
-                const next = JSON.parse(raw);
-                if ((next.epoch ?? 0) < epoch) return;
-                epoch = next.epoch ?? 0;
+                const next = channelObject(raw);
+                phase = 'validate';
+                if (
+                    !Number.isSafeInteger(next.epoch) ||
+                    next.epoch < 0 ||
+                    (next.recents !== undefined && !Array.isArray(next.recents))
+                )
+                    throw new TypeError('Invalid session');
+                if (next.epoch < epoch) return;
+                epoch = next.epoch;
                 session = next;
+                phase = 'render';
                 window.workbenchActions?.receive(next.shortcuts);
                 window.workbenchAppearance?.receive(next.appearance);
                 window.workbenchLayout?.receive(next.layout);
                 renderSession();
                 route();
-            } catch {
-                toast('项目会话状态读取失败，请重试。');
+                boundaryDiagnostics.recovered('session');
+            } catch (failure) {
+                session = previous;
+                epoch = previousEpoch;
+                boundaryDiagnostics.report('session', failure, { ...state, phase });
             }
         });
         send('refresh');

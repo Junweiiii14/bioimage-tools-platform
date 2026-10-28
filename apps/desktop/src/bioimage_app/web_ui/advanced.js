@@ -22,6 +22,7 @@ window.advancedWorkspace = (() => {
         pending = null,
         message = '',
         error = false,
+        receiptFailed = false,
         dirty = false,
         identity = '',
         page = 0;
@@ -137,6 +138,9 @@ window.advancedWorkspace = (() => {
             });
     }
     function command(operation, value = {}) {
+        // A damaged receipt has an unknown outcome. Only a fresh read may retire
+        // its client-side pending token; never automatically repeat a write.
+        if (pending && receiptFailed && operation === 'open') pending = null;
         if (pending) return;
         if (conflicts.length && operation !== 'open') {
             status('请先核对冲突字段，再继续操作。', true);
@@ -161,6 +165,7 @@ window.advancedWorkspace = (() => {
                   }
                 : data;
         pending = { requestId, operation };
+        receiptFailed = false;
         status(operation === 'open' ? '正在读取…' : '正在处理…');
         const payload = makeAdvancedRequest(context, requestId, operation, value);
         const encoded = JSON.stringify(payload);
@@ -179,12 +184,54 @@ window.advancedWorkspace = (() => {
         syncBusy();
     }
     function receive(raw) {
-        let response;
+        let phase = 'parse';
+        const context = { ...state, requestId: pending?.requestId, operation: pending?.operation };
+        let restore;
         try {
-            response = typeof raw === 'string' ? JSON.parse(raw) : raw;
-        } catch {
-            return;
+            const response = channelObject(raw);
+            phase = 'validate';
+            if (
+                typeof response.requestId !== 'string' ||
+                !['pending', 'done', 'failed', 'cancelled'].includes(response.status)
+            )
+                throw new TypeError('Invalid advanced receipt');
+            if (!pending || response.requestId !== pending.requestId) return;
+            const next = channelObject(response.data);
+            requireStateIdentity(next);
+            if (next.sessionEpoch !== state.sessionEpoch) return;
+            if (next.projectId !== state.projectId && pending.operation !== 'template_import')
+                throw new TypeError('Invalid receipt project');
+            // Preserve all local edit state until rendering the receipt succeeds.
+            const previous = {
+                data,
+                draft: copy(draft),
+                base: copy(base),
+                conflicts: copy(conflicts),
+                pending,
+                dirty,
+                message,
+                error,
+                page,
+                drafts: copy(drafts),
+            };
+            restore = () => {
+                ({ data, draft, base, conflicts, pending, dirty, message, error, page } = previous);
+                drafts.clear();
+                previous.drafts.forEach((value, key) => drafts.set(key, value));
+            };
+            phase = 'render';
+            applyResponse(response);
+            receiptFailed = false;
+            boundaryDiagnostics.recovered('advanced');
+        } catch (failure) {
+            restore?.();
+            receiptFailed = true;
+            boundaryDiagnostics.report('advanced', failure, { ...context, phase });
+            status('回复无法显示，编辑已保留。请重新读取并核对结果后再保存。', true);
+            syncBusy();
         }
+    }
+    function applyResponse(response) {
         if (!pending || response.requestId !== pending.requestId) return;
         const next = response.data;
         if (!next || next.sessionEpoch !== state.sessionEpoch) return;

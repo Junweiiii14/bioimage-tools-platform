@@ -3,6 +3,7 @@
 import base64
 import json
 import math
+import re
 from collections import Counter
 from collections.abc import Callable
 from hashlib import sha256
@@ -13,6 +14,7 @@ from PySide6.QtGui import QDesktopServices, QImage, QImageWriter
 from wb_tool.api import (
     BandBounds,
     Baseline,
+    IncompleteProjectEdit,
     LaneROI,
     ManualQuantTarget,
     ProjectTableCell,
@@ -31,6 +33,7 @@ from wb_tool.api import (
     row_is_ready,
 )
 
+from bioimage_app.diagnostics import WebBoundaryDiagnostics
 from bioimage_app.figure_window import FigureProjectWindow
 from bioimage_app.web_advanced import AdvancedCommands
 from bioimage_app.web_intake import apply_intake_command
@@ -69,6 +72,74 @@ class WorkbenchBridge(QObject):
     sessionRequested = Signal(str, str)
     sessionStateChanged = Signal(str)
     advancedStateChanged = Signal(str)
+    diagnosticNotice = Signal(str)
+
+    @Slot(str)
+    def reportUiFailure(self, raw: str) -> None:
+        """Accept only bounded diagnostic metadata, never arbitrary console text."""
+        if len(raw) > 4096:
+            return
+        try:
+            parsed = json.loads(raw)
+        except (ValueError, TypeError):
+            return
+        if not isinstance(parsed, dict):
+            return
+        data = cast(dict[str, object], parsed)
+        action = data.get("action")
+        if not isinstance(action, str) or action not in {
+            "state",
+            "progress",
+            "session",
+            "advanced",
+        }:
+            return
+        action = str(action)
+        if data.get("recovered") is True:
+            self._diagnostics.recovered(action)
+            return
+        kind = data.get("exception")
+        if not isinstance(kind, str) or kind not in {
+            "Error",
+            "TypeError",
+            "RangeError",
+            "SyntaxError",
+            "ReferenceError",
+            "URIError",
+            "EvalError",
+            "AggregateError",
+        }:
+            kind = "Error"
+        stack = data.get("stack")
+        frames = (
+            [
+                line
+                for line in cast(list[object], stack)[:8]
+                if isinstance(line, str)
+                and re.fullmatch(r"[a-z_]{1,40}\.js:[0-9]{1,7}:[0-9]{1,7}", line)
+            ]
+            if isinstance(stack, list)
+            else []
+        )
+        request = data.get("requestId")
+        operation = data.get("operation")
+        epoch, revision = data.get("sessionEpoch"), data.get("revision")
+        phase = data.get("phase")
+        self._diagnostics.report(
+            action,
+            str(kind),
+            frames,
+            project=self.host.view.project_identity,
+            epoch=epoch if type(epoch) is int and 0 <= epoch <= 2**53 - 1 else self.session_epoch,
+            revision=revision
+            if type(revision) is int and 0 <= revision <= 2**53 - 1
+            else self.host.view.generation,
+            request=request[:96] if isinstance(request, str) else "",
+            operation=operation[:48] if isinstance(operation, str) else "",
+            phase=phase
+            if isinstance(phase, str) and phase in {"parse", "validate", "render"}
+            else "render",
+        )
 
     @Slot(str, str)
     def session(self, action: str, payload: str = "{}") -> None:
@@ -110,6 +181,7 @@ class WorkbenchBridge(QObject):
         self.host = host
         self.choose = choose
         self.session_epoch = 0
+        self._diagnostics = WebBoundaryDiagnostics()
         self._previous = ""
         self._published_key: tuple[object, ...] | None = None
         self._images: dict[str, str | None] = {}
@@ -475,11 +547,11 @@ class WorkbenchBridge(QObject):
 
     @Slot()
     def publish(self) -> None:
-        self.advanced_commands.poll()
         if self.host.resources_closed:
             self.timer.stop()
             return
         try:
+            self.advanced_commands.poll()
             if self._pending_source and not self.host.operation_busy and not self.host.is_closing:
                 project_id, row_id = self._pending_source
                 self._pending_source = None
@@ -526,11 +598,25 @@ class WorkbenchBridge(QObject):
                 self._error,
             )
             if self._previous and key == self._published_key:
+                self._diagnostics.recovered("snapshot")
                 return
             state = json.dumps(self.snapshot(), ensure_ascii=False, allow_nan=False)
             self._published_key = key
-        except ValueError:
-            return  # An incomplete native advanced edit is not a replacement project.
+        except IncompleteProjectEdit:
+            return  # Explicit control validation; never replace the last valid project.
+        except Exception as error:
+            if self._diagnostics.python_failure(
+                "snapshot",
+                error,
+                project=self.host.view.project_identity,
+                epoch=self.session_epoch,
+                revision=self.host.view.generation,
+            ):
+                self.diagnosticNotice.emit(
+                    "项目显示更新失败，编辑已保留。请重试当前操作；持续失败时提供本机会话日志。"
+                )
+            return
+        self._diagnostics.recovered("snapshot")
         if state != self._previous:
             self._previous = state
             self.stateChanged.emit(state)

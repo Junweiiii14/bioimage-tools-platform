@@ -1,5 +1,6 @@
 """Multi-image row review and template editing; host owns assets and asynchronous work."""
 
+from collections.abc import Callable
 from dataclasses import replace
 from uuid import uuid4
 
@@ -36,7 +37,7 @@ from wb_tool.application.crop_suggestions import (
     apply_crop_suggestion,
     project_with_suggestions,
 )
-from wb_tool.application.desktop_data import PreviewRaster
+from wb_tool.application.desktop_data import IncompleteProjectEdit, PreviewRaster
 from wb_tool.application.figure_project import (
     FigureRender,
     FigureRow,
@@ -902,9 +903,14 @@ class FigureProjectView(QWidget):
         item = self.table.item(row, column)
         return (item.text().strip() if strip else item.text()) if item else ""
 
-    def project(
-        self, revision: int | None = None, *, include_layout: bool = True
-    ) -> WBFigureProject:
+    @staticmethod
+    def _edit_value[T](read: Callable[[], T]) -> T:
+        try:
+            return read()
+        except ValueError as error:
+            raise IncompleteProjectEdit(str(error)) from error
+
+    def _project_controls(self, revision: int | None) -> WBFigureProject:
         rows: list[FigureRow] = []
         for i, original in enumerate(self._project.rows):
             roi = None
@@ -950,29 +956,38 @@ class FigureProjectView(QWidget):
             figure_order=order,
             template=FigureTemplate(**settings),
         )
+        return project
+
+    def project(
+        self, revision: int | None = None, *, include_layout: bool = True
+    ) -> WBFigureProject:
+        # Only editable control parsing is an expected incomplete draft. Failures
+        # rebuilding persisted history/evidence remain ordinary errors.
+        project = self._edit_value(lambda: self._project_controls(revision))
+        control_rows = project.rows
         if isinstance(self._project, WBReviewProject):
             project = project_with_suggestions(project, self._project.suggestions)
         if isinstance(self._project, WBAnalysisProject):
             project = project_with_analyses(project, self._project.analyses)
-            request = self.analysis.request()
+            request = self._edit_value(self.analysis.request)
             if request is not None and self.analysis.plan is not None:
                 project = update_row_analysis_request(project, self.analysis.plan.row_id, request)
-        ocr = self.ocr.state()
+        ocr = self._edit_value(self.ocr.state)
         if ocr is not None:
             project = project_with_ocr(project, ocr)
-        plans = self.normalization.plans()
+        plans = self._edit_value(self.normalization.plans)
         if plans or isinstance(self._project, WBNormalizedProject):
             project = project_with_normalizations(project, plans)
         if self.laboratory_layout.active:
             composition = (
-                self.laboratory_layout.composition()
+                self._edit_value(self.laboratory_layout.composition)
                 if include_layout
                 else initial_composition(project)
             )
             previous = {row.row_id: row for row in self._project.rows}
             changed = {
                 row.row_id
-                for row in rows
+                for row in control_rows
                 if row.roi != previous[row.row_id].roi
                 or row.lane_count != previous[row.row_id].lane_count
             }
@@ -987,7 +1002,7 @@ class FigureProjectView(QWidget):
                 }
             )
             project = with_figure_layout(
-                project, composition, self.laboratory_layout.layout_style()
+                project, composition, self._edit_value(self.laboratory_layout.layout_style)
             )
         if isinstance(self._project, WBRestoredProject):
             project = with_archive_history(

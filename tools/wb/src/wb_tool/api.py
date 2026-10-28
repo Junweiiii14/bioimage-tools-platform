@@ -63,7 +63,13 @@ from wb_tool.application.crop_suggestions import (
     read_figure_project,
     record_crop_suggestion,
 )
-from wb_tool.application.desktop_data import PreviewRaster, ProjectDerivedTables, WBJob, WBReply
+from wb_tool.application.desktop_data import (
+    IncompleteProjectEdit,
+    PreviewRaster,
+    ProjectDerivedTables,
+    WBJob,
+    WBReply,
+)
 from wb_tool.application.discovery import (
     ExportDiscovery,
     ExportObservation,
@@ -352,6 +358,7 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "IncompleteProjectEdit",
     "IntakeDeliveryPlan",
     "IntakeDeliveryReceipt",
     "IntakeDeliveryState",
