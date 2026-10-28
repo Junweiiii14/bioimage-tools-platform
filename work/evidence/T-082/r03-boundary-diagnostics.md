@@ -28,3 +28,13 @@ Windows / Python3.12.14 / PySide6 6.12.0，所有Python命令通过 `uv run --lo
 - diagnostic recovered使用与report同样的传输异常隔离，不影响正常业务恢复。
 
 新增同/跨epoch实际渲染异常、会话home渲染异常、诊断恢复传输异常、仪器导入草稿恢复；同时覆盖已有高级、导入、生命周期、手动泳道、项目导航六文件回归。第一次完成检查点77通过后，为缓存失效/会话home增加验证，最终 **78 passed / 67.46s / exit0**。命令文件集为 `test_web_boundary_diagnostics.py test_workbench_advanced.py test_intake_web_ui.py test_workbench_lifecycle.py test_manual_lanes_workbench.py test_project_navigation_session.py`，仍锁环境及CI软件渲染。Ruff/严格Pyright与JS门禁通过。补丁准确提交复审与最终冻结全门禁待办。
+
+## 第二轮独审反例与修补
+
+ad12225 非作者复审仍为 **Request changes**：非home会话路由原地修改state.selectedId，检查点只保存state引用；全组草稿恢复后清空contentKey，下一条同身份合法状态重绘又清空草稿。独立23项通过并不能排除这两个缺口。
+
+新增真实页面操作，第一项在原ad12225上 **1 failed / 2.81s / exit1**（`.local/T082/r03-route-red.txt`）；第二项在原group_review上 **1 failed / 3.21s / exit1**（`.local/T082/r03-group-red-final.txt`），失败位于后续合法重绘后的hasDraft断言。建立第二项夹具期间曾误设项目行数为2而实际为3、误用input而真实处理为change；这些夹具失败不算产品反例，修正后才计入上述有效红例。
+
+检查点现在浅拷贝state顶层投影，保持嵌套科学载荷引用；groupReview保存语义contentKey，并用独立repaint标记失效DOM。只有真正身份/修订等键变化才清空草稿，同身份恢复重绘继续显示编辑后的数值，不将旧草稿迁入新项目。
+
+`pytest tests/test_web_boundary_diagnostics.py tests/test_group_review_workbench.py tests/test_project_navigation_session.py -q --tb=short`：**41 passed / 22.95s / exit0**（`.local/T082/r03-second-followup.txt`）。两个新增测试分别验证非home路由失败后恢复原行和手工草稿、恢复后的下一条合法状态仍保留真实基线端点数值。仍使用锁环境和进程局部软件渲染；已有mailbox诊断保留。JS完整门禁及4负例通过；Ruff/定向严格Pyright通过。第二轮准确提交复审待办。

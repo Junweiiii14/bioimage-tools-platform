@@ -167,7 +167,7 @@ function qualityDetails(entries) {
 }
 function checkpointWorkbench() {
     const previous = {
-        state,
+        state: { ...state },
         mode,
         filter,
         search,

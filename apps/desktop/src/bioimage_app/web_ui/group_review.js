@@ -8,6 +8,7 @@ window.groupReview = (() => {
         draft = null,
         dragging = null;
     let contentKey = '',
+        repaint = false,
         navigationKey = '',
         pendingFocus = false,
         tableFilter = 'all';
@@ -330,12 +331,15 @@ window.groupReview = (() => {
             state.quant?.reviewedGroups,
             [...new Set(state.rows.filter((r) => r.preview).map((r) => r.sourceId))],
         ]);
-        if (key !== contentKey) {
+        if (key !== contentKey || repaint) {
             root.scrollTop = 0;
+            if (key !== contentKey) {
+                draft = null;
+                if (!group()?.rows.some((r) => r.rowId === selection?.rowId)) selection = null;
+            }
             contentKey = key;
+            repaint = false;
             dragging = null;
-            draft = null;
-            if (!group()?.rows.some((r) => r.rowId === selection?.rowId)) selection = null;
             if (mode === 'results') results();
             else {
                 review();
@@ -637,6 +641,7 @@ window.groupReview = (() => {
     });
     function checkpoint() {
         const saved = structuredClone({
+            contentKey,
             manual,
             selection,
             draft,
@@ -646,9 +651,17 @@ window.groupReview = (() => {
             pendingSelection,
         });
         return () => {
-            ({ manual, selection, draft, pendingFocus, tableFilter, zoomLevel, pendingSelection } =
-                saved);
-            contentKey = '';
+            ({
+                contentKey,
+                manual,
+                selection,
+                draft,
+                pendingFocus,
+                tableFilter,
+                zoomLevel,
+                pendingSelection,
+            } = saved);
+            repaint = true;
             navigationKey = '';
             dragging = null;
             pan = null;

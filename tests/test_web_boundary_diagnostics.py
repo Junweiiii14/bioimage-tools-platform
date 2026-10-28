@@ -11,11 +11,13 @@ from bioimage_app.web_window import WebWorkbenchWindow
 from PySide6.QtCore import QSettings
 from pytestqt.qtbot import QtBot
 
+from tests.test_group_review_workbench import no_source_read
 from tests.test_intake_web_ui import intake_page as intake_page
 from tests.test_intake_web_ui import javascript
 from tests.test_project_measurements import setup
 from tests.test_web_bridge import bridge as bridge
 from tooling.qt_test_lifecycle import close_and_dispose_window
+from tools.wb.tests.test_project_analysis import complete, configured
 
 SECRET = "private-source-path-and-pixels"
 
@@ -295,6 +297,117 @@ def test_failed_session_home_render_restores_epoch_and_drafts(
             "render=window.originalRender;platformHome.closed=window.originalClosed;true",
         )
         diagnostics.close()
+
+
+def test_failed_project_route_restores_selection_and_manual_draft_identity(
+    page: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
+) -> None:
+    diagnostics = DesktopDiagnostics(tmp_path / "logs")
+    javascript(
+        page,
+        qtbot,
+        "manualQuant.active=true;manualQuant.current();"
+        "window.previousSelected=state.selectedId;window.savedManual=JSON.stringify(manualQuant.draft);"
+        "window.originalRender=render;render=()=>{window.failureSelection=state.selectedId;"
+        "throw new TypeError('route render failure')};true",
+    )
+    previous = javascript(page, qtbot, "previousSelected")
+    other = javascript(page, qtbot, "state.rows.find(r=>r.id!==previousSelected).id")
+    try:
+        page.bridge.sessionStateChanged.emit(
+            json.dumps(
+                {
+                    "epoch": page.bridge.session_epoch,
+                    "stage": "idle",
+                    "recents": [],
+                    "route": {
+                        "token": "uncommitted-selection",
+                        "mode": "quant",
+                        "projectId": page.host.view.project_identity,
+                        "rowId": other,
+                        "lane": 1,
+                    },
+                }
+            )
+        )
+        qtbot.waitUntil(lambda: bool(records(diagnostics)))
+        assert javascript(page, qtbot, "window.failureSelection") == other
+        assert javascript(page, qtbot, "state.selectedId") == previous
+        assert javascript(page, qtbot, "JSON.stringify(manualQuant.draft)===savedManual") is True
+        assert javascript(page, qtbot, "advancedWorkspace.hasDraft()") is True
+    finally:
+        javascript(page, qtbot, "render=window.originalRender;true")
+        diagnostics.close()
+
+
+def test_group_endpoints_survive_failure_and_next_valid_repaint(
+    qtbot: QtBot, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project, paths = configured(tmp_path)
+    project, results = complete(project, paths)
+    window = WebWorkbenchWindow(
+        settings=QSettings(str(tmp_path / "group.ini"), QSettings.Format.IniFormat)
+    )
+    diagnostics = DesktopDiagnostics(tmp_path / "logs")
+    try:
+        monkeypatch.setattr(window.host, "select_source", no_source_read)
+        window.show()
+        qtbot.waitUntil(
+            lambda: javascript(window, qtbot, "typeof bridge!=='undefined'&&!!bridge") is True
+        )
+        window.host.view.set_project(project)
+        window.host.view.table.setCurrentCell(0, 0)
+        monkeypatch.setattr(window.host, "_project_results", results)
+        window.bridge.publish()
+        qtbot.waitUntil(lambda: javascript(window, qtbot, "state.rows.length") == len(project.rows))
+        window.bridge.timer.stop()
+        javascript(
+            window, qtbot, "switchMode('quant');document.querySelector('.gr-curve').click();true"
+        )
+        qtbot.waitUntil(
+            lambda: (
+                javascript(
+                    window, qtbot, "!!document.querySelector('[data-gr-field=baselineStart]')"
+                )
+                is True
+            )
+        )
+        expected = javascript(
+            window,
+            qtbot,
+            "const endpoint=document.querySelector('[data-gr-field=baselineStart]');"
+            "endpoint.value=Number(endpoint.value)+1;"
+            "endpoint.dispatchEvent(new Event('change',{bubbles:true}));"
+            "window.endpointValue=Number(endpoint.value);window.originalRender=render;"
+            "render=()=>{throw new TypeError('group render failure')};endpointValue",
+        )
+        assert javascript(window, qtbot, "groupReview.hasDraft()") is True
+        original = window.bridge.snapshot()
+        window.bridge.stateChanged.emit(
+            json.dumps(
+                original | {"projectId": "other", "sessionEpoch": window.bridge.session_epoch + 1}
+            )
+        )
+        qtbot.waitUntil(lambda: bool(records(diagnostics)))
+        assert javascript(window, qtbot, "groupReview.hasDraft()") is True
+        javascript(window, qtbot, "render=window.originalRender;true")
+        window.bridge.stateChanged.emit(json.dumps(original | {"probe": "group-recovered"}))
+        qtbot.waitUntil(lambda: javascript(window, qtbot, "state.probe") == "group-recovered")
+        assert javascript(window, qtbot, "groupReview.hasDraft()") is True
+        assert (
+            javascript(
+                window,
+                qtbot,
+                "Number(document.querySelector('[data-gr-field=baselineStart]').value)",
+            )
+            == expected
+        )
+    finally:
+        javascript(window, qtbot, "if(window.originalRender)render=window.originalRender;true")
+        diagnostics.close()
+        close_and_dispose_window(
+            window, qtbot, resources_closed=lambda: window.host.resources_closed, timeout=20000
+        )
 
 
 @pytest.mark.parametrize("damage", ["json", "shape", "render"])
