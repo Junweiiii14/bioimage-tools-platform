@@ -74,8 +74,15 @@ class _Work(QObject):
             # This is the accepted-request boundary, not an algorithm fallback.
             # Even an empty MemoryError must drain through the normal reply path.
             # BaseException exit signals intentionally remain outside this boundary.
-            message = str(error) if isinstance(error, (ValueError, OSError, TypeError)) else ""
-            reply = WBReply(request_id, error=message or f"{type(error).__name__}: 后台操作失败")
+            reply = WBReply(request_id, error=f"{type(error).__name__}: 后台操作失败")
+            try:
+                message = str(error) if isinstance(error, (ValueError, OSError, TypeError)) else ""
+                if message:
+                    reply = WBReply(request_id, error=message)
+            except Exception:
+                # Exception formatting is user/library code and can itself fail.
+                # Keep the prepared terminal response if it does.
+                pass
             try:
                 frames = ";".join(
                     f"{Path(frame.filename).name}:{frame.lineno}:{frame.name}"

@@ -71,7 +71,7 @@ def source_project(tmp_path: Path, width: int = 4) -> tuple[Path, WBFigureProjec
     return path, project
 
 
-@pytest.mark.parametrize("phase", ["before", "decode", "tile", "memory", "runtime"])
+@pytest.mark.parametrize("phase", ["before", "decode", "tile", "memory", "runtime", "bad_message"])
 @pytest.mark.parametrize("close_during", [False, True])
 def test_fault_and_cancel_reply_once_and_drain(
     qtbot: QtBot,
@@ -103,6 +103,13 @@ def test_fault_and_cancel_reply_once_and_drain(
         wait_for_release()
         if phase == "memory":
             raise MemoryError()  # Empty messages must still be failed, never success.
+        if phase == "bad_message":
+
+            class BrokenMessage(ValueError):
+                def __str__(self) -> str:
+                    raise RuntimeError("exception message unavailable")
+
+            raise BrokenMessage()
         raise RuntimeError("controlled failure")
 
     if phase == "before":
@@ -140,7 +147,7 @@ def test_fault_and_cancel_reply_once_and_drain(
         with qtbot.captureExceptions() as escaped:
             request_id = port.submit(
                 WBJob(
-                    "preview" if phase in {"memory", "runtime"} else "quant_fig",
+                    "preview" if phase in {"memory", "runtime", "bad_message"} else "quant_fig",
                     path=str(path),
                     document=project,
                     row_id="sheet",
@@ -164,6 +171,8 @@ def test_fault_and_cancel_reply_once_and_drain(
             assert project.model_dump_json() == frozen
             if phase in {"before", "decode", "tile"}:
                 assert "取消" in reply.error
+            elif phase == "bad_message":
+                assert "BrokenMessage" in reply.error
             else:
                 assert ("MemoryError" if phase == "memory" else "RuntimeError") in reply.error
             if phase == "tile":

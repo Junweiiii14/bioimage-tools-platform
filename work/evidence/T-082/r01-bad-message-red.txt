@@ -1,0 +1,64 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+________ test_fault_and_cancel_reply_once_and_drain[False-bad_message] ________
+tests\test_wb_background_terminal.py:165: in test_fault_and_cancel_reply_once_and_drain
+    assert not escaped, "An accepted request escaped the terminal boundary"
+E   AssertionError: An accepted request escaped the terminal boundary
+E   assert not [(<class 'RuntimeError'>, RuntimeError('exception message unavailable'), <traceback object at 0x00000204308D2780>)]
+---------------------------- Captured stderr call -----------------------------
+Exceptions caught in Qt event loop:
+________________________________________________________________________________
+Traceback (most recent call last):
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\ui\background.py", line 70, in execute
+    reply = self._execute(request_id, job)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\ui\background.py", line 608, in _execute
+    image = load_tiff(job.path)
+            ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tests\test_wb_background_terminal.py", line 111, in failed
+    raise BrokenMessage()
+tests.test_wb_background_terminal.test_fault_and_cancel_reply_once_and_drain.<locals>.failed.<locals>.BrokenMessage: <exception str() failed>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\ui\background.py", line 77, in execute
+    message = str(error) if isinstance(error, (ValueError, OSError, TypeError)) else ""
+              ^^^^^^^^^^
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tests\test_wb_background_terminal.py", line 109, in __str__
+    raise RuntimeError("exception message unavailable")
+RuntimeError: exception message unavailable
+________________________________________________________________________________
+________ test_fault_and_cancel_reply_once_and_drain[True-bad_message] _________
+tests\test_wb_background_terminal.py:165: in test_fault_and_cancel_reply_once_and_drain
+    assert not escaped, "An accepted request escaped the terminal boundary"
+E   AssertionError: An accepted request escaped the terminal boundary
+E   assert not [(<class 'RuntimeError'>, RuntimeError('exception message unavailable'), <traceback object at 0x0000020430A3DD40>)]
+---------------------------- Captured stderr call -----------------------------
+Exceptions caught in Qt event loop:
+________________________________________________________________________________
+Traceback (most recent call last):
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\ui\background.py", line 70, in execute
+    reply = self._execute(request_id, job)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\ui\background.py", line 608, in _execute
+    image = load_tiff(job.path)
+            ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tests\test_wb_background_terminal.py", line 111, in failed
+    raise BrokenMessage()
+tests.test_wb_background_terminal.test_fault_and_cancel_reply_once_and_drain.<locals>.failed.<locals>.BrokenMessage: <exception str() failed>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\ui\background.py", line 77, in execute
+    message = str(error) if isinstance(error, (ValueError, OSError, TypeError)) else ""
+              ^^^^^^^^^^
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tests\test_wb_background_terminal.py", line 109, in __str__
+    raise RuntimeError("exception message unavailable")
+RuntimeError: exception message unavailable
+________________________________________________________________________________
+=========================== short test summary info ===========================
+FAILED tests/test_wb_background_terminal.py::test_fault_and_cancel_reply_once_and_drain[False-bad_message]
+FAILED tests/test_wb_background_terminal.py::test_fault_and_cancel_reply_once_and_drain[True-bad_message]
+2 failed, 18 deselected in 4.52s
