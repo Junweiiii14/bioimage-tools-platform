@@ -10,7 +10,7 @@ window.intakeWorkspace = (() => {
     const progress = document.createElement('section');
     const resultStage = $('#result-stage'),
         resultParent = resultStage.parentElement;
-    const paintedMarkup = new WeakMap();
+    let paintedMarkup = new WeakMap();
     function updateMarkup(container, markup) {
         if (paintedMarkup.get(container) === markup) return;
         const focused = container.contains(document.activeElement) ? document.activeElement : null;
@@ -634,7 +634,7 @@ window.intakeWorkspace = (() => {
             image.src = r.preview;
         }
     }
-    const rotationPaints = new WeakMap();
+    let rotationPaints = new WeakMap();
     function syncInspectorDrawer() {
         if (!state.intake?.cropEnabled || mode !== 'review') return false;
         const focused = document.activeElement;
@@ -2095,7 +2095,93 @@ window.intakeWorkspace = (() => {
             render();
         }
     });
+    function checkpoint() {
+        const children = [window.intakeGroups, window.intakeQuant, window.intakeGrid].map(
+            (editor) => editor.checkpoint(),
+        );
+        const saved = structuredClone({
+            key,
+            baseDigest,
+            basePlan,
+            draft,
+            batch,
+            selected,
+            conflict,
+            pending,
+            replace,
+            allowReuse,
+            filter,
+            cropDrafts,
+            cropPending,
+            rotationErrors,
+            rotationPreview,
+            cropSavedRow,
+            cropFocusAction,
+            chosenFigureId,
+            resultPage,
+            stagePage,
+            previewRequested,
+            cropInspectorRow,
+            discoveryKey,
+            discoveryDirty,
+            discoveryChoices,
+            followed,
+            browsing,
+            composing,
+            navigating,
+            focusAction,
+            measurePositions,
+            measureContext,
+        });
+        return () => {
+            ({
+                key,
+                baseDigest,
+                basePlan,
+                draft,
+                batch,
+                selected,
+                conflict,
+                pending,
+                replace,
+                allowReuse,
+                filter,
+                rotationPreview,
+                cropSavedRow,
+                cropFocusAction,
+                chosenFigureId,
+                resultPage,
+                stagePage,
+                previewRequested,
+                cropInspectorRow,
+                discoveryKey,
+                discoveryDirty,
+                followed,
+                browsing,
+                composing,
+                navigating,
+                focusAction,
+                measureContext,
+            } = saved);
+            for (const [target, source] of [
+                [cropDrafts, saved.cropDrafts],
+                [cropPending, saved.cropPending],
+                [rotationErrors, saved.rotationErrors],
+                [discoveryChoices, saved.discoveryChoices],
+                [measurePositions, saved.measurePositions],
+            ]) {
+                target.clear();
+                source.forEach((value, id) => target.set(id, value));
+            }
+            rotationEdit = null;
+            renderedWorkflow = null;
+            paintedMarkup = new WeakMap();
+            rotationPaints = new WeakMap();
+            children.forEach((restore) => restore());
+        };
+    }
     return {
+        checkpoint,
         expectFigure: (id) => {
             chosenFigureId = id;
             noteBrowse();

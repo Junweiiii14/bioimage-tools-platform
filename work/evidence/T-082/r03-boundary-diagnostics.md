@@ -18,3 +18,13 @@ Windows / Python3.12.14 / PySide6 6.12.0，所有Python命令通过 `uv run --lo
 3. `npm run check:web` 格式/lint/checkJs及4门禁自验证exit0；改动Python Ruff、严格定向Pyright均0；`python -m tooling.import_contracts` **9 kept / 0 broken**；`git diff --check`通过。
 
 准确提交独立复核及最终冻结树全门禁仍待办。类型门禁仍仅覆盖R04请求生成器，诊断处最小验证不声称完整UI schema覆盖。
+
+## 独审反例与修补
+
+05c1a16非作者审查 **Request changes**，不是Accepted：真实click/open入口仍挡住损坏回执后的只读重试；acceptState先提交epoch、sync先清草稿，跨身份渲染失败可丢草稿且拒绝后来的旧合法状态；recovered诊断传输抛错会反向打断有效恢复。独立原16测试虽通过，但不能覆盖这些反例。
+
+- 在未修入口的05c1a16上新增实际UI点击open/write/public_open三例，**3 failed / 6.99s / exit1**，均没有发出第二次只读请求；修补只放行receiptFailed时reload/同工具open，不放行重复保存。旧回执不能覆盖新读请求。
+- 状态/会话接收边界新增短生命周期编辑检查点；失败回滚state/epoch/路由及既有各工具编辑数据，并失效显示缓存。只克隆本地表单/几何/身份，不克隆原图和大状态；未完成指针手势取消，已编辑草稿保持。成功即释放备份，不建立第二套持久状态。高级、导入分组/计划/裁剪/积分/拼图网格与手动编辑都沿各自原有权威数据恢复。
+- diagnostic recovered使用与report同样的传输异常隔离，不影响正常业务恢复。
+
+新增同/跨epoch实际渲染异常、会话home渲染异常、诊断恢复传输异常、仪器导入草稿恢复；同时覆盖已有高级、导入、生命周期、手动泳道、项目导航六文件回归。第一次完成检查点77通过后，为缓存失效/会话home增加验证，最终 **78 passed / 67.46s / exit0**。命令文件集为 `test_web_boundary_diagnostics.py test_workbench_advanced.py test_intake_web_ui.py test_workbench_lifecycle.py test_manual_lanes_workbench.py test_project_navigation_session.py`，仍锁环境及CI软件渲染。Ruff/严格Pyright与JS门禁通过。补丁准确提交复审与最终冻结全门禁待办。

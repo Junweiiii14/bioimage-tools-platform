@@ -165,6 +165,58 @@ function qualityContent(entries) {
 function qualityDetails(entries) {
     return `<details class="quality-details">${qualityContent(entries)}</details>`;
 }
+function checkpointWorkbench() {
+    const previous = {
+        state,
+        mode,
+        filter,
+        search,
+        zoom,
+        focusCrop,
+        overlay,
+        selectedCell,
+        completedKey,
+        imageKey,
+        quantLane,
+        quantBand,
+        quantDetail,
+        quantSourceId,
+    };
+    const editors = [
+        window.desktopSession,
+        window.advancedWorkspace,
+        window.intakeWorkspace,
+        window.groupReview,
+        window.platformHome,
+    ]
+        .filter(Boolean)
+        .map((editor) => editor.checkpoint());
+    const manual = [manualQuant, manualLanes].map(checkpointManualEditor);
+    return () => {
+        ({
+            state,
+            mode,
+            filter,
+            search,
+            zoom,
+            focusCrop,
+            overlay,
+            selectedCell,
+            completedKey,
+            imageKey,
+            quantLane,
+            quantBand,
+            quantDetail,
+            quantSourceId,
+        } = previous);
+        editors.forEach((restore) => restore());
+        manual.forEach((restore) => restore());
+        imageKey = '';
+        drag = null;
+        drawing = null;
+        quantDrag = null;
+    };
+}
 function setState(next) {
     if (next.rows)
         next.rows = next.rows.map((r) => ({
@@ -1490,10 +1542,12 @@ async function bootstrap() {
                 bridge.stateChanged.connect((raw) => {
                     let phase = 'parse';
                     let next;
+                    let restore;
                     try {
                         next = channelObject(raw);
                         phase = 'validate';
                         requireProjectState(next);
+                        restore = checkpointWorkbench();
                         if (window.desktopSession && !window.desktopSession.acceptState(next))
                             return;
                         phase = 'render';
@@ -1524,6 +1578,7 @@ async function bootstrap() {
                         window.desktopSession?.route();
                         boundaryDiagnostics.recovered('state');
                     } catch (failure) {
+                        restore?.();
                         boundaryDiagnostics.report('state', failure, { ...(next || state), phase });
                     }
                 });

@@ -204,6 +204,7 @@ const desktopSession = (() => {
         window.advancedWorkspace?.connect(bridgeObject);
         channel.sessionStateChanged.connect((raw) => {
             let phase = 'parse';
+            let restore;
             const previous = session,
                 previousEpoch = epoch;
             try {
@@ -216,6 +217,7 @@ const desktopSession = (() => {
                 )
                     throw new TypeError('Invalid session');
                 if (next.epoch < epoch) return;
+                restore = checkpointWorkbench();
                 epoch = next.epoch;
                 session = next;
                 phase = 'render';
@@ -226,6 +228,7 @@ const desktopSession = (() => {
                 route();
                 boundaryDiagnostics.recovered('session');
             } catch (failure) {
+                restore?.();
                 session = previous;
                 epoch = previousEpoch;
                 boundaryDiagnostics.report('session', failure, { ...state, phase });
@@ -276,6 +279,13 @@ const desktopSession = (() => {
         return true;
     }
     return {
+        checkpoint: () => {
+            const saved = { session, token, recentKey, lastPosition, locked, epoch };
+            return () => {
+                ({ session, token, recentKey, lastPosition, locked, epoch } = saved);
+                recentKey = '';
+            };
+        },
         connect,
         route,
         hasDraft,

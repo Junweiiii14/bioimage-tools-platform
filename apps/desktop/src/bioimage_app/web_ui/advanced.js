@@ -359,7 +359,7 @@ window.advancedWorkspace = (() => {
             });
     }
     function open(next) {
-        if (pending) {
+        if (pending && !(receiptFailed && next === section)) {
             status('当前操作完成后可切换工具。');
             return;
         }
@@ -757,7 +757,7 @@ window.advancedWorkspace = (() => {
         const b = event.target.closest('[data-advanced]');
         if (b) {
             const op = b.dataset.advanced;
-            if (pending && op !== 'close') return;
+            if (pending && op !== 'close' && !(receiptFailed && op === 'reload')) return;
             if (op === 'resolve') {
                 if (conflicts.some((c) => !c.choice)) return;
                 for (const c of conflicts) {
@@ -991,12 +991,48 @@ window.advancedWorkspace = (() => {
                 closeDrawer();
         }
     }
+    function checkpoint() {
+        const saved = {
+            data,
+            draft: copy(draft),
+            base: copy(base),
+            conflicts: copy(conflicts),
+            pending,
+            dirty,
+            message,
+            error,
+            page,
+            section,
+            identity,
+            receiptFailed,
+            drafts: copy(drafts),
+        };
+        return () => {
+            ({
+                data,
+                draft,
+                base,
+                conflicts,
+                pending,
+                dirty,
+                message,
+                error,
+                page,
+                section,
+                identity,
+                receiptFailed,
+            } = saved);
+            drafts.clear();
+            saved.drafts.forEach((value, key) => drafts.set(key, value));
+        };
+    }
     function connect(object) {
         if (channel === object) return;
         channel = object;
         channel.advancedStateChanged.connect(receive);
     }
     return {
+        checkpoint,
         open,
         connect,
         sync,

@@ -485,6 +485,22 @@ window.intakeQuant = (() => {
         document.querySelector(`[data-iq-point="${k}"]`)?.focus();
     });
     return {
+        checkpoint: () => {
+            const saved = structuredClone({
+                drafts,
+                selected,
+                selectionKey,
+                matrixAnchor,
+                pendingEditor,
+                previewCollapsed,
+            });
+            return () => {
+                ({ selected, selectionKey, matrixAnchor, pendingEditor, previewCollapsed } = saved);
+                drafts.clear();
+                saved.drafts.forEach((value, key) => drafts.set(key, value));
+                drag = null;
+            };
+        },
         markup,
         figureMarkup,
         afterRender,

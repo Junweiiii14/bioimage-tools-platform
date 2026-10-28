@@ -96,7 +96,22 @@ window.platformHome = (() => {
         show(button.dataset.page);
     });
     sync();
-    return { show, sync, closed, inProject: () => view === 'project', current: () => view };
+    return {
+        show,
+        sync,
+        closed,
+        inProject: () => view === 'project',
+        current: () => view,
+        checkpoint: () => {
+            const previous = view,
+                saved = new Map(positions);
+            return () => {
+                view = previous;
+                positions.clear();
+                saved.forEach((value, key) => positions.set(key, value));
+            };
+        },
+    };
 })();
 
 window.folderDrop = (() => {

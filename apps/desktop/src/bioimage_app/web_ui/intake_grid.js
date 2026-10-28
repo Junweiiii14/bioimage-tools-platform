@@ -173,6 +173,13 @@ window.intakeGrid = (() => {
             .forEach((el) => el.classList.remove('reordering', 'drop-target'));
     });
     return {
+        checkpoint: () => {
+            const value = structuredClone({ draft, binding, saved, conflict });
+            return () => {
+                ({ draft, binding, saved, conflict } = value);
+                dragging = null;
+            };
+        },
         sidebar,
         inspector,
         hasDraft: () => {

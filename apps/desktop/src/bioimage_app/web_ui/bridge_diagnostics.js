@@ -40,7 +40,11 @@ const boundaryDiagnostics = (() => {
     }
     function recovered(action) {
         if (!failed.delete(action)) return;
-        channel?.reportUiFailure(JSON.stringify({ action, recovered: true }));
+        try {
+            channel?.reportUiFailure(JSON.stringify({ action, recovered: true }));
+        } catch {
+            // Recovery is already valid even when diagnostic transport is unavailable.
+        }
     }
     function connect(next) {
         channel = next;
@@ -48,6 +52,25 @@ const boundaryDiagnostics = (() => {
     }
     return { report, recovered, connect };
 })();
+
+// These objects contain local numeric/form edits plus methods. Gestures are
+// cancelled on rollback; no DOM node, image or scientific snapshot is cloned.
+function checkpointManualEditor(editor) {
+    const saved = structuredClone(
+        Object.fromEntries(
+            Object.entries(editor).filter(
+                ([key, value]) =>
+                    typeof value !== 'function' && !['drawing', 'dragging'].includes(key),
+            ),
+        ),
+    );
+    return () => {
+        Object.assign(editor, saved);
+        if ('drawing' in editor) editor.drawing = null;
+        if ('dragging' in editor) editor.dragging = null;
+        if ('profileKey' in editor) editor.profileKey = null;
+    };
+}
 
 function channelObject(raw) {
     const value = typeof raw === 'string' ? JSON.parse(raw) : raw;

@@ -11,6 +11,7 @@ from bioimage_app.web_window import WebWorkbenchWindow
 from PySide6.QtCore import QSettings
 from pytestqt.qtbot import QtBot
 
+from tests.test_intake_web_ui import intake_page as intake_page
 from tests.test_intake_web_ui import javascript
 from tests.test_project_measurements import setup
 from tests.test_web_bridge import bridge as bridge
@@ -145,8 +146,9 @@ def test_bad_channel_payload_is_deduplicated_and_draft_survives(
         diagnostics.close()
 
 
+@pytest.mark.parametrize("new_identity", [False, True])
 def test_render_failure_reports_safe_stack_and_next_state_recovers(
-    page: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
+    page: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path, new_identity: bool
 ) -> None:
     diagnostics = DesktopDiagnostics(tmp_path / "logs")
     try:
@@ -155,13 +157,25 @@ def test_render_failure_reports_safe_stack_and_next_state_recovers(
             qtbot,
             "window.originalRender=render;render=()=>{throw new TypeError('" + SECRET + "')};true",
         )
-        raw = json.dumps(page.bridge.snapshot())
+        original = page.bridge.snapshot()
+        next_state = (
+            original
+            | {
+                "projectId": "uncommitted-other-project",
+                "sessionEpoch": int(str(original["sessionEpoch"])) + 1,
+            }
+            if new_identity
+            else original
+        )
+        raw = json.dumps(next_state)
         for _ in range(8):
             page.bridge.stateChanged.emit(raw)
         qtbot.waitUntil(lambda: len(records(diagnostics)) == 1)
         found = records(diagnostics)[0]
         assert found["exception"] == "TypeError" and found["stack"]
         assert SECRET not in json.dumps(found)
+        assert javascript(page, qtbot, "state.projectId") == original["projectId"]
+        assert javascript(page, qtbot, "advancedWorkspace.hasDraft()") is True
         javascript(page, qtbot, "render=window.originalRender;true")
         page.bridge.stateChanged.emit(json.dumps(page.bridge.snapshot() | {"probe": "rendered"}))
         qtbot.waitUntil(lambda: javascript(page, qtbot, "state.probe") == "rendered")
@@ -174,6 +188,112 @@ def test_render_failure_reports_safe_stack_and_next_state_recovers(
         )
     finally:
         javascript(page, qtbot, "render=window.originalRender;true")
+        diagnostics.close()
+
+
+def test_diagnostic_recovery_transport_cannot_break_successful_state(
+    page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    javascript(
+        page,
+        qtbot,
+        "window.originalDiagnostic=bridge.reportUiFailure;"
+        "bridge.reportUiFailure=()=>{throw new Error('diagnostic transport unavailable')};"
+        "boundaryDiagnostics.report('state',new TypeError('bad'));true",
+    )
+    try:
+        page.bridge.stateChanged.emit(
+            json.dumps(page.bridge.snapshot() | {"probe": "transport-recovered"})
+        )
+        qtbot.waitUntil(lambda: javascript(page, qtbot, "state.probe") == "transport-recovered")
+        assert javascript(page, qtbot, "boundaryDiagnostics.recovered('state');true") is True
+        assert javascript(page, qtbot, "advancedWorkspace.hasDraft()") is True
+    finally:
+        javascript(page, qtbot, "bridge.reportUiFailure=window.originalDiagnostic;true")
+
+
+def test_failed_identity_transition_preserves_intake_plan(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
+) -> None:
+    page = intake_page
+    javascript(
+        page,
+        qtbot,
+        "const input=document.querySelector('[data-intake-field=fig-label]');"
+        "input.value='Retained plan';input.dispatchEvent(new Event('input',{bubbles:true}));"
+        "window.originalRender=render;window.savedState={...state,revision:state.revision||0};"
+        "render=()=>{throw new TypeError('render failure')};true",
+    )
+    diagnostics = DesktopDiagnostics(tmp_path / "logs")
+    try:
+        raw = javascript(
+            page,
+            qtbot,
+            "JSON.stringify({...savedState,projectId:'other',sessionEpoch:state.sessionEpoch+1,intake:null})",
+        )
+        assert isinstance(raw, str)
+        page.bridge.stateChanged.emit(raw)
+        qtbot.waitUntil(lambda: bool(records(diagnostics)))
+        assert (
+            javascript(
+                page, qtbot, "state.projectId===savedState.projectId&&intakeWorkspace.hasDraft()"
+            )
+            is True
+        )
+        javascript(page, qtbot, "render=window.originalRender;true")
+        restored = javascript(
+            page, qtbot, "JSON.stringify({...savedState,probe:'intake-recovered'})"
+        )
+        assert isinstance(restored, str)
+        page.bridge.stateChanged.emit(restored)
+        qtbot.waitUntil(lambda: javascript(page, qtbot, "state.probe") == "intake-recovered")
+        assert (
+            javascript(page, qtbot, "document.querySelector('[data-intake-field=fig-label]').value")
+            == "Retained plan"
+        )
+        assert javascript(page, qtbot, "intakeWorkspace.hasDraft()") is True
+    finally:
+        javascript(page, qtbot, "render=window.originalRender;true")
+        diagnostics.close()
+
+
+def test_failed_session_home_render_restores_epoch_and_drafts(
+    page: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
+) -> None:
+    diagnostics = DesktopDiagnostics(tmp_path / "logs")
+    original = page.bridge.snapshot()
+    javascript(
+        page,
+        qtbot,
+        "window.originalRender=render;window.originalClosed=platformHome.closed;"
+        "window.visitedHome=false;platformHome.closed=()=>{window.visitedHome=true;originalClosed()};"
+        "render=()=>{throw new TypeError('home render failure')};true",
+    )
+    try:
+        page.bridge.sessionStateChanged.emit(
+            json.dumps(
+                {
+                    "epoch": int(str(original["sessionEpoch"])) + 1,
+                    "stage": "idle",
+                    "recents": [],
+                    "route": {"token": "uncommitted-home", "mode": "home"},
+                }
+            )
+        )
+        qtbot.waitUntil(lambda: bool(records(diagnostics)))
+        assert javascript(page, qtbot, "window.visitedHome") is True
+        assert javascript(page, qtbot, "state.projectId") == original["projectId"]
+        assert javascript(page, qtbot, "advancedWorkspace.hasDraft()") is True
+        javascript(page, qtbot, "render=window.originalRender;true")
+        page.bridge.stateChanged.emit(json.dumps(original | {"probe": "session-recovered"}))
+        qtbot.waitUntil(lambda: javascript(page, qtbot, "state.probe") == "session-recovered")
+        assert javascript(page, qtbot, "advancedWorkspace.hasDraft()") is True
+    finally:
+        javascript(
+            page,
+            qtbot,
+            "render=window.originalRender;platformHome.closed=window.originalClosed;true",
+        )
         diagnostics.close()
 
 
@@ -245,6 +365,70 @@ def test_diagnostic_sink_failure_does_not_replace_snapshot_error(
     bridge.publish()
     bridge.publish()
     assert len(notices) == 1 and "重试" in notices[0]
+
+
+@pytest.mark.parametrize("entry", ["open", "write", "public_open"])
+def test_damaged_advanced_reply_can_be_reloaded_by_user_without_repeating_write(
+    page: WebWorkbenchWindow, qtbot: QtBot, entry: str
+) -> None:
+    javascript(
+        page,
+        qtbot,
+        "window.originalRequest=bridge.request;window.requestQueue=[];"
+        "bridge.request=(action,raw)=>{window.requestQueue.push(JSON.parse(raw))};true",
+    )
+    try:
+        start = (
+            "document.querySelector('[data-advanced=template_apply]').click()"
+            if entry == "write"
+            else "advancedWorkspace.open('template')"
+        )
+        javascript(page, qtbot, start + ";true")
+        first = javascript(page, qtbot, "requestQueue[0].requestId")
+        page.bridge.advancedStateChanged.emit("{bad")
+        qtbot.waitUntil(
+            lambda: (
+                "回复无法显示"
+                in str(
+                    javascript(
+                        page,
+                        qtbot,
+                        "document.querySelector('#drawer-content').innerText+document.querySelector('#advanced-footer')?.innerText",
+                    )
+                )
+            )
+        )
+        retry = (
+            "advancedWorkspace.open('template')"
+            if entry == "public_open"
+            else "document.querySelector('[data-advanced=reload]').click()"
+        )
+        javascript(page, qtbot, retry + ";true")
+        assert javascript(page, qtbot, "requestQueue.length") == 2
+        assert javascript(page, qtbot, "requestQueue[1].operation") == "open"
+        latest = javascript(page, qtbot, "requestQueue[1].requestId")
+        assert first != latest
+        response = {
+            "requestId": first,
+            "status": "done",
+            "data": page.bridge.advanced_commands.snapshot(),
+        }
+        page.bridge.advancedStateChanged.emit(json.dumps(response))
+        assert javascript(page, qtbot, "advancedWorkspace.hasDraft()") is True
+        page.bridge.advancedStateChanged.emit(json.dumps(response | {"requestId": latest}))
+        qtbot.waitUntil(
+            lambda: javascript(page, qtbot, "!!document.querySelector('#advanced-editor')") is True
+        )
+        assert (
+            javascript(
+                page, qtbot, "document.querySelector('[data-adv-path=\"template.row_gap\"]').value"
+            )
+            == "29"
+        )
+        assert javascript(page, qtbot, "advancedWorkspace.hasDraft()") is True
+        assert page.host.view.project().template.row_gap != 29
+    finally:
+        javascript(page, qtbot, "bridge.request=window.originalRequest;true")
 
 
 @pytest.mark.parametrize(

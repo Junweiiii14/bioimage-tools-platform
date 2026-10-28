@@ -635,5 +635,24 @@ window.groupReview = (() => {
             choose(e.target.dataset.grRow, Number(e.target.dataset.grLane));
         }
     });
-    return { renderActive, progress, manualMode, hasDraft: () => !!draft };
+    function checkpoint() {
+        const saved = structuredClone({
+            manual,
+            selection,
+            draft,
+            pendingFocus,
+            tableFilter,
+            zoomLevel,
+            pendingSelection,
+        });
+        return () => {
+            ({ manual, selection, draft, pendingFocus, tableFilter, zoomLevel, pendingSelection } =
+                saved);
+            contentKey = '';
+            navigationKey = '';
+            dragging = null;
+            pan = null;
+        };
+    }
+    return { renderActive, progress, manualMode, hasDraft: () => !!draft, checkpoint };
 })();

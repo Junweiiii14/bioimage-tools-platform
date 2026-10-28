@@ -700,5 +700,40 @@ window.intakeGroups = (() => {
         locked: locked(),
         dirty: dirty(),
     });
-    return { sync, reset, render, bind, hasDraft: dirty, activate, startState };
+    function checkpoint() {
+        const saved = structuredClone({
+            identity,
+            digest,
+            base,
+            draft,
+            pending,
+            conflict,
+            filter,
+            bulkFigure,
+            reuse,
+            zoomSource,
+            startError,
+            composing,
+            selected,
+        });
+        return () => {
+            ({
+                identity,
+                digest,
+                base,
+                draft,
+                pending,
+                conflict,
+                filter,
+                bulkFigure,
+                reuse,
+                zoomSource,
+                startError,
+                composing,
+            } = saved);
+            selected.clear();
+            saved.selected.forEach((value) => selected.add(value));
+        };
+    }
+    return { sync, reset, render, bind, hasDraft: dirty, activate, startState, checkpoint };
 })();
