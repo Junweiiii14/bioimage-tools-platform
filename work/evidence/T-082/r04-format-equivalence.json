@@ -1,0 +1,168 @@
+{
+  "base": "159a51e",
+  "parser": "espree@11.2.0",
+  "ignored": [
+    "source positions",
+    "Literal.raw spelling (value retained)"
+  ],
+  "preserved": [
+    "all AST structure",
+    "literal values",
+    "template raw and cooked values",
+    "regexp pattern and flags"
+  ],
+  "results": [
+    {
+      "file": "apps/desktop/src/bioimage_app/web_ui/advanced.js",
+      "astSha256": "e5af501dceae3594594dcc12937710ee9903d558e7fc28ee1c839cf92a94420b",
+      "beforeLines": 155,
+      "afterLines": 980,
+      "beforeMaxLine": 3570,
+      "afterMaxLine": 1992
+    },
+    {
+      "file": "apps/desktop/src/bioimage_app/web_ui/app.js",
+      "astSha256": "4a24b7c43fccafc23e2dada0bac5a0bf6c5e02b78a82b93670ed7b8c9aa8d922",
+      "beforeLines": 338,
+      "afterLines": 2246,
+      "beforeMaxLine": 3010,
+      "afterMaxLine": 1287
+    },
+    {
+      "file": "apps/desktop/src/bioimage_app/web_ui/appearance.js",
+      "astSha256": "cba12172db740666e5f451eefd361bc126e03d34d29fbd0d08190892f8563c14",
+      "beforeLines": 55,
+      "afterLines": 140,
+      "beforeMaxLine": 1195,
+      "afterMaxLine": 1192
+    },
+    {
+      "file": "apps/desktop/src/bioimage_app/web_ui/bootstrap.js",
+      "astSha256": "36c5ac9463bc657dfd9ff2a72f7b9a2aff038f5cab0c023a583eac24227a2ef1",
+      "beforeLines": 9,
+      "afterLines": 18,
+      "beforeMaxLine": 138,
+      "afterMaxLine": 97
+    },
+    {
+      "file": "apps/desktop/src/bioimage_app/web_ui/component_examples.js",
+      "astSha256": "babf603288955798ab23e1ec7675553dad6ccbb43033784132c0b08bbefaa2da",
+      "beforeLines": 33,
+      "afterLines": 40,
+      "beforeMaxLine": 97,
+      "afterMaxLine": 81
+    },
+    {
+      "file": "apps/desktop/src/bioimage_app/web_ui/desktop_session.js",
+      "astSha256": "27ee7d61a63d78e63c9c23c8b4c50be5c97fc21e9d02322072a7a00efb1a016e",
+      "beforeLines": 99,
+      "afterLines": 279,
+      "beforeMaxLine": 846,
+      "afterMaxLine": 682
+    },
+    {
+      "file": "apps/desktop/src/bioimage_app/web_ui/group_review.js",
+      "astSha256": "25bd50cadf2ecb2786849bedc9117c8cc4853e53fde6452cf51a14e191d0a565",
+      "beforeLines": 210,
+      "afterLines": 640,
+      "beforeMaxLine": 1834,
+      "afterMaxLine": 1863
+    },
+    {
+      "file": "apps/desktop/src/bioimage_app/web_ui/intake.js",
+      "astSha256": "2bd92a5bf4c5377b7b34ee6e52882b0f3ddc36ff76494c4bec1a41f82df7311b",
+      "beforeLines": 927,
+      "afterLines": 2130,
+      "beforeMaxLine": 1858,
+      "afterMaxLine": 1638
+    },
+    {
+      "file": "apps/desktop/src/bioimage_app/web_ui/intake_grid.js",
+      "astSha256": "31e6fee6cce8992cf265b225139568ecaf351b94c15072d5d05667dc3100910e",
+      "beforeLines": 54,
+      "afterLines": 190,
+      "beforeMaxLine": 1759,
+      "afterMaxLine": 1842
+    },
+    {
+      "file": "apps/desktop/src/bioimage_app/web_ui/intake_groups.js",
+      "astSha256": "2c72b9bef98f06f5f571d62928adb3fdc0960e8948b6c033502ba52e682bbef8",
+      "beforeLines": 335,
+      "afterLines": 707,
+      "beforeMaxLine": 1018,
+      "afterMaxLine": 1024
+    },
+    {
+      "file": "apps/desktop/src/bioimage_app/web_ui/intake_quant.js",
+      "astSha256": "ee6ce5d3032eeefdf0fc982020503226185aee47d0d50e27331ae88bbb2264c1",
+      "beforeLines": 191,
+      "afterLines": 504,
+      "beforeMaxLine": 615,
+      "afterMaxLine": 595
+    },
+    {
+      "file": "apps/desktop/src/bioimage_app/web_ui/intake_views.js",
+      "astSha256": "4b38c1650c074a7e0ed9f5c6cf2fa1d2aaf5238e589d935cca877c932f7877da",
+      "beforeLines": 73,
+      "afterLines": 169,
+      "beforeMaxLine": 659,
+      "afterMaxLine": 647
+    },
+    {
+      "file": "apps/desktop/src/bioimage_app/web_ui/interactions.js",
+      "astSha256": "1cbb9f65b4ed7be21e95391e90af0420b65aa558fcc1f5ed8580b912b7a026e5",
+      "beforeLines": 62,
+      "afterLines": 253,
+      "beforeMaxLine": 664,
+      "afterMaxLine": 145
+    },
+    {
+      "file": "apps/desktop/src/bioimage_app/web_ui/manual_lanes.js",
+      "astSha256": "70334aa44459240752071ea9ef18cd2faa8fb18e6b5fad210c2992efef5a22f4",
+      "beforeLines": 202,
+      "afterLines": 634,
+      "beforeMaxLine": 856,
+      "afterMaxLine": 841
+    },
+    {
+      "file": "apps/desktop/src/bioimage_app/web_ui/manual_quant.js",
+      "astSha256": "bdd97ff8a9ff0d0f9a9d9176930b61aaa94c95680990836f909974c360a77bd6",
+      "beforeLines": 286,
+      "afterLines": 444,
+      "beforeMaxLine": 577,
+      "afterMaxLine": 467
+    },
+    {
+      "file": "apps/desktop/src/bioimage_app/web_ui/motion.js",
+      "astSha256": "150ee172a66de30205e4c3136bf4ea5aed93d7d58292b5a7626369502d317d75",
+      "beforeLines": 41,
+      "afterLines": 82,
+      "beforeMaxLine": 156,
+      "afterMaxLine": 100
+    },
+    {
+      "file": "apps/desktop/src/bioimage_app/web_ui/platform_home.js",
+      "astSha256": "ffbcffc5d8e82c37b07877b92a39869abdb5dd20cb5c0e9df9fdcc17a105590a",
+      "beforeLines": 74,
+      "afterLines": 125,
+      "beforeMaxLine": 233,
+      "afterMaxLine": 217
+    },
+    {
+      "file": "apps/desktop/src/bioimage_app/web_ui/preview_adapter.js",
+      "astSha256": "81e773098ae6e8fa2ac88b1887baf7b0ee3f2a105755695ea4715b707d596602",
+      "beforeLines": 40,
+      "afterLines": 698,
+      "beforeMaxLine": 2851,
+      "afterMaxLine": 701
+    },
+    {
+      "file": "apps/desktop/src/bioimage_app/web_ui/shortcuts.js",
+      "astSha256": "e65767c91a01487b14a1796502a11ba49931d75b0348a93d25258b73439c884b",
+      "beforeLines": 168,
+      "afterLines": 445,
+      "beforeMaxLine": 1067,
+      "afterMaxLine": 1095
+    }
+  ]
+}
