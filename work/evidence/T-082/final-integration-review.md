@@ -40,4 +40,14 @@ R09 原始 32 份 JSON/log 已逐文件比对复制到 [r09-raw](r09-raw/README.
 
 卸载独审实算173文件摘要/大小，核对当前验收键/5快捷方式/launcher/privatePython/uninstaller消失，设置marker和Lab摘要保持；实际1300残留与报告相同。第一诊断没有worker PID，资源关闭检查不声称逐PID观察；第二诊断的两个worker退出有明确记录。双诊断stderr错误、Temp98零长文件遗失UNKNOWN、科学与物理环境未验保留。此阶段仅只读证据审计，没有再次启动产品/测试或清理缓存。
 
-最终交接文档与183份原始证据归档的准确提交独审待补；上述审查只覆盖已列明的源码与真实执行证据，不提前认可尚未提交的交接差异。
+## 最终交接差异独审与治理检查
+
+非作者 `/root/independent_review` 对准确 `ed830e1d3bab3d0c8c57f3766a898991e8a0f431..9ec7b1d0a1b2983b22ef6b7e784276ba9242269c` 的19文件差异给出 **Accepted**，检查时HEAD相符/clean。产品、测试、依赖锁、工具与门禁实现无变化。回执结构只改变 `docs/ai-workflow.md` 摘要，实算Git blob SHA `14f2bc28505cd1774bda2de15246d4924985ec36308574abb8e150918124bb79` 一致，base/scope/其余规则保持。原T045 work-log内容完整归档（仅段间空行归一），T046起旧记录逐字保持。
+
+已提交ZIP与原件相同，183成员CRC/大小/SHA及本地原字节全部独立核对；9份acceptance的request/previous-report及两诊断引用可在归档中全部解析，7份Lab快照实算一致。只收文本，无原图/模型/安装器/项目二进制或原设置值，额外凭据及内嵌图像模式扫描0发现，不声称通用检测保证。新读者可从 [最终冷启动记录](final-cold-start.md) 区分当时未提交文件、实际小变更与早先只读R08，以及不同阅读字节口径。
+
+独审确认源码/构建源与后续交接HEAD区分正确，全部实际数字/失败链/UNKNOWN/未验边界有证据；未发现剩余可执行工程或本机最小验收遗漏。R10仍需真实材料/负责人判断，列明外部环境未验；R09/R12有据处置，不制造重复测试或扩展整改。
+
+独审指出的非阻断文字修正已落实：JS四项是“门禁与协议自检（含受控负例）”，第四项为typed producer wire保持；task R04同步精确表述；work-log明确深路径失败绑定较早d66655b；补最终冷启动链接。本收据与阻塞恢复状态是收尾记录，不改产品或为通过检查削弱要求。
+
+治理验证：Root真实刷新 `dev.py context --task T-082 --scope . --record` exit0，对比此前已完整读过的输出逐节核对，未变部分摘要相同，变化部分以UTF8回读；没有手填规则哈希。`dev.py policy`扫描173产品文件/exit0；handoff维护首次将1段旧work-log先归档，再次changed=0/warnings=0/unresolved=0；新文档及入口本地链接检查158处/0缺失。`git diff --check ed830e1 9ec7b1d`独立exit0，`rule_context check --base origin/main --head 9ec7b1d`exit0。提交hook policy通过，Ruff/web因无相关源码变化明确skipped，不当作新产品测试通过。整体base差异含早期原始失败日志三处尾空白的历史边界仍见上文。

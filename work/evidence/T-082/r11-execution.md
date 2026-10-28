@@ -13,7 +13,7 @@
 
 在本工作树对准确 ed830e1 执行 `uv run --locked --no-sync python dev.py check --all`，进程局部 `QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu`：**1503 passed / 10 warnings / 756.15s，全部 isolated installed_wheels 成功，整体 exit 0**，结束后 HEAD 不变、dirty=[]。
 
-包含 policy、Ruff/1018 文件格式、严格 Pyright、9 条导入契约、固定 JS 工具/4 个负例、自有 Python 回归、四 wheel 隔离安装/API/桌面/OCR worker/历史与导出/异步关闭。未运行远端 CI；不能由本机记录推断 Linux 或远端检查成功。完整日志 SHA256 `8b096e5eaf7e437c6e949b582c2cd186330f49f74cf36d8d00f52b98175e3669`，exit 记录 SHA `ade6ab7d3a96db203eef4bc60cb644cdb3a6d80c92d6f7e629b91e97df26d0b9`。
+包含 policy、Ruff/1018 文件格式、严格 Pyright、9 条导入契约、固定 JS 工具/4 项门禁与协议自检（含受控负例）、自有 Python 回归、四 wheel 隔离安装/API/桌面/OCR worker/历史与导出/异步关闭。未运行远端 CI；不能由本机记录推断 Linux 或远端检查成功。完整日志 SHA256 `8b096e5eaf7e437c6e949b582c2cd186330f49f74cf36d8d00f52b98175e3669`，exit 记录 SHA `ade6ab7d3a96db203eef4bc60cb644cdb3a6d80c92d6f7e629b91e97df26d0b9`。
 
 d66655b 的先前全门禁 1501 + wheels exit 0 也保留，不能替代包含随后 f5d7ac9 wrapper 修复的最终门禁。44ee78c 的 2 failed / 1499 passed / exit 1 与 wheel 未运行继续保留；d1036c2 的同一行撤销修复及反例/独审见 [r05-final-gate-repair](r05-final-gate-repair.md)。
 
@@ -49,7 +49,7 @@ Laboratory 的七份前后快照（准备、安装前后、升级前后、诊断
 
 ## 独立复核与未验范围
 
-非作者 `/root/independent_review` 对准确 ed830e1 全门禁、实际最终安装器/manifest、双shell请求/失败恢复关系、升级、历史报告、诊断及卸载给出 **Accepted**。其独立实算安装器与报告摘要、26及173文件SHA/大小、当前卸载状态、5快捷方式及Laboratory快照；没有重新运行产品、测试或清缓存。源码整体/后续修复的准确提交独审见 [final-integration-review](final-integration-review.md)。最后交接差异单独复核，不借此提前宣布最终文档通过。
+非作者 `/root/independent_review` 对准确 ed830e1 全门禁、实际最终安装器/manifest、双shell请求/失败恢复关系、升级、历史报告、诊断及卸载给出 **Accepted**。其独立实算安装器与报告摘要、26及173文件SHA/大小、当前卸载状态、5快捷方式及Laboratory快照；没有重新运行产品、测试或清缓存。源码整体/后续修复及交接提交9ec7b1d的独审见 [final-integration-review](final-integration-review.md)。
 
 原生屏幕探针以安装私有Qt、windows插件和无列明强制缩放变量记录 DPR1.5 / 逻辑DPI96 / 物理DPI126.0475 / 1707×1067；它**仅是环境观测**。自动诊断使用受控离屏环境，不能称物理150%交互验收。当前最小矩阵已完成本机Win11中文路径、安装/升级/卸载与合成生命周期；干净Win10、其他员工设备、物理125/150/200%/多屏/拖放、真实GPU及外部Office未运行。旧native异常及Temp零文件根因仍UNKNOWN。
 
