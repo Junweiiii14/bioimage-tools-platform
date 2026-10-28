@@ -18,10 +18,7 @@ def quant_snapshot(
 ) -> dict[str, object]:
     if project is None:
         project = host.view.project()
-        selected = host.view.selected_row()
-    else:
-        selected_index = host.view.table.currentRow()
-        selected = project.rows[selected_index] if 0 <= selected_index < len(project.rows) else None
+    selected = next((r for r in project.rows if r.row_id == host.view.selected_row_id), None)
     plans = project.analyses if isinstance(project, WBAnalysisProject) else ()
     table: list[dict[str, object]] = []
     selected_lanes: list[dict[str, object]] = []

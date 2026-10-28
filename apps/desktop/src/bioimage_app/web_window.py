@@ -244,11 +244,11 @@ class WebWorkbenchWindow(QMainWindow):
                     [Path(path) for path in paths], automatic=action != "quant_import"
                 )
         elif action == "retry_location":
-            if self.host.retry_location_button.isHidden():
+            if not self.host.can_retry_location:
                 raise ValueError("当前没有等待重新选择保存位置的项目")
             self._starting = True
             self._stage = "opening"
-            self.host.retry_location_button.click()
+            self.host.retry_project_location()
         elif action in {"quant_export_xlsx", "quant_export_csv"}:
             extension = action.rsplit("_", 1)[-1]
             path, _ = QFileDialog.getSaveFileName(
@@ -592,15 +592,11 @@ class WebWorkbenchWindow(QMainWindow):
             has_content = bool(project.rows) or (
                 isinstance(project, WBIntakeProject) and bool(project.intake.sources)
             )
-            if (
-                has_content
-                and not self.host.view.status.text().startswith("操作失败")
-                and self.host.has_unsaved_changes
-            ):
+            if has_content and not self.host.operation_failed and self.host.has_unsaved_changes:
                 self.host.save()
                 return
             self._starting = False
-            if has_content and not self.host.view.status.text().startswith("操作失败"):
+            if has_content and not self.host.operation_failed:
                 self._ready_project = project.project_id
                 if isinstance(project, WBIntakeProject):
                     self._target_mode = "intake"

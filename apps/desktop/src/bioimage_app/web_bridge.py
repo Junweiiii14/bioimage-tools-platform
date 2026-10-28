@@ -210,8 +210,7 @@ class WorkbenchBridge(QObject):
     def snapshot(self) -> dict[str, object]:
         view = self.host.view
         project = view.project()
-        selected_index = view.table.currentRow()
-        selected = project.rows[selected_index] if 0 <= selected_index < len(project.rows) else None
+        selected = next((r for r in project.rows if r.row_id == view.selected_row_id), None)
         preview = view.source_preview
         preview_key = (
             (preview.sha256, preview.preview_width, preview.preview_height) if preview else None
@@ -524,7 +523,7 @@ class WorkbenchBridge(QObject):
             "revision": view.generation,
             "projectName": project.name,
             "intake": intake,
-            "canRetryLocation": not self.host.retry_location_button.isHidden(),
+            "canRetryLocation": self.host.can_retry_location,
             "busy": self.host.operation_busy,
             "status": self._error or view.status.text(),
             "selectedId": selected.row_id if selected else "",
@@ -589,7 +588,7 @@ class WorkbenchBridge(QObject):
                 id(self.host.intake.group_preview),
                 view.preview_label.full_pixmap.cacheKey(),
                 self.host.operation_busy,
-                self.host.retry_location_button.isHidden(),
+                self.host.can_retry_location,
                 self.host.automatic.last_output_path,
                 self.host.automatic.discovery_report,
                 self.host.intake_workflow.presentation_key,
@@ -776,12 +775,11 @@ class WorkbenchBridge(QObject):
                     self._quant_overview = (self.host.view.project().project_id, rows[index].row_id)
                 else:
                     self._quant_overview = None
-                previous_index = self.host.view.table.currentRow()
-                self.host.view.table.setCurrentCell(index, 0)
-                if self.host.operation_busy:
+                was_busy = self.host.operation_busy
+                if not self.host.view.select_row(rows[index].row_id):
+                    raise ValueError("请先完成当前编辑，再切换原图")
+                if was_busy:
                     self._pending_source = (self.host.view.project_identity, rows[index].row_id)
-                elif previous_index == index:
-                    self.host.select_source(rows[index].row_id)
             elif action == "quant_edit":
                 self._edit_quant(data)
             elif action in {
@@ -850,8 +848,7 @@ class WorkbenchBridge(QObject):
                             row_index = next(
                                 i for i, r in enumerate(current.rows) if r.figure == target
                             )
-                            self.host.view.table.setCurrentCell(row_index, 0)
-                            self.host.select_source(current.rows[row_index].row_id)
+                            self.host.view.select_row(current.rows[row_index].row_id)
                         else:
                             self.host.view.status.setText("全部分组已审核并保存")
 
@@ -936,7 +933,7 @@ class WorkbenchBridge(QObject):
                         (i for i in following if rows[i].source and not rows[i].reviewed), None
                     )
                     if next_index is not None:
-                        self.host.view.table.setCurrentCell(next_index, 0)
+                        self.host.view.select_row(rows[next_index].row_id)
             elif action == "undo":
                 self.host.view.undo_review()
             elif action == "redo":

@@ -122,7 +122,8 @@ class FigureProjectWindow(QMainWindow):
         self._save_on_close = True
         self._transition_pending = False
         self._busy = False
-        self.operation_error = ""
+        self._operation_error = ""
+        self._operation_failed = False
         self.quant_progress: dict[str, object] = {}
         self._closing = False
         self._shutting = False
@@ -139,6 +140,7 @@ class FigureProjectWindow(QMainWindow):
         self._pending_project_paths: list[Path] = []
         self._pending_project_automatic = True
         self._pending_project_intake = False
+        self._retry_location_pending = False
         self.intake = InstrumentIntakeSession(self)
         self.intake_workflow = IntakeWorkflowSession(self)
         self._auto_save = QTimer(self)
@@ -258,7 +260,7 @@ class FigureProjectWindow(QMainWindow):
         welcome_layout.addWidget(self.welcome_status)
         self.retry_location_button = QPushButton("更换项目保存位置并重试…")
         self.retry_location_button.setMaximumWidth(300)
-        self.retry_location_button.clicked.connect(self._retry_project_location)
+        self.retry_location_button.clicked.connect(self.retry_project_location)
         self.retry_location_button.hide()
         welcome_layout.addWidget(self.retry_location_button)
         welcome_layout.addStretch()
@@ -391,7 +393,23 @@ class FigureProjectWindow(QMainWindow):
         else:
             self._preview_if_needed()
 
-    def _retry_project_location(self) -> None:
+    @property
+    def can_retry_location(self) -> bool:
+        return bool(
+            self._retry_location_pending
+            and self._pending_project_paths
+            and not self._workspace
+            and not self._busy
+            and not self._closing
+        )
+
+    def _set_retry_location(self, pending: bool) -> None:
+        self._retry_location_pending = pending
+        self.retry_location_button.setVisible(self.can_retry_location)
+
+    def retry_project_location(self) -> None:
+        if not self.can_retry_location or self._busy or self._workspace or self._closing:
+            return
         parent = QFileDialog.getExistingDirectory(self, "选择项目保存位置（软件自动创建子文件夹）")
         if parent and self._pending_project_paths:
             self.start_project_from_images(
@@ -418,7 +436,7 @@ class FigureProjectWindow(QMainWindow):
         self._pending_project_paths = list(paths)
         self._pending_project_automatic = automatic
         self._pending_project_intake = intake
-        self.retry_location_button.hide()
+        self._set_retry_location(False)
         self._start()
         self.view.status.setText("正在查找 WB 原图…")
         self.welcome_status.setText("正在查找 WB 原图…")
@@ -439,7 +457,7 @@ class FigureProjectWindow(QMainWindow):
                 self._done("已取消，未创建项目。")
                 return
             if selection.error or selection.destination is None:
-                self.retry_location_button.show()
+                self._set_retry_location(True)
                 self._error(selection.error or "未能准备项目保存位置")
                 return
             pending = list(selection.paths)
@@ -1087,7 +1105,8 @@ class FigureProjectWindow(QMainWindow):
             self.view.set_project(installed)
             self.view.generation += 1
             first = next((i for i, r in enumerate(installed.rows) if r.row_id not in old_ids), 0)
-            self.view.table.setCurrentCell(first, 0)
+            if installed.rows:
+                self.view.select_row(installed.rows[first].row_id)
             self._busy = False
             ids = tuple(p.row_id for p in installed.analyses if p.row_id not in old_ids)
             if ids:
@@ -1526,6 +1545,21 @@ class FigureProjectWindow(QMainWindow):
         return self._busy
 
     @property
+    def operation_error(self) -> str:
+        """Outcome of the current host operation, independent of status wording."""
+        return self._operation_error
+
+    @property
+    def operation_failed(self) -> bool:
+        """Failure is explicit even when an exception supplied an empty message."""
+        return self._operation_failed
+
+    def clear_operation_error(self) -> None:
+        """Start an explicitly requested operation without retaining a prior failure."""
+        self._operation_error = ""
+        self._operation_failed = False
+
+    @property
     def is_closing(self) -> bool:
         return self._closing
 
@@ -1638,6 +1672,7 @@ class FigureProjectWindow(QMainWindow):
         self.pause_auto_save(True)
 
     def _controls(self) -> None:
+        self.retry_location_button.setVisible(self.can_retry_location)
         idle = not self._busy and not self._closing and not self._transition_pending
         self.create_button.setEnabled(idle and not self._workspace)
         self.open_button.setEnabled(idle and not self._workspace)
@@ -1670,7 +1705,7 @@ class FigureProjectWindow(QMainWindow):
             welcome_button.setEnabled(button.isEnabled())
 
     def _start(self) -> None:
-        self.operation_error = ""
+        self.clear_operation_error()
         self._busy = True
         self.quant_progress = {"phase": "working", "label": "后台处理中"}
         self._cancellation.clear()
@@ -1687,7 +1722,8 @@ class FigureProjectWindow(QMainWindow):
             self._ocr_refresh_timer.start(0)
 
     def _error(self, message: str) -> None:
-        self.operation_error = message
+        self._operation_error = message
+        self._operation_failed = True
         self._ocr_refresh_timer.stop()
         self._ocr_refresh_pending = False
         # A failed final save must leave the window open for recovery, never retry recursively.
@@ -2139,10 +2175,7 @@ class FigureProjectWindow(QMainWindow):
         project = self.view.project()
         if project.rows:
             index = next((i for i, row in enumerate(project.rows) if row.roi), 0)
-            if self.view.table.currentRow() != index:
-                self.view.table.setCurrentCell(index, 0)
-            else:
-                self.select_source(project.rows[index].row_id)
+            self.view.select_row(project.rows[index].row_id)
 
     def save(
         self,

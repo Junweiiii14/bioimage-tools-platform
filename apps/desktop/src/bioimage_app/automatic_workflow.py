@@ -282,10 +282,8 @@ class AutomaticWorkflow(QObject):
                             return
                         self.finished.emit(self.last_output_path)
                         index = next((i for i, row in enumerate(project.rows) if row.roi), 0)
-                        if window.view.table.currentRow() != index:
-                            window.view.table.setCurrentCell(index, 0)
-                        elif project.rows:
-                            window.select_source(project.rows[index].row_id)
+                        if project.rows:
+                            window.view.select_row(project.rows[index].row_id)
 
                     window.end_phase()
                     window.refresh_project_table(message, after=ready)

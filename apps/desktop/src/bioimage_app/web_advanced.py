@@ -187,7 +187,11 @@ class AdvancedCommands:
         if current.project_id != project_id and operation != "template_import":
             self.waiting = None
             return
-        error = host.operation_error
+        error = (
+            host.operation_error or "操作失败；请检查本机会话日志。"
+            if host.operation_failed
+            else ""
+        )
         if host.cancellation.is_set():
             error = error or "操作已取消；已提交历史保留。"
         if (
@@ -562,7 +566,7 @@ class AdvancedCommands:
         ):
             raise ValueError("文件选择期间项目已改变，请重试")
         self.waiting = (request, project.project_id, epoch, operation)
-        host.operation_error = ""
+        host.clear_operation_error()
         self._committing = False
         self._saved = False
 
