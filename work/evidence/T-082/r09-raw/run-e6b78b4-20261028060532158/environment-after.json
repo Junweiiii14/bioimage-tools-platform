@@ -1,0 +1,12 @@
+{
+  "recorded_after_runs": "2026-10-28T14:10:33.723224+08:00",
+  "power_raw": {
+    "ACLineStatus": 1,
+    "BatteryFlag": 1,
+    "BatteryLifePercent": 80,
+    "SystemStatusFlag": 0,
+    "BatteryLifeTime": 4294967295,
+    "BatteryFullLifeTime": 4294967295
+  },
+  "meaning": "ACLineStatus1=online; sampled after measurement, not continuous power monitoring"
+}

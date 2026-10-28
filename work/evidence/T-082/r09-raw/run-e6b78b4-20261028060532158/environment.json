@@ -1,0 +1,22 @@
+{
+  "recorded_at": "2026-10-28T14:05:33.9742871+08:00",
+  "commit": "e6b78b4c4dd11d06245c01cdbcc3a1cbd44d1b34",
+  "os": "Microsoft Windows 11 家庭版 中文版",
+  "os_version": "10.0.26200",
+  "os_build": "26200",
+  "cpu": {
+    "Name": "Intel(R) Core(TM) Ultra 7 255HX",
+    "NumberOfCores": 20,
+    "NumberOfLogicalProcessors": 20,
+    "MaxClockSpeed": 2400,
+    "LoadPercentage": 5
+  },
+  "total_physical_bytes": 16496738304,
+  "free_physical_kib": 3627112,
+  "power_scheme": "电源方案 GUID: 27fa6203-3987-4dcc-918d-748559d549ec  (Performance)",
+  "own_parallel_load": "Root confirmed no other agent GUI/build/pytest; only this sequential benchmark",
+  "other_user_load": "Not controlled or claimed absent; CPU LoadPercentage is a single startup WMI observation",
+  "qpa": "windows",
+  "chromium_flags": "--disable-gpu",
+  "rendering_claim": "Local software-rendering diagnostic only; no GPU remediation claim"
+}
