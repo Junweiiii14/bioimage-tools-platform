@@ -19,3 +19,9 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
+      - id: web-quality
+        name: Web format, lint and typed payload checks (locked)
+        entry: uv run --locked --no-sync python -m tooling.web_quality
+        language: system
+        files: ^(apps/desktop/src/bioimage_app/web_ui/.*\.(js|html)|package(-lock)?\.json|eslint\.config\.cjs|prettier\.config\.cjs|tsconfig\.web\.json|tooling/(check_web\.cjs|web_quality\.(py|test\.cjs))|\.node-version)$
+        pass_filenames: false

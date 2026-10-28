@@ -162,15 +162,7 @@ window.advancedWorkspace = (() => {
                 : data;
         pending = { requestId, operation };
         status(operation === 'open' ? '正在读取…' : '正在处理…');
-        const payload = {
-            schema_version: 1,
-            requestId,
-            projectId: context.projectId,
-            sessionEpoch: context.sessionEpoch,
-            revision: context.revision,
-            operation,
-            value,
-        };
+        const payload = makeAdvancedRequest(context, requestId, operation, value);
         const encoded = JSON.stringify(payload);
         if (encoded.length > 262144) {
             pending = null;

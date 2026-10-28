@@ -21,10 +21,11 @@
 
 ## 可执行的基础检查
 
-安装 uv 0.13.0，使用 Python 3.12.14（uv 自动下载），在仓库根运行：
+安装uv0.13.0，使用Python3.12.14（uv自动下载）及`.node-version`指定的Node26.7.0，在仓库根运行。Node只用于开发检查，不是产品运行依赖：
 
 ```powershell
 uv sync --locked --all-groups
+npm ci --ignore-scripts
 uv run --locked --no-sync python dev.py doctor
 uv run --locked --no-sync python dev.py check --all
 uv run --locked --no-sync python dev.py smoke-env

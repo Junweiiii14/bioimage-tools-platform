@@ -491,13 +491,11 @@ window.intakeGroups = (() => {
             if (el.dataset.groupField === 'protein' && g) g.protein_label = el.value;
             if (el.dataset.groupField === 'proteins' && f && sequential()) {
                 const old = draft.sequence.filter((p) => p.figure_id === f.figure_id);
-                const next = el.value
-                    .split(/\r?\n/)
-                    .map((label, i) => ({
-                        entry_id: old[i]?.entry_id || crypto.randomUUID(),
-                        figure_id: f.figure_id,
-                        label,
-                    }));
+                const next = el.value.split(/\r?\n/).map((label, i) => ({
+                    entry_id: old[i]?.entry_id || crypto.randomUUID(),
+                    figure_id: f.figure_id,
+                    label,
+                }));
                 draft.sequence = [
                     ...draft.sequence.filter((p) => p.figure_id !== f.figure_id),
                     ...next,
