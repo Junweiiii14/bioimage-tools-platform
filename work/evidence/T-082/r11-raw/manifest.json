@@ -1,0 +1,1317 @@
+{
+  "schema": 1,
+  "source_commit": "ed830e1d3bab3d0c8c57f3766a898991e8a0f431",
+  "archive": "r11-evidence.zip",
+  "archive_bytes": 2954135,
+  "archive_sha256": "78b0e5809bdb85911b9f5d1754bfc9f0a75b4686fe17ebd24f80620070695bf8",
+  "members": 183,
+  "uncompressed_bytes": 22893099,
+  "selection": "Explicit direct text files, allowlisted report directories, referenced request JSON, frozen gate logs, build text metadata; no recursive source/asset collection",
+  "excluded": [
+    "installers",
+    "executables and libraries",
+    "models",
+    "images",
+    "source-code.zip",
+    "source checkouts",
+    "legacy generated archives and binary render outputs"
+  ],
+  "secret_scan": {
+    "patterns": [
+      "private-key",
+      "github-token",
+      "openai-style-key",
+      "authorization-bearer",
+      "url-user-password"
+    ],
+    "findings": 0,
+    "decodings": {
+      "utf-8": 183
+    },
+    "limitation": "Pattern scan plus scoped synthetic-source selection, not a general proof of absence of all possible secrets"
+  },
+  "verification": "Every ZIP member reread; bytes/SHA256 and source bytes checked; ZIP CRC verified",
+  "files": [
+    {
+      "member": "builds/244c5da-temp-upgrade-base/app/build-manifest.json",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-upgrade-244c5da/.local/releases/runtime-244c5da1b03e-acceptance-t082-r11-a/app/build-manifest.json",
+      "bytes": 9711,
+      "sha256": "c7ead185c14fbaaf6788c92f4fde3156a88b8d4602b36fbf0a2c0eda8051f888",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/244c5da-temp-upgrade-base/app/payload-files.json",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-upgrade-244c5da/.local/releases/runtime-244c5da1b03e-acceptance-t082-r11-a/app/payload-files.json",
+      "bytes": 1388311,
+      "sha256": "5dadffacee7f32267330b697e39b94a060b95ea344e27d6e5364005016295ced",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/244c5da-temp-upgrade-base/bioimage-app.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-upgrade-244c5da/.local/releases/runtime-244c5da1b03e-acceptance-t082-r11-a/bioimage-app.log",
+      "bytes": 308,
+      "sha256": "f591cf5a411846a90b8a9d1dd0d41b041bdfdcab66d81a9b85be41c53feb7d06",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/244c5da-temp-upgrade-base/build-manifest.json",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-upgrade-244c5da/.local/releases/runtime-244c5da1b03e-acceptance-t082-r11-a/build-manifest.json",
+      "bytes": 9955,
+      "sha256": "5a1e4f7a60318d65bf5c34c8e00a60ed0d4b0edb65fa8e17225b8b8e4cf55bc7",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/244c5da-temp-upgrade-base/dependencies.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-upgrade-244c5da/.local/releases/runtime-244c5da1b03e-acceptance-t082-r11-a/dependencies.log",
+      "bytes": 919,
+      "sha256": "cbd5c4e5b5e77f9feb366c910912e5f711effc104141926acff7a48d716691c0",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/244c5da-temp-upgrade-base/dependency-check.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-upgrade-244c5da/.local/releases/runtime-244c5da1b03e-acceptance-t082-r11-a/dependency-check.log",
+      "bytes": 173,
+      "sha256": "d36537e672054237014fab0256b537b0908d7ffb1ba72a73ca5b7891d11c3942",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/244c5da-temp-upgrade-base/export.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-upgrade-244c5da/.local/releases/runtime-244c5da1b03e-acceptance-t082-r11-a/export.log",
+      "bytes": 18967,
+      "sha256": "67b0d7ec2b47b8f572b3061a2001d03debe5681b571b90e065d6b5d53064ecb0",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/244c5da-temp-upgrade-base/installer.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-upgrade-244c5da/.local/releases/runtime-244c5da1b03e-acceptance-t082-r11-a/installer.log",
+      "bytes": 1483809,
+      "sha256": "ce71d10115015cc24edccd6ab90ab26a263fb7dfcca2c544be7bc331157f8fe5",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/244c5da-temp-upgrade-base/launcher.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-upgrade-244c5da/.local/releases/runtime-244c5da1b03e-acceptance-t082-r11-a/launcher.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/244c5da-temp-upgrade-base/platform-runtime.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-upgrade-244c5da/.local/releases/runtime-244c5da1b03e-acceptance-t082-r11-a/platform-runtime.log",
+      "bytes": 311,
+      "sha256": "d804206fdd0a510023c971760b18cdd537063daf17efb8a9be0b6ec382666c5d",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/244c5da-temp-upgrade-base/product-wheels.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-upgrade-244c5da/.local/releases/runtime-244c5da1b03e-acceptance-t082-r11-a/product-wheels.log",
+      "bytes": 990,
+      "sha256": "08966eb631314f43798f0f469e1917e56be658a67aedea1d0413e33d56b61450",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/244c5da-temp-upgrade-base/product-wheels.txt",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-upgrade-244c5da/.local/releases/runtime-244c5da1b03e-acceptance-t082-r11-a/product-wheels.txt",
+      "bytes": 979,
+      "sha256": "e2d00574b71a397a816fffe1be1cb148f9f6f9bc27d0b77cb6315ab55a88402f",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/244c5da-temp-upgrade-base/requirements.txt",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-upgrade-244c5da/.local/releases/runtime-244c5da1b03e-acceptance-t082-r11-a/requirements.txt",
+      "bytes": 18917,
+      "sha256": "2d2534917d28c662516cc32aa1f4d014a05cdbfb79a8769ec6402b66d8f30cd9",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/244c5da-temp-upgrade-base/tool-contracts.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-upgrade-244c5da/.local/releases/runtime-244c5da1b03e-acceptance-t082-r11-a/tool-contracts.log",
+      "bytes": 309,
+      "sha256": "65791cb4718b52be654ca2ee80e20bee5cc3519c6c0ff7b06e1dd2f233ee4c90",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/244c5da-temp-upgrade-base/wb-tool.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-upgrade-244c5da/.local/releases/runtime-244c5da1b03e-acceptance-t082-r11-a/wb-tool.log",
+      "bytes": 303,
+      "sha256": "bedb99da9cfc4dc30bc9cb45bbd0597c5a3190c908957ba0a1f06995ff4e5143",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-deep-failed/app/build-manifest.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/app/build-manifest.json",
+      "bytes": 9711,
+      "sha256": "fcf837c987297db2c4143f5d3a0ea5eec5f95f69feeb664279e899273bb8984f",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-deep-failed/app/payload-files.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/app/payload-files.json",
+      "bytes": 1388311,
+      "sha256": "cf1af3c525991d8916ef28dee87b772e46a496309a250ee3635eeb9c4994b056",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-deep-failed/bioimage-app.log",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/bioimage-app.log",
+      "bytes": 308,
+      "sha256": "99d3e28d5a8a4ff74bfce2d4b79e11d4bd4df10df192759bb745f6ea842e85e1",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-deep-failed/build-manifest.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/build-manifest.json",
+      "bytes": 9711,
+      "sha256": "fcf837c987297db2c4143f5d3a0ea5eec5f95f69feeb664279e899273bb8984f",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-deep-failed/dependencies.log",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/dependencies.log",
+      "bytes": 920,
+      "sha256": "67a3f4558bf56447e48fefe6e5af295305d05b4413f12db4fb6ef410d265ee28",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-deep-failed/dependency-check.log",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/dependency-check.log",
+      "bytes": 173,
+      "sha256": "9a3fff7139dfe9c4503c76752c9ea7a80353e178f8dc6e155e5d565ead67467e",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-deep-failed/export.log",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/export.log",
+      "bytes": 18973,
+      "sha256": "01ce7d80d9f1e71e4d96eb70af7510fdd0f780253695c28c55b7eb5c43e4cd37",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-deep-failed/installer.log",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/installer.log",
+      "bytes": 514092,
+      "sha256": "7a72f9c73a1eebea7b46fe25acfad5efd41f73736007dfc1cb1234d35d01c5ba",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-deep-failed/launcher.log",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/launcher.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-deep-failed/platform-runtime.log",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/platform-runtime.log",
+      "bytes": 311,
+      "sha256": "878d35cfcbd5e12215e45ff6c77f3d683c92171f813fec26ea78bc928406d9b9",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-deep-failed/product-wheels.log",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/product-wheels.log",
+      "bytes": 1102,
+      "sha256": "f8f2a8391d971632554a1f7210cdfe79195e46fdac5e35683e08c52840823cc4",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-deep-failed/product-wheels.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/product-wheels.txt",
+      "bytes": 1091,
+      "sha256": "c82a198df83ef35c2c3cef8211301fd932e25ef2f8406b12a27db2982e5e3ccb",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-deep-failed/requirements.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/requirements.txt",
+      "bytes": 18945,
+      "sha256": "0fb91d2c997bc4caf83210f9f549e7c090155a94929e40c9e9f750b13e4d14ce",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-deep-failed/tool-contracts.log",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/tool-contracts.log",
+      "bytes": 309,
+      "sha256": "1837db15f7cd8b3d21bd7ea5bc67f02b70a6edf85990b8b0ee0300bc2c8b50ac",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-deep-failed/wb-tool.log",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/wb-tool.log",
+      "bytes": 303,
+      "sha256": "007bac121976cb4f07af29d563e5760b0f1a5f33f7d32e20e4841efab7cf5ab2",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-temp/app/build-manifest.json",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-d66655b/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/app/build-manifest.json",
+      "bytes": 9711,
+      "sha256": "1c5c1f6d9400cdacc904812f8e0c367aeaa9bde8f7b4ebd4f5f8e0ab160da1a6",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-temp/app/payload-files.json",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-d66655b/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/app/payload-files.json",
+      "bytes": 1388311,
+      "sha256": "59382fd9970b8b96ef9638c495db504ef97bc80892f3860d8cf6836ece171795",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-temp/bioimage-app.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-d66655b/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/bioimage-app.log",
+      "bytes": 308,
+      "sha256": "99d3e28d5a8a4ff74bfce2d4b79e11d4bd4df10df192759bb745f6ea842e85e1",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-temp/build-manifest.json",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-d66655b/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/build-manifest.json",
+      "bytes": 9955,
+      "sha256": "f72897da6f433299be5132714c7eed5be31346f4bd5372b89d294383e10650d5",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-temp/dependencies.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-d66655b/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/dependencies.log",
+      "bytes": 919,
+      "sha256": "f6504bc026896aa333e21115a14e0975b474b44688e0a562e283617ed22803ce",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-temp/dependency-check.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-d66655b/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/dependency-check.log",
+      "bytes": 173,
+      "sha256": "9a3fff7139dfe9c4503c76752c9ea7a80353e178f8dc6e155e5d565ead67467e",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-temp/export.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-d66655b/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/export.log",
+      "bytes": 18965,
+      "sha256": "23d5009e3bbc3d53d0c8a7fb800e96b7baa0d7613092c14a89d3dc43028df3ef",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-temp/installer.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-d66655b/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/installer.log",
+      "bytes": 1468215,
+      "sha256": "f215674e47a0a71b6133573ce668e0f955ab15c96a8e11d3037c4425e2dd0f7d",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-temp/launcher.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-d66655b/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/launcher.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-temp/platform-runtime.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-d66655b/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/platform-runtime.log",
+      "bytes": 311,
+      "sha256": "878d35cfcbd5e12215e45ff6c77f3d683c92171f813fec26ea78bc928406d9b9",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-temp/product-wheels.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-d66655b/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/product-wheels.log",
+      "bytes": 982,
+      "sha256": "a2b5a662df8a5ba7c031aeaf810141345bf73272b9b64ddc929f5e08297428fd",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-temp/product-wheels.txt",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-d66655b/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/product-wheels.txt",
+      "bytes": 971,
+      "sha256": "9272f11ffd733c70494f09cd4ec37410f598ec482adb1c0077e2b153e66c0a5b",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-temp/requirements.txt",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-d66655b/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/requirements.txt",
+      "bytes": 18915,
+      "sha256": "60d2a181937eeeb4cfbb47572eb6b7d62dd9a34082a91ae4fc7dc850ffd55fa4",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-temp/tool-contracts.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-d66655b/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/tool-contracts.log",
+      "bytes": 309,
+      "sha256": "1837db15f7cd8b3d21bd7ea5bc67f02b70a6edf85990b8b0ee0300bc2c8b50ac",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/d66655b-temp/wb-tool.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-d66655b/.local/releases/runtime-d66655b0cfd2-acceptance-t082-r11-a/wb-tool.log",
+      "bytes": 303,
+      "sha256": "007bac121976cb4f07af29d563e5760b0f1a5f33f7d32e20e4841efab7cf5ab2",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-persistent-final/app/build-manifest.json",
+      "source": "C:/Users/70236/.codex/artifacts/T082-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/app/build-manifest.json",
+      "bytes": 9711,
+      "sha256": "160459f75e07dac8a608c377b3cae6a8865bafeef7165994cfcad553816ec079",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-persistent-final/app/payload-files.json",
+      "source": "C:/Users/70236/.codex/artifacts/T082-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/app/payload-files.json",
+      "bytes": 1388311,
+      "sha256": "60ff43c3ed55a58543c43eee8d993aeb02326532f7b482615de3613f687f0a6c",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-persistent-final/bioimage-app.log",
+      "source": "C:/Users/70236/.codex/artifacts/T082-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/bioimage-app.log",
+      "bytes": 308,
+      "sha256": "e3906f2140ac1a64a0027e5108660838b9a8ddb4ea969886e391fc0068c15d9c",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-persistent-final/build-manifest.json",
+      "source": "C:/Users/70236/.codex/artifacts/T082-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/build-manifest.json",
+      "bytes": 9955,
+      "sha256": "8e3dc049b1305656be28f7ad950f74c43b26f8e26ca2f095ed202edec2643418",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-persistent-final/dependencies.log",
+      "source": "C:/Users/70236/.codex/artifacts/T082-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/dependencies.log",
+      "bytes": 919,
+      "sha256": "6232d90c9fc4cce70949a2da3a4c8fefa6cc0801d8bf515c97fd7706fba103c8",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-persistent-final/dependency-check.log",
+      "source": "C:/Users/70236/.codex/artifacts/T082-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/dependency-check.log",
+      "bytes": 173,
+      "sha256": "1f2e3f20998df1389238b09de1b45fe81438e6f715b9e446753c5b4f01d74259",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-persistent-final/export.log",
+      "source": "C:/Users/70236/.codex/artifacts/T082-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/export.log",
+      "bytes": 18957,
+      "sha256": "2853c9fa135852ac1d4af8aa806ef07e0b4767c0870c258313d56eac36294cbf",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-persistent-final/installer.log",
+      "source": "C:/Users/70236/.codex/artifacts/T082-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/installer.log",
+      "bytes": 1405839,
+      "sha256": "ad43b47b26d6d3bb520202aca6c0357aac680213722ae764731f791532d5ee8d",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-persistent-final/launcher.log",
+      "source": "C:/Users/70236/.codex/artifacts/T082-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/launcher.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-persistent-final/platform-runtime.log",
+      "source": "C:/Users/70236/.codex/artifacts/T082-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/platform-runtime.log",
+      "bytes": 311,
+      "sha256": "37837fc03ac2bed57498788d23b56681bcbccf2b781e3cfe45938cb24ee723c6",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-persistent-final/product-wheels.log",
+      "source": "C:/Users/70236/.codex/artifacts/T082-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/product-wheels.log",
+      "bytes": 950,
+      "sha256": "5c50d0745d718b802ffb336775c81fb0da3dabf75e17242ba244824f93cdb587",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-persistent-final/product-wheels.txt",
+      "source": "C:/Users/70236/.codex/artifacts/T082-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/product-wheels.txt",
+      "bytes": 939,
+      "sha256": "8af90f3b39dda13a8f52169c093a612f538ea0ad162ff8145cb92338e4827815",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-persistent-final/requirements.txt",
+      "source": "C:/Users/70236/.codex/artifacts/T082-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/requirements.txt",
+      "bytes": 18907,
+      "sha256": "3da9ff52531d17061f935d1cbcfe7077564186a4eecf8c5cba52db809d834242",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-persistent-final/tool-contracts.log",
+      "source": "C:/Users/70236/.codex/artifacts/T082-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/tool-contracts.log",
+      "bytes": 309,
+      "sha256": "10814ca8f938942191a9f7884e981d79860e2321a42b02f95f81cb5f54b9e2de",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-persistent-final/wb-tool.log",
+      "source": "C:/Users/70236/.codex/artifacts/T082-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/wb-tool.log",
+      "bytes": 303,
+      "sha256": "8f458bc2bc2e7972d842ad85672c0f5d29a2183a2244454607a30b0921997ec8",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-temp/app/build-manifest.json",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/app/build-manifest.json",
+      "bytes": 9711,
+      "sha256": "d1ac41cae97569f926e4a6d44f2650b1bf6769998ef50ba49e88f2bb213a9901",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-temp/app/payload-files.json",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/app/payload-files.json",
+      "bytes": 1388311,
+      "sha256": "dd8b00fab87d6d321fbaf2e1e840b850ea4e1e3525d208811c7236f7d69feaf8",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-temp/bioimage-app.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/bioimage-app.log",
+      "bytes": 308,
+      "sha256": "e3906f2140ac1a64a0027e5108660838b9a8ddb4ea969886e391fc0068c15d9c",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-temp/build-manifest.json",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/build-manifest.json",
+      "bytes": 9955,
+      "sha256": "7decadfb1425903dda46c41044d49912c2010ebb4ec491368aa59319607e5a2e",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-temp/dependencies.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/dependencies.log",
+      "bytes": 920,
+      "sha256": "f09a97ba1fc15d4b0957e2bea99c32ea0bfbc2b3c49d596499e03528cd76dd41",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-temp/dependency-check.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/dependency-check.log",
+      "bytes": 173,
+      "sha256": "1f2e3f20998df1389238b09de1b45fe81438e6f715b9e446753c5b4f01d74259",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-temp/export.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/export.log",
+      "bytes": 18965,
+      "sha256": "38fab72b101a52c52072b16c5fd06848fd0b6979c6010e8fac34addd9a5f36ad",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-temp/installer.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/installer.log",
+      "bytes": 1468215,
+      "sha256": "8b6df3f464ed6cfa2fabb8541e3e55e61c4aa6ce4b8b2bc9c18a61dec36eb6c8",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-temp/launcher.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/launcher.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-temp/platform-runtime.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/platform-runtime.log",
+      "bytes": 311,
+      "sha256": "37837fc03ac2bed57498788d23b56681bcbccf2b781e3cfe45938cb24ee723c6",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-temp/product-wheels.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/product-wheels.log",
+      "bytes": 983,
+      "sha256": "80888f6f389eb1df55118c43f364dc5cfcdd36e0f5578a38b19887a297537b2f",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-temp/product-wheels.txt",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/product-wheels.txt",
+      "bytes": 971,
+      "sha256": "f2bad3842be8f2b26b579fdf8045b65e72bed5963a45c6d17b951c2faf581d4c",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-temp/requirements.txt",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/requirements.txt",
+      "bytes": 18915,
+      "sha256": "d9b53b7f692d2cef97bb3f4f2dd3939c5344c6fbb77340221c56ca7bb02cc97a",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-temp/tool-contracts.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/tool-contracts.log",
+      "bytes": 309,
+      "sha256": "10814ca8f938942191a9f7884e981d79860e2321a42b02f95f81cb5f54b9e2de",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "builds/ed830e1-temp/wb-tool.log",
+      "source": "C:/Users/70236/AppData/Local/Temp/T082-final-ed830e1/.local/releases/runtime-ed830e1d3bab-acceptance-t082-r11-a/wb-tool.log",
+      "bytes": 303,
+      "sha256": "8f458bc2bc2e7972d842ad85672c0f5d29a2183a2244454607a30b0921997ec8",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "gates/final-check-44ee78c36a0edb5d6cd9bd0798bbca3e25edd4da-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/final-check-44ee78c36a0edb5d6cd9bd0798bbca3e25edd4da-exit.json",
+      "bytes": 209,
+      "sha256": "63b08b5194e46ddaa377020337952b0996f3179844217d01100df9737dc79d0a",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "gates/final-check-44ee78c36a0edb5d6cd9bd0798bbca3e25edd4da.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/final-check-44ee78c36a0edb5d6cd9bd0798bbca3e25edd4da.txt",
+      "bytes": 33882,
+      "sha256": "ed54b88127eb61b0a0340dd7cca6e85ba02a78a088a6cbdd79bc6ae5c23fc91f",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "gates/final-check-d66655b0cfd241c07f3b8647e08b1b3ef567e2d3-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/final-check-d66655b0cfd241c07f3b8647e08b1b3ef567e2d3-exit.json",
+      "bytes": 209,
+      "sha256": "cc6144e8e967c5fd9557fd609cd6823f9eff141f7c36f3262801ddac9cc570e1",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "gates/final-check-d66655b0cfd241c07f3b8647e08b1b3ef567e2d3.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/final-check-d66655b0cfd241c07f3b8647e08b1b3ef567e2d3.txt",
+      "bytes": 27552,
+      "sha256": "62e65e57d247e7073314914af9324b5a17a4d9c01918e46dbfb00a8989bd9b17",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "gates/final-check-ed830e1d3bab3d0c8c57f3766a898991e8a0f431-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/final-check-ed830e1d3bab3d0c8c57f3766a898991e8a0f431-exit.json",
+      "bytes": 209,
+      "sha256": "ade6ab7d3a96db203eef4bc60cb644cdb3a6d80c92d6f7e629b91e97df26d0b9",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "gates/final-check-ed830e1d3bab3d0c8c57f3766a898991e8a0f431.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/final-check-ed830e1d3bab3d0c8c57f3766a898991e8a0f431.txt",
+      "bytes": 19395,
+      "sha256": "8b096e5eaf7e437c6e949b582c2cd186330f49f74cf36d8d00f52b98175e3669",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "packaging/package-r11-evidence.py",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/package-r11-evidence.py",
+      "bytes": 6616,
+      "sha256": "bbd7bb3f10dc1695545bf9d261300e91099c55abf9ecf514912a3129f4a958af",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/acceptance-shortcuts-after-upgrade.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/acceptance-shortcuts-after-upgrade.json",
+      "bytes": 1818,
+      "sha256": "8d504aa12307b345fbac9509492f674c9fab559318b42f22b224b00c098940f6",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/acceptance-shortcuts-before-upgrade.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/acceptance-shortcuts-before-upgrade.json",
+      "bytes": 1818,
+      "sha256": "ee277462c8de2315316a28eb4c5eadbed9783d26958d524b62c2789ea1e71f2d",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1 候选核验-ps51/acceptance.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1 候选核验-ps51/acceptance.json",
+      "bytes": 1721,
+      "sha256": "121c15fae46d9ead294464940448c55b5f88613a3ed30718ac1af50f20d67503",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1 候选核验-ps7/acceptance.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1 候选核验-ps7/acceptance.json",
+      "bytes": 1460,
+      "sha256": "c887cb7129d47499f5deb741d85680f294c34702681bbf5f5013e94e8f059d02",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1 升级后严格核验/acceptance.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1 升级后严格核验/acceptance.json",
+      "bytes": 12530,
+      "sha256": "bbe25b7686f2103fa172d593658475cae88ec5906ea462c185325a55ba7ddd98",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1 安装态历史项目/legacy-verification.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1 安装态历史项目/legacy-verification.json",
+      "bytes": 2657,
+      "sha256": "98bec6910d4b3b13d28f5e098ba5aff4e393f6a43e1bf5d45fd2cee2b6dd55b4",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1 安装态双诊断/acceptance.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1 安装态双诊断/acceptance.json",
+      "bytes": 126671,
+      "sha256": "28f0bdb064acc2ed426cbb14c3f76bc0eedee413b8eb7e3ced567852e60a70ee",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1 安装态双诊断/diagnostic-0.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1 安装态双诊断/diagnostic-0.json",
+      "bytes": 374,
+      "sha256": "08e871488ce72697ce60a8c85b526dc39c459c1f27969821f7a3b9279327dcde",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1 安装态双诊断/diagnostic-0.stderr",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1 安装态双诊断/diagnostic-0.stderr",
+      "bytes": 1131,
+      "sha256": "3db58abd68d2f792289d17314d294d67384f92a2da635b038573fb5bd43e4507",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1 安装态双诊断/diagnostic-0.stdout",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1 安装态双诊断/diagnostic-0.stdout",
+      "bytes": 33,
+      "sha256": "dbd29e496673289d77f8b9448cd942e81ae5fbdffc0841db0d4d11799d78c4c1",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1 安装态双诊断/diagnostic-1.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1 安装态双诊断/diagnostic-1.json",
+      "bytes": 3215,
+      "sha256": "d10e0f5ca00c8f12c3ba4fbc3ce7860f53d0ccea00d62607667ccd72b69dfc18",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1 安装态双诊断/diagnostic-1.stderr",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1 安装态双诊断/diagnostic-1.stderr",
+      "bytes": 1131,
+      "sha256": "aab9b029064fa0e607b171280a065d384fe561d72227bd09165fbb3d88270225",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1 安装态双诊断/diagnostic-1.stdout",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1 安装态双诊断/diagnostic-1.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1 安装态双诊断/module-probe.stderr",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1 安装态双诊断/module-probe.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1 安装态双诊断/module-probe.stdout",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1 安装态双诊断/module-probe.stdout",
+      "bytes": 773,
+      "sha256": "f70cc2231421d8b90763f0b0e2948727108f3e1dd3fde18d6dfd6d1dae4de411",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1 持久候选核验-ps51/acceptance.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1 持久候选核验-ps51/acceptance.json",
+      "bytes": 12766,
+      "sha256": "9ccb462f0a0fe69f1a80068b1fb175ccc78f569c4e824743bdbb93ccfa127200",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1 持久候选核验-ps7/acceptance.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1 持久候选核验-ps7/acceptance.json",
+      "bytes": 12807,
+      "sha256": "98b9acc4e0c77ff24507b2ae9a54edc5ff97146add871fab4a70acdfeb1b1d47",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1-artifact.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1-artifact.json",
+      "bytes": 753,
+      "sha256": "6eb3d535756cb7e7d06b81a474ce77452fd056b4537b139fe1e6e61138b1976f",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1-build-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1-build-exit.json",
+      "bytes": 225,
+      "sha256": "b18791743ce6961a740d484f396a10721e867130a7364ef0ea527c7ce561d137",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1-build-start.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1-build-start.json",
+      "bytes": 499,
+      "sha256": "8ef8160d49c398154bc8fe3dec32191c468992d5984052c9c3014c8fb28f0449",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1-build.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1-build.txt",
+      "bytes": 113,
+      "sha256": "38a66eaef983f6df44ea9bafb9b1ce17dd9754516b03b217703cab674089adc9",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1-persistent-artifact.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1-persistent-artifact.json",
+      "bytes": 736,
+      "sha256": "1f328aab55a952101849b35a2ee4ec586daa72e88aba54e94df383ea89b17f5a",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1-persistent-build-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1-persistent-build-exit.json",
+      "bytes": 216,
+      "sha256": "1478d5c2997ae324eb26a829e1a2f7401c3ade3419f00efc45ce89db143fab30",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1-persistent-build-start.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1-persistent-build-start.json",
+      "bytes": 490,
+      "sha256": "3802c5a562781a559952961bcd2338944d6ea9ec1474e966380b5db00db90e3f",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1-persistent-build.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1-persistent-build.txt",
+      "bytes": 105,
+      "sha256": "253c90090e8bc3f5cac6031cad4853611408539656a57fd36e0f83266a37c09e",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1-persistent-checkout.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1-persistent-checkout.json",
+      "bytes": 383,
+      "sha256": "b3844e1c4bc2af0cc2436ca60014cc138ee5ec91e63cf66e291dbb061d646a80",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1-persistent-verify-ps51-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1-persistent-verify-ps51-exit.json",
+      "bytes": 367,
+      "sha256": "3099ea584d8e89205645eba69c9dedee1042b98c8d74b1da698b830cd1df3794",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1-persistent-verify-ps51.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1-persistent-verify-ps51.txt",
+      "bytes": 275,
+      "sha256": "3127a09e2776ca046c58fbf75d181c06882f5d8f8b744d9c04c4a1cbd7f4d5c6",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1-persistent-verify-ps7-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1-persistent-verify-ps7-exit.json",
+      "bytes": 411,
+      "sha256": "fa019e9c94063911b5a03643c25b5e4dd301f163483a17684f56d1729698342d",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1-persistent-verify-ps7.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1-persistent-verify-ps7.txt",
+      "bytes": 274,
+      "sha256": "c0ae434be503738cc7f1272ea3a83d67656596c25dd57604cbc39ccd1447b63c",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1-verify-ps51-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1-verify-ps51-exit.json",
+      "bytes": 361,
+      "sha256": "fc816d1125a5f262416226b21882811d11f0a46e0924d8fec16aee5b241e700e",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1-verify-ps51.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1-verify-ps51.txt",
+      "bytes": 269,
+      "sha256": "2b0955f55cdbda2b9d6057a4f290fccf5063028d9b4168a3090eb959416b7742",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1-verify-ps7-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1-verify-ps7-exit.json",
+      "bytes": 405,
+      "sha256": "cef8607ee691707114ac03697f56dbe5076963d91fd848b6268bb48b14388978",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/ed830e1-verify-ps7.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/ed830e1-verify-ps7.txt",
+      "bytes": 268,
+      "sha256": "aa76c2b67fce37a6ba69c58e475c7bf522413681fd2ef2e40797662cafc59c0c",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/environment-before-build.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/environment-before-build.json",
+      "bytes": 564,
+      "sha256": "81e30f43ce3456b6aac468af229f3e6122621ac2b806c593228117463b643775",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/final-artifact.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/final-artifact.json",
+      "bytes": 753,
+      "sha256": "f7f8d1569ae7df27e2d0de5965bd05fee054bf9b6225096881103c8038e03d26",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/final-build-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/final-build-exit.json",
+      "bytes": 209,
+      "sha256": "c7342ec968381f93ef73030be0dddd2e815876dcc08888fe16228c16aefb9201",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/final-build-start.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/final-build-start.json",
+      "bytes": 475,
+      "sha256": "4ecddd740a62a3720696cc01173ebd20b07f0ea68fe980e82a690e9417b69048",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/final-build.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/final-build.txt",
+      "bytes": 1671,
+      "sha256": "a630b850203ee0edf135f0aec50a1c064164b5dc1acc4bd29d38cc6808907988",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/final-short-build-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/final-short-build-exit.json",
+      "bytes": 225,
+      "sha256": "3e85402052c5c64715cf0b88cf98745e08abf9f8d44857c1f39e633eff3a2adf",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/final-short-build-start.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/final-short-build-start.json",
+      "bytes": 510,
+      "sha256": "620aec95770e92b40436fe214c14b8e2ad42efbb265ae07dc056b8bc8d27e4c8",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/final-short-build.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/final-short-build.txt",
+      "bytes": 113,
+      "sha256": "5cf97da3b61ae8af74687e89253c57195353e6194269b7f49ef83a159c418119",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/final-verify-ps51-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/final-verify-ps51-exit.json",
+      "bytes": 296,
+      "sha256": "9d71d7efcc15c53cc583daceb62a25100b4d905b17c283fa6ca3e71b206ddc3d",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/final-verify-ps51.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/final-verify-ps51.txt",
+      "bytes": 268,
+      "sha256": "c4b38f23cae5644ddca23ae9d58f7e5ba433d6f3146300bed1ad3c7c371dbb34",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/install-244c5da-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/install-244c5da-exit.json",
+      "bytes": 237,
+      "sha256": "2d5ad75e0ff6157201ded42aeb9cf54e5faa3cd9816c87f1489c0177fed10cca",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/install-244c5da-start.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/install-244c5da-start.json",
+      "bytes": 819,
+      "sha256": "d48a06e7787d4b5f7e58b4a2df416253a7bb8559aa794b4625b7aaf28f530993",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/install-244c5da.log",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/install-244c5da.log",
+      "bytes": 3171713,
+      "sha256": "d005937c7d962242a0acad1bd9c227cda71715b1f0f4686d38a11f7c07a9f1c6",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/installed-244c5da-registration.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/installed-244c5da-registration.json",
+      "bytes": 520,
+      "sha256": "a97c96ee7366e0363e90eb2b46ec2d509c6aa1224b617b0199b9893f3055592c",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/installed-base-verify-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/installed-base-verify-exit.json",
+      "bytes": 352,
+      "sha256": "3e13ed8f436ff1e121cec93f4d8fac07f6ce3f73191988406d9ffafe2e4ca23b",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/installed-base-verify.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/installed-base-verify.txt",
+      "bytes": 153,
+      "sha256": "bace916461c4131f42fe8c3dff15e46746ea692bafaefd290be6f1c9f329ae37",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/installed-dual-diagnostics-ed830e1-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/installed-dual-diagnostics-ed830e1-exit.json",
+      "bytes": 396,
+      "sha256": "02b6a7678583aa43cbfc7a25a103a93dab1bb6dabb0591d0b5165a05f96c5aee",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/installed-dual-diagnostics-ed830e1.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/installed-dual-diagnostics-ed830e1.txt",
+      "bytes": 270,
+      "sha256": "7130e53dd4fb50fc5ac493a9f347ceb71ccfa254f0da66d911dc3293551e49af",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/installed-ed830e1-registration.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/installed-ed830e1-registration.json",
+      "bytes": 520,
+      "sha256": "c7964c45757219581f356108f1655d8a531fb361e2fb42e13a901cb0c4339620",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/installed-ed830e1-verify-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/installed-ed830e1-verify-exit.json",
+      "bytes": 287,
+      "sha256": "77b8748400eb510ab996d07f783677fc9f770c3a21b91ecbebe0220d344d1344",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/installed-ed830e1-verify.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/installed-ed830e1-verify.txt",
+      "bytes": 273,
+      "sha256": "4d0522671bb57e41eaf03c6930c820e685cb86530f36f3c34f0b2c337e90d2a7",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/installed-legacy-ed830e1-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/installed-legacy-ed830e1-exit.json",
+      "bytes": 473,
+      "sha256": "9716518e95f501c0b7ddb049a60a2f03ecb02a66eb77bd7eaf5b77464a6c7f27",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/installed-legacy-ed830e1.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/installed-legacy-ed830e1.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/installed-native-screen-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/installed-native-screen-exit.json",
+      "bytes": 235,
+      "sha256": "22122d5704d56674c3ad872e4e1a5d27ee1f9173966762f380173acc6477c40f",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/installed-native-screen.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/installed-native-screen.json",
+      "bytes": 887,
+      "sha256": "8707e2413722d9efecee462fddc5299eb6f98dc8cdeb9d033e9e2ae265bda2b1",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/installed-native-screen.stderr",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/installed-native-screen.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/laboratory-after-diagnostics.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/laboratory-after-diagnostics.json",
+      "bytes": 3083,
+      "sha256": "b4e2b65b20c6380a4b6f32fdb541bf4c347b4cde5e241500581ee69e6ef17fc3",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/laboratory-after-initial-install.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/laboratory-after-initial-install.json",
+      "bytes": 3083,
+      "sha256": "b4e2b65b20c6380a4b6f32fdb541bf4c347b4cde5e241500581ee69e6ef17fc3",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/laboratory-after-uninstall.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/laboratory-after-uninstall.json",
+      "bytes": 3083,
+      "sha256": "b4e2b65b20c6380a4b6f32fdb541bf4c347b4cde5e241500581ee69e6ef17fc3",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/laboratory-after-upgrade.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/laboratory-after-upgrade.json",
+      "bytes": 3083,
+      "sha256": "b4e2b65b20c6380a4b6f32fdb541bf4c347b4cde5e241500581ee69e6ef17fc3",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/laboratory-before-install.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/laboratory-before-install.json",
+      "bytes": 3083,
+      "sha256": "b4e2b65b20c6380a4b6f32fdb541bf4c347b4cde5e241500581ee69e6ef17fc3",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/laboratory-before-upgrade.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/laboratory-before-upgrade.json",
+      "bytes": 3083,
+      "sha256": "b4e2b65b20c6380a4b6f32fdb541bf4c347b4cde5e241500581ee69e6ef17fc3",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/laboratory-preparation.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/laboratory-preparation.json",
+      "bytes": 3083,
+      "sha256": "b4e2b65b20c6380a4b6f32fdb541bf4c347b4cde5e241500581ee69e6ef17fc3",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/legacy-regression.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/legacy-regression.txt",
+      "bytes": 100,
+      "sha256": "e820d2816182dc7321baae0728f8a9edf08e9d41296fbfd814358650d5f9ea24",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/live-checkpoint.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/live-checkpoint.json",
+      "bytes": 1191,
+      "sha256": "f52671f4ca7d3365d67c5e4dc6a864cf1b28d199406d5749b4532527403c8c12",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/missing-payload-investigation.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/missing-payload-investigation.json",
+      "bytes": 60376,
+      "sha256": "2c142852113154d6937d82d42d703bc6685f96c0a6aec41bb4feceff4c64a267",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/native-screen-probe.py",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/native-screen-probe.py",
+      "bytes": 1443,
+      "sha256": "f10cb68475e190723dff43a719661f8e70c32b375d3ed825a9f5bb7fffc6b6e2",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/snapshot-laboratory.ps1",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/snapshot-laboratory.ps1",
+      "bytes": 3433,
+      "sha256": "00ab64144313b1e8e12e983e3fe1af04c81d8e126ed48b929803cd305d306eb9",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/uninstall-acceptance.ps1",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/uninstall-acceptance.ps1",
+      "bytes": 7594,
+      "sha256": "d37d34722c3723551aafd49987fc2b13891c9a9ae66e7495464effbad0e712ba",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/uninstall-ed830e1.log",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/uninstall-ed830e1.log",
+      "bytes": 1445923,
+      "sha256": "0edd8fdf41947aa28de0891786adaeb4e7e95044293a35505d01bf4de73e8e91",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/uninstall-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/uninstall-exit.json",
+      "bytes": 113,
+      "sha256": "eb3dc02e6894ffdb63b4b84221e26c52c8767aa062064ab23fe6d5ef8278f267",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/uninstall-preservation-after.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/uninstall-preservation-after.json",
+      "bytes": 161821,
+      "sha256": "02d3776d1c076f28f056b91f17d6e4c2b05ee145658955404a343f3fbc9e5e2e",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/uninstall-preservation-before.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/uninstall-preservation-before.json",
+      "bytes": 58576,
+      "sha256": "c1bace96a877b619bd2550c806a8a0ac1196f83e9fb21aaff775f4f1c0715056",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/uninstall-start.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/uninstall-start.json",
+      "bytes": 761,
+      "sha256": "7d1dd737c1fbfea9f4472b8ab89b965fce958d08dc131c807d8ff728c25a3320",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/upgrade-244c5da-to-ed830e1.log",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/upgrade-244c5da-to-ed830e1.log",
+      "bytes": 4035099,
+      "sha256": "d3c3a10a7fd7e71ff14f11c70d44e81d34b6fc77909ba79817f63ddd0e243664",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/upgrade-base-artifact.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/upgrade-base-artifact.json",
+      "bytes": 757,
+      "sha256": "bdad3c12cc32eda46179ee9e9192748d0606ec6f4869569494cef1fc2e1c2041",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/upgrade-base-build-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/upgrade-base-build-exit.json",
+      "bytes": 227,
+      "sha256": "f5598f8530845dfe8329c486d54b64c0302deba5ad1dd2458a8819db66256d3b",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/upgrade-base-build-start.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/upgrade-base-build-start.json",
+      "bytes": 276,
+      "sha256": "fb4cbbda6768c242cd00fe119917a69b4a05748c2d035fdf957a1f0138b94721",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/upgrade-base-build.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/upgrade-base-build.txt",
+      "bytes": 115,
+      "sha256": "cfd1fc9c381cf77a3529e8d3065f1845b69033053b4e9ba5d334dbeb5e1343b5",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/upgrade-base-verify-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/upgrade-base-verify-exit.json",
+      "bytes": 326,
+      "sha256": "3258fc7817d01d01caa9093f044bd5b731b30fa87034bf0bfd015950ac034056",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/upgrade-base-verify.txt",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/upgrade-base-verify.txt",
+      "bytes": 164,
+      "sha256": "7d7648a6d5439141aa8c247b1f02080bd6bb9a1e0273f788f75569bfb2cdaffe",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/upgrade-build-checkout.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/upgrade-build-checkout.json",
+      "bytes": 322,
+      "sha256": "41ec8639719999e4c5e85079b489ae522402c51121d7edae11bbaf335ef6aa0a",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/upgrade-exit.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/upgrade-exit.json",
+      "bytes": 237,
+      "sha256": "18527c5dca9ae74cd8c8ad88018c09c508b2c63afac343ff790f957ef45e13ff",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/upgrade-preservation.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/upgrade-preservation.json",
+      "bytes": 196,
+      "sha256": "05d6cfcb40555d58a9fef6ad43647bfe4d848cf90badaaaad26535272f9a4c23",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/upgrade-start.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/upgrade-start.json",
+      "bytes": 899,
+      "sha256": "e65cfd3990ed27176eb1950042a0543fc7f58864629def63bc1c913af26503bb",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/user-data-before-upgrade.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/user-data-before-upgrade.json",
+      "bytes": 4415,
+      "sha256": "19922c1c53f50e5b5fee189286a21ee5adbc07eae02573786215e939eb43081c",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/升级前安装内容 核验/acceptance.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/升级前安装内容 核验/acceptance.json",
+      "bytes": 12162,
+      "sha256": "e68f4e2f3e0706ffa981ca6dba0c15e3b928be875e22ee838f27c6cf8f6b1524",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/升级起点候选 核验/acceptance.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/升级起点候选 核验/acceptance.json",
+      "bytes": 12147,
+      "sha256": "4b8c3145a9ddb26927e2e54cf2634b3e542fc78dad49cd512321853f2dae9837",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/最终候选 核验-ps51/acceptance.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/最终候选 核验-ps51/acceptance.json",
+      "bytes": 1234,
+      "sha256": "549d676d89890f2c5b720ceb024c4d14e84bfef500b2cb8506586c02e115635f",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "r11/最终历史样例 d66655b/fixtures.json",
+      "source": "C:/Users/70236/.codex/worktrees/wb-reliability-remediation/bioimage-tools-platform/.local/T082/r11/最终历史样例 d66655b/fixtures.json",
+      "bytes": 5491,
+      "sha256": "84acf225cd697039c9c830fd60e9b11f9710d6d8e6013cbd82b18f83aa22b247",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "requests/bioimage-acceptance-02a8fb0eae2d479991235c0451656daa.request.json",
+      "source": "C:/Users/70236/AppData/Local/Temp/bioimage-acceptance-02a8fb0eae2d479991235c0451656daa.request.json",
+      "bytes": 1188,
+      "sha256": "9fd3ba79890ec68a8fa67e15e121c960d6be21fde515c5962a2232289e5757aa",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "requests/bioimage-acceptance-10e5dc90671942328d02da7fe2a38112.request.json",
+      "source": "C:/Users/70236/AppData/Local/Temp/bioimage-acceptance-10e5dc90671942328d02da7fe2a38112.request.json",
+      "bytes": 1109,
+      "sha256": "56d5d0a1efb3d9e2c6c152153d4b7ee0c80a16eaf26db908e5bbf6545e0b3c82",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "requests/bioimage-acceptance-140d899755e042688054d57a034161cc.request.json",
+      "source": "C:/Users/70236/AppData/Local/Temp/bioimage-acceptance-140d899755e042688054d57a034161cc.request.json",
+      "bytes": 1243,
+      "sha256": "06eda813f30463580e6115c772edf0eca089fdf7eac28ebcd5028c3fece72e1e",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "requests/bioimage-acceptance-617c8b675d1d4602b769e043ff1cb926.request.json",
+      "source": "C:/Users/70236/AppData/Local/Temp/bioimage-acceptance-617c8b675d1d4602b769e043ff1cb926.request.json",
+      "bytes": 1063,
+      "sha256": "2dba0c3bf32579db989b5b85f86c35fd083b4d239d1d676001ed01eacf7d8eb1",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "requests/bioimage-acceptance-9455ceaa32c642b4a01e41ec5012ea96.request.json",
+      "source": "C:/Users/70236/AppData/Local/Temp/bioimage-acceptance-9455ceaa32c642b4a01e41ec5012ea96.request.json",
+      "bytes": 1103,
+      "sha256": "20fe163b3103b7e2d6a4e051a08ea40969a33490329507b75abad0e69867e4ba",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "requests/bioimage-acceptance-a35d67adaedf4edab478dcd564f1ddc4.request.json",
+      "source": "C:/Users/70236/AppData/Local/Temp/bioimage-acceptance-a35d67adaedf4edab478dcd564f1ddc4.request.json",
+      "bytes": 1024,
+      "sha256": "4c6bd722a9b74fe487e5fc7950c10d4fa7a7f42d47879731d497b80da7796ced",
+      "text_decoding_checked": "utf-8"
+    },
+    {
+      "member": "requests/bioimage-acceptance-d8a3f40614ca4263bb9de178dee39483.request.json",
+      "source": "C:/Users/70236/AppData/Local/Temp/bioimage-acceptance-d8a3f40614ca4263bb9de178dee39483.request.json",
+      "bytes": 1232,
+      "sha256": "cd5ba6297a86e4fa73af6c714d51bff29018245589a6b020e4961543b8c255c6",
+      "text_decoding_checked": "utf-8"
+    }
+  ]
+}

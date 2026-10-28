@@ -4,7 +4,7 @@
 
 独立审查者 `/root/independent_review`，非本轮实现作者。对 `44ee78c36a0edb5d6cd9bd0798bbca3e25edd4da` 相对基线 `18b5cf6de0c83b8c67f26433a6059d8dabf1f381` 的整体差异，以及后续修复 `d1036c2bf40e7cac91c979e993d5053e148cb710` 相对 `44ee78c` 的准确差异，均给出 **Accepted（源码集成与条件处置）**。两次范围合并覆盖截至 d1036c2 的全部 tracked 代码与门禁变化。
 
-此结论不代表目标完成。44ee78c 完整门禁实际失败已保留；修复后的冻结全门禁、真实构建、新检出与安装态验收仍需各自真实证据，不能沿用旧测试通过记录。
+此结论不代表目标完成。44ee78c 完整门禁实际失败已保留；后续冻结全门禁、真实构建、新检出与安装态验收现已有各自证据，见文末增量记录，未沿用旧测试通过记录冒充最终状态。
 
 ## 整体集成审查
 
@@ -31,3 +31,13 @@
 `git diff --check 44ee78c d1036c2` exit 1，仅报告收录的原始失败文本 `final-check-44ee78c-failed.txt` 三处 pytest 源代码上下文尾空格；产品/测试差异无空白错误。保留失败日志内容，不因格式检查改写原失败材料，也不将整个 delta 的该命令写为 exit 0。
 
 R09 原始 32 份 JSON/log 已逐文件比对复制到 [r09-raw](r09-raw/README.md)，以便新检出取得原始采样，不只依赖忽略目录里的摘要。目录的证据文件属性仅保留这些字节，未改产品/脚本换行约定。
+
+## 最后源码修复与冻结证据
+
+后续私有Python验收首次真实暴露wrapper自写pyc，`f5d7ac9e05b0d701818ceced7277edd09d10024b` 最小修复获得同一非作者准确差异 **Accepted**：独立5测试21.13s/exit0，真实PS5.1/7特殊路径与exit7传递，已有缓存仍拒绝；见 [r07-private-runtime-repair](r07-private-runtime-repair.md)。随后的4份文档冻结提交 `ed830e1d3bab3d0c8c57f3766a898991e8a0f431` 增量同样Accepted。科学十文件、公式/schema/既有导出未变。
+
+非作者独立审计 ed830e1 完整门禁 **1503 passed / 756.15s + installed_wheels / exit0**，核对准确HEAD/clean与日志/exit摘要；没有把d66655b旧1501通过替代它。随后实算Temp外最终安装器SHA `5c49309132a8152c8b095dd255acdcef9adf02ecfa68175e36a6de83be724268` 和manifest、PS5.1/7新检出7794文件/requests/previous失败链、真实升级、schema1–6、双诊断、卸载均给出 **Accepted**，详见 [r11-execution](r11-execution.md)。
+
+卸载独审实算173文件摘要/大小，核对当前验收键/5快捷方式/launcher/privatePython/uninstaller消失，设置marker和Lab摘要保持；实际1300残留与报告相同。第一诊断没有worker PID，资源关闭检查不声称逐PID观察；第二诊断的两个worker退出有明确记录。双诊断stderr错误、Temp98零长文件遗失UNKNOWN、科学与物理环境未验保留。此阶段仅只读证据审计，没有再次启动产品/测试或清理缓存。
+
+最终交接文档与183份原始证据归档的准确提交独审待补；上述审查只覆盖已列明的源码与真实执行证据，不提前认可尚未提交的交接差异。
