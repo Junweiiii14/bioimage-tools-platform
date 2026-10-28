@@ -1,0 +1,221 @@
+FFFFFFFFFFFFFFFF                                                         [100%]
+================================== FAILURES ===================================
+____ test_tiny_compressed_file_with_giant_header_never_decodes[load_tiff] _____
+tools\wb\tests\test_tiff_admission.py:38: in test_tiny_compressed_file_with_giant_header_never_decodes
+    reader(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:82: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:113: in _read_tiff
+    raw = cast(NDArray[np.generic], page.asarray())
+                                    ^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:19: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+------------------------------ Captured log call ------------------------------
+ERROR    tifffile:tifffile.py:6728 <tifffile.TiffPage 0 @8> incorrect StripByteCounts count (1 != 16384)
+ERROR    tifffile:tifffile.py:6734 <tifffile.TiffPage 0 @8> incorrect StripOffsets count (1 != 16384)
+__ test_tiny_compressed_file_with_giant_header_never_decodes[load_ocr_image] __
+tools\wb\tests\test_tiff_admission.py:38: in test_tiny_compressed_file_with_giant_header_never_decodes
+    reader(path)
+tools\wb\src\wb_tool\adapters\ocr_input.py:26: in load_ocr_image
+    image = load_ocr_tiff(source)
+            ^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:87: in load_ocr_tiff
+    return _read_tiff(path, allow_display=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:113: in _read_tiff
+    raw = cast(NDArray[np.generic], page.asarray())
+                                    ^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:19: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+------------------------------ Captured log call ------------------------------
+ERROR    tifffile:tifffile.py:6728 <tifffile.TiffPage 0 @8> incorrect StripByteCounts count (1 != 16384)
+ERROR    tifffile:tifffile.py:6734 <tifffile.TiffPage 0 @8> incorrect StripOffsets count (1 != 16384)
+___________ test_unsupported_dtype_rejected_before_decode[float32] ____________
+tools\wb\tests\test_tiff_admission.py:50: in test_unsupported_dtype_rejected_before_decode
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:82: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:113: in _read_tiff
+    raw = cast(NDArray[np.generic], page.asarray())
+                                    ^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:19: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+____________ test_unsupported_dtype_rejected_before_decode[uint32] ____________
+tools\wb\tests\test_tiff_admission.py:50: in test_unsupported_dtype_rejected_before_decode
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:82: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:113: in _read_tiff
+    raw = cast(NDArray[np.generic], page.asarray())
+                                    ^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:19: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+____________ test_unsupported_dtype_rejected_before_decode[int16] _____________
+tools\wb\tests\test_tiff_admission.py:50: in test_unsupported_dtype_rejected_before_decode
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:82: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:113: in _read_tiff
+    raw = cast(NDArray[np.generic], page.asarray())
+                                    ^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:19: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+_____________ test_unsupported_dtype_rejected_before_decode[bool] _____________
+tools\wb\tests\test_tiff_admission.py:50: in test_unsupported_dtype_rejected_before_decode
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:82: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:113: in _read_tiff
+    raw = cast(NDArray[np.generic], page.asarray())
+                                    ^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:19: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+________ test_pixel_budget_boundary_and_exact_small_pixels[gray-uint8] ________
+tools\wb\tests\test_tiff_admission.py:84: in test_pixel_budget_boundary_and_exact_small_pixels
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:82: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:113: in _read_tiff
+    raw = cast(NDArray[np.generic], page.asarray())
+                                    ^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:19: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+_______ test_pixel_budget_boundary_and_exact_small_pixels[gray-uint16] ________
+tools\wb\tests\test_tiff_admission.py:84: in test_pixel_budget_boundary_and_exact_small_pixels
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:82: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:113: in _read_tiff
+    raw = cast(NDArray[np.generic], page.asarray())
+                                    ^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:19: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+________ test_pixel_budget_boundary_and_exact_small_pixels[rgb-uint8] _________
+tools\wb\tests\test_tiff_admission.py:84: in test_pixel_budget_boundary_and_exact_small_pixels
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:82: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:113: in _read_tiff
+    raw = cast(NDArray[np.generic], page.asarray())
+                                    ^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:19: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+________ test_pixel_budget_boundary_and_exact_small_pixels[rgb-uint16] ________
+tools\wb\tests\test_tiff_admission.py:84: in test_pixel_budget_boundary_and_exact_small_pixels
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:82: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:113: in _read_tiff
+    raw = cast(NDArray[np.generic], page.asarray())
+                                    ^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:19: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+________ test_pixel_budget_boundary_and_exact_small_pixels[rgba-uint8] ________
+tools\wb\tests\test_tiff_admission.py:84: in test_pixel_budget_boundary_and_exact_small_pixels
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:82: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:113: in _read_tiff
+    raw = cast(NDArray[np.generic], page.asarray())
+                                    ^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:19: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+_______ test_pixel_budget_boundary_and_exact_small_pixels[rgba-uint16] ________
+tools\wb\tests\test_tiff_admission.py:84: in test_pixel_budget_boundary_and_exact_small_pixels
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:82: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:113: in _read_tiff
+    raw = cast(NDArray[np.generic], page.asarray())
+                                    ^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:19: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+_____ test_pixel_budget_boundary_and_exact_small_pixels[rgb_planar-uint8] _____
+tools\wb\tests\test_tiff_admission.py:84: in test_pixel_budget_boundary_and_exact_small_pixels
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:82: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:113: in _read_tiff
+    raw = cast(NDArray[np.generic], page.asarray())
+                                    ^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:19: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+____ test_pixel_budget_boundary_and_exact_small_pixels[rgb_planar-uint16] _____
+tools\wb\tests\test_tiff_admission.py:84: in test_pixel_budget_boundary_and_exact_small_pixels
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:82: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:113: in _read_tiff
+    raw = cast(NDArray[np.generic], page.asarray())
+                                    ^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:19: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+____ test_pixel_budget_boundary_and_exact_small_pixels[rgba_planar-uint8] _____
+tools\wb\tests\test_tiff_admission.py:84: in test_pixel_budget_boundary_and_exact_small_pixels
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:82: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:113: in _read_tiff
+    raw = cast(NDArray[np.generic], page.asarray())
+                                    ^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:19: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+____ test_pixel_budget_boundary_and_exact_small_pixels[rgba_planar-uint16] ____
+tools\wb\tests\test_tiff_admission.py:84: in test_pixel_budget_boundary_and_exact_small_pixels
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:82: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:113: in _read_tiff
+    raw = cast(NDArray[np.generic], page.asarray())
+                                    ^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:19: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+=========================== short test summary info ===========================
+FAILED tools/wb/tests/test_tiff_admission.py::test_tiny_compressed_file_with_giant_header_never_decodes[load_tiff]
+FAILED tools/wb/tests/test_tiff_admission.py::test_tiny_compressed_file_with_giant_header_never_decodes[load_ocr_image]
+FAILED tools/wb/tests/test_tiff_admission.py::test_unsupported_dtype_rejected_before_decode[float32]
+FAILED tools/wb/tests/test_tiff_admission.py::test_unsupported_dtype_rejected_before_decode[uint32]
+FAILED tools/wb/tests/test_tiff_admission.py::test_unsupported_dtype_rejected_before_decode[int16]
+FAILED tools/wb/tests/test_tiff_admission.py::test_unsupported_dtype_rejected_before_decode[bool]
+FAILED tools/wb/tests/test_tiff_admission.py::test_pixel_budget_boundary_and_exact_small_pixels[gray-uint8]
+FAILED tools/wb/tests/test_tiff_admission.py::test_pixel_budget_boundary_and_exact_small_pixels[gray-uint16]
+FAILED tools/wb/tests/test_tiff_admission.py::test_pixel_budget_boundary_and_exact_small_pixels[rgb-uint8]
+FAILED tools/wb/tests/test_tiff_admission.py::test_pixel_budget_boundary_and_exact_small_pixels[rgb-uint16]
+FAILED tools/wb/tests/test_tiff_admission.py::test_pixel_budget_boundary_and_exact_small_pixels[rgba-uint8]
+FAILED tools/wb/tests/test_tiff_admission.py::test_pixel_budget_boundary_and_exact_small_pixels[rgba-uint16]
+FAILED tools/wb/tests/test_tiff_admission.py::test_pixel_budget_boundary_and_exact_small_pixels[rgb_planar-uint8]
+FAILED tools/wb/tests/test_tiff_admission.py::test_pixel_budget_boundary_and_exact_small_pixels[rgb_planar-uint16]
+FAILED tools/wb/tests/test_tiff_admission.py::test_pixel_budget_boundary_and_exact_small_pixels[rgba_planar-uint8]
+FAILED tools/wb/tests/test_tiff_admission.py::test_pixel_budget_boundary_and_exact_small_pixels[rgba_planar-uint16]
+16 failed in 4.19s

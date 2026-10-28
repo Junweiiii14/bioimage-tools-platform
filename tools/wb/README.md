@@ -17,6 +17,8 @@ See `../../docs/contracts/wb-intake-crop-v1.md` and `../../work/tasks/T-056-fixe
 
 # WB 数值核心
 
+T082：公共TIFF读取及原值裁剪重读使用`tiff_resource_admission@1`的解码前资源准入，默认3200万像素/2GiB估算缓冲预算，可通过进程环境配置；定量公式、原图位深及历史schema保持。依据、配置及兼容边界见[TIFF资源准入v1](../../docs/contracts/wb-tiff-resource-admission-v1.md)。
+
 T072 adds versioned `intake_crop@2` geometry acceptance for explicitly started whole
 batches. Machine acceptance retains `reviewed=false`, exact original slot geometry,
 and original-sample crops. Existing oriented frames feed display-only straightening;

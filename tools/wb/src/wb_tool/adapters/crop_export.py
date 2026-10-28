@@ -7,14 +7,12 @@ from dataclasses import asdict
 from fractions import Fraction
 from hashlib import file_digest, sha256
 from pathlib import Path
-from typing import cast
 from uuid import uuid4
 
 import numpy as np
 import tifffile
-from numpy.typing import NDArray
 
-from wb_tool.adapters.tiff_input import load_tiff
+from wb_tool.adapters.tiff_input import load_tiff, read_admitted_tiff_page
 from wb_tool.application.crop import CropRequest
 
 
@@ -53,9 +51,9 @@ def export_crop(
         stream.seek(0)
         with tifffile.TiffFile(stream) as image:
             page = image.pages[0]
-            if not isinstance(page, tifffile.TiffPage):
+            if len(image.pages) != 1 or not isinstance(page, tifffile.TiffPage):
                 raise ValueError("无法读取原始 TIFF 页")
-            original = cast(NDArray[np.generic], page.asarray())
+            original = read_admitted_tiff_page(page)
             if page.planarconfig == 2:
                 original = np.moveaxis(original, 0, -1)
             photometric = tifffile.PHOTOMETRIC(page.photometric)
@@ -111,7 +109,7 @@ def export_crop(
                 or tuple(page.extrasamples) != extras
                 or page.software != "bioimage-wb original_sample_crop@1"
                 or json.loads(page.description) != manifest
-                or not np.array_equal(page.asarray(), cropped)
+                or not np.array_equal(read_admitted_tiff_page(page), cropped)
             ):
                 raise ValueError("原值裁剪写后核验失败，未发布当前文件")
             if resolution is not None:

@@ -1,6 +1,7 @@
 """Read quantitative TIFF pixels without changing the source or its bit depth."""
 
 import json
+import os
 from dataclasses import dataclass
 from hashlib import file_digest
 from pathlib import Path
@@ -11,6 +12,7 @@ import tifffile
 from numpy.typing import NDArray
 
 DISPLAY_TIFF_SOFTWARE = "bioimage-wb figure_display@1"
+TIFF_DECODE_BUFFER_BYTES = 16 * 1024 * 1024
 
 
 def _display_only(page: tifffile.TiffPage) -> bool:
@@ -40,6 +42,89 @@ def _display_only(page: tifffile.TiffPage) -> bool:
 
 class ImageInputError(ValueError):
     """Unsupported or unreadable quantitative source."""
+
+
+def _resource_limit(name: str, default: int) -> int:
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    if not value.isascii() or not value.isdecimal() or len(value) > 19:
+        raise ImageInputError(f"{name} 须为正整数；未解码输入")
+    limit = int(value)
+    if not 0 < limit <= 2**63 - 1:
+        raise ImageInputError(f"{name} 须为正整数且不超过64位范围；未解码输入")
+    return limit
+
+
+def read_admitted_tiff_page(page: tifffile.TiffPage) -> NDArray[np.generic]:
+    """Apply tiff_resource_admission@1 before decoding, including crop re-reads.
+
+    Limits are per read, not an OS memory cap. The conservative estimate includes
+    raw pixels, conversion temporaries, immutable copies, OCR conversion and a
+    single decoded strip/tile with scratch space plus compressed read buffering.
+    See docs/contracts/wb-tiff-resource-admission-v1.md for the policy/limits.
+    """
+    max_pixels = _resource_limit("BIOIMAGE_TIFF_MAX_PIXELS", 32_000_000)
+    max_peak = _resource_limit("BIOIMAGE_TIFF_MAX_PEAK_BYTES", 2 * 1024**3)
+    width, height = page.imagewidth, page.imagelength
+    pixels = width * height
+    if width <= 0 or height <= 0 or page.imagedepth != 1:
+        raise ImageInputError("定量图像须为非空二维平面")
+    if pixels > max_pixels:
+        raise ImageInputError(f"TIFF 超出像素预算（{pixels} > {max_pixels}）；未解码输入")
+    dtype = page.dtype
+    if dtype is None or dtype.kind != "u" or dtype.itemsize not in (1, 2):
+        raise ImageInputError("仅支持 uint8 和 uint16 TIFF")
+    sample_bytes = dtype.itemsize
+    channels = page.samplesperpixel
+    rgb = page.photometric == tifffile.PHOTOMETRIC.RGB
+    if page.photometric not in (
+        tifffile.PHOTOMETRIC.MINISBLACK,
+        tifffile.PHOTOMETRIC.MINISWHITE,
+        tifffile.PHOTOMETRIC.RGB,
+    ):
+        raise ImageInputError("不支持该 TIFF 色度定义")
+    if page.planarconfig not in (1, 2):
+        raise ImageInputError("不支持该 TIFF 通道排列")
+    if rgb:
+        shape = (channels, height, width) if page.planarconfig == 2 else (height, width, channels)
+        if channels not in (3, 4) or page.shape != shape:
+            raise ImageInputError("RGB 输入须为三个颜色通道或不透明 RGBA")
+    elif channels != 1 or page.shape != (height, width):
+        raise ImageInputError("定量图像须为非空二维平面")
+    orientation = page.tags.get("Orientation")
+    if orientation is not None and orientation.value != 1:
+        raise ImageInputError("当前仅支持左上原点 TIFF，请先确认方向")
+    raw_bytes = pixels * channels * sample_bytes
+    if page.nbytes != raw_bytes:
+        raise ImageInputError("TIFF 解码尺寸与元数据不一致")
+    # A padded tile can be much larger than the visible image. Include it even
+    # for a tiny page; bounding visible pixels alone does not bound decoding.
+    segment_width = page.tilewidth if page.is_tiled else width
+    segment_height = page.tilelength if page.is_tiled else min(height, page.rowsperstrip)
+    if segment_width <= 0 or segment_height <= 0 or page.tiledepth != 1:
+        raise ImageInputError("不支持该 TIFF 解码块尺寸")
+    segment_channels = 1 if page.planarconfig == 2 else channels
+    segment_bytes = segment_width * segment_height * segment_channels * sample_bytes
+    # tifffile reads until a group exceeds buffersize, then slices that group.
+    # Include one overshoot segment and old/new group overlap, not just the
+    # nominal buffer size. Tiny files need no fictional full-sized buffer.
+    encoded_group = min(
+        sum(page.databytecounts),
+        TIFF_DECODE_BUFFER_BYTES + max(page.databytecounts, default=0),
+    )
+    encoded_buffer = 3 * encoded_group
+    peak_bytes = (
+        raw_bytes
+        + pixels * (2 * sample_bytes + 7 + (24 if rgb else 0))
+        + 3 * segment_bytes
+        + encoded_buffer
+    )
+    if peak_bytes > max_peak:
+        raise ImageInputError(f"TIFF 超出估算峰值内存预算（{peak_bytes} > {max_peak}）；未解码输入")
+    return cast(
+        NDArray[np.generic], page.asarray(maxworkers=1, buffersize=TIFF_DECODE_BUFFER_BYTES)
+    )
 
 
 def is_generated_tiff(path: str | Path) -> bool:
@@ -104,13 +189,8 @@ def _read_tiff(path: str | Path, *, allow_display: bool) -> LoadedTiff:
                 display_only = _display_only(page)
                 if display_only and not allow_display:
                     raise ImageInputError("这是显示拼图；可用于拼图OCR，定量请使用未改强度的原图")
-                orientation = page.tags.get("Orientation")
-                if orientation is not None and orientation.value != 1:
-                    raise ImageInputError("当前仅支持左上原点 TIFF，请先确认方向")
                 photometric = tifffile.PHOTOMETRIC(page.photometric).name
-                if photometric not in ("MINISBLACK", "MINISWHITE", "RGB"):
-                    raise ImageInputError("不支持该 TIFF 色度定义")
-                raw = cast(NDArray[np.generic], page.asarray())
+                raw = read_admitted_tiff_page(page)
                 planar = page.planarconfig
             stream.seek(0)
             if file_digest(stream, "sha256").hexdigest() != digest:

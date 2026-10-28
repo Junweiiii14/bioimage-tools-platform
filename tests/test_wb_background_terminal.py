@@ -324,3 +324,28 @@ def test_failure_diagnostic_is_bounded_and_cannot_suppress_reply(
             port.shutdown()
     finally:
         diagnostics.close()
+
+
+def test_preview_budget_rejection_leaves_queue_usable(
+    qtbot: QtBot,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    terminal_port: background.WBBackground,
+) -> None:
+    normal, _project = source_project(tmp_path)
+    oversized = tmp_path / "too-many-pixels.tif"
+    tifffile.imwrite(oversized, np.ones((5, 4), dtype=np.uint8))
+    monkeypatch.setenv("BIOIMAGE_TIFF_MAX_PIXELS", "16")
+    replies: list[WBReply] = []
+    terminal_port.replied.connect(replies.append)
+    failed_id = terminal_port.submit(WBJob("preview", path=str(oversized)))
+    qtbot.waitUntil(lambda: len(replies) == 1)
+    assert replies[0].request_id == failed_id and replies[0].value is None
+    assert "预算" in replies[0].error
+    assert not attribute(terminal_port, "_pending")
+    normal_id = terminal_port.submit(WBJob("preview", path=str(normal)))
+    qtbot.waitUntil(lambda: len(replies) == 2)
+    assert replies[1].request_id == normal_id and replies[1].value is not None
+    assert not replies[1].error and not attribute(terminal_port, "_pending")
+    with qtbot.waitSignal(terminal_port.closed, timeout=5000):
+        terminal_port.shutdown()

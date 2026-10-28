@@ -1,0 +1,863 @@
+Product boundary scan: 173 files; zero means product is not implemented
+RUN C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\.venv\Scripts\python.exe -m ruff check .
+All checks passed!
+RUN C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\.venv\Scripts\python.exe -m ruff format --check .
+962 files already formatted
+RUN C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\.venv\Scripts\python.exe -m pyright
+0 errors, 0 warnings, 0 informations
+RUN C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\.venv\Scripts\python.exe -m tooling.import_contracts
+=============
+Import Linter
+=============
+
+
+---------
+Contracts
+---------
+
+Analyzed 227 files, 1556 dependencies.
+--------------------------------------
+
+WB domain is independent of GUI and storage KEPT
+Public API may depend on domain, never the reverse KEPT
+Analysis depends on image ports, never file adapters or GUI KEPT
+TIFF decoding and profile integration are independent KEPT
+Shared contracts never import runtime, tools, GUI, numbers or database KEPT
+Runtime never imports experiment tools, GUI or numerical processing KEPT
+WB tool and host persistence remain independent KEPT
+Host storage queue has no experimental or image processing dependencies KEPT
+Contracts runtime and WB never import the desktop assembly KEPT
+
+Contracts: 9 kept, 0 broken.
+RUN C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\.venv\Scripts\python.exe -m pytest -q
+........................................................................ [  5%]
+[11048:44412:1028/101455.000:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/d3d_image_backing.cc:1712] Already being accessed for read
+[11048:44412:1028/101455.000:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_representation.cc:385] Unable to initialize SkSurface
+[11048:44412:1028/101533.737:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+........................................................................ [ 10%]
+[11048:44412:1028/101620.888:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/101620.889:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/101726.136:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/101726.136:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/101726.136:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/101726.136:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/101726.136:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/101726.136:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/101726.136:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/101726.136:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/101726.136:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/101726.136:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/101726.136:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/101726.136:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/101726.136:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/101726.136:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/101726.136:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/101726.136:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/101943.327:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/101947.060:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102011.058:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102031.149:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+..........................................................FF............ [ 16%]
+........................................................................ [ 21%]
+........................................................................ [ 27%]
+........................................................................ [ 32%]
+[11048:44412:1028/103223.033:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+........................................................................ [ 38%]
+........................................................................ [ 43%]
+........................................................................ [ 49%]
+........................................................................ [ 54%]
+........................................................................ [ 60%]
+........................................................................ [ 65%]
+........................................................................ [ 71%]
+..........................................................F............. [ 76%]
+........................................................................ [ 82%]
+........................................................................ [ 87%]
+........................................................................ [ 93%]
+........................................................................ [ 98%]
+.................                                                        [100%]
+================================== FAILURES ===================================
+____________ test_rotation_preview_and_one_real_click_commit[True] ____________
+
+intake_page = <bioimage_app.web_window.WebWorkbenchWindow(0x2a56c00ef40) at 0x000002A37757A4C0>
+qtbot = <pytestqt.qtbot.QtBot object at 0x000002A3000F17F0>, narrow = True
+
+    @pytest.mark.parametrize("narrow", [False, True])
+    def test_rotation_preview_and_one_real_click_commit(
+        intake_page: WebWorkbenchWindow, qtbot: QtBot, narrow: bool
+    ) -> None:
+        window = intake_page
+        window.resize(1024 if narrow else 1440, 900)
+        javascript(
+            window,
+            qtbot,
+            """
+          const image=document.createElement('canvas');image.width=180;image.height=90;
+          const ctx=image.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,180,90);
+          ctx.fillStyle='black';ctx.fillRect(25,25,100,5);
+          setState({selectedId:'protein-a',rows:[{id:'protein-a',name:'raw.tif',protein:'Actin',
+            preview:image.toDataURL(),width:180,height:90,lanes:6,roi:{x:20,y:20,width:120,height:16}}],
+            intake:{...state.intake,cropEnabled:true,figureEnabled:true,crops:[{row_id:'protein-a',
+              crop:{x0:20,y0:20,x1:140,y1:36},reason:'guided_target_ambiguous'}],
+              workflow:{policy:'intake_workflow@3',digest:'mouse',steps:[{
+                stage:'crop',target_id:'protein-a',status:'needs_review'}]}}});
+          switchMode('review');true
+        """,
+        )
+        if narrow:
+            assert javascript(
+                window,
+                qtbot,
+                "document.querySelector('.compact-inspect').getBoundingClientRect().width>0",
+            )
+            javascript(window, qtbot, "action('inspect');true")
+            qtbot.waitUntil(
+                lambda: (
+                    javascript(
+                        window,
+                        qtbot,
+                        "document.querySelector('#drawer').getAnimations()"
+                        ".every(a=>a.playState==='finished')",
+                    )
+                    is True
+                )
+            )
+        scope = "#drawer-content " if narrow else "#inspector-content "
+        action_scope = "#drawer-content " if narrow else "#inspector-action "
+>       qtbot.waitUntil(
+            lambda: (
+                javascript(
+                    window,
+                    qtbot,
+                    "(()=>{const c=document.querySelector('"
+                    + scope
+                    + "canvas');return !!c && c.getContext('2d')"
+                    ".getImageData(0,0,c.width,c.height).data.some(v=>v>0)})()",
+                )
+                is True
+            )
+        )
+E       pytestqt.exceptions.TimeoutError: waitUntil timed out in 5000 milliseconds
+
+tests\test_intake_web_ui.py:1720: TimeoutError
+---------------------------- Captured Qt messages -----------------------------
+QtWarningMsg: SKIA: Failed to begin write access.
+QtWarningMsg: SKIA: Failed to begin write access.
+QtWarningMsg: SKIA: Failed to begin write access.
+QtWarningMsg: SKIA: Failed to begin write access.
+QtWarningMsg: SKIA: Failed to begin write access.
+:None:1:
+
+QtWarningMsg: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently
+QtWarningMsg: SKIA: Failed to begin write access.
+---------------------------- Captured stderr setup ----------------------------
+[11048:44412:1028/102011.844:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/d3d_image_backing.cc:1712] Already being accessed for read
+[11048:44412:1028/102011.844:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_representation.cc:385] Unable to initialize SkSurface
+[11048:44412:1028/102011.845:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102011.845:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102011.845:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102011.845:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102011.845:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/shared_image_stub.cc:585] SharedImageStub: context already lost
+[11048:44412:1028/102011.845:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102011.845:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102011.845:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102011.846:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102011.846:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102011.846:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102011.846:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102011.846:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102011.857:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102011.857:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102011.858:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102011.858:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102011.868:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102011.878:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102011.888:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102011.948:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/d3d_image_backing.cc:1712] Already being accessed for read
+[11048:44412:1028/102011.948:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_representation.cc:385] Unable to initialize SkSurface
+[11048:44412:1028/102011.948:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102011.948:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102011.948:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102011.949:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102011.949:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/shared_image_stub.cc:585] SharedImageStub: context already lost
+[11048:44412:1028/102011.949:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102011.949:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102011.949:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102011.949:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102011.949:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102011.949:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102011.957:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102011.957:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102011.957:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102011.957:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102011.957:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102011.963:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102011.973:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102011.984:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+---------------------------- Captured stderr call -----------------------------
+[11048:44412:1028/102012.194:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/d3d_image_backing.cc:1712] Already being accessed for read
+[11048:44412:1028/102012.194:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_representation.cc:385] Unable to initialize SkSurface
+[11048:44412:1028/102012.195:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102012.195:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102012.195:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102012.195:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102012.195:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102012.195:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/shared_image_stub.cc:585] SharedImageStub: context already lost
+[11048:44412:1028/102012.195:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.195:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.195:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.195:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.196:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.196:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102012.196:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.196:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.196:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.196:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.196:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.196:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.196:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.196:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.204:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.205:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102012.205:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.205:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.205:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.205:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.205:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.205:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.205:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.205:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.205:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.205:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102012.205:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.205:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102012.205:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.212:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.214:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.222:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.229:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.230:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.231:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.238:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.246:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.258:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.394:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/d3d_image_backing.cc:1712] Already being accessed for read
+[11048:44412:1028/102012.394:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_representation.cc:385] Unable to initialize SkSurface
+[11048:44412:1028/102012.395:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102012.395:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102012.395:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102012.395:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102012.396:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/shared_image_stub.cc:585] SharedImageStub: context already lost
+[11048:44412:1028/102012.396:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.396:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.396:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102012.396:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.396:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.404:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.404:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102012.404:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.404:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.404:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.404:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.404:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.404:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.404:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.405:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.405:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.405:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.405:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.405:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.405:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.405:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.405:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.405:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102012.405:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.405:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102012.405:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.405:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.412:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.417:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.422:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.427:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.432:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.438:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.441:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.448:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.456:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.456:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.457:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.465:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.472:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.482:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.558:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/d3d_image_backing.cc:1712] Already being accessed for read
+[11048:44412:1028/102012.558:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_representation.cc:385] Unable to initialize SkSurface
+[11048:44412:1028/102012.559:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102012.559:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102012.559:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102012.559:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102012.559:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/shared_image_stub.cc:585] SharedImageStub: context already lost
+[11048:44412:1028/102012.559:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.559:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.560:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.560:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.567:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.567:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102012.567:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.567:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.567:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.567:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.567:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.567:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.567:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.567:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.567:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.567:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.567:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.567:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.567:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.567:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102012.568:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.568:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102012.568:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.576:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.581:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.586:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.590:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.595:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.600:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.608:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.615:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.622:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.769:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/d3d_image_backing.cc:1712] Already being accessed for read
+[11048:44412:1028/102012.769:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_representation.cc:385] Unable to initialize SkSurface
+[11048:44412:1028/102012.770:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102012.770:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102012.770:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102012.770:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102012.770:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102012.770:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/shared_image_stub.cc:585] SharedImageStub: context already lost
+[11048:44412:1028/102012.770:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.770:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.771:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.771:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102012.771:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.780:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.780:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102012.780:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.780:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.780:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.780:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.780:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.780:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.780:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.780:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.781:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102012.781:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102012.788:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.795:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.802:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.809:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.817:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.821:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.826:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.830:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102012.835:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+---------------------------- Captured log teardown ----------------------------
+DEBUG    bioimage_app.storage:storage.py:31 storage phase=enqueue request=e78f50710d554bc6993e56046f40d038 operation=close outcome= monotonic_ns=514004156000000 native_thread=35268
+DEBUG    bioimage_app.storage:storage.py:31 storage phase=execute-start request=e78f50710d554bc6993e56046f40d038 operation=close outcome= monotonic_ns=514004156000000 native_thread=46092
+DEBUG    bioimage_app.storage:storage.py:31 storage phase=execute-end request=e78f50710d554bc6993e56046f40d038 operation=close outcome=ok monotonic_ns=514004156000000 native_thread=46092
+DEBUG    bioimage_app.storage:storage.py:31 storage phase=reply-emit request=e78f50710d554bc6993e56046f40d038 operation=close outcome= monotonic_ns=514004156000000 native_thread=46092
+DEBUG    bioimage_app.storage:storage.py:31 storage phase=deliver request=e78f50710d554bc6993e56046f40d038 operation= outcome=pending monotonic_ns=514004156000000 native_thread=35268
+__ test_rotation_handle_changes_main_frame_and_preserves_saved_preview_size ___
+
+intake_page = <bioimage_app.web_window.WebWorkbenchWindow(0x2a3e1094a90) at 0x000002A37A565280>
+qtbot = <pytestqt.qtbot.QtBot object at 0x000002A3005FFE60>
+tmp_path = WindowsPath('C:/Users/70236/AppData/Local/Temp/pytest-of-70236/pytest-1131/test_rotation_handle_changes_m0')
+
+    def test_rotation_handle_changes_main_frame_and_preserves_saved_preview_size(
+        intake_page: WebWorkbenchWindow, qtbot: QtBot, tmp_path: Path
+    ) -> None:
+        window = intake_page
+        window.resize(1440, 900)
+        javascript(
+            window,
+            qtbot,
+            """
+          const image=document.createElement('canvas');image.width=240;image.height=160;
+          const ctx=image.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,240,160);
+          ctx.translate(120,80);ctx.rotate(-17.5*Math.PI/180);ctx.fillStyle='black';
+          ctx.fillRect(-55,-2,110,4);
+          setState({selectedId:'protein-a',rows:[{id:'protein-a',sourceId:'synthetic-angle',
+            name:'synthetic.tif',protein:'Actin',preview:image.toDataURL(),width:240,height:160,
+            lanes:6,roi:{x:50,y:40,width:140,height:80}}],intake:{...state.intake,
+            cropEnabled:true,figureEnabled:true,crops:[{row_id:'protein-a',reviewed:true,
+              crop:{x0:50,y0:40,x1:190,y1:120},reason:'',raw_crop:{sha256:'synthetic'},
+              displayFrame:{center_x:120,center_y:80,width:120,height:16,angle_degrees:-17.5}}],
+            workflow:{policy:'intake_workflow@3',digest:'rotated-saved',steps:[{
+              stage:'crop',target_id:'protein-a',status:'done'}]}}});
+          switchMode('review');true
+        """,
+        )
+        # Check actual resampled pixels: the known tilted source line is level in the preview.
+        qtbot.waitUntil(
+            lambda: (
+                javascript(
+                    window,
+                    qtbot,
+                    """(()=>{const c=document.querySelector('.intake-rotation-preview');
+              if(c.width!==120||c.height!==16)return false;
+              const data=c.getContext('2d').getImageData(0,0,120,16).data;
+              function center(start){let sum=0,n=0;for(let y=0;y<16;y++)for(let x=start;x<start+15;x++){
+                const p=(y*120+x)*4;if(data[p]<80&&data[p+3]===255){sum+=y;n++;}}
+                return n>20?sum/n:null;}
+              const a=center(15),b=center(90);return a!==null&&b!==null&&Math.abs(a-b)<.75;})()""",
+                )
+                is True
+            )
+        )
+        assert javascript(
+            window,
+            qtbot,
+            "Math.abs(new DOMMatrix(getComputedStyle(document.querySelector("
+            "'#display-frame-overlay')).transform).b-Math.sin(-17.5*Math.PI/180))<.00001",
+        )
+        qtbot.waitUntil(
+            lambda: (
+                javascript(window, qtbot, "document.getAnimations().every(a=>a.playState==='finished')")
+                is True
+            )
+        )
+        coords_json = javascript(
+            window,
+            qtbot,
+            """(()=>{const h=document.querySelector('#crop-rotate-handle').getBoundingClientRect(),
+              image=document.querySelector('#image-transform').getBoundingClientRect();
+              const x=h.x+h.width/2,y=h.y+h.height/2,cx=image.x+image.width/2,cy=image.y+image.height/2,
+              rad=25.5*Math.PI/180,dx=x-cx,dy=y-cy;
+              return JSON.stringify([x,y,cx+dx*Math.cos(rad)-dy*Math.sin(rad),
+                cy+dx*Math.sin(rad)+dy*Math.cos(rad),cx,cy]);})()""",
+        )
+        assert isinstance(coords_json, str)
+        x, y, end_x, end_y, cx, cy = TypeAdapter(
+            tuple[float, float, float, float, float, float]
+        ).validate_json(coords_json)
+        # Native mouse positions are integer pixels; use the actual delivered points
+        # as the angle oracle rather than assuming fractional pointer precision.
+        expected_angle = -17.5 + math.degrees(
+            math.atan2(round(end_y) - cy, round(end_x) - cx) - math.atan2(round(y) - cy, round(x) - cx)
+        )
+        focus = window.web.focusProxy()
+        assert focus is not None
+        assert javascript(
+            window,
+            qtbot,
+            f"document.elementFromPoint({x},{y})?.closest('#crop-rotate-handle')!==null",
+        )
+        QTest.mouseMove(focus, QPoint(round(x), round(y)))
+        QTest.mousePress(focus, Qt.MouseButton.LeftButton, pos=QPoint(round(x), round(y)))
+        qtbot.waitUntil(lambda: javascript(window, qtbot, "drag?.handle==='rotate'") is True)
+        # The offscreen platform has no system cursor; send the held-button move
+        # through Qt's event path, which WebEngine translates to captured pointer events.
+        QApplication.sendEvent(
+            focus,
+            QMouseEvent(
+                QEvent.Type.MouseMove,
+                QPointF(round(end_x), round(end_y)),
+                QPointF(focus.mapToGlobal(QPoint(round(end_x), round(end_y)))),
+                Qt.MouseButton.NoButton,
+                Qt.MouseButton.LeftButton,
+                Qt.KeyboardModifier.NoModifier,
+            ),
+        )
+        qtbot.waitUntil(lambda: javascript(window, qtbot, "drag?.angle!==drag?.original") is True)
+        QTest.mouseRelease(focus, Qt.MouseButton.LeftButton, pos=QPoint(round(end_x), round(end_y)))
+        assert javascript(
+            window,
+            qtbot,
+            f"Math.abs(intakeWorkspace.rotationFrame().angle_degrees-({expected_angle}))<.11 && "
+            "intakeWorkspace.rotationFrame().width===120 && "
+            "intakeWorkspace.rotationFrame().height===16 && "
+            "JSON.stringify(row().roi)==='"
+            + json.dumps({"x": 50, "y": 40, "width": 140, "height": 80}, separators=(",", ":"))
+            + "' && sent.length===0",
+        ), javascript(
+            window,
+            qtbot,
+            "JSON.stringify({frame:intakeWorkspace.rotationFrame(),roi:row().roi,sent,drag})",
+        )
+        javascript(window, qtbot, "window.dragAngle=intakeWorkspace.rotationFrame().angle_degrees;true")
+        javascript(window, qtbot, "intakeWorkspace.undoCrop(false);true")
+        assert javascript(window, qtbot, "intakeWorkspace.rotationFrame().angle_degrees===-17.5")
+        javascript(window, qtbot, "intakeWorkspace.undoCrop(true);true")
+        assert javascript(window, qtbot, "intakeWorkspace.rotationFrame().angle_degrees===dragAngle")
+        javascript(window, qtbot, "document.querySelector('[data-intake-reset-rotation]').click();true")
+        qtbot.waitUntil(
+            lambda: (
+                javascript(
+                    window,
+                    qtbot,
+                    "document.querySelector('#display-frame-overlay').style.transform==='rotate(0deg)'",
+                )
+                is True
+            )
+        )
+        assert javascript(
+            window,
+            qtbot,
+            "intakeWorkspace.rotationFrame().angle_degrees===0 && "
+            "intakeWorkspace.rotationFrame().width===120 && "
+            "document.querySelector('#display-frame-overlay').style.transform==='rotate(0deg)'",
+        )
+        javascript(window, qtbot, "intakeWorkspace.undoCrop(false);true")
+        # Save acknowledgement and reopening the same evidence retain the oriented frame.
+        javascript(
+            window,
+            qtbot,
+            """
+          document.querySelector('[data-intake-crop-action=confirm]').click();
+          window.savedAngle=sent.at(-1).payload.displayAngle;
+          setState({intake:{...state.intake,crops:[{...state.intake.crops[0],
+            displayFrame:{...state.intake.crops[0].displayFrame,angle_degrees:savedAngle}}],
+            workflow:{...state.intake.workflow,digest:'rotation-ack'}}});
+          setState({sessionEpoch:state.sessionEpoch+1});switchMode('review');true
+        """,
+        )
+        assert javascript(
+            window,
+            qtbot,
+            "!intakeWorkspace.hasDraft() && "
+            "savedAngle===dragAngle && "
+            "intakeWorkspace.rotationFrame().angle_degrees===savedAngle && "
+            "intakeWorkspace.rotationFrame().width===120 && "
+            "intakeWorkspace.rotationFrame().height===16",
+        )
+>       qtbot.waitUntil(
+            lambda: (
+                javascript(
+                    window,
+                    qtbot,
+                    "(()=>{const c=document.querySelector('.intake-rotation-preview');"
+                    "return c.getContext('2d').getImageData(0,0,c.width,c.height)"
+                    ".data.some(v=>v>0)})()",
+                )
+                is True
+            )
+        )
+E       pytestqt.exceptions.TimeoutError: waitUntil timed out in 5000 milliseconds
+
+tests\test_intake_web_ui.py:1975: TimeoutError
+---------------------------- Captured Qt messages -----------------------------
+QtWarningMsg: SKIA: Failed to begin write access.
+QtWarningMsg: SKIA: Failed to begin write access.
+QtWarningMsg: SKIA: Failed to begin write access.
+QtWarningMsg: SKIA: Failed to begin write access.
+QtWarningMsg: SKIA: Failed to begin write access.
+QtWarningMsg: SKIA: Failed to begin write access.
+QtWarningMsg: SKIA: Failed to begin write access.
+QtWarningMsg: SKIA: Failed to begin write access.
+:None:1:
+
+QtWarningMsg: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently
+QtWarningMsg: SKIA: Failed to begin write access.
+---------------------------- Captured stderr setup ----------------------------
+[11048:44412:1028/102019.372:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/d3d_image_backing.cc:1712] Already being accessed for read
+[11048:44412:1028/102019.372:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_representation.cc:385] Unable to initialize SkSurface
+[11048:44412:1028/102019.373:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102019.373:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102019.373:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102019.373:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102019.373:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/shared_image_stub.cc:585] SharedImageStub: context already lost
+[11048:44412:1028/102019.373:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.373:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.373:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.374:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.374:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102019.374:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.374:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.374:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.383:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.383:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102019.384:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.384:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102019.398:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.412:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.424:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.484:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/d3d_image_backing.cc:1712] Already being accessed for read
+[11048:44412:1028/102019.484:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_representation.cc:385] Unable to initialize SkSurface
+[11048:44412:1028/102019.485:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102019.485:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102019.485:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102019.485:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102019.485:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/shared_image_stub.cc:585] SharedImageStub: context already lost
+[11048:44412:1028/102019.485:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.485:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.486:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.486:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102019.486:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.486:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.497:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.497:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102019.497:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.497:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.497:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102019.505:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.520:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.531:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+---------------------------- Captured stderr call -----------------------------
+[11048:44412:1028/102019.696:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/d3d_image_backing.cc:1712] Already being accessed for read
+[11048:44412:1028/102019.696:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_representation.cc:385] Unable to initialize SkSurface
+[11048:44412:1028/102019.697:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102019.697:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102019.697:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102019.697:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102019.698:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102019.698:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/shared_image_stub.cc:585] SharedImageStub: context already lost
+[11048:44412:1028/102019.698:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.707:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.707:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102019.707:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.707:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102019.715:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.725:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.735:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.746:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.749:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.752:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.762:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.773:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.773:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.775:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.918:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/d3d_image_backing.cc:1712] Already being accessed for read
+[11048:44412:1028/102019.918:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_representation.cc:385] Unable to initialize SkSurface
+[11048:44412:1028/102019.919:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102019.919:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102019.919:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102019.919:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102019.919:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/shared_image_stub.cc:585] SharedImageStub: context already lost
+[11048:44412:1028/102019.919:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.919:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.929:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.929:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102019.929:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.929:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.929:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.929:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.929:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.929:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.929:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.929:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.929:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.929:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.929:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102019.929:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.929:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102019.930:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102019.937:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.945:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.960:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.977:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.977:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.978:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102019.988:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102020.001:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102020.015:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102020.088:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/d3d_image_backing.cc:1712] Already being accessed for read
+[11048:44412:1028/102020.088:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_representation.cc:385] Unable to initialize SkSurface
+[11048:44412:1028/102020.090:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102020.090:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102020.090:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102020.090:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102020.090:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/shared_image_stub.cc:585] SharedImageStub: context already lost
+[11048:44412:1028/102020.091:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.091:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102020.091:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.102:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.102:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102020.103:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.103:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.103:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.103:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.103:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.103:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.103:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.103:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.103:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.103:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.103:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102020.104:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.104:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102020.104:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.113:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102020.124:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102020.134:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102020.143:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102020.257:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/d3d_image_backing.cc:1712] Already being accessed for read
+[11048:44412:1028/102020.257:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_representation.cc:385] Unable to initialize SkSurface
+[11048:44412:1028/102020.257:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102020.258:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102020.258:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102020.258:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102020.258:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102020.258:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/shared_image_stub.cc:585] SharedImageStub: context already lost
+[11048:44412:1028/102020.258:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.258:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.258:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.258:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.259:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.259:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102020.259:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.259:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.259:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.259:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.269:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.269:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102020.269:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.269:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102020.277:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102020.287:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102020.297:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102020.307:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102020.386:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/d3d_image_backing.cc:1712] Already being accessed for read
+[11048:44412:1028/102020.386:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_representation.cc:385] Unable to initialize SkSurface
+[11048:44412:1028/102020.387:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102020.387:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102020.387:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102020.387:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102020.387:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102020.388:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/shared_image_stub.cc:585] SharedImageStub: context already lost
+[11048:44412:1028/102020.388:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.388:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.388:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.388:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102020.388:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.388:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.396:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.396:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102020.396:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.396:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.396:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.396:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102020.404:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102020.416:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102020.426:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102020.436:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102020.445:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102020.538:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/d3d_image_backing.cc:1712] Already being accessed for read
+[11048:44412:1028/102020.538:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_representation.cc:385] Unable to initialize SkSurface
+[11048:44412:1028/102020.538:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102020.539:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102020.539:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102020.539:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102020.539:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102020.539:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/shared_image_stub.cc:585] SharedImageStub: context already lost
+[11048:44412:1028/102020.539:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.539:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.539:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.539:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.540:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.540:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102020.540:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.540:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.540:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.540:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.548:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.548:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102020.548:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102020.548:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102020.555:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102020.565:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102020.576:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102020.586:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102021.103:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/d3d_image_backing.cc:1712] Already being accessed for read
+[11048:44412:1028/102021.103:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_representation.cc:385] Unable to initialize SkSurface
+[11048:44412:1028/102021.104:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102021.104:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102021.104:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102021.104:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102021.104:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/raster_decoder.cc:1157]   RasterDecoderImpl: Context lost during MakeCurrent.
+[11048:44412:1028/102021.105:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/shared_image_stub.cc:585] SharedImageStub: context already lost
+[11048:44412:1028/102021.105:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102021.105:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102021.105:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102021.105:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102021.105:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102021.105:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102021.115:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102021.115:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102021.115:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102021.115:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102021.115:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_context_state.cc:967] Failed to make current since context is marked as lost
+[11048:44412:1028/102021.115:ERROR:../../../qtwebengine/src/3rdparty/chromium/components/viz/service/display_embedder/skia_output_surface_impl_on_gpu.cc:2293] Failed to make current.
+[11048:44412:1028/102021.124:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102021.140:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102021.156:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[11048:44412:1028/102021.174:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+---------------------------- Captured log teardown ----------------------------
+DEBUG    bioimage_app.storage:storage.py:31 storage phase=enqueue request=596b1a81856f4ca3925141065f8c25a5 operation=close outcome= monotonic_ns=514011109000000 native_thread=35268
+DEBUG    bioimage_app.storage:storage.py:31 storage phase=execute-start request=596b1a81856f4ca3925141065f8c25a5 operation=close outcome= monotonic_ns=514011109000000 native_thread=48524
+DEBUG    bioimage_app.storage:storage.py:31 storage phase=execute-end request=596b1a81856f4ca3925141065f8c25a5 operation=close outcome=ok monotonic_ns=514011109000000 native_thread=48524
+DEBUG    bioimage_app.storage:storage.py:31 storage phase=reply-emit request=596b1a81856f4ca3925141065f8c25a5 operation=close outcome= monotonic_ns=514011109000000 native_thread=48524
+DEBUG    bioimage_app.storage:storage.py:31 storage phase=deliver request=596b1a81856f4ca3925141065f8c25a5 operation= outcome=pending monotonic_ns=514011109000000 native_thread=35268
+___________ test_actual_ocr_process_identity_stale_and_cancel[png] ____________
+
+ocr_start = OCRStartFrame(protocol_version=1, run_id='run', attempt_id='attempt', request_id='request', kind='start', sequence=0, ...png', request=OCRRequest(source_sha256='da05d286680b267d1aaa9f196fbdb8e9c0e6b08b590a78f675eab22c0068e6be', revision=3))
+
+    def test_actual_ocr_process_identity_stale_and_cancel(ocr_start: OCRStartFrame) -> None:
+        command = [sys.executable, "-I", "-m", "bioimage_app", "--worker", "wb_ocr"]
+        completed = subprocess.run(
+            command, input=encode_ocr_frame(ocr_start), capture_output=True, timeout=30
+        )
+        assert completed.returncode == 0, completed.stderr.decode("utf-8", errors="replace")
+        lines = completed.stdout.splitlines()
+        conversation = OCRConversation(ocr_start)
+        frames = [conversation.accept(line) for line in lines]
+        assert isinstance(frames[0], HelloFrame) and isinstance(frames[1], AcceptedFrame)
+        result = frames[2]
+        assert isinstance(result, OCRResultFrame)
+        assert [token.text for token in result.result.tokens] == ["1G", "AKT"]
+        assert result.revision == 3
+        for corrupted in (
+            replace(result.result, model_hashes=()),
+            replace(result.result, preprocess_id="unknown"),
+        ):
+            with pytest.raises(ValueError):
+                encode_ocr_frame(result.model_copy(update={"result": corrupted}))
+        with pytest.raises(ValueError):
+            conversation.accept(lines[-1])
+        for altered in (
+            result.model_copy(update={"revision": 4}),
+            result.model_copy(update={"attempt_id": "another"}),
+        ):
+            gate = OCRConversation(ocr_start)
+            gate.accept(lines[0])
+            gate.accept(lines[1])
+            with pytest.raises(ValueError):
+                gate.accept(encode_ocr_frame(altered))
+        gate = OCRConversation(ocr_start)
+        gate.accept(lines[0])
+        gate.accept(lines[1])
+        cancel = gate.cancellation()
+        with pytest.raises(ValueError):
+            gate.accept(lines[2])
+        cancelled = subprocess.run(
+            command,
+            input=encode_ocr_frame(ocr_start) + encode_ocr_frame(cancel),
+            capture_output=True,
+            timeout=30,
+        )
+>       assert cancelled.returncode == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['C:\\Users\\70236\\.codex\\worktrees\\wb-reliability-remediation\\bioimage-tools-platform\\.ven...worktrees\\wb-reliability-remediation\\bioimage-tools-platform\\tools\\wb\\src\\wb_tool\\adapters\\tiff_input.py)\r\n').returncode
+
+tools\wb\tests\test_ocr_protocol.py:101: AssertionError
+============================== warnings summary ===============================
+tests/test_folder_drop.py: 9 warnings
+tests/test_visible_export_desktop.py: 1 warning
+  C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tests\test_folder_drop.py:57: DeprecationWarning: Function: 'QDragEnterEvent.QDragEnterEvent(const QPoint &pos, QFlags<Qt.DropAction> actions, const QMimeData *data, QFlags<Qt.MouseButton> buttons, QFlags<Qt.KeyboardModifier> modifiers)' is marked as deprecated, please check the documentation for more information.
+    enter = QDragEnterEvent(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_intake_web_ui.py::test_rotation_preview_and_one_real_click_commit[True]
+FAILED tests/test_intake_web_ui.py::test_rotation_handle_changes_main_frame_and_preserves_saved_preview_size
+FAILED tools/wb/tests/test_ocr_protocol.py::test_actual_ocr_process_identity_stale_and_cancel[png]
+3 failed, 1310 passed, 10 warnings in 1308.13s (0:21:48)
