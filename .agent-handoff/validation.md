@@ -87,3 +87,7 @@ CI180真实失败：Windows1191过1败746.36s/child1、Linux关闭回收15min取
 ## 2026-10-24 T081 本机完整交付
 
 f1e6142准确独审/四CI：双平台1295（Linux509.77s/Windows756.69s）与全部wheel成功；新包真实升级0、7793载荷/209源码SHA、双模式自检0、37安装态53.91s/163模块来源SHA通过，真实180恢复27/9/4/27。201文件产物独审Accepted，WinPS5.1实际解压、校验器恢复执行0、桌面tree/ZIP一致；初publisher1保留并定位维护PS7模块路径，未改全局设置或包字节。最终文档HEAD独审/CI/merge仍按task谓词与final-closeout核真，不提前写通过。环境/命令/退出码及限制见work/evidence/T-081/final-delivery.md。
+
+## 2026-10-28 T082 R00
+
+基线18b5cf6；git/fetch、uv sync --locked --all-groups、两次context回执均exit0；变更规则输出已分片读取。handoff维护 changed=0/warnings=0/unresolved=0；git diff --check exit0。仅事实文档校准，产品未测试，独审待准确提交。

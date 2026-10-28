@@ -1,8 +1,8 @@
 # 生物图像工具平台
 
-当前交付入口：[T079实验室离线发行](work/tasks/T-079-laboratory-offline-delivery.md) → [实验室部署说明](docs/wb-laboratory-delivery.md) → [交接索引](AGENT_HANDOFF.md)。本轮收拢T074–T077的曲线、整版拼图、界面系统、文件夹拖入与未审核导出整改，并提供包含运行环境的Windows x64安装器。
+当前开发任务：[T082 可靠性与可维护性整改](work/tasks/T-082-reliability-remediation.md) → [交接索引](AGENT_HANDOFF.md)。最近已交付安装包及其实际验收：[T081 R2 交付记录](work/evidence/T-081/final-delivery.md)；[源码/构建/合并事实](work/evidence/T-082/baseline.md)区分各版本。本轮整改源码尚未构建交付。
 
-历史版本及证据保留，旧检查不作为本轮通过证明。实验室发行的实际安装验证、源码集成和目标机限制以T079记录为准；科学留出、干净Win10与物理DPI验收另列。开发范围保持WB，IF/IHC不自动扩展。
+历史版本及证据保留，旧检查不作为本轮通过证明。实验室发行的实际安装验证、源码集成和目标机限制以T081记录为准；科学留出、干净Win10与物理DPI验收另列。开发范围保持WB，IF/IHC不自动扩展。
 
 实验室使用者运行随附Setup.exe即可安装，包含私有Python、Qt/WebEngine、本地OCR模型和VC运行库，无需开发环境或Office。安装目标为Windows10 1809+或Windows11的x64机器，按当前用户安装；首次部署运行开始菜单环境自检并用合成练习素材核对流程。构建配方为 `python -m tooling.build_runtime_candidate --laboratory --iscc <固定编译器> --gcc <固定编译器>`；只从干净提交构建，安装器通过实验室交付包分发，不自动公开上传二进制。
 
