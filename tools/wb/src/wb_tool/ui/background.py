@@ -4,16 +4,17 @@ from dataclasses import replace
 from hashlib import file_digest
 from math import ceil
 from pathlib import Path
+from traceback import extract_tb
 from uuid import uuid4
 
 import numpy as np
 from pydantic import TypeAdapter
-from PySide6.QtCore import QObject, Qt, QThread, QTimer, Signal, Slot
+from PySide6.QtCore import QObject, Qt, QThread, QTimer, Signal, Slot, qWarning
 
 from wb_tool.adapters.crop_export import export_crop
 from wb_tool.adapters.tiff_input import load_tiff
 from wb_tool.adapters.worksheet_export import export_worksheet
-from wb_tool.application.analysis import AnalysisResult
+from wb_tool.application.analysis import AnalysisCancelled, AnalysisResult
 from wb_tool.application.crop_return import ReturnedCrop
 from wb_tool.application.crop_suggestions import CropSuggestion, read_figure_project
 from wb_tool.application.desktop_data import PreviewRaster, ProjectDerivedTables, WBJob, WBReply
@@ -64,575 +65,587 @@ class _Work(QObject):
     @Slot(str, object)
     def execute(self, request_id: str, job: WBJob) -> None:
         try:
-            cancel = job.cancellation.is_set if job.cancellation is not None else lambda: False
-            if (
-                job.operation
-                in (
-                    "project_export",
-                    "intake_table_export",
-                    "project_ocr_export",
-                    "project_normalization_export",
-                    "quant_export",
+            if job.cancellation is not None and job.cancellation.is_set():
+                raise AnalysisCancelled()
+            reply = self._execute(request_id, job)
+        except AnalysisCancelled:
+            reply = WBReply(request_id, error="操作已取消")
+        except Exception as error:
+            # This is the accepted-request boundary, not an algorithm fallback.
+            # Even an empty MemoryError must drain through the normal reply path.
+            # BaseException exit signals intentionally remain outside this boundary.
+            message = str(error) if isinstance(error, (ValueError, OSError, TypeError)) else ""
+            reply = WBReply(request_id, error=message or f"{type(error).__name__}: 后台操作失败")
+            try:
+                frames = ";".join(
+                    f"{Path(frame.filename).name}:{frame.lineno}:{frame.name}"
+                    for frame in extract_tb(error.__traceback__)[-8:]
                 )
-                and job.archive_runs is not None
-            ):
-                from wb_tool.adapters.project_evidence import verify_project_evidence
+                # Qt's existing per-session diagnostic sink persists this record.
+                # Exclude exception text, local variables, image data and source paths.
+                qWarning(
+                    f"WB job failed request={request_id} operation={job.operation} "
+                    f"revision={job.revision} exception={type(error).__name__} frames={frames}"
+                )
+            except Exception:
+                # Diagnostic allocation/I/O failure cannot suppress the terminal reply.
+                pass
+        self.replied.emit(reply)
 
-                if not isinstance(job.document, WBFigureProject):
-                    raise ValueError("缺少项目文档")
-                evidence = verify_project_evidence(job.document, job.archive_runs, cancelled=cancel)
-                job = replace(
-                    job, project_results=evidence.results, project_ocr_result=evidence.ocr
-                )
-            value: (
-                PreviewRaster
-                | ReturnedCrop
-                | WBDocument
-                | WBWorksheetDocument
-                | WBFigureProject
-                | FigureRender
-                | FigurePNG
-                | LoadedFigureTemplate
-                | MetadataBook
-                | CropSuggestion
-                | IntakeCropEvidence
-                | IntakeCropFile
-                | IntakeDeliveryReceipt
-                | IntakeFigurePreparation
-                | IntakeOutputPreparation
-                | LoadedProjectResult
-                | ProjectTableSnapshot
-                | LoadedProjectOCR
-                | ProjectDerivedTables
-                | RestoredProjectResults
-                | AnalysisResult
-                | OCRRecognition
-                | bytes
-                | str
+    def _execute(self, request_id: str, job: WBJob) -> WBReply:
+        cancel = job.cancellation.is_set if job.cancellation is not None else lambda: False
+        if (
+            job.operation
+            in (
+                "project_export",
+                "intake_table_export",
+                "project_ocr_export",
+                "project_normalization_export",
+                "quant_export",
             )
-            if job.operation == "return_crop":
-                from wb_tool.adapters.crop_return import return_reviewed_crop
+            and job.archive_runs is not None
+        ):
+            from wb_tool.adapters.project_evidence import verify_project_evidence
 
-                if not isinstance(job.document, WBFigureProject):
-                    raise ValueError("缺少审核后回存项目")
-                value = return_reviewed_crop(job.document, job.row_id, job.path, cancelled=cancel)
-            elif job.operation == "discover_tiffs":
-                from wb_tool.adapters.automatic_export import discover_tiffs
+            if not isinstance(job.document, WBFigureProject):
+                raise ValueError("缺少项目文档")
+            evidence = verify_project_evidence(job.document, job.archive_runs, cancelled=cancel)
+            job = replace(job, project_results=evidence.results, project_ocr_result=evidence.ocr)
+        value: (
+            PreviewRaster
+            | ReturnedCrop
+            | WBDocument
+            | WBWorksheetDocument
+            | WBFigureProject
+            | FigureRender
+            | FigurePNG
+            | LoadedFigureTemplate
+            | MetadataBook
+            | CropSuggestion
+            | IntakeCropEvidence
+            | IntakeCropFile
+            | IntakeDeliveryReceipt
+            | IntakeFigurePreparation
+            | IntakeOutputPreparation
+            | LoadedProjectResult
+            | ProjectTableSnapshot
+            | LoadedProjectOCR
+            | ProjectDerivedTables
+            | RestoredProjectResults
+            | AnalysisResult
+            | OCRRecognition
+            | bytes
+            | str
+        )
+        if job.operation == "return_crop":
+            from wb_tool.adapters.crop_return import return_reviewed_crop
 
-                value = discover_tiffs(job.path, cancelled=cancel, with_report=True)
-            elif job.operation == "intake_discover":
-                from wb_tool.adapters.export_discovery import discover_exports
-                from wb_tool.application.instrument_intake import WBIntakeProject
+            if not isinstance(job.document, WBFigureProject):
+                raise ValueError("缺少审核后回存项目")
+            value = return_reviewed_crop(job.document, job.row_id, job.path, cancelled=cancel)
+        elif job.operation == "discover_tiffs":
+            from wb_tool.adapters.automatic_export import discover_tiffs
 
-                if not isinstance(job.document, WBIntakeProject):
-                    raise ValueError("识别建议需要仪器来源清单")
-                value = (
-                    discover_exports(job.document, job.sources, cancelled=cancel)
-                    .model_dump_json()
-                    .encode("utf-8")
+            value = discover_tiffs(job.path, cancelled=cancel, with_report=True)
+        elif job.operation == "intake_discover":
+            from wb_tool.adapters.export_discovery import discover_exports
+            from wb_tool.application.instrument_intake import WBIntakeProject
+
+            if not isinstance(job.document, WBIntakeProject):
+                raise ValueError("识别建议需要仪器来源清单")
+            value = (
+                discover_exports(job.document, job.sources, cancelled=cancel)
+                .model_dump_json()
+                .encode("utf-8")
+            )
+        elif job.operation == "intake_workflow_prepare":
+            from wb_tool.application.intake_workflow import prepare_intake_workflow
+
+            if not isinstance(job.document, WBFigureProject) or cancel():
+                raise ValueError("执行计划准备已取消或项目不存在")
+            value = prepare_intake_workflow(job.document, expected_digest=job.data.decode("ascii"))
+            if cancel():
+                raise ValueError("执行计划准备已取消")
+        elif job.operation == "intake_crop_prepare":
+            from wb_tool.application.intake_crop import prepare_intake_crops
+            from wb_tool.application.intake_workflow import (
+                WBIntakeWorkflowProject,
+                approve_intake_workflow,
+                intake_workflow_digest,
+            )
+
+            if not isinstance(job.document, WBIntakeWorkflowProject) or cancel():
+                raise ValueError("裁剪执行准备已取消或项目不存在")
+            if intake_workflow_digest(job.document) != job.data.decode("ascii"):
+                raise ValueError("执行摘要已变化，请重新核对")
+            from wb_tool.application.intake_figure import prepare_intake_figures
+            from wb_tool.application.intake_output import prepare_intake_outputs
+
+            prepared = prepare_intake_outputs(
+                prepare_intake_figures(prepare_intake_crops(job.document))
+            )
+            value = approve_intake_workflow(
+                prepared, expected_digest=intake_workflow_digest(prepared)
+            )
+            if job.path and job.destination:
+                from wb_tool.adapters.intake_delivery import select_intake_delivery
+
+                value = select_intake_delivery(
+                    value,
+                    workspace_path=job.path,
+                    output_parent=job.destination,
+                    cancelled=cancel,
                 )
-            elif job.operation == "intake_workflow_prepare":
-                from wb_tool.application.intake_workflow import prepare_intake_workflow
+            if cancel():
+                raise ValueError("裁剪执行准备已取消")
+        elif job.operation in {
+            "intake_grid_preview",
+            "intake_grid_export",
+            "intake_single_export",
+        }:
+            from wb_tool.adapters.figure_image_export import publish_rendered_image
+            from wb_tool.adapters.intake_figure import load_intake_figure_render
+            from wb_tool.adapters.intake_grid import grid_preview, render_intake_grid
+            from wb_tool.application.intake_output import WBIntakeOutputProject
 
-                if not isinstance(job.document, WBFigureProject) or cancel():
-                    raise ValueError("执行计划准备已取消或项目不存在")
-                value = prepare_intake_workflow(
-                    job.document, expected_digest=job.data.decode("ascii")
-                )
-                if cancel():
-                    raise ValueError("执行计划准备已取消")
-            elif job.operation == "intake_crop_prepare":
-                from wb_tool.application.intake_crop import prepare_intake_crops
-                from wb_tool.application.intake_workflow import (
-                    WBIntakeWorkflowProject,
-                    approve_intake_workflow,
-                    intake_workflow_digest,
-                )
-
-                if not isinstance(job.document, WBIntakeWorkflowProject) or cancel():
-                    raise ValueError("裁剪执行准备已取消或项目不存在")
-                if intake_workflow_digest(job.document) != job.data.decode("ascii"):
-                    raise ValueError("执行摘要已变化，请重新核对")
-                from wb_tool.application.intake_figure import prepare_intake_figures
-                from wb_tool.application.intake_output import prepare_intake_outputs
-
-                prepared = prepare_intake_outputs(
-                    prepare_intake_figures(prepare_intake_crops(job.document))
-                )
-                value = approve_intake_workflow(
-                    prepared, expected_digest=intake_workflow_digest(prepared)
-                )
-                if job.path and job.destination:
-                    from wb_tool.adapters.intake_delivery import select_intake_delivery
-
-                    value = select_intake_delivery(
-                        value,
-                        workspace_path=job.path,
-                        output_parent=job.destination,
-                        cancelled=cancel,
+            if not isinstance(job.document, WBIntakeOutputProject):
+                raise ValueError("缺少当前Fig输出项目")
+            rendered = (
+                load_intake_figure_render(job.document, job.row_id, job.path, cancelled=cancel)
+                if job.operation == "intake_single_export"
+                else render_intake_grid(job.document, job.sources, cancelled=cancel)
+            )
+            value = (
+                grid_preview(rendered)
+                if job.operation == "intake_grid_preview"
+                else str(
+                    publish_rendered_image(
+                        rendered, job.document.template.dpi, job.destination, cancelled=cancel
                     )
-                if cancel():
-                    raise ValueError("裁剪执行准备已取消")
-            elif job.operation in {
-                "intake_grid_preview",
-                "intake_grid_export",
-                "intake_single_export",
-            }:
-                from wb_tool.adapters.figure_image_export import publish_rendered_image
-                from wb_tool.adapters.intake_figure import load_intake_figure_render
-                from wb_tool.adapters.intake_grid import grid_preview, render_intake_grid
-                from wb_tool.application.intake_output import WBIntakeOutputProject
-
-                if not isinstance(job.document, WBIntakeOutputProject):
-                    raise ValueError("缺少当前Fig输出项目")
-                rendered = (
-                    load_intake_figure_render(job.document, job.row_id, job.path, cancelled=cancel)
-                    if job.operation == "intake_single_export"
-                    else render_intake_grid(job.document, job.sources, cancelled=cancel)
                 )
-                value = (
-                    grid_preview(rendered)
-                    if job.operation == "intake_grid_preview"
-                    else str(
-                        publish_rendered_image(
-                            rendered, job.document.template.dpi, job.destination, cancelled=cancel
-                        )
-                    )
-                )
-            elif job.operation == "intake_delivery_materialize":
-                from wb_tool.adapters.intake_delivery import materialize_intake_delivery
-                from wb_tool.application.instrument_intake import WBIntakeProject
+            )
+        elif job.operation == "intake_delivery_materialize":
+            from wb_tool.adapters.intake_delivery import materialize_intake_delivery
+            from wb_tool.application.instrument_intake import WBIntakeProject
 
-                if not isinstance(job.document, WBIntakeProject):
-                    raise ValueError("整理项目需要当前仪器清单")
-                value = materialize_intake_delivery(
+            if not isinstance(job.document, WBIntakeProject):
+                raise ValueError("整理项目需要当前仪器清单")
+            value = materialize_intake_delivery(
+                job.document,
+                job.sources,
+                workspace_path=job.path,
+                row_id=job.row_id,
+                cancelled=cancel,
+            )
+        elif job.operation in {"intake_output_export", "intake_delivery_finalize"}:
+            from wb_tool.adapters.intake_output import export_intake_outputs
+            from wb_tool.application.intake_output import WBIntakeOutputProject
+            from wb_tool.application.intake_workflow import IntakeWorkflowTicket
+
+            if not isinstance(job.document, WBIntakeOutputProject):
+                raise ValueError("输出需要当前版本仪器清单项目")
+            ticket = IntakeWorkflowTicket.model_validate_json(job.data) if job.data else None
+            if job.operation == "intake_delivery_finalize":
+                from wb_tool.adapters.intake_delivery import finalize_intake_delivery
+
+                value = finalize_intake_delivery(
                     job.document,
                     job.sources,
                     workspace_path=job.path,
-                    row_id=job.row_id,
+                    runs=job.archive_runs or (),
+                    ticket=ticket,
                     cancelled=cancel,
                 )
-            elif job.operation in {"intake_output_export", "intake_delivery_finalize"}:
-                from wb_tool.adapters.intake_output import export_intake_outputs
-                from wb_tool.application.intake_output import WBIntakeOutputProject
-                from wb_tool.application.intake_workflow import IntakeWorkflowTicket
-
-                if not isinstance(job.document, WBIntakeOutputProject):
-                    raise ValueError("输出需要当前版本仪器清单项目")
-                ticket = IntakeWorkflowTicket.model_validate_json(job.data) if job.data else None
-                if job.operation == "intake_delivery_finalize":
-                    from wb_tool.adapters.intake_delivery import finalize_intake_delivery
-
-                    value = finalize_intake_delivery(
-                        job.document,
-                        job.sources,
-                        workspace_path=job.path,
-                        runs=job.archive_runs or (),
-                        ticket=ticket,
-                        cancelled=cancel,
-                    )
-                else:
-                    value = export_intake_outputs(
-                        job.document,
-                        job.sources,
-                        job.destination,
-                        runs=job.archive_runs or (),
-                        ticket=ticket,
-                        cancelled=cancel,
-                    )
-            elif job.operation == "intake_figure_preview":
-                from wb_tool.adapters.intake_figure import load_intake_figure_preview
-                from wb_tool.application.intake_figure import WBIntakeFigureProject
-
-                if not isinstance(job.document, WBIntakeFigureProject):
-                    raise ValueError("缺少当前Fig显示项目")
-                value = load_intake_figure_preview(
-                    job.document, job.row_id, job.path, cancelled=cancel
-                )
-            elif job.operation == "intake_figure_prepare":
-                from wb_tool.adapters.intake_figure import prepare_intake_figure
-                from wb_tool.application.intake_figure import WBIntakeFigureProject
-                from wb_tool.application.intake_workflow import IntakeWorkflowTicket
-
-                if not isinstance(job.document, WBIntakeFigureProject):
-                    raise ValueError("缺少当前完整Fig项目")
-                value = prepare_intake_figure(
-                    job.document,
-                    IntakeWorkflowTicket.model_validate_json(job.data),
-                    job.sources,
-                    job.destination,
-                    cancelled=cancel,
-                )
-            elif job.operation in {"intake_crop_propose", "intake_crop_export"}:
-                from wb_tool.adapters.intake_crop import export_intake_crop, propose_intake_crop
-                from wb_tool.application.intake_crop import WBIntakeCropProject
-                from wb_tool.application.intake_workflow import IntakeWorkflowTicket
-
-                if not isinstance(job.document, WBIntakeCropProject):
-                    raise ValueError("缺少固定N裁剪项目")
-                if job.operation == "intake_crop_propose":
-                    value = propose_intake_crop(
-                        job.path, job.document, job.row_id, sources=job.sources, cancelled=cancel
-                    )
-                else:
-                    value = export_intake_crop(
-                        job.path,
-                        job.document,
-                        job.row_id,
-                        job.destination,
-                        ticket=IntakeWorkflowTicket.model_validate_json(job.data),
-                        cancelled=cancel,
-                    )
-            elif job.operation == "automatic_row":
-                from wb_tool.adapters.automatic import automatic_project_row
-
-                if not isinstance(job.document, WBFigureProject):
-                    raise ValueError("缺少自动分析项目")
-                value = automatic_project_row(
-                    job.path,
-                    job.document,
-                    job.row_id,
-                    crop_policy=job.crop_policy,
-                    quant_policy=job.quant_policy,
-                    cancelled=cancel,
-                )
-            elif job.operation == "automatic_export":
-                from wb_tool.adapters.automatic_export import export_automatic_results
-
-                if not isinstance(job.document, WBFigureProject):
-                    raise ValueError("缺少自动结果项目")
-                value = export_automatic_results(
+            else:
+                value = export_intake_outputs(
                     job.document,
                     job.sources,
                     job.destination,
                     runs=job.archive_runs or (),
-                    processing_errors=job.processing_errors,
-                    discovery_report=job.data,
+                    ticket=ticket,
                     cancelled=cancel,
                 )
-            elif job.operation == "project_evidence":
-                from wb_tool.adapters.project_evidence import verify_project_evidence
+        elif job.operation == "intake_figure_preview":
+            from wb_tool.adapters.intake_figure import load_intake_figure_preview
+            from wb_tool.application.intake_figure import WBIntakeFigureProject
 
-                if not isinstance(job.document, WBFigureProject) or job.archive_runs is None:
-                    raise ValueError("缺少项目证据")
-                verified = verify_project_evidence(job.document, job.archive_runs, cancelled=cancel)
-                value = RestoredProjectResults(
-                    verified.results,
-                    verified.ocr,
-                    tuple(
-                        str(record["reason"])
-                        for record in verified.records
-                        if record["verification"] == "unavailable"
-                    ),
+            if not isinstance(job.document, WBIntakeFigureProject):
+                raise ValueError("缺少当前Fig显示项目")
+            value = load_intake_figure_preview(job.document, job.row_id, job.path, cancelled=cancel)
+        elif job.operation == "intake_figure_prepare":
+            from wb_tool.adapters.intake_figure import prepare_intake_figure
+            from wb_tool.application.intake_figure import WBIntakeFigureProject
+            from wb_tool.application.intake_workflow import IntakeWorkflowTicket
+
+            if not isinstance(job.document, WBIntakeFigureProject):
+                raise ValueError("缺少当前完整Fig项目")
+            value = prepare_intake_figure(
+                job.document,
+                IntakeWorkflowTicket.model_validate_json(job.data),
+                job.sources,
+                job.destination,
+                cancelled=cancel,
+            )
+        elif job.operation in {"intake_crop_propose", "intake_crop_export"}:
+            from wb_tool.adapters.intake_crop import export_intake_crop, propose_intake_crop
+            from wb_tool.application.intake_crop import WBIntakeCropProject
+            from wb_tool.application.intake_workflow import IntakeWorkflowTicket
+
+            if not isinstance(job.document, WBIntakeCropProject):
+                raise ValueError("缺少固定N裁剪项目")
+            if job.operation == "intake_crop_propose":
+                value = propose_intake_crop(
+                    job.path, job.document, job.row_id, sources=job.sources, cancelled=cancel
                 )
-            elif job.operation == "metadata_read":
-                from wb_tool.adapters.metadata_input import read_metadata_file
-
-                value = read_metadata_file(
+            else:
+                value = export_intake_crop(
                     job.path,
-                    cancelled=job.cancellation.is_set if job.cancellation else lambda: False,
+                    job.document,
+                    job.row_id,
+                    job.destination,
+                    ticket=IntakeWorkflowTicket.model_validate_json(job.data),
+                    cancelled=cancel,
                 )
-            elif job.operation == "project_derived_tables":
-                if not isinstance(job.document, WBProjectOCR):
-                    raise ValueError("缺少项目派生结果配置")
-                value = ProjectDerivedTables(
-                    fill_project_ocr_table(
-                        job.document, job.project_results, job.project_ocr_result
-                    ),
-                    fill_project_normalization(
-                        job.document, job.project_results, job.project_ocr_result
-                    )
-                    if isinstance(job.document, WBNormalizedProject)
-                    else NormalizationSnapshot(),
-                )
-            elif job.operation == "project_normalization_export":
-                from wb_tool.adapters.normalization_export import export_project_normalization
+        elif job.operation == "automatic_row":
+            from wb_tool.adapters.automatic import automatic_project_row
 
-                if not isinstance(job.document, WBNormalizedProject):
-                    raise ValueError("缺少归一化配置")
+            if not isinstance(job.document, WBFigureProject):
+                raise ValueError("缺少自动分析项目")
+            value = automatic_project_row(
+                job.path,
+                job.document,
+                job.row_id,
+                crop_policy=job.crop_policy,
+                quant_policy=job.quant_policy,
+                cancelled=cancel,
+            )
+        elif job.operation == "automatic_export":
+            from wb_tool.adapters.automatic_export import export_automatic_results
+
+            if not isinstance(job.document, WBFigureProject):
+                raise ValueError("缺少自动结果项目")
+            value = export_automatic_results(
+                job.document,
+                job.sources,
+                job.destination,
+                runs=job.archive_runs or (),
+                processing_errors=job.processing_errors,
+                discovery_report=job.data,
+                cancelled=cancel,
+            )
+        elif job.operation == "project_evidence":
+            from wb_tool.adapters.project_evidence import verify_project_evidence
+
+            if not isinstance(job.document, WBFigureProject) or job.archive_runs is None:
+                raise ValueError("缺少项目证据")
+            verified = verify_project_evidence(job.document, job.archive_runs, cancelled=cancel)
+            value = RestoredProjectResults(
+                verified.results,
+                verified.ocr,
+                tuple(
+                    str(record["reason"])
+                    for record in verified.records
+                    if record["verification"] == "unavailable"
+                ),
+            )
+        elif job.operation == "metadata_read":
+            from wb_tool.adapters.metadata_input import read_metadata_file
+
+            value = read_metadata_file(
+                job.path,
+                cancelled=job.cancellation.is_set if job.cancellation else lambda: False,
+            )
+        elif job.operation == "project_derived_tables":
+            if not isinstance(job.document, WBProjectOCR):
+                raise ValueError("缺少项目派生结果配置")
+            value = ProjectDerivedTables(
+                fill_project_ocr_table(job.document, job.project_results, job.project_ocr_result),
+                fill_project_normalization(
+                    job.document, job.project_results, job.project_ocr_result
+                )
+                if isinstance(job.document, WBNormalizedProject)
+                else NormalizationSnapshot(),
+            )
+        elif job.operation == "project_normalization_export":
+            from wb_tool.adapters.normalization_export import export_project_normalization
+
+            if not isinstance(job.document, WBNormalizedProject):
+                raise ValueError("缺少归一化配置")
+            value = str(
+                export_project_normalization(
+                    job.document,
+                    job.project_results,
+                    job.project_ocr_result,
+                    job.destination,
+                    ocr_labels=job.ocr_labels,
+                    cancelled=cancel,
+                )
+            )
+        elif job.operation in (
+            "project_ocr_result",
+            "project_ocr_install",
+            "project_ocr_table",
+            "project_ocr_export",
+        ):
+            if not isinstance(job.document, WBProjectOCR):
+                raise ValueError("缺少项目OCR状态")
+            if job.operation == "project_ocr_result":
+                if job.ocr_run is None:
+                    raise ValueError("缺少OCR运行记录")
+                value = read_project_ocr_result(job.document, job.ocr_run, job.data)
+            elif job.operation == "project_ocr_install":
+                if job.project_ocr_result is None:
+                    raise ValueError("缺少已校验OCR结果")
+                value = install_project_recognition(job.document, job.project_ocr_result)
+            elif job.operation == "project_ocr_export":
+                from wb_tool.adapters.project_ocr_export import export_project_ocr_table
+
                 value = str(
-                    export_project_normalization(
+                    export_project_ocr_table(
                         job.document,
                         job.project_results,
                         job.project_ocr_result,
                         job.destination,
-                        ocr_labels=job.ocr_labels,
                         cancelled=cancel,
                     )
                 )
-            elif job.operation in (
-                "project_ocr_result",
-                "project_ocr_install",
-                "project_ocr_table",
-                "project_ocr_export",
-            ):
-                if not isinstance(job.document, WBProjectOCR):
-                    raise ValueError("缺少项目OCR状态")
-                if job.operation == "project_ocr_result":
-                    if job.ocr_run is None:
-                        raise ValueError("缺少OCR运行记录")
-                    value = read_project_ocr_result(job.document, job.ocr_run, job.data)
-                elif job.operation == "project_ocr_install":
-                    if job.project_ocr_result is None:
-                        raise ValueError("缺少已校验OCR结果")
-                    value = install_project_recognition(job.document, job.project_ocr_result)
-                elif job.operation == "project_ocr_export":
-                    from wb_tool.adapters.project_ocr_export import export_project_ocr_table
-
-                    value = str(
-                        export_project_ocr_table(
-                            job.document,
-                            job.project_results,
-                            job.project_ocr_result,
-                            job.destination,
-                            cancelled=cancel,
-                        )
+            else:
+                value = ProjectTableSnapshot(
+                    fill_project_ocr_table(
+                        job.document, job.project_results, job.project_ocr_result
                     )
-                else:
-                    value = ProjectTableSnapshot(
-                        fill_project_ocr_table(
-                            job.document, job.project_results, job.project_ocr_result
-                        )
-                    )
-            elif job.operation == "project_result":
-                if job.analysis_plan is None:
-                    raise ValueError("缺少结果所属定量计划")
-                value = read_project_result(job.analysis_plan, job.data)
-            elif job.operation == "quant_group_reset":
-                from wb_tool.adapters.quant_supervision import reset_group_boundaries
-
-                if not isinstance(job.document, WBAnalysisProject):
-                    raise ValueError("缺少定量项目")
-                value = reset_group_boundaries(
-                    job.document, job.row_id, job.sources, cancelled=cancel
                 )
-            elif job.operation == "quant_replan":
-                from wb_tool.adapters.quant_supervision import replan_quant_lanes
+        elif job.operation == "project_result":
+            if job.analysis_plan is None:
+                raise ValueError("缺少结果所属定量计划")
+            value = read_project_result(job.analysis_plan, job.data)
+        elif job.operation == "quant_group_reset":
+            from wb_tool.adapters.quant_supervision import reset_group_boundaries
 
-                if not isinstance(job.document, WBAnalysisProject):
-                    raise ValueError("缺少定量项目")
-                value = replan_quant_lanes(job.path, job.document, job.row_id, cancelled=cancel)
-            elif job.operation == "quant_target":
-                from wb_tool.application.standalone_quant import configure_manual_quantification
+            if not isinstance(job.document, WBAnalysisProject):
+                raise ValueError("缺少定量项目")
+            value = reset_group_boundaries(job.document, job.row_id, job.sources, cancelled=cancel)
+        elif job.operation == "quant_replan":
+            from wb_tool.adapters.quant_supervision import replan_quant_lanes
 
-                if not isinstance(job.document, WBFigureProject) or job.manual_target is None:
-                    raise ValueError("缺少人工测量目标或项目")
-                if cancel():
-                    raise ValueError("独立灰度配置已取消")
-                value = configure_manual_quantification(
-                    load_tiff(job.path), job.document, job.manual_target, cancelled=cancel
+            if not isinstance(job.document, WBAnalysisProject):
+                raise ValueError("缺少定量项目")
+            value = replan_quant_lanes(job.path, job.document, job.row_id, cancelled=cancel)
+        elif job.operation == "quant_target":
+            from wb_tool.application.standalone_quant import configure_manual_quantification
+
+            if not isinstance(job.document, WBFigureProject) or job.manual_target is None:
+                raise ValueError("缺少人工测量目标或项目")
+            if cancel():
+                raise ValueError("独立灰度配置已取消")
+            value = configure_manual_quantification(
+                load_tiff(job.path), job.document, job.manual_target, cancelled=cancel
+            )
+        elif job.operation == "quant_fig":
+            from wb_tool.adapters.fig_quant import prepare_fig_quantification
+
+            if not isinstance(job.document, WBFigureProject):
+                raise ValueError("缺少Fig测量项目")
+            value = prepare_fig_quantification(job.path, job.document, job.row_id, cancelled=cancel)
+        elif job.operation == "quant_export":
+            from wb_tool.adapters.quant_export import export_wbquant_table
+
+            if not isinstance(job.document, WBFigureProject):
+                raise ValueError("缺少定量项目")
+            value = str(
+                export_wbquant_table(
+                    job.document, job.project_results, job.destination, cancelled=cancel
                 )
-            elif job.operation == "quant_fig":
-                from wb_tool.adapters.fig_quant import prepare_fig_quantification
+            )
+        elif job.operation == "intake_table_export":
+            from wb_tool.adapters.intake_table_export import export_intake_table
+            from wb_tool.application.intake_output import WBIntakeOutputProject
 
-                if not isinstance(job.document, WBFigureProject):
-                    raise ValueError("缺少Fig测量项目")
-                value = prepare_fig_quantification(
-                    job.path, job.document, job.row_id, cancelled=cancel
+            if not isinstance(job.document, WBIntakeOutputProject):
+                raise ValueError("缺少仪器结果项目")
+            value = str(
+                export_intake_table(
+                    job.document, job.project_results, job.destination, cancelled=cancel
                 )
-            elif job.operation == "quant_export":
-                from wb_tool.adapters.quant_export import export_wbquant_table
+            )
+        elif job.operation in ("project_table", "project_export"):
+            if not isinstance(job.document, WBFigureProject):
+                raise ValueError("缺少项目文档")
+            if job.operation == "project_export":
+                from wb_tool.adapters.project_export import export_project_table
 
-                if not isinstance(job.document, WBFigureProject):
-                    raise ValueError("缺少定量项目")
                 value = str(
-                    export_wbquant_table(
+                    export_project_table(
                         job.document, job.project_results, job.destination, cancelled=cancel
                     )
                 )
-            elif job.operation == "intake_table_export":
-                from wb_tool.adapters.intake_table_export import export_intake_table
-                from wb_tool.application.intake_output import WBIntakeOutputProject
-
-                if not isinstance(job.document, WBIntakeOutputProject):
-                    raise ValueError("缺少仪器结果项目")
-                value = str(
-                    export_intake_table(
-                        job.document, job.project_results, job.destination, cancelled=cancel
-                    )
+            else:
+                from wb_tool.application.intake_output import (
+                    WBIntakeOutputProject,
+                    fill_intake_table,
                 )
-            elif job.operation in ("project_table", "project_export"):
+
+                value = ProjectTableSnapshot(
+                    tuple(
+                        item.cell for item in fill_intake_table(job.document, job.project_results)
+                    )
+                    if isinstance(job.document, WBIntakeOutputProject)
+                    else fill_project_table(job.document, job.project_results)
+                )
+        elif job.operation == "crop_suggest":
+            from wb_tool.adapters.crop_suggestions import suggest_crops
+
+            if job.detection_settings is None:
+                raise ValueError("缺少候选检测参数")
+            value = suggest_crops(
+                job.path,
+                job.source_sha256,
+                job.row_id,
+                job.revision,
+                job.detection_settings,
+                cancelled=job.cancellation.is_set if job.cancellation else lambda: False,
+            )
+        elif job.operation in ("template_read", "template_export"):
+            from wb_tool.adapters.figure_template_io import (
+                export_figure_template,
+                read_figure_template,
+            )
+
+            if job.operation == "template_read":
+                value = read_figure_template(job.path, cancelled=cancel)
+            else:
                 if not isinstance(job.document, WBFigureProject):
-                    raise ValueError("缺少项目文档")
-                if job.operation == "project_export":
-                    from wb_tool.adapters.project_export import export_project_table
-
-                    value = str(
-                        export_project_table(
-                            job.document, job.project_results, job.destination, cancelled=cancel
-                        )
-                    )
-                else:
-                    from wb_tool.application.intake_output import (
-                        WBIntakeOutputProject,
-                        fill_intake_table,
-                    )
-
-                    value = ProjectTableSnapshot(
-                        tuple(
-                            item.cell
-                            for item in fill_intake_table(job.document, job.project_results)
-                        )
-                        if isinstance(job.document, WBIntakeOutputProject)
-                        else fill_project_table(job.document, job.project_results)
-                    )
-            elif job.operation == "crop_suggest":
-                from wb_tool.adapters.crop_suggestions import suggest_crops
-
-                if job.detection_settings is None:
-                    raise ValueError("缺少候选检测参数")
-                value = suggest_crops(
-                    job.path,
-                    job.source_sha256,
-                    job.row_id,
-                    job.revision,
-                    job.detection_settings,
-                    cancelled=job.cancellation.is_set if job.cancellation else lambda: False,
-                )
-            elif job.operation in ("template_read", "template_export"):
-                from wb_tool.adapters.figure_template_io import (
-                    export_figure_template,
-                    read_figure_template,
-                )
-
-                if job.operation == "template_read":
-                    value = read_figure_template(job.path, cancelled=cancel)
-                else:
-                    if not isinstance(job.document, WBFigureProject):
-                        raise ValueError("缺少模板所属项目")
-                    value = export_figure_template(
-                        job.document, job.sources, job.destination, cancelled=cancel
-                    )
-            elif job.operation == "label_font":
-                from wb_tool.adapters.label_font import find_label_font
-
-                if not isinstance(job.document, WBFigureProject):
-                    raise ValueError("缺少标签所属项目")
-                value = find_label_font(
-                    (*job.document.figure_order, *(row.protein for row in job.document.rows)),
-                    cancelled=cancel,
-                )
-            elif job.operation == "font_digest":
-                path = Path(job.path)
-                if (
-                    path.suffix.lower() not in (".ttf", ".ttc", ".otf")
-                    or path.stat().st_size > 32 * 1024 * 1024
-                ):
-                    raise ValueError("请选择不超过 32 MiB 的字体文件")
-                with path.open("rb") as stream:
-                    value = file_digest(stream, "sha256").hexdigest()
-            elif job.operation == "figure_document":
-                value = read_figure_project(job.data)
-            elif job.operation == "figure_image_export":
-                from wb_tool.adapters.figure_image_export import export_figure_image
-
-                if not isinstance(job.document, WBFigureProject):
-                    raise ValueError("缺少拼图项目")
-                value = export_figure_image(
+                    raise ValueError("缺少模板所属项目")
+                value = export_figure_template(
                     job.document, job.sources, job.destination, cancelled=cancel
                 )
-            elif job.operation in ("figure_preview", "figure_export", "figure_ocr"):
-                from wb_tool.adapters.figure_export import (
-                    encode_figure_png,
-                    export_figure_bundle,
-                    render_figure,
+        elif job.operation == "label_font":
+            from wb_tool.adapters.label_font import find_label_font
+
+            if not isinstance(job.document, WBFigureProject):
+                raise ValueError("缺少标签所属项目")
+            value = find_label_font(
+                (*job.document.figure_order, *(row.protein for row in job.document.rows)),
+                cancelled=cancel,
+            )
+        elif job.operation == "font_digest":
+            path = Path(job.path)
+            if (
+                path.suffix.lower() not in (".ttf", ".ttc", ".otf")
+                or path.stat().st_size > 32 * 1024 * 1024
+            ):
+                raise ValueError("请选择不超过 32 MiB 的字体文件")
+            with path.open("rb") as stream:
+                value = file_digest(stream, "sha256").hexdigest()
+        elif job.operation == "figure_document":
+            value = read_figure_project(job.data)
+        elif job.operation == "figure_image_export":
+            from wb_tool.adapters.figure_image_export import export_figure_image
+
+            if not isinstance(job.document, WBFigureProject):
+                raise ValueError("缺少拼图项目")
+            value = export_figure_image(
+                job.document, job.sources, job.destination, cancelled=cancel
+            )
+        elif job.operation in ("figure_preview", "figure_export", "figure_ocr"):
+            from wb_tool.adapters.figure_export import (
+                encode_figure_png,
+                export_figure_bundle,
+                render_figure,
+            )
+
+            if not isinstance(job.document, WBFigureProject):
+                raise ValueError("缺少拼图项目")
+            cancel = job.cancellation.is_set if job.cancellation is not None else lambda: False
+            if job.operation == "figure_ocr":
+                rendered = render_figure(job.document, job.sources, cancelled=cancel)
+                if cancel():
+                    raise ValueError("生成拼图已取消")
+                value = encode_figure_png(rendered, job.document.template.dpi)
+                if cancel():
+                    raise ValueError("生成拼图已取消")
+            elif job.operation == "figure_preview":
+                from PIL import Image
+
+                value = render_figure(
+                    job.document, job.sources, require_review=False, cancelled=cancel
                 )
-
-                if not isinstance(job.document, WBFigureProject):
-                    raise ValueError("缺少拼图项目")
-                cancel = job.cancellation.is_set if job.cancellation is not None else lambda: False
-                if job.operation == "figure_ocr":
-                    rendered = render_figure(job.document, job.sources, cancelled=cancel)
-                    if cancel():
-                        raise ValueError("生成拼图已取消")
-                    value = encode_figure_png(rendered, job.document.template.dpi)
-                    if cancel():
-                        raise ValueError("生成拼图已取消")
-                elif job.operation == "figure_preview":
-                    from PIL import Image
-
-                    value = render_figure(
-                        job.document, job.sources, require_review=False, cancelled=cancel
+                if max(value.width, value.height) > 2048:
+                    preview = Image.frombytes("RGB", (value.width, value.height), value.rgb)
+                    preview.thumbnail((2048, 2048), Image.Resampling.NEAREST)
+                    value = FigureRender(
+                        preview.width, preview.height, preview.tobytes(), value.manifest_json
                     )
-                    if max(value.width, value.height) > 2048:
-                        preview = Image.frombytes("RGB", (value.width, value.height), value.rgb)
-                        preview.thumbnail((2048, 2048), Image.Resampling.NEAREST)
-                        value = FigureRender(
-                            preview.width, preview.height, preview.tobytes(), value.manifest_json
-                        )
-                else:
-                    value = export_figure_bundle(
-                        job.document,
-                        job.sources,
-                        job.destination,
-                        cancelled=cancel,
-                        runs=job.archive_runs or (),
-                    )
-            elif job.operation == "ocr_preview":
-                from wb_tool.adapters.ocr_input import load_ocr_image
-
-                ocr_image = load_ocr_image(job.path)
-                height, width = ocr_image.pixels.shape
-                step = max(1, ceil(max(height, width) / 2048))
-                sampled = ocr_image.pixels[::step, ::step]
-                ph, pw = sampled.shape
-                value = PreviewRaster(
-                    ocr_image.sha256,
-                    width,
-                    height,
-                    pw,
-                    ph,
-                    sampled.tobytes(),
-                    ocr_image.bit_depth,
-                    ocr_image.warnings,
-                )
-            elif job.operation == "preview":
-                if not 1 <= job.preview_edge <= 2048:
-                    raise ValueError("预览边长必须位于 1..2048")
-                image = load_tiff(job.path)
-                height, width = image.pixels.shape
-                step = max(1, ceil(max(height, width) / job.preview_edge))
-                sampled = image.pixels[::step, ::step]
-                display = (sampled // 257).astype(np.uint8) if image.bit_depth == 16 else sampled
-                ph, pw = display.shape
-                value = PreviewRaster(
-                    image.sha256,
-                    width,
-                    height,
-                    pw,
-                    ph,
-                    display.tobytes(),
-                    image.bit_depth,
-                    image.warnings,
-                )
-            elif job.operation == "document":
-                value = read_wb_document(job.data)
-            elif job.operation == "result":
-                value = TypeAdapter(AnalysisResult).validate_json(job.data, strict=True)
-            elif job.operation == "ocr_result":
-                value = TypeAdapter(OCRRecognition).validate_json(job.data, strict=True)
-            elif job.operation == "stored_result":
-                value = TypeAdapter(AnalysisResult | OCRRecognition).validate_json(
-                    job.data, strict=True
-                )
-            elif job.operation == "export":
-                if job.worksheet is None or job.result is None:
-                    raise ValueError("缺少已复核工作表/测量")
-                value = str(export_worksheet(job.worksheet, job.result, job.path))
-            elif job.operation == "crop":
-                if job.crop is None:
-                    raise ValueError("缺少原图裁剪范围")
-                value = export_crop(job.path, job.crop, job.destination)
-            elif job.operation == "encode":
-                if job.document is None:
-                    raise ValueError("缺少文档")
-                value = job.document.model_dump_json().encode("utf-8")
             else:
-                raise ValueError("未知WB后台操作，未执行")
-            reply = WBReply(request_id, value)
-        except (ValueError, OSError, TypeError) as error:
-            reply = WBReply(request_id, error=str(error))
-        self.replied.emit(reply)
+                value = export_figure_bundle(
+                    job.document,
+                    job.sources,
+                    job.destination,
+                    cancelled=cancel,
+                    runs=job.archive_runs or (),
+                )
+        elif job.operation == "ocr_preview":
+            from wb_tool.adapters.ocr_input import load_ocr_image
+
+            ocr_image = load_ocr_image(job.path)
+            height, width = ocr_image.pixels.shape
+            step = max(1, ceil(max(height, width) / 2048))
+            sampled = ocr_image.pixels[::step, ::step]
+            ph, pw = sampled.shape
+            value = PreviewRaster(
+                ocr_image.sha256,
+                width,
+                height,
+                pw,
+                ph,
+                sampled.tobytes(),
+                ocr_image.bit_depth,
+                ocr_image.warnings,
+            )
+        elif job.operation == "preview":
+            if not 1 <= job.preview_edge <= 2048:
+                raise ValueError("预览边长必须位于 1..2048")
+            image = load_tiff(job.path)
+            height, width = image.pixels.shape
+            step = max(1, ceil(max(height, width) / job.preview_edge))
+            sampled = image.pixels[::step, ::step]
+            display = (sampled // 257).astype(np.uint8) if image.bit_depth == 16 else sampled
+            ph, pw = display.shape
+            value = PreviewRaster(
+                image.sha256,
+                width,
+                height,
+                pw,
+                ph,
+                display.tobytes(),
+                image.bit_depth,
+                image.warnings,
+            )
+        elif job.operation == "document":
+            value = read_wb_document(job.data)
+        elif job.operation == "result":
+            value = TypeAdapter(AnalysisResult).validate_json(job.data, strict=True)
+        elif job.operation == "ocr_result":
+            value = TypeAdapter(OCRRecognition).validate_json(job.data, strict=True)
+        elif job.operation == "stored_result":
+            value = TypeAdapter(AnalysisResult | OCRRecognition).validate_json(
+                job.data, strict=True
+            )
+        elif job.operation == "export":
+            if job.worksheet is None or job.result is None:
+                raise ValueError("缺少已复核工作表/测量")
+            value = str(export_worksheet(job.worksheet, job.result, job.path))
+        elif job.operation == "crop":
+            if job.crop is None:
+                raise ValueError("缺少原图裁剪范围")
+            value = export_crop(job.path, job.crop, job.destination)
+        elif job.operation == "encode":
+            if job.document is None:
+                raise ValueError("缺少文档")
+            value = job.document.model_dump_json().encode("utf-8")
+        else:
+            raise ValueError("未知WB后台操作，未执行")
+        return WBReply(request_id, value)
 
 
 class WBBackground(QObject):

@@ -1,0 +1,166 @@
+FFFFFFFFFF..                                                             [100%]
+================================== FAILURES ===================================
+__________ test_fault_and_cancel_reply_once_and_drain[False-before] ___________
+tests\test_wb_background_terminal.py:148: in test_fault_and_cancel_reply_once_and_drain
+    assert "鍙栨秷" in reply.error
+E   AssertionError: assert '鍙栨秷' in 'Fig识别已取消'
+E    +  where 'Fig识别已取消' = WBReply(request_id='96c4668fa8c74e3d991d47584d7e6ad4', value=None, error='Fig识别已取消').error
+__________ test_fault_and_cancel_reply_once_and_drain[False-decode] ___________
+tests\test_wb_background_terminal.py:141: in test_fault_and_cancel_reply_once_and_drain
+    assert not escaped, "An accepted request escaped the terminal boundary"
+E   AssertionError: An accepted request escaped the terminal boundary
+E   assert not [(<class 'wb_tool.application.analysis.AnalysisCancelled'>, AnalysisCancelled(), <traceback object at 0x0000020638E32280>)]
+---------------------------- Captured stderr call -----------------------------
+Exceptions caught in Qt event loop:
+________________________________________________________________________________
+Traceback (most recent call last):
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\ui\background.py", line 430, in execute
+    value = prepare_fig_quantification(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\adapters\fig_quant.py", line 37, in prepare_fig_quantification
+    recognition = recognize_figure(path, image.sha256, cancelled=cancelled)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\adapters\ocr.py", line 39, in recognize_figure
+    raise AnalysisCancelled()
+wb_tool.application.analysis.AnalysisCancelled
+________________________________________________________________________________
+___________ test_fault_and_cancel_reply_once_and_drain[False-tile] ____________
+tests\test_wb_background_terminal.py:141: in test_fault_and_cancel_reply_once_and_drain
+    assert not escaped, "An accepted request escaped the terminal boundary"
+E   AssertionError: An accepted request escaped the terminal boundary
+E   assert not [(<class 'wb_tool.application.analysis.AnalysisCancelled'>, AnalysisCancelled(), <traceback object at 0x000002063A002F80>)]
+---------------------------- Captured stderr call -----------------------------
+Exceptions caught in Qt event loop:
+________________________________________________________________________________
+Traceback (most recent call last):
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\ui\background.py", line 430, in execute
+    value = prepare_fig_quantification(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\adapters\fig_quant.py", line 37, in prepare_fig_quantification
+    recognition = recognize_figure(path, image.sha256, cancelled=cancelled)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\adapters\ocr.py", line 77, in recognize_figure
+    raise AnalysisCancelled()
+wb_tool.application.analysis.AnalysisCancelled
+________________________________________________________________________________
+__________ test_fault_and_cancel_reply_once_and_drain[False-memory] ___________
+tests\test_wb_background_terminal.py:141: in test_fault_and_cancel_reply_once_and_drain
+    assert not escaped, "An accepted request escaped the terminal boundary"
+E   AssertionError: An accepted request escaped the terminal boundary
+E   assert not [(<class 'MemoryError'>, MemoryError(), <traceback object at 0x000002063A04C980>)]
+---------------------------- Captured stderr call -----------------------------
+Exceptions caught in Qt event loop:
+________________________________________________________________________________
+Traceback (most recent call last):
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\ui\background.py", line 592, in execute
+    image = load_tiff(job.path)
+            ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tests\test_wb_background_terminal.py", line 93, in failed
+    raise MemoryError()  # Empty messages must still be failed, never success.
+    ^^^^^^^^^^^^^^^^^^^
+MemoryError
+________________________________________________________________________________
+__________ test_fault_and_cancel_reply_once_and_drain[False-runtime] __________
+tests\test_wb_background_terminal.py:141: in test_fault_and_cancel_reply_once_and_drain
+    assert not escaped, "An accepted request escaped the terminal boundary"
+E   AssertionError: An accepted request escaped the terminal boundary
+E   assert not [(<class 'RuntimeError'>, RuntimeError('controlled failure'), <traceback object at 0x000002063A001C80>)]
+---------------------------- Captured stderr call -----------------------------
+Exceptions caught in Qt event loop:
+________________________________________________________________________________
+Traceback (most recent call last):
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\ui\background.py", line 592, in execute
+    image = load_tiff(job.path)
+            ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tests\test_wb_background_terminal.py", line 94, in failed
+    raise RuntimeError("controlled failure")
+RuntimeError: controlled failure
+________________________________________________________________________________
+___________ test_fault_and_cancel_reply_once_and_drain[True-before] ___________
+tests\test_wb_background_terminal.py:148: in test_fault_and_cancel_reply_once_and_drain
+    assert "鍙栨秷" in reply.error
+E   AssertionError: assert '鍙栨秷' in 'Fig识别已取消'
+E    +  where 'Fig识别已取消' = WBReply(request_id='286cd67cbdfb4fbcbd8a5fb5ee2dbee8', value=None, error='Fig识别已取消').error
+___________ test_fault_and_cancel_reply_once_and_drain[True-decode] ___________
+tests\test_wb_background_terminal.py:141: in test_fault_and_cancel_reply_once_and_drain
+    assert not escaped, "An accepted request escaped the terminal boundary"
+E   AssertionError: An accepted request escaped the terminal boundary
+E   assert not [(<class 'wb_tool.application.analysis.AnalysisCancelled'>, AnalysisCancelled(), <traceback object at 0x000002063A06AF00>)]
+---------------------------- Captured stderr call -----------------------------
+Exceptions caught in Qt event loop:
+________________________________________________________________________________
+Traceback (most recent call last):
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\ui\background.py", line 430, in execute
+    value = prepare_fig_quantification(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\adapters\fig_quant.py", line 37, in prepare_fig_quantification
+    recognition = recognize_figure(path, image.sha256, cancelled=cancelled)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\adapters\ocr.py", line 39, in recognize_figure
+    raise AnalysisCancelled()
+wb_tool.application.analysis.AnalysisCancelled
+________________________________________________________________________________
+____________ test_fault_and_cancel_reply_once_and_drain[True-tile] ____________
+tests\test_wb_background_terminal.py:141: in test_fault_and_cancel_reply_once_and_drain
+    assert not escaped, "An accepted request escaped the terminal boundary"
+E   AssertionError: An accepted request escaped the terminal boundary
+E   assert not [(<class 'wb_tool.application.analysis.AnalysisCancelled'>, AnalysisCancelled(), <traceback object at 0x000002063A070CC0>)]
+---------------------------- Captured stderr call -----------------------------
+Exceptions caught in Qt event loop:
+________________________________________________________________________________
+Traceback (most recent call last):
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\ui\background.py", line 430, in execute
+    value = prepare_fig_quantification(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\adapters\fig_quant.py", line 37, in prepare_fig_quantification
+    recognition = recognize_figure(path, image.sha256, cancelled=cancelled)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\adapters\ocr.py", line 77, in recognize_figure
+    raise AnalysisCancelled()
+wb_tool.application.analysis.AnalysisCancelled
+________________________________________________________________________________
+___________ test_fault_and_cancel_reply_once_and_drain[True-memory] ___________
+tests\test_wb_background_terminal.py:141: in test_fault_and_cancel_reply_once_and_drain
+    assert not escaped, "An accepted request escaped the terminal boundary"
+E   AssertionError: An accepted request escaped the terminal boundary
+E   assert not [(<class 'MemoryError'>, MemoryError(), <traceback object at 0x000002063A0445C0>)]
+---------------------------- Captured stderr call -----------------------------
+Exceptions caught in Qt event loop:
+________________________________________________________________________________
+Traceback (most recent call last):
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\ui\background.py", line 592, in execute
+    image = load_tiff(job.path)
+            ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tests\test_wb_background_terminal.py", line 93, in failed
+    raise MemoryError()  # Empty messages must still be failed, never success.
+    ^^^^^^^^^^^^^^^^^^^
+MemoryError
+________________________________________________________________________________
+__________ test_fault_and_cancel_reply_once_and_drain[True-runtime] ___________
+tests\test_wb_background_terminal.py:141: in test_fault_and_cancel_reply_once_and_drain
+    assert not escaped, "An accepted request escaped the terminal boundary"
+E   AssertionError: An accepted request escaped the terminal boundary
+E   assert not [(<class 'RuntimeError'>, RuntimeError('controlled failure'), <traceback object at 0x000002063A011000>)]
+---------------------------- Captured stderr call -----------------------------
+Exceptions caught in Qt event loop:
+________________________________________________________________________________
+Traceback (most recent call last):
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tools\wb\src\wb_tool\ui\background.py", line 592, in execute
+    image = load_tiff(job.path)
+            ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tests\test_wb_background_terminal.py", line 94, in failed
+    raise RuntimeError("controlled failure")
+RuntimeError: controlled failure
+________________________________________________________________________________
+=========================== short test summary info ===========================
+FAILED tests/test_wb_background_terminal.py::test_fault_and_cancel_reply_once_and_drain[False-before]
+FAILED tests/test_wb_background_terminal.py::test_fault_and_cancel_reply_once_and_drain[False-decode]
+FAILED tests/test_wb_background_terminal.py::test_fault_and_cancel_reply_once_and_drain[False-tile]
+FAILED tests/test_wb_background_terminal.py::test_fault_and_cancel_reply_once_and_drain[False-memory]
+FAILED tests/test_wb_background_terminal.py::test_fault_and_cancel_reply_once_and_drain[False-runtime]
+FAILED tests/test_wb_background_terminal.py::test_fault_and_cancel_reply_once_and_drain[True-before]
+FAILED tests/test_wb_background_terminal.py::test_fault_and_cancel_reply_once_and_drain[True-decode]
+FAILED tests/test_wb_background_terminal.py::test_fault_and_cancel_reply_once_and_drain[True-tile]
+FAILED tests/test_wb_background_terminal.py::test_fault_and_cancel_reply_once_and_drain[True-memory]
+FAILED tests/test_wb_background_terminal.py::test_fault_and_cancel_reply_once_and_drain[True-runtime]
+10 failed, 2 passed in 16.29s

@@ -91,3 +91,5 @@ f1e6142准确独审/四CI：双平台1295（Linux509.77s/Windows756.69s）与全
 ## 2026-10-28 T082 R00
 
 基线18b5cf6；git/fetch、uv sync --locked --all-groups、两次context回执均exit0；变更规则输出已分片读取。handoff维护 changed=0/warnings=0/unresolved=0；git diff --check exit0。仅事实文档校准，产品未测试，独审待准确提交。
+
+T082 R01：旧码8fail/4pass/6deselect exit1；新37定向22.16s exit0、Ruff/定向Pyright0。测试夹具两次失败原因/修正及完整门禁待办见 work/evidence/T-082/r01-terminal.md。
