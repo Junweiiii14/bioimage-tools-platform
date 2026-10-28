@@ -18,4 +18,8 @@ wrapper 只补 `-B` 并说明原因，保留 `-I`、UTF-8、准确退出码、�
 
 ## 后续路径
 
-绑定修复提交独审后再冻结必要门禁及最终包；首次失败候选的额外缓存和失败报告保持，使用新的冻结构建输出验证，不删除缓存促成通过。旧升级起点已用外部可信开发 Python `-I -B` 完成严格核验，并于独立中文路径安装 exit 0，登记版本为 `0.14.0-Acceptance-t082-r11-a-244c5da1b03e`；它仅用于跨版本升级，不声称最终安装态已通过。实际最终升级、旧 schema、双诊断与卸载仍待完成。
+独立审查者 `/root/independent_review` 对 `f5d7ac9e05b0d701818ceced7277edd09d10024b` 相对 d66655b 的八文件差异给出 **Accepted**。独立命令 `uv run --locked --no-sync pytest tests/test_candidate_acceptance.py -k 'wrapper_private_python or windows_wrapper_preserves or unfrozen_bytecode' -q --tb=short` 为 **5 passed, 29 deselected / 21.13s / exit 0**，日志 `.local/T082/r07-private-python-independent-f5d7ac9.txt`。另双 shell 实际探针确认 isolated、dont_write_bytecode、utf8_mode，中文/空格/特殊字符路径与尾反斜杠保持，Python exit 7 原样返回；材料在 `.local/T082/r07-independent-f5d7ac9/`。无新产品改动、缓存清理或清单放宽。
+
+独审也比对深/短路径构建：源码、工具、uv lock、运行库和四 wheel hashes 完全相同，短路径编译及安装器退出码均 0；失败报告与原件相同，污染候选的 argparse.pyc 仍存在。
+
+现在重新冻结必要门禁及最终包；首次失败候选的额外缓存和失败报告保持，使用新的冻结构建输出验证，不删除缓存促成通过。旧升级起点已用外部可信开发 Python `-I -B` 完成严格核验，并于独立中文路径安装 exit 0，登记版本为 `0.14.0-Acceptance-t082-r11-a-244c5da1b03e`；其已安装 7794 个载荷文件与清单完全对应，额外仅 unins000.exe/dat。五快捷方式只指向本轮目录，旧 Laboratory 的登记/设置/快捷方式/身份文件摘要与安装前相同。它仅用于跨版本升级，不声称最终安装态已通过。实际最终升级、旧 schema、双诊断与卸载仍待完成。
