@@ -218,11 +218,28 @@ function checkpointWorkbench() {
     };
 }
 function setState(next) {
-    if (next.rows)
+    if (next.rows) {
+        const cellsByRow = new Map();
+        for (const cell of next.cells || []) {
+            if (!cellsByRow.has(cell.rowId)) cellsByRow.set(cell.rowId, []);
+            cellsByRow.get(cell.rowId).push(cell);
+        }
         next.rows = next.rows.map((r) => ({
             ...r,
+            ...(next.cells && !Object.hasOwn(r, 'results')
+                ? { results: cellsByRow.get(r.id) || [] }
+                : {}),
             preview: r.preview || next.sourcePreviews?.[r.sourceId] || null,
         }));
+    }
+    if (next.intake?.sources)
+        next.intake = {
+            ...next.intake,
+            sources: next.intake.sources.map((source) => ({
+                ...source,
+                preview: source.preview || next.sourcePreviews?.[source.asset?.sha256] || null,
+            })),
+        };
     const oldId = state.selectedId,
         previousCrop = cropIdentity();
     state = { ...state, ...next };

@@ -3,8 +3,10 @@
 import gc
 import json
 from collections.abc import Iterator
+from dataclasses import replace
 from hashlib import sha256
 from pathlib import Path
+from typing import cast
 
 import numpy as np
 import pytest
@@ -12,7 +14,7 @@ import tifffile
 from bioimage_app.figure_window import FigureProjectWindow
 from bioimage_app.web_bridge import WorkbenchBridge
 from pytestqt.qtbot import QtBot
-from wb_tool.api import FolderDiscoveryReport
+from wb_tool.api import FigureRow, FolderDiscoveryReport, ProjectTableCell, WBFigureProject
 
 from tooling.qt_test_lifecycle import close_and_dispose_window
 
@@ -49,6 +51,44 @@ def test_idle_publish_and_progress_do_not_rebuild_project_snapshot(
     bridge.host.view.generation += 1
     bridge.publish()
     assert calls == ["snapshot"]
+
+
+def test_shared_result_transport_keeps_order_failures_zero_and_row_summaries(
+    bridge: WorkbenchBridge,
+) -> None:
+    project = WBFigureProject(
+        project_id="shared-cell-projection",
+        rows=(FigureRow(row_id="a", figure="Fig1"), FigureRow(row_id="b", figure="Fig1")),
+        figure_order=("Fig1",),
+    )
+    bridge.host.view.set_project(project)
+    zero = ProjectTableCell("b", "Fig1", "B", 1, "", "b1", "", None, "", 0, "valid", "")
+    failed = replace(zero, row_id="a", value=None, status="failed", reason="failed evidence")
+    missing = replace(failed, lane_index=2, status="missing_source", reason="missing evidence")
+    orphan = replace(failed, row_id="historical-orphan", reason="retained flat-table evidence")
+    cells = (zero, failed, missing, orphan)
+    bridge.host.view.analysis.result_view.show_cells(cells)
+    snapshot = bridge.snapshot()
+    assert snapshot["snapshotContract"] == "wb-workbench-snapshot@1"
+    assert snapshot["cells"] == [
+        {
+            "rowId": c.row_id,
+            "fig": c.figure,
+            "protein": c.protein,
+            "lane": c.lane_index,
+            "value": c.value,
+            "rawIntegral": c.raw_integral,
+            "status": c.status,
+            "reason": c.reason,
+        }
+        for c in cells
+    ]
+    rows = cast(list[dict[str, object]], snapshot["rows"])
+    assert [row["id"] for row in rows] == ["a", "b"]
+    assert all("results" not in row for row in rows)
+    assert rows[0]["reason"] == "failed evidence；missing evidence"
+    assert rows[1]["status"] == "valid"
+    assert bridge.host.view.analysis.result_view.cells == cells
 
 
 def test_folder_report_is_visible_and_only_current_variant_can_be_added(

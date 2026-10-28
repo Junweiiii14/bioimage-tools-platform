@@ -226,12 +226,14 @@ class WorkbenchBridge(QObject):
             self._images[preview.sha256] = image_url(image)
             self._source_preview_key = preview_key
         live_sources = {r.source.sha256 for r in project.rows if r.source}
+        intake_sources: set[str] = set()
         intake = None
         if isinstance(project, WBIntakeProject):
-            live_sources.update(source.asset.sha256 for source in project.intake.sources)
+            intake_sources = {source.asset.sha256 for source in project.intake.sources}
+            live_sources.update(intake_sources)
             intake = intake_snapshot(project)
-            sources: list[dict[str, object]] = []
-            for source in project.intake.sources:
+            sources = cast(list[dict[str, object]], intake["sources"])
+            for source, projected in zip(project.intake.sources, sources, strict=True):
                 raster = view.thumbnail(source.asset.sha256)
                 if raster and source.asset.sha256 not in self._images:
                     self._images[source.asset.sha256] = image_url(
@@ -243,13 +245,8 @@ class WorkbenchBridge(QObject):
                             QImage.Format.Format_Grayscale8,
                         )
                     )
-                sources.append(
-                    {
-                        **source.model_dump(mode="json"),
-                        "preview": self._images.get(source.asset.sha256),
-                    }
-                )
-            intake["sources"] = sources
+                # The shared image map carries this display-only PNG once for source/row views.
+                projected["preview"] = None
             group_preview = self.host.intake.group_preview
             if group_preview is not None:
                 source_id, raster = group_preview
@@ -445,6 +442,9 @@ class WorkbenchBridge(QObject):
                             }
                         )
         cells = [cell_state(c) for c in view.analysis.result_view.cells]
+        cells_by_row: dict[str, list[dict[str, object]]] = {}
+        for cell in cells:
+            cells_by_row.setdefault(cast(str, cell["rowId"]), []).append(cell)
         if intake is not None and isinstance(project, WBIntakeProject):
             from dataclasses import asdict
 
@@ -480,7 +480,7 @@ class WorkbenchBridge(QObject):
                     if crop_steps.get(row.row_id) == "failed"
                     else "pending"
                 )
-            results = [cell for cell in cells if cell["rowId"] == row.row_id]
+            results = cells_by_row.get(row.row_id, [])
             reasons = list(dict.fromkeys(str(cell["reason"]) for cell in results if cell["reason"]))
             roi = row.roi
             rows.append(
@@ -502,7 +502,9 @@ class WorkbenchBridge(QObject):
                     "reviewed": row.reviewed,
                     "cropStatus": crop_status,
                     "preview": self._images.get(row.source.sha256)
-                    if row.source and source_counts[row.source.sha256] == 1
+                    if row.source
+                    and source_counts[row.source.sha256] == 1
+                    and row.source.sha256 not in intake_sources
                     else None,
                     "reason": "；".join(reasons) or ("尚未定位裁剪区域" if not roi else "等待复核"),
                     "status": "valid"
@@ -510,14 +512,16 @@ class WorkbenchBridge(QObject):
                     else "pending_review"
                     if roi
                     else "not_detected",
-                    "results": results,
                 }
             )
         return {
+            "snapshotContract": "wb-workbench-snapshot@1",
             "sessionEpoch": self.session_epoch,
             "cropEditContract": _CROP_EDIT_CONTRACT,
             "sourcePreviews": {
-                key: value for key, value in self._images.items() if source_counts[key] > 1
+                key: value
+                for key, value in self._images.items()
+                if source_counts[key] > 1 or key in intake_sources
             },
             "projectId": project.project_id,
             "revision": view.generation,
