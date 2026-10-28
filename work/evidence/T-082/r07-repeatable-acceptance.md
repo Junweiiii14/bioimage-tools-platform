@@ -49,7 +49,7 @@ Windows 当前开发环境，Python/uv 按仓库锁；不运行 GUI 和全门禁
 - 使用官方 ISPP [SaveToFile](https://jrsoftware.org/ishelp/topic_savetofile.htm) 保存真实预处理文本；去掉 OutputDir（各次独立目录）、空白/注释后，当前 default 与旧模板完全相同。
 - 本次旧/新 default 合成 installer SHA 同为 `ee1f7806cdb2e352841cad08dcec65aa15d2e3d430a054cf73b58d0c6d6d427b`。这只是该最小实验事实，不泛化为产品安装器逐字节可复现。
 - Acceptance installer SHA `22de0895a67f13956744699b9bfd7683b16b2c6c9820c00a2401bbc0b345d715`。预处理文本核 AppId、中文默认目录/菜单、桌面 AppUserModelID、独立 launcher、无 UninstallDelete。
-- 被编译模板 SHA `f0535e52bfd084307eb1592a0373f8149fe4d571d6687cd50467f0c7ba80ee63`。本地完整探针、3日志、预处理文本与 result.json 位于 `.local/T082/r07-inno-probe/`，生成 exe 不提交且从未执行。
+- 被编译模板 SHA `f0535e52bfd084307eb1592a0373f8149fe4d571d6687cd50467f0c7ba80ee63`。本地探针位于 `.local/T082/r07-inno-probe/run.py`，3日志、预处理文本与 result.json 位于其`run1/`子目录，生成 exe 不提交且从未执行。
 
 ## 尚未完成
 
