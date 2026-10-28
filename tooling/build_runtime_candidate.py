@@ -8,6 +8,15 @@ import sys
 from pathlib import Path
 
 from tooling.build_candidate import ROOT, digest, icon, licenses
+from tooling.runtime_integrity import (
+    PRODUCTS,
+    freeze_local_wheels,
+    payload_inventory,
+    runtime_member,
+    tree_identity,
+    verify_local_wheels,
+    verify_toolchain,
+)
 
 
 def run(arguments: list[str], *, log: Path | None = None) -> None:
@@ -59,6 +68,8 @@ def main() -> int:
     if subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT).strip():
         raise RuntimeError("A committed, clean checkout is required")
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+    toolchain = verify_toolchain(ROOT / "tooling/toolchain-lock.json", gcc=args.gcc, iscc=args.iscc)
+    uv = str(toolchain.uv)
     output = ROOT / ".local/releases" / ("runtime-" + commit[:12])
     output.mkdir(parents=True, exist_ok=False)
     dist = output / "app"
@@ -67,6 +78,8 @@ def main() -> int:
     shutil.copytree(
         base, runtime, ignore=shutil.ignore_patterns("site-packages", "__pycache__", "*.pyc")
     )
+    if tree_identity(runtime, runtime_member) != toolchain.python_tree:
+        raise RuntimeError("Copied runtime differs from its verified source")
     site = runtime / "Lib/site-packages"
     site.mkdir(parents=True, exist_ok=True)
     if any(site.iterdir()):
@@ -74,12 +87,11 @@ def main() -> int:
     requirements = output / "requirements.txt"
     run(
         [
-            "uv",
+            uv,
             "export",
             "--locked",
             "--no-dev",
             "--no-editable",
-            "--no-hashes",
             "--no-emit-workspace",
             "--output-file",
             str(requirements),
@@ -87,14 +99,23 @@ def main() -> int:
         log=output / "export.log",
     )
     wheels = output / "wheels"
-    for name in ("tool-contracts", "platform-runtime", "wb-tool", "bioimage-app"):
+    for name in PRODUCTS:
         run(
-            ["uv", "build", "--package", name, "--wheel", "--out-dir", str(wheels)],
+            [
+                uv,
+                "build",
+                "--require-build-hashes",
+                "--package",
+                name,
+                "--wheel",
+                "--out-dir",
+                str(wheels),
+            ],
             log=output / (name + ".log"),
         )
     run(
         [
-            "uv",
+            uv,
             "pip",
             "install",
             "--python",
@@ -102,11 +123,35 @@ def main() -> int:
             "--target",
             str(site),
             "--only-binary=:all:",
+            "--require-hashes",
             "-r",
             str(requirements),
-            *(str(wheel) for wheel in wheels.glob("*.whl")),
         ],
         log=output / "dependencies.log",
+    )
+    local_requirements = output / "product-wheels.txt"
+    wheel_hashes = freeze_local_wheels(wheels, local_requirements)
+    verify_local_wheels(wheels, wheel_hashes)
+    run(
+        [
+            uv,
+            "pip",
+            "install",
+            "--python",
+            str(runtime / "python.exe"),
+            "--target",
+            str(site),
+            "--no-deps",
+            "--no-index",
+            "--require-hashes",
+            "-r",
+            str(local_requirements),
+        ],
+        log=output / "product-wheels.log",
+    )
+    run(
+        [uv, "pip", "check", "--python", str(runtime / "python.exe")],
+        log=output / "dependency-check.log",
     )
     # This product uses QtWidgets/WebEngineWidgets, not external QML modules or
     # development headers. Qt's QML debug object paths also exceed Inno's limit.
@@ -180,13 +225,13 @@ def main() -> int:
     icon(app_icon)
     resource = output / "candidate.rc"
     resource.write_text('1 ICON "' + app_icon.as_posix() + '"\n', encoding="utf-8")
-    windres = args.gcc.with_name("windres.exe")
+    windres = toolchain.windres
     resource_object = output / "icon.o"
     run([str(windres), str(resource), str(resource_object)])
     executable = dist / ("BioImageWB.exe" if args.laboratory else "BioImageWB-Candidate.exe")
     run(
         [
-            str(args.gcc),
+            str(toolchain.gcc),
             "-std=c11",
             "-Wall",
             "-Wextra",
@@ -235,7 +280,12 @@ def main() -> int:
         "minimum_windows": "10.0.17763",
         "architecture": "x86_64",
         "msvc_runtime": {p.name: digest(runtime / p.name) for p in redistributables},
-        "wheels": {p.name: digest(p) for p in wheels.glob("*.whl")},
+        "wheels": wheel_hashes,
+        "build_inputs_contract": "verified-runtime-inputs@1",
+        "toolchain": toolchain.identity,
+        "requirements_sha256": digest(requirements),
+        "product_requirements_sha256": digest(local_requirements),
+        "models": {p.relative_to(site).as_posix(): digest(p) for p in site.rglob("*.onnx")},
     }
     manifest_path = output / "build-manifest.json"
     if args.laboratory:
@@ -302,11 +352,17 @@ def main() -> int:
             settings_namespace="GroupedIntakeTest",
             acceptance="candidate-only; clean Win10/DPI/scientific holdout pending",
         )
+    payload_manifest = dist / "payload-files.json"
+    payload_manifest.write_text(
+        json.dumps({"schema": 1, "commit": commit, "files": payload_inventory(dist)}, indent=2),
+        encoding="utf-8",
+    )
+    manifest["payload_manifest_sha256"] = digest(payload_manifest)
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     shutil.copyfile(manifest_path, dist / "build-manifest.json")
     run(
         [
-            str(args.iscc.resolve()),
+            str(toolchain.iscc),
             "/DAppSource=" + str(dist),
             "/DBuildCommit=" + commit[:12],
             "/DInstallerOutput=" + str(output),
