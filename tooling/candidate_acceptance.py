@@ -1,6 +1,6 @@
 """Read a candidate's provenance, then explicitly run its synthetic diagnostics.
 
-Standard library only: an installed private Python can execute this file with -I.
+Standard library only: an installed private Python can execute this file with -I -B.
 This command never installs, upgrades, uninstalls or publishes a distribution.
 """
 

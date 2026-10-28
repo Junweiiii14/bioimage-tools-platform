@@ -6,6 +6,8 @@
 
 使用干净、准确提交及已有门禁/独审。构建入口仍先验证 `toolchain-lock.json` 的工具来源和哈希。用于本轮可弃验收时：
 
+Windows 构建使用短路径的干净检出。T082 在较深 worktree 中于一个实际存在、完整路径为 260 字符的依赖文件处遭遇 Inno 压缩失败；相同提交、工具和依赖在短路径检出中成功。保留失败输出，换新的短路径检出，不删除依赖文件或改成功标记绕过。
+
 ```powershell
 uv run --locked --no-sync python -m tooling.build_runtime_candidate --iscc $taskISCC --gcc $taskGCC --laboratory --acceptance-id t082-r11-a
 ```
@@ -33,13 +35,13 @@ uv run --locked --no-sync python -m tooling.candidate_acceptance verify --candid
 
 验证器检查最终/包内 manifest 对应关系、安装器摘要/大小、payload 的原字节 SHA256、运行库/启动器、包内 source-code.zip、源码锁及四包的实际源码/资源。Git 参考归档由准确提交重新生成，遵守冻结的 `.gitattributes`（包括 `.cmd` CRLF）；四包纯文本仅容许明确记录的 CRLF/LF 差异，payload 哈希始终逐字节。重定向路径、未知工件、源码/资源缺失及不匹配一律失败。报告记录参考归档摘要，不承诺安装器字节级可复现。
 
-目标机可使用已核对的私有 Python 直接执行仓库脚本；它只需标准库，不能用 `-I -m tooling...`，因为产品没有安装开发 tooling：
+目标机可使用已核对的私有 Python 直接执行仓库脚本；它只需标准库，直接调用须使用 `-I -B`，防止验证器先向正在检查的私有运行库写入缓存。不能用 `-I -m tooling...`，因为产品没有安装开发 tooling：
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File tooling/windows_candidate_acceptance.ps1 -Python $taskPython -Candidate $taskCandidate -Installer $taskInstaller -InstallerSha256 $taskSHA256 -SourceCommit $taskCommit -SourceRepo $taskCheckout -ReportDirectory $taskReport
 ```
 
-PowerShell 7 使用相同参数。wrapper 仅在自身进程恢复 `$PSHOME/Modules`，在系统临时目录独占创建 UTF-8 JSON 请求文件；所有目录参数作为 JSON 数据交给 Python，避免 PS5.1 尾反斜杠/引号合并。请求文件及其摘要被保留，真实进程退出码原样传出；空退出码不能转换为 0。不会向候选或安装目录写请求/报告。
+PowerShell 7 使用相同参数。wrapper 以 `-I -B -X utf8` 调用 Python，仅在自身进程恢复 `$PSHOME/Modules`，在系统临时目录独占创建 UTF-8 JSON 请求文件；所有目录参数作为 JSON 数据交给 Python，避免 PS5.1 尾反斜杠/引号合并。请求文件及其摘要被保留，真实进程退出码原样传出；空退出码不能转换为 0。不会向候选或安装目录写请求/报告。`-B` 只禁止新缓存写入，已有未冻结缓存仍须拒绝，不能清缓存后把原失败改写为通过。
 
 ## 实际安装是单独的 Windows 门槛
 

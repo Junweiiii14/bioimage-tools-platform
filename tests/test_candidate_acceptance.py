@@ -428,3 +428,76 @@ def test_windows_wrapper_preserves_unicode_paths_failure_and_recovery(
     assert result.returncode != 0
     assert not protected.exists()
     assert payload_inventory(candidate["root"]) == before
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Actual private CPython and Windows shells")
+@pytest.mark.parametrize("shell", ["powershell.exe", "pwsh.exe"])
+def test_wrapper_private_python_does_not_write_into_its_own_candidate(
+    candidate: dict[str, Any], tmp_path: Path, shell: str
+) -> None:
+    executable = shutil.which(shell)
+    if executable is None:
+        pytest.skip(f"{shell} is not installed on this host")
+    # Build a new disposable runtime from the locked interpreter, never clean or
+    # alter a previously verified/polluted candidate to make it pass.
+    base = Path(sys.base_prefix)
+    runtime = candidate["root"] / "runtime"
+    shutil.copy2(base / "python.exe", runtime / "python.exe")
+    for library in base.glob("*.dll"):
+        shutil.copy2(library, runtime / library.name)
+    shutil.copytree(base / "DLLs", runtime / "DLLs")
+    shutil.copytree(
+        base / "Lib",
+        runtime / "Lib",
+        dirs_exist_ok=True,
+        ignore=shutil.ignore_patterns("site-packages", "__pycache__"),
+    )
+    candidate["manifest"]["runtime_python_sha256"] = acceptance.digest(runtime / "python.exe")
+    freeze(candidate)
+    before = payload_inventory(candidate["root"])
+    assert not list(runtime.rglob("*.pyc"))
+    script = Path(__file__).resolve().parents[1] / "tooling/windows_candidate_acceptance.ps1"
+    command = [
+        executable,
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        str(script),
+        "-Python",
+        str(runtime / "python.exe"),
+        "-Candidate",
+        str(candidate["candidate"]),
+        "-Installer",
+        str(candidate["installer"]),
+        "-InstallerSha256",
+        acceptance.digest(candidate["installer"]),
+        "-SourceCommit",
+        candidate["commit"],
+        "-SourceRepo",
+        str(candidate["repo"]),
+    ]
+    report = tmp_path / "同路径解释器 核验"
+    result = subprocess.run(
+        [*command, "-ReportDirectory", str(report)], capture_output=True, timeout=30
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert acceptance.document(report / "acceptance.json")["phase"] == "passed"
+    assert payload_inventory(candidate["root"]) == before
+    assert not list(runtime.rglob("*.pyc"))
+
+    # -B prevents new writes; it must not be mistaken for authorization to read,
+    # delete or silently accept a cache absent from the frozen manifest.
+    cache = runtime / "Lib/__pycache__/unfrozen.cpython-312.pyc"
+    cache.parent.mkdir()
+    cache.write_bytes(b"unverified cache")
+    polluted = payload_inventory(candidate["root"])
+    rejected = tmp_path / "保留缓存 拒绝"
+    result = subprocess.run(
+        [*command, "-ReportDirectory", str(rejected)], capture_output=True, timeout=30
+    )
+    assert result.returncode == 1, result.stdout + result.stderr
+    failure = acceptance.document(rejected / "acceptance.json")
+    assert failure["phase"] == "failed"
+    assert "Unexpected payload file" in failure["error"]
+    assert payload_inventory(candidate["root"]) == polluted

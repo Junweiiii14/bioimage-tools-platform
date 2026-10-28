@@ -38,7 +38,9 @@ try {
     try { $taskWriter.Write(($taskRequest | ConvertTo-Json -Depth 5)) } finally { $taskWriter.Dispose() }
     Write-Host ('Request retained: ' + $taskRequestPath)
     $taskScript = $PSScriptRoot + '\candidate_acceptance.py'
-    & $Python -I -X utf8 $taskScript --request-file $taskRequestPath
+    # The verifier may run from the payload it is checking. Do not create stdlib
+    # caches there before its strict inventory check; existing caches stay checked.
+    & $Python -I -B -X utf8 $taskScript --request-file $taskRequestPath
     $taskExit = $LASTEXITCODE
     if ($null -eq $taskExit) { throw 'Verifier returned no process exit code' }
     exit $taskExit

@@ -2,7 +2,7 @@
 
 - 当前任务：[T082](../work/tasks/T-082-reliability-remediation.md)，本轮可靠性与可维护性整改；原生 goal active。
 - 活动树 `wb-reliability-remediation/bioimage-tools-platform`，分支 `codex/t082-reliability-remediation`，起点 main `18b5cf6`。先核对实际 HEAD/dirty，再读任务与 `work/evidence/T-082/`。
-- 下一步：44ee78c冻结完整门禁exit1（1499通过2失败，独立wheel未执行）；d1036c2修复独审Accepted，23相关回归及独立4测试/5组Qt探针见r05-final-gate-repair/final-integration-review。重新冻结完整门禁，通过后构建/新检出/独立AppId真实跨版本升级与卸载；旧起点244c5da仅作可弃升级源。R09/R12有据条件处置保留，原始32份基准JSON/log已入库。doctor/smoke-env通过不替代全门禁；本轮还没有构建安装结果。
+- 下一步：d66655b完整门禁exit0（1501+独立wheel，独立审计Accepted）；同提交与旧244c5da实际短路径构建成功。真实新检出PS5.1因wrapper没-B污染自身候选被拒，修复2红→2绿/48通过待准确独审；见r07-private-runtime-repair。随后冻结新候选/完整门禁并核验、升级/旧schema/双诊断/卸载。旧244c5da已真实安装在新acceptance身份/中文目录，5快捷方式和登记正确、Lab摘要不变；详细工件与安装记录在.local/T082/r11/。失败构建/污染候选不删不改成功。R09/R12处置及科学待办保持。
 - R10：用户确认暂时无独立留出/负责人约定，保留科学验收待办；已冻结方法与合成回归摘要。条件架构矩阵见T082证据，R06/R09后复核。
 - 最近已交付为 T081 R2（产品 f1e6142、文档6d02b82、PR43合并18b5cf6）；真实旧 closeout 已找到。源码/构建/安装摘要区分见 T082 baseline；本轮未构建或替换在用安装。
 - 原图、历史、旧安装、ResearchVault dirty 树与其他活动树保持。科学定义与现有导出保持；科学留出、干净Win10/全部物理DPI及旧native/GPU未知不能由工程通过代替。
