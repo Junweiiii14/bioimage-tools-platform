@@ -194,7 +194,9 @@
     {
       "source_commit": "2493e0be9cc8f8f266dea86cda34b80dd98157e5",
       "path": "work/programs/scientific-agent-platform/README.md",
-      "sha256": "d856cbec3c00fddf18a3917ad43951446e090bf7e420db57b54a2c92ef1f4390"
+      "sha256": "d856cbec3c00fddf18a3917ad43951446e090bf7e420db57b54a2c92ef1f4390",
+      "projection": "Semantic merge: replace stale activation claim and document immutable publication-branch authority routing.",
+      "target_sha256": "5dd0c22e8f9256ecd3d1fef164432382190083feb48908127379afd470dfcacf"
     },
     {
       "source_commit": "2493e0be9cc8f8f266dea86cda34b80dd98157e5",
