@@ -1,0 +1,41 @@
+[
+  {
+    "dataset_id": "Magno2017-rpa-RDML1.2",
+    "scenes": ["qPCR相对表达", "qPCR孔表导入与质量状态"],
+    "title": "Magno et al. 2017 author example datasets/rpa.rdml",
+    "landing_url": "https://github.com/ramiromagno/rdml/blob/master/datasets/rpa.rdml",
+    "download_url": "https://raw.githubusercontent.com/ramiromagno/rdml/fe484d11594735cfe2d65dcbcc1f58f9315a849b/datasets/rpa.rdml",
+    "format": "RDML 1.2；ZIP内一个rdml_data.xml；8×12孔板布局",
+    "annotations": "3个sample ID均有鸡胚处理描述；10个target明确toi/ref角色；90个reaction ID可按RDML行优先规则还原孔位；88个Cq，2个缺失；每孔61个adp点；30个sample×target组合各3孔。无独立相对表达真值。",
+    "license": "论文Rights and permissions明确对文章提供的数据适用CC0，除另行说明；正文及数据可用性明确链接本作者示例文件。仓库软件另为MIT；不将MIT替代数据许可。读取文件及README未发现rpa的另行许可声明。",
+    "license_url": "https://link.springer.com/article/10.1186/s13104-017-2533-9#rightslink",
+    "access_status": "2026-10-31已从原作者raw GitHub实际下载149863字节，ZIP/XML本地解析成功；未执行仓库软件。已再次读取固定commit URL，与本地文件逐字节一致、SHA256一致，核验命令退出0。",
+    "size_if_verified": "149863 bytes；90个反应、30个sample×target组合、88个Cq；每反应61个扩增数据点。",
+    "usable_for": [
+      "RDML解包/ID引用/孔位映射/样本与靶标角色导入，以及输出为首版所需typed table",
+      "逐孔Cq到技术重复表、缺失状态、原始曲线查看、批次报表与来源追踪",
+      "有显式演练配置时走相对表达计算链：指定参照sample、选定reference target、提供E及聚合规则；演练配置不得冒充原始实验证据",
+      "异常接管反例：R-HCtrl13×GusBP1的3孔中2孔缺Cq，禁止零填充或静默仍称3个有效重复",
+      "人工修改参照/内参/孔排除后按依赖重算，验证撤销与历史结果不覆盖"
+    ],
+    "not_sufficient_for": [
+      "所有target的amplificationEfficiency字段缺失，不能默认为E=2；无标准稀释系列可直接核定效率",
+      "3个ref角色不等于在该处理条件下已经验证稳定；不能自动平均所有内参后声称方法有效",
+      "全部calibratorSample=false；R-HCtrl13描述为scrambled control，但正式参照选择及适用比较必须通过设计配置明确",
+      "描述中的R-HCtrl13是morpholino对照，R-dsH18是siRNA处理；不能据样本名自动认定该对照也适用于siRNA比较，未核实其匹配对照设计",
+      "每个sample×target有3孔，是同sample ID的技术重复；不能计为3个独立生物重复，也未核实独立动物/批次数或配对设计",
+      "88个现有Cq范围19.1629499749496–59.1107795493579；存在很晚Cq及技术重复离散，数值存在不表示科学合格，不自行编造阈值或删孔",
+      "没有独立相对表达真值、预定科学容差或产品科学放行证据；没有依据本文件声明方法准确率",
+      "本轮只做ZIP/XML结构解析，未做完整XSD验证、曲线重算、效能测量或产品导入验收"
+    ],
+    "split_unit": "保留同一sample的全部targets、技术孔及对应曲线在同一分区；本文件仅一个run，建议整体作为开发/回归样例，另取独立实验run/生物来源做holdout，不从90孔随机拆出独立科学验证集。",
+    "evidence_note": "2017-06-12论文明确引用rpa.rdml；RDML内部dateMade为2013-04-22，dateUpdated为2013-04-30，不等同发布日期。当前本地原始文件SHA256=d77d72b962c94449d2844a071501d2ae920722f4a8816a967a49495a10eb4880。源码仓库currentOid=fe484d11594735cfe2d65dcbcc1f58f9315a849b。孔位依据RDML1.2官方schema的行优先规则。已实际读取论文、README、LICENSE、原始RDML、官方schema；API请求曾403，uv启动曾缓存权限失败，改用已有venv后完成只读解析。",
+    "local_file": ".local/deliveries/B-007/development-samples/rpa.rdml",
+    "local_verification": ".local/deliveries/B-007/development-samples/rpa-source-verification.json",
+    "sha256": "d77d72b962c94449d2844a071501d2ae920722f4a8816a967a49495a10eb4880",
+    "accessed": "2026-10-31",
+    "paper_url": "https://link.springer.com/article/10.1186/s13104-017-2533-9",
+    "schema_url": "https://github.com/RDML-consortium/rdml-schema/blob/main/RDML_v1_2_REC.xsd",
+    "repository_license_url": "https://raw.githubusercontent.com/ramiromagno/rdml/master/LICENSE"
+  }
+]

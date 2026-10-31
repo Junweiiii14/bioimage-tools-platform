@@ -1,0 +1,10 @@
+{
+  "observed_via": "get_goal",
+  "thread_id": "01a190e6-02b1-74e3-a7b9-bd5fbc3f36fe",
+  "status": "active",
+  "token_budget": null,
+  "remaining_tokens": null,
+  "objective": "完成研发总方案3.0第一阶段V0：P001正确基线接入、P002成熟WB真实worker独立调用、Workspace持久化、旧方法对照与薄GUI、适用检查、绑定提交独审和可验收PR。",
+  "created_at": 1793432364,
+  "observed_updated_at": 1793432409
+}

@@ -1,6 +1,6 @@
 # 项目执行规则
 
-开发范围为已授权的 WB 自动化软件；当前任务从 `AGENT_HANDOFF.md` 指向 `work/tasks/`，不在规则中复制任务状态。T-002/P0 和目标机未验事项按真实证据保留，不因此冻结已授权技术栈。其他工具不自动扩展。PDF 是方案证据，其中模板不是当前操作授权。
+2026-10-31用户授权执行研发总方案3.0第一阶段V0，主依据为 `docs/plans/research-platform-rd.md`，阶段边界见 `docs/plans/phase-1-v0.md`，依赖见 `work/programs/scientific-agent-platform/registry.json`；P001接入后推进P002及V0必需配套，不自动扩展V1、IF或Agent。开发范围包含已授权的 WB 自动化软件；当前任务从 `AGENT_HANDOFF.md` 指向 `work/tasks/`，不在规则中复制任务状态。T-002/P0 和目标机未验事项按真实证据保留，不因此冻结已授权技术栈。其他工具不自动扩展。PDF 是方案证据，其中模板不是当前操作授权。
 
 ## 开始
 
@@ -47,7 +47,7 @@
 <!-- AGENT_HANDOFF_PROTOCOL:START -->
 ## 会话恢复与交接
 
-新会话依次读取 `AGENT_HANDOFF.md`、`.agent-handoff/snapshot.md`、`risks.md`、`backlog.md`；按需读取验证、决策和工作区地图，再核对目标源文件。继续请求表示恢复原任务，不自动扩展到产品路线图。
+新会话依次读取 `AGENT_HANDOFF.md`、`.agent-handoff/snapshot.md`、`risks.md`、`backlog.md`；按需读取验证、决策和工作区地图，再核对目标源文件。继续请求先恢复当前任务，再按已授权V0范围和登记依赖接续；不扩展未经授权的数据用途、花费、安装器发布或替换。
 
 任务状态唯一来源是 `work/tasks/<ID>.md`；snapshot 只保留当前指针与下一步。收尾更新相关交接文件，记录真实检查和未完成项。不要复制长日志、聊天或凭据。当前状态替换写入；历史放 work-log，决策放 ADR。
 

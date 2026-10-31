@@ -1,0 +1,36 @@
+[
+  {
+    "dataset_id": "BBBC005v1",
+    "scenes": ["nuclei_count", "cell_count", "IF_intensity"],
+    "title": "Synthetic cells with foreground and count ground truth",
+    "landing_url": "https://bbbc.broadinstitute.org/BBBC005",
+    "download_url": "https://data.broadinstitute.org/bbbc/BBBC005/BBBC005_v1_images.zip",
+    "format": "Synthetic 8-bit TIFF, 696 × 520; cell-body and nuclear channels; foreground masks in separate ZIP",
+    "annotations": "19,200 synthetic images. Counts encoded by filenames; 1,200 F1 in-focus foreground masks. Foreground is binary, not per-cell instance labels.",
+    "license": "Source explicitly waives copyright by Anne Carpenter; retain source attribution and record of waiver.",
+    "license_url": "https://bbbc.broadinstitute.org/BBBC005",
+    "access_status": "2026-10-31 official page and ZIP endpoint checked; application/zip recognized. Images not downloaded or decoded.",
+    "size_if_verified": "Official image ZIP 1.8 GB; ground-truth ZIP 12 MB",
+    "usable_for": ["Deterministic count and foreground fixtures", "Focus-degradation and channel-pairing engineering", "Known synthetic transformations and ROI bookkeeping"],
+    "not_sufficient_for": ["Real-cell boundary generalization", "Instance-label truth", "Real fluorescence accuracy", "Independent laboratory validation"],
+    "split_unit": "Underlying generated scene/seed; keep nuclear/cell channels, focus levels and all derivatives of the same scene in one split. Recover source grouping before splitting filenames.",
+    "evidence_note": "Ground truth: https://data.broadinstitute.org/bbbc/BBBC005/BBBC005_v1_ground_truth.zip . Count truth does not imply real-intensity truth. Source descriptions verified; archive inventory not inspected."
+  },
+  {
+    "dataset_id": "BBBC022v1",
+    "scenes": ["IF_intensity", "cell_count", "nuclei_count"],
+    "title": "Real U2OS Cell Painting multichannel images",
+    "landing_url": "https://bbbc.broadinstitute.org/BBBC022",
+    "download_url": "https://data.broadinstitute.org/bbbc/BBBC022/BBBC022_v1_images_urls.txt",
+    "format": "16-bit TIFF; five channels; 20×; 0.656 μm/pixel; plate/well/site metadata CSV",
+    "annotations": "20 plates × 384 wells × 9 sites = 69,120 fields and 345,600 channel images by source design. No independent whole-cell instance masks on the source page. BBBC039 is a nuclear subset of this collection.",
+    "license": "Source explicitly waives copyright by Anne Carpenter; retain source attribution and record of waiver.",
+    "license_url": "https://bbbc.broadinstitute.org/BBBC022",
+    "access_status": "2026-10-31 official page and 100-line image URL list read; first actual archive endpoint recognized as ZIP. No full images downloaded or decoded.",
+    "size_if_verified": "345,600 images is source-derived; total compressed size unknown. Metadata CSV listed as 35 MB.",
+    "usable_for": ["Real multichannel import and sample/field relationships", "Whole-cell algorithm development input after a separately annotated permitted subset is created", "Channel-specific previews and object/intensity linkage", "Plate and batch lineage tests"],
+    "not_sufficient_for": ["Ready-made independent whole-cell segmentation benchmark", "Absolute fluorescence ground truth", "Independence from BBBC039 or pretrained-model data"],
+    "split_unit": "Plate/batch and biological source where available; group all channels/sites/derivatives by well. Audit cross-record overlap with BBBC039 before combining datasets.",
+    "evidence_note": "First actual archive: https://data.broadinstitute.org/bbbc/BBBC022/BBBC022_v1_images_20585w1.zip . Channels: Hoechst, con A, SYTO14, WGA+phalloidin, MitoTracker. Only sample relevant plates; do not download all archives by default."
+  }
+]

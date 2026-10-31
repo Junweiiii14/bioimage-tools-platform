@@ -26,3 +26,7 @@
 成员采用 `pyproject.toml + src/<import_name>/ + tests/`，公开 `api.py` 无初始化副作用。工具内 `domain/` 为纯数值与身份，`application/` 为用例与端口，`adapters/` 为 I/O，`ui/` 为视图与交互。新增产品包必须补 workspace members、本地图、`tooling/boundaries.py`、import-linter 和独立 wheel 安装测试，不能只添目录。
 
 `desktop_sdk`、`imaging_core`、`imaging_ui`、IF/IHC 等旧规划不表示已实现或当前授权；只有真实复用需求和明确任务才创建。逐阶段演进与旧版本描述完整保留在 [整理前模块地图](archive/module-map-before-T082.md)，查历史兼容原因时再读。
+
+## V0研发接续
+
+设计主依据为[研发总方案3.0](plans/research-platform-rd.md)，本轮只实施[第一阶段V0](plans/phase-1-v0.md)。任务及依赖入口在[登记表](../work/programs/scientific-agent-platform/registry.json)，状态仅在P任务卡。现有四包、当前worker/Workspace和最新T082治理保留；设计中的新接口尚未实现。

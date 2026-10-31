@@ -1,6 +1,8 @@
 # 生物图像工具平台
 
-当前开发任务：[T082 可靠性与可维护性整改](work/tasks/T-082-reliability-remediation.md) → [交接索引](AGENT_HANDOFF.md)。最近已交付实验室安装包及其实际验收：[T081 R2 交付记录](work/evidence/T-081/final-delivery.md)；本轮已构建并完成本机可弃安装验收，见 [T082 本地交接](work/evidence/T-082/final-handoff.md)。冻结源码、验收包与交接提交分别记录，未替换在用实验室版本。
+[研发总方案3.0与HTML](docs/plans/README.md) · [第一阶段V0](docs/plans/phase-1-v0.md) · [公开开发数据](docs/plans/development-data.md) · [任务依赖](work/programs/scientific-agent-platform/README.md)。本轮范围为成熟WB用例独立运行与真实成果对照；规划不表示实现、科学准入或安装器发布。
+
+当前开发任务：[P001 正确基线接入](work/tasks/P-001-platform-baseline-adoption.md) → [交接索引](AGENT_HANDOFF.md)。最近已交付实验室安装包及其实际验收：[T081 R2 交付记录](work/evidence/T-081/final-delivery.md)；本轮已构建并完成本机可弃安装验收，见 [T082 本地交接](work/evidence/T-082/final-handoff.md)。冻结源码、验收包与交接提交分别记录，未替换在用实验室版本。
 
 历史版本及证据保留，旧检查不作为本轮通过证明。实验室发行的实际安装验证、源码集成和目标机限制以T081记录为准；科学留出、干净Win10与物理DPI验收另列。开发范围保持WB，IF/IHC不自动扩展。
 

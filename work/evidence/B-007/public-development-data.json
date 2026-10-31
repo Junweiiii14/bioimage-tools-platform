@@ -1,0 +1,530 @@
+{
+  "schema_version": 1,
+  "catalog_version": "2026-10-31-B007",
+  "scope": "Development source discovery and file checks, not product/scientific admission.",
+  "records": [
+    {
+      "dataset_id": "IOCBIO-Gel-2023-Additional-file-1",
+      "scenes": [
+        "wb"
+      ],
+      "title": "Gel membrane images used for testing IOCBIO Gel",
+      "landing_url": "https://link.springer.com/article/10.1186/s12915-023-01734-8",
+      "download_url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1186%2Fs12915-023-01734-8/MediaObjects/12915_2023_1734_MOESM1_ESM.zip",
+      "format": "ZIP archive; internal image format and bit depth unknown without inspecting archive",
+      "annotations": "Article identifies paired membrane images for Ponceau, GAPDH and LTCC; filenames encode gel number and signal. Independent per-band ROI or intensity ground truth unknown.",
+      "license": "Publisher states CC0 applies to article data unless an individual credit line says otherwise; article text/images CC BY 4.0. Archive-specific notices not inspected. Software GPLv3 is a separate license.",
+      "license_url": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "access_status": "Publisher record and supplement download link accessed 2026-10-31; endpoint returned application/octet-stream unsupported by web reader; archive not downloaded or inspected.",
+      "size_if_verified": "unknown archive size and internal file count; article comparison refers to three membranes, not a verified archive inventory",
+      "usable_for": [
+        "Candidate paired-membrane import and lane identity tests after archive inspection",
+        "Candidate ROI/background and target/total-protein workflow development",
+        "Comparison protocol design for method differences"
+      ],
+      "not_sufficient_for": [
+        "Verified native bit-depth quantitative accuracy",
+        "Independent automatic-angle reference",
+        "Instrument linearity or saturation recovery",
+        "Automatic scientific admission",
+        "Immediate commercial redistribution before archive-specific notices are checked"
+      ],
+      "split_unit": "Physical membrane/gel and biological experiment; keep all proteins, stain images, crops, exposures and derived rotations of the same membrane in one partition; only three reported membranes cannot establish broad independent generalization.",
+      "evidence_note": "2026-10-31 read publisher article dated 2023-10-20, Supplementary Information and Rights sections. Do not replace source membrane data with Figure 3 graphics. No image files downloaded. PMC mirror browser check failed; publisher text was readable.",
+      "verified_date": "2026-10-31"
+    },
+    {
+      "dataset_id": "zenodo.22092552-v2",
+      "scenes": [
+        "wb"
+      ],
+      "title": "Western blot raw data — Devin Clegg",
+      "landing_url": "https://zenodo.org/records/22092552",
+      "download_url": "https://zenodo.org/records/22092552/files/Westerns%20Raw%20Data.zip?download=1",
+      "format": "ZIP; actual archive preview lists TIFF including some .raw16.tif filenames and at least one JPEG; pixel dtype, acquisition bit depth and uncropped status unknown",
+      "annotations": "Archive folders include figure identifiers and numbered repeats, protein names, colorimetric/chemiluminescence variants and total-protein/Ponceau files; formal lane/sample map, ROI and angle ground truth unknown.",
+      "license": "CC BY 4.0 explicitly declared in official record HTML rights metadata and license-link, checked 2026-10-31. Archive-specific notices not inspected.",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",
+      "access_status": "Record and ZIP directory preview read; official HTML license metadata independently checked via ordinary HTTPS. ZIP not downloaded/decoded; still requires pixel/provenance inspection.",
+      "size_if_verified": "491.9 MB archive; record checksum md5:4452ad040602610f7788615681574556; total internal image count unknown",
+      "usable_for": [
+        "Candidate multi-protein and multi-exposure WB development fixtures under CC BY 4.0 after archive inspection",
+        "Metadata and file-identity mapping now"
+      ],
+      "not_sufficient_for": [
+        "Native quantitative pixel provenance",
+        "Using JPEG/colorimetric derivatives as chemiluminescence raw data",
+        "Independent quantitative or auto-angle validation",
+        "Archive redistribution without retaining attribution and inspecting any item-specific notices"
+      ],
+      "split_unit": "Biological experiment and physical membrane; keep same membrane's protein channels, exposures, crops, colorimetric views and total-protein images together. Do not split by archive filename or figure folder alone until lineage is verified.",
+      "evidence_note": "Version v2 publication 2026-08-25; technical created/modified date 2026-08-26. Earlier v1 is zenodo.21110406 (461.3 MB), not a second independent dataset. Preview URL https://zenodo.org/records/22092552/preview/Westerns%20Raw%20Data.zip?include_deleted=0 was actually read. The suffix raw16 is a filename clue, not a dtype inspection. Text-only web extraction omitted license value; ordinary HTTPS HTML rights and JSON-LD explicitly state CC BY 4.0, evidenced by license-html-probe.json.",
+      "verified_date": "2026-10-31"
+    },
+    {
+      "dataset_id": "BBBC014v1",
+      "scenes": [
+        "if_intensity"
+      ],
+      "title": "Human MCF7 and A549 cells cytoplasm–nucleus translocation",
+      "landing_url": "https://bbbc.broadinstitute.org/BBBC014",
+      "download_url": "https://data.broadinstitute.org/bbbc/BBBC014/BBBC014_v1_images.zip",
+      "format": "8-bit BMP; 1360x1024 pixels; paired DAPI/FITC images; plate map XLS and TXT",
+      "annotations": "96-well plate map: 12 concentration points and four replicate rows for each cell type. Biological condition labels, not independent pixel masks or calibrated fluorescence truth.",
+      "license": "CC BY 3.0 Unported, attributed to Ilya Ravkin",
+      "license_url": "https://creativecommons.org/licenses/by/3.0/",
+      "access_status": "Record, license deed and actual ZIP endpoint accessed 2026-10-31; endpoint recognized application/zip, not downloaded or decoded.",
+      "size_if_verified": "Image ZIP 121 MB; 96 wells, one field and two channel images per well per description; 192 images is a description-derived expectation, not archive inventory; plate map XLS 22 kB",
+      "usable_for": [
+        "Dual-channel pairing and plate-map import",
+        "Region-to-target intensity pipeline engineering",
+        "Dose/group and technical-replicate aggregation",
+        "Detection/measurement/display separation fixtures"
+      ],
+      "not_sufficient_for": [
+        "Absolute fluorescence calibration or accuracy tolerance",
+        "Independent cell/nuclear boundary truth",
+        "16-bit or OME metadata reader verification",
+        "Proof that a treatment trend guarantees correct segmentation or normalization"
+      ],
+      "split_unit": "Well is the minimum grouping; keep paired channels and all derived crops together. Partition wells/condition groups deliberately; single-plate data cannot establish cross-batch or cross-laboratory holdout performance.",
+      "evidence_note": "Version 1; record publication date unknown. Read 2026-10-31. BMP needs an explicitly tested lossless import adapter; do not pretend it is already within TIFF-only release scope. Plate map https://data.broadinstitute.org/bbbc/BBBC014/BBBC014_v1_platemap.xls is exposed by actual record link.",
+      "verified_date": "2026-10-31"
+    },
+    {
+      "dataset_id": "BBBC006v1",
+      "scenes": [
+        "if_intensity",
+        "nuclei_count"
+      ],
+      "title": "Human U2OS cells (out of focus)",
+      "landing_url": "https://bbbc.broadinstitute.org/BBBC006",
+      "download_url": "https://data.broadinstitute.org/bbbc/BBBC006/BBBC006_v1_images_z_16.zip",
+      "format": "16-bit LZW-compressed TIF, 696x520; w1 Hoechst and w2 phalloidin; z plane archives; CSV counts and PNG labels",
+      "annotations": "Expert in/out-of-focus classification; nuclear labels and counts generated by CellProfiler/Otsu rather than independent manual instance annotations.",
+      "license": "Record states Anne Carpenter waived all copyright and related/neighbouring rights to images and ground truth to extent possible under law; no separate deed URL exposed in reviewed text",
+      "license_url": null,
+      "access_status": "Record and z16 ZIP endpoint accessed 2026-10-31; endpoint recognized application/zip; no download or image inspection.",
+      "size_if_verified": "z16 image ZIP 800 MB; record describes 384 wells x 2 sites = 768 fields. Total planes/files unresolved: prose says 32 image sets while download list shows z00-z33; do not multiply into an asserted total.",
+      "usable_for": [
+        "16-bit paired-channel intake engineering",
+        "Focus QC and exclusion branch development",
+        "Testing focus-dependent failures in IF and counting",
+        "Reproduction of an algorithm-generated reference baseline with explicit provenance"
+      ],
+      "not_sufficient_for": [
+        "Independent human count/segmentation truth",
+        "Absolute fluorescence accuracy",
+        "Automatic z projection as a supported 2D method",
+        "Cross-plate performance from one plate"
+      ],
+      "split_unit": "Well/site acquisition stack; keep all z planes, both channels and derivatives of the same field together, preferably group by well. Never split adjacent z planes between tuning and holdout.",
+      "evidence_note": "Version 1; publication date unknown. Read 2026-10-31. z16 selected only because record declares optimal focus; z11-z23 are expert-classified in-focus. First download should be one approved subset, not all roughly 800 MB archives.",
+      "verified_date": "2026-10-31"
+    },
+    {
+      "dataset_id": "BBBC039v1",
+      "scenes": [
+        "nuclei_count"
+      ],
+      "title": "Nuclei of U2OS cells in a chemical screen",
+      "landing_url": "https://bbbc.broadinstitute.org/BBBC039",
+      "download_url": "https://data.broadinstitute.org/bbbc/BBBC039/images.zip",
+      "format": "16-bit TIFF, 520x696; color-encoded PNG instance masks; metadata ZIP with train/validation/test lists",
+      "annotations": "Approximately 23000 manually annotated nuclear instances across 200 fields; touching instances use different colors requiring correct mask decoding.",
+      "license": "CC0 explicitly stated by record",
+      "license_url": null,
+      "access_status": "Official record and download endpoints checked. Metadata ZIP (17,816 bytes) and masks ZIP (2,753,811 bytes) downloaded and archive directories inspected; image ZIP not downloaded. SHA-256 recorded in sample-download-verification.json.",
+      "size_if_verified": "200 fields, one DNA-channel field per compound; images.zip 77.9 MB, masks.zip 2.8 MB, metadata.zip 18 KB",
+      "usable_for": [
+        "Nuclear instance segmentation and counting",
+        "Touching-nucleus split/merge error analysis",
+        "16-bit reader and labeled-mask conversion",
+        "Reference train/validation/test protocol"
+      ],
+      "not_sufficient_for": [
+        "Whole-cell boundaries or cell count",
+        "Independent biomarker intensity calibration",
+        "Cross-laboratory generalization",
+        "Untouched holdout if pretrained model or earlier tuning already used these images"
+      ],
+      "split_unit": "Respect provided train/validation/test lists; keep each field and all crops/augmentations together. Audit overlap with BBBC038 and source BBBC022, and pretrained-model exposure before calling test independent.",
+      "evidence_note": "Version 1; cited dataset work 2018; page publication date unknown. Read 2026-10-31. Actual metadata endpoint https://data.broadinstitute.org/bbbc/BBBC039/metadata.zip. Masks download link is present on landing page; archive decoding not yet tested.",
+      "verified_date": "2026-10-31"
+    },
+    {
+      "dataset_id": "S-BIAD634",
+      "scenes": [
+        "nuclei_count"
+      ],
+      "title": "An annotated fluorescence image dataset for training nuclear segmentation methods",
+      "landing_url": "https://uk1s3.embassy.ebi.ac.uk/bia-integrator-data/pages/S-BIAD634.html",
+      "download_url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/rawimages/Neuroblastoma_0.tif",
+      "format": "Raw .tif and ground-truth .tif/.svg plus .png/.jpg visualizations; raw-image dtype and bit depth unknown without decoding One verified file is 8-bit grayscale; do not generalize its encoding to entire dataset.",
+      "annotations": "79 expert-annotated fluorescence images, 7813 nuclei, heterogeneous tissue/cell-line and preparation origins; raw images, per-instance and visualization files are distinct.",
+      "license": "CC0 stated by archive record",
+      "license_url": null,
+      "access_status": "Official record checked; one raw TIFF Neuroblastoma_0.tif downloaded (1,311,278 bytes) and fully decoded by Pillow: 1280×1024, L (8-bit grayscale), one frame, range 3..227. Corresponding label not downloaded; full study not downloaded.",
+      "size_if_verified": "Record study size 472.2 MiB, 468 files, 388 image-type entries; these include derived labels/visualizations, not 388 independent raw specimens. Selected TIFF listed 1.3 MiB.",
+      "usable_for": [
+        "Heterogeneous nuclear segmentation and count stress cases",
+        "Annotation/instance-mask import",
+        "Potential external nuclear holdout after lineage and model-exposure audit"
+      ],
+      "not_sufficient_for": [
+        "Whole-cell counting",
+        "Absolute fluorescence intensity validation",
+        "Treating derivative visualizations as raw intensity data",
+        "Independent patient holdout based only on random image names"
+      ],
+      "split_unit": "Patient/specimen, cell line/preparation and acquisition group where metadata allow; all fields, raw/label pairs and derivatives from a specimen remain together. Missing patient identity prevents claiming patient-independent holdout.",
+      "evidence_note": "Archive release 2023-03-07. Record describes 79 original images despite 388 image entries. Related original BioStudies S-BSST265 dynamic page returned only Loading; do not count it as a separately validated dataset. Download URL is a real clicked record link, not constructed.",
+      "verified_date": "2026-10-31"
+    },
+    {
+      "dataset_id": "BBBC020v1",
+      "scenes": [
+        "cell_count",
+        "nuclei_count"
+      ],
+      "title": "Murine bone-marrow derived macrophages",
+      "landing_url": "https://bbbc.broadinstitute.org/BBBC020",
+      "download_url": "https://data.broadinstitute.org/bbbc/BBBC020/BBBC020_v1_images.zip",
+      "format": "25 image sets: DAPI, CD11b/APC and merged view; individual outline filenames end .tif; raw format/bit depth not verified",
+      "annotations": "Per-cell and per-nucleus outlines; border-crossing and strongly overlapping/blurred objects intentionally excluded. Official page warns nuclear-outline archive is incomplete.",
+      "license": "CC BY-NC-SA 3.0 Unported; non-commercial restriction makes this a reference-only lead pending separate authorization for this commercial project",
+      "license_url": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+      "access_status": "Official record, linked license deed and actual ZIP endpoint accessed 2026-10-31; endpoint recognized application/zip; no archive downloaded and not approved for project training/development/redistribution.",
+      "size_if_verified": "25 image sets; listed images ZIP 92 MB, nuclei outlines 2.0 MB, cell outlines 1.7 MB",
+      "usable_for": [
+        "Public metadata review of whole-cell benchmark requirements and missing-label failure cases"
+      ],
+      "not_sufficient_for": [
+        "Authorized commercial-project data use without additional permission",
+        "Complete count truth for all visible objects",
+        "Treating unannotated border/blur objects as false positives",
+        "General whole-cell model validation"
+      ],
+      "split_unit": "Biological preparation/mouse and acquisition field, preserving all channels and object outlines; grouping identity unknown until metadata inspection. No split/use planned before rights clearance.",
+      "evidence_note": "Version 1, source experiment cited 2012, page publication date unknown. Read 2026-10-31. Listed to make a genuine full-cell data gap visible; it does not fill the commercial whole-cell admission gate.",
+      "verified_date": "2026-10-31"
+    },
+    {
+      "dataset_id": "BBBC005v1",
+      "scenes": [
+        "nuclei_count",
+        "cell_count",
+        "if_intensity"
+      ],
+      "title": "Synthetic cells with foreground and count ground truth",
+      "landing_url": "https://bbbc.broadinstitute.org/BBBC005",
+      "download_url": "https://data.broadinstitute.org/bbbc/BBBC005/BBBC005_v1_images.zip",
+      "format": "Synthetic 8-bit TIFF, 696 × 520; cell-body and nuclear channels; foreground masks in separate ZIP",
+      "annotations": "19,200 synthetic images. Counts encoded by filenames; 1,200 F1 in-focus foreground masks. Foreground is binary, not per-cell instance labels.",
+      "license": "Source explicitly waives copyright by Anne Carpenter; retain source attribution and record of waiver.",
+      "license_url": "https://bbbc.broadinstitute.org/BBBC005",
+      "access_status": "2026-10-31 official page and ZIP endpoint checked; application/zip recognized. Images not downloaded or decoded.",
+      "size_if_verified": "Official image ZIP 1.8 GB; ground-truth ZIP 12 MB",
+      "usable_for": [
+        "Deterministic count and foreground fixtures",
+        "Focus-degradation and channel-pairing engineering",
+        "Known synthetic transformations and ROI bookkeeping"
+      ],
+      "not_sufficient_for": [
+        "Real-cell boundary generalization",
+        "Instance-label truth",
+        "Real fluorescence accuracy",
+        "Independent laboratory validation"
+      ],
+      "split_unit": "Underlying generated scene/seed; keep nuclear/cell channels, focus levels and all derivatives of the same scene in one split. Recover source grouping before splitting filenames.",
+      "evidence_note": "Ground truth: https://data.broadinstitute.org/bbbc/BBBC005/BBBC005_v1_ground_truth.zip . Count truth does not imply real-intensity truth. Source descriptions verified; archive inventory not inspected.",
+      "verified_date": "2026-10-31"
+    },
+    {
+      "dataset_id": "BBBC022v1",
+      "scenes": [
+        "if_intensity",
+        "cell_count",
+        "nuclei_count"
+      ],
+      "title": "Real U2OS Cell Painting multichannel images",
+      "landing_url": "https://bbbc.broadinstitute.org/BBBC022",
+      "download_url": "https://data.broadinstitute.org/bbbc/BBBC022/BBBC022_v1_images_urls.txt",
+      "format": "16-bit TIFF; five channels; 20×; 0.656 μm/pixel; plate/well/site metadata CSV",
+      "annotations": "20 plates × 384 wells × 9 sites = 69,120 fields and 345,600 channel images by source design. No independent whole-cell instance masks on the source page. BBBC039 is a nuclear subset of this collection.",
+      "license": "Source explicitly waives copyright by Anne Carpenter; retain source attribution and record of waiver.",
+      "license_url": "https://bbbc.broadinstitute.org/BBBC022",
+      "access_status": "2026-10-31 official page and 100-line image URL list read; first actual archive endpoint recognized as ZIP. No full images downloaded or decoded.",
+      "size_if_verified": "345,600 images is source-derived; total compressed size unknown. Metadata CSV listed as 35 MB.",
+      "usable_for": [
+        "Real multichannel import and sample/field relationships",
+        "Whole-cell algorithm development input after a separately annotated permitted subset is created",
+        "Channel-specific previews and object/intensity linkage",
+        "Plate and batch lineage tests"
+      ],
+      "not_sufficient_for": [
+        "Ready-made independent whole-cell segmentation benchmark",
+        "Absolute fluorescence ground truth",
+        "Independence from BBBC039 or pretrained-model data"
+      ],
+      "split_unit": "Plate/batch and biological source where available; group all channels/sites/derivatives by well. Audit cross-record overlap with BBBC039 before combining datasets.",
+      "evidence_note": "First actual archive: https://data.broadinstitute.org/bbbc/BBBC022/BBBC022_v1_images_20585w1.zip . Channels: Hoechst, con A, SYTO14, WGA+phalloidin, MitoTracker. Only sample relevant plates; do not download all archives by default.",
+      "verified_date": "2026-10-31"
+    },
+    {
+      "dataset_id": "ASSAY-COLONY-ZENODO-4593510",
+      "scenes": [
+        "colony"
+      ],
+      "title": "Cell Colony Image Segmentation Dataset 1 for T-47D Breast Cancer Cells, v1",
+      "landing_url": "https://zenodo.org/records/4593510",
+      "download_url": "https://zenodo.org/records/4593510/files/Dataset1_T47D.zip?download=1",
+      "format": "ZIP containing scanner RGB images; record states 2125×2985, 48-bit, 1200 dpi; exact image extension unknown until archive inspection; separate TXT colony-coordinate files",
+      "annotations": "16 stained culture-flask images; three trained observers plus an additional microscopy-based reference observer; colony XY coordinates, criterion >50 cells; pixel masks unknown",
+      "license": "CC BY 4.0 explicitly declared in original Zenodo HTML rights metadata, license link and JSON-LD; archive-level exceptions not inspected",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",
+      "access_status": "2026-10-31: record and named file list read; public download link discovered; binary fetch returned cache miss; archive not downloaded or decoded",
+      "size_if_verified": "Dataset1_T47D.zip 479.0 MB, as stated by Zenodo; MD5 1d45b5a3bd7c50c80e628ab4cb664445",
+      "usable_for": [
+        "candidate scanner-image reader and spatial-coordinate checks after file verification",
+        "colony-count agreement against observer coordinate lists",
+        "dense/sparse colony error inspection"
+      ],
+      "not_sufficient_for": [
+        "multiwell plate localization benchmark",
+        "pixel-level colony-area ground truth",
+        "validated clonogenic survival endpoint without seeding/control identities",
+        "redistribution without attribution or checking any file-specific exceptions"
+      ],
+      "split_unit": "whole flask and acquisition/experiment date; all crops and observer labels of the same flask remain in one split; 16 images are not 16 proven independent experiments",
+      "evidence_note": "Original Zenodo record dated 2021-03-10 read on 2026-10-31. Web text extraction initially omitted license; root agent's direct original-HTML probe verified explicit CC BY 4.0, evidence work/evidence/B-007/license-html-probe.json. License is not inferred from defaults. ColonyArea author's old B2SHARE sample record 39fa39965b314f658e4a198a78d7f6b5 returned 404 and is not counted as available. Scientific method: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0092444",
+      "verified_date": "2026-10-31"
+    },
+    {
+      "dataset_id": "ASSAY-SCRATCH-ZENODO-21779854-V2",
+      "scenes": [
+        "scratch"
+      ],
+      "title": "Scratch Assay Segmentation dataset, v2.0.0",
+      "landing_url": "https://zenodo.org/records/21779854",
+      "download_url": "https://zenodo.org/records/21779854/files/dataset.zip",
+      "format": "ZIP; PNG images, COCO JSON and YOLO polygon TXT labels, acquisition/split CSV mappings; author states 1363 images, including 1248 native 2452×2056 and 115 available as 640×640 exports",
+      "annotations": "Author reports 1350 wound-gap polygons across 1213 images and 150 closed-wound negative images; HUVEC 1030, SKOV-3 333; train/val/test 932/197/234",
+      "license": "CC BY 4.0 for images and COCO annotations according to the author's dataset README; model weights and code have separate licenses, including AGPL-3.0 for Ultralytics-dependent parts",
+      "license_url": "https://github.com/nykemariotto/scratch-assay-segmentation/blob/main/LICENSE-CC-BY-4.0.txt",
+      "access_status": "2026-10-31: author repository and dataset README read, including exact wget URL; direct Zenodo v2 page inaccessible to this web tool; large archive not downloaded; author repository also advertises four small annotated examples, not locally fetched",
+      "size_if_verified": "3.7 GB, author README declaration; HTTP content length and archive checksum unknown",
+      "usable_for": [
+        "candidate wound-gap segmentation and closed-gap negative-case development",
+        "acquisition-group split reproducibility",
+        "native-resolution versus resized-image robustness tests",
+        "time-pair workflow if mapping metadata confirms matched acquisition identities"
+      ],
+      "not_sufficient_for": [
+        "external laboratory or instrument generalization",
+        "proof of causal migration rather than proliferation",
+        "automatic drift correction accuracy without registration truth",
+        "permission to use AGPL model weights under an unrelated MIT badge"
+      ],
+      "split_unit": "preserve author split_key across all timepoints/crops; 265 physical field group_key values conservatively merged into 246 split_key values; additionally group by well/plate/experiment/donor when those identities are available",
+      "evidence_note": "Primary detailed source: https://github.com/nykemariotto/scratch-assay-segmentation/blob/main/dataset/README.md, read 2026-10-31. v1 DOI 10.5281/zenodo.20298130 is explicitly superseded due to image-level leakage and must not be used. v2 archive endpoint is author-declared, not independently downloaded. Manuscript described as submitted in 2026, not verified as peer reviewed. Current main must be pinned to a commit before ingestion.",
+      "verified_date": "2026-10-31"
+    },
+    {
+      "dataset_id": "ASSAY-QPCR-PCRedux-RAS002-1.1-2",
+      "scenes": [
+        "qpcr"
+      ],
+      "title": "PCRedux 1.1-2 archived package: RAS002 amplification curves and RAS002_decisions",
+      "landing_url": "https://zenodo.org/records/7009124",
+      "download_url": "https://zenodo.org/records/7009124/files/PCRedux-1.1-2.tar.gz?download=1",
+      "format": "versioned TAR.GZ R package; RAS002 R data object derived from RAS002.rdml and RAS002_decisions associated with decision_res_RAS002.csv; exact archive member inventory not locally inspected",
+      "annotations": "Amplification-curve class labels; package distinguishes negative, ambiguous and positive curves; complete sample/reference/calibrator/biological-replicate plate design unknown",
+      "license": "archived Zenodo record explicitly declares CC BY 4.0 in original HTML rights metadata/license link/JSON-LD; package code separately declares MIT + file LICENSE; internal file-specific exceptions and original dataset provenance not inspected",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",
+      "access_status": "2026-10-31: archived release page, exact download link and maintainer 1.1-2 reference manual read; binary fetch returned cache miss; no R installation or data decoding performed",
+      "size_if_verified": "8.1 MB archive as stated by Zenodo; MD5 a32c380947b0daa8c8e306ac9e7b27aa; individual dataset size unknown",
+      "usable_for": [
+        "candidate amplification-curve import and graph rendering",
+        "QC classification and ambiguity-state tests",
+        "paired curve/label identity integrity",
+        "Cq/efficiency research only after method-specific admission"
+      ],
+      "not_sufficient_for": [
+        "complete biological relative-expression workflow validation",
+        "reference-gene stability",
+        "approved ddCt calibrator/sample pairing",
+        "all instrument proprietary formats",
+        "clinical assay performance"
+      ],
+      "split_unit": "whole original experiment/plate/sample lineage; keep all cycles, technical replicates and derived curve features together; do not split timepoints of a curve or duplicates from multiple packages",
+      "evidence_note": "Zenodo release published 2022-08-19, DOI 10.5281/zenodo.7009124. Maintainer manual https://pcruniversum.r-universe.dev/PCRedux/doc/manual.html explicitly describes RAS002 and decision_res_RAS002.csv; version 1.1-2, build 2026-10-07. Root direct-HTML license probe is recorded in work/evidence/B-007/license-html-probe.json; web text parser had omitted license. Archive is not inspected, so do not conflate record CC BY with package MIT or assume no internal exceptions. Do not interpret its failure-to-zero helper as an acceptable platform failure policy.",
+      "verified_date": "2026-10-31"
+    },
+    {
+      "dataset_id": "ASSAY-ELISA-ELISAtools-0.1.8-EXTDATA",
+      "scenes": [
+        "elisa"
+      ],
+      "title": "ELISAtools ReleaseV0.1.8 extdata: plate-reader exports, plate annotations and standards",
+      "landing_url": "https://github.com/BULQI/ELISAtools/tree/ReleaseV0.1.8/inst/extdata",
+      "download_url": "https://github.com/BULQI/ELISAtools/raw/refs/heads/ReleaseV0.1.8/inst/extdata/Assay_11_and_12.txt",
+      "format": "TXT package example bundle: design.txt, Assay_2.txt, Assay_3_and_4.txt, Assay_11_and_12.txt, AnExp_2plate.txt, stdConc.txt; plate reader text includes endpoint absorbance 450/620 nm and 96-well coordinates",
+      "annotations": "design.txt specifies three runs across Batch1/Batch2 with 1+2+2 plates; plate map includes standard s1-s8, sample P identifiers and Control; standard concentrations include 3000 through 0, but unit and sample clinical provenance unknown",
+      "license": "repository/package declares MIT; dataset-specific rights and provenance unknown beyond distribution with the package; verify the fixed archive/license before shipping examples",
+      "license_url": "https://github.com/BULQI/ELISAtools/blob/ReleaseV0.1.8/LICENSE.md",
+      "access_status": "2026-10-31: file directory plus design, plate-map, concentration and one reader-export body read; raw data endpoint identified and returned unsupported application/octet-stream to web parser; not downloaded as a bundle",
+      "size_if_verified": "Assay_11_and_12.txt 45.5 KB; design.txt 306 bytes; AnExp_2plate.txt 756 bytes; stdConc.txt 175 bytes, GitHub displayed sizes; total bundle unknown",
+      "usable_for": [
+        "plate reader parsing and role-map linkage",
+        "multi-run/plate identity validation",
+        "standard-curve and inverse-calculation engineering comparison",
+        "exclusion, dilution and fitting-parameter invalidation tests",
+        "batch-aware reporting mechanics"
+      ],
+      "not_sufficient_for": [
+        "certified true unknown-sample concentration",
+        "independent QC-based LLOQ/ULOQ validation",
+        "proof that batch correction is scientifically valid",
+        "all ELISA kit or plate reader formats",
+        "confirmed patient-level independent validation"
+      ],
+      "split_unit": "hold out complete run/batch and keep plates sharing standards/specimens together; sample identity across runs is unknown, so no claim of independent clinical holdout",
+      "evidence_note": "Primary maintainer ReleaseV0.1.8 branch read; design uses 2009-09-18 but actual acquisition provenance is not independently established. These are software-distributed instrument-like plate examples, not merely hand-entered XY standards and not a verified clinical assay dataset. download_url is one file; linked directory contains required design/map/standard companions. Branch is mutable, pin a commit or package archive before implementation.",
+      "verified_date": "2026-10-31"
+    },
+    {
+      "dataset_id": "ASSAY-IHC-OPENSLIDE-OS-2-NDPI",
+      "scenes": [
+        "ihc"
+      ],
+      "title": "OpenSlide Hamamatsu test slide OS-2.ndpi, Ki-67 brightfield",
+      "landing_url": "https://openslide.cs.cmu.edu/download/openslide-testdata/Hamamatsu/index.yaml",
+      "download_url": "https://openslide.cs.cmu.edu/download/openslide-testdata/Hamamatsu/OS-2.ndpi",
+      "format": "Hamamatsu NDPI whole-slide image; source identifies Ki-67 stain, brightfield, circa 2012",
+      "annotations": "No machine-readable positive-cell or tissue-mask reference annotation verified; QuPath tutorial demonstrations are not independently adjudicated ground truth",
+      "license": "source declares Free to use and distribute, with or without modification; index.yaml marks distributable; not relabeled CC0 or QuPath GPL",
+      "license_url": "https://openslide.cs.cmu.edu/download/openslide-testdata/Hamamatsu/",
+      "access_status": "2026-10-31: original file index and YAML metadata read; exact file link returned image/tiff unsupported by web text parser; image not downloaded or decoded",
+      "size_if_verified": "931.42 MB, original file index; published SHA256 10e6d02204bb8466a24f00079f126a5a89aa82cc1f957d2020dbfc7434a9d8b9",
+      "usable_for": [
+        "candidate WSI reader, pyramid and tile-coordinate development",
+        "memory/cancellation engineering tests after download",
+        "Ki-67 stain-view and optional annotation interaction",
+        "constructing a separately reviewed small region reference set"
+      ],
+      "not_sufficient_for": [
+        "validated Ki-67 positive rate",
+        "multi-case or multi-instrument generalization",
+        "clinical diagnosis",
+        "an independent training/test split from one slide"
+      ],
+      "split_unit": "case/specimen/slide, never tiles from one slide across train and holdout; this one-slide example is engineering data, not a scientific holdout",
+      "evidence_note": "Specific file record is in original OpenSlide index.yaml, not a portal substitute. Source https://openslide.cs.cmu.edu/download/openslide-testdata/Hamamatsu/ and QuPath acknowledgements https://qupath.readthedocs.io/en/stable/docs/intro/acknowledgements.html agree on distributability. Retain source wording and attribution record; no extra patient consent or complete labeling evidence inferred.",
+      "verified_date": "2026-10-31"
+    },
+    {
+      "dataset_id": "ASSAY-FLOW-FR-FCM-ZZJ7",
+      "scenes": [
+        "flow"
+      ],
+      "title": "FlowRepository FR-FCM-ZZJ7, GvHD data subset",
+      "landing_url": "https://flowrepository.org/id/FR-FCM-ZZJ7",
+      "download_url": null,
+      "format": "two FCS files GvHD2.fcs and GvHD8.fcs; attachments about.txt and ExampleGate.png",
+      "annotations": "official record maps Individuals P1/P2 to the two FCS files; illustrative gate PNG, no verified machine-readable adjudicated gates; full compensation controls and panel annotations unknown",
+      "license": "unknown: public record access and API test use do not establish commercial redistribution rights",
+      "license_url": null,
+      "access_status": "2026-10-31: official record search index read; direct page returned 502; public Download FCS Files entry indexed and official Bioconductor vignette documents flowRep.get('FR-FCM-ZZJ7') then download; actual binary URL not retrieved; not downloaded",
+      "size_if_verified": "unknown",
+      "usable_for": [
+        "candidate FCS decoder and channel mapping tests when access/license verified",
+        "event identity and hierarchical-gate statistics mechanics",
+        "comparison of table export and selected example gate visualization"
+      ],
+      "not_sufficient_for": [
+        "clinical GvHD classification",
+        "automatic gate ground truth",
+        "validated compensation or spectral unmixing",
+        "broad multi-donor/panel generalization",
+        "commercial example redistribution without license verification"
+      ],
+      "split_unit": "donor/subject and linked longitudinal samples; two example files cannot establish a representative holdout; do not split events of one FCS into train and independent validation",
+      "evidence_note": "Official record describes experiment dates 2002-08-16 to 2002-08-20, deposited March 2015, a small Brinkman et al. 2007 subset explicitly for API/library tests. Official package instructions https://bioconductor.riken.jp/packages/3.13/bioc/vignettes/FlowRepositoryR/inst/doc/HowTo-FlowRepositoryR.pdf name the same ID and files. Access failure retained instead of inventing a download URL.",
+      "verified_date": "2026-10-31"
+    },
+    {
+      "dataset_id": "ASSAY-FLOW-REPOD-JOLWGT-V2-FILE96794",
+      "scenes": [
+        "flow"
+      ],
+      "title": "Flow Cytometry data V2: Fig.3A_Discrimination of PBMC from GSC_Unmixed.fcs",
+      "landing_url": "https://repod.icm.edu.pl/file.xhtml?fileId=96794&version=2.0",
+      "download_url": "https://repod.icm.edu.pl/api/access/datafile/96794",
+      "format": "FCS 3.1 confirmed from actual downloaded 58-byte header; file is named Unmixed; dataset describes 17-color spectral cytometry PBMC/GSC experiments",
+      "annotations": "experiment/file-level descriptions and original FCS metadata; no machine-readable adjudicated event labels or gate truth verified; exact donor identifiers and per-file biological replicate relationships unknown",
+      "license": "CC BY 4.0 explicitly attached to this data file and dataset, not inferred from software license",
+      "license_url": "https://repod.icm.edu.pl/file.xhtml?fileId=96794&version=2.0",
+      "access_status": "2026-10-31: public dataset/file pages and exact download endpoint verified; unauthenticated Windows HTTPS request returned HTTP 200 and 3,870,980 bytes; MD5 matches source; FCS header read, event parser not run; original bytes subsequently saved to .local/deliveries/B-007/development-samples/Fig.3A_Discrimination of PBMC from GSC_Unmixed.fcs with flow-repod-96794.provenance.json",
+      "size_if_verified": "3,870,980 bytes actually read; MD5 859e65ad411ff209256468b200f94311 matches source; measured SHA256 3f208d4dbc3fd1945634a591e6f19c794db913fca6c8c10117a8dc9d59cc9a86",
+      "usable_for": [
+        "actual accessible FCS 3.1 reader fixture",
+        "channel-map and raw-versus-already-unmixed state validation",
+        "event-table and scatter-view engineering",
+        "manual/template gate interaction and derived statistics with separately authored engineering expectations"
+      ],
+      "not_sufficient_for": [
+        "automated clinical or donor-level classification ground truth",
+        "complete unmixing reference controls",
+        "proof that applying conventional compensation again is appropriate",
+        "biological gate accuracy without reviewed annotations",
+        "independent holdout from one sample"
+      ],
+      "split_unit": "donor, original biological sample, acquisition run and linked co-culture/titration/FMO files stay together; one selected file is an engineering fixture only; dataset-wide grouping requires metadata review",
+      "evidence_note": "File published 2026-03-02; dataset DOI 10.18150/JOLWGT, V2, Agnieszka Bronisz, Mossakowski Medical Research Institute PAS; parent https://repod.icm.edu.pl/dataset.xhtml?persistentId=doi:10.18150/JOLWGT. Probe uses Windows normal TLS validation, command exit 0; initial Python attempt failed local CA chain and did not yield bytes. Filename/record indicate already-unmixed data, which must be preserved as processing provenance; not a synthetic mathematical example. Retain attribution and mark derivatives.",
+      "verified_date": "2026-10-31"
+    },
+    {
+      "dataset_id": "Magno2017-rpa-RDML1.2",
+      "scenes": [
+        "qpcr"
+      ],
+      "title": "Magno et al. 2017 author example datasets/rpa.rdml",
+      "landing_url": "https://github.com/ramiromagno/rdml/blob/master/datasets/rpa.rdml",
+      "download_url": "https://raw.githubusercontent.com/ramiromagno/rdml/fe484d11594735cfe2d65dcbcc1f58f9315a849b/datasets/rpa.rdml",
+      "format": "RDML 1.2；ZIP内一个rdml_data.xml；8×12孔板布局",
+      "annotations": "3个sample ID均有鸡胚处理描述；10个target明确toi/ref角色；90个reaction ID可按RDML行优先规则还原孔位；88个Cq，2个缺失；每孔61个adp点；30个sample×target组合各3孔。无独立相对表达真值。",
+      "license": "论文Rights and permissions明确对文章提供的数据适用CC0，除另行说明；正文及数据可用性明确链接本作者示例文件。仓库软件另为MIT；不将MIT替代数据许可。读取文件及README未发现rpa的另行许可声明。",
+      "license_url": "https://link.springer.com/article/10.1186/s13104-017-2533-9#rightslink",
+      "access_status": "2026-10-31已从原作者raw GitHub实际下载149863字节，ZIP/XML本地解析成功；未执行仓库软件。已再次读取固定commit URL，与本地文件逐字节一致、SHA256一致，核验命令退出0。",
+      "size_if_verified": "149863 bytes；90个反应、30个sample×target组合、88个Cq；每反应61个扩增数据点。",
+      "usable_for": [
+        "RDML解包/ID引用/孔位映射/样本与靶标角色导入，以及输出为首版所需typed table",
+        "逐孔Cq到技术重复表、缺失状态、原始曲线查看、批次报表与来源追踪",
+        "有显式演练配置时走相对表达计算链：指定参照sample、选定reference target、提供E及聚合规则；演练配置不得冒充原始实验证据",
+        "异常接管反例：R-HCtrl13×GusBP1的3孔中2孔缺Cq，禁止零填充或静默仍称3个有效重复",
+        "人工修改参照/内参/孔排除后按依赖重算，验证撤销与历史结果不覆盖"
+      ],
+      "not_sufficient_for": [
+        "所有target的amplificationEfficiency字段缺失，不能默认为E=2；无标准稀释系列可直接核定效率",
+        "3个ref角色不等于在该处理条件下已经验证稳定；不能自动平均所有内参后声称方法有效",
+        "全部calibratorSample=false；R-HCtrl13描述为scrambled control，但正式参照选择及适用比较必须通过设计配置明确",
+        "描述中的R-HCtrl13是morpholino对照，R-dsH18是siRNA处理；不能据样本名自动认定该对照也适用于siRNA比较，未核实其匹配对照设计",
+        "每个sample×target有3孔，是同sample ID的技术重复；不能计为3个独立生物重复，也未核实独立动物/批次数或配对设计",
+        "88个现有Cq范围19.1629499749496–59.1107795493579；存在很晚Cq及技术重复离散，数值存在不表示科学合格，不自行编造阈值或删孔",
+        "没有独立相对表达真值、预定科学容差或产品科学放行证据；没有依据本文件声明方法准确率",
+        "本轮只做ZIP/XML结构解析，未做完整XSD验证、曲线重算、效能测量或产品导入验收"
+      ],
+      "split_unit": "保留同一sample的全部targets、技术孔及对应曲线在同一分区；本文件仅一个run，建议整体作为开发/回归样例，另取独立实验run/生物来源做holdout，不从90孔随机拆出独立科学验证集。",
+      "evidence_note": "2017-06-12论文明确引用rpa.rdml；RDML内部dateMade为2013-04-22，dateUpdated为2013-04-30，不等同发布日期。当前本地原始文件SHA256=d77d72b962c94449d2844a071501d2ae920722f4a8816a967a49495a10eb4880。源码仓库currentOid=fe484d11594735cfe2d65dcbcc1f58f9315a849b。孔位依据RDML1.2官方schema的行优先规则。已实际读取论文、README、LICENSE、原始RDML、官方schema；API请求曾403，uv启动曾缓存权限失败，改用已有venv后完成只读解析。",
+      "local_file": ".local/deliveries/B-007/development-samples/rpa.rdml",
+      "local_verification": ".local/deliveries/B-007/development-samples/rpa-source-verification.json",
+      "sha256": "d77d72b962c94449d2844a071501d2ae920722f4a8816a967a49495a10eb4880",
+      "accessed": "2026-10-31",
+      "paper_url": "https://link.springer.com/article/10.1186/s13104-017-2533-9",
+      "schema_url": "https://github.com/RDML-consortium/rdml-schema/blob/main/RDML_v1_2_REC.xsd",
+      "repository_license_url": "https://raw.githubusercontent.com/ramiromagno/rdml/master/LICENSE",
+      "verified_date": "2026-10-31"
+    }
+  ]
+}

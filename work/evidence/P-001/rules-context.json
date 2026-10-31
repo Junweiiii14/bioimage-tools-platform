@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "task": "P-001",
+  "base_commit": "18b5cf6de0c83b8c67f26433a6059d8dabf1f381",
+  "scopes": [
+    "."
+  ],
+  "rules": {
+    "AGENTS.md": "2ab9cabd48b08ae2e5373be5c74586e74c22b813b082b3e7f41dcc5230ea0240",
+    "docs/ai-workflow.md": "e38a4bcecd927071975afeb19b8af12cc6c21053b1f78322b8711aa2952a7d71",
+    "docs/architecture.md": "7a4c4ae9f6c7be020df13ad9b431a5ce396ffab2e588fcdc0aa6a00fdc74bc1e",
+    "docs/coding-standards.md": "40fe9541a84163e6df6be9d2a57b836b9703471440f412bd16456f1ef0382d71",
+    "docs/module-map.md": "18d9fa4d64ec8871cf0efca7d7f883290a9f5bac3578aff88c2c15bf1ba1ea37",
+    "docs/research-protocol.md": "b1ab0f9bf291e50f5872e01147f7af2671fdc5885bf2f065c804c5f4a240aa51",
+    "docs/runbooks/rule-enforcement.md": "6db3eacb3d49b8015ac54fca756236dbc8906ba5a0746741a28afd12fb7398e0"
+  },
+  "base_rules": {
+    "AGENTS.md": "3c5ce28cf9b92099025bd50db0821e94c90b5759dfb32d19e510da1774c4941f",
+    "docs/ai-workflow.md": "8003be926d828df9eaf0398d77f463a9472316be021467e7f22fb63132063f70",
+    "docs/architecture.md": "dabf3823b44d4af2f372fd5dc244747cb3cd7ff56abcfd13cf007721b8a0dbbd",
+    "docs/coding-standards.md": "40fe9541a84163e6df6be9d2a57b836b9703471440f412bd16456f1ef0382d71",
+    "docs/module-map.md": "792d6e7efc4dbc4b24f51e8d1d24e464fff5fff17d553d8a42af3154565af07a",
+    "docs/research-protocol.md": "b1ab0f9bf291e50f5872e01147f7af2671fdc5885bf2f065c804c5f4a240aa51",
+    "docs/runbooks/rule-enforcement.md": "43c1aafc0003f1901c4c35f4aa896cd520cf79dc96856019e11c1b095fc5c090"
+  }
+}

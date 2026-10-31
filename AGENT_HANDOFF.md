@@ -46,7 +46,8 @@
 
 ## Current Pointer
 
-- 当前任务：[T082 可靠性与可维护性整改](work/tasks/T-082-reliability-remediation.md)。恢复时从任务读取状态，再核对工作树；snapshot 仅提供指针和下一步。
+- 当前任务：[P001 正确产品基线接入](work/tasks/P-001-platform-baseline-adoption.md)。先读任务、研发总方案与阶段V0，再核对分支/HEAD；P002依赖P001完成。
+- T082历史工程证据及科学/目标环境待办完整保留于其[任务](work/tasks/T-082-reliability-remediation.md)，不由V0自动关闭。
 - 本轮本地工程交接：[T082 final-handoff](work/evidence/T-082/final-handoff.md)，区分冻结源码、隔离验收工件与后续交接HEAD；科学待办不由工程通过代替。
 - 最近交付：[T081 R2](work/evidence/T-081/final-delivery.md)。当前源码/构建源码/主线集成/安装包区分见 [T082 baseline](work/evidence/T-082/baseline.md)。
 - 旧 snapshot 保留于 `.agent-handoff/archive/T081-before-T082-snapshot.md`；原图、历史、既存 dirty 树及旧交付继续保护。
