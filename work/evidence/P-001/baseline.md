@@ -29,3 +29,7 @@
 6421203以双亲合并已发布PR46 dca0061f与P001/T082链；冲突保留最新T082治理再接V0语义，B008原证据/任务不修改。P001暂以codex/b008-rd-plan-github为PR base，合入main前再次核对及重载。Node固定开发依赖`npm ci --ignore-scripts` exit0，报告4项moderate漏洞，未升级锁或运行自动fix；不宣称在线审计通过。基线规则重载后输出差异已逐段核读。
 
 5例补充基线实际于8f5bf657执行：按frozen-case-design.json先约定解析预期，再通过wb_tool.api生成StartFrame，subprocess.Popen真实运行python -m wb_tool.worker，经WorkerConversation逐帧验证及真实退出码核对，结果与直接analyze_annotations的TypeAdapter序列化逐字节相等。全部exit0，原图SHA保持；具体PID/输入与结果摘要在frozen-baseline-result.json。非产品脚本未纳入模块实现，合成图/旧结果保留本地.local/p001-frozen-20261031；不存在私有图或下载样本。这不代替V0新接口/Workspace/GUI验收。
+
+## 真实main基线
+
+PR46最终发布dca0061f已正常合并main c5cb753c601ff0792865ba043126b0f4411f3ac7；本执行者实际fetch、git diff --exit-code dca0061f origin/main和祖先检查均exit0，PR47已切main。ad880209双亲接入main后，按c5cb753c重载真实规则回执/integration；完整输出与已读版本比较，仅已核读任务/交接变化，base规则树一致。历史T082回执仍绑定9ec7b1d原始提交，未删除或改写。最终HEAD独审与新CI仍待。

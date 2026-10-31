@@ -1,8 +1,8 @@
 # 当前恢复指针
 
-- 当前任务：[P001](../work/tasks/P-001-platform-baseline-adoption.md)，任务卡为状态唯一来源；后续P002和V0必需配套按登记依赖推进。
-- 执行树 `C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0`，分支 `codex/p001-v0-baseline`，产品起点 `dfc48ed7c2c944dc8f03c3931bc7985452a31393`。旧主目录dirty与T082原树不修改。
-- 下一步：PR47当前推送8f5bf657、暂base PR46发布dca0061f，已独审Accepted，规则/desktop绿、双平台foundation运行中。等原聊天将PR46正常合main后，fetch、切PR47 base到实际main并重载context/integration，复核后正常合main；不得向发布分支合并。P001完成后再激活P002。
-- 本地未提交的是P001解析旧worker5例冻结设计/真实结果、独审记录和交接更新；不是他人dirty。先核对git status及任务，新增证据须纳入下一准确提交审查。
-- 原生goal已通过create_goal/get_goal确认为active且未设预算，精简证据见 `work/evidence/P-001/goal-state.json`；实际状态仍以工具为准。
-- T082原始交接先逐字节存于 `archive/P001-before-adoption-snapshot.md`；工程通过不替代科学适用性、用户体验或干净目标环境验收，风险与历史均保留。
+- 当前任务：[P001](../work/tasks/P-001-platform-baseline-adoption.md)，状态唯一来源在任务卡；后续P002及V0必需配套按登记依赖推进。
+- 执行树 `C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0`，分支 `codex/p001-v0-baseline`，产品base dfc48ed7。旧主目录dirty、T082原树及安装不修改。
+- PR46已合main c5cb753c601ff0792865ba043126b0f4411f3ac7，已fetch核实树同dca0061f；PR47已切main，本树ad880209接入main祖先，回执/integration已按实际base重载。
+- 下一步：最终候选准确提交独审与PR47四必需CI通过后正常合main，记录P001完成再激活P002。不将旧8f5bf657 CI状态当新HEAD通过。观察器exec session94382只对应旧run41182018341，恢复核验其实际状态，不重启作业。
+- 956111c、8f5bf657、bed7973各段独审Accepted；5个旧worker解析样例已独立复现且摘要一致，仍不是V0新接口/Workspace成果。P002实现调查在work/evidence/P-001/p002-adapter-investigation.md。
+- 真实goal已create/get确认active、无token预算，实际状态以工具为准。T082科学/目标环境待办、历史失败和冻结源码/安装证据完整保留；原snapshot逐字节归档见archive/P001-before-adoption-snapshot.md。

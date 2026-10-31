@@ -1,6 +1,6 @@
 # P-001 正确产品基线与长期计划接入
 
-<!-- PROGRAM_TASK_META {"id":"P-001","status":"in_review","work_package":"W00","depends_on":[],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a190e6-02b1-74e3-a7b9-bd5fbc3f36fe","base_commit":"dfc48ed7c2c944dc8f03c3931bc7985452a31393","head_commit":"64212030b622c17c7106396450f076796ca7f214"} -->
+<!-- PROGRAM_TASK_META {"id":"P-001","status":"in_review","work_package":"W00","depends_on":[],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a190e6-02b1-74e3-a7b9-bd5fbc3f36fe","base_commit":"dfc48ed7c2c944dc8f03c3931bc7985452a31393","head_commit":"bed7973d35d17702a0700a7008445d4106fb6985"} -->
 
 ## 执行状态
 
@@ -45,10 +45,12 @@ B-007研发主方案3.0（docs/plans/research-platform-rd.md及同名HTML）、B
 
 ## 2026-10-31 激活记录
 
-本卡现为执行权威；原B008发布版本是planned历史快照，原发布树不修改。当前隔离分支codex/p001-v0-baseline，以T082 dfc48ed7建立；main与文档PR尚待最终复核。已生成真实context与integration清单。先完成计划/规则语义接入及独审、约定集成；P002仍planned。
+本卡现为执行权威；原B008发布版本是planned历史快照，原发布树不修改。当前隔离分支codex/p001-v0-baseline，以T082 dfc48ed7建立；当时main与文档PR尚待最终复核，现已核实PR46合并c5cb753c。已生成真实context与integration清单。先完成计划/规则语义接入及独审、约定集成；P002仍planned。
 
-初始956111c独审Accepted，非阻断入口措辞已修正；已在隔离分支合并方案发布dca0061f，保留其B008任务/证据原样及T082历史回执。暂定PR base为发布分支dca0061f，待PR46合入main后切实际main并重载回执，最终独审/CI/集成尚待。检查与限制见 [baseline](../evidence/P-001/baseline.md)。
+初始956111c独审Accepted，非阻断入口措辞已修正；已在隔离分支合并方案发布dca0061f，保留其B008任务/证据原样及T082历史回执。当时暂定PR base为发布分支dca0061f；现已切main c5cb753c并重载回执，最终候选独审/CI/集成尚待。检查与限制见 [baseline](../evidence/P-001/baseline.md)。
 
-PR：[47](https://github.com/Junweiiii14/bioimage-tools-platform/pull/47)，当前推送head8f5bf657已获独立Accepted，规则/desktop CI成功，双平台foundation运行中；PR46仍OPEN由原聊天负责。不得合入发布分支，等PR46正常入main后切base并重载检查，再正常合main。
+PR：[47](https://github.com/Junweiiii14/bioimage-tools-platform/pull/47)已切到main，实际base c5cb753c601ff0792865ba043126b0f4411f3ac7。已fetch、验证其树与dca0061f相同、发布提交为祖先，并以ad880209双亲接入本分支。当前回执/integration已按实际base重新生成并核读差异；最终候选需重新独审与四必需CI，再正常合main。
 
-P001补充调查：5个预先冻结解析样例真实旧worker均exit0，并与直接API逐字节结果一致，见frozen-case-design.json与frozen-baseline-result.json。当前只证明旧成熟用例基线，尚未实现新模块接口或V0Workspace成果。此新增证据尚待提交/独审。
+P001补充调查：5个预先冻结解析样例真实旧worker均exit0，并与直接API逐字节结果一致，见frozen-case-design.json与frozen-baseline-result.json。当前只证明旧成熟用例基线，尚未实现新模块接口或V0Workspace成果。新增证据已提交bed7973，独立审阅者实际复现5例并核对全部输入/结果SHA，结论Accepted；具体命令与退出码见本任务下方。
+
+补充独审：`/root/p001_review`对8f5bf657..bed7973 Accepted，实际命令`.venv/Scripts/python.exe work/evidence/P-001/replay_frozen_baseline.py .local/p001-review-replay` exit0，5进程exit0、除PID外所有记录一致；规则回执对bed7973/dca0061f检查exit0。该证据随接main后的最终候选推送；旧8f5bf657作业可能因新提交被正常并发取消，不作伪通过，也不手动重复运行。
