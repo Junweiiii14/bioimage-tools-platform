@@ -46,6 +46,6 @@
 
 ## Current Pointer
 
-- 当前任务：[T081](work/tasks/T-081-prominent-crop-stage-barrier.md)，固定N明显条带漏裁与全批裁剪barrier修复，活动树wb-lab-installer。T080已交付/PR41合入，当前状态以T081任务及其最终闭合谓词为准；本机R2交付已验，最终记录独审/CI/PR43合入仅据真实收据。
-- T079旧快照保留在.agent-handoff/archive/T079-before-T080-snapshot.md，归档、dirty树及清理引用载荷继续保护。
-- 旧T077指针归档.agent-handoff/archive/T077-before-T079-snapshot.md；视频研究是另一个已启动独立聊天，其wb-ui-system树整体保留。旧安装/生成物由T079按备份证明整理；T081保留旧包、未重复清理；旧dirty源码、原图/历史保持，不能沿用旧“安装保留”指针。
+- 当前状态见`.agent-handoff/snapshot.md`和B-008任务卡；新产品执行入口为docs/plans/phase-1-v0.md。
+- 原T081指针/未验范围已保留在.agent-handoff/archive/B008-before-publication-snapshot.md；新方案发布不销账。
+- 研发主方案docs/plans/research-platform-rd.md；依赖work/programs/scientific-agent-platform/registry.json；目标树接入由P001完成。

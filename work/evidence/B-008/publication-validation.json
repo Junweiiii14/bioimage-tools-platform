@@ -1,0 +1,11 @@
+{
+  "result": "pass",
+  "chapters": 13,
+  "tables": 49,
+  "dataset_records": 17,
+  "source_links": "repository-relative and existing",
+  "html_bytes": 344080,
+  "source_sha256": "bc8865864ab01a6d2d59a2a46324b17cf1c3b7f9da8e9018927a3cc7419adbd6",
+  "html_sha256": "8cb1ab6de84bc80069100a7893ce552710c9355235dd65ace65b38b44c33bc72",
+  "projection_note": "Published content projection differs from local delivery only in portability/location presentation; task-card refinements are separately reviewed. No source product copied."
+}

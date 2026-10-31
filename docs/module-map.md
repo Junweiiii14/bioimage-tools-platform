@@ -72,3 +72,6 @@ T-024 历史集成：工具平台静态注册 WB；目录导入→自动泳道/�
 
 
 T067在WB既有intake_revision内实现执行后分组编辑和intake_workflow@2，宿主/网页复用原CAS与采集组网格，不新增平台实验特判或依赖。契约见 contracts/wb-intake-group-revision-v1.md，任务T067。
+
+
+2026-10-31研发演进见[总方案3.0](plans/research-platform-rd.md)及[第一阶段V0](plans/phase-1-v0.md)。此文件保留当前分支实现事实，方案中的新模块尚未实现；P001应在较新实际产品树重新核对此图。

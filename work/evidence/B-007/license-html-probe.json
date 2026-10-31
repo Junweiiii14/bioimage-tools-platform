@@ -1,0 +1,53 @@
+[
+  {
+    "record_id": "4593510",
+    "url": "https://zenodo.org/records/4593510",
+    "matches": [
+      "0\", \"publisher\": \"Zenodo\", \"resource_type\": {\"id\": \"dataset\", \"title\": {\"de\": \"Datensatz\", \"en\": \"Dataset\"}}, \"rights\": [{\"description\": {\"en\": \"The Creative Commons Attribution license allows re-distribution and re-use of a licensed work on the condition that the creator is appropriately credited.\"}, \"icon\": \"cc-by-",
+      "icon\", \"id\": \"cc-by-4.0\", \"props\": {\"scheme\": \"spdx\", \"url\": \"https://creativecommons.org/licenses/by/4.0/legalcode\"}, \"title\": {\"en\": \"Creative Commons Attribution 4.0 International\"}}], \"subjects\": [{\"subject\": \"Cell Colony Counting\"}, {\"subject\": \"Image processing\"}, {\"subject\": \"T-47D",
+      " \"publication_date_l10n_medium\": \"Mar 10, 2021\", \"resource_type\": {\"id\": \"dataset\", \"title_l10n\": \"Dataset\"}, \"rights\": [{\"description_l10n\": \"The Creative Commons Attribution license allows re-distribution and re-use of a licensed work on the condition that the creator is appropriately credited.\", \"icon\": \"cc-by-ico",
+      "n\", \"id\": \"cc-by-4.0\", \"props\": {\"scheme\": \"spdx\", \"url\": \"https://creativecommons.org/licenses/by/4.0/legalcode\"}, \"title_l10n\": \"Creative Commons Attribution 4.0 International\"}], \"updated_date_l10n_long\": \"March 11, 2021\", \"version\": \"v1\"}, \"updated\": \"2021-03-11T00:27:25.434121+00:",
+      "0\", \"publisher\": \"Zenodo\", \"resource_type\": {\"id\": \"dataset\", \"title\": {\"de\": \"Datensatz\", \"en\": \"Dataset\"}}, \"rights\": [{\"description\": {\"en\": \"The Creative Commons Attribution license allows re-distribution and re-use of a licensed work on the condition that the creator is appropriately credited.\"}, \"icon\": \"cc-by-",
+      "icon\", \"id\": \"cc-by-4.0\", \"props\": {\"scheme\": \"spdx\", \"url\": \"https://creativecommons.org/licenses/by/4.0/legalcode\"}, \"title\": {\"en\": \"Creative Commons Attribution 4.0 International\"}}], \"subjects\": [{\"subject\": \"Cell Colony Counting\"}, {\"subject\": \"Image processing\"}, {\"subject\": \"T-47D",
+      " \"publication_date_l10n_medium\": \"Mar 10, 2021\", \"resource_type\": {\"id\": \"dataset\", \"title_l10n\": \"Dataset\"}, \"rights\": [{\"description_l10n\": \"The Creative Commons Attribution license allows re-distribution and re-use of a licensed work on the condition that the creator is appropriately credited.\", \"icon\": \"cc-by-ico",
+      "n\", \"id\": \"cc-by-4.0\", \"props\": {\"scheme\": \"spdx\", \"url\": \"https://creativecommons.org/licenses/by/4.0/legalcode\"}, \"title_l10n\": \"Creative Commons Attribution 4.0 International\"}], \"updated_date_l10n_long\": \"March 11, 2021\", \"version\": \"v1\"}, \"updated\": \"2021-03-11T00:27:25.434121+00:",
+      "    <a class=\"license-link\" href=\"https://creativecommons.org/licenses/by/4.0/legalcode\" target=\"_blank\"",
+      ": \"eng\", \"name\": \"English\"}, \"keywords\": \"Cell Colony Counting, Image processing, T-47D Breast Cancer Cells\", \"license\": \"https://creativecommons.org/licenses/by/4.0/legalcode\", \"name\": \"Cell Colony Image Segmentation Dataset 1 for T-47D Breast Cancer Cells\", \"publisher\": {\"@type\": \"Organization\", \"name\": \"Zenodo\"}, \""
+    ],
+    "status": "html_read"
+  },
+  {
+    "record_id": "22092552",
+    "url": "https://zenodo.org/records/22092552",
+    "matches": [
+      "8-25\", \"publisher\": \"Zenodo\", \"resource_type\": {\"id\": \"image-photo\", \"title\": {\"de\": \"Foto\", \"en\": \"Photo\"}}, \"rights\": [{\"description\": {\"en\": \"The Creative Commons Attribution license allows re-distribution and re-use of a licensed work on the condition that the creator is appropriately credited.\"}, \"icon\": \"cc-by-",
+      "icon\", \"id\": \"cc-by-4.0\", \"props\": {\"scheme\": \"spdx\", \"url\": \"https://creativecommons.org/licenses/by/4.0/legalcode\"}, \"title\": {\"en\": \"Creative Commons Attribution 4.0 International\"}}], \"title\": \"Western blot raw data\"}, \"parent\": {\"access\": {\"owned_by\": {\"user\": \"1439478\"}, \"settings\":",
+      "publication_date_l10n_medium\": \"Aug 25, 2026\", \"resource_type\": {\"id\": \"image-photo\", \"title_l10n\": \"Photo\"}, \"rights\": [{\"description_l10n\": \"The Creative Commons Attribution license allows re-distribution and re-use of a licensed work on the condition that the creator is appropriately credited.\", \"icon\": \"cc-by-ico",
+      "n\", \"id\": \"cc-by-4.0\", \"props\": {\"scheme\": \"spdx\", \"url\": \"https://creativecommons.org/licenses/by/4.0/legalcode\"}, \"title_l10n\": \"Creative Commons Attribution 4.0 International\"}], \"updated_date_l10n_long\": \"August 26, 2026\", \"version\": \"v2\"}, \"updated\": \"2026-08-26T20:00:41.571841+00",
+      "8-25\", \"publisher\": \"Zenodo\", \"resource_type\": {\"id\": \"image-photo\", \"title\": {\"de\": \"Foto\", \"en\": \"Photo\"}}, \"rights\": [{\"description\": {\"en\": \"The Creative Commons Attribution license allows re-distribution and re-use of a licensed work on the condition that the creator is appropriately credited.\"}, \"icon\": \"cc-by-",
+      "icon\", \"id\": \"cc-by-4.0\", \"props\": {\"scheme\": \"spdx\", \"url\": \"https://creativecommons.org/licenses/by/4.0/legalcode\"}, \"title\": {\"en\": \"Creative Commons Attribution 4.0 International\"}}], \"title\": \"Western blot raw data\"}, \"parent\": {\"access\": {\"owned_by\": {\"user\": \"1439478\"}, \"settings\":",
+      "publication_date_l10n_medium\": \"Aug 25, 2026\", \"resource_type\": {\"id\": \"image-photo\", \"title_l10n\": \"Photo\"}, \"rights\": [{\"description_l10n\": \"The Creative Commons Attribution license allows re-distribution and re-use of a licensed work on the condition that the creator is appropriately credited.\", \"icon\": \"cc-by-ico",
+      "n\", \"id\": \"cc-by-4.0\", \"props\": {\"scheme\": \"spdx\", \"url\": \"https://creativecommons.org/licenses/by/4.0/legalcode\"}, \"title_l10n\": \"Creative Commons Attribution 4.0 International\"}], \"updated_date_l10n_long\": \"August 26, 2026\", \"version\": \"v2\"}, \"updated\": \"2026-08-26T20:00:41.571841+00",
+      "    <a class=\"license-link\" href=\"https://creativecommons.org/licenses/by/4.0/legalcode\" target=\"_blank\"",
+      ":00:41.571841+00:00\", \"datePublished\": \"2026-08-25\", \"identifier\": \"https://doi.org/10.5281/zenodo.22092552\", \"license\": \"https://creativecommons.org/licenses/by/4.0/legalcode\", \"name\": \"Western blot raw data\", \"publisher\": {\"@type\": \"Organization\", \"name\": \"Zenodo\"}, \"size\": \"469.13 MB\", \"url\": \"https://zenodo.org/re"
+    ],
+    "status": "html_read"
+  },
+  {
+    "record_id": "7009124",
+    "url": "https://zenodo.org/records/7009124",
+    "matches": [
+      "\", \"publisher\": \"Zenodo\", \"resource_type\": {\"id\": \"software\", \"title\": {\"de\": \"Software\", \"en\": \"Software\"}}, \"rights\": [{\"description\": {\"en\": \"The Creative Commons Attribution license allows re-distribution and re-use of a licensed work on the condition that the creator is appropriately credited.\"}, \"icon\": \"cc-by-",
+      "icon\", \"id\": \"cc-by-4.0\", \"props\": {\"scheme\": \"spdx\", \"url\": \"https://creativecommons.org/licenses/by/4.0/legalcode\"}, \"title\": {\"en\": \"Creative Commons Attribution 4.0 International\"}}], \"subjects\": [{\"subject\": \"machine learning\"}, {\"subject\": \"qPCR\"}, {\"subject\": \"bioinformatics\"}, {\"s",
+      "publication_date_l10n_medium\": \"Aug 19, 2022\", \"resource_type\": {\"id\": \"software\", \"title_l10n\": \"Software\"}, \"rights\": [{\"description_l10n\": \"The Creative Commons Attribution license allows re-distribution and re-use of a licensed work on the condition that the creator is appropriately credited.\", \"icon\": \"cc-by-ico",
+      "n\", \"id\": \"cc-by-4.0\", \"props\": {\"scheme\": \"spdx\", \"url\": \"https://creativecommons.org/licenses/by/4.0/legalcode\"}, \"title_l10n\": \"Creative Commons Attribution 4.0 International\"}], \"updated_date_l10n_long\": \"August 19, 2022\", \"version\": \"1.1-2\"}, \"updated\": \"2022-08-19T14:26:16.259857",
+      "\", \"publisher\": \"Zenodo\", \"resource_type\": {\"id\": \"software\", \"title\": {\"de\": \"Software\", \"en\": \"Software\"}}, \"rights\": [{\"description\": {\"en\": \"The Creative Commons Attribution license allows re-distribution and re-use of a licensed work on the condition that the creator is appropriately credited.\"}, \"icon\": \"cc-by-",
+      "icon\", \"id\": \"cc-by-4.0\", \"props\": {\"scheme\": \"spdx\", \"url\": \"https://creativecommons.org/licenses/by/4.0/legalcode\"}, \"title\": {\"en\": \"Creative Commons Attribution 4.0 International\"}}], \"subjects\": [{\"subject\": \"machine learning\"}, {\"subject\": \"qPCR\"}, {\"subject\": \"bioinformatics\"}, {\"s",
+      "publication_date_l10n_medium\": \"Aug 19, 2022\", \"resource_type\": {\"id\": \"software\", \"title_l10n\": \"Software\"}, \"rights\": [{\"description_l10n\": \"The Creative Commons Attribution license allows re-distribution and re-use of a licensed work on the condition that the creator is appropriately credited.\", \"icon\": \"cc-by-ico",
+      "n\", \"id\": \"cc-by-4.0\", \"props\": {\"scheme\": \"spdx\", \"url\": \"https://creativecommons.org/licenses/by/4.0/legalcode\"}, \"title_l10n\": \"Creative Commons Attribution 4.0 International\"}], \"updated_date_l10n_long\": \"August 19, 2022\", \"version\": \"1.1-2\"}, \"updated\": \"2022-08-19T14:26:16.259857",
+      "    <a class=\"license-link\" href=\"https://creativecommons.org/licenses/by/4.0/legalcode\" target=\"_blank\"",
+      "\": \"eng\", \"name\": \"English\"}, \"keywords\": \"machine learning, qPCR, bioinformatics, open source, explainable\", \"license\": \"https://creativecommons.org/licenses/by/4.0/legalcode\", \"name\": \"PCRedux: A Quantitative PCR Machine Learning Toolkit\", \"publisher\": {\"@type\": \"Organization\", \"name\": \"Zenodo\"}, \"size\": \"7.7 MB\", \""
+    ],
+    "status": "html_read"
+  }
+]

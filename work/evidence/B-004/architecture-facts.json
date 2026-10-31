@@ -1,0 +1,236 @@
+{
+  "audit_date": "2026-10-31",
+  "scope": "read-only source and historical evidence audit; no product execution",
+  "product_root": "<original-local-workspace>",
+  "branch": "codex/t082-reliability-remediation",
+  "head": "dfc48ed7c2c944dc8f03c3931bc7985452a31393",
+  "dirty": false,
+  "frozen_product_source": "ed830e1d3bab3d0c8c57f3766a898991e8a0f431",
+  "source_to_head_diff": "19 documentation/handoff/evidence files; no product source changes",
+  "existing_laboratory_delivery_product": "f1e6142",
+  "active_product_task": "T-082 reliability remediation, local engineering complete, scientific and external target environment acceptance incomplete",
+  "versions": {
+    "bioimage_app": "0.14.0",
+    "wb_tool": "0.19.0",
+    "tool_contracts": "0.1.0",
+    "platform_runtime": "0.2.0"
+  },
+  "facts": [
+    {
+      "id": "A01",
+      "claim": "Only WB exists as an experimental tool; desktop_sdk/imaging_core/imaging_ui/IF/IHC remain planned",
+      "path": "docs/module-map.md",
+      "line": 28,
+      "evidence": "module map plus directory listing of packages and tools",
+      "kind": "source_fact"
+    },
+    {
+      "id": "A02",
+      "claim": "Default desktop UI is Qt WebEngine WebWorkbenchWindow, not a future proposal",
+      "path": "docs/module-map.md",
+      "line": 16,
+      "kind": "source_fact"
+    },
+    {
+      "id": "A03",
+      "claim": "WB-specific workflow has fixed crop/compose/measure/export stages",
+      "path": "tools/wb/src/wb_tool/application/intake_workflow.py",
+      "line": 26,
+      "symbols": [
+        "Stage",
+        "IntakeWorkflowLedger",
+        "_prerequisites"
+      ],
+      "kind": "source_fact"
+    },
+    {
+      "id": "A04",
+      "claim": "Workflow project permits at most one running stage and rejects stale input digests",
+      "path": "tools/wb/src/wb_tool/application/intake_workflow.py",
+      "line": 120,
+      "symbols": [
+        "WBIntakeWorkflowProject.intake_projection"
+      ],
+      "kind": "source_fact"
+    },
+    {
+      "id": "A05",
+      "claim": "Explicit post-run grouping edit exists, requires no running stage, revokes approval",
+      "path": "tools/wb/src/wb_tool/application/intake_revision.py",
+      "line": 24,
+      "symbols": [
+        "begin_intake_group_revision",
+        "revise_intake_grouping"
+      ],
+      "kind": "source_fact"
+    },
+    {
+      "id": "A06",
+      "claim": "Completed crop edits invalidate the row crop and its Fig compose/measure plus export, retaining historical records",
+      "path": "tools/wb/src/wb_tool/application/intake_revision.py",
+      "line": 218,
+      "symbols": [
+        "revise_completed_intake_crop"
+      ],
+      "kind": "source_fact"
+    },
+    {
+      "id": "A07",
+      "claim": "Explicit crop angle edits display sampling only; range -30..30 with source-bounds checks",
+      "path": "tools/wb/src/wb_tool/application/intake_crop.py",
+      "line": 715,
+      "kind": "source_fact"
+    },
+    {
+      "id": "A08",
+      "claim": "Oriented display frame and axis-aligned source sampling rectangles differ; rectangles are not claimed equal to rotated polygons",
+      "path": "tools/wb/src/wb_tool/domain/fixed_lane_frame.py",
+      "line": 1,
+      "symbols": [
+        "fixed_lane_frame"
+      ],
+      "kind": "source_fact"
+    },
+    {
+      "id": "A09",
+      "claim": "Quantitative lane profiles are row means from original uint8/uint16 2D pixels",
+      "path": "tools/wb/src/wb_tool/domain/lanes.py",
+      "line": 44,
+      "symbols": [
+        "compute_lane_profiles"
+      ],
+      "kind": "source_fact"
+    },
+    {
+      "id": "A10",
+      "claim": "Current process events do not include streaming progress/preview/checkpoint; decoder caps total frames at 8",
+      "path": "apps/desktop/src/bioimage_app/process.py",
+      "line": 18,
+      "symbols": [
+        "ProcessEvent",
+        "_Decoder.feed"
+      ],
+      "kind": "source_fact"
+    },
+    {
+      "id": "A11",
+      "claim": "Worker protocol v1 has hello/start/cancel/accepted/result/failure/cancelled/error frames with strict identities",
+      "path": "tools/wb/src/wb_tool/application/worker_protocol.py",
+      "line": 20,
+      "symbols": [
+        "WireModel",
+        "IdentifiedFrame",
+        "WorkerFrame"
+      ],
+      "kind": "source_fact"
+    },
+    {
+      "id": "A12",
+      "claim": "Web bridge polls at 180ms but skips unchanged snapshot keys and emits smaller changed progress separately",
+      "path": "apps/desktop/src/bioimage_app/web_bridge.py",
+      "line": 202,
+      "symbols": [
+        "WorkbenchBridge.publish"
+      ],
+      "kind": "source_fact"
+    },
+    {
+      "id": "A13",
+      "claim": "Motion API supports cancellable animations and reduced motion; commands do not await animation completion",
+      "path": "apps/desktop/src/bioimage_app/web_ui/motion.js",
+      "line": 1,
+      "kind": "source_fact"
+    },
+    {
+      "id": "A14",
+      "claim": "Existing local navigation and resource request filters limit WebEngine surface; not an algorithm-code sandbox",
+      "path": "apps/desktop/src/bioimage_app/web_window.py",
+      "line": 36,
+      "symbols": [
+        "LocalAssetFilter",
+        "LocalWorkbenchPage"
+      ],
+      "kind": "source_fact_and_boundary"
+    },
+    {
+      "id": "A15",
+      "claim": "RunSession persists cancellation and requires process exit before terminal storage commit",
+      "path": "apps/desktop/src/bioimage_app/run_session.py",
+      "line": 21,
+      "symbols": [
+        "RunSession",
+        "_try_terminal"
+      ],
+      "kind": "source_fact"
+    },
+    {
+      "id": "A16",
+      "claim": "Workspace supplies immutable drafts/assets and CAS run commits; workers do not write SQLite",
+      "path": "packages/platform_runtime/README.md",
+      "line": 3,
+      "kind": "source_fact"
+    },
+    {
+      "id": "A17",
+      "claim": "Historical evidence reports 1503 tests and local Win11 minimal installation acceptance, not independent scientific validity",
+      "path": "work/tasks/T-082-reliability-remediation.md",
+      "line": 4,
+      "kind": "historical_validation"
+    },
+    {
+      "id": "A18",
+      "claim": "No held-out scientific data and method owner comparison agreement available in T082 record",
+      "path": "work/evidence/T-082/scientific-baseline.md",
+      "line": 3,
+      "kind": "historical_validation_gap"
+    },
+    {
+      "id": "A19",
+      "claim": "History schemas 1-15 and 53-operation WBJob retained; no evidence-based trigger for wholesale rewrite in T082",
+      "path": "work/evidence/T-082/architecture-conditions.md",
+      "line": 1,
+      "kind": "historical_architecture_assessment"
+    }
+  ],
+  "performance_historical": {
+    "source": "work/evidence/T-082/r09-disposition.md",
+    "baseline_commit": "244c5da",
+    "optimized_commit": "e6b78b4",
+    "samples": 30,
+    "warmup": 5,
+    "environment": "same synthetic fixtures, local software rendering; not real customer scale",
+    "row_512x96": {
+      "snapshot_p95_ms_before": 657.76,
+      "snapshot_p95_ms_after": 144.83,
+      "click_p95_ms_before": 1221.5,
+      "click_p95_ms_after": 512.4,
+      "payload_bytes_after": 15190523
+    },
+    "intake_512x96": {
+      "snapshot_p95_ms_before": 824.3,
+      "snapshot_p95_ms_after": 207.28,
+      "click_p95_ms_before": 2162.9,
+      "click_p95_ms_after": 1233.7,
+      "payload_bytes_after": 27149399
+    },
+    "small_row_click_p95_ms": {
+      "before": 177.2,
+      "after": 234.8,
+      "attribution": "unknown"
+    },
+    "not_claimed": [
+      "all performance budgets passed",
+      "customer typical performance",
+      "whole-process peak memory"
+    ]
+  },
+  "recommendation": "Retain numerical core, immutable storage and process lifecycle; add general module/workflow/review/event/agent layers incrementally and isolate algorithm development. No full-stack rewrite justified by current evidence.",
+  "not_executed": [
+    "product tests",
+    "scientific validation",
+    "GUI interaction",
+    "new performance measurement",
+    "installation acceptance",
+    "penetration testing"
+  ]
+}
