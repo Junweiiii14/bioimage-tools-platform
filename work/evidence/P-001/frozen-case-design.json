@@ -1,0 +1,110 @@
+{
+  "method": "profile_integral@1",
+  "quant_policy": "legacy_bounds@1",
+  "geometry_policy": "fixed_grid@1",
+  "polarity": "light",
+  "band_bounds": [
+    0,
+    4
+  ],
+  "pixel_width": 3,
+  "absolute_tolerance": 0,
+  "expectation_source": "Analytic triangle area base 4 x height 20 / 2 = 40; 16-bit scaled by 100. Constant profile has zero area above its baseline. Out-of-bounds ROI invalid; dtype endpoint pixels require review. Expectations fixed before execution.",
+  "cases": [
+    {
+      "name": "triangle_u8",
+      "dtype": "uint8",
+      "profile": [
+        10,
+        20,
+        30,
+        20,
+        10
+      ],
+      "roi": [
+        0,
+        0,
+        3,
+        5
+      ],
+      "expected_status": "valid",
+      "expected_signal": 40.0
+    },
+    {
+      "name": "triangle_u16",
+      "dtype": "uint16",
+      "profile": [
+        1000,
+        2000,
+        3000,
+        2000,
+        1000
+      ],
+      "roi": [
+        0,
+        0,
+        3,
+        5
+      ],
+      "expected_status": "valid",
+      "expected_signal": 4000.0
+    },
+    {
+      "name": "flat_zero",
+      "dtype": "uint16",
+      "profile": [
+        1000,
+        1000,
+        1000,
+        1000,
+        1000
+      ],
+      "roi": [
+        0,
+        0,
+        3,
+        5
+      ],
+      "expected_status": "valid",
+      "expected_signal": 0.0
+    },
+    {
+      "name": "invalid_roi",
+      "dtype": "uint16",
+      "profile": [
+        1000,
+        2000,
+        3000,
+        2000,
+        1000
+      ],
+      "roi": [
+        0,
+        0,
+        4,
+        5
+      ],
+      "expected_status": "invalid",
+      "expected_signal": null
+    },
+    {
+      "name": "dtype_limits",
+      "dtype": "uint8",
+      "profile": [
+        0,
+        20,
+        30,
+        20,
+        0
+      ],
+      "roi": [
+        0,
+        0,
+        3,
+        5
+      ],
+      "expected_status": "quality_review",
+      "expected_signal": null
+    }
+  ]
+}
