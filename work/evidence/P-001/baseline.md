@@ -23,3 +23,7 @@
 已核对四包README、tool_contracts.api、wb_tool的AnalysisRequest/analyze_annotations、现有worker、RunSession及Workspace提交契约。选择严格uint8/uint16原值+固定半开ROI/闭区间条带的成熟手工分析用例；归一化不在该用例本身，不能为它声称坏分母测试已覆盖。可用解析三角剖面及平坦/上下限/非法ROI/不支持dtype建立事前预期；旧路径与独立路径都需真实运行，差异非复制旧表。复用真实PID登记后放行请求、成功退出后终态CAS；候选清单验证与产物发布须有明确失败/取消行为。新契约按真实用例最小化，平台不引入WB语义。
 
 科学留出、负责人判定、干净目标Windows和用户现场验收仍待外部条件；不阻塞已授权工程，不等价为新科学方法准入。
+
+## 暂定集成候选
+
+6421203以双亲合并已发布PR46 dca0061f与P001/T082链；冲突保留最新T082治理再接V0语义，B008原证据/任务不修改。P001暂以codex/b008-rd-plan-github为PR base，合入main前再次核对及重载。Node固定开发依赖`npm ci --ignore-scripts` exit0，报告4项moderate漏洞，未升级锁或运行自动fix；不宣称在线审计通过。基线规则重载后输出差异已逐段核读。

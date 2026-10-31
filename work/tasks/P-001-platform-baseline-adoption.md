@@ -1,6 +1,6 @@
 # P-001 正确产品基线与长期计划接入
 
-<!-- PROGRAM_TASK_META {"id":"P-001","status":"in_progress","work_package":"W00","depends_on":[],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a190e6-02b1-74e3-a7b9-bd5fbc3f36fe","base_commit":"dfc48ed7c2c944dc8f03c3931bc7985452a31393","head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-001","status":"in_review","work_package":"W00","depends_on":[],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a190e6-02b1-74e3-a7b9-bd5fbc3f36fe","base_commit":"dfc48ed7c2c944dc8f03c3931bc7985452a31393","head_commit":"64212030b622c17c7106396450f076796ca7f214"} -->
 
 ## 执行状态
 
@@ -46,3 +46,5 @@ B-007研发主方案3.0（docs/plans/research-platform-rd.md及同名HTML）、B
 ## 2026-10-31 激活记录
 
 本卡现为执行权威；原B008发布版本是planned历史快照，原发布树不修改。当前隔离分支codex/p001-v0-baseline，以T082 dfc48ed7建立；main与文档PR尚待最终复核。已生成真实context与integration清单。先完成计划/规则语义接入及独审、约定集成；P002仍planned。
+
+初始956111c独审Accepted，非阻断入口措辞已修正；已在隔离分支合并方案发布dca0061f，保留其B008任务/证据原样及T082历史回执。暂定PR base为发布分支dca0061f，待PR46合入main后切实际main并重载回执，最终独审/CI/集成尚待。检查与限制见 [baseline](../evidence/P-001/baseline.md)。
