@@ -211,6 +211,7 @@ class ModuleExecutor(Protocol):
     def validate(self, inputs: InputMetadata, params: FrozenParams) -> ValidationReport: ...
     def execute(self, request: ExecutionRequest, context: ExecutionContext) -> OutputManifest: ...
 
+
 # context 仅提供受限资产读写、取消检查、进度/预览发布。
 # execute 的纯计算交给 domain；worker 适配器负责 I/O。
 # domain 不获取 Workspace、Qt、任意文件系统或网络客户端。

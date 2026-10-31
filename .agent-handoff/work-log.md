@@ -1,7 +1,5 @@
 # Current Work Log
 
-## 2026-10-19 T-050 规划修订
-
 ## 2026-10-18 T045本地实现完成
 
 从f42f069仅新增t045隔离树，产品a2cda5f/3f4c593/8246eb1和测试后继f18589a；手动泳道/UB整段/Fig自动工程闭环完成。指定图33Fig106运行成功、重开106、真实CSV/XLSX135行545值拒绝覆盖。独审原5项及Space全部resolved，schema9未知反例9→10独审14项0；最终747passed517.90秒/原child及check0、全部wheel与9合约通过。原停止/746+1失败记录不抹去。原项目/旧树/快捷方式保持，源图SHA与旧四核心文件已复核。后继仅文档/私图捕获gitignore；本地completed未push/main/发布。历史原生UNKNOWN与科学/干净机留出保留，使用候选Start脚本，详见T045验证/说明。
@@ -153,3 +151,7 @@ T079首轮62d91b0 CI Windows1223完整/wheel0，Linux1222过1败：测试在下�
 ## 2026-10-24 T081 固定N明显主行与完整交付
 
 按用户确认4/2/5/4完成180实际9图自动裁剪；prominent/crop5/workflow5全批门槛已独审PR42合入。R1安装态33项未覆盖图片角色缺陷，独审Blocked后按typed资产修复，四反例先红后绿；c3df首CI关闭测试缺空闲前置，受控真实worker红/补齐前置3绿，原断言与时限保持。最终f1独审四CI通过，R2实际安装/37项/全部27原图9裁图4Fig27缩略图和201文件独审交付通过。首次publisher1的维护终端PS7模块路径冲突保留，经独审局部环境恢复checker0，全字节不变。原图/历史/旧包/dirty和视频树保持，不新建聊天/调度；最终记录HEAD独审/CI/正常PR43合入依任务闭合谓词，不把未来检查写通过。
+
+## 2026-10-31 B008 当前交接
+
+方案与V0派发说明见work/tasks/B-008-github-plan-and-phase-one.md及archive/work-log-20261031T074220415396Z.md。PR46准确HEAD独审/四CI/合并按任务闭合条件核验。Astra新聊天已在独立bioimage-v0执行树激活P001，get_goal记录active且无预算；不把本分支planned发布快照当其正在执行的状态。

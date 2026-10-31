@@ -27,3 +27,15 @@
 - context使用目标树自己的dev.py，显式UV_PROJECT_ENVIRONMENT指向已安装的产品venv，仅`--no-sync`跑文档/规则检查，未同步/升级该环境。规则变化后重新生成唯一B008回执，最终检查绑定PR base/head。
 
 GitHub必需CI、提交独审和新聊天goal状态将在B008任务卡及对应GitHub对象中记录；不伪造已经完成的集成或用户科学验收。
+
+## 首轮失败与修正
+
+首次commit钩子在新worktree空venv中找不到ruff，退出2；显式选择已安装的T082 venv且--no-sync后，三个原有钩子全部通过，未跳过钩子或改变产品依赖。
+
+首提交ac983007的GitHub quality run 41181434999在两平台均被Ruff格式检查阻止：3.0及2.0归档的Python示例各缺一个空行。仅补格式要求的空行，重建HTML并更新投影摘要；随后本机全仓Ruff format --check报告990文件已格式化。没有修改原始本地交付、公式、测试或CI门禁。
+
+ac983007的非作者P卡/阶段计划审查Accepted；另一审阅者发现便携模式将输出移到.local后仍留三处相对证据链接，报告Blocked。已仅对便携模式将这三处改为GitHub main文件链接，并说明查看外部证据需要联网和文档PR已合入。仓库模式相对链接保持，字体与正文仍可离线读取。最终增量审查结论绑定最后提交记录于PR46；本文件不提前声称其通过。
+
+Edge headless仓库版实际打开：13章/49表，WB Sans字体loaded，无pageerror/requestfailed，1440px下正文无横向溢出，截图已视检。原始烟测保留本机.local/B008-html-smoke.json与PNG，不作为新产品验收。便携修正后重新构建并独立核验链接。
+
+GitHub阶段issue44、milestone2及维护issue45已创建。GPT-6 Astra新聊天返回ID并已开始基线接入，目标active的执行者核验见thread-dispatch.json。B008完成只按任务卡最终闭合条件与GitHub准确HEAD事实判定。

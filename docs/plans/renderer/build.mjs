@@ -5,6 +5,7 @@ import {marked} from 'marked';
 const __dirname=path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '../../..');
 const source = path.join(root, 'docs/plans/research-platform-rd.md');
+const standalone=process.argv.includes('--standalone');
 const md = fs.readFileSync(source, 'utf8');
 let body = marked.parse(md, {gfm:true, breaks:false});
 const sourceLinks = Object.fromEntries([...md.matchAll(/\| (N\d{2}) \| \[([^\]]+)\]\((https?:[^)]+)\)/g)].map(m=>[m[1],m[3]]));
@@ -19,13 +20,24 @@ body = body.replace(/<h([2-4])>(.*?)<\/h\1>/gs, (_,level,content) => {
 });
 body = body.replace(/<table>/g,'<div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的数据表"><table>').replace(/<\/table>/g,'</table></div>');
 body = body.replace(/href="(C:\/[^"<>]+)"/g,(_,p)=>`href="file:///${encodeURI(p)}"`);
+if (standalone) {
+  body = body.replace(/href="([^"#]+)"/g, (attribute, href) => {
+    if (/^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith('//')) return attribute;
+    const target = path.resolve(path.dirname(source), decodeURIComponent(href));
+    const relative = path.relative(root, target);
+    if (relative.startsWith('..') || path.isAbsolute(relative) || !fs.existsSync(target)) {
+      throw new Error(`Invalid repository evidence link: ${href}`);
+    }
+    const urlPath = relative.split(path.sep).map(encodeURIComponent).join('/');
+    return `href="https://github.com/Junweiiii14/bioimage-tools-platform/blob/main/${urlPath}"`;
+  });
+}
 let block=0;
 body = body.replace(/<(p|li|pre|tr)>/g,(_,tag)=>`<${tag} id="block-${++block}">`);
 const diagram = `<figure class="flow-diagram" aria-labelledby="flow-caption"><figcaption id="flow-caption">一份可追溯项目，从实验输入到最终成果</figcaption><div class="flow-row"><div>图像、孔表与事件<small>保留原始输入</small></div><span aria-hidden="true">→</span><div>导入与身份校验<small>样本、单位、实验设计</small></div><span aria-hidden="true">→</span><div>自动场景工作流<small>模块连接 · 逐步证据</small></div><span aria-hidden="true">→</span><div>观察与可选微调<small>同源预览 · 依赖重算</small></div><span aria-hidden="true">→</span><div>表图成果包<small>可追溯 · 可重开</small></div></div><p>运行前设参数 → 运行中可观察、暂停与调整 → 运行后生成新版本；普通样本默认自动完成。</p></figure>`;
 body = body.replace(/(<h2 id="section-1"[^>]*>)/,diagram+'$1');
 const toc = top.map(x=>`<a href="#${x.id}">${escape(x.content)}</a>`).join('');
 const fontRoot=path.join(root,'apps/desktop/src/bioimage_app/web_ui/fonts');
-const standalone=process.argv.includes('--standalone');
 const fontSource=standalone ? 'data:font/ttf;base64,'+fs.readFileSync(path.join(fontRoot,'NotoSansSC-VF.ttf')).toString('base64') : '../../apps/desktop/src/bioimage_app/web_ui/fonts/NotoSansSC-VF.ttf';
 const fontLicense=fs.readFileSync(path.join(fontRoot,'OFL.txt'),'utf8');
 const css = `
