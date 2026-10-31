@@ -16,8 +16,10 @@
   "scope": "P001 baseline adoption, then P002 and necessary V0 support; real worker, persisted outputs, old-method comparison, thin GUI, checks, independent review and PR",
   "limitations": "This dispatch is not V0 product completion; the receiving chat maintains its own execution evidence and actual task state. No token budget was assigned.",
   "goal_state_evidence": "goal-state.json",
-  "goal_state_sha256": "daacf30f3c688f6305f043dedee464e49ca78a99fe2f2df674b0a7728e1c7728",
   "execution_checkout": "bioimage-v0",
   "execution_branch": "codex/p001-v0-baseline",
-  "execution_task": "P-001 in_progress in receiving execution tree; this publication retains planned source snapshots"
+  "execution_task": "P-001 in_progress in receiving execution tree; this publication retains planned source snapshots",
+  "source_goal_state_sha256": "daacf30f3c688f6305f043dedee464e49ca78a99fe2f2df674b0a7728e1c7728",
+  "published_goal_state_sha256": "f3d85901987649cd41f46aa7d3ce61516c748cf3a9914e25ddadce086d175c54",
+  "goal_evidence_projection": "Source file copied verbatim; Git normalizes CRLF to LF. Both source and published SHA256 are recorded."
 }
