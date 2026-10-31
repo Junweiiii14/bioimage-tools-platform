@@ -1,0 +1,9 @@
+{
+  "case": "intake-limit",
+  "started_at": "2026-10-28T13:50:37.4818538+08:00",
+  "ended_at": "2026-10-28T13:53:34.4564747+08:00",
+  "exit_code": 0,
+  "command": "uv run --locked --no-sync python -m tooling.benchmark_workbench_snapshot --run --case intake-limit",
+  "qpa": "windows",
+  "chromium_flags": "--disable-gpu"
+}

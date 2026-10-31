@@ -3,6 +3,7 @@
 import base64
 import json
 import math
+import re
 from collections import Counter
 from collections.abc import Callable
 from hashlib import sha256
@@ -13,6 +14,7 @@ from PySide6.QtGui import QDesktopServices, QImage, QImageWriter
 from wb_tool.api import (
     BandBounds,
     Baseline,
+    IncompleteProjectEdit,
     LaneROI,
     ManualQuantTarget,
     ProjectTableCell,
@@ -31,6 +33,7 @@ from wb_tool.api import (
     row_is_ready,
 )
 
+from bioimage_app.diagnostics import WebBoundaryDiagnostics
 from bioimage_app.figure_window import FigureProjectWindow
 from bioimage_app.web_advanced import AdvancedCommands
 from bioimage_app.web_intake import apply_intake_command
@@ -69,6 +72,74 @@ class WorkbenchBridge(QObject):
     sessionRequested = Signal(str, str)
     sessionStateChanged = Signal(str)
     advancedStateChanged = Signal(str)
+    diagnosticNotice = Signal(str)
+
+    @Slot(str)
+    def reportUiFailure(self, raw: str) -> None:
+        """Accept only bounded diagnostic metadata, never arbitrary console text."""
+        if len(raw) > 4096:
+            return
+        try:
+            parsed = json.loads(raw)
+        except (ValueError, TypeError):
+            return
+        if not isinstance(parsed, dict):
+            return
+        data = cast(dict[str, object], parsed)
+        action = data.get("action")
+        if not isinstance(action, str) or action not in {
+            "state",
+            "progress",
+            "session",
+            "advanced",
+        }:
+            return
+        action = str(action)
+        if data.get("recovered") is True:
+            self._diagnostics.recovered(action)
+            return
+        kind = data.get("exception")
+        if not isinstance(kind, str) or kind not in {
+            "Error",
+            "TypeError",
+            "RangeError",
+            "SyntaxError",
+            "ReferenceError",
+            "URIError",
+            "EvalError",
+            "AggregateError",
+        }:
+            kind = "Error"
+        stack = data.get("stack")
+        frames = (
+            [
+                line
+                for line in cast(list[object], stack)[:8]
+                if isinstance(line, str)
+                and re.fullmatch(r"[a-z_]{1,40}\.js:[0-9]{1,7}:[0-9]{1,7}", line)
+            ]
+            if isinstance(stack, list)
+            else []
+        )
+        request = data.get("requestId")
+        operation = data.get("operation")
+        epoch, revision = data.get("sessionEpoch"), data.get("revision")
+        phase = data.get("phase")
+        self._diagnostics.report(
+            action,
+            str(kind),
+            frames,
+            project=self.host.view.project_identity,
+            epoch=epoch if type(epoch) is int and 0 <= epoch <= 2**53 - 1 else self.session_epoch,
+            revision=revision
+            if type(revision) is int and 0 <= revision <= 2**53 - 1
+            else self.host.view.generation,
+            request=request[:96] if isinstance(request, str) else "",
+            operation=operation[:48] if isinstance(operation, str) else "",
+            phase=phase
+            if isinstance(phase, str) and phase in {"parse", "validate", "render"}
+            else "render",
+        )
 
     @Slot(str, str)
     def session(self, action: str, payload: str = "{}") -> None:
@@ -110,6 +181,7 @@ class WorkbenchBridge(QObject):
         self.host = host
         self.choose = choose
         self.session_epoch = 0
+        self._diagnostics = WebBoundaryDiagnostics()
         self._previous = ""
         self._published_key: tuple[object, ...] | None = None
         self._images: dict[str, str | None] = {}
@@ -138,8 +210,7 @@ class WorkbenchBridge(QObject):
     def snapshot(self) -> dict[str, object]:
         view = self.host.view
         project = view.project()
-        selected_index = view.table.currentRow()
-        selected = project.rows[selected_index] if 0 <= selected_index < len(project.rows) else None
+        selected = next((r for r in project.rows if r.row_id == view.selected_row_id), None)
         preview = view.source_preview
         preview_key = (
             (preview.sha256, preview.preview_width, preview.preview_height) if preview else None
@@ -155,12 +226,14 @@ class WorkbenchBridge(QObject):
             self._images[preview.sha256] = image_url(image)
             self._source_preview_key = preview_key
         live_sources = {r.source.sha256 for r in project.rows if r.source}
+        intake_sources: set[str] = set()
         intake = None
         if isinstance(project, WBIntakeProject):
-            live_sources.update(source.asset.sha256 for source in project.intake.sources)
+            intake_sources = {source.asset.sha256 for source in project.intake.sources}
+            live_sources.update(intake_sources)
             intake = intake_snapshot(project)
-            sources: list[dict[str, object]] = []
-            for source in project.intake.sources:
+            sources = cast(list[dict[str, object]], intake["sources"])
+            for source, projected in zip(project.intake.sources, sources, strict=True):
                 raster = view.thumbnail(source.asset.sha256)
                 if raster and source.asset.sha256 not in self._images:
                     self._images[source.asset.sha256] = image_url(
@@ -172,13 +245,8 @@ class WorkbenchBridge(QObject):
                             QImage.Format.Format_Grayscale8,
                         )
                     )
-                sources.append(
-                    {
-                        **source.model_dump(mode="json"),
-                        "preview": self._images.get(source.asset.sha256),
-                    }
-                )
-            intake["sources"] = sources
+                # The shared image map carries this display-only PNG once for source/row views.
+                projected["preview"] = None
             group_preview = self.host.intake.group_preview
             if group_preview is not None:
                 source_id, raster = group_preview
@@ -374,6 +442,9 @@ class WorkbenchBridge(QObject):
                             }
                         )
         cells = [cell_state(c) for c in view.analysis.result_view.cells]
+        cells_by_row: dict[str, list[dict[str, object]]] = {}
+        for cell in cells:
+            cells_by_row.setdefault(cast(str, cell["rowId"]), []).append(cell)
         if intake is not None and isinstance(project, WBIntakeProject):
             from dataclasses import asdict
 
@@ -409,7 +480,7 @@ class WorkbenchBridge(QObject):
                     if crop_steps.get(row.row_id) == "failed"
                     else "pending"
                 )
-            results = [cell for cell in cells if cell["rowId"] == row.row_id]
+            results = cells_by_row.get(row.row_id, [])
             reasons = list(dict.fromkeys(str(cell["reason"]) for cell in results if cell["reason"]))
             roi = row.roi
             rows.append(
@@ -431,7 +502,9 @@ class WorkbenchBridge(QObject):
                     "reviewed": row.reviewed,
                     "cropStatus": crop_status,
                     "preview": self._images.get(row.source.sha256)
-                    if row.source and source_counts[row.source.sha256] == 1
+                    if row.source
+                    and source_counts[row.source.sha256] == 1
+                    and row.source.sha256 not in intake_sources
                     else None,
                     "reason": "；".join(reasons) or ("尚未定位裁剪区域" if not roi else "等待复核"),
                     "status": "valid"
@@ -439,20 +512,22 @@ class WorkbenchBridge(QObject):
                     else "pending_review"
                     if roi
                     else "not_detected",
-                    "results": results,
                 }
             )
         return {
+            "snapshotContract": "wb-workbench-snapshot@1",
             "sessionEpoch": self.session_epoch,
             "cropEditContract": _CROP_EDIT_CONTRACT,
             "sourcePreviews": {
-                key: value for key, value in self._images.items() if source_counts[key] > 1
+                key: value
+                for key, value in self._images.items()
+                if source_counts[key] > 1 or key in intake_sources
             },
             "projectId": project.project_id,
             "revision": view.generation,
             "projectName": project.name,
             "intake": intake,
-            "canRetryLocation": not self.host.retry_location_button.isHidden(),
+            "canRetryLocation": self.host.can_retry_location,
             "busy": self.host.operation_busy,
             "status": self._error or view.status.text(),
             "selectedId": selected.row_id if selected else "",
@@ -475,11 +550,11 @@ class WorkbenchBridge(QObject):
 
     @Slot()
     def publish(self) -> None:
-        self.advanced_commands.poll()
         if self.host.resources_closed:
             self.timer.stop()
             return
         try:
+            self.advanced_commands.poll()
             if self._pending_source and not self.host.operation_busy and not self.host.is_closing:
                 project_id, row_id = self._pending_source
                 self._pending_source = None
@@ -517,7 +592,7 @@ class WorkbenchBridge(QObject):
                 id(self.host.intake.group_preview),
                 view.preview_label.full_pixmap.cacheKey(),
                 self.host.operation_busy,
-                self.host.retry_location_button.isHidden(),
+                self.host.can_retry_location,
                 self.host.automatic.last_output_path,
                 self.host.automatic.discovery_report,
                 self.host.intake_workflow.presentation_key,
@@ -526,11 +601,25 @@ class WorkbenchBridge(QObject):
                 self._error,
             )
             if self._previous and key == self._published_key:
+                self._diagnostics.recovered("snapshot")
                 return
             state = json.dumps(self.snapshot(), ensure_ascii=False, allow_nan=False)
             self._published_key = key
-        except ValueError:
-            return  # An incomplete native advanced edit is not a replacement project.
+        except IncompleteProjectEdit:
+            return  # Explicit control validation; never replace the last valid project.
+        except Exception as error:
+            if self._diagnostics.python_failure(
+                "snapshot",
+                error,
+                project=self.host.view.project_identity,
+                epoch=self.session_epoch,
+                revision=self.host.view.generation,
+            ):
+                self.diagnosticNotice.emit(
+                    "项目显示更新失败，编辑已保留。请重试当前操作；持续失败时提供本机会话日志。"
+                )
+            return
+        self._diagnostics.recovered("snapshot")
         if state != self._previous:
             self._previous = state
             self.stateChanged.emit(state)
@@ -690,12 +779,11 @@ class WorkbenchBridge(QObject):
                     self._quant_overview = (self.host.view.project().project_id, rows[index].row_id)
                 else:
                     self._quant_overview = None
-                previous_index = self.host.view.table.currentRow()
-                self.host.view.table.setCurrentCell(index, 0)
-                if self.host.operation_busy:
+                was_busy = self.host.operation_busy
+                if not self.host.view.select_row(rows[index].row_id):
+                    raise ValueError("请先完成当前编辑，再切换原图")
+                if was_busy:
                     self._pending_source = (self.host.view.project_identity, rows[index].row_id)
-                elif previous_index == index:
-                    self.host.select_source(rows[index].row_id)
             elif action == "quant_edit":
                 self._edit_quant(data)
             elif action in {
@@ -764,8 +852,7 @@ class WorkbenchBridge(QObject):
                             row_index = next(
                                 i for i, r in enumerate(current.rows) if r.figure == target
                             )
-                            self.host.view.table.setCurrentCell(row_index, 0)
-                            self.host.select_source(current.rows[row_index].row_id)
+                            self.host.view.select_row(current.rows[row_index].row_id)
                         else:
                             self.host.view.status.setText("全部分组已审核并保存")
 
@@ -850,7 +937,7 @@ class WorkbenchBridge(QObject):
                         (i for i in following if rows[i].source and not rows[i].reviewed), None
                     )
                     if next_index is not None:
-                        self.host.view.table.setCurrentCell(next_index, 0)
+                        self.host.view.select_row(rows[next_index].row_id)
             elif action == "undo":
                 self.host.view.undo_review()
             elif action == "redo":

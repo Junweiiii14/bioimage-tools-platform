@@ -1,0 +1,278 @@
+[
+  {
+    "case": "rows-small",
+    "elapsed_seconds": 10.055158,
+    "json_sha256": "e420c18b61e32bbc1ec04a195d4f95f15b3bbb1131211fa66c1e41848a9c2f80",
+    "log_sha256": "73501ed942ba58b9c37373e698afaf43d0611711b214695ceeca294e425312aa",
+    "fixture_sha256": "3c0ea28cb00661130229c501ff5ce7374a3caf33e71d0c0b77ad39c5b17002af",
+    "bytes": 15252,
+    "memory_before": {
+      "host": {
+        "pid": 43632,
+        "private_bytes": 1663152128,
+        "working_set_bytes": 442548224,
+        "peak_working_set_bytes": 454184960
+      },
+      "renderer": {
+        "pid": 33340,
+        "private_bytes": 55226368,
+        "working_set_bytes": 142569472,
+        "peak_working_set_bytes": 166588416
+      }
+    },
+    "memory_after": {
+      "host": {
+        "pid": 43632,
+        "private_bytes": 1652727808,
+        "working_set_bytes": 438284288,
+        "peak_working_set_bytes": 454676480
+      },
+      "renderer": {
+        "pid": 33340,
+        "private_bytes": 96358400,
+        "working_set_bytes": 188755968,
+        "peak_working_set_bytes": 189751296
+      }
+    },
+    "cold_p95": {
+      "construct_ms": 0.1048,
+      "serialize_ms": 0.0574,
+      "total_ms": 0.1622
+    },
+    "warm_p95": {
+      "construct_ms": 0.0954,
+      "serialize_ms": 0.0744,
+      "total_ms": 0.1675
+    },
+    "click_p95_ms": 177.20000004768372,
+    "click_max_ms": 233.60000002384186,
+    "handler_p95_ms": 175.70000004768372,
+    "idle_p95_ms": 0.0076,
+    "idle_calls": 0,
+    "idle_emissions": 0,
+    "screen": {
+      "width": 1707,
+      "height": 1067,
+      "device_pixel_ratio": 1.5,
+      "logical_dpi": 96.0
+    },
+    "viewport": [
+      1440,
+      940
+    ],
+    "environment": {
+      "QT_QPA_PLATFORM": "windows",
+      "QT_OPENGL": null,
+      "QTWEBENGINE_CHROMIUM_FLAGS": "--disable-gpu",
+      "QT_QUICK_BACKEND": null
+    },
+    "qt": "6.12.0"
+  },
+  {
+    "case": "rows-limit",
+    "elapsed_seconds": 114.897474,
+    "json_sha256": "e5477621f30c5511d3af98fd0ea047d7529161ed9c10e00050b3169700a20fd3",
+    "log_sha256": "773b696d048388b241000dc1787b5ab409803b07dcf0cca3dd735f808af187b5",
+    "fixture_sha256": "06b5c973121a21adf15b19a6469f1b92cbb97041cc7d00de45c014f3b3c8145e",
+    "bytes": 25009484,
+    "memory_before": {
+      "host": {
+        "pid": 49888,
+        "private_bytes": 1818947584,
+        "working_set_bytes": 606449664,
+        "peak_working_set_bytes": 743677952
+      },
+      "renderer": {
+        "pid": 1480,
+        "private_bytes": 226299904,
+        "working_set_bytes": 337043456,
+        "peak_working_set_bytes": 357900288
+      }
+    },
+    "memory_after": {
+      "host": {
+        "pid": 49888,
+        "private_bytes": 1897951232,
+        "working_set_bytes": 682323968,
+        "peak_working_set_bytes": 891359232
+      },
+      "renderer": {
+        "pid": 1480,
+        "private_bytes": 626966528,
+        "working_set_bytes": 726179840,
+        "peak_working_set_bytes": 912941056
+      }
+    },
+    "cold_p95": {
+      "construct_ms": 524.7926,
+      "serialize_ms": 127.0882,
+      "total_ms": 651.8808
+    },
+    "warm_p95": {
+      "construct_ms": 529.5591,
+      "serialize_ms": 130.1224,
+      "total_ms": 657.7564
+    },
+    "click_p95_ms": 1221.5,
+    "click_max_ms": 1238.199999988079,
+    "handler_p95_ms": 1220.0999999642372,
+    "idle_p95_ms": 0.0098,
+    "idle_calls": 0,
+    "idle_emissions": 0,
+    "screen": {
+      "width": 1707,
+      "height": 1067,
+      "device_pixel_ratio": 1.5,
+      "logical_dpi": 96.0
+    },
+    "viewport": [
+      1440,
+      940
+    ],
+    "environment": {
+      "QT_QPA_PLATFORM": "windows",
+      "QT_OPENGL": null,
+      "QTWEBENGINE_CHROMIUM_FLAGS": "--disable-gpu",
+      "QT_QUICK_BACKEND": null
+    },
+    "qt": "6.12.0"
+  },
+  {
+    "case": "intake-small",
+    "elapsed_seconds": 10.38154,
+    "json_sha256": "a414cded8e3ee28838ee8955d7f8f917485cb1e148ca5d04df1873935ded2010",
+    "log_sha256": "3035b97f1e8a78ed72b5b366e0ac21dd336e6b25d11a76a460263da19aa93686",
+    "fixture_sha256": "11f185a269ff4f46e11622a0a203f451f4d8d36427084c68d24fb04cb72302c4",
+    "bytes": 195697,
+    "memory_before": {
+      "host": {
+        "pid": 38860,
+        "private_bytes": 1667653632,
+        "working_set_bytes": 448720896,
+        "peak_working_set_bytes": 460222464
+      },
+      "renderer": {
+        "pid": 48824,
+        "private_bytes": 56037376,
+        "working_set_bytes": 144601088,
+        "peak_working_set_bytes": 161030144
+      }
+    },
+    "memory_after": {
+      "host": {
+        "pid": 38860,
+        "private_bytes": 1660395520,
+        "working_set_bytes": 444170240,
+        "peak_working_set_bytes": 463249408
+      },
+      "renderer": {
+        "pid": 48824,
+        "private_bytes": 157679616,
+        "working_set_bytes": 239603712,
+        "peak_working_set_bytes": 240844800
+      }
+    },
+    "cold_p95": {
+      "construct_ms": 1.7929,
+      "serialize_ms": 0.3896,
+      "total_ms": 2.1875
+    },
+    "warm_p95": {
+      "construct_ms": 0.3547,
+      "serialize_ms": 0.3833,
+      "total_ms": 0.7327
+    },
+    "click_p95_ms": 191.60000002384186,
+    "click_max_ms": 240.0999999642372,
+    "handler_p95_ms": 190.69999998807907,
+    "idle_p95_ms": 0.0126,
+    "idle_calls": 0,
+    "idle_emissions": 0,
+    "screen": {
+      "width": 1707,
+      "height": 1067,
+      "device_pixel_ratio": 1.5,
+      "logical_dpi": 96.0
+    },
+    "viewport": [
+      1440,
+      940
+    ],
+    "environment": {
+      "QT_QPA_PLATFORM": "windows",
+      "QT_OPENGL": null,
+      "QTWEBENGINE_CHROMIUM_FLAGS": "--disable-gpu",
+      "QT_QUICK_BACKEND": null
+    },
+    "qt": "6.12.0"
+  },
+  {
+    "case": "intake-limit",
+    "elapsed_seconds": 176.974621,
+    "json_sha256": "1c5feb092f989c1bba2c81faf8b7a5d277caa8d35092a90fcbb29fa5c43dd99e",
+    "log_sha256": "b9dacf87898e03e6b3fe4f2be1e4e44d9e27c5184a63bd7ef76e2b8fde1ad2f0",
+    "fixture_sha256": "ae39df820412576fe4e37dacde87b45e4afc31911b28abe7722120f79c3ed573",
+    "bytes": 48294826,
+    "memory_before": {
+      "host": {
+        "pid": 50056,
+        "private_bytes": 1891123200,
+        "working_set_bytes": 674091008,
+        "peak_working_set_bytes": 994193408
+      },
+      "renderer": {
+        "pid": 33912,
+        "private_bytes": 274083840,
+        "working_set_bytes": 378339328,
+        "peak_working_set_bytes": 718557184
+      }
+    },
+    "memory_after": {
+      "host": {
+        "pid": 50056,
+        "private_bytes": 2068783104,
+        "working_set_bytes": 812523520,
+        "peak_working_set_bytes": 1224691712
+      },
+      "renderer": {
+        "pid": 33912,
+        "private_bytes": 1365528576,
+        "working_set_bytes": 1462345728,
+        "peak_working_set_bytes": 1812414464
+      }
+    },
+    "cold_p95": {
+      "construct_ms": 776.8921,
+      "serialize_ms": 199.4586,
+      "total_ms": 973.1616
+    },
+    "warm_p95": {
+      "construct_ms": 626.5718,
+      "serialize_ms": 197.7324,
+      "total_ms": 824.3042
+    },
+    "click_p95_ms": 2162.900000035763,
+    "click_max_ms": 2193.600000023842,
+    "handler_p95_ms": 2161.400000035763,
+    "idle_p95_ms": 0.0104,
+    "idle_calls": 0,
+    "idle_emissions": 0,
+    "screen": {
+      "width": 1707,
+      "height": 1067,
+      "device_pixel_ratio": 1.5,
+      "logical_dpi": 96.0
+    },
+    "viewport": [
+      1440,
+      940
+    ],
+    "environment": {
+      "QT_QPA_PLATFORM": "windows",
+      "QT_OPENGL": null,
+      "QTWEBENGINE_CHROMIUM_FLAGS": "--disable-gpu",
+      "QT_QUICK_BACKEND": null
+    },
+    "qt": "6.12.0"
+  }
+]

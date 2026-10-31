@@ -2,16 +2,84 @@
 
 import faulthandler
 import json
+import re
 import sys
 import threading
 import traceback
 from contextlib import suppress
 from datetime import UTC, datetime
+from hashlib import sha256
+from importlib.metadata import version
 from pathlib import Path
 from types import TracebackType
 from uuid import uuid4
 
-from PySide6.QtCore import QMessageLogContext, QtMsgType, qFormatLogMessage, qInstallMessageHandler
+from PySide6.QtCore import (
+    QMessageLogContext,
+    QtMsgType,
+    qFormatLogMessage,
+    qInstallMessageHandler,
+    qWarning,
+)
+
+
+class WebBoundaryDiagnostics:
+    """Bounded, payload-free events routed through the existing desktop Qt sink."""
+
+    def __init__(self) -> None:
+        self._failed: set[str] = set()
+        self._version = version("bioimage-app")
+
+    def recovered(self, action: str) -> None:
+        self._failed.discard(action)
+
+    def report(
+        self,
+        action: str,
+        exception: str,
+        stack: list[str],
+        *,
+        project: str,
+        epoch: int,
+        revision: int,
+        request: str = "",
+        operation: str = "",
+        phase: str = "render",
+    ) -> bool:
+        if action in self._failed:
+            return False
+        self._failed.add(action)
+        # IDs are correlation tokens, never user names, payloads or filesystem paths.
+        record = {
+            "contract": "web-boundary@1",
+            "version": self._version,
+            "action": action,
+            "phase": phase,
+            "project": sha256(project.encode()).hexdigest()[:16],
+            "session": epoch,
+            "revision": revision,
+            "request": sha256(request.encode()).hexdigest()[:16] if request else "",
+            "operation": operation if re.fullmatch(r"[a-z_]{1,48}", operation) else "",
+            "exception": exception,
+            "stack": stack[:8],
+        }
+        # A failed log sink must not suppress the actionable UI notice/recovery.
+        with suppress(Exception):
+            qWarning("web-boundary " + json.dumps(record, ensure_ascii=True))
+        return True
+
+    def python_failure(
+        self, action: str, error: Exception, *, project: str, epoch: int, revision: int
+    ) -> bool:
+        frames = traceback.extract_tb(error.__traceback__)[-8:]
+        return self.report(
+            action,
+            type(error).__name__,
+            [f"{Path(f.filename).name}:{f.lineno}:{f.name}" for f in frames],
+            project=project,
+            epoch=epoch,
+            revision=revision,
+        )
 
 
 class DesktopDiagnostics:

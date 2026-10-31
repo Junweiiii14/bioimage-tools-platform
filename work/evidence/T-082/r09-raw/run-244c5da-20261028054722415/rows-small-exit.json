@@ -1,0 +1,9 @@
+{
+  "case": "rows-small",
+  "started_at": "2026-10-28T13:47:29.7376548+08:00",
+  "ended_at": "2026-10-28T13:47:39.7928127+08:00",
+  "exit_code": 0,
+  "command": "uv run --locked --no-sync python -m tooling.benchmark_workbench_snapshot --run --case rows-small",
+  "qpa": "windows",
+  "chromium_flags": "--disable-gpu"
+}

@@ -1,0 +1,271 @@
+Product boundary scan: 173 files; zero means product is not implemented
+RUN C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\.venv\Scripts\python.exe -m ruff check .
+All checks passed!
+RUN C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\.venv\Scripts\python.exe -m ruff format --check .
+1014 files already formatted
+RUN C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\.venv\Scripts\python.exe -m pyright
+0 errors, 0 warnings, 0 informations
+RUN C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\.venv\Scripts\python.exe -m tooling.import_contracts
+=============
+Import Linter
+=============
+
+
+---------
+Contracts
+---------
+
+Analyzed 228 files, 1565 dependencies.
+--------------------------------------
+
+WB domain is independent of GUI and storage KEPT
+Public API may depend on domain, never the reverse KEPT
+Analysis depends on image ports, never file adapters or GUI KEPT
+TIFF decoding and profile integration are independent KEPT
+Shared contracts never import runtime, tools, GUI, numbers or database KEPT
+Runtime never imports experiment tools, GUI or numerical processing KEPT
+WB tool and host persistence remain independent KEPT
+Host storage queue has no experimental or image processing dependencies KEPT
+Contracts runtime and WB never import the desktop assembly KEPT
+
+Contracts: 9 kept, 0 broken.
+RUN C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\.venv\Scripts\python.exe -m tooling.web_quality
+Checking formatting...
+All matched files use Prettier code style!
+✔ format gate rejects an unformatted input and accepts formatted input (235.32ms)
+✔ lint gate rejects unreachable code in the production file scope (406.4597ms)
+✔ checkJs rejects wrong identity and request types at the real payload producer (1016.5627ms)
+✔ typed producer keeps the existing advanced request wire representation (0.9177ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1878.0922
+RUN C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\.venv\Scripts\python.exe -m pytest -q
+........................................................................ [  4%]
+........................................................................ [  9%]
+[34012:53424:1028/141535.365:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141535.365:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141535.365:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141543.732:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141543.732:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141555.796:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141555.796:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141555.796:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141555.796:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141555.796:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141555.796:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141555.796:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141555.796:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141555.796:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141555.796:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141555.796:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141646.560:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141652.368:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141652.369:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141652.369:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141652.369:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141652.369:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141652.369:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141652.369:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141652.369:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141652.369:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141652.369:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141652.369:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141652.369:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141652.369:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141652.369:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141652.369:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141652.369:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141652.369:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141655.190:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141655.190:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141655.190:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141655.190:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141655.190:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141655.190:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141655.627:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141655.627:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141655.627:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141655.627:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141655.627:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141655.627:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+........................................................................ [ 14%]
+[34012:53424:1028/141751.157:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141751.157:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141751.157:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141751.157:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141751.157:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141751.157:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141751.157:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141751.157:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141751.157:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141758.223:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141758.223:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141759.804:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/141759.804:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+........................................................................ [ 19%]
+[34012:53424:1028/142119.051:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142119.051:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142119.059:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142119.059:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142119.059:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+........................................................................ [ 23%]
+........................................................................ [ 28%]
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142402.437:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+........................................................................ [ 33%]
+[34012:53424:1028/142455.207:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142455.207:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142455.207:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142455.207:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142455.207:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[34012:53424:1028/142455.207:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/command_buffer/service/shared_image/shared_image_manager.cc:521] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+......F................................................................. [ 38%]
+........................................................................ [ 43%]
+........................................................................ [ 47%]
+........................................................................ [ 52%]
+........................................................................ [ 57%]
+........................................................................ [ 62%]
+........................................................................ [ 67%]
+........................................................................ [ 71%]
+........................................................................ [ 76%]
+........................................................................ [ 81%]
+........................................................................ [ 86%]
+........................................................................ [ 91%]
+.................F...................................................... [ 95%]
+.............................................................            [100%]
+================================== FAILURES ===================================
+_____ test_anchored_snapshot_keeps_target_distinct_from_sampling_context ______
+
+    def test_anchored_snapshot_keeps_target_distinct_from_sampling_context() -> None:
+        from tool_contracts.api import AssetRef
+        from wb_tool.api import FigureRow, FigureTemplate, LaneROI, ProjectRowAnalysis
+    
+        from tools.wb.tests.test_anchored_analysis import anchored_request
+    
+        image, request = anchored_request()
+        crop = LaneROI("r", 0, 38, 4, 62)
+        row = FigureRow(
+            row_id="r",
+            figure="Fig1",
+            protein="target",
+            lane_count=1,
+            source=AssetRef(
+                asset_id="source", relative_path="inputs/source.tif", sha256=image.sha256, size_bytes=1
+            ),
+            filename="source.tif",
+            width=4,
+            height=120,
+            bit_depth=16,
+            roi=crop,
+            reviewed=True,
+        )
+        project = WBAnalysisProject(
+            project_id="p",
+            rows=(row,),
+            figure_order=("Fig1",),
+            template=FigureTemplate(crop_height=24),
+            analyses=(ProjectRowAnalysis(row_id="r", crop=crop, request=request),),
+        )
+        # A presentation unit test needs no filesystem or live native host.
+        host = cast(
+            FigureProjectWindow,
+            SimpleNamespace(
+                view=SimpleNamespace(project=lambda: project, selected_row=lambda: row, generation=0),
+                project_results=[],
+                operation_busy=False,
+            ),
+        )
+>       data = cast(dict[str, Any], quant_snapshot(host))
+                                    ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_web_quant.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\desktop\src\bioimage_app\web_quant.py:21: in quant_snapshot
+    selected = next((r for r in project.rows if r.row_id == host.view.selected_row_id), None)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+.0 = <tuple_iterator object at 0x000002DDF576C310>
+
+>   selected = next((r for r in project.rows if r.row_id == host.view.selected_row_id), None)
+                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'types.SimpleNamespace' object has no attribute 'selected_row_id'. Did you mean: 'selected_row'?
+
+apps\desktop\src\bioimage_app\web_quant.py:21: AttributeError
+_________ test_crop_edits_clear_only_changed_frame_and_undo_restores __________
+
+qtbot = <pytestqt.qtbot.QtBot object at 0x000002DDF877E570>
+owned_widgets = <function owned_widget_scope.<locals>.own at 0x000002DDF878FEC0>
+tmp_path = WindowsPath('C:/Users/70236/AppData/Local/Temp/pytest-of-70236/pytest-1199/test_crop_edits_clear_only_cha0')
+
+    def test_crop_edits_clear_only_changed_frame_and_undo_restores(
+        qtbot: QtBot, owned_widgets: WidgetOwner, tmp_path: Path
+    ) -> None:
+        project, _ = mixed_resolution(tmp_path)
+        frame = DisplayFrame(center_x=18, center_y=15, width=20, height=8, angle_degrees=15)
+        slices = tuple(
+            s.model_copy(update={"display_frame": frame}) if s.row_id == "r0" else s
+            for s in project.composition.slices
+        )
+        project = project.model_copy(
+            update={"composition": project.composition.model_copy(update={"slices": slices})}
+        )
+        view = create_figure_project_view()
+        owned_widgets(view)
+        view.set_project(project)
+        view.table.setCurrentCell(0, 0)
+        roi = project.rows[0].roi
+        assert roi is not None
+        view.canvas.roi_drawn.emit((roi.x0 + 5, roi.y0, roi.x1, roi.y1))
+        changed = view.project()
+        assert isinstance(changed, WBLayoutProject)
+        assert changed.composition.slices[0].display_frame is None
+        assert changed.composition.slices[1:] == project.composition.slices[1:]
+        view.undo_review()
+        restored = view.project()
+        assert isinstance(restored, WBLayoutProject)
+        assert restored.rows[0].roi == roi
+>       assert restored.composition.slices[0].display_frame == frame
+E       AssertionError: assert None == DisplayFrame(sampling_policy='within_roi@1', center_x=18.0, center_y=15.0, width=20.0, height=8.0, angle_degrees=15.0)
+E        +  where None = FigureSlice(display_frame=None, row_id='r0', figure='Fig1', line=1, position=1, first_lane=1, last_lane=3).display_frame
+
+tools\wb\tests\test_standard_display_ui.py:71: AssertionError
+============================== warnings summary ===============================
+tests/test_folder_drop.py: 9 warnings
+tests/test_visible_export_desktop.py: 1 warning
+  C:\Users\70236\.codex\worktrees\wb-reliability-remediation\bioimage-tools-platform\tests\test_folder_drop.py:57: DeprecationWarning: Function: 'QDragEnterEvent.QDragEnterEvent(const QPoint &pos, QFlags<Qt.DropAction> actions, const QMimeData *data, QFlags<Qt.MouseButton> buttons, QFlags<Qt.KeyboardModifier> modifiers)' is marked as deprecated, please check the documentation for more information.
+    enter = QDragEnterEvent(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_web_quant.py::test_anchored_snapshot_keeps_target_distinct_from_sampling_context
+FAILED tools/wb/tests/test_standard_display_ui.py::test_crop_edits_clear_only_changed_frame_and_undo_restores
+2 failed, 1499 passed, 10 warnings in 724.38s (0:12:04)

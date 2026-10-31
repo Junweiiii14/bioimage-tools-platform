@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "phase": "failed",
+  "command": "verify",
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 198 Stepping 2, GenuineIntel",
+    "cpu_count": 20,
+    "verifier_python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+    "powershell": {
+      "version": "5.1.26100.9711",
+      "module_path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\Modules"
+    }
+  },
+  "source_commit": "d66655b0cfd241c07f3b8647e08b1b3ef567e2d3",
+  "verifier_sha256": "190054df2532f65bc55544a879047ea318128352c83f09a609f2cc132f7a47e7",
+  "request": {
+    "path": "C:\\Users\\70236\\AppData\\Local\\Temp\\bioimage-acceptance-617c8b675d1d4602b769e043ff1cb926.request.json",
+    "sha256": "2dba0c3bf32579db989b5b85f86c35fd083b4d239d1d676001ed01eacf7d8eb1"
+  },
+  "processes": [],
+  "diagnostics": [],
+  "limitations": "Synthetic engineering checks; clean Win10, physical DPI/input/GPU, external office apps and independent scientific holdout remain unverified. No install/upgrade/uninstall or publication is performed.",
+  "error": "ValueError: Unexpected payload file: runtime/Lib/__pycache__/argparse.cpython-312.pyc"
+}

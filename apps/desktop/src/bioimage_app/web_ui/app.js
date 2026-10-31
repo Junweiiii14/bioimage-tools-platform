@@ -2,336 +2,2330 @@
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 const paths = {
-  sidebar:'M3 3h18v18H3zM15 3v18',
-  grid:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',
-  lanes:'M4 5h16v14H4zM8 8v8M12 8v8M16 8v8',
-  help:'M9 9a3 3 0 0 1 6 0c0 2-3 2-3 4M12 17h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z',
-  settings:'m9 3-1 3-3 1-2 3 2 3 1 3 3 1 3 2 3-2 3-1 1-3 2-3-2-3-3-1-1-3H9ZM15 11a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
-  chevron:'m9 5 7 7-7 7', 'chevron-down':'m6 9 6 6 6-6','chevron-up':'m6 15 6-6 6 6',check:'m5 12 4 4L19 6',plus:'M12 5v14M5 12h14',minus:'M5 12h14',
-  download:'M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5',upload:'M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5',arrow:'M4 12h15m-6-6 6 6-6 6',
-  folder:'M3 6h7l2 3h9v11H3V6Z',scan:'M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5M7 8h10v8H7z',layout:'M3 3h18v18H3zM3 9h18M9 9v12',table:'M3 3h18v18H3zM3 9h18M3 15h18M9 3v18',sliders:'M4 7h16M4 17h16M8 4v6M16 14v6',search:'M10 17a7 7 0 1 1 0-14 7 7 0 0 1 0 14Zm5-2 6 6',shield:'m12 3 8 3v6c0 5-8 9-8 9S4 17 4 12V6l8-3Zm-4 9 3 3 5-6',undo:'M4 10h10a6 6 0 0 1 0 12M4 10l5-5M4 10l5 5',redo:'M20 10H10a6 6 0 0 0 0 12m16-12-5-5m5 5-5 5',focus:'M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5M8 12h8M12 8v8',expand:'M3 9V3h6M15 3h6v6M21 15v6h-6M9 21H3v-6',image:'M3 3h18v18H3zM3 17l6-6 4 4 3-3 5 5M15 7h.01',mouse:'M12 3a6 6 0 0 0-6 6v6a6 6 0 0 0 12 0V9a6 6 0 0 0-6-6ZM12 3v6',layers:'m12 3 10 6-10 6L2 9l10-6ZM2 13l10 6 10-6M2 17l10 6 10-6',close:'m6 6 12 12M6 18 18 6',warning:'m12 3 10 18H2L12 3ZM12 9v5m0 3h.01',spark:'M12 2v4m0 12v4M2 12h4m12 0h4M5 5l3 3m8 8 3 3M5 19l3-3m8-8 3-3',file:'M5 3h9l5 5v13H5V3Zm9 0v6h5M8 13h8M8 17h6',curve:'M3 19h18M3 19V3M4 16c4 0 3-10 7-10s2 10 10 10',eye:'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Zm13 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z'
+    sidebar: 'M3 3h18v18H3zM15 3v18',
+    grid: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',
+    lanes: 'M4 5h16v14H4zM8 8v8M12 8v8M16 8v8',
+    help: 'M9 9a3 3 0 0 1 6 0c0 2-3 2-3 4M12 17h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z',
+    settings:
+        'm9 3-1 3-3 1-2 3 2 3 1 3 3 1 3 2 3-2 3-1 1-3 2-3-2-3-3-1-1-3H9ZM15 11a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
+    chevron: 'm9 5 7 7-7 7',
+    'chevron-down': 'm6 9 6 6 6-6',
+    'chevron-up': 'm6 15 6-6 6 6',
+    check: 'm5 12 4 4L19 6',
+    plus: 'M12 5v14M5 12h14',
+    minus: 'M5 12h14',
+    download: 'M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5',
+    upload: 'M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5',
+    arrow: 'M4 12h15m-6-6 6 6-6 6',
+    folder: 'M3 6h7l2 3h9v11H3V6Z',
+    scan: 'M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5M7 8h10v8H7z',
+    layout: 'M3 3h18v18H3zM3 9h18M9 9v12',
+    table: 'M3 3h18v18H3zM3 9h18M3 15h18M9 3v18',
+    sliders: 'M4 7h16M4 17h16M8 4v6M16 14v6',
+    search: 'M10 17a7 7 0 1 1 0-14 7 7 0 0 1 0 14Zm5-2 6 6',
+    shield: 'm12 3 8 3v6c0 5-8 9-8 9S4 17 4 12V6l8-3Zm-4 9 3 3 5-6',
+    undo: 'M4 10h10a6 6 0 0 1 0 12M4 10l5-5M4 10l5 5',
+    redo: 'M20 10H10a6 6 0 0 0 0 12m16-12-5-5m5 5-5 5',
+    focus: 'M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5M8 12h8M12 8v8',
+    expand: 'M3 9V3h6M15 3h6v6M21 15v6h-6M9 21H3v-6',
+    image: 'M3 3h18v18H3zM3 17l6-6 4 4 3-3 5 5M15 7h.01',
+    mouse: 'M12 3a6 6 0 0 0-6 6v6a6 6 0 0 0 12 0V9a6 6 0 0 0-6-6ZM12 3v6',
+    layers: 'm12 3 10 6-10 6L2 9l10-6ZM2 13l10 6 10-6M2 17l10 6 10-6',
+    close: 'm6 6 12 12M6 18 18 6',
+    warning: 'm12 3 10 18H2L12 3ZM12 9v5m0 3h.01',
+    spark: 'M12 2v4m0 12v4M2 12h4m12 0h4M5 5l3 3m8 8 3 3M5 19l3-3m8-8 3-3',
+    file: 'M5 3h9l5 5v13H5V3Zm9 0v6h5M8 13h8M8 17h6',
+    curve: 'M3 19h18M3 19V3M4 16c4 0 3-10 7-10s2 10 10 10',
+    eye: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Zm13 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
 };
-function icon(name){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${paths[name] || paths.file}"/></svg>`;}
-function icons(root=document){$$('[data-icon]',root).forEach(el=>{el.innerHTML=icon(el.dataset.icon);});}
-function escapeText(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-const number = value => value == null ? '—' : Number(value).toLocaleString('en-US',{maximumFractionDigits:2});
-let state={projectName:'新建实验项目',rows:[],cells:[],selectedId:null,busy:false,status:'就绪',outputPath:'',montage:null};
-let bridge=null, mode='review',filter='all',search='',zoom=1,focusCrop=true,overlay=true,selectedCell=null;
-const imagePan={x:0,y:0,key:null,hand:false,space:false,drag:null};
-let demoOriginal=null,undoStack=[],redoStack=[],imageKey='',toastTimer,drag=null,drawerTrigger=null;
+function icon(name) {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${paths[name] || paths.file}"/></svg>`;
+}
+function icons(root = document) {
+    $$('[data-icon]', root).forEach((el) => {
+        el.innerHTML = icon(el.dataset.icon);
+    });
+}
+function escapeText(value) {
+    return String(value ?? '').replace(
+        /[&<>"']/g,
+        (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
+    );
+}
+const number = (value) =>
+    value == null ? '—' : Number(value).toLocaleString('en-US', { maximumFractionDigits: 2 });
+let state = {
+    projectName: '新建实验项目',
+    rows: [],
+    cells: [],
+    selectedId: null,
+    busy: false,
+    status: '就绪',
+    outputPath: '',
+    montage: null,
+};
+let bridge = null,
+    mode = 'review',
+    filter = 'all',
+    search = '',
+    zoom = 1,
+    focusCrop = true,
+    overlay = true,
+    selectedCell = null;
+const imagePan = { x: 0, y: 0, key: null, hand: false, space: false, drag: null };
+let demoOriginal = null,
+    undoStack = [],
+    redoStack = [],
+    imageKey = '',
+    toastTimer,
+    drag = null,
+    drawerTrigger = null;
 
-const cropState=r=>state.intake?.cropEnabled?(r?.draft?'pending':r?.cropStatus||'pending'):!r?.roi?'failed':r.draft?'pending':r.cropStatus||'ready';
-const cropLabel=r=>({ready:'裁图就绪',pending:r?.draft?'裁剪草稿 · 待更新':'裁图待更新',failed:'裁图异常 · 点击调整'})[cropState(r)]||'裁图待更新';
-const needsAttention=r=>cropState(r)!=='ready';
-let completedKey=null;
-const row=()=>state.rows.find(r=>r.id===state.selectedId)||state.rows[0];
-const send=(action,payload={})=>bridge&&bridge.request(action,JSON.stringify(payload));
-const quantIdentity=()=>({projectId:state.projectId,sessionEpoch:state.sessionEpoch,revision:state.quant?.revision,id:row()?.id,sourceId:row()?.sourceId,lane:quantLane,bandId:quantBand});
-const sameQuantIdentity=identity=>{const current=quantIdentity();return Object.keys(current).every(key=>identity?.[key]===current[key]);};
-const cropIdentity=(r=row())=>({cropEditContract:state.cropEditContract,projectId:state.projectId,sessionEpoch:state.sessionEpoch,revision:state.revision,id:r?.id,sourceId:r?.sourceId});
-const sameCropIdentity=identity=>{const current=cropIdentity();return Object.keys(current).every(key=>identity?.[key]===current[key]);};
-function toast(message){$('#toast').textContent=message;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3500);}
-function statusLabel(status){return ({quality_review:'质量待复核',needs_review:'待复核',unreviewed:'待复核',ready:'有效',valid:'有效',ok:'有效',excluded:'已排除',result_unavailable:'结果不可用',missing:'未完成',pending:'待计算',stale:'已修改，待重算'})[status]||'待复核';}
-
-function quantHasQuality(value){return value&&(!['ready','valid','ok'].includes(value.status)||value.signal==null);}
-function qualityContent(entries){
- const reasons=new Map();
- for(const entry of entries){if(!entry.reason)continue;if(!reasons.has(entry.reason))reasons.set(entry.reason,new Set());if(entry.label)reasons.get(entry.reason).add(entry.label);}
- return `<summary>质量说明${reasons.size?'（'+reasons.size+' 类）':''}</summary>${reasons.size?'<ul>'+[...reasons].map(([reason,labels])=>`<li>${labels.size?escapeText([...labels].join('、'))+'：':''}${escapeText(reason)}</li>`).join('')+'</ul>':'<p>当前记录没有附加质量说明。</p>'}`;
-}
-function qualityDetails(entries){return `<details class="quality-details">${qualityContent(entries)}</details>`;}
-function setState(next){if(next.rows)next.rows=next.rows.map(r=>({...r,preview:r.preview||next.sourcePreviews?.[r.sourceId]||null}));const oldId=state.selectedId,previousCrop=cropIdentity();state={...state,...next};window.advancedWorkspace?.sync();if(!sameCropIdentity(previousCrop)){drag=null;drawing=null;quantDrag=null;}window.intakeWorkspace?.sync();manualQuant.sync();if(selectedCell)selectedCell=state.cells.find(c=>c.rowId===selectedCell.rowId&&c.lane===selectedCell.lane)||null;if(!state.selectedId&&state.rows.length)state.selectedId=state.rows.find(r=>r.roi)?.id||state.rows[0].id;if(oldId!==state.selectedId){focusCrop=true;zoom=1;}render();if(next.autoCompletedKey&&!state.busy&&next.autoCompletedKey!==completedKey){completedKey=next.autoCompletedKey;if(!window.platformHome||platformHome.inProject())switchMode('layout');}window.intakeWorkspace?.followBatch();}
-function render(){
-  $('#retry-location').hidden=!state.canRetryLocation;if(state.canRetryLocation)$('#home-note').textContent=state.status;
-  $('.compact-inspect').innerHTML=icon('eye')+(mode==='quant'?'定量详情':'裁图详情');$('#project-name').textContent=state.projectName;$('#source-count').textContent=state.rows.length;$('#attention-count').textContent=state.rows.filter(needsAttention).length;
-  $('#operation-status').textContent=state.status||'就绪';$('#status-dot').classList.toggle('busy',!!state.busy);$('#cancel-button').hidden=!state.busy;
-  $('#save-status').innerHTML=icon(state.busy?'curve':'check')+(state.busy?'处理中':bridge?'已就绪':'预览草稿');
-  $('#runtime-badge').textContent=bridge?'桌面工作台':'网页预览';$('#status-right').textContent=bridge?'本地工作空间 · 原图保留':'交互预览 · 不执行新的科学计算';
-  $$('[data-action="return-layout"], [data-action="reanalyze"]').forEach(b=>b.disabled=state.busy||!row());
-  window.platformHome?.sync();
-  if(window.platformHome&&!platformHome.inProject())return;
-  if(window.intakeWorkspace?.renderActive())return;
-  if(window.groupReview?.renderActive())return;
-  renderSources();renderCanvas();renderInspector();if(mode==='quant')renderQuant();if(mode==='results')renderResults();$$('[data-action="reanalyze"], [data-action="compose"], [data-edit-row]').forEach(button=>button.disabled=!!state.busy||!!state.intake&&!(state.intake.figureEnabled&&button.hasAttribute('data-edit-row')));
-  if(!$('#drawer').hidden&&$('#drawer').dataset.inspector==='true'&&!window.intakeWorkspace?.syncInspectorDrawer()&&!document.activeElement?.matches('[data-intake-rotation]')){const focused=document.activeElement,editingLane=focused?.matches('[data-lane-count]'),typedValue=editingLane?focused.value:null,control=focused?.matches('[data-lane-count]')?'[data-lane-count]':focused?.dataset.action?'[data-action="'+focused.dataset.action+'"]':null;$('#drawer-content').innerHTML=$('#inspector-content').innerHTML+$('#inspector-action').innerHTML;if(control){const replacement=$(control,$('#drawer-content'));if(editingLane&&replacement)replacement.value=typedValue;replacement?.focus();}}
-  const first=state.rows.find(r=>r.preview&&r.roi)||state.rows.find(r=>r.preview);
-  if(first){$('#home-image').src=state.montage||first.preview;$('#recent-image').src=first.preview;$('#recent-name').textContent=state.projectName;$('#recent-description').textContent=`${state.rows.length} 张原图 · ${state.rows.filter(r=>r.roi).length} 张已有自动裁剪 · 自动裁图记录`;}
-}
-function renderSources(){
- if(window.intakeWorkspace?.renderSourceList())return;
- const focusedSource=state.intake?.automation&&$('#source-list').contains(document.activeElement)?document.activeElement.dataset.row:null;
- const grouped=mode==='quant';$('.source-panel').classList.toggle('quant-sources',grouped);$('.source-panel .panel-heading h2').firstChild.nodeValue=grouped?'Fig 分组 ':'项目原图 ';$('#source-search').placeholder=grouped?'查找 Fig 或条带…':'查找原图…';$('#source-search').setAttribute('aria-label',grouped?'查找 Fig 或条带':'查找原图');if(grouped){renderQuantSources();return;}
-  const filtered=state.rows.filter(r=>(filter!=='attention'||needsAttention(r))&&r.name.toLowerCase().includes(search.toLowerCase()));
-  $('#source-list').innerHTML=filtered.map((r,index)=>`<button class="source-item ${r.id===state.selectedId?'active':''}" data-row="${escapeText(r.id)}" aria-pressed="${r.id===state.selectedId}" title="${escapeText(r.name)}"><img class="source-thumb" src="${r.preview||''}" alt="" ${r.preview?'':'hidden'}><span class="source-copy"><strong>${escapeText(r.fig||`图 ${index+1}`)} · ${escapeText(r.name)}</strong><small class="${!needsAttention(r)?'reviewed':''}">${cropLabel(r)}</small></span></button>`).join('')||'<p class="empty-list">'+(state.rows.length?'没有符合条件的原图。':'导入原图后，所有来源会显示在这里。')+'</p>';
- if(focusedSource)$$('[data-row]',$('#source-list')).find(b=>b.dataset.row===focusedSource)?.focus({preventScroll:true});
-}
-function renderCanvas(){
- const layout=state.intake?.figureEnabled&&mode==='layout'?intakeWorkspace.layoutState():null;
- const r=row();$('#source-image').style.clipPath=quantImageClip();$('.main-panel').classList.toggle('quant-mode',mode==='quant');$('#quant-profile').hidden=mode!=='quant';$('#quant-lanes').hidden=mode!=='quant';$('#image-stage').hidden=mode==='results';$('#result-stage').hidden=mode!=='results';
- $('#image-title').textContent=mode==='results'?'测量结果':mode==='layout'?(layout?.label||'当前拼图'):mode==='quant'?(quantDetail?quantRowTitle(r):(quantData()?.group?.figure||r?.fig||'当前 Fig')+' · 整组灰度定量'):(state.intake?r?.protein||r?.name:r?.name)||'选择一张原图';$('#source-image').alt=mode==='layout'||(mode==='quant'&&!quantDetail)?'Fig 标注拼图':r?.name||'当前原图';
- $('#image-subtitle').textContent=mode==='quant'?(!quantDetail?'同一泳道贯穿组内条带 · 点击曲线分段查看原图依据':r?'原图：'+r.name+' · '+r.width+' × '+r.height+' px':'添加原图后选择测量区域与泳道数'):mode==='results'?`${state.rows.length} 张原图 · 有效信号与待复核积分独立呈现`:mode==='layout'?(state.montage?'原图裁剪的组合预览 · 显示变换不进入定量':'等待生成当前版本拼图'):r?(state.intake?`${r.fig} · ${r.name} · ${r.lanes} 个泳道`:`${r.width} × ${r.height} px  ·  ${r.bitDepth||'原始'} 位  ·  ${r.lanes} 个泳道`):'查看自动识别结果，在图上完成调整';
- $('#stage-label').textContent=mode==='quant'&&!quantDetail?'Fig 标注拼图 · 原像素映射':mode==='layout'?'拼图预览':focusCrop?'原图 · 聚焦裁剪区域':'原始图像';
- $('#canvas-hint').textContent=mode==='quant'?(quantDetail?'拖动框体或曲线边界调整 · 可返回整组':'选择泳道 · 点击曲线分段查看原图与封底'):mode==='results'?'选择结果查看完整原因':mode==='layout'?(state.montage?(state.intake?.figureEnabled?'点击图块定位蛋白；修改裁剪使用右侧入口':'点击拼图中的图片，返回对应原图调整'):'当前版本拼图尚未生成'):r&&!r.roi?'在原图上拖出裁剪区域 · 无需填写坐标':'拖动边框调整裁剪 · 滚轮缩放 · 方向键微调';
- $('.image-actions').hidden=mode==='results';$$('.image-actions [data-action=undo],.image-actions [data-action=redo]').forEach(b=>b.hidden=mode==='quant');$('#overlay-toggle').hidden=mode!=='review';
- const src=mode==='layout'?(layout&&!layout.show?null:state.montage):(mode==='quant'&&!quantDetail)?(quantData()?.group?.sourceSheet?r?.preview:state.montage):r?.preview;
- $('#empty-image').hidden=!!src;$('#image-transform').hidden=!src;$('#empty-image h3').textContent=mode==='layout'?'拼图尚未就绪':'从一张原图开始';$('#empty-image p').textContent=mode==='layout'?(state.busy?'正在更新，请稍候。':'可更新拼图，或从右侧异常列表返回原图调整。'):'选择项目中的原图，或打开界面预览。';$('#empty-image button').hidden=mode==='layout';
- if(layout&&!layout.show){$('#empty-image h3').textContent=layout.label;$('#empty-image p').textContent=layout.complete?'正在读取所选成图…':'成图尚未完成；请在右侧查看缺项并完成处理。';}
- if(mode==='quant'&&!quantDetail){$('#empty-image h3').textContent='当前 Fig 拼图尚未就绪';$('#empty-image p').textContent=state.busy?'正在更新，请稍候。':'返回拼图生成当前版本标注图，再按 Fig 查看灰度。';$('#empty-image button').hidden=true;}
- if(!src){$('#crop-overlay').hidden=true;$('#display-frame-overlay').hidden=true;$('#montage-regions').hidden=true;return;}
- if(imageKey!==src){imageKey=src;$('#source-image').src=src;}
- renderMontageRegions();requestAnimationFrame(fitImage);
-}
-function fitImage(){
- const img=$('#source-image'),vp=$('#image-viewport'),r=row();if(!img.naturalWidth||!vp.clientWidth)return;
- const scale=Math.min(vp.clientWidth/img.naturalWidth,vp.clientHeight/img.naturalHeight),w=img.naturalWidth*scale,h=img.naturalHeight*scale;
- const target=$('#image-transform');target.style.width=w+'px';target.style.height=h+'px';let actualZoom=zoom,tx=0,ty=0;
- if((mode==='review'||(mode==='quant'&&quantDetail))&&focusCrop&&r?.roi){const roi=mode==='quant'?(quantData()?.contextBounds||r.roi):cropViewBounds(r);const availableHeight=mode==='review'?Math.max(16,vp.clientHeight-96):.82*vp.clientHeight;actualZoom=zoom*Math.min(mode==='quant'?24:6,Math.max(mode==='review'?.01:1,Math.min(.76*vp.clientWidth/(roi.width/r.width*w),availableHeight/(roi.height/r.height*h))));tx=(.5-(roi.x+roi.width/2)/r.width)*w*actualZoom;ty=(.5-(roi.y+roi.height/2)/r.height)*h*actualZoom;}
- if(mode==='quant'&&!quantDetail&&focusCrop){const box=quantGroupBounds(),size=quantGroupDimensions();if(box&&size.width&&size.height){actualZoom=zoom*Math.min(12,Math.max(1,Math.min(.90*vp.clientWidth/(box.width/size.width*w),.82*vp.clientHeight/(box.height/size.height*h))));tx=(.5-(box.x+box.width/2)/size.width)*w*actualZoom;ty=(.5-(box.y+box.height/2)/size.height)*h*actualZoom;}}
- const panKey=[mode,quantDetail,r?.id,focusCrop].join(':');if(imagePan.key!==panKey){imagePan.key=panKey;imagePan.x=0;imagePan.y=0;}
- target.style.transform=`translate(${tx+imagePan.x}px,${ty+imagePan.y}px) scale(${actualZoom})`;$('#zoom-label').textContent=zoom===1?(focusCrop&&r?.roi?'聚焦泳道':'适应窗口'):Math.round(zoom*100)+'%';
- if(mode==='quant')renderQuantOverlay(actualZoom);
- const crop=$('#crop-overlay');crop.hidden=mode!=='review'||!r?.roi||!overlay;
- crop.classList.toggle('quantification-range',!!state.intake?.cropEnabled);
- if(!crop.hidden){const b=r.roi;crop.style.left=b.x/r.width*100+'%';crop.style.top=b.y/r.height*100+'%';crop.style.width=b.width/r.width*100+'%';crop.style.height=b.height/r.height*100+'%';crop.style.borderWidth=(1.5/actualZoom)+'px';$('.crop-tag').textContent=state.intake?.cropEnabled?'原图定量范围':cropLabel(r);$('.crop-tag').style.transform=`scale(${1/actualZoom})`;$('.crop-tag').style.transformOrigin='left bottom';$('.crop-tag').style.bottom=`calc(100% + ${7/actualZoom}px)`;$$('.crop-handle').forEach(el=>el.style.transform=`scale(${1/actualZoom})`);$('#lane-lines').innerHTML=Array.from({length:r.lanes},(_,i)=>`<span class="lane-number" style="left:${(i+.5)/r.lanes*100}%;top:calc(100% + ${6/actualZoom}px);bottom:auto;transform:translateX(-50%) scale(${1/actualZoom});transform-origin:top">${i+1}</span>${i?`<span class="lane-line" style="left:${i/r.lanes*100}%"></span>`:''}`).join('');}
- renderDisplayFrame(r,actualZoom);
-}
-
-function cropViewBounds(r){
- const frame=window.intakeWorkspace?.rotationFrame(r);if(!frame)return r.roi;
- const points=intakeWorkspace.rotationCorners(frame),b=r.roi;
- const x=Math.min(b.x,...points.map(p=>p.x)),y=Math.min(b.y,...points.map(p=>p.y));
- return {x,y,width:Math.max(b.x+b.width,...points.map(p=>p.x))-x,height:Math.max(b.y+b.height,...points.map(p=>p.y))-y};
-}
-function renderDisplayFrame(r,actualZoom){
- const node=$('#display-frame-overlay'),frame=window.intakeWorkspace?.rotationFrame(r);
- node.hidden=mode!=='review'||!overlay||!frame;if(node.hidden)return;
- node.style.left=(frame.center_x-frame.width/2)/r.width*100+'%';node.style.top=(frame.center_y-frame.height/2)/r.height*100+'%';
- node.style.width=frame.width/r.width*100+'%';node.style.height=frame.height/r.height*100+'%';node.style.transform=`rotate(${frame.angle_degrees}deg)`;
- node.style.borderWidth=2/actualZoom+'px';node.classList.toggle('invalid',!!intakeWorkspace.rotationError(r));
- const handle=$('#crop-rotate-handle');handle.disabled=!!state.busy||!intakeWorkspace.cropEditable(r.id);
- handle.style.transform=`translateX(-50%) scale(${1/actualZoom})`;handle.style.bottom=`calc(100% + ${18/actualZoom}px)`;
- handle.setAttribute('aria-valuenow',String(frame.angle_degrees));handle.title=`旋转显示框 ${frame.angle_degrees.toFixed(1)}°；拖动或用方向键微调（±30°）`;
- $('#display-frame-label').textContent=`显示 / 拼图 ${frame.angle_degrees.toFixed(1)}°`;
- $('#display-frame-label').style.transform=`scale(${1/actualZoom})`;$('#display-frame-label').style.top=`calc(100% + ${25/actualZoom}px)`;
-}
-
-function renderMontageRegions(){
- const layer=$('#montage-regions');layer.hidden=mode!=='layout';
- if(layer.hidden)return;
- const width=state.montageWidth,height=state.montageHeight;
- layer.innerHTML=width>0&&height>0?(state.montageRegions||[]).map(region=>{
-  const source=state.rows.find(item=>item.id===region.rowId);if(!source)return '';
-  return `<button class="montage-region" data-edit-row="${escapeText(source.id)}" aria-label="${state.intake?.figureEnabled?'定位蛋白':'调整原图'} ${escapeText(source.name)}" title="${state.intake?.figureEnabled?'定位蛋白':'点击返回原图'}：${escapeText(source.name)}" style="left:${region.x/width*100}%;top:${region.y/height*100}%;width:${region.width/width*100}%;height:${region.height/height*100}%"></button>`;
- }).join(''):'';
-}
-function resizeRatio(r,b,handle,dx,dy){
- const ratio=1.25*r.lanes,west=handle.includes('w'),north=handle.includes('n');
- const anchorX=west?b.x+b.width:b.x,anchorY=north?b.y+b.height:b.y;
- const desiredWidth=b.width+(west?-dx:dx),desiredHeight=b.height+(north?-dy:dy);
- const h=Math.abs(dx)/ratio>=Math.abs(dy)?desiredWidth/ratio:desiredHeight;
- const maxWidth=west?anchorX:r.width-anchorX,maxHeight=north?anchorY:r.height-anchorY;
- const height=Math.max(0,Math.min(Math.max(4,Math.round(h)),maxHeight,Math.floor(maxWidth/ratio)));
- const width=Math.round(height*ratio);
- if(height<4||width<4)return {...b};
- return {x:west?anchorX-width:anchorX,y:north?anchorY-height:anchorY,width,height};
-}
-function setLanes(n){
- const r=row();if(!r||state.busy)return;
- if(state.intake){toast('槽位数来自已确认清单，不能在裁剪中修改');return;}
- if(!Number.isSafeInteger(n)||n<1||n>96){toast('泳道数须为 1–96 的整数');renderInspector();return;}
- if(n===r.lanes)return;
- const width=r.roi?Math.round(r.roi.height*1.25*n):0;
- if(r.roi&&width>r.width){toast('当前高度下宽度超出原图，请先缩小裁剪框，再增加泳道数');renderInspector();return;}
- if(bridge){send('set_lanes',{...cropIdentity(r),n});closeDrawer();return;}
- const before=r.roi?{...r.roi}:null,oldN=r.lanes;r.lanes=n;
- const next=before?{...before,x:Math.max(0,Math.min(r.width-width,Math.round(before.x+(before.width-width)/2))),width}:null;
- commitCrop(next,before);undoStack.at(-1).lanes=oldN;
- toast('已调整网页草稿泳道数；拼图与定量未重新计算');
-}
-
-function dataPair(label,value){return `<div class="data-pair"><span>${label}</span><strong>${escapeText(value)}</strong></div>`;}
-function renderInspector(){
- if(state.intake?.cropEnabled&&mode==='review'){window.intakeWorkspace.renderCropInspector(row());return;}if(window.intakeWorkspace?.renderFigureInspector())return;
- if(mode==='quant'){renderQuantInspector();return;}
- const r=row();$('#inspector-title').textContent=mode==='results'?'输出结果':mode==='layout'?'拼图设置':'当前原图';$('#review-badge').textContent=mode==='review'?cropLabel(r):'自动裁图';$('#review-badge').className='status-badge '+(r&&!needsAttention(r)?'ok':'pending');
- const valid=state.cells.filter(c=>c.value!=null).length;
- let content='';
- if(mode==='results'){
-  content=`<section class="inspect-section"><h3>本项目的结果</h3>${dataPair('原图数量',state.rows.length+' 张')}${dataPair('已有裁剪',state.rows.filter(r=>r.roi).length+' 张')}${dataPair('有效信号',valid+' 项')}${dataPair('待复核 / 未完成',state.cells.length-valid+' 项')}<p>结果项包含待定位占位，不等于检出泳道数量。</p></section><section class="inspect-section"><h3>${selectedCell?escapeText(selectedCell.fig)+' · 泳道 '+selectedCell.lane:'结果依据'}</h3><p class="row-reason">${escapeText(selectedCell?.reason||'选择左侧表格中的一项，查看原始积分、有效性与完整质量原因。')}</p>${selectedCell?dataPair('原始积分',number(selectedCell.rawIntegral)):''}</section><section class="inspect-section"><h3>本次会话输出</h3><p>${escapeText(state.outputPath?state.outputPath.split(/[\\/]/).pop():'尚未在本次会话导出')}</p><button class="text-button" data-action="open_output">${icon('folder')}打开结果文件夹</button></section>`;
- }else if(mode==='layout'){
-  content=`<section class="inspect-section"><h3>排版预览</h3><p>点击任意图片返回原图调整。正常裁图直接参与拼图，无需逐张确认。</p>${dataPair('就绪图像',state.rows.filter(r=>!needsAttention(r)).length+' 张')}${dataPair('标签', '保留原始项目标签')}${state.rows.some(needsAttention)?'<div class="crop-exceptions"><h3>待更新与异常原图</h3>'+state.rows.filter(needsAttention).map(item=>`<button class="exception-source" data-edit-row="${escapeText(item.id)}">${icon('warning')}<span>${escapeText(item.name)}<small>${cropState(item)==='pending'?'裁图待更新 · 返回原图':'未完成裁图 · 返回原图调整'}</small></span>${icon('chevron')}</button>`).join('')+'</div>':''}${!bridge&&state.rows.some(item=>item.draft)?'<p class="draft-label">当前拼图为历史记录，尚未包含网页裁剪草稿。</p>':''}</section><section class="inspect-section"><h3>模板与样式</h3><button class="button subtle full" data-action="advanced" data-section="template">${icon('sliders')}调整模板与分段</button><p style="margin-top:13px">${bridge?'完整模板编辑器在原生高级窗口中打开。':'网页展示已生成的拼图记录，模板修改在桌面版执行。'}</p></section><section class="inspect-section"><div class="layout-note">原图用于定量，拼图用于展示。两者的处理始终分开。</div><button class="text-button" data-action="compose">${icon('layout')}更新拼图预览</button></section>`;
- }else if(r){
-  const cells=r.results||state.cells.filter(c=>c.rowId===r.id);
-  content=`<section class="inspect-section"><h3>识别概览</h3><label class="lane-count-label">泳道数 n<div class="lane-stepper"><button data-action="lanes-minus" aria-label="减少一个泳道" ${state.busy?'disabled':''}>${icon('minus')}</button><input data-lane-count type="number" min="1" max="96" step="1" value="${r.lanes}" aria-label="泳道数 n" ${state.busy?'disabled':''}><button data-action="lanes-plus" aria-label="增加一个泳道" ${state.busy?'disabled':''}>${icon('plus')}</button></div></label><p>固定比例 ${number(1.25*r.lanes)} : 1 · 修改 n 调整宽度</p>${dataPair('裁剪',r.roi?`${r.roi.width} × ${r.roi.height} px`:'待定位')}${dataPair('蛋白',r.protein&&r.protein!=='Unassigned'?r.protein:'未指定')}</section><section class="inspect-section">${!r.roi?'<p>尚未找到可靠裁剪，可在原图指定范围或重新识别。</p>':''}${qualityDetails([{reason:r.reason,label:''},...cells.map(c=>({reason:c.reason,label:'泳道 '+c.lane}))])}<h3>泳道结果</h3><table class="lane-summary"><thead><tr><th>泳道</th><th>有效信号</th><th>原始积分</th></tr></thead><tbody>${cells.slice(0,8).map((c,i)=>`<tr><td>${c.lane||i+1}</td><td>${number(c.value)}</td><td>${number(c.rawIntegral)}</td></tr>`).join('')||'<tr><td colspan="3">尚无可用结果</td></tr>'}</tbody></table><p style="margin-top:12px">待复核原始积分不是有效信号。</p><button class="disclosure" data-action="advanced" data-section="analysis"><span>查看曲线与积分边界</span>${icon('chevron')}</button></section><section class="inspect-section"><button class="button subtle full" data-action="return_crop" ${!r.roi||state.busy?'disabled':''}>审核裁图并回存原文件夹</button><small>新增显示图、原值 TIFF 和来源记录</small><button class="text-button" data-action="return_crop" data-locate="true" ${!r.roi||state.busy?'disabled':''}>重新定位原图并回存</button></section><section class="inspect-section"><button class="disclosure" data-action="advanced" data-section="metadata"><span>实验信息与泳道设置</span>${icon('chevron')}</button><button class="disclosure" data-action="reanalyze"><span>重新自动识别</span>${icon('scan')}</button>${r.draft&&!bridge?'<p class="draft-label">网页草稿已修改，未重新计算；原记录不变。</p>':''}</section>`;
- }else{content='<section class="inspect-section"><h3>等待原图</h3><p>原图导入后，这里显示当前对象、裁剪结果与具体质量原因。</p></section>';}
- $('#inspector-content').innerHTML=content;$('#inspector-action').innerHTML=mode==='review'?`<button class="button primary full" data-action="return-layout" ${!r||state.busy?'disabled':''}>${icon('layout')}返回拼图${icon('arrow')}</button><small>裁图无需确认，定量质量独立显示</small>`:`<button class="button primary full" data-action="export" ${!state.rows.length||state.busy?'disabled':''}>${icon('download')}导出结果包</button><small>缺失与无效值保持空白</small>`;
-}
-function renderResults(){
- if(state.intake?.figureEnabled){window.intakeWorkspace.renderIntakeResults();return;}
- if(state.quant?.table?.length){renderQuantTable();return;}
- $('#results-body').innerHTML=state.cells.map((c,i)=>`<tr tabindex="0" data-cell="${i}" aria-label="${escapeText(c.fig)} 泳道 ${c.lane}，${statusLabel(c.status)}" class="${selectedCell===c?'selected':''}"><td>${escapeText(c.fig)}<small>${escapeText(c.protein==='Unassigned'?'未指定蛋白':c.protein||'未指定蛋白')}</small></td><td>${c.lane}</td><td>${number(c.value)}</td><td>${number(c.rawIntegral)}</td><td><span class="result-state">${statusLabel(c.status)}</span></td></tr>`).join('')||'<tr><td colspan="5">尚无测量结果。导入原图后由桌面后台处理。</td></tr>';
- $('#result-count').textContent=`${state.cells.length} 个结果项（含待定位占位）`;
-}
-function updateModeIndicator(){const tab=$('.mode-tab.active'),bar=$('.mode-tabs'),indicator=$('.mode-indicator');if(!tab||!bar||!indicator)return;const rect=tab.getBoundingClientRect(),parent=bar.getBoundingClientRect();indicator.style.transform=`translateX(${rect.left-parent.left+bar.scrollLeft}px)`;indicator.style.width=rect.width+'px';}
-function switchMode(next){if(state.intake&&!window.intakeWorkspace.allowedModes().includes(next))next='intake';if(next==='intake'&&!state.intake)return;if(state.busy&&next==='layout'&&!state.montage&&!state.intake?.automation){toast('拼图将在当前处理完成后可用');return;}const previousMode=mode;if(next!==mode)window.intakeWorkspace?.noteBrowse();mode=next;if(mode==='quant'&&previousMode!=='quant'){quantDetail=!state.montage;focusCrop=true;if(row())quantOpenGroups.add(String(row().fig??''));}if(mode==='quant'&&!state.montage)quantDetail=true;window.platformHome?.show('project',{focus:false});$('#home-view').hidden=true;$('#work-view').hidden=false;$$('.mode-tab').forEach(b=>{b.classList.toggle('active',b.dataset.mode===mode);b.setAttribute('aria-selected',String(b.dataset.mode===mode));});requestAnimationFrame(updateModeIndicator);if(mode==='layout'&&bridge&&!state.busy){if(state.intake?.figureEnabled)window.intakeWorkspace.requestFigure();else if(!state.montage)send('compose');}if(mode==='quant'&&bridge&&row()&&!state.intake)send('quant_select',{id:row().id,lane:quantLane,bandId:quantBand,overview:!quantDetail});selectedCell=null;zoom=1;render();if(previousMode!==mode){const workspace=$('.workspace'),intake=$('#intake-workspace');window.uiMotion.cancel(workspace);if(intake)window.uiMotion.cancel(intake);window.uiMotion.enter(workspace.hidden?intake:workspace);}if(state.intake?.figureEnabled&&previousMode!==mode){const heading=$('#intake-workspace:not([hidden]) h1')||$('#image-title');heading?.setAttribute('tabindex','-1');heading?.focus({preventScroll:true});}}
-function select(id){window.intakeWorkspace?.noteBrowse();state.selectedId=id;focusCrop=true;zoom=1;if(bridge)send('select',{id});render();}
-function openDrawer(title,content){document.querySelector('#advanced-footer')?.remove();const panel=$('#drawer');panel.classList.remove('advanced-drawer');if(panel.hidden||panel.dataset.closing==='true')drawerTrigger=document.activeElement?.closest('#drawer')?drawerTrigger:document.activeElement;panel.dataset.closing='false';panel.dataset.inspector='false';$('#drawer-title').textContent=title;$('#drawer-content').innerHTML=content;panel.classList.remove('closing');$('#drawer-backdrop').hidden=false;$('.app-shell').inert=true;$('.platform-rail').inert=true;uiMotion.drawer(true);$('#drawer [data-action="close-drawer"]').focus({preventScroll:true});}
-function closeDrawer(){const panel=$('#drawer');if(panel.hidden||panel.dataset.closing==='true')return;panel.dataset.closing='true';uiMotion.drawer(false,()=>{panel.hidden=true;panel.dataset.closing='false';$('#drawer-backdrop').hidden=true;$('.app-shell').inert=false;$('.platform-rail').inert=false;if(drawerTrigger?.isConnected)drawerTrigger.focus({preventScroll:true});});}
-function advanced(section){if(section==='analysis'){closeDrawer();switchMode('quant');return;}window.advancedWorkspace.open(section);}
-async function loadDemo(){
- closeDrawer();
- if(bridge){send('open_project');return;}
- if(demoOriginal){setState(structuredClone(demoOriginal));switchMode(state.autoCompletedKey?'layout':'review');return;}
- try{const res=await fetch('demo.json',{cache:'no-store'});if(!res.ok)throw new Error();const data=await res.json();demoOriginal=structuredClone(data);setState(data);switchMode(state.autoCompletedKey?'layout':'review');toast('已打开真实历史记录的交互预览；修改仅保留在网页草稿。');}catch{openDrawer('打开界面预览','<div class="drawer-copy"><p>此网页尚未加载本地预览资料。</p><p>请使用项目提供的预览启动器，或在桌面工作台中选择 WB 原图并开始。</p></div>');}
-}
-function commitCrop(next,before,identity=cropIdentity()){const r=row();if(!r)return;if(state.intake?.cropEnabled){window.intakeWorkspace.stageCrop(next,before);return;}if(bridge){if(!sameCropIdentity(identity)){toast('裁剪依据已改变，请重新调整');render();return;}send('crop',{...identity,roi:next});return;}undoStack.push({id:r.id,roi:before,reviewed:r.reviewed,lanes:r.lanes});redoStack=[];r.roi=next;r.reviewed=false;r.draft=true;r.reason='网页草稿已调整，未执行新测量；下列积分来自历史记录。';r.results=(r.results||[]).map(c=>({...c,value:null,status:'stale',reason:'网页草稿已调整，未执行新测量。'}));state.cells=state.cells.map(c=>c.rowId===r.id?{...c,value:null,status:'stale',reason:'网页草稿已调整，未执行新测量。'}:c);state.status='网页草稿已调整；等待桌面重新计算';render();}
-function undoRedo(redo){if(state.intake?.cropEnabled){window.intakeWorkspace.undoCrop(redo);return;}if(bridge){send(redo?'redo':'undo');return;}const from=redo?redoStack:undoStack,to=redo?undoStack:redoStack;if(!from.length){toast(redo?'没有可重做的调整':'没有可撤销的调整');return;}const item=from.pop(),r=state.rows.find(r=>r.id===item.id);to.push({id:r.id,roi:structuredClone(r.roi),reviewed:r.reviewed,lanes:r.lanes});r.roi=item.roi;r.reviewed=item.reviewed;r.lanes=item.lanes??r.lanes;select(r.id);toast(redo?'已重做裁剪调整':'已撤销裁剪调整');}
-function showTools(){openDrawer('项目工具',`<p class="drawer-copy">围绕当前实验项目，按需进入完整编辑。</p>${state.sourceDiscovery?'<button class="text-button" data-action="folder-sources">查看文件夹筛选记录</button>':''}${[['metadata','file','批量实验信息','填写蛋白、样本信息与泳道设置'],['analysis','curve','积分曲线与边界','核对曲线，调整积分边界与基线'],['template','layout','模板与分段','管理版式、字体与实验室模板'],['ocr','scan','OCR 识别与写表','识别标签，明确关联到实验来源'],['normalization','table','样本对应与归一化','选择目标、参照与明确的样本关系']].map(([s,i,title,description])=>`<button class="tool-link" data-action="advanced" data-section="${s}">${icon(i)}<span><h3>${title}</h3><p>${description}</p></span></button>`).join('')}`);}
-function showFolderSources(){
- const report=state.sourceDiscovery;
- if(!report){toast('本次会话尚无文件夹筛选记录');return;}
- openDrawer('文件夹筛选记录',`<p class="drawer-copy">初始选入 ${report.paths.length} 个候选，手动补入请求 ${(report.requested_additions||[]).length} 项；另列 ${report.skipped.length} 个文件。编号变体可能包含不同内容，可按需加入；原文件均保留。</p><h3>已选原图</h3>${report.paths.map(path=>`<p>${escapeText(path.split(/[\\/]/).pop())}</p>`).join('')}<h3>其他文件</h3>${report.skipped.map((item,index)=>`<section class="inspect-section"><p title="${escapeText(item.path)}">${escapeText(item.path.split(/[\\/]/).pop())}</p><small>${item.reason==='numbered_acquisition_variant'?'同次采集的其他编号文件':'本软件生成的显示图或裁剪'}</small>${item.reason==='numbered_acquisition_variant'?`<button class="text-button" data-action="include-folder-source" data-index="${index}" data-report-id="${escapeText(report.id)}" ${state.busy?'disabled':''}>加入本项目</button>`:''}</section>`).join('')}`);
-}
-function exportAction(){if(bridge){send('export');return;}openDrawer('导出与历史记录',`<div class="drawer-copy"><p>网页修改是交互草稿，不执行科学重算，也不生成新的实验结果。</p><h3>查看原始测量记录</h3><p>可下载预览项目原有的测量表。此文件不包含本次网页调整。</p><button class="button primary" data-action="download-record" ${demoOriginal?'':'disabled'}>${icon('download')}下载历史测量记录 CSV</button></div>`);}
-function downloadRecord(){const esc=v=>{let s=String(v??'');if(/^[=+\-@]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';};const records=[['图组','蛋白','泳道','有效信号','原始积分','状态','原因'],...demoOriginal.cells.map(c=>[c.fig,c.protein,c.lane,c.value,c.rawIntegral,c.status,c.reason])];const url=URL.createObjectURL(new Blob(['\ufeff'+records.map(r=>r.map(esc).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='WB-历史记录-未含网页调整.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('已下载原始历史记录，未包含网页草稿调整');}
-function action(name,element){
- switch(name){
- case 'home':window.platformHome.show('platform');break;
- case 'workbench':window.platformHome.show('wb');break;
- case 'demo':loadDemo();break;
- case 'retry_location':if(bridge)send(name);break;
- case 'quant_import':if(bridge){manualQuant.pendingImport=true;send(name);}else toast('请在桌面工作台独立测量原图灰度。');break;
- case 'import':case 'import_folder':case 'open_project':if(state.intake&&name!=='open_project'){if(window.intakeWorkspace?.hasDraft()){toast('请先保存清单、提交对应关系，或放弃草稿。');return;}send('intake_import_folder');return;}manualQuant.pendingImport=false;if(bridge)send(name);else openDrawer('从原图开始',`<div class="drawer-copy"><p>网页可以预览与调整交互草稿。真实 TIFF 导入、自动建项目与定量计算在同源桌面版执行。</p><button class="button primary" data-action="demo">打开真实资料预览${icon('arrow')}</button><h3>桌面中的操作</h3><p>选择原图或原图文件夹后自动处理，无需先选择空目录。</p></div>`);break;
- case 'export':exportAction();break;
- case 'download-record':downloadRecord();break;
- case 'select':break;
- case 'cancel':send('cancel');break;
- case 'undo':undoRedo(false);break;case 'redo':undoRedo(true);break;
- case 'focus':focusCrop=!focusCrop;zoom=1;renderCanvas();break;
- case 'fit':focusCrop=false;zoom=1;renderCanvas();break;
- case 'zoom-in':zoom=Math.min(5,zoom*1.2);fitImage();break;case 'zoom-out':zoom=Math.max(.25,zoom/1.2);fitImage();break;
- case 'overlay':overlay=!overlay;$('#overlay-toggle').style.color=overlay?'var(--accent)':'';fitImage();break;
- case 'tools':showTools();break;
- case 'folder-sources':showFolderSources();break;
- case 'include-folder-source':send('include_folder_source',{index:Number(element.dataset.index),reportId:element.dataset.reportId});closeDrawer();break;
- case 'advanced':advanced(element.dataset.section);break;
- case 'inspect':if(window.intakeWorkspace?.inspectMeasurement())break;openDrawer($('#inspector-title').textContent,$('#inspector-content').innerHTML+$('#inspector-action').innerHTML);$('#drawer').dataset.inspector='true';window.intakeWorkspace?.syncInspectorDrawer();break;
- case 'close-drawer':closeDrawer();break;
- case 'return_crop':{const r=row();if(bridge&&r&&!state.busy)send(name,{...quantIdentity(),revision:state.revision,locate:element.dataset.locate==='true'});else if(!bridge)toast('请在桌面工作台回存原图裁剪。');break;}
- case 'return-layout':if(state.busy)return;closeDrawer();switchMode('layout');break;
- case 'lanes-minus':setLanes(row()?.lanes-1);break;
- case 'lanes-plus':setLanes(row()?.lanes+1);break;
- case 'reanalyze':if(bridge)send('reanalyze');else toast('网页不执行科学计算，请在桌面工作台重新识别。');break;
- case 'compose':if(bridge)send('compose');else toast('当前显示已生成的历史拼图，网页草稿未重新渲染。');break;
- case 'open_output':if(bridge)send('open_output');else exportAction();break;
- case 'shortcut-settings':window.workbenchActions?.invoke('shortcuts.settings');break;
- case 'settings':window.workbenchAppearance.open();break;
- case 'help':openDrawer('使用工作台',`<div class="drawer-copy"><h3>导入与自动处理</h3><p>桌面选择 WB 原图后，自动建立独立项目并识别泳道、裁剪和测量。</p><h3>图上复核</h3><p>修改 n 快速改变宽度，拖动角点等比例调整，方向键微调。滚轮缩放；“聚焦”切换原图与裁剪区域。调整后，旧结果不会冒充新的有效结果。</p><h3>结果与导出</h3><p>原始积分与有效信号独立展示。正常裁图直接进入拼图。点击拼图可回到原图调整，定量质量独立显示。</p><h3>键盘</h3><p>Tab 移动焦点 · Esc 关闭面板<br>Ctrl+Z 撤销 · Ctrl+Shift+Z 重做</p></div>`);break;
- }
-}
-document.addEventListener('click',event=>{const button=event.target.closest('[data-action]');if(button&&!button.disabled){action(button.dataset.action,button);return;}const item=event.target.closest('[data-row]');if(item){select(item.dataset.row);if(!state.busy)switchMode(mode==='quant'?'quant':'review');}const edit=event.target.closest('[data-edit-row]');if(edit&&!edit.disabled&&!state.busy){select(edit.dataset.editRow);if(!(state.intake&&mode==='layout'))switchMode('review');closeDrawer();}const tab=event.target.closest('[data-mode]');if(tab){window.intakeWorkspace?.noteBrowse();switchMode(tab.dataset.mode);}const f=event.target.closest('[data-filter]');if(f){filter=f.dataset.filter;$$('[data-filter]').forEach(b=>b.classList.toggle('active',b===f));renderSources();}const cell=event.target.closest('[data-cell]');if(cell){selectedCell=state.cells[Number(cell.dataset.cell)];renderResults();renderInspector();if(matchMedia('(max-width:900px)').matches)openDrawer('结果依据',$('#inspector-content').innerHTML);}});
-$('#source-search').addEventListener('input',event=>{search=event.target.value;renderSources();});
-document.addEventListener('change',event=>{if(event.target.matches('[data-lane-count]')){setLanes(Number(event.target.value));return;}});
-$('#drawer-backdrop').addEventListener('click',closeDrawer);
-document.addEventListener('keydown',event=>{if(event.key==='Escape'){closeDrawer();return;}if(event.key==='Enter'&&event.target.matches('[data-cell]'))event.target.click();if(event.key==='Tab'&&!$('#drawer').hidden){const focusables=$$('button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), summary, a[href]', $('#drawer'));if(event.shiftKey&&document.activeElement===focusables[0]){event.preventDefault();focusables.at(-1).focus();}else if(!event.shiftKey&&document.activeElement===focusables.at(-1)){event.preventDefault();focusables[0].focus();}}});
-$('#source-image').addEventListener('load',fitImage);
-new ResizeObserver(()=>{fitImage();updateModeIndicator();}).observe($('.main-panel'));
-$('#image-stage').addEventListener('wheel',event=>{if(!row()?.preview)return;event.preventDefault();zoom=Math.min(5,Math.max(.25,zoom*(event.deltaY<0?1.08:1/1.08)));fitImage();},{passive:false});
-$('#crop-overlay').addEventListener('pointerdown',event=>{if(state.busy||mode!=='review')return;const r=row();if(!r?.roi||(state.intake?.cropEnabled&&!window.intakeWorkspace.cropEditable(r.id)))return;event.preventDefault();event.currentTarget.setPointerCapture(event.pointerId);const rect=$('#image-transform').getBoundingClientRect();drag={id:r.id,identity:cropIdentity(r),x:event.clientX,y:event.clientY,roi:structuredClone(r.roi),rect,handle:event.target.dataset.handle||'move'};});
-$('#crop-overlay').addEventListener('pointermove',event=>{if(!drag)return;const r=row();if(!sameCropIdentity(drag.identity)){drag=null;render();return;}let b={...drag.roi},dx=Math.round((event.clientX-drag.x)/drag.rect.width*r.width),dy=Math.round((event.clientY-drag.y)/drag.rect.height*r.height);if(drag.handle==='move'){b.x=Math.max(0,Math.min(r.width-b.width,b.x+dx));b.y=Math.max(0,Math.min(r.height-b.height,b.y+dy));}else{b=resizeRatio(r,b,drag.handle,dx,dy);} r.roi=b;const c=$('#crop-overlay');c.style.left=b.x/r.width*100+'%';c.style.top=b.y/r.height*100+'%';c.style.width=b.width/r.width*100+'%';c.style.height=b.height/r.height*100+'%';if(state.intake?.cropEnabled){intakeWorkspace.previewRotation(null,false);renderDisplayFrame(r,new DOMMatrix(getComputedStyle($('#image-transform')).transform).a);}});
-$('#crop-overlay').addEventListener('pointerup',()=>{if(!drag)return;const before=drag.roi,identity=drag.identity;drag=null;if(!sameCropIdentity(identity)){render();return;}const next={...row().roi};if(JSON.stringify(before)!==JSON.stringify(next))commitCrop(next,before,identity);});
-$('#crop-overlay').addEventListener('pointercancel',()=>{if(drag){if(sameCropIdentity(drag.identity))row().roi=drag.roi;drag=null;fitImage();}});
-$('#crop-overlay').addEventListener('keydown',event=>{if(event.isComposing||event.keyCode===229||window.workbenchActions?.isComposing()||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)||state.busy)return;event.preventDefault();const r=row();if(!r?.roi||(state.intake?.cropEnabled&&!window.intakeWorkspace.cropEditable(r.id)))return;const before={...r.roi},next={...r.roi},step=event.shiftKey?10:1;const handle=event.target.dataset.handle;if(handle){const dx=event.key==='ArrowLeft'?-step:event.key==='ArrowRight'?step:0,dy=event.key==='ArrowUp'?-step:event.key==='ArrowDown'?step:0;commitCrop(resizeRatio(r,before,handle,dx*1.25*r.lanes,dy),before);return;}next.x=Math.max(0,Math.min(r.width-next.width,next.x+(event.key==='ArrowLeft'?-step:event.key==='ArrowRight'?step:0)));next.y=Math.max(0,Math.min(r.height-next.height,next.y+(event.key==='ArrowUp'?-step:event.key==='ArrowDown'?step:0)));commitCrop(next,before);});
-
-const rotationHandle=$('#crop-rotate-handle');
-rotationHandle.addEventListener('pointerdown',event=>{
- const r=row(),frame=window.intakeWorkspace?.rotationFrame(r);if(!frame||state.busy||!intakeWorkspace.cropEditable(r.id))return;
- event.preventDefault();event.stopPropagation();rotationHandle.focus({preventScroll:true});rotationHandle.setPointerCapture(event.pointerId);
- const rect=$('#image-transform').getBoundingClientRect(),cx=rect.left+frame.center_x/r.width*rect.width,cy=rect.top+frame.center_y/r.height*rect.height;
- drag={handle:'rotate',identity:cropIdentity(r),digest:state.intake.workflow.digest,cx,cy,start:Math.atan2(event.clientY-cy,event.clientX-cx),original:frame.angle_degrees,angle:frame.angle_degrees};
+const cropState = (r) =>
+    state.intake?.cropEnabled
+        ? r?.draft
+            ? 'pending'
+            : r?.cropStatus || 'pending'
+        : !r?.roi
+          ? 'failed'
+          : r.draft
+            ? 'pending'
+            : r.cropStatus || 'ready';
+const cropLabel = (r) =>
+    ({
+        ready: '裁图就绪',
+        pending: r?.draft ? '裁剪草稿 · 待更新' : '裁图待更新',
+        failed: '裁图异常 · 点击调整',
+    })[cropState(r)] || '裁图待更新';
+const needsAttention = (r) => cropState(r) !== 'ready';
+let completedKey = null;
+const row = () => state.rows.find((r) => r.id === state.selectedId) || state.rows[0];
+const send = (action, payload = {}) => bridge && bridge.request(action, JSON.stringify(payload));
+const quantIdentity = () => ({
+    projectId: state.projectId,
+    sessionEpoch: state.sessionEpoch,
+    revision: state.quant?.revision,
+    id: row()?.id,
+    sourceId: row()?.sourceId,
+    lane: quantLane,
+    bandId: quantBand,
 });
-rotationHandle.addEventListener('pointermove',event=>{
- if(drag?.handle!=='rotate')return;
- if(state.busy||!sameCropIdentity(drag.identity)||drag.digest!==state.intake.workflow.digest){drag=null;intakeWorkspace.previewRotation();return;}
- let delta=(Math.atan2(event.clientY-drag.cy,event.clientX-drag.cx)-drag.start)*180/Math.PI;
- delta=(delta+540)%360-180;drag.angle=+Math.max(-30,Math.min(30,drag.original+delta)).toFixed(1);
- intakeWorkspace.previewRotation(drag.angle);
+const sameQuantIdentity = (identity) => {
+    const current = quantIdentity();
+    return Object.keys(current).every((key) => identity?.[key] === current[key]);
+};
+const cropIdentity = (r = row()) => ({
+    cropEditContract: state.cropEditContract,
+    projectId: state.projectId,
+    sessionEpoch: state.sessionEpoch,
+    revision: state.revision,
+    id: r?.id,
+    sourceId: r?.sourceId,
 });
-rotationHandle.addEventListener('pointerup',()=>{
- if(drag?.handle!=='rotate')return;const edit=drag;drag=null;intakeWorkspace.previewRotation();
- if(!state.busy&&sameCropIdentity(edit.identity)&&edit.digest===state.intake.workflow.digest)intakeWorkspace.stageRotation(edit.angle);
+const sameCropIdentity = (identity) => {
+    const current = cropIdentity();
+    return Object.keys(current).every((key) => identity?.[key] === current[key]);
+};
+function toast(message) {
+    $('#toast').textContent = message;
+    $('#toast').classList.add('visible');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => $('#toast').classList.remove('visible'), 3500);
+}
+function statusLabel(status) {
+    return (
+        {
+            quality_review: '质量待复核',
+            needs_review: '待复核',
+            unreviewed: '待复核',
+            ready: '有效',
+            valid: '有效',
+            ok: '有效',
+            excluded: '已排除',
+            result_unavailable: '结果不可用',
+            missing: '未完成',
+            pending: '待计算',
+            stale: '已修改，待重算',
+        }[status] || '待复核'
+    );
+}
+
+function quantHasQuality(value) {
+    return value && (!['ready', 'valid', 'ok'].includes(value.status) || value.signal == null);
+}
+function qualityContent(entries) {
+    const reasons = new Map();
+    for (const entry of entries) {
+        if (!entry.reason) continue;
+        if (!reasons.has(entry.reason)) reasons.set(entry.reason, new Set());
+        if (entry.label) reasons.get(entry.reason).add(entry.label);
+    }
+    return `<summary>质量说明${reasons.size ? '（' + reasons.size + ' 类）' : ''}</summary>${reasons.size ? '<ul>' + [...reasons].map(([reason, labels]) => `<li>${labels.size ? escapeText([...labels].join('、')) + '：' : ''}${escapeText(reason)}</li>`).join('') + '</ul>' : '<p>当前记录没有附加质量说明。</p>'}`;
+}
+function qualityDetails(entries) {
+    return `<details class="quality-details">${qualityContent(entries)}</details>`;
+}
+function checkpointWorkbench() {
+    const previous = {
+        state: { ...state },
+        mode,
+        filter,
+        search,
+        zoom,
+        focusCrop,
+        overlay,
+        selectedCell,
+        completedKey,
+        imageKey,
+        quantLane,
+        quantBand,
+        quantDetail,
+        quantSourceId,
+    };
+    const editors = [
+        window.desktopSession,
+        window.advancedWorkspace,
+        window.intakeWorkspace,
+        window.groupReview,
+        window.platformHome,
+    ]
+        .filter(Boolean)
+        .map((editor) => editor.checkpoint());
+    const manual = [manualQuant, manualLanes].map(checkpointManualEditor);
+    return () => {
+        ({
+            state,
+            mode,
+            filter,
+            search,
+            zoom,
+            focusCrop,
+            overlay,
+            selectedCell,
+            completedKey,
+            imageKey,
+            quantLane,
+            quantBand,
+            quantDetail,
+            quantSourceId,
+        } = previous);
+        editors.forEach((restore) => restore());
+        manual.forEach((restore) => restore());
+        imageKey = '';
+        drag = null;
+        drawing = null;
+        quantDrag = null;
+    };
+}
+function setState(next) {
+    if (next.rows) {
+        const cellsByRow = new Map();
+        for (const cell of next.cells || []) {
+            if (!cellsByRow.has(cell.rowId)) cellsByRow.set(cell.rowId, []);
+            cellsByRow.get(cell.rowId).push(cell);
+        }
+        next.rows = next.rows.map((r) => ({
+            ...r,
+            ...(next.cells && !Object.hasOwn(r, 'results')
+                ? { results: cellsByRow.get(r.id) || [] }
+                : {}),
+            preview: r.preview || next.sourcePreviews?.[r.sourceId] || null,
+        }));
+    }
+    if (next.intake?.sources)
+        next.intake = {
+            ...next.intake,
+            sources: next.intake.sources.map((source) => ({
+                ...source,
+                preview: source.preview || next.sourcePreviews?.[source.asset?.sha256] || null,
+            })),
+        };
+    const oldId = state.selectedId,
+        previousCrop = cropIdentity();
+    state = { ...state, ...next };
+    window.advancedWorkspace?.sync();
+    if (!sameCropIdentity(previousCrop)) {
+        drag = null;
+        drawing = null;
+        quantDrag = null;
+    }
+    window.intakeWorkspace?.sync();
+    manualQuant.sync();
+    if (selectedCell)
+        selectedCell =
+            state.cells.find(
+                (c) => c.rowId === selectedCell.rowId && c.lane === selectedCell.lane,
+            ) || null;
+    if (!state.selectedId && state.rows.length)
+        state.selectedId = state.rows.find((r) => r.roi)?.id || state.rows[0].id;
+    if (oldId !== state.selectedId) {
+        focusCrop = true;
+        zoom = 1;
+    }
+    render();
+    if (next.autoCompletedKey && !state.busy && next.autoCompletedKey !== completedKey) {
+        completedKey = next.autoCompletedKey;
+        if (!window.platformHome || platformHome.inProject()) switchMode('layout');
+    }
+    window.intakeWorkspace?.followBatch();
+}
+function render() {
+    $('#retry-location').hidden = !state.canRetryLocation;
+    if (state.canRetryLocation) $('#home-note').textContent = state.status;
+    $('.compact-inspect').innerHTML = icon('eye') + (mode === 'quant' ? '定量详情' : '裁图详情');
+    $('#project-name').textContent = state.projectName;
+    $('#source-count').textContent = state.rows.length;
+    $('#attention-count').textContent = state.rows.filter(needsAttention).length;
+    $('#operation-status').textContent = state.status || '就绪';
+    $('#status-dot').classList.toggle('busy', !!state.busy);
+    $('#cancel-button').hidden = !state.busy;
+    $('#save-status').innerHTML =
+        icon(state.busy ? 'curve' : 'check') +
+        (state.busy ? '处理中' : bridge ? '已就绪' : '预览草稿');
+    $('#runtime-badge').textContent = bridge ? '桌面工作台' : '网页预览';
+    $('#status-right').textContent = bridge
+        ? '本地工作空间 · 原图保留'
+        : '交互预览 · 不执行新的科学计算';
+    $$('[data-action="return-layout"], [data-action="reanalyze"]').forEach(
+        (b) => (b.disabled = state.busy || !row()),
+    );
+    window.platformHome?.sync();
+    if (window.platformHome && !platformHome.inProject()) return;
+    if (window.intakeWorkspace?.renderActive()) return;
+    if (window.groupReview?.renderActive()) return;
+    renderSources();
+    renderCanvas();
+    renderInspector();
+    if (mode === 'quant') renderQuant();
+    if (mode === 'results') renderResults();
+    $$('[data-action="reanalyze"], [data-action="compose"], [data-edit-row]').forEach(
+        (button) =>
+            (button.disabled =
+                !!state.busy ||
+                (!!state.intake &&
+                    !(state.intake.figureEnabled && button.hasAttribute('data-edit-row')))),
+    );
+    if (
+        !$('#drawer').hidden &&
+        $('#drawer').dataset.inspector === 'true' &&
+        !window.intakeWorkspace?.syncInspectorDrawer() &&
+        !document.activeElement?.matches('[data-intake-rotation]')
+    ) {
+        const focused = document.activeElement,
+            editingLane = focused?.matches('[data-lane-count]'),
+            typedValue = editingLane ? focused.value : null,
+            control = focused?.matches('[data-lane-count]')
+                ? '[data-lane-count]'
+                : focused?.dataset.action
+                  ? '[data-action="' + focused.dataset.action + '"]'
+                  : null;
+        $('#drawer-content').innerHTML =
+            $('#inspector-content').innerHTML + $('#inspector-action').innerHTML;
+        if (control) {
+            const replacement = $(control, $('#drawer-content'));
+            if (editingLane && replacement) replacement.value = typedValue;
+            replacement?.focus();
+        }
+    }
+    const first = state.rows.find((r) => r.preview && r.roi) || state.rows.find((r) => r.preview);
+    if (first) {
+        $('#home-image').src = state.montage || first.preview;
+        $('#recent-image').src = first.preview;
+        $('#recent-name').textContent = state.projectName;
+        $('#recent-description').textContent =
+            `${state.rows.length} 张原图 · ${state.rows.filter((r) => r.roi).length} 张已有自动裁剪 · 自动裁图记录`;
+    }
+}
+function renderSources() {
+    if (window.intakeWorkspace?.renderSourceList()) return;
+    const focusedSource =
+        state.intake?.automation && $('#source-list').contains(document.activeElement)
+            ? document.activeElement.dataset.row
+            : null;
+    const grouped = mode === 'quant';
+    $('.source-panel').classList.toggle('quant-sources', grouped);
+    $('.source-panel .panel-heading h2').firstChild.nodeValue = grouped ? 'Fig 分组 ' : '项目原图 ';
+    $('#source-search').placeholder = grouped ? '查找 Fig 或条带…' : '查找原图…';
+    $('#source-search').setAttribute('aria-label', grouped ? '查找 Fig 或条带' : '查找原图');
+    if (grouped) {
+        renderQuantSources();
+        return;
+    }
+    const filtered = state.rows.filter(
+        (r) =>
+            (filter !== 'attention' || needsAttention(r)) &&
+            r.name.toLowerCase().includes(search.toLowerCase()),
+    );
+    $('#source-list').innerHTML =
+        filtered
+            .map(
+                (r, index) =>
+                    `<button class="source-item ${r.id === state.selectedId ? 'active' : ''}" data-row="${escapeText(r.id)}" aria-pressed="${r.id === state.selectedId}" title="${escapeText(r.name)}"><img class="source-thumb" src="${r.preview || ''}" alt="" ${r.preview ? '' : 'hidden'}><span class="source-copy"><strong>${escapeText(r.fig || `图 ${index + 1}`)} · ${escapeText(r.name)}</strong><small class="${!needsAttention(r) ? 'reviewed' : ''}">${cropLabel(r)}</small></span></button>`,
+            )
+            .join('') ||
+        '<p class="empty-list">' +
+            (state.rows.length ? '没有符合条件的原图。' : '导入原图后，所有来源会显示在这里。') +
+            '</p>';
+    if (focusedSource)
+        $$('[data-row]', $('#source-list'))
+            .find((b) => b.dataset.row === focusedSource)
+            ?.focus({ preventScroll: true });
+}
+function renderCanvas() {
+    const layout =
+        state.intake?.figureEnabled && mode === 'layout' ? intakeWorkspace.layoutState() : null;
+    const r = row();
+    $('#source-image').style.clipPath = quantImageClip();
+    $('.main-panel').classList.toggle('quant-mode', mode === 'quant');
+    $('#quant-profile').hidden = mode !== 'quant';
+    $('#quant-lanes').hidden = mode !== 'quant';
+    $('#image-stage').hidden = mode === 'results';
+    $('#result-stage').hidden = mode !== 'results';
+    $('#image-title').textContent =
+        mode === 'results'
+            ? '测量结果'
+            : mode === 'layout'
+              ? layout?.label || '当前拼图'
+              : mode === 'quant'
+                ? quantDetail
+                    ? quantRowTitle(r)
+                    : (quantData()?.group?.figure || r?.fig || '当前 Fig') + ' · 整组灰度定量'
+                : (state.intake ? r?.protein || r?.name : r?.name) || '选择一张原图';
+    $('#source-image').alt =
+        mode === 'layout' || (mode === 'quant' && !quantDetail)
+            ? 'Fig 标注拼图'
+            : r?.name || '当前原图';
+    $('#image-subtitle').textContent =
+        mode === 'quant'
+            ? !quantDetail
+                ? '同一泳道贯穿组内条带 · 点击曲线分段查看原图依据'
+                : r
+                  ? '原图：' + r.name + ' · ' + r.width + ' × ' + r.height + ' px'
+                  : '添加原图后选择测量区域与泳道数'
+            : mode === 'results'
+              ? `${state.rows.length} 张原图 · 有效信号与待复核积分独立呈现`
+              : mode === 'layout'
+                ? state.montage
+                    ? '原图裁剪的组合预览 · 显示变换不进入定量'
+                    : '等待生成当前版本拼图'
+                : r
+                  ? state.intake
+                      ? `${r.fig} · ${r.name} · ${r.lanes} 个泳道`
+                      : `${r.width} × ${r.height} px  ·  ${r.bitDepth || '原始'} 位  ·  ${r.lanes} 个泳道`
+                  : '查看自动识别结果，在图上完成调整';
+    $('#stage-label').textContent =
+        mode === 'quant' && !quantDetail
+            ? 'Fig 标注拼图 · 原像素映射'
+            : mode === 'layout'
+              ? '拼图预览'
+              : focusCrop
+                ? '原图 · 聚焦裁剪区域'
+                : '原始图像';
+    $('#canvas-hint').textContent =
+        mode === 'quant'
+            ? quantDetail
+                ? '拖动框体或曲线边界调整 · 可返回整组'
+                : '选择泳道 · 点击曲线分段查看原图与封底'
+            : mode === 'results'
+              ? '选择结果查看完整原因'
+              : mode === 'layout'
+                ? state.montage
+                    ? state.intake?.figureEnabled
+                        ? '点击图块定位蛋白；修改裁剪使用右侧入口'
+                        : '点击拼图中的图片，返回对应原图调整'
+                    : '当前版本拼图尚未生成'
+                : r && !r.roi
+                  ? '在原图上拖出裁剪区域 · 无需填写坐标'
+                  : '拖动边框调整裁剪 · 滚轮缩放 · 方向键微调';
+    $('.image-actions').hidden = mode === 'results';
+    $$('.image-actions [data-action=undo],.image-actions [data-action=redo]').forEach(
+        (b) => (b.hidden = mode === 'quant'),
+    );
+    $('#overlay-toggle').hidden = mode !== 'review';
+    const src =
+        mode === 'layout'
+            ? layout && !layout.show
+                ? null
+                : state.montage
+            : mode === 'quant' && !quantDetail
+              ? quantData()?.group?.sourceSheet
+                  ? r?.preview
+                  : state.montage
+              : r?.preview;
+    $('#empty-image').hidden = !!src;
+    $('#image-transform').hidden = !src;
+    $('#empty-image h3').textContent = mode === 'layout' ? '拼图尚未就绪' : '从一张原图开始';
+    $('#empty-image p').textContent =
+        mode === 'layout'
+            ? state.busy
+                ? '正在更新，请稍候。'
+                : '可更新拼图，或从右侧异常列表返回原图调整。'
+            : '选择项目中的原图，或打开界面预览。';
+    $('#empty-image button').hidden = mode === 'layout';
+    if (layout && !layout.show) {
+        $('#empty-image h3').textContent = layout.label;
+        $('#empty-image p').textContent = layout.complete
+            ? '正在读取所选成图…'
+            : '成图尚未完成；请在右侧查看缺项并完成处理。';
+    }
+    if (mode === 'quant' && !quantDetail) {
+        $('#empty-image h3').textContent = '当前 Fig 拼图尚未就绪';
+        $('#empty-image p').textContent = state.busy
+            ? '正在更新，请稍候。'
+            : '返回拼图生成当前版本标注图，再按 Fig 查看灰度。';
+        $('#empty-image button').hidden = true;
+    }
+    if (!src) {
+        $('#crop-overlay').hidden = true;
+        $('#display-frame-overlay').hidden = true;
+        $('#montage-regions').hidden = true;
+        return;
+    }
+    if (imageKey !== src) {
+        imageKey = src;
+        $('#source-image').src = src;
+    }
+    renderMontageRegions();
+    requestAnimationFrame(fitImage);
+}
+function fitImage() {
+    const img = $('#source-image'),
+        vp = $('#image-viewport'),
+        r = row();
+    if (!img.naturalWidth || !vp.clientWidth) return;
+    const scale = Math.min(vp.clientWidth / img.naturalWidth, vp.clientHeight / img.naturalHeight),
+        w = img.naturalWidth * scale,
+        h = img.naturalHeight * scale;
+    const target = $('#image-transform');
+    target.style.width = w + 'px';
+    target.style.height = h + 'px';
+    let actualZoom = zoom,
+        tx = 0,
+        ty = 0;
+    if ((mode === 'review' || (mode === 'quant' && quantDetail)) && focusCrop && r?.roi) {
+        const roi = mode === 'quant' ? quantData()?.contextBounds || r.roi : cropViewBounds(r);
+        const availableHeight =
+            mode === 'review' ? Math.max(16, vp.clientHeight - 96) : 0.82 * vp.clientHeight;
+        actualZoom =
+            zoom *
+            Math.min(
+                mode === 'quant' ? 24 : 6,
+                Math.max(
+                    mode === 'review' ? 0.01 : 1,
+                    Math.min(
+                        (0.76 * vp.clientWidth) / ((roi.width / r.width) * w),
+                        availableHeight / ((roi.height / r.height) * h),
+                    ),
+                ),
+            );
+        tx = (0.5 - (roi.x + roi.width / 2) / r.width) * w * actualZoom;
+        ty = (0.5 - (roi.y + roi.height / 2) / r.height) * h * actualZoom;
+    }
+    if (mode === 'quant' && !quantDetail && focusCrop) {
+        const box = quantGroupBounds(),
+            size = quantGroupDimensions();
+        if (box && size.width && size.height) {
+            actualZoom =
+                zoom *
+                Math.min(
+                    12,
+                    Math.max(
+                        1,
+                        Math.min(
+                            (0.9 * vp.clientWidth) / ((box.width / size.width) * w),
+                            (0.82 * vp.clientHeight) / ((box.height / size.height) * h),
+                        ),
+                    ),
+                );
+            tx = (0.5 - (box.x + box.width / 2) / size.width) * w * actualZoom;
+            ty = (0.5 - (box.y + box.height / 2) / size.height) * h * actualZoom;
+        }
+    }
+    const panKey = [mode, quantDetail, r?.id, focusCrop].join(':');
+    if (imagePan.key !== panKey) {
+        imagePan.key = panKey;
+        imagePan.x = 0;
+        imagePan.y = 0;
+    }
+    target.style.transform = `translate(${tx + imagePan.x}px,${ty + imagePan.y}px) scale(${actualZoom})`;
+    $('#zoom-label').textContent =
+        zoom === 1 ? (focusCrop && r?.roi ? '聚焦泳道' : '适应窗口') : Math.round(zoom * 100) + '%';
+    if (mode === 'quant') renderQuantOverlay(actualZoom);
+    const crop = $('#crop-overlay');
+    crop.hidden = mode !== 'review' || !r?.roi || !overlay;
+    crop.classList.toggle('quantification-range', !!state.intake?.cropEnabled);
+    if (!crop.hidden) {
+        const b = r.roi;
+        crop.style.left = (b.x / r.width) * 100 + '%';
+        crop.style.top = (b.y / r.height) * 100 + '%';
+        crop.style.width = (b.width / r.width) * 100 + '%';
+        crop.style.height = (b.height / r.height) * 100 + '%';
+        crop.style.borderWidth = 1.5 / actualZoom + 'px';
+        $('.crop-tag').textContent = state.intake?.cropEnabled ? '原图定量范围' : cropLabel(r);
+        $('.crop-tag').style.transform = `scale(${1 / actualZoom})`;
+        $('.crop-tag').style.transformOrigin = 'left bottom';
+        $('.crop-tag').style.bottom = `calc(100% + ${7 / actualZoom}px)`;
+        $$('.crop-handle').forEach((el) => (el.style.transform = `scale(${1 / actualZoom})`));
+        $('#lane-lines').innerHTML = Array.from(
+            { length: r.lanes },
+            (_, i) =>
+                `<span class="lane-number" style="left:${((i + 0.5) / r.lanes) * 100}%;top:calc(100% + ${6 / actualZoom}px);bottom:auto;transform:translateX(-50%) scale(${1 / actualZoom});transform-origin:top">${i + 1}</span>${i ? `<span class="lane-line" style="left:${(i / r.lanes) * 100}%"></span>` : ''}`,
+        ).join('');
+    }
+    renderDisplayFrame(r, actualZoom);
+}
+
+function cropViewBounds(r) {
+    const frame = window.intakeWorkspace?.rotationFrame(r);
+    if (!frame) return r.roi;
+    const points = intakeWorkspace.rotationCorners(frame),
+        b = r.roi;
+    const x = Math.min(b.x, ...points.map((p) => p.x)),
+        y = Math.min(b.y, ...points.map((p) => p.y));
+    return {
+        x,
+        y,
+        width: Math.max(b.x + b.width, ...points.map((p) => p.x)) - x,
+        height: Math.max(b.y + b.height, ...points.map((p) => p.y)) - y,
+    };
+}
+function renderDisplayFrame(r, actualZoom) {
+    const node = $('#display-frame-overlay'),
+        frame = window.intakeWorkspace?.rotationFrame(r);
+    node.hidden = mode !== 'review' || !overlay || !frame;
+    if (node.hidden) return;
+    node.style.left = ((frame.center_x - frame.width / 2) / r.width) * 100 + '%';
+    node.style.top = ((frame.center_y - frame.height / 2) / r.height) * 100 + '%';
+    node.style.width = (frame.width / r.width) * 100 + '%';
+    node.style.height = (frame.height / r.height) * 100 + '%';
+    node.style.transform = `rotate(${frame.angle_degrees}deg)`;
+    node.style.borderWidth = 2 / actualZoom + 'px';
+    node.classList.toggle('invalid', !!intakeWorkspace.rotationError(r));
+    const handle = $('#crop-rotate-handle');
+    handle.disabled = !!state.busy || !intakeWorkspace.cropEditable(r.id);
+    handle.style.transform = `translateX(-50%) scale(${1 / actualZoom})`;
+    handle.style.bottom = `calc(100% + ${18 / actualZoom}px)`;
+    handle.setAttribute('aria-valuenow', String(frame.angle_degrees));
+    handle.title = `旋转显示框 ${frame.angle_degrees.toFixed(1)}°；拖动或用方向键微调（±30°）`;
+    $('#display-frame-label').textContent = `显示 / 拼图 ${frame.angle_degrees.toFixed(1)}°`;
+    $('#display-frame-label').style.transform = `scale(${1 / actualZoom})`;
+    $('#display-frame-label').style.top = `calc(100% + ${25 / actualZoom}px)`;
+}
+
+function renderMontageRegions() {
+    const layer = $('#montage-regions');
+    layer.hidden = mode !== 'layout';
+    if (layer.hidden) return;
+    const width = state.montageWidth,
+        height = state.montageHeight;
+    layer.innerHTML =
+        width > 0 && height > 0
+            ? (state.montageRegions || [])
+                  .map((region) => {
+                      const source = state.rows.find((item) => item.id === region.rowId);
+                      if (!source) return '';
+                      return `<button class="montage-region" data-edit-row="${escapeText(source.id)}" aria-label="${state.intake?.figureEnabled ? '定位蛋白' : '调整原图'} ${escapeText(source.name)}" title="${state.intake?.figureEnabled ? '定位蛋白' : '点击返回原图'}：${escapeText(source.name)}" style="left:${(region.x / width) * 100}%;top:${(region.y / height) * 100}%;width:${(region.width / width) * 100}%;height:${(region.height / height) * 100}%"></button>`;
+                  })
+                  .join('')
+            : '';
+}
+function resizeRatio(r, b, handle, dx, dy) {
+    const ratio = 1.25 * r.lanes,
+        west = handle.includes('w'),
+        north = handle.includes('n');
+    const anchorX = west ? b.x + b.width : b.x,
+        anchorY = north ? b.y + b.height : b.y;
+    const desiredWidth = b.width + (west ? -dx : dx),
+        desiredHeight = b.height + (north ? -dy : dy);
+    const h = Math.abs(dx) / ratio >= Math.abs(dy) ? desiredWidth / ratio : desiredHeight;
+    const maxWidth = west ? anchorX : r.width - anchorX,
+        maxHeight = north ? anchorY : r.height - anchorY;
+    const height = Math.max(
+        0,
+        Math.min(Math.max(4, Math.round(h)), maxHeight, Math.floor(maxWidth / ratio)),
+    );
+    const width = Math.round(height * ratio);
+    if (height < 4 || width < 4) return { ...b };
+    return {
+        x: west ? anchorX - width : anchorX,
+        y: north ? anchorY - height : anchorY,
+        width,
+        height,
+    };
+}
+function setLanes(n) {
+    const r = row();
+    if (!r || state.busy) return;
+    if (state.intake) {
+        toast('槽位数来自已确认清单，不能在裁剪中修改');
+        return;
+    }
+    if (!Number.isSafeInteger(n) || n < 1 || n > 96) {
+        toast('泳道数须为 1–96 的整数');
+        renderInspector();
+        return;
+    }
+    if (n === r.lanes) return;
+    const width = r.roi ? Math.round(r.roi.height * 1.25 * n) : 0;
+    if (r.roi && width > r.width) {
+        toast('当前高度下宽度超出原图，请先缩小裁剪框，再增加泳道数');
+        renderInspector();
+        return;
+    }
+    if (bridge) {
+        send('set_lanes', { ...cropIdentity(r), n });
+        closeDrawer();
+        return;
+    }
+    const before = r.roi ? { ...r.roi } : null,
+        oldN = r.lanes;
+    r.lanes = n;
+    const next = before
+        ? {
+              ...before,
+              x: Math.max(
+                  0,
+                  Math.min(r.width - width, Math.round(before.x + (before.width - width) / 2)),
+              ),
+              width,
+          }
+        : null;
+    commitCrop(next, before);
+    undoStack.at(-1).lanes = oldN;
+    toast('已调整网页草稿泳道数；拼图与定量未重新计算');
+}
+
+function dataPair(label, value) {
+    return `<div class="data-pair"><span>${label}</span><strong>${escapeText(value)}</strong></div>`;
+}
+function renderInspector() {
+    if (state.intake?.cropEnabled && mode === 'review') {
+        window.intakeWorkspace.renderCropInspector(row());
+        return;
+    }
+    if (window.intakeWorkspace?.renderFigureInspector()) return;
+    if (mode === 'quant') {
+        renderQuantInspector();
+        return;
+    }
+    const r = row();
+    $('#inspector-title').textContent =
+        mode === 'results' ? '输出结果' : mode === 'layout' ? '拼图设置' : '当前原图';
+    $('#review-badge').textContent = mode === 'review' ? cropLabel(r) : '自动裁图';
+    $('#review-badge').className = 'status-badge ' + (r && !needsAttention(r) ? 'ok' : 'pending');
+    const valid = state.cells.filter((c) => c.value != null).length;
+    let content = '';
+    if (mode === 'results') {
+        content = `<section class="inspect-section"><h3>本项目的结果</h3>${dataPair('原图数量', state.rows.length + ' 张')}${dataPair('已有裁剪', state.rows.filter((r) => r.roi).length + ' 张')}${dataPair('有效信号', valid + ' 项')}${dataPair('待复核 / 未完成', state.cells.length - valid + ' 项')}<p>结果项包含待定位占位，不等于检出泳道数量。</p></section><section class="inspect-section"><h3>${selectedCell ? escapeText(selectedCell.fig) + ' · 泳道 ' + selectedCell.lane : '结果依据'}</h3><p class="row-reason">${escapeText(selectedCell?.reason || '选择左侧表格中的一项，查看原始积分、有效性与完整质量原因。')}</p>${selectedCell ? dataPair('原始积分', number(selectedCell.rawIntegral)) : ''}</section><section class="inspect-section"><h3>本次会话输出</h3><p>${escapeText(state.outputPath ? state.outputPath.split(/[\\/]/).pop() : '尚未在本次会话导出')}</p><button class="text-button" data-action="open_output">${icon('folder')}打开结果文件夹</button></section>`;
+    } else if (mode === 'layout') {
+        content = `<section class="inspect-section"><h3>排版预览</h3><p>点击任意图片返回原图调整。正常裁图直接参与拼图，无需逐张确认。</p>${dataPair('就绪图像', state.rows.filter((r) => !needsAttention(r)).length + ' 张')}${dataPair('标签', '保留原始项目标签')}${
+            state.rows.some(needsAttention)
+                ? '<div class="crop-exceptions"><h3>待更新与异常原图</h3>' +
+                  state.rows
+                      .filter(needsAttention)
+                      .map(
+                          (item) =>
+                              `<button class="exception-source" data-edit-row="${escapeText(item.id)}">${icon('warning')}<span>${escapeText(item.name)}<small>${cropState(item) === 'pending' ? '裁图待更新 · 返回原图' : '未完成裁图 · 返回原图调整'}</small></span>${icon('chevron')}</button>`,
+                      )
+                      .join('') +
+                  '</div>'
+                : ''
+        }${!bridge && state.rows.some((item) => item.draft) ? '<p class="draft-label">当前拼图为历史记录，尚未包含网页裁剪草稿。</p>' : ''}</section><section class="inspect-section"><h3>模板与样式</h3><button class="button subtle full" data-action="advanced" data-section="template">${icon('sliders')}调整模板与分段</button><p style="margin-top:13px">${bridge ? '完整模板编辑器在原生高级窗口中打开。' : '网页展示已生成的拼图记录，模板修改在桌面版执行。'}</p></section><section class="inspect-section"><div class="layout-note">原图用于定量，拼图用于展示。两者的处理始终分开。</div><button class="text-button" data-action="compose">${icon('layout')}更新拼图预览</button></section>`;
+    } else if (r) {
+        const cells = r.results || state.cells.filter((c) => c.rowId === r.id);
+        content = `<section class="inspect-section"><h3>识别概览</h3><label class="lane-count-label">泳道数 n<div class="lane-stepper"><button data-action="lanes-minus" aria-label="减少一个泳道" ${state.busy ? 'disabled' : ''}>${icon('minus')}</button><input data-lane-count type="number" min="1" max="96" step="1" value="${r.lanes}" aria-label="泳道数 n" ${state.busy ? 'disabled' : ''}><button data-action="lanes-plus" aria-label="增加一个泳道" ${state.busy ? 'disabled' : ''}>${icon('plus')}</button></div></label><p>固定比例 ${number(1.25 * r.lanes)} : 1 · 修改 n 调整宽度</p>${dataPair('裁剪', r.roi ? `${r.roi.width} × ${r.roi.height} px` : '待定位')}${dataPair('蛋白', r.protein && r.protein !== 'Unassigned' ? r.protein : '未指定')}</section><section class="inspect-section">${!r.roi ? '<p>尚未找到可靠裁剪，可在原图指定范围或重新识别。</p>' : ''}${qualityDetails([{ reason: r.reason, label: '' }, ...cells.map((c) => ({ reason: c.reason, label: '泳道 ' + c.lane }))])}<h3>泳道结果</h3><table class="lane-summary"><thead><tr><th>泳道</th><th>有效信号</th><th>原始积分</th></tr></thead><tbody>${
+            cells
+                .slice(0, 8)
+                .map(
+                    (c, i) =>
+                        `<tr><td>${c.lane || i + 1}</td><td>${number(c.value)}</td><td>${number(c.rawIntegral)}</td></tr>`,
+                )
+                .join('') || '<tr><td colspan="3">尚无可用结果</td></tr>'
+        }</tbody></table><p style="margin-top:12px">待复核原始积分不是有效信号。</p><button class="disclosure" data-action="advanced" data-section="analysis"><span>查看曲线与积分边界</span>${icon('chevron')}</button></section><section class="inspect-section"><button class="button subtle full" data-action="return_crop" ${!r.roi || state.busy ? 'disabled' : ''}>审核裁图并回存原文件夹</button><small>新增显示图、原值 TIFF 和来源记录</small><button class="text-button" data-action="return_crop" data-locate="true" ${!r.roi || state.busy ? 'disabled' : ''}>重新定位原图并回存</button></section><section class="inspect-section"><button class="disclosure" data-action="advanced" data-section="metadata"><span>实验信息与泳道设置</span>${icon('chevron')}</button><button class="disclosure" data-action="reanalyze"><span>重新自动识别</span>${icon('scan')}</button>${r.draft && !bridge ? '<p class="draft-label">网页草稿已修改，未重新计算；原记录不变。</p>' : ''}</section>`;
+    } else {
+        content =
+            '<section class="inspect-section"><h3>等待原图</h3><p>原图导入后，这里显示当前对象、裁剪结果与具体质量原因。</p></section>';
+    }
+    $('#inspector-content').innerHTML = content;
+    $('#inspector-action').innerHTML =
+        mode === 'review'
+            ? `<button class="button primary full" data-action="return-layout" ${!r || state.busy ? 'disabled' : ''}>${icon('layout')}返回拼图${icon('arrow')}</button><small>裁图无需确认，定量质量独立显示</small>`
+            : `<button class="button primary full" data-action="export" ${!state.rows.length || state.busy ? 'disabled' : ''}>${icon('download')}导出结果包</button><small>缺失与无效值保持空白</small>`;
+}
+function renderResults() {
+    if (state.intake?.figureEnabled) {
+        window.intakeWorkspace.renderIntakeResults();
+        return;
+    }
+    if (state.quant?.table?.length) {
+        renderQuantTable();
+        return;
+    }
+    $('#results-body').innerHTML =
+        state.cells
+            .map(
+                (c, i) =>
+                    `<tr tabindex="0" data-cell="${i}" aria-label="${escapeText(c.fig)} 泳道 ${c.lane}，${statusLabel(c.status)}" class="${selectedCell === c ? 'selected' : ''}"><td>${escapeText(c.fig)}<small>${escapeText(c.protein === 'Unassigned' ? '未指定蛋白' : c.protein || '未指定蛋白')}</small></td><td>${c.lane}</td><td>${number(c.value)}</td><td>${number(c.rawIntegral)}</td><td><span class="result-state">${statusLabel(c.status)}</span></td></tr>`,
+            )
+            .join('') || '<tr><td colspan="5">尚无测量结果。导入原图后由桌面后台处理。</td></tr>';
+    $('#result-count').textContent = `${state.cells.length} 个结果项（含待定位占位）`;
+}
+function updateModeIndicator() {
+    const tab = $('.mode-tab.active'),
+        bar = $('.mode-tabs'),
+        indicator = $('.mode-indicator');
+    if (!tab || !bar || !indicator) return;
+    const rect = tab.getBoundingClientRect(),
+        parent = bar.getBoundingClientRect();
+    indicator.style.transform = `translateX(${rect.left - parent.left + bar.scrollLeft}px)`;
+    indicator.style.width = rect.width + 'px';
+}
+function switchMode(next) {
+    if (state.intake && !window.intakeWorkspace.allowedModes().includes(next)) next = 'intake';
+    if (next === 'intake' && !state.intake) return;
+    if (state.busy && next === 'layout' && !state.montage && !state.intake?.automation) {
+        toast('拼图将在当前处理完成后可用');
+        return;
+    }
+    const previousMode = mode;
+    if (next !== mode) window.intakeWorkspace?.noteBrowse();
+    mode = next;
+    if (mode === 'quant' && previousMode !== 'quant') {
+        quantDetail = !state.montage;
+        focusCrop = true;
+        if (row()) quantOpenGroups.add(String(row().fig ?? ''));
+    }
+    if (mode === 'quant' && !state.montage) quantDetail = true;
+    window.platformHome?.show('project', { focus: false });
+    $('#home-view').hidden = true;
+    $('#work-view').hidden = false;
+    $$('.mode-tab').forEach((b) => {
+        b.classList.toggle('active', b.dataset.mode === mode);
+        b.setAttribute('aria-selected', String(b.dataset.mode === mode));
+    });
+    requestAnimationFrame(updateModeIndicator);
+    if (mode === 'layout' && bridge && !state.busy) {
+        if (state.intake?.figureEnabled) window.intakeWorkspace.requestFigure();
+        else if (!state.montage) send('compose');
+    }
+    if (mode === 'quant' && bridge && row() && !state.intake)
+        send('quant_select', {
+            id: row().id,
+            lane: quantLane,
+            bandId: quantBand,
+            overview: !quantDetail,
+        });
+    selectedCell = null;
+    zoom = 1;
+    render();
+    if (previousMode !== mode) {
+        const workspace = $('.workspace'),
+            intake = $('#intake-workspace');
+        window.uiMotion.cancel(workspace);
+        if (intake) window.uiMotion.cancel(intake);
+        window.uiMotion.enter(workspace.hidden ? intake : workspace);
+    }
+    if (state.intake?.figureEnabled && previousMode !== mode) {
+        const heading = $('#intake-workspace:not([hidden]) h1') || $('#image-title');
+        heading?.setAttribute('tabindex', '-1');
+        heading?.focus({ preventScroll: true });
+    }
+}
+function select(id) {
+    window.intakeWorkspace?.noteBrowse();
+    state.selectedId = id;
+    focusCrop = true;
+    zoom = 1;
+    if (bridge) send('select', { id });
+    render();
+}
+function openDrawer(title, content) {
+    document.querySelector('#advanced-footer')?.remove();
+    const panel = $('#drawer');
+    panel.classList.remove('advanced-drawer');
+    if (panel.hidden || panel.dataset.closing === 'true')
+        drawerTrigger = document.activeElement?.closest('#drawer')
+            ? drawerTrigger
+            : document.activeElement;
+    panel.dataset.closing = 'false';
+    panel.dataset.inspector = 'false';
+    $('#drawer-title').textContent = title;
+    $('#drawer-content').innerHTML = content;
+    panel.classList.remove('closing');
+    $('#drawer-backdrop').hidden = false;
+    $('.app-shell').inert = true;
+    $('.platform-rail').inert = true;
+    uiMotion.drawer(true);
+    $('#drawer [data-action="close-drawer"]').focus({ preventScroll: true });
+}
+function closeDrawer() {
+    const panel = $('#drawer');
+    if (panel.hidden || panel.dataset.closing === 'true') return;
+    panel.dataset.closing = 'true';
+    uiMotion.drawer(false, () => {
+        panel.hidden = true;
+        panel.dataset.closing = 'false';
+        $('#drawer-backdrop').hidden = true;
+        $('.app-shell').inert = false;
+        $('.platform-rail').inert = false;
+        if (drawerTrigger?.isConnected) drawerTrigger.focus({ preventScroll: true });
+    });
+}
+function advanced(section) {
+    if (section === 'analysis') {
+        closeDrawer();
+        switchMode('quant');
+        return;
+    }
+    window.advancedWorkspace.open(section);
+}
+async function loadDemo() {
+    closeDrawer();
+    if (bridge) {
+        send('open_project');
+        return;
+    }
+    if (demoOriginal) {
+        setState(structuredClone(demoOriginal));
+        switchMode(state.autoCompletedKey ? 'layout' : 'review');
+        return;
+    }
+    try {
+        const res = await fetch('demo.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        demoOriginal = structuredClone(data);
+        setState(data);
+        switchMode(state.autoCompletedKey ? 'layout' : 'review');
+        toast('已打开真实历史记录的交互预览；修改仅保留在网页草稿。');
+    } catch {
+        openDrawer(
+            '打开界面预览',
+            '<div class="drawer-copy"><p>此网页尚未加载本地预览资料。</p><p>请使用项目提供的预览启动器，或在桌面工作台中选择 WB 原图并开始。</p></div>',
+        );
+    }
+}
+function commitCrop(next, before, identity = cropIdentity()) {
+    const r = row();
+    if (!r) return;
+    if (state.intake?.cropEnabled) {
+        window.intakeWorkspace.stageCrop(next, before);
+        return;
+    }
+    if (bridge) {
+        if (!sameCropIdentity(identity)) {
+            toast('裁剪依据已改变，请重新调整');
+            render();
+            return;
+        }
+        send('crop', { ...identity, roi: next });
+        return;
+    }
+    undoStack.push({ id: r.id, roi: before, reviewed: r.reviewed, lanes: r.lanes });
+    redoStack = [];
+    r.roi = next;
+    r.reviewed = false;
+    r.draft = true;
+    r.reason = '网页草稿已调整，未执行新测量；下列积分来自历史记录。';
+    r.results = (r.results || []).map((c) => ({
+        ...c,
+        value: null,
+        status: 'stale',
+        reason: '网页草稿已调整，未执行新测量。',
+    }));
+    state.cells = state.cells.map((c) =>
+        c.rowId === r.id
+            ? { ...c, value: null, status: 'stale', reason: '网页草稿已调整，未执行新测量。' }
+            : c,
+    );
+    state.status = '网页草稿已调整；等待桌面重新计算';
+    render();
+}
+function undoRedo(redo) {
+    if (state.intake?.cropEnabled) {
+        window.intakeWorkspace.undoCrop(redo);
+        return;
+    }
+    if (bridge) {
+        send(redo ? 'redo' : 'undo');
+        return;
+    }
+    const from = redo ? redoStack : undoStack,
+        to = redo ? undoStack : redoStack;
+    if (!from.length) {
+        toast(redo ? '没有可重做的调整' : '没有可撤销的调整');
+        return;
+    }
+    const item = from.pop(),
+        r = state.rows.find((r) => r.id === item.id);
+    to.push({ id: r.id, roi: structuredClone(r.roi), reviewed: r.reviewed, lanes: r.lanes });
+    r.roi = item.roi;
+    r.reviewed = item.reviewed;
+    r.lanes = item.lanes ?? r.lanes;
+    select(r.id);
+    toast(redo ? '已重做裁剪调整' : '已撤销裁剪调整');
+}
+function showTools() {
+    openDrawer(
+        '项目工具',
+        `<p class="drawer-copy">围绕当前实验项目，按需进入完整编辑。</p>${state.sourceDiscovery ? '<button class="text-button" data-action="folder-sources">查看文件夹筛选记录</button>' : ''}${[
+            ['metadata', 'file', '批量实验信息', '填写蛋白、样本信息与泳道设置'],
+            ['analysis', 'curve', '积分曲线与边界', '核对曲线，调整积分边界与基线'],
+            ['template', 'layout', '模板与分段', '管理版式、字体与实验室模板'],
+            ['ocr', 'scan', 'OCR 识别与写表', '识别标签，明确关联到实验来源'],
+            ['normalization', 'table', '样本对应与归一化', '选择目标、参照与明确的样本关系'],
+        ]
+            .map(
+                ([s, i, title, description]) =>
+                    `<button class="tool-link" data-action="advanced" data-section="${s}">${icon(i)}<span><h3>${title}</h3><p>${description}</p></span></button>`,
+            )
+            .join('')}`,
+    );
+}
+function showFolderSources() {
+    const report = state.sourceDiscovery;
+    if (!report) {
+        toast('本次会话尚无文件夹筛选记录');
+        return;
+    }
+    openDrawer(
+        '文件夹筛选记录',
+        `<p class="drawer-copy">初始选入 ${report.paths.length} 个候选，手动补入请求 ${(report.requested_additions || []).length} 项；另列 ${report.skipped.length} 个文件。编号变体可能包含不同内容，可按需加入；原文件均保留。</p><h3>已选原图</h3>${report.paths.map((path) => `<p>${escapeText(path.split(/[\\/]/).pop())}</p>`).join('')}<h3>其他文件</h3>${report.skipped.map((item, index) => `<section class="inspect-section"><p title="${escapeText(item.path)}">${escapeText(item.path.split(/[\\/]/).pop())}</p><small>${item.reason === 'numbered_acquisition_variant' ? '同次采集的其他编号文件' : '本软件生成的显示图或裁剪'}</small>${item.reason === 'numbered_acquisition_variant' ? `<button class="text-button" data-action="include-folder-source" data-index="${index}" data-report-id="${escapeText(report.id)}" ${state.busy ? 'disabled' : ''}>加入本项目</button>` : ''}</section>`).join('')}`,
+    );
+}
+function exportAction() {
+    if (bridge) {
+        send('export');
+        return;
+    }
+    openDrawer(
+        '导出与历史记录',
+        `<div class="drawer-copy"><p>网页修改是交互草稿，不执行科学重算，也不生成新的实验结果。</p><h3>查看原始测量记录</h3><p>可下载预览项目原有的测量表。此文件不包含本次网页调整。</p><button class="button primary" data-action="download-record" ${demoOriginal ? '' : 'disabled'}>${icon('download')}下载历史测量记录 CSV</button></div>`,
+    );
+}
+function downloadRecord() {
+    const esc = (v) => {
+        let s = String(v ?? '');
+        if (/^[=+\-@]/.test(s)) s = "'" + s;
+        return '"' + s.replace(/"/g, '""') + '"';
+    };
+    const records = [
+        ['图组', '蛋白', '泳道', '有效信号', '原始积分', '状态', '原因'],
+        ...demoOriginal.cells.map((c) => [
+            c.fig,
+            c.protein,
+            c.lane,
+            c.value,
+            c.rawIntegral,
+            c.status,
+            c.reason,
+        ]),
+    ];
+    const url = URL.createObjectURL(
+        new Blob(['\ufeff' + records.map((r) => r.map(esc).join(',')).join('\r\n')], {
+            type: 'text/csv;charset=utf-8',
+        }),
+    );
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'WB-历史记录-未含网页调整.csv';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast('已下载原始历史记录，未包含网页草稿调整');
+}
+function action(name, element) {
+    switch (name) {
+        case 'home':
+            window.platformHome.show('platform');
+            break;
+        case 'workbench':
+            window.platformHome.show('wb');
+            break;
+        case 'demo':
+            loadDemo();
+            break;
+        case 'retry_location':
+            if (bridge) send(name);
+            break;
+        case 'quant_import':
+            if (bridge) {
+                manualQuant.pendingImport = true;
+                send(name);
+            } else toast('请在桌面工作台独立测量原图灰度。');
+            break;
+        case 'import':
+        case 'import_folder':
+        case 'open_project':
+            if (state.intake && name !== 'open_project') {
+                if (window.intakeWorkspace?.hasDraft()) {
+                    toast('请先保存清单、提交对应关系，或放弃草稿。');
+                    return;
+                }
+                send('intake_import_folder');
+                return;
+            }
+            manualQuant.pendingImport = false;
+            if (bridge) send(name);
+            else
+                openDrawer(
+                    '从原图开始',
+                    `<div class="drawer-copy"><p>网页可以预览与调整交互草稿。真实 TIFF 导入、自动建项目与定量计算在同源桌面版执行。</p><button class="button primary" data-action="demo">打开真实资料预览${icon('arrow')}</button><h3>桌面中的操作</h3><p>选择原图或原图文件夹后自动处理，无需先选择空目录。</p></div>`,
+                );
+            break;
+        case 'export':
+            exportAction();
+            break;
+        case 'download-record':
+            downloadRecord();
+            break;
+        case 'select':
+            break;
+        case 'cancel':
+            send('cancel');
+            break;
+        case 'undo':
+            undoRedo(false);
+            break;
+        case 'redo':
+            undoRedo(true);
+            break;
+        case 'focus':
+            focusCrop = !focusCrop;
+            zoom = 1;
+            renderCanvas();
+            break;
+        case 'fit':
+            focusCrop = false;
+            zoom = 1;
+            renderCanvas();
+            break;
+        case 'zoom-in':
+            zoom = Math.min(5, zoom * 1.2);
+            fitImage();
+            break;
+        case 'zoom-out':
+            zoom = Math.max(0.25, zoom / 1.2);
+            fitImage();
+            break;
+        case 'overlay':
+            overlay = !overlay;
+            $('#overlay-toggle').style.color = overlay ? 'var(--accent)' : '';
+            fitImage();
+            break;
+        case 'tools':
+            showTools();
+            break;
+        case 'folder-sources':
+            showFolderSources();
+            break;
+        case 'include-folder-source':
+            send('include_folder_source', {
+                index: Number(element.dataset.index),
+                reportId: element.dataset.reportId,
+            });
+            closeDrawer();
+            break;
+        case 'advanced':
+            advanced(element.dataset.section);
+            break;
+        case 'inspect':
+            if (window.intakeWorkspace?.inspectMeasurement()) break;
+            openDrawer(
+                $('#inspector-title').textContent,
+                $('#inspector-content').innerHTML + $('#inspector-action').innerHTML,
+            );
+            $('#drawer').dataset.inspector = 'true';
+            window.intakeWorkspace?.syncInspectorDrawer();
+            break;
+        case 'close-drawer':
+            closeDrawer();
+            break;
+        case 'return_crop': {
+            const r = row();
+            if (bridge && r && !state.busy)
+                send(name, {
+                    ...quantIdentity(),
+                    revision: state.revision,
+                    locate: element.dataset.locate === 'true',
+                });
+            else if (!bridge) toast('请在桌面工作台回存原图裁剪。');
+            break;
+        }
+        case 'return-layout':
+            if (state.busy) return;
+            closeDrawer();
+            switchMode('layout');
+            break;
+        case 'lanes-minus':
+            setLanes(row()?.lanes - 1);
+            break;
+        case 'lanes-plus':
+            setLanes(row()?.lanes + 1);
+            break;
+        case 'reanalyze':
+            if (bridge) send('reanalyze');
+            else toast('网页不执行科学计算，请在桌面工作台重新识别。');
+            break;
+        case 'compose':
+            if (bridge) send('compose');
+            else toast('当前显示已生成的历史拼图，网页草稿未重新渲染。');
+            break;
+        case 'open_output':
+            if (bridge) send('open_output');
+            else exportAction();
+            break;
+        case 'shortcut-settings':
+            window.workbenchActions?.invoke('shortcuts.settings');
+            break;
+        case 'settings':
+            window.workbenchAppearance.open();
+            break;
+        case 'help':
+            openDrawer(
+                '使用工作台',
+                `<div class="drawer-copy"><h3>导入与自动处理</h3><p>桌面选择 WB 原图后，自动建立独立项目并识别泳道、裁剪和测量。</p><h3>图上复核</h3><p>修改 n 快速改变宽度，拖动角点等比例调整，方向键微调。滚轮缩放；“聚焦”切换原图与裁剪区域。调整后，旧结果不会冒充新的有效结果。</p><h3>结果与导出</h3><p>原始积分与有效信号独立展示。正常裁图直接进入拼图。点击拼图可回到原图调整，定量质量独立显示。</p><h3>键盘</h3><p>Tab 移动焦点 · Esc 关闭面板<br>Ctrl+Z 撤销 · Ctrl+Shift+Z 重做</p></div>`,
+            );
+            break;
+    }
+}
+document.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-action]');
+    if (button && !button.disabled) {
+        action(button.dataset.action, button);
+        return;
+    }
+    const item = event.target.closest('[data-row]');
+    if (item) {
+        select(item.dataset.row);
+        if (!state.busy) switchMode(mode === 'quant' ? 'quant' : 'review');
+    }
+    const edit = event.target.closest('[data-edit-row]');
+    if (edit && !edit.disabled && !state.busy) {
+        select(edit.dataset.editRow);
+        if (!(state.intake && mode === 'layout')) switchMode('review');
+        closeDrawer();
+    }
+    const tab = event.target.closest('[data-mode]');
+    if (tab) {
+        window.intakeWorkspace?.noteBrowse();
+        switchMode(tab.dataset.mode);
+    }
+    const f = event.target.closest('[data-filter]');
+    if (f) {
+        filter = f.dataset.filter;
+        $$('[data-filter]').forEach((b) => b.classList.toggle('active', b === f));
+        renderSources();
+    }
+    const cell = event.target.closest('[data-cell]');
+    if (cell) {
+        selectedCell = state.cells[Number(cell.dataset.cell)];
+        renderResults();
+        renderInspector();
+        if (matchMedia('(max-width:900px)').matches)
+            openDrawer('结果依据', $('#inspector-content').innerHTML);
+    }
 });
-rotationHandle.addEventListener('pointercancel',()=>{if(drag?.handle==='rotate'){drag=null;intakeWorkspace.previewRotation();}});
-rotationHandle.addEventListener('keydown',event=>{
- if(event.isComposing||event.keyCode===229||window.workbenchActions?.isComposing()||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)||state.busy)return;
- event.preventDefault();event.stopPropagation();const frame=intakeWorkspace.rotationFrame();if(!frame)return;
- const delta=(['ArrowLeft','ArrowDown'].includes(event.key)?-1:1)*(event.shiftKey?1:.1);
- intakeWorkspace.stageRotation(+Math.max(-30,Math.min(30,frame.angle_degrees+delta)).toFixed(1));
+$('#source-search').addEventListener('input', (event) => {
+    search = event.target.value;
+    renderSources();
+});
+document.addEventListener('change', (event) => {
+    if (event.target.matches('[data-lane-count]')) {
+        setLanes(Number(event.target.value));
+        return;
+    }
+});
+$('#drawer-backdrop').addEventListener('click', closeDrawer);
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+        closeDrawer();
+        return;
+    }
+    if (event.key === 'Enter' && event.target.matches('[data-cell]')) event.target.click();
+    if (event.key === 'Tab' && !$('#drawer').hidden) {
+        const focusables = $$(
+            'button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), summary, a[href]',
+            $('#drawer'),
+        );
+        if (event.shiftKey && document.activeElement === focusables[0]) {
+            event.preventDefault();
+            focusables.at(-1).focus();
+        } else if (!event.shiftKey && document.activeElement === focusables.at(-1)) {
+            event.preventDefault();
+            focusables[0].focus();
+        }
+    }
+});
+$('#source-image').addEventListener('load', fitImage);
+new ResizeObserver(() => {
+    fitImage();
+    updateModeIndicator();
+}).observe($('.main-panel'));
+$('#image-stage').addEventListener(
+    'wheel',
+    (event) => {
+        if (!row()?.preview) return;
+        event.preventDefault();
+        zoom = Math.min(5, Math.max(0.25, zoom * (event.deltaY < 0 ? 1.08 : 1 / 1.08)));
+        fitImage();
+    },
+    { passive: false },
+);
+$('#crop-overlay').addEventListener('pointerdown', (event) => {
+    if (state.busy || mode !== 'review') return;
+    const r = row();
+    if (!r?.roi || (state.intake?.cropEnabled && !window.intakeWorkspace.cropEditable(r.id)))
+        return;
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    const rect = $('#image-transform').getBoundingClientRect();
+    drag = {
+        id: r.id,
+        identity: cropIdentity(r),
+        x: event.clientX,
+        y: event.clientY,
+        roi: structuredClone(r.roi),
+        rect,
+        handle: event.target.dataset.handle || 'move',
+    };
+});
+$('#crop-overlay').addEventListener('pointermove', (event) => {
+    if (!drag) return;
+    const r = row();
+    if (!sameCropIdentity(drag.identity)) {
+        drag = null;
+        render();
+        return;
+    }
+    let b = { ...drag.roi },
+        dx = Math.round(((event.clientX - drag.x) / drag.rect.width) * r.width),
+        dy = Math.round(((event.clientY - drag.y) / drag.rect.height) * r.height);
+    if (drag.handle === 'move') {
+        b.x = Math.max(0, Math.min(r.width - b.width, b.x + dx));
+        b.y = Math.max(0, Math.min(r.height - b.height, b.y + dy));
+    } else {
+        b = resizeRatio(r, b, drag.handle, dx, dy);
+    }
+    r.roi = b;
+    const c = $('#crop-overlay');
+    c.style.left = (b.x / r.width) * 100 + '%';
+    c.style.top = (b.y / r.height) * 100 + '%';
+    c.style.width = (b.width / r.width) * 100 + '%';
+    c.style.height = (b.height / r.height) * 100 + '%';
+    if (state.intake?.cropEnabled) {
+        intakeWorkspace.previewRotation(null, false);
+        renderDisplayFrame(r, new DOMMatrix(getComputedStyle($('#image-transform')).transform).a);
+    }
+});
+$('#crop-overlay').addEventListener('pointerup', () => {
+    if (!drag) return;
+    const before = drag.roi,
+        identity = drag.identity;
+    drag = null;
+    if (!sameCropIdentity(identity)) {
+        render();
+        return;
+    }
+    const next = { ...row().roi };
+    if (JSON.stringify(before) !== JSON.stringify(next)) commitCrop(next, before, identity);
+});
+$('#crop-overlay').addEventListener('pointercancel', () => {
+    if (drag) {
+        if (sameCropIdentity(drag.identity)) row().roi = drag.roi;
+        drag = null;
+        fitImage();
+    }
+});
+$('#crop-overlay').addEventListener('keydown', (event) => {
+    if (
+        event.isComposing ||
+        event.keyCode === 229 ||
+        window.workbenchActions?.isComposing() ||
+        !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key) ||
+        state.busy
+    )
+        return;
+    event.preventDefault();
+    const r = row();
+    if (!r?.roi || (state.intake?.cropEnabled && !window.intakeWorkspace.cropEditable(r.id)))
+        return;
+    const before = { ...r.roi },
+        next = { ...r.roi },
+        step = event.shiftKey ? 10 : 1;
+    const handle = event.target.dataset.handle;
+    if (handle) {
+        const dx = event.key === 'ArrowLeft' ? -step : event.key === 'ArrowRight' ? step : 0,
+            dy = event.key === 'ArrowUp' ? -step : event.key === 'ArrowDown' ? step : 0;
+        commitCrop(resizeRatio(r, before, handle, dx * 1.25 * r.lanes, dy), before);
+        return;
+    }
+    next.x = Math.max(
+        0,
+        Math.min(
+            r.width - next.width,
+            next.x + (event.key === 'ArrowLeft' ? -step : event.key === 'ArrowRight' ? step : 0),
+        ),
+    );
+    next.y = Math.max(
+        0,
+        Math.min(
+            r.height - next.height,
+            next.y + (event.key === 'ArrowUp' ? -step : event.key === 'ArrowDown' ? step : 0),
+        ),
+    );
+    commitCrop(next, before);
 });
 
-let drawing=null;
-$('#image-viewport').addEventListener('pointerdown',event=>{
- const r=row();if(mode!=='review'||state.busy||r?.roi||!r?.preview||(state.intake?.cropEnabled&&!window.intakeWorkspace.cropEditable(r.id)))return;
- const rect=$('#image-transform').getBoundingClientRect();const x=Math.round((event.clientX-rect.left)/rect.width*r.width),y=Math.round((event.clientY-rect.top)/rect.height*r.height);
- if(x<0||y<0||x>=r.width||y>=r.height)return;event.preventDefault();event.currentTarget.setPointerCapture(event.pointerId);drawing={id:r.id,identity:cropIdentity(r),x,y,rect};
+const rotationHandle = $('#crop-rotate-handle');
+rotationHandle.addEventListener('pointerdown', (event) => {
+    const r = row(),
+        frame = window.intakeWorkspace?.rotationFrame(r);
+    if (!frame || state.busy || !intakeWorkspace.cropEditable(r.id)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    rotationHandle.focus({ preventScroll: true });
+    rotationHandle.setPointerCapture(event.pointerId);
+    const rect = $('#image-transform').getBoundingClientRect(),
+        cx = rect.left + (frame.center_x / r.width) * rect.width,
+        cy = rect.top + (frame.center_y / r.height) * rect.height;
+    drag = {
+        handle: 'rotate',
+        identity: cropIdentity(r),
+        digest: state.intake.workflow.digest,
+        cx,
+        cy,
+        start: Math.atan2(event.clientY - cy, event.clientX - cx),
+        original: frame.angle_degrees,
+        angle: frame.angle_degrees,
+    };
 });
-$('#image-viewport').addEventListener('pointermove',event=>{
- if(!drawing)return;const r=row();if(!sameCropIdentity(drawing.identity)){drawing=null;render();return;}
- const x=Math.max(0,Math.min(r.width,Math.round((event.clientX-drawing.rect.left)/drawing.rect.width*r.width))),y=Math.max(0,Math.min(r.height,Math.round((event.clientY-drawing.rect.top)/drawing.rect.height*r.height)));
- const handle=(y<drawing.y?'n':'s')+(x<drawing.x?'w':'e');r.roi=resizeRatio(r,{x:drawing.x,y:drawing.y,width:0,height:0},handle,x-drawing.x,y-drawing.y);focusCrop=false;fitImage();
+rotationHandle.addEventListener('pointermove', (event) => {
+    if (drag?.handle !== 'rotate') return;
+    if (
+        state.busy ||
+        !sameCropIdentity(drag.identity) ||
+        drag.digest !== state.intake.workflow.digest
+    ) {
+        drag = null;
+        intakeWorkspace.previewRotation();
+        return;
+    }
+    let delta =
+        ((Math.atan2(event.clientY - drag.cy, event.clientX - drag.cx) - drag.start) * 180) /
+        Math.PI;
+    delta = ((delta + 540) % 360) - 180;
+    drag.angle = +Math.max(-30, Math.min(30, drag.original + delta)).toFixed(1);
+    intakeWorkspace.previewRotation(drag.angle);
 });
-$('#image-viewport').addEventListener('pointerup',()=>{if(!drawing)return;const identity=drawing.identity;drawing=null;if(!sameCropIdentity(identity)){render();return;}const r=row();if(r.roi?.width>=4&&r.roi?.height>=4)commitCrop({...r.roi},null,identity);else{r.roi=null;fitImage();}});
-$('#image-viewport').addEventListener('pointercancel',()=>{if(drawing){if(sameCropIdentity(drawing.identity))row().roi=null;drawing=null;fitImage();}});
+rotationHandle.addEventListener('pointerup', () => {
+    if (drag?.handle !== 'rotate') return;
+    const edit = drag;
+    drag = null;
+    intakeWorkspace.previewRotation();
+    if (
+        !state.busy &&
+        sameCropIdentity(edit.identity) &&
+        edit.digest === state.intake.workflow.digest
+    )
+        intakeWorkspace.stageRotation(edit.angle);
+});
+rotationHandle.addEventListener('pointercancel', () => {
+    if (drag?.handle === 'rotate') {
+        drag = null;
+        intakeWorkspace.previewRotation();
+    }
+});
+rotationHandle.addEventListener('keydown', (event) => {
+    if (
+        event.isComposing ||
+        event.keyCode === 229 ||
+        window.workbenchActions?.isComposing() ||
+        !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key) ||
+        state.busy
+    )
+        return;
+    event.preventDefault();
+    event.stopPropagation();
+    const frame = intakeWorkspace.rotationFrame();
+    if (!frame) return;
+    const delta =
+        (['ArrowLeft', 'ArrowDown'].includes(event.key) ? -1 : 1) * (event.shiftKey ? 1 : 0.1);
+    intakeWorkspace.stageRotation(
+        +Math.max(-30, Math.min(30, frame.angle_degrees + delta)).toFixed(1),
+    );
+});
 
-async function bootstrap(){icons();render();if(new URLSearchParams(location.search).get("preview")==="1")return;if(window.qt?.webChannelTransport){const script=document.createElement('script');script.src='qrc:///qtwebchannel/qwebchannel.js';script.onload=()=>new QWebChannel(qt.webChannelTransport,channel=>{bridge=channel.objects.workbench;window.desktopSession?.connect(bridge);bridge.progressChanged?.connect(raw=>{try{window.groupReview?.progress(JSON.parse(raw));}catch{toast('进度状态读取失败');}});bridge.stateChanged.connect(raw=>{try{const next=JSON.parse(raw);if(window.desktopSession&&!window.desktopSession.acceptState(next))return;const wasEmpty=!state.rows.length;const sameProject=state.projectId===next.projectId&&state.sessionEpoch===next.sessionEpoch;setState(next);if(manualQuant.pendingImport&&state.rows.length&&!state.busy){manualQuant.pendingImport=false;mode='quant';quantDetail=true;switchMode('quant');}else if(state.intake&&(!sameProject||(platformHome.inProject()&&!window.intakeWorkspace.allowedModes().includes(mode))))switchMode('intake');else if(wasEmpty&&state.rows.length&&!state.autoCompletedKey&&!manualQuant.pendingImport)switchMode('review');window.desktopSession?.route();}catch{toast('项目状态无法读取，请重新打开项目。');}});$('#home-note').textContent='选择原图后自动创建独立项目，所有处理在本机执行。';send('refresh');});document.head.appendChild(script);}else{try{const response=await fetch('demo.json');if(response.ok){demoOriginal=await response.json();setState(structuredClone(demoOriginal));}}catch{} }if(new URLSearchParams(location.search).get('view')==='home'||!state.rows.length){window.platformHome?.show('platform',{focus:false});}else switchMode(state.autoCompletedKey?'layout':'review');}
-let quantLane=1,quantBand=null,quantDrag=null,quantDetail=false;
-const quantOpenGroups=new Set();
-let quantSourceId=null;
-function quantGroups(rows=state.rows){const order=state.quant?.rowOrder||[],rank=new Map(order.map((id,i)=>[id,i])),ordered=[...rows].sort((a,b)=>(rank.get(a.id)??order.length)-(rank.get(b.id)??order.length));const groups=new Map();for(const item of ordered){const key=String(item.fig??'');if(!groups.has(key))groups.set(key,{key,label:key||'未指定 Fig',rows:[]});groups.get(key).rows.push(item);}return [...groups.values()];}
-function quantRowTitle(item){if(!item)return '按 Fig 查看灰度定量';const group=quantGroups().find(g=>g.rows.some(r=>r.id===item.id)),index=group?.rows.findIndex(r=>r.id===item.id)??-1;return (group?.label||'未指定 Fig')+' · 条带 '+(index+1)+(item.protein&&item.protein!=='Unassigned'?' · '+item.protein:'');}
-function renderQuantSources(){const groups=quantGroups(),current=row(),currentGroup=groups.find(g=>g.rows.some(r=>r.id===current?.id));if(quantSourceId!==current?.id){quantSourceId=current?.id;if(currentGroup)quantOpenGroups.add(currentGroup.key);}$('#source-count').textContent=groups.length;const needle=search.toLowerCase();$('#source-list').innerHTML=groups.map((group,index)=>{const rows=group.rows.filter(item=>group.label.toLowerCase().includes(needle)||item.name.toLowerCase().includes(needle)||quantRowTitle(item).toLowerCase().includes(needle));if(!rows.length)return '';const active=group===currentGroup,expanded=quantOpenGroups.has(group.key)||!!needle;return `<section class="quant-source-group ${active?'current':''}"><button class="quant-group-toggle" data-quant-group-toggle="${index}" aria-expanded="${expanded}" aria-controls="quant-group-${index}" ${state.busy?'disabled':''}><span>${escapeText(group.label)}<small>${group.rows.length} 个条带${active?' · 当前组':''}</small></span>${icon('chevron-down')}</button><div id="quant-group-${index}" class="quant-group-rows" ${expanded?'':'hidden'}>${rows.map(item=>`<button class="source-item quant-source-item ${item.id===current?.id?'active':''}" data-quant-source="${escapeText(item.id)}" aria-pressed="${item.id===current?.id}" title="原图：${escapeText(item.name)}" ${state.busy?'disabled':''}><img class="source-thumb" src="${item.preview||''}" alt="" ${item.preview?'':'hidden'}><span class="source-copy"><strong>条带 ${group.rows.indexOf(item)+1}${item.protein&&item.protein!=='Unassigned'?' · '+escapeText(item.protein):''}</strong><small>${escapeText(item.name)}</small></span></button>`).join('')}</div></section>`;}).join('')||'<p class="empty-list">'+(state.rows.length?'没有符合条件的 Fig 或条带。':'添加原图后即可独立测量灰度。')+'</p>';}
+let drawing = null;
+$('#image-viewport').addEventListener('pointerdown', (event) => {
+    const r = row();
+    if (
+        mode !== 'review' ||
+        state.busy ||
+        r?.roi ||
+        !r?.preview ||
+        (state.intake?.cropEnabled && !window.intakeWorkspace.cropEditable(r.id))
+    )
+        return;
+    const rect = $('#image-transform').getBoundingClientRect();
+    const x = Math.round(((event.clientX - rect.left) / rect.width) * r.width),
+        y = Math.round(((event.clientY - rect.top) / rect.height) * r.height);
+    if (x < 0 || y < 0 || x >= r.width || y >= r.height) return;
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    drawing = { id: r.id, identity: cropIdentity(r), x, y, rect };
+});
+$('#image-viewport').addEventListener('pointermove', (event) => {
+    if (!drawing) return;
+    const r = row();
+    if (!sameCropIdentity(drawing.identity)) {
+        drawing = null;
+        render();
+        return;
+    }
+    const x = Math.max(
+            0,
+            Math.min(
+                r.width,
+                Math.round(((event.clientX - drawing.rect.left) / drawing.rect.width) * r.width),
+            ),
+        ),
+        y = Math.max(
+            0,
+            Math.min(
+                r.height,
+                Math.round(((event.clientY - drawing.rect.top) / drawing.rect.height) * r.height),
+            ),
+        );
+    const handle = (y < drawing.y ? 'n' : 's') + (x < drawing.x ? 'w' : 'e');
+    r.roi = resizeRatio(
+        r,
+        { x: drawing.x, y: drawing.y, width: 0, height: 0 },
+        handle,
+        x - drawing.x,
+        y - drawing.y,
+    );
+    focusCrop = false;
+    fitImage();
+});
+$('#image-viewport').addEventListener('pointerup', () => {
+    if (!drawing) return;
+    const identity = drawing.identity;
+    drawing = null;
+    if (!sameCropIdentity(identity)) {
+        render();
+        return;
+    }
+    const r = row();
+    if (r.roi?.width >= 4 && r.roi?.height >= 4) commitCrop({ ...r.roi }, null, identity);
+    else {
+        r.roi = null;
+        fitImage();
+    }
+});
+$('#image-viewport').addEventListener('pointercancel', () => {
+    if (drawing) {
+        if (sameCropIdentity(drawing.identity)) row().roi = null;
+        drawing = null;
+        fitImage();
+    }
+});
+
+async function bootstrap() {
+    icons();
+    render();
+    if (new URLSearchParams(location.search).get('preview') === '1') return;
+    if (window.qt?.webChannelTransport) {
+        const script = document.createElement('script');
+        script.src = 'qrc:///qtwebchannel/qwebchannel.js';
+        script.onload = () =>
+            new QWebChannel(qt.webChannelTransport, (channel) => {
+                bridge = channel.objects.workbench;
+                boundaryDiagnostics.connect(bridge);
+                window.desktopSession?.connect(bridge);
+                bridge.progressChanged?.connect((raw) => {
+                    let phase = 'parse';
+                    try {
+                        const next = channelObject(raw);
+                        phase = 'validate';
+                        if (typeof next.busy !== 'boolean' || typeof next.status !== 'string')
+                            throw new TypeError('Invalid progress');
+                        phase = 'render';
+                        window.groupReview?.progress(next);
+                        boundaryDiagnostics.recovered('progress');
+                    } catch (failure) {
+                        boundaryDiagnostics.report('progress', failure, { ...state, phase });
+                    }
+                });
+                bridge.stateChanged.connect((raw) => {
+                    let phase = 'parse';
+                    let next;
+                    let restore;
+                    try {
+                        next = channelObject(raw);
+                        phase = 'validate';
+                        requireProjectState(next);
+                        restore = checkpointWorkbench();
+                        if (window.desktopSession && !window.desktopSession.acceptState(next))
+                            return;
+                        phase = 'render';
+                        const wasEmpty = !state.rows.length;
+                        const sameProject =
+                            state.projectId === next.projectId &&
+                            state.sessionEpoch === next.sessionEpoch;
+                        setState(next);
+                        if (manualQuant.pendingImport && state.rows.length && !state.busy) {
+                            manualQuant.pendingImport = false;
+                            mode = 'quant';
+                            quantDetail = true;
+                            switchMode('quant');
+                        } else if (
+                            state.intake &&
+                            (!sameProject ||
+                                (platformHome.inProject() &&
+                                    !window.intakeWorkspace.allowedModes().includes(mode)))
+                        )
+                            switchMode('intake');
+                        else if (
+                            wasEmpty &&
+                            state.rows.length &&
+                            !state.autoCompletedKey &&
+                            !manualQuant.pendingImport
+                        )
+                            switchMode('review');
+                        window.desktopSession?.route();
+                        boundaryDiagnostics.recovered('state');
+                    } catch (failure) {
+                        restore?.();
+                        boundaryDiagnostics.report('state', failure, { ...(next || state), phase });
+                    }
+                });
+                $('#home-note').textContent = '选择原图后自动创建独立项目，所有处理在本机执行。';
+                send('refresh');
+            });
+        document.head.appendChild(script);
+    } else {
+        try {
+            const response = await fetch('demo.json');
+            if (response.ok) {
+                demoOriginal = await response.json();
+                setState(structuredClone(demoOriginal));
+            }
+        } catch {}
+    }
+    if (new URLSearchParams(location.search).get('view') === 'home' || !state.rows.length) {
+        window.platformHome?.show('platform', { focus: false });
+    } else switchMode(state.autoCompletedKey ? 'layout' : 'review');
+}
+let quantLane = 1,
+    quantBand = null,
+    quantDrag = null,
+    quantDetail = false;
+const quantOpenGroups = new Set();
+let quantSourceId = null;
+function quantGroups(rows = state.rows) {
+    const order = state.quant?.rowOrder || [],
+        rank = new Map(order.map((id, i) => [id, i])),
+        ordered = [...rows].sort(
+            (a, b) => (rank.get(a.id) ?? order.length) - (rank.get(b.id) ?? order.length),
+        );
+    const groups = new Map();
+    for (const item of ordered) {
+        const key = String(item.fig ?? '');
+        if (!groups.has(key)) groups.set(key, { key, label: key || '未指定 Fig', rows: [] });
+        groups.get(key).rows.push(item);
+    }
+    return [...groups.values()];
+}
+function quantRowTitle(item) {
+    if (!item) return '按 Fig 查看灰度定量';
+    const group = quantGroups().find((g) => g.rows.some((r) => r.id === item.id)),
+        index = group?.rows.findIndex((r) => r.id === item.id) ?? -1;
+    return (
+        (group?.label || '未指定 Fig') +
+        ' · 条带 ' +
+        (index + 1) +
+        (item.protein && item.protein !== 'Unassigned' ? ' · ' + item.protein : '')
+    );
+}
+function renderQuantSources() {
+    const groups = quantGroups(),
+        current = row(),
+        currentGroup = groups.find((g) => g.rows.some((r) => r.id === current?.id));
+    if (quantSourceId !== current?.id) {
+        quantSourceId = current?.id;
+        if (currentGroup) quantOpenGroups.add(currentGroup.key);
+    }
+    $('#source-count').textContent = groups.length;
+    const needle = search.toLowerCase();
+    $('#source-list').innerHTML =
+        groups
+            .map((group, index) => {
+                const rows = group.rows.filter(
+                    (item) =>
+                        group.label.toLowerCase().includes(needle) ||
+                        item.name.toLowerCase().includes(needle) ||
+                        quantRowTitle(item).toLowerCase().includes(needle),
+                );
+                if (!rows.length) return '';
+                const active = group === currentGroup,
+                    expanded = quantOpenGroups.has(group.key) || !!needle;
+                return `<section class="quant-source-group ${active ? 'current' : ''}"><button class="quant-group-toggle" data-quant-group-toggle="${index}" aria-expanded="${expanded}" aria-controls="quant-group-${index}" ${state.busy ? 'disabled' : ''}><span>${escapeText(group.label)}<small>${group.rows.length} 个条带${active ? ' · 当前组' : ''}</small></span>${icon('chevron-down')}</button><div id="quant-group-${index}" class="quant-group-rows" ${expanded ? '' : 'hidden'}>${rows.map((item) => `<button class="source-item quant-source-item ${item.id === current?.id ? 'active' : ''}" data-quant-source="${escapeText(item.id)}" aria-pressed="${item.id === current?.id}" title="原图：${escapeText(item.name)}" ${state.busy ? 'disabled' : ''}><img class="source-thumb" src="${item.preview || ''}" alt="" ${item.preview ? '' : 'hidden'}><span class="source-copy"><strong>条带 ${group.rows.indexOf(item) + 1}${item.protein && item.protein !== 'Unassigned' ? ' · ' + escapeText(item.protein) : ''}</strong><small>${escapeText(item.name)}</small></span></button>`).join('')}</div></section>`;
+            })
+            .join('') ||
+        '<p class="empty-list">' +
+            (state.rows.length ? '没有符合条件的 Fig 或条带。' : '添加原图后即可独立测量灰度。') +
+            '</p>';
+}
 // Called only on explicit overview entry, never from render/state callbacks.
-function requestQuantMontage(){if(bridge&&!state.busy&&!state.montage)send('compose');}
-const quantData=()=>state.quant?.rowId===row()?.id?state.quant:null;
-function quantSelection(){const q=quantData(),lane=q?.lanes?.find(l=>l.lane===quantLane)||q?.lanes?.[0],band=lane?.bands?.find(b=>String(b.id)===String(quantBand))||lane?.bands?.[0];if(lane)quantLane=lane.lane;if(band)quantBand=band.id;return {q,lane,band};}
-const finiteQuantValue=v=>typeof v==='number'&&Number.isFinite(v);
-const hasQuantBounds=(band,length)=>!!band&&['start','end','baselineStart','baselineEnd'].every(key=>finiteQuantValue(band[key]))&&Number.isInteger(band.start)&&Number.isInteger(band.end)&&band.start>=0&&band.start<band.end&&band.end<length;
-const quantValue=v=>v==null||!Number.isFinite(Number(v))?'—':Number(v).toFixed(2);
-function selectQuant(id,lane,bandId,detail=true){if(state.busy)return;quantLane=Number(lane)||1;quantBand=bandId??null;if(id!==state.selectedId){state.selectedId=id;zoom=1;focusCrop=true;}quantDetail=detail;mode='quant';switchMode('quant');}
-function quantEdit(fields,identity=quantIdentity()){if(!sameQuantIdentity(identity)){renderQuant();return;}const {q,lane,band}=quantSelection();if(!q||!lane||state.busy)return;if(!bridge){toast('网页仅展示历史曲线；请在桌面工作台调整并重新计算。');renderQuant();return;}send('quant_edit',{...identity,lane:lane.lane,bandId:band?.id,...fields});}
-function renderQuant(){if(manualQuant.isSetup())manualQuant.render();else{renderQuantInspector();renderQuantProfile();}manualQuant.refreshProfiles();requestAnimationFrame(fitImage);}
-function renderQuantOverlay(actualZoom=1){if(manualQuant.isSetup()){manualQuant.overlay(actualZoom);return;}if(!quantDetail){renderQuantGroupOverlay(actualZoom);return;}const layer=$('#quant-lanes'),{q}=quantSelection(),r=row();layer.hidden=mode!=='quant';if(layer.hidden)return;layer.innerHTML=(q?.lanes||[]).map(l=>{const b=l.targetRoi||l.roi;if(!b||!r)return '';return `<div class="quant-lane ${l.lane===quantLane?'selected':''}" data-quant-lane="${l.lane}" role="button" tabindex="0" aria-label="泳道 ${l.lane}；方向键移动，Shift 加速" style="left:${b.x/r.width*100}%;top:${b.y/r.height*100}%;width:${b.width/r.width*100}%;height:${b.height/r.height*100}%;border-width:0"><svg class="manual-lane-shape"><rect x="0" y="0" width="100%" height="100%" style="stroke-width:${1.5/actualZoom}px"/></svg><span class="quant-lane-tag" style="transform:scale(${1/actualZoom})">${l.lane}</span>${l.lane===quantLane?['nw','ne','sw','se'].map(h=>`<button class="quant-handle ${h}" data-quant-handle="${h}" aria-label="调整泳道 ${l.lane} ${h==='nw'?'左上':h==='ne'?'右上':h==='sw'?'左下':'右下'}角" style="transform:scale(${1/actualZoom})"></button>`).join(''):''}</div>`;}).join('');}
-function renderQuantInspector(){if(!quantDetail){renderQuantGroupInspector();return;}const {q,lane,band}=quantSelection(),disabled=state.busy||!bridge?'disabled':'';$('#inspector-title').textContent='定量监督';$('#review-badge').textContent=state.busy?'正在计算':q?.status==='ready'?'自动计算完成':q?.status==='pending'?'等待计算':'查看计算状态';$('#review-badge').className='status-badge '+(q?.status==='ready'?'ok':'pending');$('#inspector-content').innerHTML=`<section class="inspect-section"><h3>${escapeText(quantRowTitle(row()))}</h3><p>按 Fig 查看组内条带。定量始终使用对应原图像素，选择泳道查看依据。</p><div class="quant-lane-picker">${(q?.lanes||[]).map(l=>`<button data-quant-pick="${l.lane}" aria-pressed="${l.lane===quantLane}" ${state.busy?'disabled':''}>${l.lane}</button>`).join('')}</div>${lane?.bands?.length>1?`<label class="quant-field">条带<select data-quant-band>${lane.bands.map(b=>`<option value="${escapeText(b.id)}" ${b.id===band?.id?'selected':''}>${escapeText(b.label||b.id)}</option>`).join('')}</select></label>`:''}${dataPair('当前泳道',lane?'泳道 '+lane.lane:'尚未规划')}${dataPair('灰度积分 Signal',quantValue(band?.signal))}<p class="quant-reason">${escapeText(band?.reason||q?.reason||'数值来自原始像素计算；显示缩放不影响定量。')}</p></section>${lane&&band?`<section class="inspect-section"><h3>积分范围与封底</h3><p>在曲线中拖动边界和封底端点，或用以下数值精调。</p><div class="quant-fields">${[['start','起点 y',0,Math.max(0,(lane.profile?.length||1)-1),1],['end','终点 y',0,Math.max(0,(lane.profile?.length||1)-1),1],['baselineStart','起点封底',null,null,0.1],['baselineEnd','终点封底',null,null,0.1]].map(([key,label,min,max,step])=>`<label class="quant-field">${label}<input type="number" data-quant-field="${key}" value="${finiteQuantValue(band[key])?band[key]:''}" ${min!==null?'min="'+min+'"':''} ${max!==null?'max="'+max+'"':''} step="${step}" ${disabled}></label>`).join('')}</div><p>曲线 y 从采样区起点算起；原图起点 y = ${lane.roi.y}。${lane.targetRoi?`目标位置保持独立，背景上下文扩展 ${lane.contextExpansionPercent||0}%。`:``}边界与封底调整后自动重算。</p></section>`:''}<section class="inspect-section"><h3>计算方法</h3><p>原像素逐行均值，直线封底，正信号梯形积分。</p><button class="button subtle full" data-manual-quant-reset ${disabled}>${icon('scan')}恢复当前区域自动边界</button><p>保留测量区域与泳道数，重新估计积分边界。</p></section>`;manualQuant.detailActions();}
-function profileGeometry(lane,band){const values=lane?.profile||[],baselines=[band?.baselineStart,band?.baselineEnd].filter(finiteQuantValue),max=Math.max(1,...values,...baselines),min=Math.min(0,...values,...baselines),span=max-min||1;return {values,min,max,span,x:i=>44+i/Math.max(1,values.length-1)*612,y:v=>156-(v-min)/span*128};}
-function renderQuantProfile(draftBand=null){
- if(!quantDetail){renderQuantGroupProfile();return;}
- const panel=manualQuant.profilePanel()||$('#quant-profile'),selection=quantSelection(),lane=selection.lane,band=draftBand||selection.band;
- panel.hidden=mode!=='quant';if(panel.hidden)return;
- if(!lane?.profile?.length){panel.innerHTML=`<div class="quant-empty"><h3>${state.busy?'正在计算灰度曲线':'尚无可用灰度曲线'}</h3><p>${escapeText(quantData()?.reason||'选择原图区域并计算后，在这里查看灰度曲线。')}</p></div>`;return;}
- panel.innerHTML=`<div class="quant-profile-heading"><div><h3>泳道 ${lane.lane} · 灰度曲线</h3><span>原图逐行剖面 · ${lane.profile.length} 个采样点</span></div><span class="quant-legend"><i></i>原图曲线 <i></i>直线封底</span></div>${manualQuant.chart(lane,band,true)}`;
+function requestQuantMontage() {
+    if (bridge && !state.busy && !state.montage) send('compose');
+}
+const quantData = () => (state.quant?.rowId === row()?.id ? state.quant : null);
+function quantSelection() {
+    const q = quantData(),
+        lane = q?.lanes?.find((l) => l.lane === quantLane) || q?.lanes?.[0],
+        band = lane?.bands?.find((b) => String(b.id) === String(quantBand)) || lane?.bands?.[0];
+    if (lane) quantLane = lane.lane;
+    if (band) quantBand = band.id;
+    return { q, lane, band };
+}
+const finiteQuantValue = (v) => typeof v === 'number' && Number.isFinite(v);
+const hasQuantBounds = (band, length) =>
+    !!band &&
+    ['start', 'end', 'baselineStart', 'baselineEnd'].every((key) => finiteQuantValue(band[key])) &&
+    Number.isInteger(band.start) &&
+    Number.isInteger(band.end) &&
+    band.start >= 0 &&
+    band.start < band.end &&
+    band.end < length;
+const quantValue = (v) => (v == null || !Number.isFinite(Number(v)) ? '—' : Number(v).toFixed(2));
+function selectQuant(id, lane, bandId, detail = true) {
+    if (state.busy) return;
+    quantLane = Number(lane) || 1;
+    quantBand = bandId ?? null;
+    if (id !== state.selectedId) {
+        state.selectedId = id;
+        zoom = 1;
+        focusCrop = true;
+    }
+    quantDetail = detail;
+    mode = 'quant';
+    switchMode('quant');
+}
+function quantEdit(fields, identity = quantIdentity()) {
+    if (!sameQuantIdentity(identity)) {
+        renderQuant();
+        return;
+    }
+    const { q, lane, band } = quantSelection();
+    if (!q || !lane || state.busy) return;
+    if (!bridge) {
+        toast('网页仅展示历史曲线；请在桌面工作台调整并重新计算。');
+        renderQuant();
+        return;
+    }
+    send('quant_edit', { ...identity, lane: lane.lane, bandId: band?.id, ...fields });
+}
+function renderQuant() {
+    if (manualQuant.isSetup()) manualQuant.render();
+    else {
+        renderQuantInspector();
+        renderQuantProfile();
+    }
+    manualQuant.refreshProfiles();
+    requestAnimationFrame(fitImage);
+}
+function renderQuantOverlay(actualZoom = 1) {
+    if (manualQuant.isSetup()) {
+        manualQuant.overlay(actualZoom);
+        return;
+    }
+    if (!quantDetail) {
+        renderQuantGroupOverlay(actualZoom);
+        return;
+    }
+    const layer = $('#quant-lanes'),
+        { q } = quantSelection(),
+        r = row();
+    layer.hidden = mode !== 'quant';
+    if (layer.hidden) return;
+    layer.innerHTML = (q?.lanes || [])
+        .map((l) => {
+            const b = l.targetRoi || l.roi;
+            if (!b || !r) return '';
+            return `<div class="quant-lane ${l.lane === quantLane ? 'selected' : ''}" data-quant-lane="${l.lane}" role="button" tabindex="0" aria-label="泳道 ${l.lane}；方向键移动，Shift 加速" style="left:${(b.x / r.width) * 100}%;top:${(b.y / r.height) * 100}%;width:${(b.width / r.width) * 100}%;height:${(b.height / r.height) * 100}%;border-width:0"><svg class="manual-lane-shape"><rect x="0" y="0" width="100%" height="100%" style="stroke-width:${1.5 / actualZoom}px"/></svg><span class="quant-lane-tag" style="transform:scale(${1 / actualZoom})">${l.lane}</span>${l.lane === quantLane ? ['nw', 'ne', 'sw', 'se'].map((h) => `<button class="quant-handle ${h}" data-quant-handle="${h}" aria-label="调整泳道 ${l.lane} ${h === 'nw' ? '左上' : h === 'ne' ? '右上' : h === 'sw' ? '左下' : '右下'}角" style="transform:scale(${1 / actualZoom})"></button>`).join('') : ''}</div>`;
+        })
+        .join('');
+}
+function renderQuantInspector() {
+    if (!quantDetail) {
+        renderQuantGroupInspector();
+        return;
+    }
+    const { q, lane, band } = quantSelection(),
+        disabled = state.busy || !bridge ? 'disabled' : '';
+    $('#inspector-title').textContent = '定量监督';
+    $('#review-badge').textContent = state.busy
+        ? '正在计算'
+        : q?.status === 'ready'
+          ? '自动计算完成'
+          : q?.status === 'pending'
+            ? '等待计算'
+            : '查看计算状态';
+    $('#review-badge').className = 'status-badge ' + (q?.status === 'ready' ? 'ok' : 'pending');
+    $('#inspector-content').innerHTML =
+        `<section class="inspect-section"><h3>${escapeText(quantRowTitle(row()))}</h3><p>按 Fig 查看组内条带。定量始终使用对应原图像素，选择泳道查看依据。</p><div class="quant-lane-picker">${(q?.lanes || []).map((l) => `<button data-quant-pick="${l.lane}" aria-pressed="${l.lane === quantLane}" ${state.busy ? 'disabled' : ''}>${l.lane}</button>`).join('')}</div>${lane?.bands?.length > 1 ? `<label class="quant-field">条带<select data-quant-band>${lane.bands.map((b) => `<option value="${escapeText(b.id)}" ${b.id === band?.id ? 'selected' : ''}>${escapeText(b.label || b.id)}</option>`).join('')}</select></label>` : ''}${dataPair('当前泳道', lane ? '泳道 ' + lane.lane : '尚未规划')}${dataPair('灰度积分 Signal', quantValue(band?.signal))}<p class="quant-reason">${escapeText(band?.reason || q?.reason || '数值来自原始像素计算；显示缩放不影响定量。')}</p></section>${
+            lane && band
+                ? `<section class="inspect-section"><h3>积分范围与封底</h3><p>在曲线中拖动边界和封底端点，或用以下数值精调。</p><div class="quant-fields">${[
+                      ['start', '起点 y', 0, Math.max(0, (lane.profile?.length || 1) - 1), 1],
+                      ['end', '终点 y', 0, Math.max(0, (lane.profile?.length || 1) - 1), 1],
+                      ['baselineStart', '起点封底', null, null, 0.1],
+                      ['baselineEnd', '终点封底', null, null, 0.1],
+                  ]
+                      .map(
+                          ([key, label, min, max, step]) =>
+                              `<label class="quant-field">${label}<input type="number" data-quant-field="${key}" value="${finiteQuantValue(band[key]) ? band[key] : ''}" ${min !== null ? 'min="' + min + '"' : ''} ${max !== null ? 'max="' + max + '"' : ''} step="${step}" ${disabled}></label>`,
+                      )
+                      .join(
+                          '',
+                      )}</div><p>曲线 y 从采样区起点算起；原图起点 y = ${lane.roi.y}。${lane.targetRoi ? `目标位置保持独立，背景上下文扩展 ${lane.contextExpansionPercent || 0}%。` : ``}边界与封底调整后自动重算。</p></section>`
+                : ''
+        }<section class="inspect-section"><h3>计算方法</h3><p>原像素逐行均值，直线封底，正信号梯形积分。</p><button class="button subtle full" data-manual-quant-reset ${disabled}>${icon('scan')}恢复当前区域自动边界</button><p>保留测量区域与泳道数，重新估计积分边界。</p></section>`;
+    manualQuant.detailActions();
+}
+function profileGeometry(lane, band) {
+    const values = lane?.profile || [],
+        baselines = [band?.baselineStart, band?.baselineEnd].filter(finiteQuantValue),
+        max = Math.max(1, ...values, ...baselines),
+        min = Math.min(0, ...values, ...baselines),
+        span = max - min || 1;
+    return {
+        values,
+        min,
+        max,
+        span,
+        x: (i) => 44 + (i / Math.max(1, values.length - 1)) * 612,
+        y: (v) => 156 - ((v - min) / span) * 128,
+    };
+}
+function renderQuantProfile(draftBand = null) {
+    if (!quantDetail) {
+        renderQuantGroupProfile();
+        return;
+    }
+    const panel = manualQuant.profilePanel() || $('#quant-profile'),
+        selection = quantSelection(),
+        lane = selection.lane,
+        band = draftBand || selection.band;
+    panel.hidden = mode !== 'quant';
+    if (panel.hidden) return;
+    if (!lane?.profile?.length) {
+        panel.innerHTML = `<div class="quant-empty"><h3>${state.busy ? '正在计算灰度曲线' : '尚无可用灰度曲线'}</h3><p>${escapeText(quantData()?.reason || '选择原图区域并计算后，在这里查看灰度曲线。')}</p></div>`;
+        return;
+    }
+    panel.innerHTML = `<div class="quant-profile-heading"><div><h3>泳道 ${lane.lane} · 灰度曲线</h3><span>原图逐行剖面 · ${lane.profile.length} 个采样点</span></div><span class="quant-legend"><i></i>原图曲线 <i></i>直线封底</span></div>${manualQuant.chart(lane, band, true)}`;
 }
 
-function renderQuantTable(){const table=state.quant.table,maxLane=Math.max(0,...table.flatMap(r=>(r.values||[]).map(v=>v.lane)));$('.result-intro h3').textContent='灰度分析';$('.result-intro p').textContent='WBQuant 1.4.3 表格结构 · 点击数值返回对应泳道与曲线';$('.results-scroll thead').innerHTML=`<tr><th>组序</th><th>组名</th><th>条带</th>${Array.from({length:maxLane},(_,i)=>`<th>泳道 ${i+1}</th>`).join('')}</tr>`;$('#results-body').innerHTML=table.map(r=>`<tr><td>${escapeText(r.groupOrder)}</td><td>${escapeText(r.groupName)}</td><td>${escapeText(r.label||r.band)}</td>${Array.from({length:maxLane},(_,i)=>{const v=r.values?.find(v=>v.lane===i+1);return `<td>${v?`<button class="quant-table-cell" data-quant-row="${escapeText(r.rowId)}" data-quant-pick="${i+1}" data-quant-band-id="${escapeText(v.bandId??r.band??'')}" title="${escapeText(statusLabel(v.status)+'；'+(v.reason||'查看原图与曲线'))}" aria-label="泳道 ${i+1}，${escapeText(statusLabel(v.status))}，原始积分 ${escapeText(quantValue(v.signal))}">${quantValue(v.signal)}${quantHasQuality(v)?'<sup class="quant-quality-mark" aria-hidden="true">*</sup>':''}</button>`:''}</td>`;}).join('')}</tr>`).join('');$('#result-count').textContent=`${table.length} 条带 · 空值保留为空，不以 0 代替`;$('.table-footer>span:last-child').innerHTML='<button class="text-button" data-quant-export="csv">CSV</button><button class="text-button" data-quant-export="xlsx">导出 Excel</button>';$('#inspector-content').innerHTML=`<section class="inspect-section"><h3>灰度分析表</h3><p>按分组、条带、泳道组织原始灰度积分。显示和导出保留两位小数。</p>${dataPair('条带数',table.length)}<p>点击任一数值，返回该原图的泳道与积分曲线。</p></section><section class="inspect-section"><h3>输出说明</h3><p>缺失结果留空；不默认加入内参归一化或对照倍数。* 表示有质量说明，原始积分不等于有效信号；点击数值可查看对应曲线。</p>${qualityDetails(table.flatMap(r=>(r.values||[]).map(v=>({reason:v.reason,label:(r.label||r.band||r.rowId)+' · 泳道 '+v.lane}))))}<button class="button subtle full" data-quant-export="csv" ${!bridge||state.busy?'disabled':''}>${icon('download')}导出分组 CSV</button></section>`;$('#inspector-action').innerHTML=`<button class="button primary full" data-quant-export="xlsx" ${!bridge||state.busy?'disabled':''}>${icon('download')}导出灰度分析 Excel</button><small>所有数值均可追溯到原图</small>`;}
-document.addEventListener('click',e=>{if(e.target.closest('[data-quant-overview]')){quantDetail=false;focusCrop=true;zoom=1;closeDrawer();render();requestQuantMontage();return;}const groupLane=e.target.closest('[data-quant-group-lane]');if(groupLane&&!state.busy){quantLane=Number(groupLane.dataset.quantGroupLane);renderQuant();return;}const segment=e.target.closest('[data-quant-segment]');if(segment&&!state.busy){selectQuant(segment.dataset.quantSegment,quantLane,segment.dataset.quantBandId);return;}const groupButton=e.target.closest('[data-quant-group-toggle]');if(groupButton&&!state.busy){const group=quantGroups()[Number(groupButton.dataset.quantGroupToggle)];if(!group)return;if(quantOpenGroups.has(group.key)&&group.rows.some(item=>item.id===state.selectedId)){quantOpenGroups.delete(group.key);renderQuantSources();}else{quantOpenGroups.add(group.key);const selected=group.rows.find(item=>item.id===state.selectedId)||group.rows[0];selectQuant(selected.id,1,null,false);}return;}const source=e.target.closest('[data-quant-source]');if(source){selectQuant(source.dataset.quantSource,1,null);return;}if(e.target.closest('[data-quant-group]')){if(bridge&&!state.busy&&row()&&quantData()?.group?.compatible)send('quant_group',{figure:row().fig});else if(!bridge)toast('请在桌面工作台计算本 Fig 组');return;}const pick=e.target.closest('[data-quant-pick]');if(pick){selectQuant(pick.dataset.quantRow||row()?.id,pick.dataset.quantPick,pick.dataset.quantBandId);return;}const lane=e.target.closest('[data-quant-lane]');if(lane&&!quantDrag){quantLane=Number(lane.dataset.quantLane);quantBand=null;renderQuant();return;}const output=e.target.closest('[data-quant-export]');if(output){if(bridge&&!state.busy)send('quant_export',{format:output.dataset.quantExport});else toast('请在桌面工作台导出新的计算结果');}});
-document.addEventListener('change',e=>{if(e.target.matches('[data-quant-field]')){const value=Number(e.target.value);if(e.target.value===''||!Number.isFinite(value)){toast('请输入有效数值');renderQuantInspector();return;}quantEdit({[e.target.dataset.quantField]:value});}if(e.target.matches('[data-quant-band]')){quantBand=e.target.value;renderQuant();}});
-function quantBoxChange(b,handle,dx,dy,r){const next={...b};if(handle==='move'){next.x=Math.max(0,Math.min(r.width-b.width,b.x+dx));next.y=Math.max(0,Math.min(r.height-b.height,b.y+dy));return next;}const left=handle.includes('w')?Math.max(0,Math.min(b.x+b.width-2,b.x+dx)):b.x,right=handle.includes('e')?Math.max(b.x+2,Math.min(r.width,b.x+b.width+dx)):b.x+b.width,top=handle.includes('n')?Math.max(0,Math.min(b.y+b.height-2,b.y+dy)):b.y,bottom=handle.includes('s')?Math.max(b.y+2,Math.min(r.height,b.y+b.height+dy)):b.y+b.height;return {x:left,y:top,width:right-left,height:bottom-top};}
-$('#quant-lanes').addEventListener('pointerdown',e=>{const el=e.target.closest('[data-quant-lane]');if(!el||state.busy||!bridge)return;e.preventDefault();quantLane=Number(el.dataset.quantLane);const {lane,q}=quantSelection();if(!lane)return;const target=$('#quant-lanes');target.setPointerCapture(e.pointerId);quantDrag={type:'roi',identity:quantIdentity(),id:q.rowId,revision:q.revision,startX:e.clientX,startY:e.clientY,roi:{...(lane.targetRoi||lane.roi)},handle:e.target.dataset.quantHandle||'move',rect:$('#image-transform').getBoundingClientRect()};renderQuantInspector();renderQuantProfile();});
-function startQuantPoint(e){const point=e.target.closest('[data-quant-point]');if(!point||state.busy||!bridge)return;e.preventDefault();const {q,lane,band}=quantSelection();if(!band)return;e.currentTarget.setPointerCapture(e.pointerId);quantDrag={type:'point',identity:quantIdentity(),id:q.rowId,revision:q.revision,key:point.dataset.quantPoint,band:{...band},geometry:profileGeometry(lane,band),rect:point.closest('svg').getBoundingClientRect()};}
-for(const id of ['#quant-profile','#quant-profile-single'])$(id).addEventListener('pointerdown',startQuantPoint);
-function moveQuant(e){if(!quantDrag)return;const d=quantDrag,r=row(),{q,lane}=quantSelection();if(!q||!sameQuantIdentity(d.identity)||q.rowId!==d.id||q.revision!==d.revision){quantDrag=null;renderQuant();return;}if(d.type==='roi'){d.next=quantBoxChange(d.roi,d.handle,Math.round((e.clientX-d.startX)/d.rect.width*r.width),Math.round((e.clientY-d.startY)/d.rect.height*r.height),r);const el=$(`[data-quant-lane="${lane.lane}"]`);if(el){el.style.left=d.next.x/r.width*100+'%';el.style.top=d.next.y/r.height*100+'%';el.style.width=d.next.width/r.width*100+'%';el.style.height=d.next.height/r.height*100+'%';}}else{const x=(e.clientX-d.rect.left)/d.rect.width*680,y=(e.clientY-d.rect.top)/d.rect.height*196;let value;if(d.key==='start'||d.key==='end'){value=Math.round((x-44)/612*(d.geometry.values.length-1));value=d.key==='start'?Math.max(0,Math.min(d.band.end-1,value)):Math.max(d.band.start+1,Math.min(d.geometry.values.length-1,value));}else value=+(d.geometry.min+(156-y)/128*d.geometry.span).toFixed(2);d.next={[d.key]:value};renderQuantProfile({...d.band,...d.next});const handle=$(`[data-quant-point="${d.key}"]`,manualQuant.profilePanel()||document);if(handle){handle.setAttribute(d.key.startsWith('baseline')?'cy':'cx',d.key.startsWith('baseline')?d.geometry.y(value):d.geometry.x(value));handle.setAttribute('aria-valuenow',value);}}}
-function endQuant(){if(!quantDrag)return;const d=quantDrag;quantDrag=null;if(d.next)quantEdit(d.type==='roi'?{roi:d.next}:d.next,d.identity);renderQuant();}
-for(const id of ['#quant-lanes','#quant-profile','#quant-profile-single']){const el=$(id);el.addEventListener('pointermove',moveQuant);el.addEventListener('pointerup',endQuant);el.addEventListener('pointercancel',()=>{quantDrag=null;renderQuant();});el.addEventListener('keydown',e=>{const laneEl=e.target.closest('[data-quant-lane]'),point=e.target.closest('[data-quant-point]');if(e.key==='Enter'&&laneEl){quantLane=Number(laneEl.dataset.quantLane);renderQuant();return;}if(e.isComposing||e.keyCode===229||window.workbenchActions?.isComposing()||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)||state.busy||!bridge)return;e.preventDefault();const step=e.shiftKey?10:1;if(laneEl){quantLane=Number(laneEl.dataset.quantLane);const {lane}=quantSelection();if(lane)quantEdit({roi:quantBoxChange(lane.targetRoi||lane.roi,e.target.dataset.quantHandle||'move',e.key==='ArrowLeft'?-step:e.key==='ArrowRight'?step:0,e.key==='ArrowUp'?-step:e.key==='ArrowDown'?step:0,row())});}if(point){const {band,lane}=quantSelection();if(!band)return;const key=point.dataset.quantPoint,delta=(e.key==='ArrowDown'||e.key==='ArrowLeft'?-1:1)*step;let value=Number(band[key])+delta;if(key==='start')value=Math.max(0,Math.min(band.end-1,value));if(key==='end')value=Math.max(band.start+1,Math.min(lane.profile.length-1,value));quantEdit({[key]:value});}});}
+function renderQuantTable() {
+    const table = state.quant.table,
+        maxLane = Math.max(0, ...table.flatMap((r) => (r.values || []).map((v) => v.lane)));
+    $('.result-intro h3').textContent = '灰度分析';
+    $('.result-intro p').textContent = 'WBQuant 1.4.3 表格结构 · 点击数值返回对应泳道与曲线';
+    $('.results-scroll thead').innerHTML =
+        `<tr><th>组序</th><th>组名</th><th>条带</th>${Array.from({ length: maxLane }, (_, i) => `<th>泳道 ${i + 1}</th>`).join('')}</tr>`;
+    $('#results-body').innerHTML = table
+        .map(
+            (r) =>
+                `<tr><td>${escapeText(r.groupOrder)}</td><td>${escapeText(r.groupName)}</td><td>${escapeText(r.label || r.band)}</td>${Array.from(
+                    { length: maxLane },
+                    (_, i) => {
+                        const v = r.values?.find((v) => v.lane === i + 1);
+                        return `<td>${v ? `<button class="quant-table-cell" data-quant-row="${escapeText(r.rowId)}" data-quant-pick="${i + 1}" data-quant-band-id="${escapeText(v.bandId ?? r.band ?? '')}" title="${escapeText(statusLabel(v.status) + '；' + (v.reason || '查看原图与曲线'))}" aria-label="泳道 ${i + 1}，${escapeText(statusLabel(v.status))}，原始积分 ${escapeText(quantValue(v.signal))}">${quantValue(v.signal)}${quantHasQuality(v) ? '<sup class="quant-quality-mark" aria-hidden="true">*</sup>' : ''}</button>` : ''}</td>`;
+                    },
+                ).join('')}</tr>`,
+        )
+        .join('');
+    $('#result-count').textContent = `${table.length} 条带 · 空值保留为空，不以 0 代替`;
+    $('.table-footer>span:last-child').innerHTML =
+        '<button class="text-button" data-quant-export="csv">CSV</button><button class="text-button" data-quant-export="xlsx">导出 Excel</button>';
+    $('#inspector-content').innerHTML =
+        `<section class="inspect-section"><h3>灰度分析表</h3><p>按分组、条带、泳道组织原始灰度积分。显示和导出保留两位小数。</p>${dataPair('条带数', table.length)}<p>点击任一数值，返回该原图的泳道与积分曲线。</p></section><section class="inspect-section"><h3>输出说明</h3><p>缺失结果留空；不默认加入内参归一化或对照倍数。* 表示有质量说明，原始积分不等于有效信号；点击数值可查看对应曲线。</p>${qualityDetails(table.flatMap((r) => (r.values || []).map((v) => ({ reason: v.reason, label: (r.label || r.band || r.rowId) + ' · 泳道 ' + v.lane }))))}<button class="button subtle full" data-quant-export="csv" ${!bridge || state.busy ? 'disabled' : ''}>${icon('download')}导出分组 CSV</button></section>`;
+    $('#inspector-action').innerHTML =
+        `<button class="button primary full" data-quant-export="xlsx" ${!bridge || state.busy ? 'disabled' : ''}>${icon('download')}导出灰度分析 Excel</button><small>所有数值均可追溯到原图</small>`;
+}
+document.addEventListener('click', (e) => {
+    if (e.target.closest('[data-quant-overview]')) {
+        quantDetail = false;
+        focusCrop = true;
+        zoom = 1;
+        closeDrawer();
+        render();
+        requestQuantMontage();
+        return;
+    }
+    const groupLane = e.target.closest('[data-quant-group-lane]');
+    if (groupLane && !state.busy) {
+        quantLane = Number(groupLane.dataset.quantGroupLane);
+        renderQuant();
+        return;
+    }
+    const segment = e.target.closest('[data-quant-segment]');
+    if (segment && !state.busy) {
+        selectQuant(segment.dataset.quantSegment, quantLane, segment.dataset.quantBandId);
+        return;
+    }
+    const groupButton = e.target.closest('[data-quant-group-toggle]');
+    if (groupButton && !state.busy) {
+        const group = quantGroups()[Number(groupButton.dataset.quantGroupToggle)];
+        if (!group) return;
+        if (
+            quantOpenGroups.has(group.key) &&
+            group.rows.some((item) => item.id === state.selectedId)
+        ) {
+            quantOpenGroups.delete(group.key);
+            renderQuantSources();
+        } else {
+            quantOpenGroups.add(group.key);
+            const selected =
+                group.rows.find((item) => item.id === state.selectedId) || group.rows[0];
+            selectQuant(selected.id, 1, null, false);
+        }
+        return;
+    }
+    const source = e.target.closest('[data-quant-source]');
+    if (source) {
+        selectQuant(source.dataset.quantSource, 1, null);
+        return;
+    }
+    if (e.target.closest('[data-quant-group]')) {
+        if (bridge && !state.busy && row() && quantData()?.group?.compatible)
+            send('quant_group', { figure: row().fig });
+        else if (!bridge) toast('请在桌面工作台计算本 Fig 组');
+        return;
+    }
+    const pick = e.target.closest('[data-quant-pick]');
+    if (pick) {
+        selectQuant(
+            pick.dataset.quantRow || row()?.id,
+            pick.dataset.quantPick,
+            pick.dataset.quantBandId,
+        );
+        return;
+    }
+    const lane = e.target.closest('[data-quant-lane]');
+    if (lane && !quantDrag) {
+        quantLane = Number(lane.dataset.quantLane);
+        quantBand = null;
+        renderQuant();
+        return;
+    }
+    const output = e.target.closest('[data-quant-export]');
+    if (output) {
+        if (bridge && !state.busy) send('quant_export', { format: output.dataset.quantExport });
+        else toast('请在桌面工作台导出新的计算结果');
+    }
+});
+document.addEventListener('change', (e) => {
+    if (e.target.matches('[data-quant-field]')) {
+        const value = Number(e.target.value);
+        if (e.target.value === '' || !Number.isFinite(value)) {
+            toast('请输入有效数值');
+            renderQuantInspector();
+            return;
+        }
+        quantEdit({ [e.target.dataset.quantField]: value });
+    }
+    if (e.target.matches('[data-quant-band]')) {
+        quantBand = e.target.value;
+        renderQuant();
+    }
+});
+function quantBoxChange(b, handle, dx, dy, r) {
+    const next = { ...b };
+    if (handle === 'move') {
+        next.x = Math.max(0, Math.min(r.width - b.width, b.x + dx));
+        next.y = Math.max(0, Math.min(r.height - b.height, b.y + dy));
+        return next;
+    }
+    const left = handle.includes('w') ? Math.max(0, Math.min(b.x + b.width - 2, b.x + dx)) : b.x,
+        right = handle.includes('e')
+            ? Math.max(b.x + 2, Math.min(r.width, b.x + b.width + dx))
+            : b.x + b.width,
+        top = handle.includes('n') ? Math.max(0, Math.min(b.y + b.height - 2, b.y + dy)) : b.y,
+        bottom = handle.includes('s')
+            ? Math.max(b.y + 2, Math.min(r.height, b.y + b.height + dy))
+            : b.y + b.height;
+    return { x: left, y: top, width: right - left, height: bottom - top };
+}
+$('#quant-lanes').addEventListener('pointerdown', (e) => {
+    const el = e.target.closest('[data-quant-lane]');
+    if (!el || state.busy || !bridge) return;
+    e.preventDefault();
+    quantLane = Number(el.dataset.quantLane);
+    const { lane, q } = quantSelection();
+    if (!lane) return;
+    const target = $('#quant-lanes');
+    target.setPointerCapture(e.pointerId);
+    quantDrag = {
+        type: 'roi',
+        identity: quantIdentity(),
+        id: q.rowId,
+        revision: q.revision,
+        startX: e.clientX,
+        startY: e.clientY,
+        roi: { ...(lane.targetRoi || lane.roi) },
+        handle: e.target.dataset.quantHandle || 'move',
+        rect: $('#image-transform').getBoundingClientRect(),
+    };
+    renderQuantInspector();
+    renderQuantProfile();
+});
+function startQuantPoint(e) {
+    const point = e.target.closest('[data-quant-point]');
+    if (!point || state.busy || !bridge) return;
+    e.preventDefault();
+    const { q, lane, band } = quantSelection();
+    if (!band) return;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    quantDrag = {
+        type: 'point',
+        identity: quantIdentity(),
+        id: q.rowId,
+        revision: q.revision,
+        key: point.dataset.quantPoint,
+        band: { ...band },
+        geometry: profileGeometry(lane, band),
+        rect: point.closest('svg').getBoundingClientRect(),
+    };
+}
+for (const id of ['#quant-profile', '#quant-profile-single'])
+    $(id).addEventListener('pointerdown', startQuantPoint);
+function moveQuant(e) {
+    if (!quantDrag) return;
+    const d = quantDrag,
+        r = row(),
+        { q, lane } = quantSelection();
+    if (!q || !sameQuantIdentity(d.identity) || q.rowId !== d.id || q.revision !== d.revision) {
+        quantDrag = null;
+        renderQuant();
+        return;
+    }
+    if (d.type === 'roi') {
+        d.next = quantBoxChange(
+            d.roi,
+            d.handle,
+            Math.round(((e.clientX - d.startX) / d.rect.width) * r.width),
+            Math.round(((e.clientY - d.startY) / d.rect.height) * r.height),
+            r,
+        );
+        const el = $(`[data-quant-lane="${lane.lane}"]`);
+        if (el) {
+            el.style.left = (d.next.x / r.width) * 100 + '%';
+            el.style.top = (d.next.y / r.height) * 100 + '%';
+            el.style.width = (d.next.width / r.width) * 100 + '%';
+            el.style.height = (d.next.height / r.height) * 100 + '%';
+        }
+    } else {
+        const x = ((e.clientX - d.rect.left) / d.rect.width) * 680,
+            y = ((e.clientY - d.rect.top) / d.rect.height) * 196;
+        let value;
+        if (d.key === 'start' || d.key === 'end') {
+            value = Math.round(((x - 44) / 612) * (d.geometry.values.length - 1));
+            value =
+                d.key === 'start'
+                    ? Math.max(0, Math.min(d.band.end - 1, value))
+                    : Math.max(d.band.start + 1, Math.min(d.geometry.values.length - 1, value));
+        } else value = +(d.geometry.min + ((156 - y) / 128) * d.geometry.span).toFixed(2);
+        d.next = { [d.key]: value };
+        renderQuantProfile({ ...d.band, ...d.next });
+        const handle = $(`[data-quant-point="${d.key}"]`, manualQuant.profilePanel() || document);
+        if (handle) {
+            handle.setAttribute(
+                d.key.startsWith('baseline') ? 'cy' : 'cx',
+                d.key.startsWith('baseline') ? d.geometry.y(value) : d.geometry.x(value),
+            );
+            handle.setAttribute('aria-valuenow', value);
+        }
+    }
+}
+function endQuant() {
+    if (!quantDrag) return;
+    const d = quantDrag;
+    quantDrag = null;
+    if (d.next) quantEdit(d.type === 'roi' ? { roi: d.next } : d.next, d.identity);
+    renderQuant();
+}
+for (const id of ['#quant-lanes', '#quant-profile', '#quant-profile-single']) {
+    const el = $(id);
+    el.addEventListener('pointermove', moveQuant);
+    el.addEventListener('pointerup', endQuant);
+    el.addEventListener('pointercancel', () => {
+        quantDrag = null;
+        renderQuant();
+    });
+    el.addEventListener('keydown', (e) => {
+        const laneEl = e.target.closest('[data-quant-lane]'),
+            point = e.target.closest('[data-quant-point]');
+        if (e.key === 'Enter' && laneEl) {
+            quantLane = Number(laneEl.dataset.quantLane);
+            renderQuant();
+            return;
+        }
+        if (
+            e.isComposing ||
+            e.keyCode === 229 ||
+            window.workbenchActions?.isComposing() ||
+            !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key) ||
+            state.busy ||
+            !bridge
+        )
+            return;
+        e.preventDefault();
+        const step = e.shiftKey ? 10 : 1;
+        if (laneEl) {
+            quantLane = Number(laneEl.dataset.quantLane);
+            const { lane } = quantSelection();
+            if (lane)
+                quantEdit({
+                    roi: quantBoxChange(
+                        lane.targetRoi || lane.roi,
+                        e.target.dataset.quantHandle || 'move',
+                        e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0,
+                        e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0,
+                        row(),
+                    ),
+                });
+        }
+        if (point) {
+            const { band, lane } = quantSelection();
+            if (!band) return;
+            const key = point.dataset.quantPoint,
+                delta = (e.key === 'ArrowDown' || e.key === 'ArrowLeft' ? -1 : 1) * step;
+            let value = Number(band[key]) + delta;
+            if (key === 'start') value = Math.max(0, Math.min(band.end - 1, value));
+            if (key === 'end')
+                value = Math.max(band.start + 1, Math.min(lane.profile.length - 1, value));
+            quantEdit({ [key]: value });
+        }
+    });
+}
 
-function quantGroupDimensions(){return quantData()?.group?.sourceSheet?{width:row()?.width,height:row()?.height}:{width:state.montageWidth,height:state.montageHeight};}
-function quantGroupRegions(){const ids=new Set((quantData()?.group?.rows||[]).map(item=>item.rowId));if(quantData()?.group?.sourceSheet)return state.rows.filter(r=>ids.has(r.id)&&r.roi).map(r=>({rowId:r.id,...r.roi,sourceRoi:r.roi}));return (state.montageRegions||[]).filter(region=>ids.has(region.rowId));}
-function quantGroupBounds(){const regions=quantGroupRegions();if(!regions.length)return null;const declared=regions[0].groupBounds;if(declared&&[declared.x,declared.y,declared.width,declared.height].every(Number.isFinite)&&declared.width>0&&declared.height>0)return declared;const left=Math.min(...regions.map(r=>r.x)),top=Math.min(...regions.map(r=>r.y)),right=Math.max(...regions.map(r=>r.x+r.width)),bottom=Math.max(...regions.map(r=>r.y+r.height));const x=Math.max(0,left-180),y=Math.max(0,top-55);return {x,y,width:Math.min(quantGroupDimensions().width,right+10)-x,height:Math.min(quantGroupDimensions().height,bottom+35)-y};}
-function quantMappedLane(region,crop,lane){const roi=lane.targetRoi||lane.roi;if(!roi||!crop||!crop.width||!crop.height)return null;const left=Math.max(crop.x,roi.x),right=Math.min(crop.x+crop.width,roi.x+roi.width),top=Math.max(crop.y,roi.y),bottom=Math.min(crop.y+crop.height,roi.y+roi.height);if(right<=left||bottom<=top)return null;const matrix=region.sourceToOutput;if(Array.isArray(matrix)&&matrix.length===2&&matrix.every(row=>Array.isArray(row)&&row.length===3&&row.every(Number.isFinite))){const corners=[[left,top],[right,top],[right,bottom],[left,bottom]].map(([x,y])=>[matrix[0][0]*x+matrix[0][1]*y+matrix[0][2],matrix[1][0]*x+matrix[1][1]*y+matrix[1][2]]),x=Math.max(region.x,Math.min(...corners.map(p=>p[0]))),y=Math.max(region.y,Math.min(...corners.map(p=>p[1]))),x1=Math.min(region.x+region.width,Math.max(...corners.map(p=>p[0]))),y1=Math.min(region.y+region.height,Math.max(...corners.map(p=>p[1])));return x1>x&&y1>y?{x,y,width:x1-x,height:y1-y}:null;}return {x:region.x+(left-crop.x)/crop.width*region.width,y:region.y+(top-crop.y)/crop.height*region.height,width:(right-left)/crop.width*region.width,height:(bottom-top)/crop.height*region.height};}
+function quantGroupDimensions() {
+    return quantData()?.group?.sourceSheet
+        ? { width: row()?.width, height: row()?.height }
+        : { width: state.montageWidth, height: state.montageHeight };
+}
+function quantGroupRegions() {
+    const ids = new Set((quantData()?.group?.rows || []).map((item) => item.rowId));
+    if (quantData()?.group?.sourceSheet)
+        return state.rows
+            .filter((r) => ids.has(r.id) && r.roi)
+            .map((r) => ({ rowId: r.id, ...r.roi, sourceRoi: r.roi }));
+    return (state.montageRegions || []).filter((region) => ids.has(region.rowId));
+}
+function quantGroupBounds() {
+    const regions = quantGroupRegions();
+    if (!regions.length) return null;
+    const declared = regions[0].groupBounds;
+    if (
+        declared &&
+        [declared.x, declared.y, declared.width, declared.height].every(Number.isFinite) &&
+        declared.width > 0 &&
+        declared.height > 0
+    )
+        return declared;
+    const left = Math.min(...regions.map((r) => r.x)),
+        top = Math.min(...regions.map((r) => r.y)),
+        right = Math.max(...regions.map((r) => r.x + r.width)),
+        bottom = Math.max(...regions.map((r) => r.y + r.height));
+    const x = Math.max(0, left - 180),
+        y = Math.max(0, top - 55);
+    return {
+        x,
+        y,
+        width: Math.min(quantGroupDimensions().width, right + 10) - x,
+        height: Math.min(quantGroupDimensions().height, bottom + 35) - y,
+    };
+}
+function quantMappedLane(region, crop, lane) {
+    const roi = lane.targetRoi || lane.roi;
+    if (!roi || !crop || !crop.width || !crop.height) return null;
+    const left = Math.max(crop.x, roi.x),
+        right = Math.min(crop.x + crop.width, roi.x + roi.width),
+        top = Math.max(crop.y, roi.y),
+        bottom = Math.min(crop.y + crop.height, roi.y + roi.height);
+    if (right <= left || bottom <= top) return null;
+    const matrix = region.sourceToOutput;
+    if (
+        Array.isArray(matrix) &&
+        matrix.length === 2 &&
+        matrix.every((row) => Array.isArray(row) && row.length === 3 && row.every(Number.isFinite))
+    ) {
+        const corners = [
+                [left, top],
+                [right, top],
+                [right, bottom],
+                [left, bottom],
+            ].map(([x, y]) => [
+                matrix[0][0] * x + matrix[0][1] * y + matrix[0][2],
+                matrix[1][0] * x + matrix[1][1] * y + matrix[1][2],
+            ]),
+            x = Math.max(region.x, Math.min(...corners.map((p) => p[0]))),
+            y = Math.max(region.y, Math.min(...corners.map((p) => p[1]))),
+            x1 = Math.min(region.x + region.width, Math.max(...corners.map((p) => p[0]))),
+            y1 = Math.min(region.y + region.height, Math.max(...corners.map((p) => p[1])));
+        return x1 > x && y1 > y ? { x, y, width: x1 - x, height: y1 - y } : null;
+    }
+    return {
+        x: region.x + ((left - crop.x) / crop.width) * region.width,
+        y: region.y + ((top - crop.y) / crop.height) * region.height,
+        width: ((right - left) / crop.width) * region.width,
+        height: ((bottom - top) / crop.height) * region.height,
+    };
+}
 
-function renderQuantGroupOverlay(actualZoom=1){const layer=$('#quant-lanes'),group=quantData()?.group,size=quantGroupDimensions();layer.hidden=mode!=='quant';if(layer.hidden)return;if(!group?.compatible||!size.width||!size.height){layer.innerHTML='';return;}const regions=quantGroupRegions();layer.innerHTML=regions.flatMap(region=>{const source=state.rows.find(item=>item.id===region.rowId),item=group.rows.find(item=>item.rowId===region.rowId);return (item?.lanes||[]).filter(lane=>!region.sourceLaneRange||(lane.lane>=region.sourceLaneRange[0]&&lane.lane<=region.sourceLaneRange[1])).map(lane=>{const b=quantMappedLane(region,region.sourceRoi||source?.roi,lane);if(!b)return '';return `<button class="quant-group-lane ${lane.lane===quantLane?'selected':''}" data-quant-group-lane="${lane.lane}" aria-pressed="${lane.lane===quantLane}" aria-label="${escapeText(item.protein||source?.name||'条带')}，泳道 ${lane.lane}" style="left:${b.x/size.width*100}%;top:${b.y/size.height*100}%;width:${b.width/size.width*100}%;height:${b.height/size.height*100}%;border-width:0"><svg class="manual-lane-shape"><rect x="0" y="0" width="100%" height="100%" style="stroke-width:${1.5/actualZoom}px"/></svg><span class="quant-lane-tag" style="transform:scale(${1/actualZoom})">${lane.lane}</span></button>`;});}).join('');}
-function quantImageClip(){if(mode!=='quant'||quantDetail||!state.montage||!state.montageWidth||!state.montageHeight)return '';const box=quantGroupBounds();if(!box)return '';const clamp=value=>Math.max(0,Math.min(100,value));return `inset(${clamp(box.y/state.montageHeight*100)}% ${clamp((state.montageWidth-box.x-box.width)/state.montageWidth*100)}% ${clamp((state.montageHeight-box.y-box.height)/state.montageHeight*100)}% ${clamp(box.x/state.montageWidth*100)}%)`;}
-function quantGroupBandResults(item,index){const lane=item.lanes?.find(l=>l.lane===quantLane),bands=lane?.bands||[],title=item.protein&&item.protein!=='Unassigned'?item.protein:'条带 '+(index+1);return `<div class="quant-strip-results"><button class="quant-segment-link" data-quant-segment="${escapeText(item.rowId)}" ${state.busy?'disabled':''}><span>${escapeText(title)}<small>${bands.length} 个积分区间</small></span>${icon('chevron')}</button>${bands.map((band,bandIndex)=>{const valid=['ready','valid','ok'].includes(band.status)&&band.signal!=null;return `<div class="quant-band-result"><button class="quant-band-value" data-quant-segment="${escapeText(item.rowId)}" data-quant-band-id="${escapeText(band.id)}" ${state.busy?'disabled':''}><span>${escapeText(band.label||'积分 '+(bandIndex+1))}<strong class="${valid?'valid':''}">${quantValue(band.signal)}</strong></span>${valid?'':'<span class="quant-quality-mark" role="img" aria-label="'+escapeText(statusLabel(band.status))+'">*</span>'}</button></div>`;}).join('')||'<p class="quant-no-band">暂无积分区间；可进入原图查看。</p>'}</div>`;}
-function renderQuantGroupInspector(){const q=quantData(),group=q?.group,available=!!group?.compatible,disabled=state.busy||!bridge||!available,count=Number(group?.laneCount)||0;$('#inspector-title').textContent='Fig 组定量';$('#review-badge').textContent=state.busy?'正在计算':!available?'组映射不可用':'原图映射';$('#review-badge').className='status-badge '+(available?'ok':'pending');$('#inspector-content').innerHTML=`<section class="inspect-section"><h3>${escapeText(group?.figure||row()?.fig||'当前 Fig')}</h3><p>${group?.sourceSheet?'当前 Fig 直接定位导入拼图中的各排条带。':'先完成 Fig 标注拼图，再按相同泳道查看组内各条带。'}积分使用对应原像素。</p>${!available?`<p class="quant-group-warning">${escapeText(group?.reason||'等待当前 Fig 的原图映射与泳道规划。')}<br>可选择左侧单条带调整；组内泳道数一致且有裁剪后再计算整组。</p>`:''}<div class="quant-lane-picker">${Array.from({length:count},(_,i)=>`<button data-quant-group-lane="${i+1}" aria-pressed="${quantLane===i+1}" ${state.busy||!available?'disabled':''}>${i+1}</button>`).join('')}</div>${dataPair('当前泳道',available?'泳道 '+quantLane:'尚未建立组映射')}${dataPair('组内条带',(group?.rows?.length||0)+' 个')}</section><section class="inspect-section"><h3>组内灰度结果</h3><p>点选条带可在原图中调整泳道、积分范围与封底。</p><div class="quant-group-values">${(group?.rows||[]).map((item,index)=>quantGroupBandResults(item,index)).join('')}</div><p>* 表示有质量说明，原始积分不等于有效信号。</p>${qualityDetails((group?.rows||[]).flatMap(item=>(item.lanes?.find(l=>l.lane===quantLane)?.bands||[]).map(band=>({reason:band.reason,label:(item.protein||item.rowId)+' · 泳道 '+quantLane}))))}</section><section class="inspect-section"><h3>分段原图映射</h3><p>泳道框分别映射至每个条带的原图坐标；不把显示位置不同的泳道强行对齐。曲线按条带分段，段间留白不参与积分。</p></section>`;$('#inspector-action').innerHTML=`<button class="button primary full" data-quant-group ${disabled?'disabled':''}>${icon('curve')}计算本 Fig 组</button><button class="button subtle full" data-mode="results">${icon('table')}下一步：灰度结果${icon('arrow')}</button><button class="text-button quant-back-layout" data-mode="layout">${icon('layout')}返回 Fig 拼图</button><small>保留现有泳道与封底，自动计算组内条带</small>`;}
-function renderQuantGroupProfile(){const panel=$('#quant-profile'),group=quantData()?.group;panel.hidden=mode!=='quant';if(panel.hidden)return;if(!group?.compatible){panel.innerHTML=`<div class="quant-empty"><h3>当前 Fig 无法按同一泳道展示组曲线</h3><p>${escapeText(group?.reason||'等待当前 Fig 的原图映射与泳道规划。')} 请选择左侧条带查看原图与独立曲线；统一组内泳道数及裁剪后再查看整组。</p></div>`;return;}const segments=(group?.rows||[]).map((item,index)=>({item,index,lane:item.lanes?.find(l=>l.lane===quantLane)}));if(!segments.length){panel.innerHTML='<div class="quant-empty"><h3>等待 Fig 灰度曲线</h3><p>当前组的原图计算完成后，在这里按泳道查看全部条带。</p></div>';return;}const allValues=segments.flatMap(s=>s.lane?.profile||[]),baselines=segments.flatMap(s=>(s.lane?.bands||[]).flatMap(b=>[b.baselineStart,b.baselineEnd])).filter(finiteQuantValue),max=allValues.concat(baselines).reduce((a,b)=>Math.max(a,b),1),min=allValues.concat(baselines).reduce((a,b)=>Math.min(a,b),0),span=max-min||1,gap=14,plotWidth=Math.max(680,segments.length*150+68),width=(plotWidth-68-gap*(segments.length-1))/segments.length,y=v=>150-(v-min)/span*112;const content=segments.map(({item,index,lane})=>{const values=lane?.profile||[],left=44+index*(width+gap),x=i=>left+i/Math.max(1,values.length-1)*width,title=item.protein&&item.protein!=='Unassigned'?item.protein:'条带 '+(index+1);let fills='',base='';for(const band of lane?.bands||[]){if(!hasQuantBounds(band,values.length))continue;const {start,end,baselineStart:a,baselineEnd:b}=band,points=values.slice(start,end+1).map((v,j)=>`${x(start+j)},${y(Math.max(v,a+(b-a)*j/(end-start)))}`);fills+=`<polygon class="quant-fill" points="${x(start)},${y(a)} ${points.join(' ')} ${x(end)},${y(b)}"/>`;base+=`<path class="quant-baseline" d="M${x(start)},${y(a)}L${x(end)},${y(b)}"/>`;}return `<g><text x="${left+width/2}" y="19" text-anchor="middle" class="quant-segment-label">${escapeText(title)}</text><path class="quant-axis" d="M${left},150H${left+width}"/>${fills}${values.length?`<path class="quant-curve" d="${values.map((v,i)=>(i?'L':'M')+x(i)+','+y(v)).join(' ')}"/>`:`<text x="${left+width/2}" y="95" text-anchor="middle">无曲线</text>`}${base}<text x="${left}" y="176">0</text><text x="${left+width}" y="176" text-anchor="end">${values.length?values.length-1+' y':'—'}</text><rect class="quant-segment-hit" data-quant-segment="${escapeText(item.rowId)}" x="${left}" y="0" width="${width}" height="180" tabindex="0" role="button" aria-label="查看 ${escapeText(title)} 原图和积分曲线"/></g>`;}).join('');panel.innerHTML=`<div class="quant-profile-heading"><div><h3>泳道 ${quantLane} · ${escapeText(group.figure)} 组内曲线</h3><span>每段对应一张原图 · 间隔不积分 · 点击进入条带监督</span></div><span class="quant-legend"><i></i>原图曲线 <i></i>直线封底</span></div><div class="quant-group-chart-scroll"><svg class="quant-chart quant-group-chart" viewBox="0 0 ${plotWidth} 190" preserveAspectRatio="none" style="min-width:${plotWidth}px" aria-label="当前泳道的组内分段灰度曲线"><text x="38" y="41" text-anchor="end">${number(max)}</text><text x="38" y="152" text-anchor="end">${number(min)}</text>${content}</svg></div>`;}
-document.addEventListener('keydown',event=>{if((event.key==='Enter'||event.key===' ')&&event.target.matches('[data-quant-segment]')){event.preventDefault();event.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}});
+function renderQuantGroupOverlay(actualZoom = 1) {
+    const layer = $('#quant-lanes'),
+        group = quantData()?.group,
+        size = quantGroupDimensions();
+    layer.hidden = mode !== 'quant';
+    if (layer.hidden) return;
+    if (!group?.compatible || !size.width || !size.height) {
+        layer.innerHTML = '';
+        return;
+    }
+    const regions = quantGroupRegions();
+    layer.innerHTML = regions
+        .flatMap((region) => {
+            const source = state.rows.find((item) => item.id === region.rowId),
+                item = group.rows.find((item) => item.rowId === region.rowId);
+            return (item?.lanes || [])
+                .filter(
+                    (lane) =>
+                        !region.sourceLaneRange ||
+                        (lane.lane >= region.sourceLaneRange[0] &&
+                            lane.lane <= region.sourceLaneRange[1]),
+                )
+                .map((lane) => {
+                    const b = quantMappedLane(region, region.sourceRoi || source?.roi, lane);
+                    if (!b) return '';
+                    return `<button class="quant-group-lane ${lane.lane === quantLane ? 'selected' : ''}" data-quant-group-lane="${lane.lane}" aria-pressed="${lane.lane === quantLane}" aria-label="${escapeText(item.protein || source?.name || '条带')}，泳道 ${lane.lane}" style="left:${(b.x / size.width) * 100}%;top:${(b.y / size.height) * 100}%;width:${(b.width / size.width) * 100}%;height:${(b.height / size.height) * 100}%;border-width:0"><svg class="manual-lane-shape"><rect x="0" y="0" width="100%" height="100%" style="stroke-width:${1.5 / actualZoom}px"/></svg><span class="quant-lane-tag" style="transform:scale(${1 / actualZoom})">${lane.lane}</span></button>`;
+                });
+        })
+        .join('');
+}
+function quantImageClip() {
+    if (
+        mode !== 'quant' ||
+        quantDetail ||
+        !state.montage ||
+        !state.montageWidth ||
+        !state.montageHeight
+    )
+        return '';
+    const box = quantGroupBounds();
+    if (!box) return '';
+    const clamp = (value) => Math.max(0, Math.min(100, value));
+    return `inset(${clamp((box.y / state.montageHeight) * 100)}% ${clamp(((state.montageWidth - box.x - box.width) / state.montageWidth) * 100)}% ${clamp(((state.montageHeight - box.y - box.height) / state.montageHeight) * 100)}% ${clamp((box.x / state.montageWidth) * 100)}%)`;
+}
+function quantGroupBandResults(item, index) {
+    const lane = item.lanes?.find((l) => l.lane === quantLane),
+        bands = lane?.bands || [],
+        title =
+            item.protein && item.protein !== 'Unassigned' ? item.protein : '条带 ' + (index + 1);
+    return `<div class="quant-strip-results"><button class="quant-segment-link" data-quant-segment="${escapeText(item.rowId)}" ${state.busy ? 'disabled' : ''}><span>${escapeText(title)}<small>${bands.length} 个积分区间</small></span>${icon('chevron')}</button>${
+        bands
+            .map((band, bandIndex) => {
+                const valid = ['ready', 'valid', 'ok'].includes(band.status) && band.signal != null;
+                return `<div class="quant-band-result"><button class="quant-band-value" data-quant-segment="${escapeText(item.rowId)}" data-quant-band-id="${escapeText(band.id)}" ${state.busy ? 'disabled' : ''}><span>${escapeText(band.label || '积分 ' + (bandIndex + 1))}<strong class="${valid ? 'valid' : ''}">${quantValue(band.signal)}</strong></span>${valid ? '' : '<span class="quant-quality-mark" role="img" aria-label="' + escapeText(statusLabel(band.status)) + '">*</span>'}</button></div>`;
+            })
+            .join('') || '<p class="quant-no-band">暂无积分区间；可进入原图查看。</p>'
+    }</div>`;
+}
+function renderQuantGroupInspector() {
+    const q = quantData(),
+        group = q?.group,
+        available = !!group?.compatible,
+        disabled = state.busy || !bridge || !available,
+        count = Number(group?.laneCount) || 0;
+    $('#inspector-title').textContent = 'Fig 组定量';
+    $('#review-badge').textContent = state.busy
+        ? '正在计算'
+        : !available
+          ? '组映射不可用'
+          : '原图映射';
+    $('#review-badge').className = 'status-badge ' + (available ? 'ok' : 'pending');
+    $('#inspector-content').innerHTML =
+        `<section class="inspect-section"><h3>${escapeText(group?.figure || row()?.fig || '当前 Fig')}</h3><p>${group?.sourceSheet ? '当前 Fig 直接定位导入拼图中的各排条带。' : '先完成 Fig 标注拼图，再按相同泳道查看组内各条带。'}积分使用对应原像素。</p>${!available ? `<p class="quant-group-warning">${escapeText(group?.reason || '等待当前 Fig 的原图映射与泳道规划。')}<br>可选择左侧单条带调整；组内泳道数一致且有裁剪后再计算整组。</p>` : ''}<div class="quant-lane-picker">${Array.from({ length: count }, (_, i) => `<button data-quant-group-lane="${i + 1}" aria-pressed="${quantLane === i + 1}" ${state.busy || !available ? 'disabled' : ''}>${i + 1}</button>`).join('')}</div>${dataPair('当前泳道', available ? '泳道 ' + quantLane : '尚未建立组映射')}${dataPair('组内条带', (group?.rows?.length || 0) + ' 个')}</section><section class="inspect-section"><h3>组内灰度结果</h3><p>点选条带可在原图中调整泳道、积分范围与封底。</p><div class="quant-group-values">${(group?.rows || []).map((item, index) => quantGroupBandResults(item, index)).join('')}</div><p>* 表示有质量说明，原始积分不等于有效信号。</p>${qualityDetails((group?.rows || []).flatMap((item) => (item.lanes?.find((l) => l.lane === quantLane)?.bands || []).map((band) => ({ reason: band.reason, label: (item.protein || item.rowId) + ' · 泳道 ' + quantLane }))))}</section><section class="inspect-section"><h3>分段原图映射</h3><p>泳道框分别映射至每个条带的原图坐标；不把显示位置不同的泳道强行对齐。曲线按条带分段，段间留白不参与积分。</p></section>`;
+    $('#inspector-action').innerHTML =
+        `<button class="button primary full" data-quant-group ${disabled ? 'disabled' : ''}>${icon('curve')}计算本 Fig 组</button><button class="button subtle full" data-mode="results">${icon('table')}下一步：灰度结果${icon('arrow')}</button><button class="text-button quant-back-layout" data-mode="layout">${icon('layout')}返回 Fig 拼图</button><small>保留现有泳道与封底，自动计算组内条带</small>`;
+}
+function renderQuantGroupProfile() {
+    const panel = $('#quant-profile'),
+        group = quantData()?.group;
+    panel.hidden = mode !== 'quant';
+    if (panel.hidden) return;
+    if (!group?.compatible) {
+        panel.innerHTML = `<div class="quant-empty"><h3>当前 Fig 无法按同一泳道展示组曲线</h3><p>${escapeText(group?.reason || '等待当前 Fig 的原图映射与泳道规划。')} 请选择左侧条带查看原图与独立曲线；统一组内泳道数及裁剪后再查看整组。</p></div>`;
+        return;
+    }
+    const segments = (group?.rows || []).map((item, index) => ({
+        item,
+        index,
+        lane: item.lanes?.find((l) => l.lane === quantLane),
+    }));
+    if (!segments.length) {
+        panel.innerHTML =
+            '<div class="quant-empty"><h3>等待 Fig 灰度曲线</h3><p>当前组的原图计算完成后，在这里按泳道查看全部条带。</p></div>';
+        return;
+    }
+    const allValues = segments.flatMap((s) => s.lane?.profile || []),
+        baselines = segments
+            .flatMap((s) => (s.lane?.bands || []).flatMap((b) => [b.baselineStart, b.baselineEnd]))
+            .filter(finiteQuantValue),
+        max = allValues.concat(baselines).reduce((a, b) => Math.max(a, b), 1),
+        min = allValues.concat(baselines).reduce((a, b) => Math.min(a, b), 0),
+        span = max - min || 1,
+        gap = 14,
+        plotWidth = Math.max(680, segments.length * 150 + 68),
+        width = (plotWidth - 68 - gap * (segments.length - 1)) / segments.length,
+        y = (v) => 150 - ((v - min) / span) * 112;
+    const content = segments
+        .map(({ item, index, lane }) => {
+            const values = lane?.profile || [],
+                left = 44 + index * (width + gap),
+                x = (i) => left + (i / Math.max(1, values.length - 1)) * width,
+                title =
+                    item.protein && item.protein !== 'Unassigned'
+                        ? item.protein
+                        : '条带 ' + (index + 1);
+            let fills = '',
+                base = '';
+            for (const band of lane?.bands || []) {
+                if (!hasQuantBounds(band, values.length)) continue;
+                const { start, end, baselineStart: a, baselineEnd: b } = band,
+                    points = values
+                        .slice(start, end + 1)
+                        .map(
+                            (v, j) =>
+                                `${x(start + j)},${y(Math.max(v, a + ((b - a) * j) / (end - start)))}`,
+                        );
+                fills += `<polygon class="quant-fill" points="${x(start)},${y(a)} ${points.join(' ')} ${x(end)},${y(b)}"/>`;
+                base += `<path class="quant-baseline" d="M${x(start)},${y(a)}L${x(end)},${y(b)}"/>`;
+            }
+            return `<g><text x="${left + width / 2}" y="19" text-anchor="middle" class="quant-segment-label">${escapeText(title)}</text><path class="quant-axis" d="M${left},150H${left + width}"/>${fills}${values.length ? `<path class="quant-curve" d="${values.map((v, i) => (i ? 'L' : 'M') + x(i) + ',' + y(v)).join(' ')}"/>` : `<text x="${left + width / 2}" y="95" text-anchor="middle">无曲线</text>`}${base}<text x="${left}" y="176">0</text><text x="${left + width}" y="176" text-anchor="end">${values.length ? values.length - 1 + ' y' : '—'}</text><rect class="quant-segment-hit" data-quant-segment="${escapeText(item.rowId)}" x="${left}" y="0" width="${width}" height="180" tabindex="0" role="button" aria-label="查看 ${escapeText(title)} 原图和积分曲线"/></g>`;
+        })
+        .join('');
+    panel.innerHTML = `<div class="quant-profile-heading"><div><h3>泳道 ${quantLane} · ${escapeText(group.figure)} 组内曲线</h3><span>每段对应一张原图 · 间隔不积分 · 点击进入条带监督</span></div><span class="quant-legend"><i></i>原图曲线 <i></i>直线封底</span></div><div class="quant-group-chart-scroll"><svg class="quant-chart quant-group-chart" viewBox="0 0 ${plotWidth} 190" preserveAspectRatio="none" style="min-width:${plotWidth}px" aria-label="当前泳道的组内分段灰度曲线"><text x="38" y="41" text-anchor="end">${number(max)}</text><text x="38" y="152" text-anchor="end">${number(min)}</text>${content}</svg></div>`;
+}
+document.addEventListener('keydown', (event) => {
+    if (
+        (event.key === 'Enter' || event.key === ' ') &&
+        event.target.matches('[data-quant-segment]')
+    ) {
+        event.preventDefault();
+        event.target.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    }
+});
 
 bootstrap();

@@ -91,6 +91,7 @@ def main() -> int:
         ("ruff", "format", "--check", "."),
         ("pyright",),
         ("tooling.import_contracts",),
+        ("tooling.web_quality",),
         ("pytest", "-q"),
         ("tooling.installed_wheels",),
     ]:

@@ -46,6 +46,8 @@
 
 ## Current Pointer
 
-- 当前状态见`.agent-handoff/snapshot.md`和B-008任务卡；新产品执行入口为docs/plans/phase-1-v0.md。
-- 原T081指针/未验范围已保留在.agent-handoff/archive/B008-before-publication-snapshot.md；新方案发布不销账。
-- 研发主方案docs/plans/research-platform-rd.md；依赖work/programs/scientific-agent-platform/registry.json；目标树接入由P001完成。
+- 当前任务：[P001 正确产品基线接入](work/tasks/P-001-platform-baseline-adoption.md)。先读任务、研发总方案与阶段V0，再核对分支/HEAD；P002依赖P001完成。
+- T082历史工程证据及科学/目标环境待办完整保留于其[任务](work/tasks/T-082-reliability-remediation.md)，不由V0自动关闭。
+- 本轮本地工程交接：[T082 final-handoff](work/evidence/T-082/final-handoff.md)，区分冻结源码、隔离验收工件与后续交接HEAD；科学待办不由工程通过代替。
+- 最近交付：[T081 R2](work/evidence/T-081/final-delivery.md)。当前源码/构建源码/主线集成/安装包区分见 [T082 baseline](work/evidence/T-082/baseline.md)。
+- 旧 snapshot 保留于 `.agent-handoff/archive/T081-before-T082-snapshot.md`；原图、历史、既存 dirty 树及旧交付继续保护。

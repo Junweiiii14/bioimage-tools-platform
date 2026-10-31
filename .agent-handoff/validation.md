@@ -91,3 +91,19 @@ CI180真实失败：Windows1191过1败746.36s/child1、Linux关闭回收15min取
 ## 2026-10-24 T081 本机完整交付
 
 f1e6142准确独审/四CI：双平台1295（Linux509.77s/Windows756.69s）与全部wheel成功；新包真实升级0、7793载荷/209源码SHA、双模式自检0、37安装态53.91s/163模块来源SHA通过，真实180恢复27/9/4/27。201文件产物独审Accepted，WinPS5.1实际解压、校验器恢复执行0、桌面tree/ZIP一致；初publisher1保留并定位维护PS7模块路径，未改全局设置或包字节。最终文档HEAD独审/CI/merge仍按task谓词与final-closeout核真，不提前写通过。环境/命令/退出码及限制见work/evidence/T-081/final-delivery.md。
+
+## 2026-10-28 T082 R00
+
+基线18b5cf6；git/fetch、uv sync --locked --all-groups、两次context回执均exit0；变更规则输出已分片读取。handoff维护 changed=0/warnings=0/unresolved=0；git diff --check exit0。仅事实文档校准，产品未测试，独审待准确提交。
+
+T082 R01：旧码8fail/4pass/6deselect exit1；新37定向22.16s exit0、Ruff/定向Pyright0。测试夹具两次失败原因/修正及完整门禁待办见 work/evidence/T-082/r01-terminal.md。
+
+T082 R01补丁cb5f2c6：正文格式化2红→36定向6.51s/0，非作者20项5.86s/0及额外边界注入Accepted。旧全门禁已出现2失败，未完成且被本补丁取代；不是最终通过证据。R10科学材料用户明确暂缺，冻结定义/合成摘要，独立科学待办。
+
+T082 R02：旧16红→新101定向19.24s/0、Ruff/严格Pyright0；39新输入案例及真实后台拒绝恢复。旧全门禁实际3失败1310通过/1308.13s/1，运行中源码变动使其不可绑定最终提交，wheel未执行。GPU原失败与固定源码2失败102通过保留；进程局部disable-gpu同UI3项7.01s/0，不销硬件根因。详见r02-tiff-admission.md。
+
+## 2026-10-28 T082 最终冻结与本机验收
+
+ed830e1准确完整门禁1503 passed/756.15s+全部isolated wheels/exit0，HEAD/clean保持，独立审计Accepted；未运行远端CI。最终Temp外持久短路径标准构建exit0、包SHA5c493091…724268；新检出私有PythonPS5.1/7各7794文件严格核验0。真实244c5da→ed830e1升级0、schema1–6安装态旧金样0、7/19项双诊断0/0、真实卸载0；独立实算173文件保持、5快捷方式/登记移除、设置/Lab保持。完整命令、SHA、exit与原始日志见work/evidence/T-082/r11-execution.md及r11-raw/。源码/工件独审Accepted；后续交接差异独审按任务记录。
+
+44ee78c原2失败1499过保留，d103撤销修复先红后绿/独审；f5d7ac9 wrapper补-B双shell先红后绿/独审；深Inno路径失败、Temp98零长文件遗失UNKNOWN和双诊断GPU日志均保留。原生DPR1.5仅屏幕观测，科学留出/负责人标准与干净Win10/物理交互/其他机器/Office未验，不用工程通过替代。

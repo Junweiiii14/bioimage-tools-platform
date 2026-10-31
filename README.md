@@ -1,12 +1,10 @@
 # 生物图像工具平台
 
-## 研发与任务入口（2026-10-31）
+[研发总方案3.0与HTML](docs/plans/README.md) · [第一阶段V0](docs/plans/phase-1-v0.md) · [公开开发数据](docs/plans/development-data.md) · [任务依赖](work/programs/scientific-agent-platform/README.md)。本轮范围为成熟WB用例独立运行与真实成果对照；规划不表示实现、科学准入或安装器发布。
 
-[研发总方案3.0与HTML](docs/plans/README.md) · [第一阶段V0](docs/plans/phase-1-v0.md) · [公开开发数据](docs/plans/development-data.md) · [任务依赖](work/programs/scientific-agent-platform/README.md)。新路线包含10类实验，当前启动范围是V0旧WB独立运行；下方保留已有实验室产品使用说明。方案发布不表示新功能或本地T082已合入main。
+当前开发任务：[P001 正确基线接入](work/tasks/P-001-platform-baseline-adoption.md) → [交接索引](AGENT_HANDOFF.md)。最近已交付实验室安装包及其实际验收：[T081 R2 交付记录](work/evidence/T-081/final-delivery.md)；本轮已构建并完成本机可弃安装验收，见 [T082 本地交接](work/evidence/T-082/final-handoff.md)。冻结源码、验收包与交接提交分别记录，未替换在用实验室版本。
 
-当前交付入口：[T079实验室离线发行](work/tasks/T-079-laboratory-offline-delivery.md) → [实验室部署说明](docs/wb-laboratory-delivery.md) → [交接索引](AGENT_HANDOFF.md)。本轮收拢T074–T077的曲线、整版拼图、界面系统、文件夹拖入与未审核导出整改，并提供包含运行环境的Windows x64安装器。
-
-历史版本及证据保留，旧检查不作为本轮通过证明。实验室发行的实际安装验证、源码集成和目标机限制以T079记录为准；科学留出、干净Win10与物理DPI验收另列。开发范围保持WB，IF/IHC不自动扩展。
+历史版本及证据保留，旧检查不作为本轮通过证明。实验室发行的实际安装验证、源码集成和目标机限制以T081记录为准；科学留出、干净Win10与物理DPI验收另列。开发范围保持WB，IF/IHC不自动扩展。
 
 实验室使用者运行随附Setup.exe即可安装，包含私有Python、Qt/WebEngine、本地OCR模型和VC运行库，无需开发环境或Office。安装目标为Windows10 1809+或Windows11的x64机器，按当前用户安装；首次部署运行开始菜单环境自检并用合成练习素材核对流程。构建配方为 `python -m tooling.build_runtime_candidate --laboratory --iscc <固定编译器> --gcc <固定编译器>`；只从干净提交构建，安装器通过实验室交付包分发，不自动公开上传二进制。
 
@@ -25,10 +23,11 @@
 
 ## 可执行的基础检查
 
-安装 uv 0.13.0，使用 Python 3.12.14（uv 自动下载），在仓库根运行：
+安装uv0.13.0，使用Python3.12.14（uv自动下载）及`.node-version`指定的Node26.7.0，在仓库根运行。Node只用于开发检查，不是产品运行依赖：
 
 ```powershell
 uv sync --locked --all-groups
+npm ci --ignore-scripts
 uv run --locked --no-sync python dev.py doctor
 uv run --locked --no-sync python dev.py check --all
 uv run --locked --no-sync python dev.py smoke-env

@@ -1,154 +1,1054 @@
 'use strict';
-window.advancedWorkspace=(()=>{
-  const titles={template:'模板与分段',metadata:'批量实验信息',ocr:'OCR 校正',normalization:'样本对应与归一化'};
-  const labels={project_name:'实验项目',figure:'Fig',protein:'蛋白',lane_count:'N',empty_lanes:'空泳道',order:'顺序',notes:'备注'};
-  let channel=null,section='',data=null,draft=null,pending=null,message='',error=false,dirty=false,identity='',page=0;
-  const drafts=new Map();
-  let base=null,conflicts=[];
-  const equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
-  function reconcile(original,local,latest,path=[]){
-    if(equal(local,original))return copy(latest);
-    if(equal(latest,original)||equal(local,latest))return copy(local);
-    if(original&&local&&latest&&!Array.isArray(original)&&typeof original==='object'&&typeof local==='object'&&typeof latest==='object'){const result={};for(const key of new Set([...Object.keys(original),...Object.keys(local),...Object.keys(latest)]))result[key]=reconcile(original[key],local[key],latest[key],[...path,key]);return result;}
-    conflicts.push({path,local:copy(local),latest:copy(latest),choice:null});return copy(local);
-  }
-  function mergeCurrent(saved){conflicts=[];const latest=seed();draft=reconcile(saved.base||latest,saved.draft,latest);base=latest;dirty=!equal(draft,base);}
-  function absorbPage(){const p=data.metadataPreview;if(!p)return;for(const [n,e] of p.entries.entries()){const i=p.offset+n;draft.entries[i]??={index:i,target:e.target_id,selected:false,values:{}};}}
-  const copy=value=>structuredClone(value);
-  const esc=value=>escapeText(value);
-  const button=(op,label,primary=false)=>`<button class="button ${primary?'primary':'subtle'}" data-advanced="${op}" ${pending?'disabled':''}>${label}</button>`;
-  const input=(path,value,type='text',extra='')=>`<input data-adv-path="${path}" type="${type}" ${type==='checkbox'?(value?'checked':''):`value="${esc(value??'')}"`} ${extra}>`;
-  const field=(name,path,value,type='text',extra='')=>`<label class="advanced-field"><span>${name}</span>${input(path,value,type,extra)}</label>`;
-  const select=(path,value,options)=>`<select data-adv-path="${path}">${options.map(([k,v])=>`<option value="${esc(k)}" ${String(k)===String(value)?'selected':''}>${esc(v)}</option>`).join('')}</select>`;
-  const source=(path,value)=>select(path,value,[['','选择来源'],...data.rows.map(r=>[r.id,r.figure+' · '+r.protein+' · '+r.filename])]);
-  function seed(){
-    if(section==='template')return {template:Object.fromEntries(Object.entries(data.template).filter(([k])=>!['font','schema_version','display_mapping'].includes(k))),figureOrder:[...data.figureOrder],style:copy(data.style),composition:copy(data.composition)};
-    if(section==='metadata')return {mode:'common',rows:[],common:Object.fromEntries(Object.keys(labels).map(k=>[k,''])),separator:'_',pattern:'figure,protein,lane_count',sheet:0,header:1,keyKind:'filename',keyColumn:0,columns:{},fields:[],entries:{}};
-    if(section==='ocr')return {rows:(data.ocr?.rows||[]).map(r=>({...r,target:r.link?.target_row_id||''}))};
-    return {target:'',reference:'',kind:'',active:data.normalizations[0]?.target.row_id||'',plans:copy(data.normalizations),ocrLabels:false};
-  }
-  function remember(){if(data&&draft)drafts.set(data.projectId+':'+section,{draft:copy(draft),base:copy(base),conflicts:copy(conflicts),dirty,revision:data.revision});}
-  function command(operation,value={}){
-    if(pending)return;
-    if(conflicts.length&&operation!=='open'){status('请先核对冲突字段，再继续操作。',true);return;}
-    if(!data&&operation!=='open')return;
-    if(dirty&&!operation.endsWith('_apply')&&!['metadata_preview','metadata_headers','metadata_page','open'].includes(operation)){status('请先保存当前编辑，或撤销后继续。',true);return;}
-    const requestId='advanced-'+Date.now()+'-'+Math.random().toString(36).slice(2);
-    const context=operation==='open'?{projectId:state.projectId,sessionEpoch:state.sessionEpoch,revision:state.revision}:data;
-    pending={requestId,operation};status(operation==='open'?'正在读取…':'正在处理…');
-    const payload={schema_version:1,requestId,projectId:context.projectId,sessionEpoch:context.sessionEpoch,revision:context.revision,operation,value};
-    const encoded=JSON.stringify(payload);
-    if(encoded.length>262144){pending=null;status('本次编辑超过提交容量，请分批保存。',true);syncBusy();return;}
-    if(channel)channel.request('advanced_ui',encoded);
-    else if(window.previewAdapter)window.previewAdapter.advanced(payload,receive);
-    else{pending=null;status('此操作需要桌面项目。',true);}
-    syncBusy();
-  }
-  function receive(raw){
-    let response;try{response=typeof raw==='string'?JSON.parse(raw):raw;}catch{return;}
-    if(!pending||response.requestId!==pending.requestId)return;
-    const next=response.data;if(!next||next.sessionEpoch!==state.sessionEpoch)return;
-    if(response.status==='pending'){status('正在处理…');return;}
-    const operation=pending.operation;pending=null;
-    if(response.status==='failed'){status(response.error||'操作失败，编辑已保留。',true);syncBusy();return;}
-    if(response.status==='cancelled'){status('已取消选择。');syncBusy();return;}
-    const previousProject=data?.projectId;data=next;
-    if(operation==='open'){
-      const saved=drafts.get(data.projectId+':'+section);base=seed();conflicts=[];draft=copy(base);dirty=false;
-      if(saved?.dirty){if(saved.revision!==data.revision){mergeCurrent(saved);message=conflicts.length?'项目已有新修订，请逐项核对冲突。':'已更新背景信息，你的编辑保留；核对后保存。';}else{draft=saved.draft;base=saved.base||base;conflicts=saved.conflicts||[];dirty=true;message=conflicts.length?'请核对冲突字段。':'编辑已恢复。';}}else message='';error=conflicts.length>0;
-    }else if(operation==='metadata_preview'){
-      draft.entries={};page=0;absorbPage();base=copy(draft);dirty=false;message='逐条核对来源，再选择行和字段应用。';
-    }else if(operation==='metadata_page'){absorbPage();page=Math.floor(data.metadataPreview.offset/data.metadataPreview.pageSize);message='';
-    }else if(operation==='metadata_import'){
-      draft.mode='table';draft.sheet=0;draft.header=1;draft.columns={};message='选择匹配列与字段，然后生成预览。';
-    }else if(operation.endsWith('_apply')||operation.startsWith('normalization_')&&operation!=='normalization_export'||operation.startsWith('ocr_')&&operation!=='ocr_export'||operation==='template_import'||operation==='font_import'){
-      const active=draft?.active;draft=seed();if(section==='normalization'&&data.normalizations.some(p=>p.target.row_id===active))draft.active=active;dirty=false;base=copy(draft);conflicts=[];error=false;message=data.persisted?'已保存。':'已更新草稿，请保存项目。';
-    }else if(operation==='metadata_headers'){message='表头已更新，请核对列映射。';error=false;}else{message='已完成。';error=false;}
-    if(previousProject&&previousProject!==data.projectId){drafts.delete(previousProject+':'+section);draft=seed();dirty=false;}
-    if(section==='metadata')absorbPage();
-    remember();render();
-  }
-  function status(text,failed=false){message=text;error=failed;const loading=document.querySelector('.advanced-drawer .advanced-loading');if(loading)loading.innerHTML=failed?`<p class="advanced-error" role="alert">${esc(text)}</p><button class="button subtle" data-advanced="reload">重试</button>`:esc(text);const node=document.getElementById('advanced-status');if(node){node.textContent=text;node.dataset.error=String(failed);}const note=document.getElementById('advanced-unsaved');if(note)note.textContent=dirty?'未保存编辑':'';}
-  function syncBusy(){document.querySelectorAll('#advanced-editor input,#advanced-editor select,#advanced-editor textarea,#advanced-editor button,#advanced-footer [data-advanced]:not([data-advanced=close])').forEach(el=>{if(pending){if(el.dataset.busyDisabled===undefined)el.dataset.busyDisabled=String(el.disabled);el.disabled=true;}else if(el.dataset.busyDisabled!==undefined){el.disabled=el.dataset.busyDisabled==='true';delete el.dataset.busyDisabled;}});}
-  function open(next){if(pending){status('当前操作完成后可切换工具。');return;}remember();section=next;page=0;identity=state.sessionEpoch+':'+state.projectId;data=null;draft=null;pending=null;openDrawer(titles[section],'<div class="advanced-loading" role="status">正在读取项目…</div>');document.getElementById('drawer').classList.add('advanced-drawer');command('open',{section});}
-  function render(){
-    const panel=document.getElementById('drawer');
-    // A receipt updates the saved draft even after leaving, but never takes over another panel.
-    if(!data||!draft||panel.hidden||panel.dataset.closing==='true'||!panel.classList.contains('advanced-drawer'))return;
-    const active=document.activeElement,focus=active?.dataset.advPath,selection=active?.tagName==='INPUT'&&['text','search'].includes(active.type)?[active.selectionStart,active.selectionEnd]:null,scroll=document.querySelector('#drawer-content').scrollTop;
-    const content=section==='template'?template():section==='metadata'?metadata():section==='ocr'?ocr():normalization();
-    document.querySelector('#drawer-content').innerHTML=`<div class="advanced-context"><span>${esc(data.name)}</span><span id="advanced-unsaved">${dirty?'未保存编辑':''}</span><button class="text-button" data-advanced="reload">重新读取</button><button class="text-button" data-advanced="discard">撤销当前编辑</button></div><nav class="advanced-tabs">${Object.entries(titles).map(([key,title])=>`<button data-advanced-section="${key}" aria-current="${section===key?'page':'false'}">${title}</button>`).join('')}</nav><datalist id="advanced-sources">${data.rows.map(r=>`<option value="${esc(r.id)}">${esc(r.figure+' · '+r.protein+' · '+r.filename)}</option>`).join('')}</datalist>${conflictPanel()}<div id="advanced-editor">${content}</div>`;
-    let footer=document.getElementById('advanced-footer');if(!footer){footer=document.createElement('div');footer.id='advanced-footer';footer.className='advanced-feedback';document.getElementById('drawer').append(footer);}
-    const save=section==='template'?['template_apply','保存版式']:section==='metadata'&&data.metadataPreview?['metadata_apply','应用并保存']:section==='ocr'&&data.ocr?['ocr_apply','保存校正']:section==='normalization'&&draft.plans.length?['normalization_apply','保存对应']:null;
-    footer.innerHTML=`<p id="advanced-status" role="status" data-error="${error}">${esc(message)}</p>${save?button(...save,true):''}${button('close','返回工作区')}<details><summary>兼容工具</summary>${button('compatibility','打开原桌面编辑器')}</details>`;
-    if(focus){const target=document.querySelector(`[data-adv-path="${CSS.escape(focus)}"]`);target?.focus({preventScroll:true});if(target&&selection)target.setSelectionRange(...selection);}document.querySelector('#drawer-content').scrollTop=scroll;syncBusy();
-  }
-  function conflictPanel(){return conflicts.length?`<section class="advanced-conflicts" aria-label="编辑冲突"><h3>核对发生变化的内容</h3>${conflicts.map((c,i)=>`<div><strong>${esc(c.path.join(' / '))}</strong><div class="advanced-conflict-values"><button data-conflict="${i}" data-choice="local" aria-pressed="${c.choice==='local'}"><span>保留我的编辑</span><pre>${esc(JSON.stringify(c.local,null,2)??'空')}</pre></button><button data-conflict="${i}" data-choice="latest" aria-pressed="${c.choice==='latest'}"><span>使用项目当前值</span><pre>${esc(JSON.stringify(c.latest,null,2)??'空')}</pre></button></div></div>`).join('')}<button class="button primary" data-advanced="resolve" ${conflicts.some(c=>!c.choice)?'disabled':''}>确认核对并继续编辑</button></section>`:'';}
-  function template(){
-    const t=draft.template,s=draft.style;
-    return `<div class="advanced-split"><section><h3>版式</h3><div class="advanced-form">${field('模板名称','template.name',t.name)}${field('文字字号（输出像素）','template.font_size',t.font_size,'number','min="8" max="96"')}${field('标签宽度（输出像素）','template.label_width',t.label_width,'number','min="30" max="1000"')}<label class="advanced-field"><span>标签位置</span>${select('template.label_side',t.label_side,[['left','左侧'],['right','右侧']])}</label>${field('行间距（输出像素）','template.row_gap',t.row_gap,'number')}${field('Fig 间距（输出像素）','template.figure_gap',t.figure_gap,'number')}${field('外边距（输出像素）','template.margin',t.margin,'number')}${field('每行 Fig 数','template.columns',t.columns,'number','min="1" max="12"')}${field('导出 DPI','template.dpi',t.dpi,'number','min="72" max="1200"')}${field('标题字号','style.heading_size',s.heading_size,'number')}${field('分段间距','style.segment_gap',s.segment_gap,'number')}<label class="advanced-field"><span>布局方向</span>${select('style.flow',s.flow,[['columns','按列'],['rows','按行']])}</label></div><details class="quality-details"><summary>精确参数与显示规则</summary><div class="advanced-form">${field('默认裁剪高度（原图像素）','template.crop_height',t.crop_height,'number','min="2" max="4096"')}${field('边框（输出像素）','template.border',t.border,'number','min="1" max="10"')}${field('泳道显示宽度','style.lane_unit',s.lane_unit,'number','min="5" max="1200" step="5"')}<label class="advanced-field"><span>显示方式</span>${select('style.display_policy',s.display_policy,[['native_samples@1','原始尺寸'],['standard_lane_ratio@1','标准泳道比例']])}</label><label class="advanced-field"><span>标签对齐</span>${select('style.label_alignment',s.label_alignment,[['left','左对齐'],['right','右对齐']])}</label></div><p>显示比例不进入定量。裁剪高度是原图参数；已有分段保留各行实际 ROI。</p></details><div class="advanced-actions">${button('font_import','导入成图字体')}${button('template_import','导入模板并新建')}${button('template_export','导出模板')}</div></section><section class="advanced-preview"><h3>当前已保存成图</h3>${state.montage?`<img src="${esc(state.montage)}" alt="当前项目已生成成图">`:'<div class="advanced-empty">保存版式后生成预览</div>'}<p>输出字体：${data.template.font?'已导入项目字体':'内置拉丁字体，中文标签需导入字体'}</p><div class="advanced-actions">${button('template_preview','生成预览')}${button('figure_export','导出成图')}</div></section></div><section class="advanced-section"><h3>Fig 顺序</h3><ol class="advanced-order">${draft.figureOrder.map((name,i)=>`<li draggable="true" data-adv-order="${i}"><span>${esc(name)}</span><button class="icon-button" data-order-up="${i}" aria-label="上移 ${esc(name)}" ${i===0?'disabled':''}>${icon('chevron-up')}</button><button class="icon-button" data-order-down="${i}" aria-label="下移 ${esc(name)}" ${i===draft.figureOrder.length-1?'disabled':''}>${icon('chevron-down')}</button></li>`).join('')}</ol></section><details class="advanced-section quality-details"><summary>横向分段与 Fig 列配置</summary><div class="advanced-table-scroll"><table class="advanced-table"><thead><tr><th>来源行 ID</th><th>Fig</th><th>显示行</th><th>段序</th><th>起始泳道</th><th>结束泳道</th><th></th></tr></thead><tbody>${draft.composition.slices.map((r,i)=>`<tr><td>${source(`composition.slices.${i}.row_id`,r.row_id)}</td>${['figure','line','position','first_lane','last_lane'].map(k=>`<td>${input(`composition.slices.${i}.${k}`,r[k],k==='figure'?'text':'number')}</td>`).join('')}<td><button class="text-button" data-remove-slice="${i}">移除</button></td></tr>`).join('')}</tbody></table></div>${button('add_slice','添加分段')}<div class="advanced-form">${draft.composition.columns.map((c,i)=>field(c.figure+' 所在列',`composition.columns.${i}.column`,c.column,'number','min="1" max="12"')).join('')}</div></details>`;
-  }
-  function metadata(){
-    const d=draft,preview=data.metadataPreview,book=data.book;
-    const rowChecks=data.rows.map(r=>`<label class="advanced-check">${input('row:'+r.id,d.rows.includes(r.id),'checkbox')}<span>${esc(r.figure+' · '+r.protein)}<small>${esc(r.filename)} · N=${r.lanes}</small></span></label>`).join('');
-    const common=Object.entries(labels).map(([k,v])=>field(v,'common.'+k,d.common[k])).join('');
-    const headers=book?.header?.sheet===d.sheet&&book?.header?.row===d.header-1?book.header.cells:[];
-    const columns=[[-1,'不导入'],...headers.map((h,i)=>[i,(i+1)+': '+(h.text||h.error||'空白')])];
-    const mapping=book?`<div class="advanced-form"><label class="advanced-field"><span>工作表</span>${select('sheet',d.sheet,book.sheets.map((s,i)=>[i,s.name]))}</label>${field('表头行','header',d.header,'number','min="1"')}<label class="advanced-field"><span>匹配方式</span>${select('keyKind',d.keyKind,[['filename','完整文件名'],['row_id','行 ID'],['sha256','完整 SHA256']])}</label><label class="advanced-field"><span>匹配列</span>${select('keyColumn',d.keyColumn,columns.slice(1))}</label>${Object.entries(labels).map(([k,v])=>`<label class="advanced-field"><span>${v}</span>${select('columns.'+k,d.columns[k]??-1,columns)}</label>`).join('')}</div>`:'<p class="advanced-empty">读取 Excel / CSV 后选择工作表和匹配列。</p>';
-    return `<div class="advanced-split"><section><h3>选择原图行</h3><div class="advanced-row-choices">${rowChecks||'当前项目尚无原图行'}</div></section><section><h3>信息来源</h3>${select('mode',d.mode,[['common','共同填写'],['filename','从文件名提取'],['table','Excel / CSV']])}${d.mode==='common'?`<div class="advanced-form">${common}</div>`:d.mode==='filename'?`<div class="advanced-form">${field('分隔符','separator',d.separator)}${field('字段顺序','pattern',d.pattern)}</div><p>字段：figure, protein, lane_count；用 - 忽略一段。</p>`:`<div class="advanced-actions">${button('metadata_import','读取表格')}</div>${mapping}`}<div class="advanced-actions">${button('metadata_preview','生成预览',true)}</div></section></div>${preview?`<section class="advanced-section"><h3>核对后应用</h3><div class="advanced-field-checks">${Object.entries(labels).map(([k,v])=>`<label>${input('field:'+k,d.fields.includes(k),'checkbox')}${v}</label>`).join('')}</div><div class="advanced-table-scroll"><table class="advanced-table"><thead><tr><th>应用</th><th>目标行 ID</th>${Object.values(labels).map(v=>`<th>${v}</th>`).join('')}<th>状态</th></tr></thead><tbody>${preview.entries.map((e,n)=>{const i=preview.offset+n,r=d.entries[i],values=Object.fromEntries(e.values);return `<tr><td>${input(`entries.${i}.selected`,r.selected,'checkbox')}</td><td>${source(`entries.${i}.target`,r.target)}</td>${Object.keys(labels).map(k=>`<td>${values[k]?input(`entries.${i}.values.${k}`,r.values[k]??values[k].text,'text',`aria-label="${labels[k]}，预览 ${i+1}"`):'—'}${values[k]?.error&&!Object.hasOwn(r.values,k)?`<small class="advanced-error">${esc(values[k].error)}</small>`:''}</td>`).join('')}<td>${esc(e.issue||'请核对来源')}</td></tr>`;}).join('')}</tbody></table></div>${pagination(preview.total,preview.pageSize)}<p>空白保持原值。N 与空泳道改变后需要重新审核与定量。</p></section>`:''}`;
-  }
-  function ocr(){return `<div class="advanced-actions">${button('ocr_composed','识别当前成图',true)}${button('ocr_import','导入拼图')}${button('ocr_recognize','重新识别')}</div><p class="advanced-source">${data.ocr?esc(data.ocr.filename)+' · '+data.ocr.width+' × '+data.ocr.height+' px':'识别产生建议；人工校正与明确关联后才能写表。'}</p>${data.ocr?`<div class="advanced-table-scroll"><table class="advanced-table"><thead><tr><th>Fig</th><th>蛋白</th><th>关联原图行 ID</th><th>人工确认</th><th></th></tr></thead><tbody>${draft.rows.slice(page*50,page*50+50).map((r,n)=>{const i=page*50+n;return `<tr><td>${input(`rows.${i}.figure`,r.figure)}</td><td>${input(`rows.${i}.protein`,r.protein)}</td><td>${source(`rows.${i}.target`,r.target)}</td><td>${input(`rows.${i}.confirmed`,r.confirmed,'checkbox')}</td><td><button class="text-button" data-remove-ocr="${i}">移除</button></td></tr>`;}).join('')}</tbody></table></div>${pagination(draft.rows.length)}<div class="advanced-actions">${button('add_ocr','添加标签行')}</div><details class="quality-details"><summary>识别原文</summary><div class="advanced-token-list">${(data.ocr.recognition?.tokens||[]).map(t=>`<span>${esc(t.text)}</span>`).join('')}</div></details><div class="advanced-actions">${button('tables_refresh','刷新关联结果')}${button('ocr_export','导出关联表')}</div>${resultTable(data.tables.ocr_cells||[],false)}`:'<div class="advanced-empty">选择当前成图，或导入一张拼图开始。</div>'}`;}
-  function normalization(){
-    const d=draft,plan=d.plans.find(p=>p.target.row_id===d.active),index=d.plans.indexOf(plan),p='plans.'+index+'.';
-    const create=`<details class="quality-details" ${!d.plans.length?'open':''}><summary>建立目标与参照关系</summary><div class="advanced-form"><label class="advanced-field"><span>目标行</span>${source('target',d.target)}</label><label class="advanced-field"><span>参照行</span>${source('reference',d.reference)}</label><label class="advanced-field"><span>参照类型</span>${select('kind',d.kind,[['','请选择'],['housekeeping','目标蛋白 / 内参'],['phospho_total','磷酸化 / 总蛋白']])}</label></div><div class="advanced-actions">${button('normalization_create','建立关系',true)}</div></details>`;
-    return `${create}${plan?`<section class="advanced-section"><label class="advanced-field"><span>当前关系</span>${select('active',d.active,d.plans.map(p=>[p.target.row_id,(data.rows.find(r=>r.id===p.target.row_id)?.protein||p.target.row_id)+' / '+(data.rows.find(r=>r.id===p.reference.row_id)?.protein||p.reference.row_id)]))}</label><div class="advanced-form"><label class="advanced-field"><span>参照类型</span>${select(p+'kind',plan.kind,[['housekeeping','目标蛋白 / 内参'],['phospho_total','磷酸化 / 总蛋白']])}</label><label class="advanced-field"><span>计算方式</span>${select(p+'control_mode',plan.control_mode,[['ratio_only','仅比值'],['single_control','相对单个对照'],['control_mean','相对所选对照均值']])}</label>${field('实验对应说明',p+'notes',plan.notes)}</div><div class="advanced-table-scroll"><table class="advanced-table"><thead><tr><th>目标泳道</th><th>样本 / 重复编号</th><th>参照泳道</th><th>包含</th><th>对照</th></tr></thead><tbody>${plan.pairs.map((r,i)=>`<tr><th>${r.target_lane}</th><td>${input(p+`pairs.${i}.sample`,r.sample)}</td><td>${input(p+`pairs.${i}.reference_lane`,r.reference_lane,'number',`min="1" max="${plan.reference.lane_count}" placeholder="未对应"`)}</td><td>${input(p+`pairs.${i}.included`,r.included,'checkbox')}</td><td>${input(p+`pairs.${i}.control`,r.control,'checkbox')}</td></tr>`).join('')}</tbody></table></div><label class="advanced-check">${input(p+'confirmed',plan.confirmed,'checkbox')}我已核对样本对应与参照</label><div class="advanced-actions">${button('normalization_remove','移除此关系')}</div></section>`:''}<section class="advanced-section"><h3>归一化结果</h3><div class="advanced-actions">${button('tables_refresh','刷新结果')}<label class="advanced-check">${input('ocrLabels',d.ocrLabels,'checkbox')}使用已确认 OCR 标签</label>${button('normalization_export','导出结果')}</div>${resultTable(d.ocrLabels?data.tables.normalization?.ocr_cells||[]:data.tables.normalization?.cells||[],true)}</section>`;
-  }
-  function resultTable(rows,normal){return '<div data-derived-table>'+ (rows.length?`<div class="advanced-table-scroll"><table class="advanced-table"><thead><tr>${(normal?['样本','目标泳道','参照泳道','比值','相对值','状态']:['Fig','蛋白','泳道','有效信号','原始积分','状态']).map(x=>'<th>'+x+'</th>').join('')}</tr></thead><tbody>${rows.slice(page*50,page*50+50).map(r=>`<tr>${(normal?[r.sample,r.target_lane,r.reference_lane,number(r.ratio),number(r.relative),r.ratio_reason||r.relative_reason||r.ratio_status]:[r.figure,r.protein,r.lane_index,number(r.value),number(r.raw_integral),r.reason||r.status]).map(x=>'<td>'+esc(x??'—')+'</td>').join('')}</tr>`).join('')}</tbody></table></div>${pagination(rows.length)}`:'<p class="advanced-empty">尚无可显示结果。缺失或无效数据保持为空。</p>')+'</div>';}
-  function pagination(count,size=50){return count>size?`<div class="advanced-pagination"><button class="text-button" data-adv-page="${page-1}" ${page===0?'disabled':''}>上一页</button><span>${page+1} / ${Math.ceil(count/size)}</span><button class="text-button" data-adv-page="${page+1}" ${(page+1)*size>=count?'disabled':''}>下一页</button></div>`:'';}
-  function change(event){
-    const path=event.target.dataset.advPath;if(!path||!draft)return;
-    if(section==='normalization'&&path==='active'&&dirty){event.target.value=draft.active;status('请先保存或撤销当前关系的编辑。',true);return;}
-    const value=event.target.type==='checkbox'?event.target.checked:event.target.type==='number'?(event.target.value===''?null:Number(event.target.value)):event.target.value;
-    if(path.startsWith('row:')||path.startsWith('field:')){const key=path.startsWith('row:')?'rows':'fields',id=path.slice(path.indexOf(':')+1);draft[key]=value?[...new Set([...draft[key],id])]:draft[key].filter(x=>x!==id);}
-    else{const parts=path.split('.');let obj=draft;for(const key of parts.slice(0,-1))obj=obj[key];obj[parts.at(-1)]=['sheet','keyColumn'].includes(path)||path.startsWith('columns.')?Number(value):value;}
-    if(section==='ocr'&&path.startsWith('rows.')&&!path.endsWith('.confirmed')){draft.rows[Number(path.split('.')[1])].confirmed=false;const b=document.querySelector(`[data-adv-path="rows.${path.split('.')[1]}.confirmed"]`);if(b)b.checked=false;}
-    if(section==='normalization'&&path.startsWith('plans.')&&!path.endsWith('.confirmed')){draft.plans[Number(path.split('.')[1])].confirmed=false;const b=document.querySelector(`[data-adv-path="plans.${path.split('.')[1]}.confirmed"]`);if(b)b.checked=false;}
-    if(section==='normalization'?path.startsWith('plans.'):!['active','ocrLabels','mode','sheet','header','keyColumn','keyKind'].includes(path))dirty=true;
-    if(section==='metadata'&&data.metadataPreview&&!path.startsWith('entries.')&&!path.startsWith('field:')){data.metadataPreview=null;draft.entries={};}
-    remember();status(dirty?'尚未保存':'');
-    if(event.type==='change'&&section==='metadata'&&['sheet','header'].includes(path)){if(path==='sheet')draft.header=1;draft.columns={};command('metadata_headers',{sheet:draft.sheet,header:draft.header-1});}
-    if(event.type==='change'&&['mode','sheet','header','active','ocrLabels'].includes(path)){page=0;render();}
-  }
-  document.addEventListener('input',change);document.addEventListener('change',event=>{if(event.target.tagName==='SELECT'||['checkbox','number'].includes(event.target.type))change(event);});
-  document.addEventListener('click',event=>{
-    const conflict=event.target.closest('[data-conflict]');if(conflict){conflicts[Number(conflict.dataset.conflict)].choice=conflict.dataset.choice;remember();render();return;}
-    const tab=event.target.closest('[data-advanced-section]');if(tab){open(tab.dataset.advancedSection);return;}
-    const b=event.target.closest('[data-advanced]');if(b){const op=b.dataset.advanced;if(pending&&op!=='close')return;
-      if(op==='resolve'){if(conflicts.some(c=>!c.choice))return;for(const c of conflicts){let target=draft;for(const key of c.path.slice(0,-1))target=target[key];target[c.path.at(-1)]=copy(c[c.choice]);}conflicts=[];dirty=!equal(draft,base);remember();status('冲突已核对，请检查内容后保存。');render();return;}
-      if(op==='close'){closeDrawer();return;}
-      if(op==='compatibility'){if(dirty){status('请先保存或撤销当前编辑。',true);return;}send('advanced',{section});closeDrawer();return;}
-      if(op==='reload'){remember();command('open',{section});return;}
-      if(op==='discard'){drafts.delete(data.projectId+':'+section);dirty=false;conflicts=[];draft=seed();base=copy(draft);command('open',{section});return;}
-      if(op==='add_ocr'){draft.rows.push({row_id:'manual-'+crypto.randomUUID(),figure:'',protein:'',target:'',confirmed:false});dirty=true;remember();render();return;}
-      if(op==='add_slice'){draft.composition.slices.push({row_id:'',figure:'',line:1,position:1,first_lane:1,last_lane:1});dirty=true;remember();render();return;}
-      if(op==='template_apply'){command(op,draft);return;}
-      if(op==='metadata_preview'){const value={...draft,header:draft.header-1,fields:draft.pattern.split(',').map(x=>x.trim()==='-'?'':x.trim()),columns:Object.fromEntries(Object.entries(draft.columns).filter(([,v])=>v>=0))};command(op,value);return;}
-      if(op==='metadata_apply'){command(op,{previewId:data.metadataPreview.id,fields:draft.fields,entries:Object.values(draft.entries).filter(e=>e.selected)});return;}
-      if(op==='ocr_apply'){command(op,{rows:draft.rows.map(({row_id,figure,protein,target,confirmed})=>({row_id,figure,protein,target,confirmed}))});return;}
-      if(op==='normalization_create'){command(op,{target:draft.target,reference:draft.reference,kind:draft.kind});return;}
-      if(op==='normalization_apply'){const p=draft.plans.find(p=>p.target.row_id===draft.active);if(p)command(op,{target:draft.active,plan:{kind:p.kind,control_mode:p.control_mode,pairs:p.pairs,confirmed:p.confirmed,notes:p.notes}});return;}
-      if(op==='normalization_remove'){command(op,{target:draft.active});return;}
-      command(op,{ocrLabels:draft?.ocrLabels===true});return;
+window.advancedWorkspace = (() => {
+    const titles = {
+        template: '模板与分段',
+        metadata: '批量实验信息',
+        ocr: 'OCR 校正',
+        normalization: '样本对应与归一化',
+    };
+    const labels = {
+        project_name: '实验项目',
+        figure: 'Fig',
+        protein: '蛋白',
+        lane_count: 'N',
+        empty_lanes: '空泳道',
+        order: '顺序',
+        notes: '备注',
+    };
+    let channel = null,
+        section = '',
+        data = null,
+        draft = null,
+        pending = null,
+        message = '',
+        error = false,
+        receiptFailed = false,
+        dirty = false,
+        identity = '',
+        page = 0;
+    const drafts = new Map();
+    let base = null,
+        conflicts = [];
+    const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+    function reconcile(original, local, latest, path = []) {
+        if (equal(local, original)) return copy(latest);
+        if (equal(latest, original) || equal(local, latest)) return copy(local);
+        if (
+            original &&
+            local &&
+            latest &&
+            !Array.isArray(original) &&
+            typeof original === 'object' &&
+            typeof local === 'object' &&
+            typeof latest === 'object'
+        ) {
+            const result = {};
+            for (const key of new Set([
+                ...Object.keys(original),
+                ...Object.keys(local),
+                ...Object.keys(latest),
+            ]))
+                result[key] = reconcile(original[key], local[key], latest[key], [...path, key]);
+            return result;
+        }
+        conflicts.push({ path, local: copy(local), latest: copy(latest), choice: null });
+        return copy(local);
     }
-    const remove=event.target.closest('[data-remove-ocr],[data-remove-slice]');if(remove){if(remove.dataset.removeOcr!==undefined)draft.rows.splice(Number(remove.dataset.removeOcr),1);else draft.composition.slices.splice(Number(remove.dataset.removeSlice),1);dirty=true;remember();render();return;}
-    const move=event.target.closest('[data-order-up],[data-order-down]');if(move){const from=Number(move.dataset.orderUp??move.dataset.orderDown);reorder(from,from+(move.dataset.orderUp!==undefined?-1:1));return;}
-    const pager=event.target.closest('[data-adv-page]');if(pager&&!pager.disabled){const next=Number(pager.dataset.advPage);if(section==='metadata'&&data.metadataPreview){command('metadata_page',{page:next,previewId:data.metadataPreview.id});}else{page=next;render();}}
-  });
-  function reorder(from,to){if(from===to||to<0||to>=draft.figureOrder.length)return;const positions=[...document.querySelectorAll('[data-adv-order]')].map(el=>({name:el.querySelector('span').textContent,top:el.getBoundingClientRect().top}));draft.figureOrder.splice(to,0,draft.figureOrder.splice(from,1)[0]);dirty=true;remember();render();document.querySelectorAll('[data-adv-order]').forEach(el=>{const old=positions.find(p=>p.name===el.querySelector('span').textContent);const delta=old.top-el.getBoundingClientRect().top;if(delta&&uiMotion.preference()==='expressive')uiMotion.run(el,[{transform:`translateY(${delta}px)`},{transform:'none'}],220);});}
-  let dragging=null;document.addEventListener('dragstart',event=>{const item=event.target.closest('[data-adv-order]');if(!item)return;dragging=Number(item.dataset.advOrder);event.dataTransfer.effectAllowed='move';event.dataTransfer.setData('text/plain',String(dragging));item.classList.add('reordering');});
-  document.addEventListener('dragover',event=>{const item=event.target.closest('[data-adv-order]');if(item&&dragging!==null){event.preventDefault();document.querySelectorAll('.drop-target').forEach(el=>el.classList.remove('drop-target'));item.classList.add('drop-target');}});
-  document.addEventListener('drop',event=>{const item=event.target.closest('[data-adv-order]');if(item&&dragging!==null){event.preventDefault();reorder(dragging,Number(item.dataset.advOrder));}dragging=null;});document.addEventListener('dragend',()=>{dragging=null;document.querySelectorAll('.reordering,.drop-target').forEach(el=>el.classList.remove('reordering','drop-target'));});
-  function sync(){const key=state.sessionEpoch+':'+state.projectId;if(data&&data.revision!==state.revision&&Object.keys(data.tables||{}).length){data.tables={};document.querySelectorAll('[data-derived-table]').forEach(el=>el.innerHTML='<p class="advanced-empty">项目已更新，请刷新结果。</p>');}if(identity&&identity!==key){drafts.clear();draft=null;data=null;dirty=false;pending=null;identity=key;if(document.querySelector('#drawer').classList.contains('advanced-drawer'))closeDrawer();}}
-  function connect(object){if(channel===object)return;channel=object;channel.advancedStateChanged.connect(receive);}
-  return {open,connect,sync,receive,hasDraft:()=>dirty||[...drafts.values()].some(d=>d.dirty),reset:()=>{drafts.clear();dirty=false;pending=null;data=null;draft=null;base=null;conflicts=[];},isOpen:()=>!document.querySelector('#drawer').hidden&&document.querySelector('#drawer').classList.contains('advanced-drawer')};
+    function mergeCurrent(saved) {
+        conflicts = [];
+        const latest = seed();
+        draft = reconcile(saved.base || latest, saved.draft, latest);
+        base = latest;
+        dirty = !equal(draft, base);
+    }
+    function absorbPage() {
+        const p = data.metadataPreview;
+        if (!p) return;
+        for (const [n, e] of p.entries.entries()) {
+            const i = p.offset + n;
+            draft.entries[i] ??= { index: i, target: e.target_id, selected: false, values: {} };
+        }
+    }
+    const copy = (value) => structuredClone(value);
+    const esc = (value) => escapeText(value);
+    const button = (op, label, primary = false) =>
+        `<button class="button ${primary ? 'primary' : 'subtle'}" data-advanced="${op}" ${pending ? 'disabled' : ''}>${label}</button>`;
+    const input = (path, value, type = 'text', extra = '') =>
+        `<input data-adv-path="${path}" type="${type}" ${type === 'checkbox' ? (value ? 'checked' : '') : `value="${esc(value ?? '')}"`} ${extra}>`;
+    const field = (name, path, value, type = 'text', extra = '') =>
+        `<label class="advanced-field"><span>${name}</span>${input(path, value, type, extra)}</label>`;
+    const select = (path, value, options) =>
+        `<select data-adv-path="${path}">${options.map(([k, v]) => `<option value="${esc(k)}" ${String(k) === String(value) ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>`;
+    const source = (path, value) =>
+        select(path, value, [
+            ['', '选择来源'],
+            ...data.rows.map((r) => [r.id, r.figure + ' · ' + r.protein + ' · ' + r.filename]),
+        ]);
+    function seed() {
+        if (section === 'template')
+            return {
+                template: Object.fromEntries(
+                    Object.entries(data.template).filter(
+                        ([k]) => !['font', 'schema_version', 'display_mapping'].includes(k),
+                    ),
+                ),
+                figureOrder: [...data.figureOrder],
+                style: copy(data.style),
+                composition: copy(data.composition),
+            };
+        if (section === 'metadata')
+            return {
+                mode: 'common',
+                rows: [],
+                common: Object.fromEntries(Object.keys(labels).map((k) => [k, ''])),
+                separator: '_',
+                pattern: 'figure,protein,lane_count',
+                sheet: 0,
+                header: 1,
+                keyKind: 'filename',
+                keyColumn: 0,
+                columns: {},
+                fields: [],
+                entries: {},
+            };
+        if (section === 'ocr')
+            return {
+                rows: (data.ocr?.rows || []).map((r) => ({
+                    ...r,
+                    target: r.link?.target_row_id || '',
+                })),
+            };
+        return {
+            target: '',
+            reference: '',
+            kind: '',
+            active: data.normalizations[0]?.target.row_id || '',
+            plans: copy(data.normalizations),
+            ocrLabels: false,
+        };
+    }
+    function remember() {
+        if (data && draft)
+            drafts.set(data.projectId + ':' + section, {
+                draft: copy(draft),
+                base: copy(base),
+                conflicts: copy(conflicts),
+                dirty,
+                revision: data.revision,
+            });
+    }
+    function command(operation, value = {}) {
+        // A damaged receipt has an unknown outcome. Only a fresh read may retire
+        // its client-side pending token; never automatically repeat a write.
+        if (pending && receiptFailed && operation === 'open') pending = null;
+        if (pending) return;
+        if (conflicts.length && operation !== 'open') {
+            status('请先核对冲突字段，再继续操作。', true);
+            return;
+        }
+        if (!data && operation !== 'open') return;
+        if (
+            dirty &&
+            !operation.endsWith('_apply') &&
+            !['metadata_preview', 'metadata_headers', 'metadata_page', 'open'].includes(operation)
+        ) {
+            status('请先保存当前编辑，或撤销后继续。', true);
+            return;
+        }
+        const requestId = 'advanced-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+        const context =
+            operation === 'open'
+                ? {
+                      projectId: state.projectId,
+                      sessionEpoch: state.sessionEpoch,
+                      revision: state.revision,
+                  }
+                : data;
+        pending = { requestId, operation };
+        receiptFailed = false;
+        status(operation === 'open' ? '正在读取…' : '正在处理…');
+        const payload = makeAdvancedRequest(context, requestId, operation, value);
+        const encoded = JSON.stringify(payload);
+        if (encoded.length > 262144) {
+            pending = null;
+            status('本次编辑超过提交容量，请分批保存。', true);
+            syncBusy();
+            return;
+        }
+        if (channel) channel.request('advanced_ui', encoded);
+        else if (window.previewAdapter) window.previewAdapter.advanced(payload, receive);
+        else {
+            pending = null;
+            status('此操作需要桌面项目。', true);
+        }
+        syncBusy();
+    }
+    function receive(raw) {
+        let phase = 'parse';
+        const context = { ...state, requestId: pending?.requestId, operation: pending?.operation };
+        let restore;
+        try {
+            const response = channelObject(raw);
+            phase = 'validate';
+            if (
+                typeof response.requestId !== 'string' ||
+                !['pending', 'done', 'failed', 'cancelled'].includes(response.status)
+            )
+                throw new TypeError('Invalid advanced receipt');
+            if (!pending || response.requestId !== pending.requestId) return;
+            const next = channelObject(response.data);
+            requireStateIdentity(next);
+            if (next.sessionEpoch !== state.sessionEpoch) return;
+            if (next.projectId !== state.projectId && pending.operation !== 'template_import')
+                throw new TypeError('Invalid receipt project');
+            // Preserve all local edit state until rendering the receipt succeeds.
+            const previous = {
+                data,
+                draft: copy(draft),
+                base: copy(base),
+                conflicts: copy(conflicts),
+                pending,
+                dirty,
+                message,
+                error,
+                page,
+                drafts: copy(drafts),
+            };
+            restore = () => {
+                ({ data, draft, base, conflicts, pending, dirty, message, error, page } = previous);
+                drafts.clear();
+                previous.drafts.forEach((value, key) => drafts.set(key, value));
+            };
+            phase = 'render';
+            applyResponse(response);
+            receiptFailed = false;
+            boundaryDiagnostics.recovered('advanced');
+        } catch (failure) {
+            restore?.();
+            receiptFailed = true;
+            boundaryDiagnostics.report('advanced', failure, { ...context, phase });
+            status('回复无法显示，编辑已保留。请重新读取并核对结果后再保存。', true);
+            syncBusy();
+        }
+    }
+    function applyResponse(response) {
+        if (!pending || response.requestId !== pending.requestId) return;
+        const next = response.data;
+        if (!next || next.sessionEpoch !== state.sessionEpoch) return;
+        if (response.status === 'pending') {
+            status('正在处理…');
+            return;
+        }
+        const operation = pending.operation;
+        pending = null;
+        if (response.status === 'failed') {
+            status(response.error || '操作失败，编辑已保留。', true);
+            syncBusy();
+            return;
+        }
+        if (response.status === 'cancelled') {
+            status('已取消选择。');
+            syncBusy();
+            return;
+        }
+        const previousProject = data?.projectId;
+        data = next;
+        if (operation === 'open') {
+            const saved = drafts.get(data.projectId + ':' + section);
+            base = seed();
+            conflicts = [];
+            draft = copy(base);
+            dirty = false;
+            if (saved?.dirty) {
+                if (saved.revision !== data.revision) {
+                    mergeCurrent(saved);
+                    message = conflicts.length
+                        ? '项目已有新修订，请逐项核对冲突。'
+                        : '已更新背景信息，你的编辑保留；核对后保存。';
+                } else {
+                    draft = saved.draft;
+                    base = saved.base || base;
+                    conflicts = saved.conflicts || [];
+                    dirty = true;
+                    message = conflicts.length ? '请核对冲突字段。' : '编辑已恢复。';
+                }
+            } else message = '';
+            error = conflicts.length > 0;
+        } else if (operation === 'metadata_preview') {
+            draft.entries = {};
+            page = 0;
+            absorbPage();
+            base = copy(draft);
+            dirty = false;
+            message = '逐条核对来源，再选择行和字段应用。';
+        } else if (operation === 'metadata_page') {
+            absorbPage();
+            page = Math.floor(data.metadataPreview.offset / data.metadataPreview.pageSize);
+            message = '';
+        } else if (operation === 'metadata_import') {
+            draft.mode = 'table';
+            draft.sheet = 0;
+            draft.header = 1;
+            draft.columns = {};
+            message = '选择匹配列与字段，然后生成预览。';
+        } else if (
+            operation.endsWith('_apply') ||
+            (operation.startsWith('normalization_') && operation !== 'normalization_export') ||
+            (operation.startsWith('ocr_') && operation !== 'ocr_export') ||
+            operation === 'template_import' ||
+            operation === 'font_import'
+        ) {
+            const active = draft?.active;
+            draft = seed();
+            if (
+                section === 'normalization' &&
+                data.normalizations.some((p) => p.target.row_id === active)
+            )
+                draft.active = active;
+            dirty = false;
+            base = copy(draft);
+            conflicts = [];
+            error = false;
+            message = data.persisted ? '已保存。' : '已更新草稿，请保存项目。';
+        } else if (operation === 'metadata_headers') {
+            message = '表头已更新，请核对列映射。';
+            error = false;
+        } else {
+            message = '已完成。';
+            error = false;
+        }
+        if (previousProject && previousProject !== data.projectId) {
+            drafts.delete(previousProject + ':' + section);
+            draft = seed();
+            dirty = false;
+        }
+        if (section === 'metadata') absorbPage();
+        remember();
+        render();
+    }
+    function status(text, failed = false) {
+        message = text;
+        error = failed;
+        const loading = document.querySelector('.advanced-drawer .advanced-loading');
+        if (loading)
+            loading.innerHTML = failed
+                ? `<p class="advanced-error" role="alert">${esc(text)}</p><button class="button subtle" data-advanced="reload">重试</button>`
+                : esc(text);
+        const node = document.getElementById('advanced-status');
+        if (node) {
+            node.textContent = text;
+            node.dataset.error = String(failed);
+        }
+        const note = document.getElementById('advanced-unsaved');
+        if (note) note.textContent = dirty ? '未保存编辑' : '';
+    }
+    function syncBusy() {
+        document
+            .querySelectorAll(
+                '#advanced-editor input,#advanced-editor select,#advanced-editor textarea,#advanced-editor button,#advanced-footer [data-advanced]:not([data-advanced=close])',
+            )
+            .forEach((el) => {
+                if (pending) {
+                    if (el.dataset.busyDisabled === undefined)
+                        el.dataset.busyDisabled = String(el.disabled);
+                    el.disabled = true;
+                } else if (el.dataset.busyDisabled !== undefined) {
+                    el.disabled = el.dataset.busyDisabled === 'true';
+                    delete el.dataset.busyDisabled;
+                }
+            });
+    }
+    function open(next) {
+        if (pending && !(receiptFailed && next === section)) {
+            status('当前操作完成后可切换工具。');
+            return;
+        }
+        remember();
+        section = next;
+        page = 0;
+        identity = state.sessionEpoch + ':' + state.projectId;
+        data = null;
+        draft = null;
+        pending = null;
+        openDrawer(
+            titles[section],
+            '<div class="advanced-loading" role="status">正在读取项目…</div>',
+        );
+        document.getElementById('drawer').classList.add('advanced-drawer');
+        command('open', { section });
+    }
+    function render() {
+        const panel = document.getElementById('drawer');
+        // A receipt updates the saved draft even after leaving, but never takes over another panel.
+        if (
+            !data ||
+            !draft ||
+            panel.hidden ||
+            panel.dataset.closing === 'true' ||
+            !panel.classList.contains('advanced-drawer')
+        )
+            return;
+        const active = document.activeElement,
+            focus = active?.dataset.advPath,
+            selection =
+                active?.tagName === 'INPUT' && ['text', 'search'].includes(active.type)
+                    ? [active.selectionStart, active.selectionEnd]
+                    : null,
+            scroll = document.querySelector('#drawer-content').scrollTop;
+        const content =
+            section === 'template'
+                ? template()
+                : section === 'metadata'
+                  ? metadata()
+                  : section === 'ocr'
+                    ? ocr()
+                    : normalization();
+        document.querySelector('#drawer-content').innerHTML =
+            `<div class="advanced-context"><span>${esc(data.name)}</span><span id="advanced-unsaved">${dirty ? '未保存编辑' : ''}</span><button class="text-button" data-advanced="reload">重新读取</button><button class="text-button" data-advanced="discard">撤销当前编辑</button></div><nav class="advanced-tabs">${Object.entries(
+                titles,
+            )
+                .map(
+                    ([key, title]) =>
+                        `<button data-advanced-section="${key}" aria-current="${section === key ? 'page' : 'false'}">${title}</button>`,
+                )
+                .join(
+                    '',
+                )}</nav><datalist id="advanced-sources">${data.rows.map((r) => `<option value="${esc(r.id)}">${esc(r.figure + ' · ' + r.protein + ' · ' + r.filename)}</option>`).join('')}</datalist>${conflictPanel()}<div id="advanced-editor">${content}</div>`;
+        let footer = document.getElementById('advanced-footer');
+        if (!footer) {
+            footer = document.createElement('div');
+            footer.id = 'advanced-footer';
+            footer.className = 'advanced-feedback';
+            document.getElementById('drawer').append(footer);
+        }
+        const save =
+            section === 'template'
+                ? ['template_apply', '保存版式']
+                : section === 'metadata' && data.metadataPreview
+                  ? ['metadata_apply', '应用并保存']
+                  : section === 'ocr' && data.ocr
+                    ? ['ocr_apply', '保存校正']
+                    : section === 'normalization' && draft.plans.length
+                      ? ['normalization_apply', '保存对应']
+                      : null;
+        footer.innerHTML = `<p id="advanced-status" role="status" data-error="${error}">${esc(message)}</p>${save ? button(...save, true) : ''}${button('close', '返回工作区')}<details><summary>兼容工具</summary>${button('compatibility', '打开原桌面编辑器')}</details>`;
+        if (focus) {
+            const target = document.querySelector(`[data-adv-path="${CSS.escape(focus)}"]`);
+            target?.focus({ preventScroll: true });
+            if (target && selection) target.setSelectionRange(...selection);
+        }
+        document.querySelector('#drawer-content').scrollTop = scroll;
+        syncBusy();
+    }
+    function conflictPanel() {
+        return conflicts.length
+            ? `<section class="advanced-conflicts" aria-label="编辑冲突"><h3>核对发生变化的内容</h3>${conflicts.map((c, i) => `<div><strong>${esc(c.path.join(' / '))}</strong><div class="advanced-conflict-values"><button data-conflict="${i}" data-choice="local" aria-pressed="${c.choice === 'local'}"><span>保留我的编辑</span><pre>${esc(JSON.stringify(c.local, null, 2) ?? '空')}</pre></button><button data-conflict="${i}" data-choice="latest" aria-pressed="${c.choice === 'latest'}"><span>使用项目当前值</span><pre>${esc(JSON.stringify(c.latest, null, 2) ?? '空')}</pre></button></div></div>`).join('')}<button class="button primary" data-advanced="resolve" ${conflicts.some((c) => !c.choice) ? 'disabled' : ''}>确认核对并继续编辑</button></section>`
+            : '';
+    }
+    function template() {
+        const t = draft.template,
+            s = draft.style;
+        return `<div class="advanced-split"><section><h3>版式</h3><div class="advanced-form">${field('模板名称', 'template.name', t.name)}${field('文字字号（输出像素）', 'template.font_size', t.font_size, 'number', 'min="8" max="96"')}${field('标签宽度（输出像素）', 'template.label_width', t.label_width, 'number', 'min="30" max="1000"')}<label class="advanced-field"><span>标签位置</span>${select(
+            'template.label_side',
+            t.label_side,
+            [
+                ['left', '左侧'],
+                ['right', '右侧'],
+            ],
+        )}</label>${field('行间距（输出像素）', 'template.row_gap', t.row_gap, 'number')}${field('Fig 间距（输出像素）', 'template.figure_gap', t.figure_gap, 'number')}${field('外边距（输出像素）', 'template.margin', t.margin, 'number')}${field('每行 Fig 数', 'template.columns', t.columns, 'number', 'min="1" max="12"')}${field('导出 DPI', 'template.dpi', t.dpi, 'number', 'min="72" max="1200"')}${field('标题字号', 'style.heading_size', s.heading_size, 'number')}${field('分段间距', 'style.segment_gap', s.segment_gap, 'number')}<label class="advanced-field"><span>布局方向</span>${select(
+            'style.flow',
+            s.flow,
+            [
+                ['columns', '按列'],
+                ['rows', '按行'],
+            ],
+        )}</label></div><details class="quality-details"><summary>精确参数与显示规则</summary><div class="advanced-form">${field('默认裁剪高度（原图像素）', 'template.crop_height', t.crop_height, 'number', 'min="2" max="4096"')}${field('边框（输出像素）', 'template.border', t.border, 'number', 'min="1" max="10"')}${field('泳道显示宽度', 'style.lane_unit', s.lane_unit, 'number', 'min="5" max="1200" step="5"')}<label class="advanced-field"><span>显示方式</span>${select(
+            'style.display_policy',
+            s.display_policy,
+            [
+                ['native_samples@1', '原始尺寸'],
+                ['standard_lane_ratio@1', '标准泳道比例'],
+            ],
+        )}</label><label class="advanced-field"><span>标签对齐</span>${select(
+            'style.label_alignment',
+            s.label_alignment,
+            [
+                ['left', '左对齐'],
+                ['right', '右对齐'],
+            ],
+        )}</label></div><p>显示比例不进入定量。裁剪高度是原图参数；已有分段保留各行实际 ROI。</p></details><div class="advanced-actions">${button('font_import', '导入成图字体')}${button('template_import', '导入模板并新建')}${button('template_export', '导出模板')}</div></section><section class="advanced-preview"><h3>当前已保存成图</h3>${state.montage ? `<img src="${esc(state.montage)}" alt="当前项目已生成成图">` : '<div class="advanced-empty">保存版式后生成预览</div>'}<p>输出字体：${data.template.font ? '已导入项目字体' : '内置拉丁字体，中文标签需导入字体'}</p><div class="advanced-actions">${button('template_preview', '生成预览')}${button('figure_export', '导出成图')}</div></section></div><section class="advanced-section"><h3>Fig 顺序</h3><ol class="advanced-order">${draft.figureOrder.map((name, i) => `<li draggable="true" data-adv-order="${i}"><span>${esc(name)}</span><button class="icon-button" data-order-up="${i}" aria-label="上移 ${esc(name)}" ${i === 0 ? 'disabled' : ''}>${icon('chevron-up')}</button><button class="icon-button" data-order-down="${i}" aria-label="下移 ${esc(name)}" ${i === draft.figureOrder.length - 1 ? 'disabled' : ''}>${icon('chevron-down')}</button></li>`).join('')}</ol></section><details class="advanced-section quality-details"><summary>横向分段与 Fig 列配置</summary><div class="advanced-table-scroll"><table class="advanced-table"><thead><tr><th>来源行 ID</th><th>Fig</th><th>显示行</th><th>段序</th><th>起始泳道</th><th>结束泳道</th><th></th></tr></thead><tbody>${draft.composition.slices.map((r, i) => `<tr><td>${source(`composition.slices.${i}.row_id`, r.row_id)}</td>${['figure', 'line', 'position', 'first_lane', 'last_lane'].map((k) => `<td>${input(`composition.slices.${i}.${k}`, r[k], k === 'figure' ? 'text' : 'number')}</td>`).join('')}<td><button class="text-button" data-remove-slice="${i}">移除</button></td></tr>`).join('')}</tbody></table></div>${button('add_slice', '添加分段')}<div class="advanced-form">${draft.composition.columns.map((c, i) => field(c.figure + ' 所在列', `composition.columns.${i}.column`, c.column, 'number', 'min="1" max="12"')).join('')}</div></details>`;
+    }
+    function metadata() {
+        const d = draft,
+            preview = data.metadataPreview,
+            book = data.book;
+        const rowChecks = data.rows
+            .map(
+                (r) =>
+                    `<label class="advanced-check">${input('row:' + r.id, d.rows.includes(r.id), 'checkbox')}<span>${esc(r.figure + ' · ' + r.protein)}<small>${esc(r.filename)} · N=${r.lanes}</small></span></label>`,
+            )
+            .join('');
+        const common = Object.entries(labels)
+            .map(([k, v]) => field(v, 'common.' + k, d.common[k]))
+            .join('');
+        const headers =
+            book?.header?.sheet === d.sheet && book?.header?.row === d.header - 1
+                ? book.header.cells
+                : [];
+        const columns = [
+            [-1, '不导入'],
+            ...headers.map((h, i) => [i, i + 1 + ': ' + (h.text || h.error || '空白')]),
+        ];
+        const mapping = book
+            ? `<div class="advanced-form"><label class="advanced-field"><span>工作表</span>${select(
+                  'sheet',
+                  d.sheet,
+                  book.sheets.map((s, i) => [i, s.name]),
+              )}</label>${field('表头行', 'header', d.header, 'number', 'min="1"')}<label class="advanced-field"><span>匹配方式</span>${select(
+                  'keyKind',
+                  d.keyKind,
+                  [
+                      ['filename', '完整文件名'],
+                      ['row_id', '行 ID'],
+                      ['sha256', '完整 SHA256'],
+                  ],
+              )}</label><label class="advanced-field"><span>匹配列</span>${select('keyColumn', d.keyColumn, columns.slice(1))}</label>${Object.entries(
+                  labels,
+              )
+                  .map(
+                      ([k, v]) =>
+                          `<label class="advanced-field"><span>${v}</span>${select('columns.' + k, d.columns[k] ?? -1, columns)}</label>`,
+                  )
+                  .join('')}</div>`
+            : '<p class="advanced-empty">读取 Excel / CSV 后选择工作表和匹配列。</p>';
+        return `<div class="advanced-split"><section><h3>选择原图行</h3><div class="advanced-row-choices">${rowChecks || '当前项目尚无原图行'}</div></section><section><h3>信息来源</h3>${select(
+            'mode',
+            d.mode,
+            [
+                ['common', '共同填写'],
+                ['filename', '从文件名提取'],
+                ['table', 'Excel / CSV'],
+            ],
+        )}${d.mode === 'common' ? `<div class="advanced-form">${common}</div>` : d.mode === 'filename' ? `<div class="advanced-form">${field('分隔符', 'separator', d.separator)}${field('字段顺序', 'pattern', d.pattern)}</div><p>字段：figure, protein, lane_count；用 - 忽略一段。</p>` : `<div class="advanced-actions">${button('metadata_import', '读取表格')}</div>${mapping}`}<div class="advanced-actions">${button('metadata_preview', '生成预览', true)}</div></section></div>${
+            preview
+                ? `<section class="advanced-section"><h3>核对后应用</h3><div class="advanced-field-checks">${Object.entries(
+                      labels,
+                  )
+                      .map(
+                          ([k, v]) =>
+                              `<label>${input('field:' + k, d.fields.includes(k), 'checkbox')}${v}</label>`,
+                      )
+                      .join(
+                          '',
+                      )}</div><div class="advanced-table-scroll"><table class="advanced-table"><thead><tr><th>应用</th><th>目标行 ID</th>${Object.values(
+                      labels,
+                  )
+                      .map((v) => `<th>${v}</th>`)
+                      .join('')}<th>状态</th></tr></thead><tbody>${preview.entries
+                      .map((e, n) => {
+                          const i = preview.offset + n,
+                              r = d.entries[i],
+                              values = Object.fromEntries(e.values);
+                          return `<tr><td>${input(`entries.${i}.selected`, r.selected, 'checkbox')}</td><td>${source(`entries.${i}.target`, r.target)}</td>${Object.keys(
+                              labels,
+                          )
+                              .map(
+                                  (k) =>
+                                      `<td>${values[k] ? input(`entries.${i}.values.${k}`, r.values[k] ?? values[k].text, 'text', `aria-label="${labels[k]}，预览 ${i + 1}"`) : '—'}${values[k]?.error && !Object.hasOwn(r.values, k) ? `<small class="advanced-error">${esc(values[k].error)}</small>` : ''}</td>`,
+                              )
+                              .join('')}<td>${esc(e.issue || '请核对来源')}</td></tr>`;
+                      })
+                      .join(
+                          '',
+                      )}</tbody></table></div>${pagination(preview.total, preview.pageSize)}<p>空白保持原值。N 与空泳道改变后需要重新审核与定量。</p></section>`
+                : ''
+        }`;
+    }
+    function ocr() {
+        return `<div class="advanced-actions">${button('ocr_composed', '识别当前成图', true)}${button('ocr_import', '导入拼图')}${button('ocr_recognize', '重新识别')}</div><p class="advanced-source">${data.ocr ? esc(data.ocr.filename) + ' · ' + data.ocr.width + ' × ' + data.ocr.height + ' px' : '识别产生建议；人工校正与明确关联后才能写表。'}</p>${
+            data.ocr
+                ? `<div class="advanced-table-scroll"><table class="advanced-table"><thead><tr><th>Fig</th><th>蛋白</th><th>关联原图行 ID</th><th>人工确认</th><th></th></tr></thead><tbody>${draft.rows
+                      .slice(page * 50, page * 50 + 50)
+                      .map((r, n) => {
+                          const i = page * 50 + n;
+                          return `<tr><td>${input(`rows.${i}.figure`, r.figure)}</td><td>${input(`rows.${i}.protein`, r.protein)}</td><td>${source(`rows.${i}.target`, r.target)}</td><td>${input(`rows.${i}.confirmed`, r.confirmed, 'checkbox')}</td><td><button class="text-button" data-remove-ocr="${i}">移除</button></td></tr>`;
+                      })
+                      .join(
+                          '',
+                      )}</tbody></table></div>${pagination(draft.rows.length)}<div class="advanced-actions">${button('add_ocr', '添加标签行')}</div><details class="quality-details"><summary>识别原文</summary><div class="advanced-token-list">${(data.ocr.recognition?.tokens || []).map((t) => `<span>${esc(t.text)}</span>`).join('')}</div></details><div class="advanced-actions">${button('tables_refresh', '刷新关联结果')}${button('ocr_export', '导出关联表')}</div>${resultTable(data.tables.ocr_cells || [], false)}`
+                : '<div class="advanced-empty">选择当前成图，或导入一张拼图开始。</div>'
+        }`;
+    }
+    function normalization() {
+        const d = draft,
+            plan = d.plans.find((p) => p.target.row_id === d.active),
+            index = d.plans.indexOf(plan),
+            p = 'plans.' + index + '.';
+        const create = `<details class="quality-details" ${!d.plans.length ? 'open' : ''}><summary>建立目标与参照关系</summary><div class="advanced-form"><label class="advanced-field"><span>目标行</span>${source('target', d.target)}</label><label class="advanced-field"><span>参照行</span>${source('reference', d.reference)}</label><label class="advanced-field"><span>参照类型</span>${select(
+            'kind',
+            d.kind,
+            [
+                ['', '请选择'],
+                ['housekeeping', '目标蛋白 / 内参'],
+                ['phospho_total', '磷酸化 / 总蛋白'],
+            ],
+        )}</label></div><div class="advanced-actions">${button('normalization_create', '建立关系', true)}</div></details>`;
+        return `${create}${
+            plan
+                ? `<section class="advanced-section"><label class="advanced-field"><span>当前关系</span>${select(
+                      'active',
+                      d.active,
+                      d.plans.map((p) => [
+                          p.target.row_id,
+                          (data.rows.find((r) => r.id === p.target.row_id)?.protein ||
+                              p.target.row_id) +
+                              ' / ' +
+                              (data.rows.find((r) => r.id === p.reference.row_id)?.protein ||
+                                  p.reference.row_id),
+                      ]),
+                  )}</label><div class="advanced-form"><label class="advanced-field"><span>参照类型</span>${select(
+                      p + 'kind',
+                      plan.kind,
+                      [
+                          ['housekeeping', '目标蛋白 / 内参'],
+                          ['phospho_total', '磷酸化 / 总蛋白'],
+                      ],
+                  )}</label><label class="advanced-field"><span>计算方式</span>${select(
+                      p + 'control_mode',
+                      plan.control_mode,
+                      [
+                          ['ratio_only', '仅比值'],
+                          ['single_control', '相对单个对照'],
+                          ['control_mean', '相对所选对照均值'],
+                      ],
+                  )}</label>${field('实验对应说明', p + 'notes', plan.notes)}</div><div class="advanced-table-scroll"><table class="advanced-table"><thead><tr><th>目标泳道</th><th>样本 / 重复编号</th><th>参照泳道</th><th>包含</th><th>对照</th></tr></thead><tbody>${plan.pairs.map((r, i) => `<tr><th>${r.target_lane}</th><td>${input(p + `pairs.${i}.sample`, r.sample)}</td><td>${input(p + `pairs.${i}.reference_lane`, r.reference_lane, 'number', `min="1" max="${plan.reference.lane_count}" placeholder="未对应"`)}</td><td>${input(p + `pairs.${i}.included`, r.included, 'checkbox')}</td><td>${input(p + `pairs.${i}.control`, r.control, 'checkbox')}</td></tr>`).join('')}</tbody></table></div><label class="advanced-check">${input(p + 'confirmed', plan.confirmed, 'checkbox')}我已核对样本对应与参照</label><div class="advanced-actions">${button('normalization_remove', '移除此关系')}</div></section>`
+                : ''
+        }<section class="advanced-section"><h3>归一化结果</h3><div class="advanced-actions">${button('tables_refresh', '刷新结果')}<label class="advanced-check">${input('ocrLabels', d.ocrLabels, 'checkbox')}使用已确认 OCR 标签</label>${button('normalization_export', '导出结果')}</div>${resultTable(d.ocrLabels ? data.tables.normalization?.ocr_cells || [] : data.tables.normalization?.cells || [], true)}</section>`;
+    }
+    function resultTable(rows, normal) {
+        return (
+            '<div data-derived-table>' +
+            (rows.length
+                ? `<div class="advanced-table-scroll"><table class="advanced-table"><thead><tr>${(normal ? ['样本', '目标泳道', '参照泳道', '比值', '相对值', '状态'] : ['Fig', '蛋白', '泳道', '有效信号', '原始积分', '状态']).map((x) => '<th>' + x + '</th>').join('')}</tr></thead><tbody>${rows
+                      .slice(page * 50, page * 50 + 50)
+                      .map(
+                          (r) =>
+                              `<tr>${(normal ? [r.sample, r.target_lane, r.reference_lane, number(r.ratio), number(r.relative), r.ratio_reason || r.relative_reason || r.ratio_status] : [r.figure, r.protein, r.lane_index, number(r.value), number(r.raw_integral), r.reason || r.status]).map((x) => '<td>' + esc(x ?? '—') + '</td>').join('')}</tr>`,
+                      )
+                      .join('')}</tbody></table></div>${pagination(rows.length)}`
+                : '<p class="advanced-empty">尚无可显示结果。缺失或无效数据保持为空。</p>') +
+            '</div>'
+        );
+    }
+    function pagination(count, size = 50) {
+        return count > size
+            ? `<div class="advanced-pagination"><button class="text-button" data-adv-page="${page - 1}" ${page === 0 ? 'disabled' : ''}>上一页</button><span>${page + 1} / ${Math.ceil(count / size)}</span><button class="text-button" data-adv-page="${page + 1}" ${(page + 1) * size >= count ? 'disabled' : ''}>下一页</button></div>`
+            : '';
+    }
+    function change(event) {
+        const path = event.target.dataset.advPath;
+        if (!path || !draft) return;
+        if (section === 'normalization' && path === 'active' && dirty) {
+            event.target.value = draft.active;
+            status('请先保存或撤销当前关系的编辑。', true);
+            return;
+        }
+        const value =
+            event.target.type === 'checkbox'
+                ? event.target.checked
+                : event.target.type === 'number'
+                  ? event.target.value === ''
+                      ? null
+                      : Number(event.target.value)
+                  : event.target.value;
+        if (path.startsWith('row:') || path.startsWith('field:')) {
+            const key = path.startsWith('row:') ? 'rows' : 'fields',
+                id = path.slice(path.indexOf(':') + 1);
+            draft[key] = value
+                ? [...new Set([...draft[key], id])]
+                : draft[key].filter((x) => x !== id);
+        } else {
+            const parts = path.split('.');
+            let obj = draft;
+            for (const key of parts.slice(0, -1)) obj = obj[key];
+            obj[parts.at(-1)] =
+                ['sheet', 'keyColumn'].includes(path) || path.startsWith('columns.')
+                    ? Number(value)
+                    : value;
+        }
+        if (section === 'ocr' && path.startsWith('rows.') && !path.endsWith('.confirmed')) {
+            draft.rows[Number(path.split('.')[1])].confirmed = false;
+            const b = document.querySelector(
+                `[data-adv-path="rows.${path.split('.')[1]}.confirmed"]`,
+            );
+            if (b) b.checked = false;
+        }
+        if (
+            section === 'normalization' &&
+            path.startsWith('plans.') &&
+            !path.endsWith('.confirmed')
+        ) {
+            draft.plans[Number(path.split('.')[1])].confirmed = false;
+            const b = document.querySelector(
+                `[data-adv-path="plans.${path.split('.')[1]}.confirmed"]`,
+            );
+            if (b) b.checked = false;
+        }
+        if (
+            section === 'normalization'
+                ? path.startsWith('plans.')
+                : ![
+                      'active',
+                      'ocrLabels',
+                      'mode',
+                      'sheet',
+                      'header',
+                      'keyColumn',
+                      'keyKind',
+                  ].includes(path)
+        )
+            dirty = true;
+        if (
+            section === 'metadata' &&
+            data.metadataPreview &&
+            !path.startsWith('entries.') &&
+            !path.startsWith('field:')
+        ) {
+            data.metadataPreview = null;
+            draft.entries = {};
+        }
+        remember();
+        status(dirty ? '尚未保存' : '');
+        if (
+            event.type === 'change' &&
+            section === 'metadata' &&
+            ['sheet', 'header'].includes(path)
+        ) {
+            if (path === 'sheet') draft.header = 1;
+            draft.columns = {};
+            command('metadata_headers', { sheet: draft.sheet, header: draft.header - 1 });
+        }
+        if (
+            event.type === 'change' &&
+            ['mode', 'sheet', 'header', 'active', 'ocrLabels'].includes(path)
+        ) {
+            page = 0;
+            render();
+        }
+    }
+    document.addEventListener('input', change);
+    document.addEventListener('change', (event) => {
+        if (event.target.tagName === 'SELECT' || ['checkbox', 'number'].includes(event.target.type))
+            change(event);
+    });
+    document.addEventListener('click', (event) => {
+        const conflict = event.target.closest('[data-conflict]');
+        if (conflict) {
+            conflicts[Number(conflict.dataset.conflict)].choice = conflict.dataset.choice;
+            remember();
+            render();
+            return;
+        }
+        const tab = event.target.closest('[data-advanced-section]');
+        if (tab) {
+            open(tab.dataset.advancedSection);
+            return;
+        }
+        const b = event.target.closest('[data-advanced]');
+        if (b) {
+            const op = b.dataset.advanced;
+            if (pending && op !== 'close' && !(receiptFailed && op === 'reload')) return;
+            if (op === 'resolve') {
+                if (conflicts.some((c) => !c.choice)) return;
+                for (const c of conflicts) {
+                    let target = draft;
+                    for (const key of c.path.slice(0, -1)) target = target[key];
+                    target[c.path.at(-1)] = copy(c[c.choice]);
+                }
+                conflicts = [];
+                dirty = !equal(draft, base);
+                remember();
+                status('冲突已核对，请检查内容后保存。');
+                render();
+                return;
+            }
+            if (op === 'close') {
+                closeDrawer();
+                return;
+            }
+            if (op === 'compatibility') {
+                if (dirty) {
+                    status('请先保存或撤销当前编辑。', true);
+                    return;
+                }
+                send('advanced', { section });
+                closeDrawer();
+                return;
+            }
+            if (op === 'reload') {
+                remember();
+                command('open', { section });
+                return;
+            }
+            if (op === 'discard') {
+                drafts.delete(data.projectId + ':' + section);
+                dirty = false;
+                conflicts = [];
+                draft = seed();
+                base = copy(draft);
+                command('open', { section });
+                return;
+            }
+            if (op === 'add_ocr') {
+                draft.rows.push({
+                    row_id: 'manual-' + crypto.randomUUID(),
+                    figure: '',
+                    protein: '',
+                    target: '',
+                    confirmed: false,
+                });
+                dirty = true;
+                remember();
+                render();
+                return;
+            }
+            if (op === 'add_slice') {
+                draft.composition.slices.push({
+                    row_id: '',
+                    figure: '',
+                    line: 1,
+                    position: 1,
+                    first_lane: 1,
+                    last_lane: 1,
+                });
+                dirty = true;
+                remember();
+                render();
+                return;
+            }
+            if (op === 'template_apply') {
+                command(op, draft);
+                return;
+            }
+            if (op === 'metadata_preview') {
+                const value = {
+                    ...draft,
+                    header: draft.header - 1,
+                    fields: draft.pattern.split(',').map((x) => (x.trim() === '-' ? '' : x.trim())),
+                    columns: Object.fromEntries(
+                        Object.entries(draft.columns).filter(([, v]) => v >= 0),
+                    ),
+                };
+                command(op, value);
+                return;
+            }
+            if (op === 'metadata_apply') {
+                command(op, {
+                    previewId: data.metadataPreview.id,
+                    fields: draft.fields,
+                    entries: Object.values(draft.entries).filter((e) => e.selected),
+                });
+                return;
+            }
+            if (op === 'ocr_apply') {
+                command(op, {
+                    rows: draft.rows.map(({ row_id, figure, protein, target, confirmed }) => ({
+                        row_id,
+                        figure,
+                        protein,
+                        target,
+                        confirmed,
+                    })),
+                });
+                return;
+            }
+            if (op === 'normalization_create') {
+                command(op, { target: draft.target, reference: draft.reference, kind: draft.kind });
+                return;
+            }
+            if (op === 'normalization_apply') {
+                const p = draft.plans.find((p) => p.target.row_id === draft.active);
+                if (p)
+                    command(op, {
+                        target: draft.active,
+                        plan: {
+                            kind: p.kind,
+                            control_mode: p.control_mode,
+                            pairs: p.pairs,
+                            confirmed: p.confirmed,
+                            notes: p.notes,
+                        },
+                    });
+                return;
+            }
+            if (op === 'normalization_remove') {
+                command(op, { target: draft.active });
+                return;
+            }
+            command(op, { ocrLabels: draft?.ocrLabels === true });
+            return;
+        }
+        const remove = event.target.closest('[data-remove-ocr],[data-remove-slice]');
+        if (remove) {
+            if (remove.dataset.removeOcr !== undefined)
+                draft.rows.splice(Number(remove.dataset.removeOcr), 1);
+            else draft.composition.slices.splice(Number(remove.dataset.removeSlice), 1);
+            dirty = true;
+            remember();
+            render();
+            return;
+        }
+        const move = event.target.closest('[data-order-up],[data-order-down]');
+        if (move) {
+            const from = Number(move.dataset.orderUp ?? move.dataset.orderDown);
+            reorder(from, from + (move.dataset.orderUp !== undefined ? -1 : 1));
+            return;
+        }
+        const pager = event.target.closest('[data-adv-page]');
+        if (pager && !pager.disabled) {
+            const next = Number(pager.dataset.advPage);
+            if (section === 'metadata' && data.metadataPreview) {
+                command('metadata_page', { page: next, previewId: data.metadataPreview.id });
+            } else {
+                page = next;
+                render();
+            }
+        }
+    });
+    function reorder(from, to) {
+        if (from === to || to < 0 || to >= draft.figureOrder.length) return;
+        const positions = [...document.querySelectorAll('[data-adv-order]')].map((el) => ({
+            name: el.querySelector('span').textContent,
+            top: el.getBoundingClientRect().top,
+        }));
+        draft.figureOrder.splice(to, 0, draft.figureOrder.splice(from, 1)[0]);
+        dirty = true;
+        remember();
+        render();
+        document.querySelectorAll('[data-adv-order]').forEach((el) => {
+            const old = positions.find((p) => p.name === el.querySelector('span').textContent);
+            const delta = old.top - el.getBoundingClientRect().top;
+            if (delta && uiMotion.preference() === 'expressive')
+                uiMotion.run(
+                    el,
+                    [{ transform: `translateY(${delta}px)` }, { transform: 'none' }],
+                    220,
+                );
+        });
+    }
+    let dragging = null;
+    document.addEventListener('dragstart', (event) => {
+        const item = event.target.closest('[data-adv-order]');
+        if (!item) return;
+        dragging = Number(item.dataset.advOrder);
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', String(dragging));
+        item.classList.add('reordering');
+    });
+    document.addEventListener('dragover', (event) => {
+        const item = event.target.closest('[data-adv-order]');
+        if (item && dragging !== null) {
+            event.preventDefault();
+            document
+                .querySelectorAll('.drop-target')
+                .forEach((el) => el.classList.remove('drop-target'));
+            item.classList.add('drop-target');
+        }
+    });
+    document.addEventListener('drop', (event) => {
+        const item = event.target.closest('[data-adv-order]');
+        if (item && dragging !== null) {
+            event.preventDefault();
+            reorder(dragging, Number(item.dataset.advOrder));
+        }
+        dragging = null;
+    });
+    document.addEventListener('dragend', () => {
+        dragging = null;
+        document
+            .querySelectorAll('.reordering,.drop-target')
+            .forEach((el) => el.classList.remove('reordering', 'drop-target'));
+    });
+    function sync() {
+        const key = state.sessionEpoch + ':' + state.projectId;
+        if (data && data.revision !== state.revision && Object.keys(data.tables || {}).length) {
+            data.tables = {};
+            document
+                .querySelectorAll('[data-derived-table]')
+                .forEach(
+                    (el) =>
+                        (el.innerHTML = '<p class="advanced-empty">项目已更新，请刷新结果。</p>'),
+                );
+        }
+        if (identity && identity !== key) {
+            drafts.clear();
+            draft = null;
+            data = null;
+            dirty = false;
+            pending = null;
+            identity = key;
+            if (document.querySelector('#drawer').classList.contains('advanced-drawer'))
+                closeDrawer();
+        }
+    }
+    function checkpoint() {
+        const saved = {
+            data,
+            draft: copy(draft),
+            base: copy(base),
+            conflicts: copy(conflicts),
+            pending,
+            dirty,
+            message,
+            error,
+            page,
+            section,
+            identity,
+            receiptFailed,
+            drafts: copy(drafts),
+        };
+        return () => {
+            ({
+                data,
+                draft,
+                base,
+                conflicts,
+                pending,
+                dirty,
+                message,
+                error,
+                page,
+                section,
+                identity,
+                receiptFailed,
+            } = saved);
+            drafts.clear();
+            saved.drafts.forEach((value, key) => drafts.set(key, value));
+        };
+    }
+    function connect(object) {
+        if (channel === object) return;
+        channel = object;
+        channel.advancedStateChanged.connect(receive);
+    }
+    return {
+        checkpoint,
+        open,
+        connect,
+        sync,
+        receive,
+        hasDraft: () => dirty || [...drafts.values()].some((d) => d.dirty),
+        reset: () => {
+            drafts.clear();
+            dirty = false;
+            pending = null;
+            data = null;
+            draft = null;
+            base = null;
+            conflicts = [];
+        },
+        isOpen: () =>
+            !document.querySelector('#drawer').hidden &&
+            document.querySelector('#drawer').classList.contains('advanced-drawer'),
+    };
 })();

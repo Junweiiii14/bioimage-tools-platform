@@ -1,0 +1,10 @@
+{
+  "observed_via": "get_goal",
+  "thread_id": "01a190e6-02b1-74e3-a7b9-bd5fbc3f36fe",
+  "status": "active",
+  "token_budget": null,
+  "remaining_tokens": null,
+  "objective": "完成研发总方案3.0第一阶段V0：先完成P001真实产品基线接入，再完成P002成熟WB用例独立执行及V0必需配套；交付真实worker运行、Workspace持久化成果、旧方法对照和保持当前设计语言的薄GUI入口；通过适用检查及绑定提交的独立审查，提供可验收PR和中文说明。",
+  "created_at": 1793432364,
+  "observed_updated_at": 1793432409
+}

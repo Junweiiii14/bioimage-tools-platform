@@ -12,6 +12,7 @@ winget install --id astral-sh.uv --version 0.13.0 --exact --source winget --scop
 
 ```powershell
 uv sync --locked --all-groups
+npm ci --ignore-scripts
 uv run --locked --no-sync python dev.py doctor
 uv run --locked --no-sync python dev.py check --all
 uv run --locked --no-sync python dev.py smoke-env
@@ -19,6 +20,10 @@ uv run --locked --no-sync pre-commit install
 ```
 
 默认 dev 组用于检查。desktop 组安装 Qt、图像/科学计算和 pytest-qt；build 组准备 Nuitka。`uv run` 默认会同步默认组；要保持额外组，显式加 `--group desktop` 或使用已完整同步环境的 `uv run --no-sync`。不要以运行检查后额外依赖被移除误判为损坏。
+
+JavaScript开发检查使用`.node-version`固定的Node26.7.0，package.json/package-lock.json固定Prettier3.9.10、ESLint10.13.0、TypeScript5.9.3及依赖工件完整性。先安装该Node版本再运行`npm ci --ignore-scripts`；只安装本地开发依赖，不全局安装工具，不启用包安装脚本。开发机/CI需要Node，产品安装包不需要Node。
+
+`npm run check:web`或`uv run --locked --no-sync python -m tooling.web_quality`运行同一门禁；缺工具或版本错误明确失败，不自动联网修复。`npm run format:web`只格式化工作台JS。初始lint覆盖20个脚本的明确正确性规则；checkJs先覆盖真实高级桥接请求生成器及共享身份，并非全应用类型化。Python请求校验仍独立保留。格式、lint、类型受控负例均随门禁执行。
 
 ## 命令职责
 
@@ -32,7 +37,7 @@ Qt 平台一致；未跳过兼容界面或改变测试断言。直接 pytest 也
 |---|---|
 | `doctor` | Python 精确版本、基本检查工具版本 |
 | `policy` | PDF 摘要、AGENTS 大小、技能来源树摘要、已有产品路径的直接导入边界 |
-| `check --all` | policy＋Ruff＋format＋Pyright strict＋当前所有 pytest；任一非零即失败 |
+| `check --all` | policy＋Ruff＋format＋Pyright strict＋导入契约＋固定JS门禁＋当前所有pytest＋独立wheel安装；任一非零即失败 |
 | `smoke-env` | Qt offscreen 控件、QProcess、中文路径 uint16 TIFF 原值往返和科学库导入 |
 | `audit` | pip-audit 查询当前环境已知漏洞；网络失败不等价于通过 |
 | `context --task <ID> --scope <目录> --record` | 输出适用规则并记录版本与范围；PR 的 rules-context 独立检查回执 |

@@ -1,0 +1,142 @@
+[
+  {
+    "case": "rows-small",
+    "elapsed_seconds": 10.231205,
+    "json_sha256": "5e6bd0b203381a158b31b48f4d33a5b59319391ed551044c8f8409b8859a69fd",
+    "log_sha256": "14904b24656013f543c8c9221566b91496e6005fc973da22448fef8a55c15658",
+    "fixture_sha256": "3c0ea28cb00661130229c501ff5ce7374a3caf33e71d0c0b77ad39c5b17002af",
+    "byte_count": 10591,
+    "private_before": 1729253376,
+    "private_after": 1747537920,
+    "private_before_GiB": 1.6104927062988281,
+    "private_after_GiB": 1.6275215148925781,
+    "cold_p95": {
+      "construct_ms": 0.1076,
+      "serialize_ms": 0.0454,
+      "total_ms": 0.1504
+    },
+    "warm_p95": {
+      "construct_ms": 0.1236,
+      "serialize_ms": 0.0409,
+      "total_ms": 0.1625
+    },
+    "click_p95_ms": 234.79999995231628,
+    "click_max_ms": 235.69999998807907,
+    "handler_p95_ms": 233.39999997615814,
+    "idle_p95_ms": 0.0079,
+    "idle_calls": 0,
+    "idle_emissions": 0,
+    "warm_total_reduction_percent": 2.985074626865669,
+    "bytes_reduction_percent": 30.5599265670076,
+    "click_reduction_percent": -32.50564327829157,
+    "pids": [
+      51824,
+      49564
+    ]
+  },
+  {
+    "case": "rows-limit",
+    "elapsed_seconds": 54.566112,
+    "json_sha256": "d4f6e81f4834a6723e090a0efb7354290cfe385d829439f524c262519eaa6fcc",
+    "log_sha256": "8bffaa3c5d06a37715a5d2406005567272d693909a1407739642728875c6aa91",
+    "fixture_sha256": "06b5c973121a21adf15b19a6469f1b92cbb97041cc7d00de45c014f3b3c8145e",
+    "byte_count": 15190523,
+    "private_before": 1959378944,
+    "private_after": 2237120512,
+    "private_before_GiB": 1.8248138427734375,
+    "private_after_GiB": 2.0834808349609375,
+    "cold_p95": {
+      "construct_ms": 66.2018,
+      "serialize_ms": 81.7434,
+      "total_ms": 145.9365
+    },
+    "warm_p95": {
+      "construct_ms": 65.1711,
+      "serialize_ms": 82.6527,
+      "total_ms": 144.8285
+    },
+    "click_p95_ms": 512.3999999761581,
+    "click_max_ms": 524.5,
+    "handler_p95_ms": 510.89999997615814,
+    "idle_p95_ms": 0.0093,
+    "idle_calls": 0,
+    "idle_emissions": 0,
+    "warm_total_reduction_percent": 77.98143811295488,
+    "bytes_reduction_percent": 39.26094996602089,
+    "click_reduction_percent": 58.05157593318394,
+    "pids": [
+      31356,
+      49764
+    ]
+  },
+  {
+    "case": "intake-small",
+    "elapsed_seconds": 9.746636,
+    "json_sha256": "02fd405391ab9820bd9e1c67d57fcca5dd2d4bb330e709ea55f653c5ef07ee03",
+    "log_sha256": "f8e60d79dc59d088202c9eb81e8346c2b30cf06e839769a0cf523ec721394a81",
+    "fixture_sha256": "11f185a269ff4f46e11622a0a203f451f4d8d36427084c68d24fb04cb72302c4",
+    "byte_count": 102546,
+    "private_before": 1722257408,
+    "private_after": 1788555264,
+    "private_before_GiB": 1.6039772033691406,
+    "private_after_GiB": 1.6657218933105469,
+    "cold_p95": {
+      "construct_ms": 1.7964,
+      "serialize_ms": 0.2204,
+      "total_ms": 2.0168
+    },
+    "warm_p95": {
+      "construct_ms": 0.3542,
+      "serialize_ms": 0.2187,
+      "total_ms": 0.5644
+    },
+    "click_p95_ms": 118.60000002384186,
+    "click_max_ms": 230.39999997615814,
+    "handler_p95_ms": 117.30000001192093,
+    "idle_p95_ms": 0.0092,
+    "idle_calls": 0,
+    "idle_emissions": 0,
+    "warm_total_reduction_percent": 22.969837587006957,
+    "bytes_reduction_percent": 47.599605512603674,
+    "click_reduction_percent": 38.1002087635262,
+    "pids": [
+      24776,
+      28500
+    ]
+  },
+  {
+    "case": "intake-limit",
+    "elapsed_seconds": 100.285207,
+    "json_sha256": "a53c0fade65a321086dbc4bd076e8c70ab8c45c1427ccee6275f6181b0036ccf",
+    "log_sha256": "73b287b6bf8ea639850c43d7721c91bc8410654d4a7772beb10407f32bee0da0",
+    "fixture_sha256": "ae39df820412576fe4e37dacde87b45e4afc31911b28abe7722120f79c3ed573",
+    "byte_count": 27149399,
+    "private_before": 2104565760,
+    "private_after": 2536415232,
+    "private_before_GiB": 1.9600296020507812,
+    "private_after_GiB": 2.3622207641601562,
+    "cold_p95": {
+      "construct_ms": 247.9463,
+      "serialize_ms": 122.447,
+      "total_ms": 359.462
+    },
+    "warm_p95": {
+      "construct_ms": 94.0938,
+      "serialize_ms": 115.5958,
+      "total_ms": 207.28
+    },
+    "click_p95_ms": 1233.699999988079,
+    "click_max_ms": 1242,
+    "handler_p95_ms": 1232.699999988079,
+    "idle_p95_ms": 0.0096,
+    "idle_calls": 0,
+    "idle_emissions": 0,
+    "warm_total_reduction_percent": 74.85394348348584,
+    "bytes_reduction_percent": 43.78404220775119,
+    "click_reduction_percent": 42.96083961497617,
+    "pids": [
+      5576,
+      22996
+    ]
+  }
+]

@@ -1,0 +1,87 @@
+{
+  "source_commit": "8f5bf6571a6a431a24a46434dca8b067ea43488c",
+  "product_base": "dfc48ed7c2c944dc8f03c3931bc7985452a31393",
+  "execution": "Existing public API vs existing real wb_tool.worker. P001 investigation only; not the future module interface or Workspace V0 acceptance.",
+  "cases": [
+    {
+      "case": "triangle_u8",
+      "source_sha256": "dfa6fbcc71b8b96de0444f14bb73eedc3687e30762773e44c9a15093138bcaf5",
+      "result_sha256": "07c3e48b1f72d5c71d223263979287bd6d58114bba7b0138b66cf42c64b140e6",
+      "observed_pid": 22320,
+      "exit_code": 0,
+      "frames": [
+        "hello",
+        "accepted",
+        "result"
+      ],
+      "status": "valid",
+      "signal": 40.0,
+      "independent_expected": 40.0,
+      "matches_direct_api": true
+    },
+    {
+      "case": "triangle_u16",
+      "source_sha256": "c20c8589d21f2897561f5e3cfe64a3fbe5366232077d08e37dc95f236667ccfd",
+      "result_sha256": "ceda567d50bb9fc1edfa6e3b4c7fedae961fcd7688538b0755c7aa4d10f5679a",
+      "observed_pid": 16708,
+      "exit_code": 0,
+      "frames": [
+        "hello",
+        "accepted",
+        "result"
+      ],
+      "status": "valid",
+      "signal": 4000.0,
+      "independent_expected": 4000.0,
+      "matches_direct_api": true
+    },
+    {
+      "case": "flat_zero",
+      "source_sha256": "b5630c588edc45fcb78b6da96cf524d9f7293269dfa08ed0d04ca91e0a43b7f1",
+      "result_sha256": "24eb4ce447801d22ea1397b335484e537e131d0a4698159106c2d8039f49158e",
+      "observed_pid": 47248,
+      "exit_code": 0,
+      "frames": [
+        "hello",
+        "accepted",
+        "result"
+      ],
+      "status": "valid",
+      "signal": 0.0,
+      "independent_expected": 0.0,
+      "matches_direct_api": true
+    },
+    {
+      "case": "invalid_roi",
+      "source_sha256": "c20c8589d21f2897561f5e3cfe64a3fbe5366232077d08e37dc95f236667ccfd",
+      "result_sha256": "b5734159160b60dc6ac477f95fcf1ad8949b2cef1e6f418f5401ae1398f262fe",
+      "observed_pid": 300,
+      "exit_code": 0,
+      "frames": [
+        "hello",
+        "accepted",
+        "result"
+      ],
+      "status": "invalid",
+      "signal": null,
+      "independent_expected": null,
+      "matches_direct_api": true
+    },
+    {
+      "case": "dtype_limits",
+      "source_sha256": "99484398a4ca79550abd8f91e09e791ad84b0ea5831988df4cde80b4510a67b1",
+      "result_sha256": "acc9c7d420806571727a1be3b38f718c8e9252f0a295ed68df2bf1c27a0fc947",
+      "observed_pid": 47792,
+      "exit_code": 0,
+      "frames": [
+        "hello",
+        "accepted",
+        "result"
+      ],
+      "status": "quality_review",
+      "signal": null,
+      "independent_expected": null,
+      "matches_direct_api": true
+    }
+  ]
+}

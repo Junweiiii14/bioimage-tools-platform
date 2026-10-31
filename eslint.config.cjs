@@ -1,0 +1,38 @@
+// A focused correctness gate for existing classic browser scripts. Whole-app
+// global/type migration is deliberately not claimed by this initial rule set.
+module.exports = [
+    {
+        files: ['apps/desktop/src/bioimage_app/web_ui/*.js'],
+        languageOptions: { ecmaVersion: 2024, sourceType: 'script' },
+        rules: {
+            'constructor-super': 'error',
+            'for-direction': 'error',
+            'no-async-promise-executor': 'error',
+            'no-class-assign': 'error',
+            'no-compare-neg-zero': 'error',
+            'no-const-assign': 'error',
+            'no-debugger': 'error',
+            'no-dupe-args': 'error',
+            'no-dupe-class-members': 'error',
+            'no-dupe-else-if': 'error',
+            'no-dupe-keys': 'error',
+            'no-duplicate-case': 'error',
+            'no-func-assign': 'error',
+            'no-import-assign': 'error',
+            'no-invalid-regexp': 'error',
+            'no-loss-of-precision': 'error',
+            'no-new-native-nonconstructor': 'error',
+            'no-promise-executor-return': 'error',
+            'no-setter-return': 'error',
+            'no-sparse-arrays': 'error',
+            'no-this-before-super': 'error',
+            'no-unexpected-multiline': 'error',
+            'no-unreachable': 'error',
+            'no-unsafe-finally': 'error',
+            'no-unsafe-negation': 'error',
+            'no-unsafe-optional-chaining': 'error',
+            'use-isnan': 'error',
+            'valid-typeof': 'error',
+        },
+    },
+];

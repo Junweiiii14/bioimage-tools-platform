@@ -15,5 +15,112 @@
     "observed_archive_sha256": "d73d02c9caed172db0f3331fb4030e0a3b85947aefff9cc1da4dd81b7423c3a1",
     "cache": "~/.cache/bioimage-nuitka",
     "verification": "minimal accelerated compile and generated-launcher run passed; standalone product untested"
+  },
+  "runtime_candidate": {
+    "schema": 1,
+    "verified_on": "2026-10-28",
+    "python_runtime": {
+      "source": {
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260825/cpython-3.12.14%2B20260825-x86_64-pc-windows-msvc-install_only_stripped.tar.gz",
+        "archive_sha256": "8e6aad12ef6fc9685e67ce66253f8f72d6e8fa02cb7187e5850bd4db5ecd9e2a"
+      },
+      "tree": {
+        "files": 2295,
+        "tree_sha256": "0ab3586b62ebbd26706b71c1f5d44febf70e7d4af9c43783a67b7f2814d7cf1c"
+      }
+    },
+    "compiler_runtime": {
+      "source": {
+        "url": "https://github.com/brechtsanders/winlibs_mingw/releases/download/15.2.0posix-13.0.0-msvcrt-r6/winlibs-x86_64-posix-seh-gcc-15.2.0-mingw-w64msvcrt-13.0.0-r6.zip",
+        "archive_sha256": "d73d02c9caed172db0f3331fb4030e0a3b85947aefff9cc1da4dd81b7423c3a1"
+      },
+      "tree": {
+        "files": 11602,
+        "tree_sha256": "548b48719ff45f9ac17c00d343700d469deb53243e33722827cd0aeb7b7955a5"
+      }
+    },
+    "inno_runtime": {
+      "source": {
+        "url": "https://github.com/jrsoftware/issrc/releases/download/is-6_7_3/innosetup-6.7.3.exe",
+        "archive_sha256": "9c73c3bae7ed48d44112a0f48e66742c00090bdb5bef71d9d3c056c66e97b732",
+        "verification": "Valid Authenticode signatures on installed compiler/support binaries; four loader/engine stubs verified with upstream def02 public key; see work/evidence/T-082/r06-provenance.md"
+      },
+      "files": {
+        "Compil32.exe": "f59e6adf0c2484e3c191a79d2ad02c7c5e4eb6a0e73763fc295f0c997a23ae73",
+        "is7z.dll": "f97cda058bfe97a7e9ced5cde7018bbc26e35155c3c7405c6146808f8d06806d",
+        "is7zxa.dll": "e3cef67858843c554100126f04932be327097777865e4eb82951dd97cdb28942",
+        "is7zxr.dll": "728b368dc4f2831cc4d13291f46eeaf9f89b7e3a91356cf793c330e953b8e17b",
+        "isbunzip.dll": "31d04c1e4bfdfa34704c142fa98f80c0a3076e4b312d6ada57c4be9d9c7dcf26",
+        "isbzip.dll": "8072e83385afc4a84006271a87a11fc0a22b149cbd77322669ca56c470d28ced",
+        "ISCC.exe": "0a8757031b33777e4c9cbffee40f11a5062b36d25cbe144c1db73b6102b80ad7",
+        "ISCmplr.dll": "85a1e3090d3a5b85319f001b7c8f9ecfad45f37eff030a67bbe29ef58b7aa2c3",
+        "islzma.dll": "8af307ce3738ab1d37cc7e76b2f76615e2045597d4367c3e40d52b5f2fbd353d",
+        "islzma32.exe": "fd977c3ac44c56997d2b4fd6647e97e2457c43991a6ae26a4b2252c0eabdfebb",
+        "islzma64.exe": "87a50495aff580b78cad57906a765d3cf28ca508cfa95c24c1247c286ddf71b2",
+        "ISPP.dll": "bde04be7f4a55ca56afb6b06600d7cbe8326fac468ac3f2885b80eefb3ed2a7a",
+        "isscint.dll": "ddd2748bc79122a67eed77f6039f6508245e0aa7f0fdbbfca99d1e922a1e8ce4",
+        "ISSigTool.exe": "aea490d45665a88c0c832d25647d21c1b87962efedb25668caec05678e0fd7c6",
+        "isunzlib.dll": "8287d0e287a66ee78537c8d1d98e426562b95c50f569b92cea9ce36a9fa57e64",
+        "iszlib.dll": "14c0d4a2a41572384f8309cdf03de5c6e7ed46bef64cce70d989b2665eff1a47",
+        "Setup.e32": "a80d75ba8d8c336050c37f7707de8bb017cc93597329e0ea18d474156b3e0da5",
+        "SetupCustomStyle.e32": "9675a2a5c78c66b691cc80270031da42bebad5725fbf60853cb4e5f90251bd5e",
+        "SetupLdr.e32": "5475964893adbb33ccc420ad4d88bbdff27dfaaca7580cd6058ea2798893490d",
+        "SetupLdr.e64": "e38f2140e6bfd86c6ddc69c98f46475080c75fd5ee4be701ceff9c842c6c5019",
+        "ISPPBuiltins.iss": "bc765e1121a95dc602ca1248b484418cecc6db9d4b6f4dae58e9a2c35262527c",
+        "Default.isl": "42a5f6f7dbbddf26cc278f67db5d894235ce1d126a6856702e31bd02023a1316"
+      }
+    },
+    "tools": {
+      "uv": {
+        "version": "0.13.0",
+        "sha256": "2bfbe53d3cc95799e98fa08323b04844fc01d4f8c87dd5c00089e43f6554f162",
+        "source": {
+          "url": "https://github.com/astral-sh/uv/releases/download/0.13.0/uv-x86_64-pc-windows-msvc.zip",
+          "archive_sha256": "088962f9e7b7bd9ea740c04c650b2a21c8928c345bd99ac24350dc924dba656c"
+        },
+        "arguments": [
+          "--version"
+        ],
+        "version_pattern": "^uv 0\\.13\\.0(?:\\s|$)"
+      },
+      "gcc": {
+        "version": "15.2.0",
+        "sha256": "4c4b0bc110422cc3e48d1936eb5c5cdb311f40f3f5ee7fb693dad8d3f1db0a9f",
+        "source": {
+          "url": "https://github.com/brechtsanders/winlibs_mingw/releases/download/15.2.0posix-13.0.0-msvcrt-r6/winlibs-x86_64-posix-seh-gcc-15.2.0-mingw-w64msvcrt-13.0.0-r6.zip",
+          "archive_sha256": "d73d02c9caed172db0f3331fb4030e0a3b85947aefff9cc1da4dd81b7423c3a1"
+        },
+        "arguments": [
+          "--version"
+        ],
+        "version_pattern": "^gcc.*15\\.2\\.0$"
+      },
+      "windres": {
+        "version": "2.46.0.20260210",
+        "sha256": "70903d43c0f2fb7be29a0980dbc40b99fb69591a6d9153f7f59cffbb193fcd91",
+        "source": {
+          "url": "https://github.com/brechtsanders/winlibs_mingw/releases/download/15.2.0posix-13.0.0-msvcrt-r6/winlibs-x86_64-posix-seh-gcc-15.2.0-mingw-w64msvcrt-13.0.0-r6.zip",
+          "archive_sha256": "d73d02c9caed172db0f3331fb4030e0a3b85947aefff9cc1da4dd81b7423c3a1"
+        },
+        "arguments": [
+          "--version"
+        ],
+        "version_pattern": "^GNU windres .*2\\.46\\.0\\.20260210$"
+      },
+      "iscc": {
+        "version": "6.7.3",
+        "sha256": "0a8757031b33777e4c9cbffee40f11a5062b36d25cbe144c1db73b6102b80ad7",
+        "source": {
+          "url": "https://github.com/jrsoftware/issrc/releases/download/is-6_7_3/innosetup-6.7.3.exe",
+          "archive_sha256": "9c73c3bae7ed48d44112a0f48e66742c00090bdb5bef71d9d3c056c66e97b732",
+          "verification": "Valid Authenticode signatures on installed compiler/support binaries; four loader/engine stubs verified with upstream def02 public key; see work/evidence/T-082/r06-provenance.md"
+        },
+        "arguments": [
+          "-"
+        ],
+        "stdin": "#error BIOIMAGE_VERSION_PROBE\n",
+        "version_pattern": "^Compiler engine version: Inno Setup 6\\.7\\.3$"
+      }
+    }
   }
 }

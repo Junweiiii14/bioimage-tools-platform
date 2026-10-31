@@ -1,0 +1,16 @@
+{
+  "name": "bioimage-workbench-development",
+  "private": true,
+  "packageManager": "npm@11.19.0",
+  "engines": { "node": "26.7.x" },
+  "scripts": {
+    "check:web": "node tooling/check_web.cjs",
+    "format:web": "prettier --write apps/desktop/src/bioimage_app/web_ui/*.js"
+  },
+  "devDependencies": {
+    "eslint": "10.13.0",
+    "espree": "11.2.0",
+    "prettier": "3.9.10",
+    "typescript": "5.9.3"
+  }
+}

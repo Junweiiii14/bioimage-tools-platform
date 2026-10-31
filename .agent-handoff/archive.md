@@ -118,5 +118,9 @@ T050初次归档复制因archive目录尚不存在失败，随后从未修改的
 - [work-log-20261023T102501962090Z.md](archive/work-log-20261023T102501962090Z.md): work log exceeded 64 KiB or 30 dated sections
 - [work-log-20261023T141910899621Z.md](archive/work-log-20261023T141910899621Z.md): work log exceeded 64 KiB or 30 dated sections
 - [work-log-20261023T191514662845Z.md](archive/work-log-20261023T191514662845Z.md): work log exceeded 64 KiB or 30 dated sections
-- [work-log-20261031T074220415396Z.md](archive/work-log-20261031T074220415396Z.md): work log exceeded 64 KiB or 30 dated sections
-- [work-log-20261031T074301625647Z.md](archive/work-log-20261031T074301625647Z.md): work log exceeded 64 KiB or 30 dated sections
+- [work-log-20261028T020741968930Z.md](archive/work-log-20261028T020741968930Z.md): work log exceeded 64 KiB or 30 dated sections
+- [work-log-20261028T080548765867Z.md](archive/work-log-20261028T080548765867Z.md): work log exceeded 64 KiB or 30 dated sections
+
+- [B008 publication work log](archive/work-log-20261031T074220415396Z.md)
+- [B008 dispatch work log](archive/work-log-20261031T074301625647Z.md)
+- [work-log-20261031T074731801579Z.md](archive/work-log-20261031T074731801579Z.md): work log exceeded 64 KiB or 30 dated sections

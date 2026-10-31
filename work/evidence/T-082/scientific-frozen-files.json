@@ -1,0 +1,17 @@
+{
+  "baseline": "462aa4e7ebfb77e7d920f3cbe7cf70e928b59cef",
+  "purpose": "Engineering definitions and synthetic regression freeze; no independent scientific holdout",
+  "sha256": {
+    "docs/contracts/wb-reference-v1.md": "ef6a538dc5ea0f7d0ebbf61fca4e6e1db8f37e901194865b9e6914d591b7c112",
+    "docs/contracts/wb-fig-quant-v1.md": "28f13be5f440376f9574e117d88fdecf2c7e2804abfa149e32a9d4bfd3e6fafa",
+    "docs/contracts/wb-project-normalization-v1.md": "00de2f698c2fb64501d69ebdb9931543e6e700a78b05fcee1c8327e106bea681",
+    "tools/wb/src/wb_tool/domain/lanes.py": "11cefe8268550afa1c499c4a7dfc783502ba32363168254572ef38999b6c0c5a",
+    "tools/wb/src/wb_tool/domain/quantify.py": "8ad2da99beedd012b7ffe00a69a8f47601dbb9e10bb01e73988db164a46d04cc",
+    "tools/wb/src/wb_tool/domain/normalization.py": "538e6a8b0daefe24b69a11cf9bfcf85cb70f34bb0148f059ae6a4d2294fee22f",
+    "tools/wb/tests/test_input_profiles.py": "f786037b35d7c70140072add77defc81ef1d93cfabc99c5ae25ad9e00380828b",
+    "tools/wb/tests/test_manual_lanes.py": "0251c56217515fa8f2c05e234cda576e58df90fbebb081b75b4d108b60964419",
+    "tools/wb/tests/test_peak_envelope.py": "5de73617c10be13cf27ee0e6cf48b517373e3e6d91ca9d6535e0400eef306623",
+    "tools/wb/tests/test_project_analysis.py": "86a961ec608374160573a3c42d81882fbd2b12856c07dd12edbc723f0d714e9d"
+  },
+  "normalization": "LF as tracked Git text"
+}

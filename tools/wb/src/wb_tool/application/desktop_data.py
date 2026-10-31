@@ -39,6 +39,10 @@ from wb_tool.domain.crop_detection import CropDetectionSettings
 from wb_tool.domain.worksheet import OCRRecognition, Worksheet
 
 
+class IncompleteProjectEdit(ValueError):
+    """Native editable controls do not yet form a valid project draft."""
+
+
 @dataclass(frozen=True)
 class PreviewRaster:
     sha256: str

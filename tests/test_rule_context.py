@@ -93,6 +93,49 @@ def test_scope_expansion_requires_reload(repo: tuple[Path, str]) -> None:
     assert "outside loaded scope" in validate(root, base, commit(root, "extra scope"))[0]
 
 
+def test_scoped_receipt_loads_ancestors_and_descendants_without_sibling_rules(
+    repo: tuple[Path, str],
+) -> None:
+    root, _ = repo
+    applicable = {
+        "tools/AGENTS.md",
+        "tools/wb/AGENTS.md",
+        "tools/wb/AGENTS.override.md",
+        "tools/wb/ui/AGENTS.md",
+    }
+    siblings = {"tools/if/AGENTS.md", "apps/AGENTS.md"}
+    for name in applicable | siblings:
+        rule = root / name
+        rule.parent.mkdir(parents=True, exist_ok=True)
+        rule.write_text(f"Rule for {name}\n", encoding="utf-8")
+    base = commit(root, "separate module rules")
+    scopes = ["tools/wb", "work"]
+    receipt = make_receipt(root, "F-002", scopes, base)
+    assert set(receipt["rules"]) == set(CORE) | applicable
+    assert set(receipt["base_rules"]) == set(CORE) | applicable
+    record(root, base, scopes)
+    (root / "tools/wb/ui/changed.py").write_text("pass\n", encoding="utf-8")
+    assert validate(root, base, commit(root, "covered module update")) == []
+
+    (root / "tools/wb/ui/AGENTS.md").write_text("Changed nested rule\n", encoding="utf-8")
+    assert "rules changed" in validate(root, base, commit(root, "nested rule drift"))[0]
+    record(root, base, scopes)
+    assert validate(root, base, commit(root, "reload scoped rule")) == []
+
+
+@pytest.mark.parametrize("outside", ["tools/if/changed.py", "tools/wb_extra/changed.py"])
+def test_scoped_receipt_cannot_cover_a_sibling_or_same_prefix_directory(
+    repo: tuple[Path, str], outside: str
+) -> None:
+    root, base = repo
+    record(root, base, ["tools/wb", "work"])
+    extra = root / outside
+    extra.parent.mkdir(parents=True, exist_ok=True)
+    extra.write_text("pass\n", encoding="utf-8")
+    error = validate(root, base, commit(root, "outside module update"))[0]
+    assert "outside loaded scope" in error and outside in error
+
+
 def test_stale_base_is_rejected(repo: tuple[Path, str]) -> None:
     root, base = repo
     record(root, base)

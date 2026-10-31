@@ -1,5 +1,6 @@
 """Multi-image row review and template editing; host owns assets and asynchronous work."""
 
+from collections.abc import Callable
 from dataclasses import replace
 from uuid import uuid4
 
@@ -36,7 +37,7 @@ from wb_tool.application.crop_suggestions import (
     apply_crop_suggestion,
     project_with_suggestions,
 )
-from wb_tool.application.desktop_data import PreviewRaster
+from wb_tool.application.desktop_data import IncompleteProjectEdit, PreviewRaster
 from wb_tool.application.figure_project import (
     FigureRender,
     FigureRow,
@@ -145,6 +146,7 @@ class FigureProjectView(QWidget):
         self.generation = 0
         self._loading = False
         self._project = WBFigureProject(project_id=uuid4().hex)
+        self._selected_row_id = ""
         self._thumbnails: dict[str, QIcon] = {}
         self._thumbnail_rasters: dict[str, PreviewRaster] = {}
         self._source_preview: PreviewRaster | None = None
@@ -514,7 +516,7 @@ class FigureProjectView(QWidget):
             )
 
     def _source_field_edited(self, column: int) -> None:
-        index = self.table.currentRow()
+        index = self.selection_index
         item = self.table.item(index, column) if index >= 0 else None
         if item is not None:
             item.setText(
@@ -525,7 +527,7 @@ class FigureProjectView(QWidget):
         self.source_list.blockSignals(True)
         self.source_list.clear()
         self.source_count.setText(f"项目原图 · {len(self._project.rows)}")
-        index = self.table.currentRow()
+        index = self.selection_index
         for i, row in enumerate(self._project.rows):
             review = self.table.item(i, 9)
             reviewed = bool(review and review.checkState() == Qt.CheckState.Checked)
@@ -854,10 +856,10 @@ class FigureProjectView(QWidget):
 
     def _confirm_and_next(self) -> None:
         self.confirm_selected()
-        current = self.table.currentRow()
+        current = self.selection_index
         for index in (*range(current + 1, self.table.rowCount()), *range(0, current)):
             if self._needs_attention(index) and not self.table.isRowHidden(index):
-                self.table.setCurrentCell(index, 0)
+                self.select_row(self._project.rows[index].row_id)
                 return
         self.status.setText("裁剪已确认；定量质量警告仍需独立复核。")
 
@@ -881,30 +883,28 @@ class FigureProjectView(QWidget):
             self.analysis_sources.addItem(title)
             source_item = self.analysis_sources.item(index)
             source_item.setToolTip(title)
-        self.analysis_source.setCurrentIndex(self.table.currentRow())
-        self.analysis_sources.setCurrentRow(self.table.currentRow())
+        self.analysis_source.setCurrentIndex(self.selection_index)
+        self.analysis_sources.setCurrentRow(self.selection_index)
         self.analysis_sources.blockSignals(False)
         self.analysis_source.blockSignals(False)
         self._refresh_source_workspace()
 
     def _select_analysis_source(self, index: int) -> None:
-        if 0 <= index < self.table.rowCount():
-            try:
-                self.project()
-            except ValueError as error:
-                self.status.setText(str(error))
-                self._refresh_analysis_sources()
-                return
-            # The original selection path commits valid dirty annotation edits first.
-            self.table.setCurrentCell(index, 0)
+        if 0 <= index < len(self._project.rows):
+            self.select_row(self._project.rows[index].row_id)
 
     def _text(self, row: int, column: int, *, strip: bool = True) -> str:
         item = self.table.item(row, column)
         return (item.text().strip() if strip else item.text()) if item else ""
 
-    def project(
-        self, revision: int | None = None, *, include_layout: bool = True
-    ) -> WBFigureProject:
+    @staticmethod
+    def _edit_value[T](read: Callable[[], T]) -> T:
+        try:
+            return read()
+        except ValueError as error:
+            raise IncompleteProjectEdit(str(error)) from error
+
+    def _project_controls(self, revision: int | None) -> WBFigureProject:
         rows: list[FigureRow] = []
         for i, original in enumerate(self._project.rows):
             roi = None
@@ -950,29 +950,38 @@ class FigureProjectView(QWidget):
             figure_order=order,
             template=FigureTemplate(**settings),
         )
+        return project
+
+    def project(
+        self, revision: int | None = None, *, include_layout: bool = True
+    ) -> WBFigureProject:
+        # Only editable control parsing is an expected incomplete draft. Failures
+        # rebuilding persisted history/evidence remain ordinary errors.
+        project = self._edit_value(lambda: self._project_controls(revision))
+        control_rows = project.rows
         if isinstance(self._project, WBReviewProject):
             project = project_with_suggestions(project, self._project.suggestions)
         if isinstance(self._project, WBAnalysisProject):
             project = project_with_analyses(project, self._project.analyses)
-            request = self.analysis.request()
+            request = self._edit_value(self.analysis.request)
             if request is not None and self.analysis.plan is not None:
                 project = update_row_analysis_request(project, self.analysis.plan.row_id, request)
-        ocr = self.ocr.state()
+        ocr = self._edit_value(self.ocr.state)
         if ocr is not None:
             project = project_with_ocr(project, ocr)
-        plans = self.normalization.plans()
+        plans = self._edit_value(self.normalization.plans)
         if plans or isinstance(self._project, WBNormalizedProject):
             project = project_with_normalizations(project, plans)
         if self.laboratory_layout.active:
             composition = (
-                self.laboratory_layout.composition()
+                self._edit_value(self.laboratory_layout.composition)
                 if include_layout
                 else initial_composition(project)
             )
             previous = {row.row_id: row for row in self._project.rows}
             changed = {
                 row.row_id
-                for row in rows
+                for row in control_rows
                 if row.roi != previous[row.row_id].roi
                 or row.lane_count != previous[row.row_id].lane_count
             }
@@ -987,7 +996,7 @@ class FigureProjectView(QWidget):
                 }
             )
             project = with_figure_layout(
-                project, composition, self.laboratory_layout.layout_style()
+                project, composition, self._edit_value(self.laboratory_layout.layout_style)
             )
         if isinstance(self._project, WBRestoredProject):
             project = with_archive_history(
@@ -1040,7 +1049,7 @@ class FigureProjectView(QWidget):
         self._rendered_preview = None
         self.preview_label.clear_render()
         self._loading = True
-        old_index = self.table.currentRow()
+        old_index = self.selection_index
         selected = (
             self._project.rows[old_index] if 0 <= old_index < len(self._project.rows) else None
         )
@@ -1066,6 +1075,7 @@ class FigureProjectView(QWidget):
             self._last_review_focus = None
             self._pending_review_focus = None
         self._project = project
+        self._set_selection(project.rows[selected_index].row_id if selected_index >= 0 else "")
         self.history_label.setText(
             f"从归档恢复 · {len(project.archive_sources)} 个来源 · "
             f"{len(project.imported_runs)} 条历史运行。"
@@ -1284,34 +1294,51 @@ class FigureProjectView(QWidget):
         self._overlay()
 
     def _selected(self, row: int, _column: int, _previous_row: int, _previous_column: int) -> None:
-        if not self._loading and 0 <= row < len(self._project.rows):
-            try:
-                self._project = self.project()
-            except ValueError as error:
-                self.status.setText(str(error))
-                self.table.blockSignals(True)
-                self.table.setCurrentCell(_previous_row, max(0, _previous_column))
-                self.table.blockSignals(False)
-                self._refresh_analysis_sources()
-                return
+        if self._loading:
+            return
+        if 0 <= row < len(self._project.rows):
+            self.select_row(self._project.rows[row].row_id)
+        else:
+            self._set_selection("")
+
+    def _set_selection(self, row_id: str) -> None:
+        """Install one semantic selection and project it to the compatibility table."""
+        self._selected_row_id = row_id
+        index = self.selection_index
+        blocked = self.table.blockSignals(True)
+        try:
+            self.table.setCurrentCell(index, 0 if index >= 0 else -1)
+        finally:
+            self.table.blockSignals(blocked)
+
+    def select_row(self, row_id: str) -> bool:
+        """Accept a selection intent only after valid native edits are committed."""
+        if not any(row.row_id == row_id for row in self._project.rows):
+            return False
+        try:
+            project = self.project()
+        except ValueError as error:
+            self.status.setText(str(error))
+            self._set_selection(self._selected_row_id)
             self._refresh_analysis_sources()
-            source = self._project.rows[row].source
-            if (
-                not self._source_preview
-                or not source
-                or self._source_preview.sha256 != source.sha256
-            ):
-                self._source_preview = None
-                self.canvas.set_image(PreviewRaster("", 0, 0, 0, 0, b"", 0, ()))
-                self.canvas.set_lanes(())
-                self.canvas.set_regions(())
-                self.analysis.clear_source_preview()
-            self.show_analysis(row)
-            self._overlay()
-            self.source_requested.emit(self._project.rows[row].row_id)
+            return False
+        self._project = project
+        self._set_selection(row_id)
+        self._refresh_analysis_sources()
+        source = self._project.rows[self.selection_index].source
+        if not self._source_preview or not source or self._source_preview.sha256 != source.sha256:
+            self._source_preview = None
+            self.canvas.set_image(PreviewRaster("", 0, 0, 0, 0, b"", 0, ()))
+            self.canvas.set_lanes(())
+            self.canvas.set_regions(())
+            self.analysis.clear_source_preview()
+        self.show_analysis(self.selection_index)
+        self._overlay()
+        self.source_requested.emit(row_id)
+        return True
 
     def show_analysis(self, index: int | None = None) -> None:
-        index = self.table.currentRow() if index is None else index
+        index = self.selection_index if index is None else index
         project = self.project()
         # Commit editor values before show_plan clears its dirty flag.
         self._project = project
@@ -1346,7 +1373,7 @@ class FigureProjectView(QWidget):
     def configure_analysis(self) -> None:
         try:
             project = self.project()
-            index = self.table.currentRow()
+            index = self.selection_index
             if not 0 <= index < len(project.rows):
                 raise ValueError("请选择已审核的行")
             plan = make_row_analysis(
@@ -1414,17 +1441,31 @@ class FigureProjectView(QWidget):
         self.show_analysis()
 
     def selected_row(self) -> FigureRow | None:
-        index = self.table.currentRow()
-        return self.project().rows[index] if 0 <= index < len(self._project.rows) else None
+        return next(
+            (row for row in self.project().rows if row.row_id == self._selected_row_id), None
+        )
 
     @property
-    def presentation_key(self) -> tuple[int, int, int]:
+    def selected_row_id(self) -> str:
+        """Stable selection identity; widgets only submit intents and display it."""
+        return self._selected_row_id
+
+    @property
+    def selection_index(self) -> int:
+        """Position of the selected identity in the current immutable row order."""
+        return next(
+            (i for i, row in enumerate(self._project.rows) if row.row_id == self._selected_row_id),
+            -1,
+        )
+
+    @property
+    def presentation_key(self) -> tuple[int, int, str]:
         """Cheap invalidation token; never reconstruct a project just to poll it.
 
         Native edits increment generation; model installations replace the frozen
         project. Selection is separate because it changes visible profiles.
         """
-        return id(self._project), self.generation, self.table.currentRow()
+        return id(self._project), self.generation, self._selected_row_id
 
     @property
     def project_identity(self) -> str:
@@ -1437,7 +1478,7 @@ class FigureProjectView(QWidget):
         return self._source_preview
 
     def set_source_preview(self, preview: PreviewRaster) -> None:
-        index = self.table.currentRow()
+        index = self.selection_index
         row = self._project.rows[index] if 0 <= index < len(self._project.rows) else None
         if row is None or row.source is None or row.source.sha256 != preview.sha256:
             return
@@ -1553,7 +1594,7 @@ class FigureProjectView(QWidget):
         self._drawn((crop.x0, crop.y0, crop.x1, crop.y1), lane_count=lane_count)
 
     def _drawn(self, coords: tuple[int, int, int, int], *, lane_count: int | None = None) -> None:
-        index = self.table.currentRow()
+        index = self.selection_index
         if index < 0 or self._project.rows[index].source is None:
             return
         current = self.selected_row()
@@ -1622,8 +1663,9 @@ class FigureProjectView(QWidget):
         except ValueError as error:
             self.status.setText(f"无法恢复裁剪：{error}")
             return
-        self.table.setCurrentCell(index, 0)
-        if self.table.currentRow() != index:
+        # Reselecting the same row would commit its edited geometry before undo
+        # can restore the original display frame against the retained baseline.
+        if self.selected_row_id != row_id and not self.select_row(row_id):
             return
         self._restoring_crop = True
         try:
@@ -1676,7 +1718,7 @@ class FigureProjectView(QWidget):
             if i < self.source_list.count():
                 self.source_list.item(i).setHidden(bool(hidden))
 
-        current = self.table.currentRow()
+        current = self.selection_index
         if select_visible and current >= 0 and self.table.isRowHidden(current):
             visible = next(
                 (i for i in range(self.table.rowCount()) if not self.table.isRowHidden(i)), -1
@@ -1687,14 +1729,13 @@ class FigureProjectView(QWidget):
     def move_row(self, step: int) -> None:
         try:
             project = self.project()
-            index = self.table.currentRow()
+            index = self.selection_index
             target = index + step
             if not (0 <= index < len(project.rows) and 0 <= target < len(project.rows)):
                 return
             rows = list(project.rows)
             rows[index], rows[target] = rows[target], rows[index]
             self.set_project(project.model_copy(update={"rows": tuple(rows)}))
-            self.table.selectRow(target)
             self._edited()
         except ValueError as error:
             self.status.setText(str(error))
@@ -1719,7 +1760,7 @@ class FigureProjectView(QWidget):
     def remove_row(self) -> None:
         try:
             project = self.project()
-            rows = tuple(r for i, r in enumerate(project.rows) if i != self.table.currentRow())
+            rows = tuple(r for i, r in enumerate(project.rows) if i != self.selection_index)
             order = tuple(
                 name for name in project.figure_order if any(r.figure == name for r in rows)
             )

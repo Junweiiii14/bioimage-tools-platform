@@ -1,0 +1,12 @@
+{
+  "recorded_after_runs": "2026-10-28T13:54:21.285419+08:00",
+  "power_raw": {
+    "ACLineStatus": 1,
+    "BatteryFlag": 1,
+    "BatteryLifePercent": 80,
+    "SystemStatusFlag": 0,
+    "BatteryLifeTime": 4294967295,
+    "BatteryFullLifeTime": 4294967295
+  },
+  "meaning": "ACLineStatus 1=AC online, 0=offline,255=unknown; sampled after the four runs"
+}

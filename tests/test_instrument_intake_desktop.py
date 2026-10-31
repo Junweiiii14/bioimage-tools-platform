@@ -676,9 +676,24 @@ def test_raw_variants_assign_and_reopen_without_algorithm(
     restored = current(window)
     assert restored.intake == expected.intake
     assert window.navigation.read(path)["mode"] == "intake"
-    snapshot = cast(dict[str, object], window.bridge.snapshot()["intake"])
+    transport = window.bridge.snapshot()
+    snapshot = cast(dict[str, object], transport["intake"])
     thumbnails = cast(list[dict[str, object]], snapshot["sources"])
-    assert all(source["preview"] for source in thumbnails)
+    shared = cast(dict[str, object], transport["sourcePreviews"])
+    assert all(source["preview"] is None for source in thumbnails)
+    assert all(shared[cast(dict[str, str], source["asset"])["sha256"]] for source in thumbnails)
+
+    def visible_thumbnails() -> bool:
+        replies: list[object] = []
+        window.web.page().runJavaScript(
+            "document.querySelectorAll('.intake-source-image img').length===3 && "
+            "[...document.querySelectorAll('.intake-source-image img')].every(i=>i.naturalWidth>0)",
+            replies.append,
+        )
+        qtbot.waitUntil(lambda: bool(replies))
+        return replies[0] is True
+
+    qtbot.waitUntil(visible_thumbnails, timeout=10000)
     assert all(p.read_bytes() == data for p, data in before.items())
     assert set(root.rglob("*.tif")) == set(before)
 

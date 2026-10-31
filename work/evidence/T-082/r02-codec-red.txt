@@ -1,0 +1,100 @@
+FFFFFF                                                                   [100%]
+================================== FAILURES ===================================
+___________ test_compressed_content_cannot_exceed_declared_block[8] ___________
+tools\wb\tests\test_tiff_admission.py:201: in test_compressed_content_cannot_exceed_declared_block
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:167: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:193: in _read_tiff
+    raw = read_admitted_tiff_page(page)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:126: in read_admitted_tiff_page
+    NDArray[np.generic], page.asarray(maxworkers=1, buffersize=TIFF_DECODE_BUFFER_BYTES)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:25: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+_________ test_compressed_content_cannot_exceed_declared_block[32946] _________
+tools\wb\tests\test_tiff_admission.py:201: in test_compressed_content_cannot_exceed_declared_block
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:167: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:193: in _read_tiff
+    raw = read_admitted_tiff_page(page)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:126: in read_admitted_tiff_page
+    NDArray[np.generic], page.asarray(maxworkers=1, buffersize=TIFF_DECODE_BUFFER_BYTES)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:25: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+_________ test_compressed_content_cannot_exceed_declared_block[50013] _________
+tools\wb\tests\test_tiff_admission.py:201: in test_compressed_content_cannot_exceed_declared_block
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:167: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:193: in _read_tiff
+    raw = read_admitted_tiff_page(page)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:126: in read_admitted_tiff_page
+    NDArray[np.generic], page.asarray(maxworkers=1, buffersize=TIFF_DECODE_BUFFER_BYTES)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:25: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+_________ test_compressed_content_cannot_exceed_declared_block[32773] _________
+tools\wb\tests\test_tiff_admission.py:201: in test_compressed_content_cannot_exceed_declared_block
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:167: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:193: in _read_tiff
+    raw = read_admitted_tiff_page(page)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:126: in read_admitted_tiff_page
+    NDArray[np.generic], page.asarray(maxworkers=1, buffersize=TIFF_DECODE_BUFFER_BYTES)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:25: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+_________ test_compressed_content_cannot_exceed_declared_block[34925] _________
+tools\wb\tests\test_tiff_admission.py:201: in test_compressed_content_cannot_exceed_declared_block
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:167: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:193: in _read_tiff
+    raw = read_admitted_tiff_page(page)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:126: in read_admitted_tiff_page
+    NDArray[np.generic], page.asarray(maxworkers=1, buffersize=TIFF_DECODE_BUFFER_BYTES)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:25: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+____________ test_lzma_dictionary_limit_before_decoder_allocation _____________
+tools\wb\tests\test_tiff_admission.py:215: in test_lzma_dictionary_limit_before_decoder_allocation
+    load_tiff(path)
+tools\wb\src\wb_tool\adapters\tiff_input.py:167: in load_tiff
+    return _read_tiff(path, allow_display=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:193: in _read_tiff
+    raw = read_admitted_tiff_page(page)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\src\wb_tool\adapters\tiff_input.py:126: in read_admitted_tiff_page
+    NDArray[np.generic], page.asarray(maxworkers=1, buffersize=TIFF_DECODE_BUFFER_BYTES)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\wb\tests\test_tiff_admission.py:25: in forbidden
+    raise AssertionError("Resource admission must run before asarray")
+E   AssertionError: Resource admission must run before asarray
+=========================== short test summary info ===========================
+FAILED tools/wb/tests/test_tiff_admission.py::test_compressed_content_cannot_exceed_declared_block[8]
+FAILED tools/wb/tests/test_tiff_admission.py::test_compressed_content_cannot_exceed_declared_block[32946]
+FAILED tools/wb/tests/test_tiff_admission.py::test_compressed_content_cannot_exceed_declared_block[50013]
+FAILED tools/wb/tests/test_tiff_admission.py::test_compressed_content_cannot_exceed_declared_block[32773]
+FAILED tools/wb/tests/test_tiff_admission.py::test_compressed_content_cannot_exceed_declared_block[34925]
+FAILED tools/wb/tests/test_tiff_admission.py::test_lzma_dictionary_limit_before_decoder_allocation
+6 failed, 39 deselected in 3.63s
