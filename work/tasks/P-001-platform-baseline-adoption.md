@@ -1,6 +1,6 @@
 # P-001 正确产品基线与长期计划接入
 
-<!-- PROGRAM_TASK_META {"id":"P-001","status":"in_review","work_package":"W00","depends_on":[],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a190e6-02b1-74e3-a7b9-bd5fbc3f36fe","base_commit":"dfc48ed7c2c944dc8f03c3931bc7985452a31393","head_commit":"bed7973d35d17702a0700a7008445d4106fb6985"} -->
+<!-- PROGRAM_TASK_META {"id":"P-001","status":"done","work_package":"W00","depends_on":[],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a190e6-02b1-74e3-a7b9-bd5fbc3f36fe","base_commit":"dfc48ed7c2c944dc8f03c3931bc7985452a31393","head_commit":"f4bd81e182ee4b982949e99eb51136dabcea7701"} -->
 
 ## 执行状态
 
@@ -54,3 +54,7 @@ PR：[47](https://github.com/Junweiiii14/bioimage-tools-platform/pull/47)已切�
 P001补充调查：5个预先冻结解析样例真实旧worker均exit0，并与直接API逐字节结果一致，见frozen-case-design.json与frozen-baseline-result.json。当前只证明旧成熟用例基线，尚未实现新模块接口或V0Workspace成果。新增证据已提交bed7973，独立审阅者实际复现5例并核对全部输入/结果SHA，结论Accepted；具体命令与退出码见本任务下方。
 
 补充独审：`/root/p001_review`对8f5bf657..bed7973 Accepted，实际命令`.venv/Scripts/python.exe work/evidence/P-001/replay_frozen_baseline.py .local/p001-review-replay` exit0，5进程exit0、除PID外所有记录一致；规则回执对bed7973/dca0061f检查exit0。该证据随接main后的最终候选推送；旧8f5bf657作业可能因新提交被正常并发取消，不作伪通过，也不手动重复运行。
+
+## 已完成的P001退出证据
+
+2026-10-31 PR47正常合main `29930f62a0b158189b76e0fad7d090d632f149d6`，实际fetch和git diff --exit-code f4bd81e origin/main为0，合并树等同独审候选。f4bd81e四项必需检查全SUCCESS（quality41182524890，rules41182524880）；Windows1503 passed/708.63s，Linux1499 passed/4已有平台skip/567.33s，双平台独立wheel及桌面/OCR安装用例通过；无修改skip/容差/门禁。最终独审见review-final.md。P001接入与集成条件满足；T082科学/外部目标机缺口不变。状态关闭记录随后续P002启动提交，已完成不是提前承诺。

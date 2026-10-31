@@ -13,6 +13,10 @@ for variable in (
 
 
 def main() -> int:
+    if sys.argv[1:] == ["--worker", "wb_v0_compare"]:
+        from wb_tool.api import run_wb_module_worker
+
+        return run_wb_module_worker()
     if len(sys.argv) == 3 and sys.argv[1] == "--verify-supervision-installation":
         from pathlib import Path
 

@@ -22,6 +22,20 @@ from wb_tool.adapters.intake_delivery import (
 from wb_tool.adapters.intake_figure import load_intake_figure_preview, prepare_intake_figure
 from wb_tool.adapters.intake_output import export_intake_outputs
 from wb_tool.adapters.metadata_input import read_metadata_file
+from wb_tool.adapters.module_compare import compare_wb_module
+from wb_tool.adapters.module_execution import (
+    execute_wb_module,
+    prepare_wb_execution,
+    wb_module_environment,
+    wb_module_spec,
+)
+from wb_tool.adapters.module_protocol import (
+    WBModuleCancel,
+    WBModuleConversation,
+    WBModuleStart,
+    encode_module_frame,
+    module_identity,
+)
 from wb_tool.adapters.ocr_input import OCRImage, load_ocr_image
 from wb_tool.adapters.quant_export import (
     export_wbquant_table,
@@ -358,6 +372,16 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "compare_wb_module",
+    "WBModuleStart",
+    "WBModuleCancel",
+    "WBModuleConversation",
+    "encode_module_frame",
+    "module_identity",
+    "execute_wb_module",
+    "prepare_wb_execution",
+    "wb_module_environment",
+    "wb_module_spec",
     "IncompleteProjectEdit",
     "IntakeDeliveryPlan",
     "IntakeDeliveryReceipt",
@@ -643,6 +667,7 @@ __all__ = [
     "create_wb_view",
     "create_wb_background",
     "run_wb_worker",
+    "run_wb_module_worker",
     "AcceptedFrame",
     "CancelFrame",
     "CancelledFrame",
@@ -746,6 +771,12 @@ def create_wb_background() -> "WBBackground":
 
 def run_wb_worker() -> int:
     from wb_tool.worker import main
+
+    return main()
+
+
+def run_wb_module_worker() -> int:
+    from wb_tool.module_worker import main
 
     return main()
 

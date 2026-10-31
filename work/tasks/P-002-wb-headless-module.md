@@ -1,6 +1,6 @@
 # P-002 V0成熟WB方法独立调用与真实成果对照
 
-<!-- PROGRAM_TASK_META {"id":"P-002","status":"planned","work_package":"W02","depends_on":["P-001"],"execution_root":"not_activated","owner":null,"base_commit":null,"head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-002","status":"in_progress","work_package":"W02","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a190e6-02b1-74e3-a7b9-bd5fbc3f36fe","base_commit":"29930f62a0b158189b76e0fad7d090d632f149d6","head_commit":null} -->
 
 ## 执行状态
 
@@ -45,3 +45,21 @@ P-001接入并确认的实际产品树；B-007第2/3/4/12.2/13.1节；冻结旧�
 ## 继续入口
 
 本卡未完成步骤为继续位置；主依据为docs/plans/research-platform-rd.md第2/3/4/12.2/13.1节。V0交付是本次第一阶段终点，不自动推进V1、IF或Agent；后续按已授权范围与前置依赖激活。修改规则或范围后重载context，收尾更新任务与handoff。
+
+## 2026-10-31激活
+
+P001已独审并经PR47四必需CI正常合main29930f62，当前从该准确main建立codex/p002-wb-headless-module（执行树bioimage-v0）。成熟用例冻结预期与旧worker真实证据见work/evidence/P-001/frozen-case-design.json和frozen-baseline-result.json；无归一化公式扩展。接入调查是候选，按实际代码验证，不以空接口、单元测试或文档代替完整V0。
+
+## 2026-10-31局部实现验证
+
+当前未提交模块契约及成熟用例适配；未修改原科学公式、AssetRef v1或旧storage schema。Win11/Python3.12.14，base/HEAD29930f62，执行 `.venv/Scripts/python.exe -m pytest tools/wb/tests/test_module_execution.py tests/test_workspace.py::test_contract_schema_snapshot -q --basetemp=.local/pytest-p002-module-b`：exit0，12 passed，3.30秒。覆盖解析独立预期40/4000、旧调用一致、原图不变、请求摘要/角色/修订/实现拒绝、非法ROI空值及原因、取消、未知dtype、JSON异常、成果端口和事件身份。此为局部检查；新worker、持久成果、薄GUI、隔离wheel、全门禁、独审及PR集成尚未完成。
+
+## 2026-10-31真实worker与持久化增量
+
+已实现静态wb_v0_compare worker与工具独立module_worker；旧分析和新模块分别真实计算，生成两张非空CSV、来源清单及两份机器结果。RunSession沿原PID/退出/取消路径，在存储线程验证候选成果、导入登记资产并最终commit_result。格式与兼容边界见docs/contracts/wb-module-v0.md。现有原方法/旧默认运行路径保持。
+
+本树未提交增量，base29930f62，Win11/Python3.12.14。指定工作区TEMP/TMP=.local/p002-process-temp后，执行 `.venv/Scripts/python.exe -m pytest tools/wb/tests/test_module_execution.py tests/test_module_run_session.py tests/test_run_session.py tests/test_async_storage.py tests/test_workspace.py::test_contract_schema_snapshot -q --basetemp=.local/pytest-p002-integrated-c`：exit0，34 passed，21.99秒；日志.local/p002-integrated-tests.txt。证明真实新worker数值40/4000、身份/文件摘要、无覆盖/非法ROI空值；真实RunSession成功重开、manifest后退出7、输出缺失/同尺寸篡改、取消，以及原RunSession/异步存储行为。
+
+首次组合检查16 passed/1 failed：既有import_bytes测试因沙箱默认TEMP写入PermissionError失败；独立TemporaryDirectory写入复现权限错误，未改产品或测试预期，改为工作区TEMP后该项1 passed，再完成上述34项组合验证。初始JSON极深嵌套测试发现仅依赖Python递归上限不确定，改为显式32层准入后通过；首轮Pyright提示未知容器类型，已用边界cast明确类型，无ignore。受影响文件Ruff、Pyright（0errors）和dev.py policy（180产品文件）均exit0；全门禁、隔离wheel及独审未运行。
+
+下一步：共享会话控制器与完整无GUI宿主命令、现有工作台薄对照入口及中文验收流程；扩大路径/成果准入负例，最终全门禁与准确提交独审/PR集成。不得据本增量将P002或V0标done。

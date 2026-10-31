@@ -18,10 +18,13 @@ from PySide6.QtCore import QObject, Qt, QThread, QTimer, Signal, Slot
 from tool_contracts.api import (
     AssetRef,
     DraftSnapshot,
+    ExecutionRequest,
     ProcessExitReceipt,
     RecoveryReport,
     RunRecord,
 )
+
+from bioimage_app.module_results import commit_module_result
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -91,6 +94,7 @@ class StorageCommand:
     reason: str = ""
     interrupted: bool = False
     cancellation: Event | None = None
+    module_request: ExecutionRequest | None = None
 
 
 @dataclass(frozen=True)
@@ -183,6 +187,16 @@ class _StorageWorker(QObject):
             if command.receipt is None:
                 raise ValueError("Terminal operation requires an observed process exit")
             if op == "commit":
+                if command.module_request is not None:
+                    return commit_module_result(
+                        store,
+                        command.run_id,
+                        command.receipt,
+                        command.data,
+                        command.module_request,
+                        command.path,
+                        command.cancellation,
+                    ), b""
                 return store.commit_result(
                     command.run_id,
                     command.receipt,

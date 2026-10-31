@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from threading import Event
 
 from PySide6.QtCore import QObject, Signal, Slot
-from tool_contracts.api import ProcessExitReceipt, RunRecord
+from tool_contracts.api import ExecutionRequest, ProcessExitReceipt, RunRecord
 
 from bioimage_app.process import ProcessCodec, ProcessOutcome, ProcessRunner
 from bioimage_app.storage import AsyncStorage, StorageCommand, StorageReply
@@ -30,10 +30,26 @@ class RunSession(QObject):
         prepared: RunRecord,
         codec: ProcessCodec,
         parent: QObject | None = None,
+        *,
+        module_request: ExecutionRequest | None = None,
+        module_output_directory: str = "",
     ) -> None:
         super().__init__(parent)
         if prepared.state != "prepared" or prepared.pid is not None:
             raise ValueError("Session requires a frozen prepared run")
+        if (module_request is None) != (not module_output_directory):
+            raise ValueError("Module publication requires both request and staging directory")
+        self._module_request = (
+            ExecutionRequest.model_validate_json(module_request.model_dump_json())
+            if module_request is not None
+            else None
+        )
+        if module_request is not None and (prepared.document_id, prepared.revision) != (
+            module_request.document_id,
+            module_request.revision,
+        ):
+            raise ValueError("Module request differs from the prepared document revision")
+        self._module_output_directory = module_output_directory
         self._store = storage
         self._prepared = prepared
         self._runner = ProcessRunner(codec, self)
@@ -170,6 +186,8 @@ class RunSession(QObject):
                 receipt=receipt,
                 data=outcome.terminal.data,
                 cancellation=self._cancellation,
+                module_request=self._module_request,
+                path=self._module_output_directory,
             )
         self._terminal_submitted = True
         self._submit(command.operation, command)

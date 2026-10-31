@@ -13,12 +13,31 @@ from wb_tool.api import (
     OCRStartFrame,
     ResultFrame,
     StartFrame,
+    WBModuleConversation,
+    WBModuleStart,
     WorkerConversation,
+    encode_module_frame,
     encode_ocr_frame,
     encode_worker_frame,
 )
 
 from bioimage_app.process import ProcessEvent
+
+
+class WBModuleProcessCodec:
+    def __init__(self, start: WBModuleStart) -> None:
+        self._conversation = WBModuleConversation(start)
+
+    def accept(self, data: bytes) -> ProcessEvent:
+        event = self._conversation.accept(data)
+        return ProcessEvent(
+            event.kind,
+            event.manifest.model_dump_json().encode("utf-8") if event.manifest is not None else b"",
+            event.reason,
+        )
+
+    def cancellation(self) -> bytes:
+        return encode_module_frame(self._conversation.cancellation())
 
 
 class WBProcessCodec:

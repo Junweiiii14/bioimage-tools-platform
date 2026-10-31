@@ -1,6 +1,6 @@
 # 当前风险与外部验收边界
 
-当前V0任务状态从 [P001](../work/tasks/P-001-platform-baseline-adoption.md)进入；以下[T082](../work/tasks/T-082-reliability-remediation.md)风险继续保留。这里保留恢复工作必须知道的边界；不复制测试台账，不把历史失败变成当前阻塞或已修复结论。
+当前V0任务状态从 [P002](../work/tasks/P-002-wb-headless-module.md)进入；P001已完成，以下[T082](../work/tasks/T-082-reliability-remediation.md)风险继续保留。这里保留恢复工作必须知道的边界；不复制测试台账，不把历史失败变成当前阻塞或已修复结论。
 
 - **科学适用性未验。** 用户确认暂时没有未用于调参的留出实验图及负责人认可的比较方法/指标/容差，R10 保留待办；工程继续。开发图、合成回归、参考辅助裁图及高置信 OCR 不证明独立准确率或“80%整项目成功率”。方法冻结见 [scientific-baseline](../work/evidence/T-082/scientific-baseline.md)。原值、行宽均值/积分、显式归一化及人工确认口径不变。
 - **目标环境未验。** 历史本机 Win11 安装证据不代替干净 Win10、全部员工设备、物理 DPI/拖放/GPU 或外部 Excel/WPS/LibreOffice 验收。T-002/P0 原生按钮/ROI/DPI 缺项继续保留；历史用户 Esc 中止不写成通过。R07/R11 的本轮实际范围与未运行矩阵以任务及对应证据为准。
