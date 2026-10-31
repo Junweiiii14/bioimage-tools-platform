@@ -1,0 +1,22 @@
+{
+  "records": 17,
+  "scene_coverage": {
+    "cell_count": 3,
+    "colony": 1,
+    "elisa": 1,
+    "flow": 2,
+    "if_intensity": 4,
+    "ihc": 1,
+    "nuclei_count": 6,
+    "qpcr": 2,
+    "scratch": 1,
+    "wb": 2
+  },
+  "registry_sha256": "663424bfd51eea7b4caf7d93f4998f88301d798ec740a4d4545b14e72d31ea12",
+  "source_files": [
+    "work\\evidence\\B-007\\image-datasets.json",
+    "work\\evidence\\B-007\\root-datasets.json",
+    "work\\evidence\\B-007\\assay-datasets.json",
+    "work\\evidence\\B-007\\supplement-qpcr-dataset.json"
+  ]
+}

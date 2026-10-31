@@ -1,5 +1,9 @@
 # 生物图像工具平台
 
+## 研发与任务入口（2026-10-31）
+
+[研发总方案3.0与HTML](docs/plans/README.md) · [第一阶段V0](docs/plans/phase-1-v0.md) · [公开开发数据](docs/plans/development-data.md) · [任务依赖](work/programs/scientific-agent-platform/README.md)。新路线包含10类实验，当前启动范围是V0旧WB独立运行；下方保留已有实验室产品使用说明。方案发布不表示新功能或本地T082已合入main。
+
 当前交付入口：[T079实验室离线发行](work/tasks/T-079-laboratory-offline-delivery.md) → [实验室部署说明](docs/wb-laboratory-delivery.md) → [交接索引](AGENT_HANDOFF.md)。本轮收拢T074–T077的曲线、整版拼图、界面系统、文件夹拖入与未审核导出整改，并提供包含运行环境的Windows x64安装器。
 
 历史版本及证据保留，旧检查不作为本轮通过证明。实验室发行的实际安装验证、源码集成和目标机限制以T079记录为准；科学留出、干净Win10与物理DPI验收另列。开发范围保持WB，IF/IHC不自动扩展。

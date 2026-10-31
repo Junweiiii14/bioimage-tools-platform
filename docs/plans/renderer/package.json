@@ -1,0 +1,16 @@
+{
+  "name": "bioimage-rd-plan-renderer",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "standalone": "node build.mjs --standalone"
+  },
+  "dependencies": {
+    "marked": "17.0.5"
+  }
+}

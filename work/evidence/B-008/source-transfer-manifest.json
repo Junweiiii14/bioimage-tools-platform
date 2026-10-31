@@ -1,0 +1,260 @@
+{
+  "schema_version": 1,
+  "base_commit": "18b5cf6de0c83b8c67f26433a6059d8dabf1f381",
+  "source_content_version": "B-007/3.0",
+  "files": [
+    {
+      "path": "docs/plans/research-platform-rd.md",
+      "source_sha256": "8cdf685973da5fb7c7b60162d233e09c2a22c07724466102df34d914fb783f07",
+      "publication_sha256": "7d155774e3e22afe126267723f2a5cb984e9092ab6ee44d292e11e47e868afcb",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "docs/plans/archive/research-platform-rd-v2.md",
+      "source_sha256": "dee995655330b7a15e4eeb146b6f4fec300e25818b844c0c04bd3bbc3a8c85e2",
+      "publication_sha256": "f83fda55c839bcb1189357177d132bcbe1c785bbffb732ea37ce1ce5944200a6",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "docs/plans/scientific-agent-platform.md",
+      "source_sha256": "b0013b1e28251a7fa785e8b4b9032ffcc742913812f97d50ce459993d50de5b9",
+      "publication_sha256": "f11fadd05333088b61794df3bc59fef99926f2db8dceae9b4bc5301836dc84d5",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-004/architecture-audit.md",
+      "source_sha256": "e6a43ddcb04068be715c35f77b767812cf2b48a0da898768353366766c5814ee",
+      "publication_sha256": "5dfbb68164d11027d2516e39123f2b2469aae7d1e86eceacd79f86054c734505",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-004/architecture-facts.json",
+      "source_sha256": "81107f0d273d4704c43a86be725d779b33d807607f0ac1f8fc27ea2b513e678a",
+      "publication_sha256": "fa118cf3543b4236275a6f91b6da340493a982e46de599f44fa3352bc7ee2a3b",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-004/technical-review.md",
+      "source_sha256": "7580ed85d8573d9eb09f51a45319c6cb33d2d91a9c84b7247da9a5d5ca578ca3",
+      "publication_sha256": "7580ed85d8573d9eb09f51a45319c6cb33d2d91a9c84b7247da9a5d5ca578ca3",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/tasks/P-001-platform-baseline-adoption.md",
+      "source_sha256": "8de61a5c11ee16061f2c9e40b7b632f205c6afa54c44c270f6a25762a96bf272",
+      "publication_sha256": "5b8c52ff98e80bdc18192c9f6a16a10ddab93a7d0a8d037c6159eb964a1f8d50",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/tasks/P-002-wb-headless-module.md",
+      "source_sha256": "cec01999de7ca0967e2a66606460d1e09e2cd89daf54df64f1a6198f0dbf7ff1",
+      "publication_sha256": "f392899c4f1df421c094249d5db0481a93119c1344421899f5f7122f08550adc",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/tasks/P-003-method-validation-foundation.md",
+      "source_sha256": "d7770e4d3f7913f1b775bb904937b32578891454cace4d08f2b862623b17d45f",
+      "publication_sha256": "21a3fdbebf49d8794a481c693335906455eba287521d140b1d3f42fe3d0314ce",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/tasks/P-004-analysis-asset-contract.md",
+      "source_sha256": "404653dc813e76c1a19a0dd7809b9ca9e9b05c6581025cf9fdec764a3708b3dc",
+      "publication_sha256": "295f2c0f805c043cba0dcfefad4287ebc1a90d51bb230ef8e34def8f794c4a1b",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/tasks/P-005-workflow-execution-slice.md",
+      "source_sha256": "f63cc55a31f877f53a555ccc1a6f5feb3cf17e5536d34c0f1e0d88327b4df585",
+      "publication_sha256": "40dddbf984af39614e2e6715f58a4749bb4e5f8d5e5f225ef05362826dbd3979",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/tasks/P-006-interaction-performance-baseline.md",
+      "source_sha256": "6b3c529b0267dc593be0771e922781e3ed12a94973df78889547fbf116d73a89",
+      "publication_sha256": "64238c45b092bb0f9e3e21e90e4638b448c15bc852afcd4a3d15fc8af1e34a87",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/programs/scientific-agent-platform/README.md",
+      "source_sha256": "15c843eae2482ac603e3f2470ebf3b766b8ae47a3ef294b41a0d5b1067775272",
+      "publication_sha256": "d856cbec3c00fddf18a3917ad43951446e090bf7e420db57b54a2c92ef1f4390",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/programs/scientific-agent-platform/registry.json",
+      "source_sha256": "79e502bb2f66ba903267fb5ce5d929d911e71d7f2604ba47c46944ed116f4899",
+      "publication_sha256": "4bba3b9f5992864549af76ffcbaeecf61b5247eb74bed390dfdd31b28de5f466",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/programs/scientific-agent-platform/check_plan.py",
+      "source_sha256": "e40732e7de0c80f1a5e921e8131242339f2afa40a0a66ecd784cfbb3b549051e",
+      "publication_sha256": "bb4aa61244dd3f3e0c08ae256ba92f6d1215b6e33c2d41ed83c503a1096fb35c",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/programs/scientific-agent-platform/task-template.md",
+      "source_sha256": "375eab8bd3171d657faa4b12bdbdc7620388b90e248756b886195fedd7cd6d9f",
+      "publication_sha256": "375eab8bd3171d657faa4b12bdbdc7620388b90e248756b886195fedd7cd6d9f",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/01-existing-design-language.md",
+      "source_sha256": "96fd0645b297b25e2d4881b7d04c1c5be295bc05484e2b2d7da0db2fe43aaea3",
+      "publication_sha256": "fc9aaa9da2ad3e057b04acb65c62c6024d6e27264e05f55cd331a48cb91c8876",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/02-lab-image-workflows.md",
+      "source_sha256": "4a64e3ed50574e06a11e2f52afab1d41560195d3d2b83ce787e40a3697028f98",
+      "publication_sha256": "993a0fe93aa2a0d5f435808f59a85981aa5a407606a71233b0205c28f6cb4022",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/03-lab-table-and-assay-workflows.md",
+      "source_sha256": "ca06a61a3ae6da5c294774da24d51c6f5bf3bd79d61a50aa1befb5fb15d54541",
+      "publication_sha256": "1c06a3f161a70880b0fe06e1025dfbdec83d2e25e12942d2905b852f96b18ec3",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/04-human-adjustments.md",
+      "source_sha256": "977105bc1d1f2c7b973e4c5948d3f4fd98ab7732349f30183e2d38199d4adaff",
+      "publication_sha256": "d156d36c198ac7d907efc6935098fe60061f49d382bbfd0cd35194df2740f496",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/05-assay-datasets.md",
+      "source_sha256": "40b1b30f08e1c7ecd4c54d27ee1df335812f8309b61e7da605ba0ea255bf32bb",
+      "publication_sha256": "40b1b30f08e1c7ecd4c54d27ee1df335812f8309b61e7da605ba0ea255bf32bb",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/06-module-reuse-and-development.md",
+      "source_sha256": "71df115301edc4f8e53cd3339c2907aad5914c69790e8167b214dab420c8ffa6",
+      "publication_sha256": "71df115301edc4f8e53cd3339c2907aad5914c69790e8167b214dab420c8ffa6",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/07-data-development-policy.md",
+      "source_sha256": "8b0506af692311593bce0f1113e011b562769ca52152cc228d0f73b84d2c3a9f",
+      "publication_sha256": "7fd82764632e0507e915a18fb656b64b677dc9b86839a11a3a8988e22a4f2fc4",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/architecture-review.md",
+      "source_sha256": "3200e7dfd36ac15ac6e274c95ee824da1f2ba0ba27e7487c46fca1ea48f6f441",
+      "publication_sha256": "69c7a934e89c8317647ea5abe29c4d7d987dde60b0fa810115cfaeff1a9235de",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/assay-datasets.json",
+      "source_sha256": "606b665768e9d6aff476447305be13a9eb0a65c912f70e7d3c2ca0b6ef26a39b",
+      "publication_sha256": "606b665768e9d6aff476447305be13a9eb0a65c912f70e7d3c2ca0b6ef26a39b",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/dataset-validation.json",
+      "source_sha256": "c8426fabf9215b7c1029aa5fef8632170236716e549e91d74e740497dab353d2",
+      "publication_sha256": "0f3098fbade9394fd7b34d6c60a4842511ab9ec86c652f023d13650d0ccfe79e",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/design-detection.json",
+      "source_sha256": "0e278cb471cc15df9a50469b6f5dd6bd16ff40b11607a97d8ca354ec4e8e10c7",
+      "publication_sha256": "3f638813a933b6cfc8b38e9da40e8c30c52a1dbcaebf9e85be401cc66058f9ab",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/document-validation.json",
+      "source_sha256": "f37021e65bc368dd938add225775283e5abdc74337577b02b769cf7e8bd6b3db",
+      "publication_sha256": "dab51c9bb9b35c75bb895c3971a0a1dff8abb228ace74521b815e9993fe3a850",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/html-validation.json",
+      "source_sha256": "2aaf7bae69e690a0db6948cca03c476811029b00c16cc8025697757030c292b9",
+      "publication_sha256": "2aaf7bae69e690a0db6948cca03c476811029b00c16cc8025697757030c292b9",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/image-datasets.json",
+      "source_sha256": "090d6f56397fbf1e02113359c4b5b95d5fd7d676b393ceeeb2421ca19ab82bc0",
+      "publication_sha256": "fe66c7bb20be8108c73cf317bc6a54abe3f3920993266ca862bdee915df02324",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/license-html-probe.json",
+      "source_sha256": "2b11cacb6fcef7871cffcc158cc7455877c28831c3d6891ffbc4fd174dc45036",
+      "publication_sha256": "3207b8dac2020c736489160c7c313e84e8423116c3735b8c659b56f8537a3674",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/package-validation.json",
+      "source_sha256": "fbff4a521ffca6832ad744a17a56c63e9b7d977842aa92035e67b1d35fe607f2",
+      "publication_sha256": "0481296e90ed358dc3dcb2b467a3a38f35e340dec0a4f0364b36ef32c62cf4ad",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/public-development-data.json",
+      "source_sha256": "3a0af74057abc9c16fe60e4cdf4b3af9ec03a6f17b0e5ff9fb725e4d3d781689",
+      "publication_sha256": "663424bfd51eea7b4caf7d93f4998f88301d798ec740a4d4545b14e72d31ea12",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/root-datasets.json",
+      "source_sha256": "7d023b1fd57d54144eb51857412332524d23adec201b6ad575ed68bff6ed5b8e",
+      "publication_sha256": "7d023b1fd57d54144eb51857412332524d23adec201b6ad575ed68bff6ed5b8e",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/sample-download-verification.json",
+      "source_sha256": "42eb8d59783ca8aa300bec2c2da554489622ad9d03e275a98a48183721588c5a",
+      "publication_sha256": "7ab6a6e8ac9893c77fe157a045089e8c22adbf28b01820c3c4589ada037e45b4",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/supplement-qpcr-dataset.json",
+      "source_sha256": "48acb22bb6e4b7203fc6e5b8a6fa189fcb530f77aa23b3381074e5ef146b56cc",
+      "publication_sha256": "48acb22bb6e4b7203fc6e5b8a6fa189fcb530f77aa23b3381074e5ef146b56cc",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/supplement-qpcr-dataset.md",
+      "source_sha256": "7891a65655c1bbc6ef857f442debe6bb177a9a81736dd9d6160fd1a915d3e0a9",
+      "publication_sha256": "7891a65655c1bbc6ef857f442debe6bb177a9a81736dd9d6160fd1a915d3e0a9",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/validation.md",
+      "source_sha256": "4267aa71ef2cd9f60f7b47ef6997c309203caa38c03f50649e203edce2179929",
+      "publication_sha256": "4267aa71ef2cd9f60f7b47ef6997c309203caa38c03f50649e203edce2179929",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/evidence/B-007/workflow-review.md",
+      "source_sha256": "153d994cb8dcff93b8449e2c20c994cb3afe86fc72630a900030cae724bbcd47",
+      "publication_sha256": "153d994cb8dcff93b8449e2c20c994cb3afe86fc72630a900030cae724bbcd47",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/tasks/B-005-ai-development-program.md",
+      "source_sha256": "04a5d40712d201a0e837af4ade0d7f16d9708a5b5c3f6c7c609f96234cc226de",
+      "publication_sha256": "04a5d40712d201a0e837af4ade0d7f16d9708a5b5c3f6c7c609f96234cc226de",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/tasks/B-006-product-rd-blueprint.md",
+      "source_sha256": "054e1b50a8a47467ed453d2cb749ef4badc5672fcf948c911fb97ac16c72b5f3",
+      "publication_sha256": "054e1b50a8a47467ed453d2cb749ef4badc5672fcf948c911fb97ac16c72b5f3",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    },
+    {
+      "path": "work/tasks/B-007-lab-workflow-and-design-spec.md",
+      "source_sha256": "7d49677798254113b1786bb57f359427438d973bacd51b9e9e038f768f9abd76",
+      "publication_sha256": "7d49677798254113b1786bb57f359427438d973bacd51b9e9e038f768f9abd76",
+      "projection": "Repository-relative Markdown evidence links; machine roots redacted; LF normalized; P001-P006 aligned to B007; check_plan formatting/compound condition only. Source hashes preserve original inspection binding."
+    }
+  ],
+  "excluded": "Source product dirty, .local files and sample data, old rules receipts, old transfer manifest, installed packages and old handoff."
+}

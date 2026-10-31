@@ -1,0 +1,8 @@
+{
+  "result": "pass",
+  "archive": "<original-local-workspace>\\.local\\deliveries\\B-007\\outputs\\公开开发数据与样例包_20261031.zip",
+  "bytes": 7144753,
+  "sha256": "5c0784a9157858fe4a2b3b717575068d427cac458dc7b28cea06708ea2174fd9",
+  "entries": 12,
+  "scope": "Archive CRC and exact constituent SHA-256 only; not scientific validation."
+}

@@ -1,0 +1,37 @@
+{
+  "structural": {
+    "title": "科研数据平台完整研发总方案 · B-007",
+    "chapters": 13,
+    "tables": 49,
+    "duplicateIds": [],
+    "brokenAnchors": [],
+    "overflow": false,
+    "text": 109511
+  },
+  "search": {
+    "count": 6,
+    "status": "找到 6 处，显示前 12 处。",
+    "jump": "#block-545",
+    "empty": true
+  },
+  "mobile": {
+    "overflow": false,
+    "menuBefore": "false",
+    "menuOpened": "true",
+    "menuAfter": "false",
+    "jump": "#section-12"
+  },
+  "print": {
+    "sidebarHidden": true,
+    "contentVisible": true,
+    "tableOverflow": "visible",
+    "headings": 13
+  },
+  "styleEvidence": {
+    "cellPadding": "13px 15px",
+    "font": "\"WB Sans\", \"Microsoft YaHei\", sans-serif",
+    "fontLoaded": true
+  },
+  "issues": [],
+  "network": []
+}
