@@ -42,3 +42,8 @@ platform_runtime仅通用图/账本/失效规则；实验适配在工具api与�
 ## 最终CI资源实测
 
 53892fd独审Accepted；PR53 quality41434643209 Linux1671passed4旧skip10warnings728.40秒、所有wheel通过，desktop/rulescontext成功。Windows1675passed10warnings1347.61秒、全部wheel及dev.py最终成功标记均实际出现，checkstep为success；但job总25分24秒，被服务器25分钟上限标cancelled，不能作为必需CI通过。现仅Windows作业总时限25→30分钟，Linux20不变，无断言/单测时限/跳过/门禁削弱；纯CI资源变更不重复本机全量。需准确增量独审及新HEAD正常CI。
+
+
+## 旧网页测试夹具时序修正
+
+资源候选0c33的CI41438503742：Linux1671pass4旧skip820.52秒/allwheels通过；Windows1failed1674passed875.13秒，旧advanced真实网页用例在手工未保存的并发修订后，与700ms自动保存竞争，下一次template_apply被宿主busy正确拒绝。实际调用自动保存回调的有界探针重现相同断言（探针1pass8.16秒表示观察到预期旧失败，不是产品通过）。仅补3行：真实保存并发修订、等待原20秒预算内hostidle、断言current_draft_saved，再原流程验证冲突/24值/保存重开导出；原断言/容差/skip/单测时限均不改。修正后该完整文件2pass8.88秒。产品代码保持53892fd，准确新提交独审/CI待完成。

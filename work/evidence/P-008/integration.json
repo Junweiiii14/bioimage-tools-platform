@@ -2,12 +2,12 @@
   "candidate": "53892fd9c99a7c175ae5f5b95bbc98032df1c1d5",
   "pr": "https://github.com/Junweiiii14/bioimage-tools-platform/pull/53",
   "quality_run": 41434643209,
-  "integration_state": "not merged: Windows job cancelled by25min total limit despite successful check step; resource-only correction pending newheadCI",
+  "integration_state": "not merged: resource candidate0c33 CI41438503742 Windows1failed1674passed; actual advanced-form test fixture autosave race reproduced and corrected; new exact review/CI pending",
   "checks": [
     {
       "link": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41434643209/job/125241961091",
       "name": "foundation (windows-latest)",
-      "state": "IN_PROGRESS"
+      "state": "CANCELLED"
     },
     {
       "link": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41434643209/job/125241960829",
@@ -50,5 +50,32 @@
     "sha256": "f374165b250c73893bbb34a736eac555bfed554a6c89c138ac4fef9554443073",
     "acceptance": "job is not pass; normal requiredCI remains necessary"
   },
-  "ci_resource_change": "Only Windows job total limit25->30minutes; Linux20 unchanged. No assertion/testtimeout/skip/testscope/dependency/requiredcheck change. No local full suite repeated for CI-only change."
+  "ci_resource_change": "Only Windows job total limit25->30minutes; Linux20 unchanged. No assertion/testtimeout/skip/testscope/dependency/requiredcheck change. No local full suite repeated for CI-only change.",
+  "checks_snapshot": "Final candidate53892fd first CI41434643209 completed: Windows CANCELLED at whole-job25minute limit; other requiredchecks SUCCESS. This array is not the new0c33 head CI result.",
+  "resource_candidate_run": {
+    "candidate": "0c33e705d3010e89a86c0fc5c99ffb797bfdf9d8",
+    "quality_run": 41438503742,
+    "linux": "1671passed4existingSkipped10warnings820.52s and all isolatedwheels pass",
+    "windows": "1failed1674passed10warnings875.13s; test_actual_web_forms_save_reopen_and_export conflict resolve then template_apply received legitimate hostbusy error; wheels not reached",
+    "reason": "Test injected unsaved concurrent project/generation then raced the real700ms autosave timer. Explicitly invoking actual _save_idle_edits immediately after resolve independently reproduced same hostbusy failure. Corrected fixture commits concurrent revision and waits actualhostidle+current_draft_saved before publishing; original conflict24/result/export assertions retained.",
+    "logs": [
+      {
+        "path": ".local/p008-ci-windows-0c33e70.log",
+        "sha256": "76edbd1940b56067c6a5002776cd492a8d30fb30d81bf471be528803b7e202e0"
+      },
+      {
+        "path": ".local/p008-ci-linux-0c33e70.log",
+        "sha256": "78621aa901058f6e5961cde7cd01bc10681d484f1de3e6f9950314b3dbdcc13b"
+      },
+      {
+        "path": ".local/p008-advanced-busy-before.log",
+        "sha256": "2f0de3d789c94b3f94d935478f214808e9d98b203f29e29e9117b5b0f1f8d9f3"
+      },
+      {
+        "path": ".local/p008-advanced-busy-after.log",
+        "sha256": "a5a54c34a533800e12d81c4c333e6a9bacfb7709bc88d05739cd9eea70c228cb"
+      }
+    ],
+    "local_validation": "actual autosave injection probe1passed8.16s (observes expected old assertion failure, not productpass); corrected entireadvancedfile2passed8.88s; no productcode, testassertion, tolerance,skip,timeout change"
+  }
 }
