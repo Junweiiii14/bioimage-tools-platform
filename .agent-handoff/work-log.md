@@ -1,9 +1,5 @@
 # Current Work Log
 
-## 2026-10-19 T051 main规划集成
-
-PR16四项必需检查通过，匹配cdf4b7d后合并43d520f。产品基线a234354与main存在历史文档冲突，保留产品分支完整历史，README添加新版规划入口；T050证据、规划和原main快照并入。新任务T051实现导入/清单/缩略图分配，不改变OCR功能。产品原快照归档T051-product-before-intake.md。
-
 ## 2026-10-20 E3完成，连续进入E4
 
 产品32da9f4，T056 done：固定N槽位/原值TIFF/真实宿主复核与CAS，独审发现票据导出及桥接强退review的P2均按新提交复验关闭。完整check0：832/553.10s、原child0、9契约、全部wheel/真实离线OCR；21桌面前端18.93s，UI限定ship/documenter No changes。旧purecall UNKNOWN与344/truncated inventory转E6，不消账；真实科学/目标环境仍未验。下一项T057 E4。
@@ -156,3 +152,7 @@ R01–R08实施、R09窄优化/有据暂缓和R12兼容条件台账均经独审�
 ## 2026-11-02 P002正常集成与M1接续
 
 PR48准确a69b38e四必需CI成功，正常merge main f2dc5ad且树一致；P002原范围done，独审/真实五例/隔离wheel/双平台门禁见integration.json。首轮文档Ruff失败保留。B011规划7dac55d独审可接受、已修复职责重叠，合新main75c5028后真实重载回执；新增任务仍planned，接续P003→P007→P005→P008、P006/P008→P009。科学/用户/目标环境及旧UNKNOWN保留。
+
+## 2026-11-02 P003实际评估框架与独审修复
+
+新增数据/方法评估契约、runtime纯比较与父子闭包、真实WB五例评估、D1登记及18项回归。独审初次Request changes的共同父泄漏与冻结参数忽略已在0edf0e0修复并准确复审Accepted；旧全门禁因已知缺陷主动中止，r2全门禁session52799尚运行。r2实际工程0/科学请求2，S1始终not_granted。Git产物换行破坏原SHA已用受限字节保留策略处理，30个暂存blob SHA验证和真实尾空格负例通过，08decb6增量待独审；原输出与旧记录保留。
