@@ -1,6 +1,6 @@
 # P-006 真实工作台运行反馈与性能基线
 
-<!-- PROGRAM_TASK_META {"id":"P-006","status":"in_review","work_package":"W05","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"839fa521d9ae11ceb51f9c4c7493eb2a0251eda0","head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-006","status":"in_review","work_package":"W05","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"839fa521d9ae11ceb51f9c4c7493eb2a0251eda0","head_commit":"a2155360c61802b618a8db611ffda10ecec7cff1"} -->
 
 ## 执行状态
 
