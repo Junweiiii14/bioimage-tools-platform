@@ -47,3 +47,7 @@ P006已done；P008准确b4847a5独审/四必需CI/双侧wheel后PR53正常merge2
 ## 2026-11-02 独立视觉修正与确认
 
 Fresh reviewer首轮bb42有效12图结论fix，唯一问题为窄窗任务密度。一批顶部/高级元数据折叠/图起点修正后，同12图确认15.57秒，原独立审查者评分resolved，disposition ship仅覆盖该fix。完整原结论visual-review.md，设计一致性documenter证据design-conformance.md。真实Web5流程+原生图探针6passed41.34秒，type/web/Ruff通过。所有失败和原图保留；有效主检+确认预算已用完，不再自主视觉循环或第二detector。性能、wheel、最终准确代码独审和PRCI仍未做，保持in_progress。
+
+## 2026-11-03 正式性能/隔离安装准备
+
+新增原生采样工具及performance-measurement.md，r5两场景1+0诊断退出0，非正式分布。最小Qt等待实验定位旧qWait线程饥饿，新AsyncEventPump的真实存储创建/回执/排空1passed1.80秒；失败不改写为通过、不改产品/P006旧工具。type/Ruff通过。tooling/installed_wheels.py新增实际已安装Web编排资产/保存重开/4000→40/6worker/布局模板+CLI校验，已静态编译但还没运行，不能当安装通过。正式默认5+30冻结后新目录串行运行；详细样本与终点边界按新测量说明。

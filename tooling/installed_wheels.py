@@ -660,6 +660,92 @@ rows = list(csv.DictReader(Path(second_batch['samples'][0]['outputs']['measureme
     encoding='utf-8-sig').splitlines()))
 assert rows[0]['value'] == '40.0'
 print('Installed batch: 4000/40, six runs, reopen, two publisher reruns, template/second batch')
+
+# The installed authoring surface must ship its JS/CSS and use the same real engine.
+import time
+from unittest.mock import patch
+from PySide6.QtCore import QSettings
+from PySide6.QtWidgets import QFileDialog
+from bioimage_app.web_window import WebWorkbenchWindow
+import bioimage_app.workflow_authoring_bridge
+assert Path(bioimage_app.workflow_authoring_bridge.__file__).is_relative_to(Path(sys.prefix))
+web_assets = Path(bioimage_app.api.__file__).parent / 'web_ui'
+assert all((web_assets / name).is_file() for name in (
+    'workflow_authoring.js', 'workflow_authoring.css', 'workflow_graph.js', 'workflow_graph.css'))
+app.setQuitOnLastWindowClosed(False)
+editor = WebWorkbenchWindow(settings=QSettings(str(Path('authoring-ui.ini').resolve()),
+                                               QSettings.Format.IniFormat))
+editor.show()
+
+def authoring_wait(predicate, timeout=45):
+    deadline = time.monotonic() + timeout
+    while not predicate():
+        assert time.monotonic() < deadline, 'Installed authoring deadline exceeded'
+        QTimer.singleShot(5, app.quit)
+        app.exec()
+
+def authoring_js(code):
+    replies = []
+    editor.web.page().runJavaScript(code, replies.append)
+    authoring_wait(lambda: bool(replies))
+    return replies[0]
+
+authoring_parent = Path('installed-authoring-parent').resolve()
+authoring_parent.mkdir()
+authoring_wait(lambda: authoring_js('!!window.workflowEditor?.snapshot().connected') is True)
+with patch.object(QFileDialog, 'getExistingDirectory', return_value=str(authoring_parent)):
+    authoring_js("document.querySelector('[data-workflow-open]').click();"
+                 "document.querySelector('[data-wf-choose=new_example]').click();true")
+    authoring_wait(lambda: authoring_js('workflowEditor.snapshot().graph?.nodes.length') == 3)
+authoring_js("document.querySelector('#wf-title').value='Wheel authoring roundtrip';"
+             "document.querySelector('#wf-title').dispatchEvent(new Event('input'));"
+             "document.querySelector('[data-node=analyze] .wf-node-title')"
+             ".dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}));"
+             "document.querySelector('#wf-save').click();true")
+authoring_wait(lambda: authoring_js(
+    '!workflowEditor.snapshot().pending && !workflowEditor.hasDraft()') is True)
+assert editor.authoring.projection.project.graph.title == 'Wheel authoring roundtrip'
+authoring_js("document.querySelector('#wf-run').click();true")
+authoring_wait(lambda: authoring_js("Array.from(document.querySelectorAll('#wf-output-list td'))"
+                                   ".some(cell=>cell.textContent==='4000.0')") is True)
+assert authoring_js("!!document.querySelector('#wf-output-list img')") is True
+authoring_wait(lambda: authoring_js(
+    '!workflowEditor.snapshot().pending && !workflowEditor.snapshot().running') is True)
+authoring_js("document.querySelector('[data-wf-choose=bind_example]').click();true")
+authoring_wait(lambda: authoring_js('!workflowEditor.snapshot().pending') is True)
+authoring_js("document.querySelector('#wf-run').click();true")
+authoring_wait(lambda: authoring_js("Array.from(document.querySelectorAll('#wf-output-list td'))"
+                                   ".some(cell=>cell.textContent==='40.0')") is True)
+authoring_wait(lambda: authoring_js(
+    '!workflowEditor.snapshot().pending && !workflowEditor.snapshot().running') is True)
+authoring_template = Path('installed-visual-template.json').resolve()
+with patch.object(QFileDialog, 'getSaveFileName', return_value=(str(authoring_template), '')):
+    authoring_js("document.querySelector('[data-wf-choose=export_template]').click();true")
+    authoring_wait(lambda: authoring_template.is_file() and
+                   authoring_js('!workflowEditor.snapshot().pending') is True)
+portable = json.loads(authoring_template.read_text(encoding='utf-8'))
+assert portable['template_version'] == 1
+assert next(p for p in portable['layout']['positions'] if p['node_id']=='analyze')['x'] == 320
+authoring_workspace = Path(authoring_js("document.querySelector('#wf-workspace-path').textContent"))
+revision = editor.authoring.projection.project.revision
+with patch.object(QFileDialog, 'getExistingDirectory', return_value=str(authoring_workspace)):
+    authoring_js("document.querySelector('[data-wf-choose=open_project]').click();true")
+    authoring_wait(lambda: authoring_js('!workflowEditor.snapshot().pending') is True)
+assert editor.authoring.projection.project.revision == revision
+assert editor.authoring.projection.project.graph.title == 'Wheel authoring roundtrip'
+assert editor.host.workspace_path == ''
+editor.close()
+authoring_wait(lambda: editor.authoring.resources_closed and editor.host.resources_closed)
+with Workspace.open(authoring_workspace) as store:
+    authoring_runs = store.list_runs()
+    assert len(authoring_runs) == 6 and all(r.state=='succeeded' and r.pid for r in authoring_runs)
+portable_batch = batch_command(Path('installed-visual-template-cli').resolve(), '--validation',
+                               'triangle_u8', '--template', str(authoring_template))
+portable_rows = list(csv.DictReader(Path(portable_batch['samples'][0]['outputs']['measurements'])
+                                    .read_text(encoding='utf-8-sig').splitlines()))
+assert portable_rows[0]['value'] == '40.0'
+print('Installed authoring: actual WebChannel assets, edit/save/reopen, 4000/40, '
+      'six real workers, layout-preserving template and shared CLI')
 """
 
 

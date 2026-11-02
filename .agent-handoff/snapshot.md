@@ -32,11 +32,13 @@ PR53最终b4847a56b682e71356129e34fac59262c08659e7非作者Accepted，全4d6..b4
 
 - 响应修正后的真实Web5流程+原生图探针最新6passed41.34秒/exit0，type/web/Ruff均过。技能明确要求的fresh documenter仅写P009/design-conformance.md，确认既有设计体系一致，旧sidecar provenance drift和backdrop advisory只报告不修全局。
 
+- 性能工具新AsyncEventPump已通过实际存储创建/回执/排空1test1.80s；旧qWait在最小实验中线程饥饿，nestedLoop才执行，产品与P006旧工具均未改，失败保留。诊断r4/r5全部两场景走通，仍非正式p95。wheel新增probe只静态编译/检查过，不能声称安装通过。type/Ruff0。
+
 ## 设计上下文与后继
 
 本会话impeccable context一次已跑，.local/p009-ui-context.txt506行已完整实际读（含后补200–350），PRODUCT/DESIGN均为沿用T075四主题、本地NotoSansSC、40px控件的Operate扩展。已实际surface-brief read module_compare.js和craft-floor；新局部brief.impeccable/surfaces/workflow-authoring.md，不改全局DESIGN。用户已有明确授权，不按技能通用模板重问已定需求/审批。图探针截图只功能证据，不是最终视觉主检；最终完整UI一次主检+最多一次确认，detect在完成UI后一次，视觉独审按skill要求在最终候选集中做。
 
-下一步：冻结当前产品源码后做P006口径原生性能（5预热+30正式、真实QTest可信点击、反馈/settled/暂停取消ack/排空分开、超线保留；拍图的关闭动画和500ms等待不能带入成绩）；随后隔离wheel、新完整候选准确提交独立代码审查/PR必需CI正常合并。视觉主检/确认和documenter已结束，不重做功能矩阵/视觉循环或本地全量。根目标仍active。
+下一步：新tooling/benchmark_workflow_authoring.py已完成两场景小样本诊断r5/exit0（非正式，1+0）。冻结工具提交后，QT_QPA_PLATFORM=windows、QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu，默认5+30、全新.local/p009-perf-frozen输出正式采样。等待实际handle终态，期间不跑测试/打包或修改采样源。正常3节点/12合成注释与64驻留节点（不执行64worker）；四主题node/preview，neutral真实PID暂停/继续/取消。指标与失败历史见performance-measurement.md。之后运行已补P009 GUI/模板/6真实worker的tooling.installed_wheels（尚未跑），再完整候选准确代码独审/PR必需CI。视觉已结束，不重开截图循环或第二detector，不重复本机全量。
 
 P009当前只是本地工作提交，不建小步PR/逐提交审查；可运行完整候选后集中独审，局部验证/最终CI全量，不重复本机1675全套。已有独审/root/p002_independent_review可复用最终代码审查，当前idle。保留task/规则回执、P008closeout及轮转archive一起提交，别漏新未跟踪源码或误收B012。
 
