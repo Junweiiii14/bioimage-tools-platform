@@ -37,3 +37,8 @@ platform_runtime仅通用图/账本/失效规则；实验适配在工具api与�
 ## 最终候选独审修正
 
 候选323d59f四组隔离wheel全部退出0，含安装后批量4000/40、6run/重开、样式8run和模板第二批。独审真实复现P2：pausing时接受resume使父running/子paused停滞，Request changes。已明确仅完成暂停或重开awaiting_resume才接受继续；新增回归先1failed2.94秒，修复后批量整文件10passed68.35秒。无容差/预期弱化。独审自身并发pytest与作者编辑重叠的2failed8passed50.91秒不归属冻结候选、不作为新增缺陷或通过。最终修正准确提交复审及PR53修正后CI待完成。
+
+
+## 最终CI资源实测
+
+53892fd独审Accepted；PR53 quality41434643209 Linux1671passed4旧skip10warnings728.40秒、所有wheel通过，desktop/rulescontext成功。Windows1675passed10warnings1347.61秒、全部wheel及dev.py最终成功标记均实际出现，checkstep为success；但job总25分24秒，被服务器25分钟上限标cancelled，不能作为必需CI通过。现仅Windows作业总时限25→30分钟，Linux20不变，无断言/单测时限/跳过/门禁削弱；纯CI资源变更不重复本机全量。需准确增量独审及新HEAD正常CI。

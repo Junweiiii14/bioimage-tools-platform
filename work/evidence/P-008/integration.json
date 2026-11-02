@@ -1,0 +1,54 @@
+{
+  "candidate": "53892fd9c99a7c175ae5f5b95bbc98032df1c1d5",
+  "pr": "https://github.com/Junweiiii14/bioimage-tools-platform/pull/53",
+  "quality_run": 41434643209,
+  "integration_state": "not merged: Windows job cancelled by25min total limit despite successful check step; resource-only correction pending newheadCI",
+  "checks": [
+    {
+      "link": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41434643209/job/125241961091",
+      "name": "foundation (windows-latest)",
+      "state": "IN_PROGRESS"
+    },
+    {
+      "link": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41434643209/job/125241960829",
+      "name": "desktop-environment",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41434643209/job/125241961100",
+      "name": "foundation (ubuntu-latest)",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41434643209/job/125241962434",
+      "name": "native-case",
+      "state": "SKIPPED"
+    },
+    {
+      "link": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41434643226/job/125241331040",
+      "name": "rules-context",
+      "state": "SUCCESS"
+    }
+  ],
+  "linux": {
+    "job": 125241961100,
+    "result": "1671 passed,4 existing skipped,10 warnings in728.40s; all four isolated wheel checks including real batch4000/40, six runs, reopen, style reruns and template second batch passed",
+    "log": ".local/p008-ci-linux-53892fd.log",
+    "sha256": "f26697f962b1561751a58c44c11a5eddbe4757565458ca5a0565c946ee5534f7"
+  },
+  "independent_review": "Accepted full4d6ee6ce364780cad24ef09b808740846937714c..53892fd9c99a7c175ae5f5b95bbc98032df1c1d5; see independent-review.md",
+  "limitations": "Engineering synthetic evidence; P009 not started; scientificS1/targetWindows/physicalDPI/GPU/userexperience not accepted.",
+  "windows_first_run": {
+    "job": 125241961091,
+    "job_conclusion": "cancelled",
+    "annotation": "The job has exceeded the maximum execution time of 25m0s",
+    "check_step_conclusion": "success",
+    "test_result": "1675passed10warnings1347.61s",
+    "installed_wheels": "all probes including batch4000/40,sixruns,reopen,style,template second batch printed passed; dev.py final success marker present",
+    "job_times": "11:11:50Z..11:37:14Z; checkstep11:12:30Z..11:37:05Z; total25m24s",
+    "log": ".local/p008-ci-windows-53892fd.log",
+    "sha256": "f374165b250c73893bbb34a736eac555bfed554a6c89c138ac4fef9554443073",
+    "acceptance": "job is not pass; normal requiredCI remains necessary"
+  },
+  "ci_resource_change": "Only Windows job total limit25->30minutes; Linux20 unchanged. No assertion/testtimeout/skip/testscope/dependency/requiredcheck change. No local full suite repeated for CI-only change."
+}

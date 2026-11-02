@@ -1,11 +1,5 @@
 # Current Work Log
 
-## 2026-10-21 T073 批准执行与UI原型
-
-- 用户批准六项及追加UI完整方案，create_goal记录全部范围；新树wb-reliable-crop-ui/main941b424，分支codex/t073-reliable-crop-ui。旧四树SHA/HEAD/dirty保存，新树只复制旧T073文档，不动旧文件。
-- 研究Linear/Figma/Carbon与MDN/web.dev，写研究和本地HTML原型并打开IAB；合成图/示例流程，未接科学计算。第一轮视觉含1440/1024/390；确认真实示例自动暂停→一次继续→5行结果。检测一次及JS语法已执行，最终视觉和代码独审待完成。
-- uv sync0；既有两模块28用例110.36s0。一次浏览器reload/检查批次超时，重取原tab成功，不作产品失败；一次动态页签旧名称定位失败，按实时名称成功。产品算法/安装未改。
-
 ## 2026-10-21 T073 固定网格与精简验证
 
 用户补充固定N、原像素槽宽和5N:4比例，已实现整排对齐，不再强求N个独立连通组件；手动确认范围完整保留。只读最终重放为1行保留人工、8行自动、1行首带与标记相连仍暂停；原图SHA不变。补安全采样Y边界阻止背景扩展重新读入排除结构，并把局部第二目标传至真实quality_review。UI预审问题关闭、最后3项定向0；新两个科学反例首轮37过1败为测试构造先触发原有扩展保护，改用合法25%范围内越限反例。首全门禁8项类型错，pytest尚未启动；修正类型，无ignore/放宽。按用户要求不反复冒烟，保留必需检查。新ReliableCropTest独立安装身份，随包仅相关自动流程自检。尚未提交独审/PR/构建。
@@ -149,3 +143,7 @@ PR51准确c243四必需SUCCESS，正常merge006e9f1/tree与独审候选相同。
 ## 2026-11-02 P008真实批次候选
 
 父索引/共享WorkflowSession顺序执行、样本隔离、暂停取消恢复、真实claim后进程崩溃对账、CLI及模板第二批/分支图/缓存重算贯通。批次8pass51.87s、CLI3pass63.01s、关联80pass236.02s。最后取消问题均实际先失败后修：坏源回执双终态1fail2.40s；重开提前取消/父取消阻塞2fail8.81s；最终相关16pass50.04s。static/policy/9边界过；最后源码只定向检查，不重复全量。新增wheels探针/集中准确独审/PRCI待做，不认整卡/M1完成。外部B012规划dirty未提交。
+
+## 2026-11-02 P008 final candidate review/CI
+
+323d59f isolated wheels exit0 including batch/template; independent P2 pausing/resume stall genuinely reproduced then fixed53892fd. Author batch10passed68.35s; independent frozen correction3passed30.69s Accepted full4d6..53892fd. PR53 ready; finalquality41434643209 live, rulescontext success, nativecase expectedskip. Await actual requiredCI then normalmerge; P009 stillplanned. Rawfailed/contaminatedrun retained; no repeatedlocalfullsuite. Evidence/handoff edits await integration closeout, do not push sameproduct documentation merely to restartCI.
