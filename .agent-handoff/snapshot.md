@@ -8,7 +8,7 @@
 - p001_review对29930f62..725fc6a提出P1发布绑定遗漏；当前修复通过payload_kind强制匹配，missing_binding回归通过，尚待新提交独审。旧审查不能写Accepted。
 - 2026-11-02新增共享ComparisonSession、CLI、薄GUI及中文docs/wb-v0-acceptance.md。最新CLI/RunSession组合16 passed/56.81秒（.local/p002-final-target-a.txt），Pyright零错误；真实工作台2 passed/5.64秒，局部视觉ship/documenter No changes（详情任务卡）。wheel门禁仅追加同一用例独立安装验证。
 - 2026-11-02新执行者01a199d4-dac3-7dd3-af35-cdad7d361934已在产品HEAD78403be接手，真实goal active、无预算，证据work/evidence/B-010/goal-state.json。从旧聊天原生命令记录确认完整门禁completed/exit0（890398ms、1537 passed）及五例冻结生成exit0；接手又对原五工作区实际重开及校验全部保留成果摘要，证据P-002/recovery-verification.json。未重写冻结运行。
-- 下一步：非作者p002_independent_review正在只读审查29930f62..78403be；待处理发现、准确提交复审、PR与必需CI集成。4.0文档同步须随正常规则回执及阶段集成清单保留。尚无P002最终独审或集成结论，不标done。旧句柄不作为成功依据。
+- 下一步：非作者p002_independent_review已对29930f62..2591309独审Accepted，独立34项测试与输入篡改/证据核验通过，报告P-002/review-final.md。PR48待四必需CI与正常集成。4.0文档同步须随正常规则回执及阶段集成清单保留。P002为in_review，尚无集成结论，不标done。旧句柄不作为成功依据。
 - 真实goal已get确认active、无token预算。用户明确允许回传目标状态/提交号/执行树，已向原聊天01a19004-3b85-7a30-bc08-c9e59a79d209回传以上状态；无需重复索要同一许可。
 - T082科学/目标环境待办、历史失败和冻结源码/安装证据完整保留；原snapshot逐字节归档见archive/P001-before-adoption-snapshot.md。P003–006仅按V0必需范围接入，不因部分实现自动整卡完成。
 

@@ -1,6 +1,6 @@
 # P-002 V0成熟WB方法独立调用与真实成果对照
 
-<!-- PROGRAM_TASK_META {"id":"P-002","status":"in_progress","work_package":"W02","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"29930f62a0b158189b76e0fad7d090d632f149d6","head_commit":"78403be43b225da3626e3a6ef0a8aeda2cbbbaec"} -->
+<!-- PROGRAM_TASK_META {"id":"P-002","status":"in_review","work_package":"W02","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"29930f62a0b158189b76e0fad7d090d632f149d6","head_commit":"2591309eecffeb07558d3492bc3f69425dc6d24a"} -->
 
 ## 执行状态
 
@@ -87,3 +87,7 @@ Win11/Python3.12.14，当前未提交增量：`uv run --locked --no-sync python 
 上一轮真实工作台两项测试2 passed/5.64秒，日志.local/p002-ui-capture-check.txt，1440与960宽截图在.impeccable/review/p002。impeccable_finish_reviewer局部视觉ship，documenter No changes；代码最终独审仍待执行。初始沙箱QWebEngineProfile异常退出0x80000003，使用既有CI离屏环境后通过，不宣称根因修复。CLI首次Windows -I忽略PYTHONIOENCODING导致输出gbk，改为显式UTF-8字节后8 passed/46.37秒；无放松断言。
 
 门禁变更仅在tooling/installed_wheels.py追加验证：裸WB安装调用新公共用例得4000且不加载Qt/数据库；桌面wb extra安装通过真实CLI运行、差异与关闭重开，并检查UI资源随wheel存在。原安装检查、边界和阈值不删改，锁文件无变化。完整`dev.py check --all`当前运行中，不能提前写通过。最终准确提交独审、PR/CI及正式冻结输出证据待完成；P002保持in_progress。
+
+## 2026-11-02最终独审与PR
+
+非作者p002_independent_review已对准确29930f62..2591309eecffeb07558d3492bc3f69425dc6d24a给出Accepted，无阻断发现；独立34 passed/53.11秒、同尺寸输入篡改拒绝探针及全套同步/冻结成果摘要核验通过。详见work/evidence/P-002/review-final.md。状态in_review，PR48已创建，需四个必需CI通过后正常合并；未提前记done。此次后续仅记录报告/任务交接，不更改已审产品。
