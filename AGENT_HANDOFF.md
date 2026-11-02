@@ -46,7 +46,7 @@
 
 ## Current Pointer
 
-- 当前任务：[P003 方法/数据评估基础](work/tasks/P-003-method-validation-foundation.md)，并行携带[B011 M1/M2拆分收尾](work/tasks/B-011-m1-m2-task-decomposition.md)。P002已通过PR48四必需CI正常合入main f2dc5ad4，工程收据work/evidence/P-002/integration.json；P001不重做。按4.0及phase-2-workflow-authoring.md、snapshot和实际分支/HEAD恢复。
+- 当前任务：[P006 工作台性能基线](work/tasks/P-006-interaction-performance-baseline.md)，P003/B011已PR49正常合main839fa52，P007依赖已满足；P006采样完成后优先接续[P007科学资产/图契约](work/tasks/P-007-scientific-workflow-contracts.md)。按4.0任务卡/snapshot与实际分支HEAD恢复，P001/P002不重做。
 - T082历史工程证据及科学/目标环境待办完整保留于其[任务](work/tasks/T-082-reliability-remediation.md)，不由V0自动关闭。
 - 本轮本地工程交接：[T082 final-handoff](work/evidence/T-082/final-handoff.md)，区分冻结源码、隔离验收工件与后续交接HEAD；科学待办不由工程通过代替。
 - 最近交付：[T081 R2](work/evidence/T-081/final-delivery.md)。当前源码/构建源码/主线集成/安装包区分见 [T082 baseline](work/evidence/T-082/baseline.md)。

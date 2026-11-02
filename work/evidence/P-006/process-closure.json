@@ -1,0 +1,19 @@
+{
+  "checked_utc": "2026-11-02T03:35:00.2663498Z",
+  "alive": [],
+  "recorded_host_renderer_pids": [
+    5168,
+    15108,
+    16060,
+    16372,
+    22104,
+    26512,
+    26928,
+    29960,
+    31260,
+    41640,
+    45932,
+    51680
+  ],
+  "scope": "Recorded host/renderer IDs only; no kill, not a global process-tree absence proof"
+}

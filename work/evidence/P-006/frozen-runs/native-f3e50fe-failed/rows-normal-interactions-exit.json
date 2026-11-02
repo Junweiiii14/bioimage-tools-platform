@@ -1,0 +1,11 @@
+{
+  "output": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p006-native-20261102-104914\\rows-normal-interactions.json",
+  "source_commit": "f3e50fef23275269326261c8a228d442bd8e8093",
+  "exit_code": 1,
+  "log": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p006-native-20261102-104914\\rows-normal-interactions.log",
+  "warmup": 5,
+  "samples": 30,
+  "interaction_baseline": true,
+  "command": "uv run --locked --no-sync python -m tooling.benchmark_workbench_snapshot --run --case rows-normal --interaction-baseline",
+  "case": "rows-normal"
+}

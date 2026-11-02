@@ -1,0 +1,19 @@
+{
+  "conditions": "Single point load/memory observation; not exclusive host or continuous power monitoring",
+  "cpu": {
+    "Name": "Intel(R) Core(TM) Ultra 7 255HX",
+    "NumberOfCores": 20,
+    "NumberOfLogicalProcessors": 20,
+    "LoadPercentage": 2
+  },
+  "os": {
+    "Caption": "Microsoft Windows 11 家庭版 中文版",
+    "Version": "10.0.26200",
+    "TotalVisibleMemorySize": 16110096,
+    "FreePhysicalMemory": 3374584
+  },
+  "power_scheme": "电源方案 GUID: 27fa6203-3987-4dcc-918d-748559d549ec  (Performance)",
+  "captured_at": "2026-11-02T10:49:16.7772066+08:00",
+  "owned_test_or_gate_processes": [],
+  "source_commit": "f3e50fef23275269326261c8a228d442bd8e8093"
+}

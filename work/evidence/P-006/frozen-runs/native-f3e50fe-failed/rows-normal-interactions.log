@@ -1,0 +1,31 @@
+[52092:21220:1102/105321.276:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/gpu_channel_manager.cc:920] Failed to create GLES3 context, fallback to GLES2.
+[52092:21220:1102/105321.276:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/gpu_channel_manager.cc:931] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+[52092:21220:1102/105321.288:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/gpu_channel_manager.cc:920] Failed to create GLES3 context, fallback to GLES2.
+[52092:21220:1102/105321.288:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/gpu_channel_manager.cc:931] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+[52092:21220:1102/105321.288:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/gpu_channel_manager.cc:920] Failed to create GLES3 context, fallback to GLES2.
+[52092:21220:1102/105321.288:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/gpu_channel_manager.cc:931] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\70236\ResearchVault\Codex-Workbench\bioimage-v0\tooling\benchmark_workbench_snapshot.py", line 885, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "C:\Users\70236\ResearchVault\Codex-Workbench\bioimage-v0\tooling\benchmark_workbench_snapshot.py", line 869, in main
+    "measurement": measure(
+                   ^^^^^^^^
+  File "C:\Users\70236\ResearchVault\Codex-Workbench\bioimage-v0\tooling\benchmark_workbench_snapshot.py", line 743, in measure
+    production_interactions(window, pump, samples, warmup)
+  File "C:\Users\70236\ResearchVault\Codex-Workbench\bioimage-v0\tooling\benchmark_workbench_snapshot.py", line 485, in production_interactions
+    click(f'[data-appearance-theme="{theme}"]')
+  File "C:\Users\70236\ResearchVault\Codex-Workbench\bioimage-v0\tooling\benchmark_workbench_snapshot.py", line 437, in click
+    x, y = cast(list[float], json.loads(str(position)))
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\AppData\Roaming\uv\python\cpython-3.12.14-windows-x86_64-none\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\AppData\Roaming\uv\python\cpython-3.12.14-windows-x86_64-none\Lib\json\decoder.py", line 338, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\AppData\Roaming\uv\python\cpython-3.12.14-windows-x86_64-none\Lib\json\decoder.py", line 356, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)

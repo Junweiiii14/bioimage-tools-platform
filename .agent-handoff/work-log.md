@@ -1,9 +1,5 @@
 # Current Work Log
 
-## 2026-10-20 E3完成，连续进入E4
-
-产品32da9f4，T056 done：固定N槽位/原值TIFF/真实宿主复核与CAS，独审发现票据导出及桥接强退review的P2均按新提交复验关闭。完整check0：832/553.10s、原child0、9契约、全部wheel/真实离线OCR；21桌面前端18.93s，UI限定ship/documenter No changes。旧purecall UNKNOWN与344/truncated inventory转E6，不消账；真实科学/目标环境仍未验。下一项T057 E4。
-
 ## 2026-10-20 E4完成，连续进入E5
 
 T057 done，产品ff89867：完整Fig先持久化再真实原像素运行；843/579.73s、原child0、9契约/全隔离wheel/真实OCR/check0，绑定独审通过。df轮843/570.37s后wheel因顶层PIL失败1，ff延迟导入修复，独立API无PIL/核心5探针和完整复验0。分页与回源两P2已按提交关闭，UI限定ship、documenter No changes。原生UNKNOWN/344截断inventory/真实科学与目标机限制保留，无发布。下一阶段T058，详细证据work/evidence/T-057。
@@ -156,3 +152,7 @@ PR48准确a69b38e四必需CI成功，正常merge main f2dc5ad且树一致；P002
 ## 2026-11-02 P003实际评估框架与独审修复
 
 新增数据/方法评估契约、runtime纯比较与父子闭包、真实WB五例评估、D1登记及18项回归。独审初次Request changes的共同父泄漏与冻结参数忽略已在0edf0e0修复并准确复审Accepted；旧全门禁因已知缺陷主动中止，r2全门禁session52799尚运行。r2实际工程0/科学请求2，S1始终not_granted。Git产物换行破坏原SHA已用受限字节保留策略处理，30个暂存blob SHA验证和真实尾空格负例通过，08decb6增量待独审；原输出与旧记录保留。
+
+## 2026-11-02 P006真实原生基线
+
+源码a9bda313冻结后完成rows-normal四主题/准备取消5+30及其余五例R09负载，六例exit0。旧f3首轮失败保留。raw/SHA/fixture/所有分布复算见P006/native-results.json；报告明确设置四主题超100ms、前台UNKNOWN、取消全部preparing/run=null、host确认28ms与服务关闭6.4秒分开。上界快照/刷新/payload及内存超线完整保留。记录12个host/renderer均已退出，未杀进程。P006 in_review，待最终独审/CI正常PR；目标仍M1/M2，下一P007前置满足。

@@ -1,0 +1,16 @@
+{
+  "source_commit": "0edf0e0e2f3e3950dbac3bdf4dd55d3f39791991",
+  "log": ".local/p003-check-all-r2.txt",
+  "command": "uv run --locked --no-sync python dev.py check --all",
+  "exit_code": 0,
+  "python_product_test_and_gate_bytes_match_final_candidate": "c02c2ed65238d553d923a2f7f72e1cc1f7381f7c",
+  "pytest": {
+    "passed": 1555,
+    "warnings": 10,
+    "seconds": 787.44
+  },
+  "installed_evaluation": "literal zero, lineage leakage and no scientific approval passed",
+  "installed_v0": "real worker, 4000 exact comparison, committed assets and reopen passed",
+  "log_sha256": "c3d681098f8ac0b753e9aa73456d1d4311fb206a36ff46a59acde72c7b21c46e",
+  "scope": "Local full gate on frozen Python bytes; final evidence/attributes separately reviewed and final PR CI still pending"
+}

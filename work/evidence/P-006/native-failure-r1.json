@@ -1,0 +1,20 @@
+{
+  "source_commit": "f3e50fef23275269326261c8a228d442bd8e8093",
+  "result": "measurement_failed",
+  "exit_code": 1,
+  "valid_complete_performance_report": false,
+  "observed_failure": "Geometry JavaScript returned no coordinate JSON; JSONDecodeError before the theme setup click",
+  "visibility_hypothesis": "The tool waited for DOM existence, not stationary visible/hit-testable drawer geometry; no claim that all GLES/native errors share this cause",
+  "original_run_directory": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p006-native-20261102-104914",
+  "original_files_preserved": true,
+  "checked_original_host_and_wrappers_exited": [
+    34240,
+    49956,
+    52092
+  ],
+  "raw_files_sha256": {
+    "environment-before.json": "0fb7d7f4097c98a4059eb423adefbb027f8717e592db208f6394db69ac8905d0",
+    "rows-normal-interactions.log": "e665de0710c2b56555b5d1708811bb4ec2379301976cc17049ef2f05cce20f62",
+    "rows-normal-interactions-exit.json": "ecd830e2a4c6702e20620b99363de3364a8442dca69cef0cc466d4b3ee3f27c3"
+  }
+}

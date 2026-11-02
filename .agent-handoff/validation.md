@@ -115,3 +115,6 @@ ed830e1准确完整门禁1503 passed/756.15s+全部isolated wheels/exit0，HEAD/
 ## 2026-11-02 P002 PR48最终CI与集成
 
 准确a69b38e，四必需SUCCESS；Windows1537passed/924.48秒，Linux1533passed/4既有skip/602.27秒；双平台独立wheel V0真实worker/成果提交/重开通过。main f2dc5ad Git tree等于独审候选，gh pr merge --merge --match-head-commit正常集成。工程证据work/evidence/P-002/integration.json；未验科学/用户/目标机，不发布安装器。
+
+| 2026-11-02 | P006源a9bda313，Windows11/Qt6.12原生windows/disable-gpu；六例5+30，rows-normal额外四主题/准备取消 | 六命令exit0；首轮失败保留；多项超预算/前台UNKNOWN，不当目标机或算法验收 | work/evidence/P-006/results.md |
+| 2026-11-02 | P006文档候选，pytest tests/test_workbench_snapshot_benchmark.py -q / Ruff check+format / policy+import_contracts+web_quality | 30passed/3.18秒，全部exit0；独立审查/CI待完成；本地完整check --all本阶段未重跑，必需CI将跑完整 | work/tasks/P-006-interaction-performance-baseline.md |

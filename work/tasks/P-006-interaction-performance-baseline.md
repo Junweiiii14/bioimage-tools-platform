@@ -1,6 +1,6 @@
 # P-006 真实工作台运行反馈与性能基线
 
-<!-- PROGRAM_TASK_META {"id":"P-006","status":"planned","work_package":"W05","depends_on":["P-001"],"execution_root":"not_activated","owner":null,"base_commit":null,"head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-006","status":"in_review","work_package":"W05","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"839fa521d9ae11ceb51f9c4c7493eb2a0251eda0","head_commit":"a2155360c61802b618a8db611ffda10ecec7cff1"} -->
 
 ## 执行状态
 
@@ -42,3 +42,31 @@ B-007第4/5/6/12/13.3章、实际桌面入口、T-082 R09原数据与限制、�
 ## 继续入口
 
 本卡未完成步骤为继续位置；主依据为docs/plans/research-platform-rd.md第4/5/6/12/13.3章，B-005仅作治理历史。修改规则或范围后重载context，收尾更新任务与handoff。
+
+## 2026-11-02激活
+
+前置P001已done，P002也已正常集成；P003准确候选c02c2ed独审/完整本地1555项门禁通过，PR49尚等待远端双平台CI。本任务独立本地分支codex/p006-interaction-baseline从c02c2ed开始，不夹入PR49，不阻断其现有检查。先准备可复现测量设计/现有R09工具适配，在本地完整门禁实际退出后才测性能；不把并行全量测试负载下的成绩作为静态基线。测前冻结源码/工具/输入/重复次数，产品或规则变化后真实重载上下文。
+
+## 当前基线刷新
+
+PR49已正常集成main839fa52，本地保留未提交P006工具改动快进到同一main；真实重载P006 context --scope . --base 839fa52 --record。P003本地完整门禁实际退出0后才安排本任务性能测量，避免把全量测试并行负载当作静态基线。当前仍仅准备/验证观测工具，没有实际性能成绩。
+
+## 观测工具准备
+
+保留原R09四个负载/seed/预算/5+30默认采样，追加两类normal负载（32行/8Fig/12泳道）及显式schema2的--interaction-baseline。真实原生settings/theme/close/cancel控制，四主题各5+30，区分DOM+绘制机会反馈、动画settled、真实host取消确认和idle服务关闭；未对齐的preview/node/pause明确未测/待实现，不把它们写成预算通过。测量设计measurement-design.json及contracts/workbench-performance-baseline-v1.md已冻结定义，当前还没有性能成绩。
+
+工具局部23项观察器测试exit0/2.53秒，包含生产render回执与新观察器非可信/旧/缺动作/异常/未settled拒绝；六类fixture严格校验均通过，局部Pyright0。原预算/上界/断言未降低。纯Node测试不是实际性能证据；下一步准确提交预审、干净冻结后运行真实原生测量并保留失败/超线。
+
+## 首轮真实原生采样失败及可见性修复
+
+源f3e50fef的rows-normal --interaction-baseline实际exit1，无完整性能报告，不能写预算通过。确切观测为原生目标几何JS未返回坐标，主题设置click中JSONDecodeError；源代码只等DOM存在后立即要求控件完全在viewport，缺少动画/可命中等待，故采用可见性/稳定性修复假设，不将既有GLES日志统一定因。原log/exit/environment完整保留在原.local及frozen-runs/native-f3e50fe-failed，摘要和原host/wrapper PID实际已退出的核实见native-failure-r1.json。
+
+新工具定位会等可见、静止、可命中目标，再在紧邻QTest派发前计时；未改变5+30、负载/预算/反馈终点。增加moving/offscreen/disabled/hidden/occluded等守卫，30 tests exit0/3.00秒、类型0；主题原始值分阶段写log，避免后继失败丢失诊断。取消的neutral主题范围明确。只扩展P006冻结raw目录的字节保留属性，与P003同策略，不隐藏真正尾空格等错误。待新准确提交复审，在新目录重新采样，旧失败不覆盖。
+
+## 第二轮完整原生结果与审查
+
+准确源码a9bda313，第二轮六例均exit0；四主题/neutral取消在rows-normal各5+30，其他五例沿用原R09快照/桥接/内存。全部分布重算、fixture摘要核对、12个已记录host/renderer PID结束后均不存活。完整失败历史、raw字节/SHA及results.md/native-results.json/process-closure.json已保存。
+
+设置feedback p95四主题944.6–1134ms超100ms，前台状态未记录UNKNOWN，不能断言活跃用户根因；两上界快照、四例刷新、仪器上界payload和三例内存点超旧线。取消均preparing、run=null，无已启动worker证据；确认28.070ms、DOM85.2ms、服务关闭6396.539ms分别保留。非作者只读复算正常例Accepted with required reporting boundaries，最终全部差异/数据待准确提交独审与必需CI；合并前保持in_review。未改变产品算法、测试容差/skip、预算或门禁。
+
+收尾本地适用检查：30 tests passed/3.18秒，Ruff check/format、policy、9个import-linter合约、web格式/lint/checkJs四反例检查均exit0。Pyright全范围0 errors/0 warnings/exit0；本阶段本地完整check --all未重跑，不沿用P003完整1555项当新增观察器覆盖；PR必需双平台CI将运行完整门禁。

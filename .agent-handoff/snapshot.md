@@ -1,28 +1,24 @@
 # 当前恢复指针
 
-- 目标：先完成P002/M0验收与正常集成，再按已授权4.0持续完成M1通用执行、M2可视编排。真实goal active、无token预算，初始实际工具证据work/evidence/B-010/goal-state.json；恢复时再次get_goal。
-- 实际产品树C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0，唯一执行聊天01a199d4-dac3-7dd3-af35-cdad7d361934。旧执行聊天idle/interrupted，不同时写入。旧规划树、历史工作树、原图/成果/安装不修改。
-- 当前分支codex/m1-workflow-foundation，base为正常合入后的main f2dc5ad。P003产品候选0edf0e0、随后08decb6冻结字节/证据提交，最新HEAD请实际git核实。原规划7dac55d未夹入PR48。
+- 目标仍为真实M1通用工作流执行及M2可视编排；P002/M0与P003 D1框架已正常集成。原生goal active、无预算，初始工具证据B-010/goal-state.json，恢复再get_goal。
+- 实际产品树C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0，唯一执行聊天01a199d4-dac3-7dd3-af35-cdad7d361934。当前分支codex/p006-interaction-baseline，base main839fa521d9ae11ceb51f9c4c7493eb2a0251eda0；最新HEAD/dirty须实际git核实。
 
-## 当前任务和真实证据
+## 当前状态与证据
 
-- 当前[P003](../work/tasks/P-003-method-validation-foundation.md)状态in_review，以卡为唯一状态源。新契约/runtime评估/真实WB解析评估命令、性质及负例、wheel追加检查已实施，未假称科学准入。产品修复提交0edf0e0e2f3e3950dbac3bdf4dd55d3f39791991。
-- 首次debeb3e被非作者Request changes：共同未知父/不同子标签漏判泄漏、冻结polarity/band_bounds/quant_policy被忽略。均已修复，独审精确f2dc5ad..0edf0e0 Accepted，独立18passed/2.62秒及六种排序/原正反例通过；初次门禁因已知缺陷由作者核验own进程树后中止exit1，不写通过。
-- r2冻结frozen-evaluation-r2/execution-r2.json实际绑定0edf0e0：真实WB值40/4000/有效0/无效空值/复核空值，工程exit0；scientific请求exit2且S1 not_granted。初次debeb3e冻结证据原样保留为被拒候选历史。
-- 冻结JSON在Git换行规范化后SHA不一致的问题已真实复现；08decb6限定两类P003产物保留原生产字节，默认空白错误仍检查，仅识别CR行尾。30个原/r2 Git暂存blob已逐个SHA匹配，真正尾随空格负例仍拒绝，收据byte-preservation.json。该数据保留增量/最终文档提交待独审，不是放松数值或测试门禁。
-- 完整新门禁源0edf0e0正在实际执行：session52799，.local/p003-check-all-r2.txt；结果文件仅完成后写.local/p003-check-all-r2-result.json。恢复先实际poll会话，或核实结果与日志，不猜成功。产品文件自该冻结提交未再改变。
-- B011精确f2dc5ad..8710d76独审Accepted，回执已真实刷新新main。规划/治理仍需随当前PR正常集成，P007–009保持planned；新增目录/任务不等于产品完成。
-- P002已原范围done：PR48四必需CI通过且正常merge main f2dc5ad；Windows1537passed/924.48秒、Linux1533passed/4既有skip/602.27秒，双平台wheel真实V0通过。合并树等于独审候选a69b38e。收据P-002/integration.json，首轮Ruff失败及科学/现场限制保留，未发安装器。
+- [P006](../work/tasks/P-006-interaction-performance-baseline.md)已按前置P001 done激活；P003等待CI期间仅在独立本地分支准备观测工具，未夹进PR49。现本地全门禁实际退出0、PR49也已正常集成，P006 context已按新main839重载。
+- 观测工具保留R09四原案例/预算/seed，新增两类normal（32行/8Fig/12泳道）和显式schema2交互模式；四主题真实native settings/close，当前P002取消UI确认/绘制机会/idle排空分开。30项观察器守卫测试与局部类型/格式/六fixture校验通过；源码a9第二轮六例原生exit0，四主题settings超100ms、取消均preparing且run=null，前台状态UNKNOWN。原失败/完整原值保留P006/results.md；in_review待最终独审/CI，不以Node测试当性能。
+- [P003](../work/tasks/P-003-method-validation-foundation.md)done：PR49准确c02c2ed经非作者f2dc5ad..c02c2ed Accepted，四必需CI SUCCESS；Windows1555passed/923.34秒、Linux1551passed/4既有Windows skip/528.76秒，双平台评估/V0 wheel通过。main839fa52 tree等于候选，integration.json。作者本地1555passed/787.44秒/wheels exit0，local-gate-r2.json。
+- P003初审P1共同父身份漏判、P2冻结参数忽略均已真实复现并修复；准确复审18passed/2.62秒、原正反例/六排序通过。旧debeb冻结/主动中止门禁exit1历史保留；r2源0edf0e0真实WB值40/4000/有效0/无效空值/复核空值，工程0、scientific请求2、S1 not_granted。
+- P003冻结字节保留策略经独立Git blobs及报告引用30份SHA核实，普通CRLF通过、三类真实空白错误拒绝。并非放松数值/测试，见byte-preservation/review-final。B011已随PR49正常集成done，新P007–009仍planned。
+- P002原范围done：PR48四必需CI/独审后正常合main f2dc5ad，合并树等于候选a69b38e；真实worker/持久成果/重开/冻结五例与中文操作单保留。未发布安装器。
 
 ## 下一步
 
-1. 对当前最终增量准确独审，准备P003/B011正常PR；完整作者门禁及四必需CI全部真实通过后集成并记P003工程done。若再发现缺陷按新提交复审，不能沿用旧相关结论。
-2. P003的D1不等于S1；缺负责人/独立留出/阈值不能生成科学通过。随后按登记P007科学资产/连接/冻结图→P005单图真实可靠执行→P008有限批量完整M1；P006真实性能基线及P008完成后P009可视编排M2。目标仍active，不在框架或空接口处停下。
-3. P004消费P007，仅负责新WB正式分析图/几何方法；M1原整数图路径不依赖其整卡。P005完成单图依赖失效/复用/恢复，P008复用同一账本/缓存/恢复器扩展批量，P009接同一执行器。
+1. P006原生采样已终态，完成准确提交独审和正常PR/四必需CI；不把测量exit0当预算通过。报告保留前台UNKNOWN、服务关闭6.4秒和未实现node/pause/host-ready预览；不需重复测已得样本。
+2. 激活前置已满足的P007并真实context；之后P005单图可靠执行→P008有限批量完整M1，P006/P008完成后P009接同一执行器实现M2。各任务准确独审、适当检查、正常PR/必需CI后done，不在框架或画图处停止。
 
 ## 保留边界
 
-- 主依据docs/plans/research-platform-rd.md（4.0）和phase-2-workflow-authoring.md；B005历史治理、B009历史内容审查不是本树产品门禁。
-- P004/WB新校正方法仍单独待办，不作为M1原整数图路径的整卡前置。P003 D1不等于方法S1。
-- 科学独立留出/负责人容差、用户体验、干净Windows/物理DPI/GPU及T002/P0缺项保留，见risks/backlog；不冻结无依赖工程。未授权其他实验全部展开、Agent、安装器发布/替换、外联、花费或数据上传。
-- 整理前本次完整snapshot逐字节保留于archive/P002-before-M1-snapshot-20261102.md，旧历史及UNKNOWN不销账。workspace旧T072索引另有原字节归档。
+- 主依据4.0研究总方案与phase-2-workflow-authoring.md；B005历史治理、B009内容审查不是本树产品门禁。
+- P004 WB新校正/正式分析图方法另行版本化，不是M1旧整数图的整卡前置；P003 D1不等于S1。
+- 独立科学留出/负责人容差、用户体验、干净Windows/物理DPI/GPU、T002/P0缺项与旧原生UNKNOWN保留，见risks/backlog。旧树/原图/历史/安装不覆盖；不扩权其他实验全部展开、Agent、安装发布、外联、花费或数据上传。

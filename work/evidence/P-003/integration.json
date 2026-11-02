@@ -1,0 +1,55 @@
+{
+  "pr": {
+    "headRefOid": "c02c2ed65238d553d923a2f7f72e1cc1f7381f7c",
+    "mergeCommit": {
+      "oid": "839fa521d9ae11ceb51f9c4c7493eb2a0251eda0"
+    },
+    "mergedAt": "2026-11-02T02:38:32Z",
+    "state": "MERGED",
+    "url": "https://github.com/Junweiiii14/bioimage-tools-platform/pull/49"
+  },
+  "required_checks": [
+    {
+      "link": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41376417778/job/125057522367",
+      "name": "foundation (windows-latest)",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41376417750/job/125057522550",
+      "name": "rules-context",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41376417778/job/125057522449",
+      "name": "foundation (ubuntu-latest)",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41376417778/job/125057522277",
+      "name": "desktop-environment",
+      "state": "SUCCESS"
+    }
+  ],
+  "merge_tree_matches_reviewed_candidate": true,
+  "independent_review": {
+    "reviewer": "p002_independent_review",
+    "base": "f2dc5ad44fba2e4f951b8987f0babb6b41c1d1a2",
+    "head": "c02c2ed65238d553d923a2f7f72e1cc1f7381f7c",
+    "conclusion": "Accepted after initial findings, exact fixes and byte-preservation review"
+  },
+  "quality_run": 41376417778,
+  "windows": {
+    "passed": 1555,
+    "warnings": 10,
+    "pytest_seconds": 923.34
+  },
+  "linux": {
+    "passed": 1551,
+    "skipped": 4,
+    "warnings": 10,
+    "pytest_seconds": 528.76
+  },
+  "both_platforms_installed_evaluation_and_v0": "passed",
+  "ci_log_sha256": "953858ca017c1863ea8684556220919e0238dbcb4d40c0d55e393dc4c4747bdb",
+  "scope": "D1/engineering framework and B011 planning integrated; no S1/target-machine/user acceptance, no installer publication"
+}

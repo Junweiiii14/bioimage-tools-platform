@@ -1,0 +1,12 @@
+{
+  "samples": 30,
+  "exit_code": 0,
+  "warmup": 5,
+  "command": "uv run --locked --no-sync python -m tooling.benchmark_workbench_snapshot --run --case rows-small --output C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p006-native-r2-20261102-111045\\rows-small.json",
+  "source_commit": "a9bda31365ac892719d5bdeae4f58f8051504863",
+  "output": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p006-native-r2-20261102-111045\\rows-small.json",
+  "started_utc": "2026-11-02T03:31:14.0401115Z",
+  "case": "rows-small",
+  "log": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p006-native-r2-20261102-111045\\rows-small.log",
+  "finished_utc": "2026-11-02T03:31:23.7183552Z"
+}
