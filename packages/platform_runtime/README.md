@@ -23,4 +23,8 @@ backup 使用 SQLite 一致性备份 API 和不可变文件副本，拒绝现存
 
 测试见仓库根 tests/test_workspace.py；完整门禁还构建并隔离安装独立 wheel。
 
+P003追加纯评估入口dataset_partition_issues、method_plan_digest、evaluate_method：
+核对来源分组父子闭包、冻结方法/输入/参数/环境、独立期望及缺失状态；不含具体实验公式，
+不进行文件I/O、不授予科学准入。契约见仓库docs/contracts/method-validation-v1.md。
+
 T-019：import_draft_snapshot只在尚无文档/run的新工作区保存一个外来修订，后续继续正常CAS；不注册外来run/PID。带.restore-incomplete标记的目录拒绝打开。文档内容保持opaque，格式仍为v1。

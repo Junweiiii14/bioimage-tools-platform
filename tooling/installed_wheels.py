@@ -235,6 +235,40 @@ with Workspace.open('installed-workspace') as store:
     assert store.get_run(run.run_id) == completed
 assert not any(name.startswith(('wb_tool', 'PySide6', 'numpy')) for name in sys.modules)
 print('Isolated runtime/contracts wheels: immutable input, run commit/reopen; no tool/GUI/numerics')
+import json
+from platform_runtime.api import evaluate_method, method_plan_digest, dataset_partition_issues
+from tool_contracts.api import (
+    ValidationDataRecord, ValidationCase, MethodEvaluationPlan, MethodEvaluationEvidence,
+    MethodObservation, ModuleSpec, ModulePort, RuntimeVersion,
+)
+validation = Path('validation.json')
+validation.write_text('{"value":0.0}', encoding='utf-8')
+value = json.loads(validation.read_text(encoding='utf-8'))['value']
+data_digest = sha256(validation.read_bytes()).hexdigest()
+record = ValidationDataRecord(record_id='source', dataset_id='installed_fixture',
+    source_groups=('fixture',), partition='development', evidence_kind='synthetic_analytic',
+    payload_sha256=data_digest, file_status='verified_local', decode_status='decoded',
+    license_use_status='allowed', license_and_use='Self-generated JSON fixture', unit='example')
+spec = ModuleSpec(module_id='installed_fixture', module_version='1', method_version='literal@1',
+    implementation_digest='a'*64, parameters_schema='{}',
+    input_ports=(ModulePort(name='source',kind='typed_table'),),
+    output_ports=(ModulePort(name='result',kind='typed_table',filename='result.json'),))
+plan = MethodEvaluationPlan(evaluation_id='installed_check', intended_use='engineering',
+    module=spec, environment=(RuntimeVersion(name='fixture',version='1'),), records=(record,),
+    cases=(ValidationCase(case_id='literal',record_id='source',metric_id='value',unit='example',
+        parameters_sha256='b'*64,expected_status='valid',expected_value=0.0,
+        absolute_tolerance=0.0,reference_source='Declared JSON literal zero'),))
+evidence = MethodEvaluationEvidence(plan_sha256=method_plan_digest(plan), module=spec,
+    environment=plan.environment, observations=(MethodObservation(case_id='literal',
+        payload_sha256=data_digest,parameters_sha256='b'*64,unit='example',
+        status='valid',value=value),))
+report = evaluate_method(plan,evidence)
+assert report.engineering_passed and report.requested_use_allowed
+assert report.scientific_admission == 'not_granted'
+heldout = record.model_copy(update={'record_id':'heldout','partition':'holdout'})
+assert 'source_group_leakage' in dataset_partition_issues((record,heldout))
+assert not any(name.startswith(('wb_tool', 'PySide6', 'numpy')) for name in sys.modules)
+print('Installed evaluation: literal zero, lineage leakage and no scientific approval passed')
 """
 
 
