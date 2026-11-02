@@ -1,6 +1,6 @@
 # P-003 方法和数据验证登记及评估基础
 
-<!-- PROGRAM_TASK_META {"id":"P-003","status":"in_progress","work_package":"W01","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"f2dc5ad44fba2e4f951b8987f0babb6b41c1d1a2","head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-003","status":"in_review","work_package":"W01","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"f2dc5ad44fba2e4f951b8987f0babb6b41c1d1a2","head_commit":"0edf0e0e2f3e3950dbac3bdf4dd55d3f39791991"} -->
 
 ## 执行状态
 
@@ -58,3 +58,11 @@ Win11/Python3.12.14，当前未提交实现：`uv run --locked --no-sync python 
 ## 初次独审Request changes与修复
 
 准确f2dc5ad..debeb3e被非作者提出P1共同父身份未闭包导致同源泄漏漏判、P2冻结polarity/band_bounds/quant_policy被工具忽略；独立反例均实际复现。报告work/evidence/P-003/review-request-changes.md，不把初次13项通过当独审接受。现闭包同时跟踪祖先record身份/分组，严格核对全部实际设计参数及整数类型；新增性质/真实评估拒绝与三字段/布尔坐标反例，18 passed/3.08秒、局部Pyright0。源debeb3e的全门禁在pytest阶段因这些缺陷主动停止，exit1；通过CIM核对本树python/uv及所属shell后停止自己进程树，复查遗留子PID均已退出。该次仅早期Ruff/类型/导入/JS通过，不宣称完整门禁通过，旧冻结证据与execution.json原样保留，新候选另冻结/全验/独审。追加方法登记断言时曾误插到纯性质测试导致NameError及precommit失败，已移到实际文件测试，未改期望/容差，修后13passed/2.43秒且提交钩子通过。
+
+## R2复审、冻结与完整门禁
+
+非作者准确f2dc5ad..0edf0e0 Accepted，独立18passed/2.62秒及原反例/正例/六排序复现均通过，见review-r2.md。作者修后18passed/2.74秒。新冻结frozen-evaluation-r2及execution-r2.json绑定0edf0e0，真实工程命令exit0，科学请求命令exit2且保留正确数值诊断/不获S1。旧初候选证据保留，r2为后继验收候选，不覆盖。
+
+另发现Git自动LF规范化会改变Windows生成报告的原字节，导致clone后原SHA和method-report引用不一致。对P003两类冻结产物限定-text，显式保留默认blank-at-eol/blank-at-eof/space-before-tab错误检查，仅将CR识别为行尾。不是产品代码/数值/门禁阈值放宽；原工作区产物不改，旧规范化Git版本留在0edf0e0，新blob保存真正原生产字节。实际验证两批30个暂存blob均等于原冻结SHA；负例证明真正尾随空格仍被拒，收据byte-preservation.json。该属性/冻结证据增量尚待独审。
+
+新完整`dev.py check --all`在源0edf0e0实际运行，日志.local/p003-check-all-r2.txt、会话52799；恢复须核实实际句柄或结果JSON，不提前写通过。P003保持in_review，待最终增量独审、完整门禁/安装和正常PR/必需CI集成。
