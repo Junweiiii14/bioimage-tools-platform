@@ -8,4 +8,6 @@
 
 没有修改.importlinter、依赖锁、门禁、数值或schema。修复后实际import-linter为9 kept/0 broken；原store/session、Web重开和测量等待器10passed38.59s，类型0，目标Ruff/format通过。追加已有FIFO用例验证未配置拒绝；7run真实编排用例记录处理器线程，须始终同一存储线程且不是GUI线程。最终结果和准确提交独审另记。
 
+742c产品装配独立验证2passed15.32s，作者2passed15.73s，9导入契约独立exit0。独审另指出新归档的CI原始文本有真实行尾空格，使742c全范围diff检查exit1。现改为无损ci-5e69b2f-failed.log.gz，mtime=0；ci-log-bytes.json记录原文/压缩字节数与SHA，解压逐字节等于原件，旧742c历史仍保留原文。未trim日志、覆盖原件或扩大whitespace忽略。此修正只涉及证据，不需要重跑产品测试。
+
 前一64c全部隔离wheel通过继续保留其准确源码范围；本次装配修改后的安装验证交最终必需CI完成，不把旧wheel结果改署新提交，不在本机再次全量回归。纯装配改动未改变预览/节点/控制逻辑，原冻结性能仍明确绑定26f/64c，不冒充新提交性能实测。

@@ -1,0 +1,11 @@
+{
+  "source_commit": "5e69b2f67eb0aeac7db81afee4033e021b8b1917",
+  "ci_run": 41494573552,
+  "original_name": "ci-5e69b2f-failed.log",
+  "original_bytes": 23341,
+  "original_sha256": "0868000380209d2fd3561b5e1ac0a3aa97031c1108abd52d10c6cee01e97a012",
+  "compressed_name": "ci-5e69b2f-failed.log.gz",
+  "compressed_bytes": 2573,
+  "compressed_sha256": "7083e8b16b84fd76a334692ac1f22869e698d51fb44fd7b3bbad9c396058e20f",
+  "reason": "Lossless archive of native CI whitespace; no whitespace gate changes."
+}

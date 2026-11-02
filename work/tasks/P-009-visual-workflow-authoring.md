@@ -79,3 +79,5 @@ Fresh reviewer首轮bb42有效12图结论fix，唯一问题为窄窗任务密度
 ## 2026-11-03 首轮CI边界失败与装配修复
 
 41494573552双平台已terminal failure，import-linter实际拒绝storage→authoring_store→WB/NumPy，未进入pytest/wheel；原日志及具体路径见ci-storage-boundary.md。修复为authoring Session在线程启动前固定装配处理器，通用storage不导入工具，原同一worker/Workspace/bytes命令不变，未改门禁。import-linter9 kept/0 broken；相关10passed38.59s；默认无装配拒绝和同一后台线程实测2passed15.73s，类型/目标Ruff/format通过。待冻结准确复审后更新同PR55，不重跑旧失败或在本机重复全部测试/wheel；新CI会验证当前安装。26f/64c性能及64c本地wheel仍保留原源码归属。
+
+742c5d2装配修复已推同PR55，quality41495505039/rules41495504928启动；独立9导入契约及2真实线程/拒绝测试通过15.32s，产品增量Accepted。独审发现仅新增原CI文本行尾空格使diff检查失败，改无损gzip+原/压缩SHA后全范围检查通过，不修改whitespace门禁。下一纯证据提交将替代742c运行，旧CI取消须如实记录，不称其测试失败或通过。

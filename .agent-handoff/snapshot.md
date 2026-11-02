@@ -27,7 +27,7 @@
 2. 本地不再重复全pytest/已通过wheel/原生测量；最终CI执行全量Windows/Linux已有门禁和wheel。失败按真实原因处理，不自动重跑凑绿。
 3. 集成后按objective-audit.md及原P002/M1/M2需求逐项核验，记录当前PR/check/tree，不能靠状态文字宣布完成。保持科学/设备/用户体验及性能限制。
 
-当前存储装配产品修复及相应测试/契约/交接未提交，B012仍保留。没有活跃外部CI，41494573552已失败终结；不要继续等待旧run。5e69b2f纯证据扩展报告.local/p009-review-5e69b2f.md需保留，已提交review-final.md仍为64c源码范围，装配修复需新的准确审查。
+存储装配已提交并推742c5d26403b1509537ebe1cfd4cf6ba4b4e18ef；quality41495505039/rules41495504928启动。独立产品增量Accepted、9导入契约过、2真实线程/默认拒绝测试15.32s。仅原CI文本行尾空格导致742c diffcheck失败，当前改无损gzip+原/压缩SHA，解压字节一致，未扩大whitespace忽略。纯证据修正需冻结并推同PR，准确报告待reviewer延伸；新推可能取消742c CI，按真实终态记录。旧41494573552 failure不重跑。B012仍保留，review-final.md仍明确64c旧范围，新报告不改署历史。
 
 旧快照已逐字节归档archive/P009-before-manifest-fix-snapshot.md；详细失败、命令和阶段证据在任务及work/evidence/P-009，不在snapshot复制长日志。
 
