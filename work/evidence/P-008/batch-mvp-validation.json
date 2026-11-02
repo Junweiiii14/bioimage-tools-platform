@@ -1,6 +1,6 @@
 {
   "tested_base": "5d5dd226a7dc6bf16879c16257a0d3754b814ff3",
-  "tested_worktree": "normalized final source hashes; read individual result scope before claiming coverage",
+  "tested_worktree": "Source hashes below identify candidate323d59f; subsequent pause/resume guard validation is recorded in followup_validation.",
   "environment": "Windows-11-10.0.26200-SP0",
   "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
   "logs": {
@@ -61,5 +61,29 @@
     "tests/test_workflow_session.py": "c68bc9885700b20be16bb9b7f701a624f5797480dc2b3d1b5b91c95f21fcf67d",
     "tooling/installed_wheels.py": "197ce713c107f21ae6fcea85a631c9cf76d20376b467857e76933fb2b14f0380"
   },
-  "limits": "engineering synthetic/fixture evidence only; whole P008 review/wheels/fullCI pending, P009 not started; no scientificS1/clean target/physicalDPI/user acceptance claim"
+  "limits": "engineering synthetic/fixture evidence only; whole P008 review/wheels/fullCI pending, P009 not started; no scientificS1/clean target/physicalDPI/user acceptance claim",
+  "followup_validation": {
+    "candidate": "323d59f02cc94cc0b1b8d1acde0a8dfe64720a17",
+    "independent_review": "Request changes: reproduced P2 resume while pausing leaves parent running/child paused; corrected by accepting resume only after paused or explicit reopened awaiting_resume. Independent concurrent pytest overlapped edits: 2failed8passed50.91s, non-authoritative, retained by reviewer.",
+    "checks": [
+      {
+        "log": ".local/p008-final-wheels-323d59f.log",
+        "result": "All four isolated installed wheel probes passed, including actual batch4000/40 six runs, reopen, style8runs and template second batch. Before pause guard correction.",
+        "exit_code": 0,
+        "sha256": "58c69efc7938452eef4490a57bdcea8d3a9792c70ac8fa1f8a29b51d54af63fa"
+      },
+      {
+        "log": ".local/p008-early-resume-before.log",
+        "result": "1failed2.94s; resume accepted at pausing, expected rejection",
+        "exit_code": 1,
+        "sha256": "9576522cb51a5c9da5a0ff1631292ac919d7f8b1e09aea0d9e42ecf8557f612c"
+      },
+      {
+        "log": ".local/p008-early-resume-after.log",
+        "result": "10passed68.35s; full batch targeted file including pause/resume completion, six real runs, existing cancel/crash/ENOSPC/isolation",
+        "exit_code": 0,
+        "sha256": "b1f1d2243a7a63155f2ecb6d2dc371af37e933f329356e4d96123d4317253d80"
+      }
+    ]
+  }
 }

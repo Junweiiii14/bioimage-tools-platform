@@ -115,6 +115,11 @@ class WorkflowBatchSession(QObject):
             previous = next((c for c in self._batch.controls if c.command_id == command_id), None)
             if previous is not None:
                 return previous.action == action
+        if action == "resume" and not (
+            self._batch is not None
+            and (self._batch.state == "paused" or self._phase == "awaiting_resume")
+        ):
+            return False
         count = len(self._batch.controls) if self._batch else 0
         count += sum(c.operation == "control" for c in self._queue)
         count += int(self._waiting is not None and self._waiting[1] == "control")

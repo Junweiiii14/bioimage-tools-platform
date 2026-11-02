@@ -32,3 +32,8 @@ platform_runtime仅通用图/账本/失效规则；实验适配在工具api与�
 真实输入CSV4000/40、合法零0/invalid空值分别核验；批次8项51.87秒、CLI3项63.01秒、关联80项236.02秒通过。之后为两个已复现取消问题补丁：坏输入回执与取消双终态，及取消请求被父存储阻挡/重开加载前取消未应用；原失败保留，最终相关16项50.04秒通过，未弱化预期或容差。精确范围/原日志摘要/源码SHA见batch-mvp-validation.json；最终准确独审/隔离wheels/CI尚待完成，不提前done。
 
 新增有限预算16样本/合计64节点256边/1MiB计划/256派发/128父控制（保留最后取消名额），父文档沿旧16MiB；不是性能或OS硬配额。公开纯模型不依赖WB/Qt；父索引仅指向旧WorkflowLedger，不另造结果/资产/PID。中文操作单docs/runbooks/workflow-batch.md，版本契约docs/contracts/workflow-batch-v1.md。
+
+
+## 最终候选独审修正
+
+候选323d59f四组隔离wheel全部退出0，含安装后批量4000/40、6run/重开、样式8run和模板第二批。独审真实复现P2：pausing时接受resume使父running/子paused停滞，Request changes。已明确仅完成暂停或重开awaiting_resume才接受继续；新增回归先1failed2.94秒，修复后批量整文件10passed68.35秒。无容差/预期弱化。独审自身并发pytest与作者编辑重叠的2failed8passed50.91秒不归属冻结候选、不作为新增缺陷或通过。最终修正准确提交复审及PR53修正后CI待完成。

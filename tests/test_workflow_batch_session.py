@@ -389,6 +389,46 @@ app.exec()
         assert len(store.list_runs()) == 6
 
 
+def test_batch_resume_requires_completed_pause_boundary(
+    qtbot: QtBot,
+    batch_fixture: tuple[Path, WorkflowBatch, tuple[AssetRef, ...]],
+) -> None:
+    workspace, batch, _sources = batch_fixture
+    session = WorkflowBatchSession(wb_workflow_registry)
+    ended: list[WorkflowBatchStatus] = []
+    early_resume: list[bool] = []
+    paused = False
+    resumed = False
+
+    def changed(status: WorkflowBatchStatus) -> None:
+        nonlocal paused, resumed
+        if status.child and status.child.pid and not paused:
+            paused = True
+            assert session.pause()
+        if status.state == "pausing" and not early_resume:
+            early_resume.append(session.resume())
+        if status.state == "paused" and not resumed:
+            resumed = session.resume()
+
+    def completed(_status: WorkflowBatchStatus) -> None:
+        session.close()
+
+    session.changed.connect(changed)
+    session.completed.connect(completed)
+    session.finished.connect(ended.append)
+    try:
+        session.start(str(workspace), batch)
+        qtbot.waitUntil(lambda: bool(early_resume), timeout=15000)
+        assert early_resume == [False]
+        qtbot.waitUntil(lambda: bool(ended), timeout=45000)
+        assert resumed and ended[0].state == "completed" and not ended[0].message
+        with Workspace.open(workspace) as store:
+            assert len(store.list_runs()) == 6
+    finally:
+        session.close()
+        qtbot.waitUntil(lambda: bool(ended), timeout=30000)
+
+
 def test_batch_cancel_signals_current_commit_before_parent_storage_ack(
     qtbot: QtBot,
     batch_fixture: tuple[Path, WorkflowBatch, tuple[AssetRef, ...]],
