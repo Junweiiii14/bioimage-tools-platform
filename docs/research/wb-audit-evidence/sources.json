@@ -1,0 +1,219 @@
+[
+  {
+    "title": "ImageJ Gel Analyzer操作说明",
+    "url": "https://imagej.net/ij/docs/menus/analyze.html",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/research/2026-11-02-wb-workflow-audit.md"
+    ]
+  },
+  {
+    "title": "ImageJ图像菜单",
+    "url": "https://imagej.net/ij/docs/menus/image.html",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/research/2026-11-02-wb-workflow-audit.md"
+    ]
+  },
+  {
+    "title": "LI-COR定量归一化说明",
+    "url": "https://www.licorbio.com/support/contents/applications/western-blots/revert-normalization-protocol.html",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/research/2026-11-02-wb-workflow-audit.md"
+    ]
+  },
+  {
+    "title": "ImageJ Gel选项",
+    "url": "https://imagej.net/ij/docs/guide/146-30.html",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/research/2026-11-02-wb-workflow-audit.md",
+      "docs/research/2026-11-02-wb-workflow-audit.md"
+    ]
+  },
+  {
+    "title": "Prism数据表",
+    "url": "https://www.graphpad.com/guides/prism/latest/user-guide/using_data_table_format.htm",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/research/2026-11-02-wb-workflow-audit.md"
+    ]
+  },
+  {
+    "title": "分析入口",
+    "url": "https://www.graphpad.com/guides/prism/latest/user-guide/using_choosing_an_analysis.htm",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/research/2026-11-02-wb-workflow-audit.md"
+    ]
+  },
+  {
+    "title": "单点图",
+    "url": "https://www.graphpad.com/guides/prism/latest/user-guide/using_graphing_each_replicate.htm",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/research/2026-11-02-wb-workflow-audit.md"
+    ]
+  },
+  {
+    "title": "Prism非配对t检验操作",
+    "url": "https://www.graphpad.com/guides/prism/latest/statistics/stat_howto_ttestunpaired.htm",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/research/2026-11-02-wb-workflow-audit.md"
+    ]
+  },
+  {
+    "title": "LI-COR背景方法",
+    "url": "https://www.licorbio.com/support/contents/software/image-studio/analysis/gel-and-blot-background.html",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/research/2026-11-02-wb-workflow-audit.md"
+    ]
+  },
+  {
+    "title": "ImageJ背景扣除",
+    "url": "https://imagej.net/ij/docs/menus/process.html",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/research/2026-11-02-wb-workflow-audit.md"
+    ]
+  },
+  {
+    "title": "Bio-Rad快速指南，1—3页",
+    "url": "https://www.bio-rad.com/webroot/web/pdf/lsr/literature/Bulletin_6434.pdf",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/research/2026-11-02-wb-workflow-audit.md"
+    ]
+  },
+  {
+    "title": "Illustrator置入",
+    "url": "https://helpx.adobe.com/illustrator/using/place-multiple-files.html",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/research/2026-11-02-wb-workflow-audit.md"
+    ]
+  },
+  {
+    "title": "Photoshop批处理",
+    "url": "https://helpx.adobe.com/uk/photoshop/desktop/automate-tasks/process-a-batch-of-files/batch-process-files.html",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/research/2026-11-02-wb-workflow-audit.md"
+    ]
+  },
+  {
+    "title": "ASBMB图像与数据呈现要求",
+    "url": "https://www.asbmb.org/journals/author-resources/collecting-and-presenting-data",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/research/2026-11-02-wb-workflow-audit.md"
+    ]
+  },
+  {
+    "title": "ImageJ宏批处理",
+    "url": "https://imagej.net/tutorials/batch-processing-with-ij-macro",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/research/2026-11-02-wb-workflow-audit.md"
+    ]
+  },
+  {
+    "title": "CellProfiler对象识别",
+    "url": "https://cellprofiler-manual.s3.amazonaws.com/CellProfiler-4.2.8/modules/objectprocessing.html",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/plans/experiment-research-roadmap.md"
+    ]
+  },
+  {
+    "title": "强度测量",
+    "url": "https://cellprofiler-manual.s3.amazonaws.com/CellProfiler-4.2.8/modules/measurement.html",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/plans/experiment-research-roadmap.md"
+    ]
+  },
+  {
+    "title": "Dojindo CCK-8",
+    "url": "https://www.dojindo.com/ASIA/products/CK04/",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/plans/experiment-research-roadmap.md"
+    ]
+  },
+  {
+    "title": "Prism标准曲线",
+    "url": "https://www.graphpad.com/guides/prism/latest/curve-fitting/reg_interpolating_with_linear_or_n.htm",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/plans/experiment-research-roadmap.md"
+    ]
+  },
+  {
+    "title": "QuantStudio Design and Analysis v2相对定量指南，Rev F.0",
+    "url": "https://documents.thermofisher.com/TFS-Assets/LSG/manuals/MAN0018747_RelativeQuantificatAnalysisModule_QSDASWv2_UG.pdf",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/plans/experiment-research-roadmap.md"
+    ]
+  },
+  {
+    "title": "原始方法论文",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7386569/",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/plans/experiment-research-roadmap.md"
+    ]
+  },
+  {
+    "title": "ColonyArea官方说明",
+    "url": "https://imagej.net/plugins/colonyarea",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/plans/experiment-research-roadmap.md"
+    ]
+  },
+  {
+    "title": "QuPath细胞检测教程",
+    "url": "https://qupath.readthedocs.io/en/stable/docs/tutorials/cell_detection.html",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/plans/experiment-research-roadmap.md"
+    ]
+  },
+  {
+    "title": "FlowJo Graph Window",
+    "url": "https://docs.flowjo.com/flowjo/graphs-and-gating/gw-overview/",
+    "accessed": "2026-11-02",
+    "kind": "official documentation or primary method paper",
+    "used_in": [
+      "docs/plans/experiment-research-roadmap.md"
+    ]
+  }
+]

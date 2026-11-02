@@ -1,0 +1,250 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>长期维护与人工代码审查计划</title><style>
+:root{--paper:#fefff9;--canvas:#f1f3e9;--ink:#203b2e;--muted:#52634c;--line:#dce3d4;--accent:#24745a;--wash:#e6efcf;--code:#f1f4e9;--focus:#24745a;color-scheme:light}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:30px}body{margin:0;background:var(--canvas);color:var(--ink);font:16px/1.9 'WB Sans','Microsoft YaHei',sans-serif;font-synthesis:none}::selection{background:#c9dfce;color:#152b22}a{color:var(--accent);text-underline-offset:4px}a:hover{text-decoration-thickness:2px}button,input{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--focus);outline-offset:4px}input{caret-color:var(--accent)}
+.skip{position:fixed;left:20px;top:-100px;background:var(--paper);padding:8px;z-index:20}.skip:focus{top:12px}.sidebar{position:fixed;left:0;top:0;bottom:0;width:288px;padding:35px 24px;overflow:auto;background:var(--paper);border-right:1px solid var(--line)}.brand{display:block;font-size:20px;font-weight:700;margin-bottom:6px;text-decoration:none}.edition{font-size:13px;color:var(--muted);margin:0 0 24px}.search-label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}.search-box{width:100%;border:1px solid #879b92;background:var(--paper);border-radius:8px;padding:10px 11px;line-height:1.5;color:var(--ink)}.search-box::placeholder{color:#64756d}.search-status{font-size:12px;color:var(--muted);margin:8px 0;min-height:22px}.search-results{display:grid;gap:0;max-height:40vh;overflow:auto}.search-results a{font-size:12px;padding:8px 0;border-bottom:1px solid var(--line);line-height:1.7}.toc{margin-top:22px;display:grid;gap:3px}.toc>a{display:block;padding:8px 10px;text-decoration:none;font-size:14px;line-height:1.7;border-radius:4px}.toc>a[aria-current=true]{background:var(--wash);font-weight:700}.toc>a:hover{background:#f1f4ef}.side-note{font-size:12px;line-height:1.8;color:var(--muted);margin-top:28px;padding-top:16px;border-top:1px solid var(--line)}.print-button{padding:8px 12px;border:1px solid #8fa498;border-radius:8px;background:transparent;color:var(--accent);margin-top:18px;font-size:13px}.mobile-bar{display:none}
+.page{margin-left:288px;padding:0 48px 60px}.document{max-width:1120px;margin:auto;background:var(--paper);padding:52px 52px 80px;box-shadow:0 8px 32px #173b2210}.document>h1{font-family:'Microsoft YaHei',sans-serif;font-weight:650;font-size:clamp(30px,3vw,43px);line-height:1.45;margin:0 0 12px;letter-spacing:0}.document>h1+p{color:var(--muted);font-size:13px;margin-bottom:28px}.document>p,.document>ul,.document>ol{max-width:74ch}.document>p{margin:16px 0}h2{font-size:27px;line-height:1.55;margin:70px 0 24px;padding-top:26px;border-top:1px solid var(--line);font-weight:700}h3{font-size:21px;line-height:1.6;margin:38px 0 15px}h4{font-size:17px;margin:28px 0 12px;line-height:1.65}h2,h3,h4{scroll-margin-top:26px;text-wrap:balance}h2:target,h3:target,h4:target,[id^=block]:target{background:var(--wash);outline:2px solid #b5ccbc;outline-offset:6px}.permalink{font-weight:400;font-size:.7em;margin-left:10px;color:var(--muted);text-decoration:none;opacity:0}h2:hover .permalink,h3:hover .permalink,h4:hover .permalink,.permalink:focus-visible{opacity:1}p,li,td,th{overflow-wrap:anywhere}li{margin:7px 0}ul,ol{padding-left:1.7em}strong{font-weight:700}code{font-family:Consolas,'Cascadia Code',monospace;font-size:.89em;background:var(--code);border-radius:3px;padding:2px 4px;overflow-wrap:anywhere}pre{overflow:auto;background:#edf2ef;border:1px solid var(--line);border-radius:6px;padding:22px;line-height:1.65;font-size:14px;tab-size:2;max-height:600px}pre code{padding:0;border-radius:0;background:transparent;overflow-wrap:normal;white-space:pre}.table-wrap{max-width:100%;overflow:auto;margin:22px 0 28px;border:1px solid var(--line);border-radius:8px;scrollbar-color:#8da396 #e8eeea}table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.85}th,td{text-align:left;vertical-align:top;padding:13px 15px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-width:135px;font-variant-numeric:tabular-nums}th{background:#edf2ed;font-weight:700;color:#294b3e}td:last-child,th:last-child{border-right:none}tbody tr:last-child td{border-bottom:none}tbody tr:nth-child(even){background:#fafbf7}td code{font-size:12px}.flow-diagram{margin:36px 0 0;padding:22px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}figcaption{font-weight:700;margin-bottom:18px}.flow-row{display:flex;gap:8px;align-items:center}.flow-row>div{flex:1;padding:12px 7px;background:var(--wash);text-align:center;font-size:13px;font-weight:700;line-height:1.6;min-width:0}.flow-row small{display:block;font-size:11px;color:#486153;font-weight:400;margin-top:7px}.flow-row>span{color:var(--accent)}.flow-diagram p{font-size:12px;color:var(--muted);margin:15px 0 0}.document-footer{margin-top:65px;border-top:1px solid var(--line);padding-top:20px;font-size:12px;color:var(--muted)}.reading-links{display:flex;flex-wrap:wrap;gap:10px 22px;padding:16px 0 24px;border-bottom:1px solid var(--line);margin-bottom:28px;font-size:13px}.reading-links a{text-decoration:none}.reading-links a:hover{text-decoration:underline}button:hover{background:var(--wash)}
+@media(min-width:1700px){.document{padding-left:68px;padding-right:68px}}@media(max-width:1200px){.sidebar{width:248px;padding:28px 18px}.page{margin-left:248px;padding:0 22px 40px}.document{padding:36px 28px 60px}.flow-row{flex-wrap:wrap}.flow-row>div{min-width:100px}}@media(max-width:780px){html{scroll-padding-top:85px}.mobile-bar{display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;padding:12px 18px;background:var(--paper);border-bottom:1px solid var(--line);font-size:14px}.mobile-bar button{border:1px solid #8fa498;padding:5px 12px;border-radius:4px;background:transparent;color:var(--accent)}.sidebar{display:none;position:fixed;top:65px;width:100%;bottom:auto;max-height:calc(100vh - 65px);padding:18px 24px;z-index:9;border-bottom:1px solid var(--line)}body.nav-open .sidebar{display:block}.sidebar .brand,.sidebar .edition,.side-note{display:none}.toc{margin-top:12px}.toc>a{padding:6px 8px}.page{margin-left:0;padding:0}.document{padding:26px 20px 48px;box-shadow:none}.document>h1{font-size:31px}.document>p{font-size:15px}.document h2{font-size:23px;margin-top:50px;padding-top:20px;scroll-margin-top:85px}.document h3{font-size:19px;scroll-margin-top:85px}.document h4{scroll-margin-top:85px}.table-wrap{margin-right:0}th,td{min-width:165px;font-size:12px;padding:11px}pre{font-size:12px;padding:15px}.flow-row{display:grid;grid-template-columns:1fr}.flow-row>div{padding:10px}.flow-row small{display:inline;margin-left:8px}.flow-row>span{text-align:center;line-height:1;transform:rotate(90deg)}.search-results{max-height:25vh}.permalink{opacity:1}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}@media print{@page{size:A4;margin:16mm 12mm}.sidebar,.mobile-bar,.skip,.reading-links,.permalink{display:none!important}.page{margin:0;padding:0}.document{max-width:none;padding:0;box-shadow:none}.document>h1{font-size:28px}body{background:white;font-size:10pt;line-height:1.7}.document>p{font-size:10pt}h2{break-before:page;font-size:20px;margin:0 0 16px;padding-top:0;border:0}h3{font-size:15px}h4{font-size:12px}h2,h3,h4{break-after:avoid}table{font-size:8pt}.table-wrap{overflow:visible;border-radius:0;break-inside:auto}th,td{min-width:0;padding:6px;overflow-wrap:anywhere}thead{display:table-header-group}tr{break-inside:avoid}pre{max-height:none;white-space:pre-wrap;overflow:visible;font-size:8pt}pre code{white-space:pre-wrap;overflow-wrap:anywhere}.flow-diagram{break-inside:avoid}a{color:inherit;text-decoration:none}}
+</style></head><body><a class="skip" href="#document">跳到正文</a><div class="mobile-bar"><strong>科研数据平台 · 4.2</strong><button id="menu-toggle" aria-controls="navigation" aria-expanded="false">目录与检索</button></div><aside class="sidebar" id="navigation"><a class="brand" href="#document">科研数据平台</a><p class="edition">合并方案 4.2 · 2026.11.02</p><label class="search-label" for="search">查找操作、模块或维护要求</label><input class="search-box" id="search" type="search" placeholder="例如：操作 / 版本 / 审查"><p class="search-status" id="search-status" aria-live="polite">搜索全文；内容始终完整保留。</p><div id="results" class="search-results"></div><nav class="toc" aria-label="文档目录"><a href="#section-1">1. 分区与责任：按变化原因组织代码</a><a href="#section-2">2. 人工审查怎么快速进入代码</a><a href="#section-3">3. 保持代码简洁的具体准则</a><a href="#section-4">4. 一次改动怎样实现、验证和审查</a><a href="#section-5">5. 方法、接口、数据和依赖怎样长期演进</a><a href="#section-6">6. 维护节奏和技术债怎样控制</a><a href="#section-7">7. 接手与渐进落地</a></nav><button class="print-button" id="print">打印 / 保存 PDF</button><p class="side-note">方案与实施状态分别标注。当前仅更新规划目录，未同步开发窗口。</p></aside><main class="page"><article class="document" id="document" tabindex="-1"><h1>长期维护与人工代码审查计划</h1>
+<p id="block-1">2026-11-02 · 配合4.2总方案 · 规划树修订，未同步开发窗口</p>
+<p id="block-2">目标是让功能增加时仍能定位代码、解释方法、验证修改和恢复历史。沿用现有公开API、工作区、worker和门禁，渐进改善；本文件不代表重构已完成，也不启用定时任务。旧维护要求完整保存在<a href="maintenance-reference-before-B015.md">历史快照</a>，已知科学、目标机和发布缺项仍以实际任务为准。</p>
+<h2 id="section-1" tabindex="-1">1. 分区与责任：按变化原因组织代码<a class="permalink" href="#section-1" aria-label="链接到此节">§</a></h2>
+<p id="block-3">实际产品树为<code>bioimage-v0</code>，本目录保留旧代码，不能用本地旧实现覆盖它。下表是对现有职责的导航和后续约束，具体API以实际树当时版本为准。</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的数据表"><table>
+<thead>
+<tr id="block-4">
+<th>分区</th>
+<th>入口与位置</th>
+<th>应审查什么</th>
+<th>责任角色</th>
+</tr>
+</thead>
+<tbody><tr id="block-5">
+<td>公共契约</td>
+<td><code>packages/tool_contracts/src/tool_contracts/api.py</code></td>
+<td>数据类型、身份、单位、版本、未知/失败状态、兼容</td>
+<td>当前契约变更维护者</td>
+</tr>
+<tr id="block-6">
+<td>平台运行/存储</td>
+<td><code>packages/platform_runtime/src/platform_runtime/api.py</code></td>
+<td>通用图/账本、工作区事务、取消/恢复；无实验特判</td>
+<td>当前平台任务维护者</td>
+</tr>
+<tr id="block-7">
+<td>实验公开入口</td>
+<td><code>tools/wb/src/wb_tool/api.py</code></td>
+<td>最小稳定接口；不泄露内部服务容器或GUI</td>
+<td>该实验工具维护者</td>
+</tr>
+<tr id="block-8">
+<td>纯算法</td>
+<td>工具的<code>domain/</code></td>
+<td>公式、数值范围、坐标、单位、方法版本和参考</td>
+<td>方法实现者＋独立审查者</td>
+</tr>
+<tr id="block-9">
+<td>应用用例</td>
+<td>工具的<code>application/</code></td>
+<td>组合本工具能力、输入前提、状态和明确业务结果</td>
+<td>该实验工具维护者</td>
+</tr>
+<tr id="block-10">
+<td>外部适配</td>
+<td>工具的<code>adapters/</code></td>
+<td>文件/外部软件/进程边界、格式转换、输出核验</td>
+<td>适配维护者</td>
+</tr>
+<tr id="block-11">
+<td>宿主接线</td>
+<td><code>apps/desktop/src/bioimage_app/</code></td>
+<td>静态注册、运行/存储端口、线程和进程生命周期</td>
+<td>桌面/平台集成维护者</td>
+</tr>
+<tr id="block-12">
+<td>界面展示</td>
+<td>宿主<code>web_ui/</code>和工具<code>ui/</code></td>
+<td>事件→用例、预览、编辑草稿、焦点、旧事件拒绝</td>
+<td>界面维护者</td>
+</tr>
+<tr id="block-13">
+<td>验证与工具</td>
+<td>包内<code>tests/</code>、根<code>tests/</code>、<code>tooling/</code></td>
+<td>独立预期、边界、真实进程/存储与安装验证</td>
+<td>作者自验＋非作者独审</td>
+</tr>
+</tbody></table></div>
+<p id="block-14">责任角色由任务卡填写当前owner，不另造人员管理系统。平台不依赖具体实验；工具不互相导入内部代码；领域计算不依赖Qt、数据库或子进程。宿主的线程/进程接线不是算法职责。依赖方向以<a href="architecture.md">架构约束</a>为准。</p>
+<p id="block-15">同一算法只保留一个权威实现，GUI、CLI和工作流都调用它。文件格式适配也不应私自再写一份公式。真正有方法差异时用明确方法名和版本区分，不用隐藏布尔开关悄悄切换语义。</p>
+<h2 id="section-2" tabindex="-1">2. 人工审查怎么快速进入代码<a class="permalink" href="#section-2" aria-label="链接到此节">§</a></h2>
+<p id="block-16">采用三层导航，不要求人读完仓库才能评审：</p>
+<ol>
+<li id="block-17"><strong>根模块地图：</strong> 回答“这次改动属于哪个分区”，只维护包/职责/公开入口/测试入口。</li>
+<li id="block-18"><strong>模块README：</strong> 回答“从用户行为进入哪条调用链”，保留入口、输入输出、关键函数、方法记录及验证命令，链接详细契约。</li>
+<li id="block-19"><strong>源码局部说明：</strong> 回答“这里为什么这样算/这样提交”，仅对不明显的前提、不变量、边界和兼容原因写短说明。</li>
+</ol>
+<p id="block-20">模块README建议采用以下短表；可以是现有README的一节，不需新增文件：</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的数据表"><table>
+<thead>
+<tr id="block-21">
+<th>用户行为</th>
+<th>公开入口</th>
+<th>用例→算法/适配</th>
+<th>输出/副作用</th>
+<th>参考测试与方法说明</th>
+</tr>
+</thead>
+<tbody><tr id="block-22">
+<td>实际行为</td>
+<td>实际符号</td>
+<td>实际文件和符号</td>
+<td>实际文件/结果/状态</td>
+<td>可直接定位的链接</td>
+</tr>
+</tbody></table></div>
+<p id="block-23"><strong>WB现有示例（只读定位，不是本轮代码变更）：</strong></p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的数据表"><table>
+<thead>
+<tr id="block-24">
+<th>想审查什么</th>
+<th>从哪里看</th>
+</tr>
+</thead>
+<tbody><tr id="block-25">
+<td>定量入口是否丢位深/混入显示图</td>
+<td><a href="../tools/wb/src/wb_tool/adapters/tiff_input.py">tiff_input.py</a>，<code>load_tiff</code></td>
+</tr>
+<tr id="block-26">
+<td>数值到底怎么算</td>
+<td><a href="../tools/wb/src/wb_tool/domain/lanes.py">lanes.py</a>，<code>compute_lane_profiles</code> → <a href="../tools/wb/src/wb_tool/domain/quantify.py">quantify.py</a>，<code>integrate_profile</code></td>
+</tr>
+<tr id="block-27">
+<td>质量状态怎样产生</td>
+<td><a href="../tools/wb/src/wb_tool/application/analysis.py">analysis.py</a>，<code>analyze_annotations</code></td>
+</tr>
+<tr id="block-28">
+<td>归一化配对和公式</td>
+<td><a href="../tools/wb/src/wb_tool/application/project_normalization.py">project_normalization.py</a> → <a href="../tools/wb/src/wb_tool/domain/normalization.py">normalization.py</a></td>
+</tr>
+<tr id="block-29">
+<td>哪些能力已成为节点</td>
+<td><a href="../tools/wb/src/wb_tool/adapters/workflow_nodes.py">workflow_nodes.py</a>，注册ID及<code>wb_workflow_spec</code></td>
+</tr>
+<tr id="block-30">
+<td>数学参考有没有独立预期</td>
+<td><a href="../tools/wb/tests/test_quantify.py">test_quantify.py</a>、<a href="../tools/wb/tests/test_normalization.py">test_normalization.py</a>；测试存在不代表本轮跑过</td>
+</tr>
+</tbody></table></div>
+<p id="block-31">源码标注采用普通docstring/注释，不引入自定义标签解析器。新建或确实修改的关键算法文件可用四项短说明：<strong>职责；输入输出和单位；不变量/方法版本；参考记录或测试。</strong> 不要求每个小函数重复这些内容，不在注释里复制任务历史和过期行号。导航以文件＋符号为主，随改动更新。</p>
+<p id="block-32">一个混合多种职责的巨大文件，不会因为加上“区域一/区域二”就变清楚。确需拆分时沿职责和公开接口拆；不要给每个短函数单独建文件，也不要创建大量只转发一次的包装层。</p>
+<h2 id="section-3" tabindex="-1">3. 保持代码简洁的具体准则<a class="permalink" href="#section-3" aria-label="链接到此节">§</a></h2>
+<ul>
+<li id="block-33">名称表达实验含义和量纲，例如<code>reference_signal</code>，避免模糊的<code>data2</code>、<code>result_new</code>和聚合所有逻辑的<code>utils</code>。已有公开名改动须考虑兼容。</li>
+<li id="block-34">一段代码解决一个明确行为。优先直接的数据变换和显式分支；复杂状态转移集中在既有状态模型，不把状态散落到UI、文件名和多个布尔值。</li>
+<li id="block-35">入口对不可信输入验证一次，内部使用确定类型。真实跨文件/进程/异步边界仍需核对来源与修订；这不是可以删除的重复校验。</li>
+<li id="block-36">只捕获能处理或需要转换成边界错误的异常；保留原因。不能用空结果、有效0、默认成功或偷偷换算法掩盖失败。</li>
+<li id="block-37">公共API只暴露真实消费者需要的接口。不为假想扩展先造服务定位器、插件市场、万能基类或第二执行器。</li>
+<li id="block-38">提炼共用代码要证明语义相同；相似代码若表达不同实验方法，可以保持分离。新公共包仍需既有import-linter与独立wheel检查。</li>
+<li id="block-39">不为追求更少代码删掉来源、单位、原始值、取消/提交保证。也不以防御为理由层层复制这些检查。</li>
+</ul>
+<p id="block-40">不设置“越短越好”的硬指标。函数太长、嵌套过深、一个文件频繁因不同原因修改时，先问是否混合职责；确有问题才重构。自动生成文件、第三方固定代码和迁移历史单独看待，不拿相同行数标准改写。</p>
+<h2 id="section-4" tabindex="-1">4. 一次改动怎样实现、验证和审查<a class="permalink" href="#section-4" aria-label="链接到此节">§</a></h2>
+<p id="block-41"><strong>开始：</strong> 读实际任务、base/HEAD/dirty与适用规则，保留他人改动。方法变化先链接操作/方法记录；普通重命名不启动整套实验调研。已有授权内自主推进。</p>
+<p id="block-42"><strong>实施：</strong> 做一个端到端行为切片。科学语义变更与纯重构分别说明；无关依赖升级和全仓格式整理单独处理。并行开发时各自独立工作区；同一契约由一个协调者管理。此处不授权新增开发窗口或通知。</p>
+<p id="block-43"><strong>验证：</strong> 按下表选本次风险，先定向，再在最终候选完成既有必需检查。记录实际环境/提交/退出码；检查结果不随相关代码变化自动沿用。</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的数据表"><table>
+<thead>
+<tr id="block-44">
+<th>改动类型</th>
+<th>最有价值的验证</th>
+</tr>
+</thead>
+<tbody><tr id="block-45">
+<td>公式、默认参数、预处理</td>
+<td>独立算例/原软件对照/适用数据，检查单位、极值、缺失与方法版本</td>
+</tr>
+<tr id="block-46">
+<td>文件或公共接口</td>
+<td>真实输入输出、格式/类型边界、相关消费者、安装包隔离</td>
+</tr>
+<tr id="block-47">
+<td>调度、存储、取消、恢复</td>
+<td>真实进程/文件/事务，提交前后故障与晚到事件；mock不能证明完整运行</td>
+</tr>
+<tr id="block-48">
+<td>UI交互</td>
+<td>实际入口、键盘/焦点、错误/空状态、后台响应；截图不证明计算正确</td>
+</tr>
+<tr id="block-49">
+<td>文档/样式/局部整理</td>
+<td>相关链接、渲染、最小回归；不额外重跑无关产品全套</td>
+</tr>
+<tr id="block-50">
+<td>依赖、格式迁移、候选发行</td>
+<td>独立变更审查、旧样例兼容、干净环境与恢复路线；依实际授权执行</td>
+</tr>
+</tbody></table></div>
+<p id="block-51"><strong>审查说明只需讲清四件事：</strong> 用户行为的前后变化；从哪些入口/函数读起；哪些方法/数据/并发不变量受影响；跑过什么以及仍有什么限制。小改动几句话足够，复杂方法再链接对照记录。</p>
+<p id="block-52"><strong>非作者独审：</strong> 沿调用链检查科学公式、数据转换、状态提交、失败路径及必要测试。检查“当前算法只有一份”“UI不藏公式”“结果确实提交”，而不是只看目录漂亮或测试数量多。审查绑定准确base..head；集成走PR和必需CI，不绕过规则。</p>
+<p id="block-53"><strong>完成：</strong> 只更新受影响的README/契约/地图；任务状态唯一写任务卡，交接保存指针。新增算法留方法追溯，新增接口留消费者，不要求每个修改生成重复文档。</p>
+<h2 id="section-5" tabindex="-1">5. 方法、接口、数据和依赖怎样长期演进<a class="permalink" href="#section-5" aria-label="链接到此节">§</a></h2>
+<p id="block-54">区分已有版本轴的含义：<strong>方法版本</strong>说明计算定义；<strong>模块/实现版本</strong>说明执行实现；<strong>数据schema</strong>说明保存格式；<strong>模板版本</strong>说明组合和参数。记录运行环境以便复现，不为普通文案或无影响重构制造科学新方法。</p>
+<p id="block-55">模板固定其方法与模块版本，升级时明确创建新版本/修订。旧结果可查看不等于旧环境仍能执行；缺少依赖时说明不可运行，不静默换成新算法。既有结果不重算冒充历史。</p>
+<p id="block-56">格式迁移需说明支持哪些旧版本、保留哪些字段、何时拒绝写入。先备份，在副本走“读取→迁移→保存→重开→导出/恢复”，回滚使用旧程序及旧备份，不假定新文件能被旧程序写回。</p>
+<p id="block-57">拟弃用接口先找实际调用者和历史模板，给出替代及迁移说明，保留约定兼容期并验证；删除条件写在对应任务，不永久堆积没有消费者的兼容层，也不未经验证删除仍被使用的路径。</p>
+<p id="block-58">依赖和外部软件按固定版本维护。升级作为独立diff，核对来源、许可记录、漏洞及受影响方法/文件格式，运行相应验证。模型、技能、MCP更新同样可追溯；不随每次启动自动升级环境。安装环境记录锁文件、工具链及原生库；不把本机可运行等同干净目标机通过。</p>
+<p id="block-59">原图、结果和私有数据不依赖Git备份。工作区使用一致性备份；恢复演练到新位置核对文件和结果。日志记录任务/节点/方法/版本/错误和耗时等诊断信息，避免私有原图、凭据和敏感样本内容。日志/缓存清理只有在保留规则和实际需求明确后实现，不自动删除研究证据。</p>
+<h2 id="section-6" tabindex="-1">6. 维护节奏和技术债怎样控制<a class="permalink" href="#section-6" aria-label="链接到此节">§</a></h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的数据表"><table>
+<thead>
+<tr id="block-60">
+<th>时机</th>
+<th>检查和行动</th>
+<th>留下的证据</th>
+</tr>
+</thead>
+<tbody><tr id="block-61">
+<td>每个任务</td>
+<td>核对入口/规则；相关验证；修复本次引入的重复和边界问题；收尾交接</td>
+<td>任务及检查记录、准确diff</td>
+</tr>
+<tr id="block-62">
+<td>每周有维护工作时</td>
+<td>人工查看新依赖风险、机器人PR、反复失败和到期技术债；无新风险不改代码</td>
+<td>现有任务中的处理决定，不创建无意义日报</td>
+</tr>
+<tr id="block-63">
+<td>每个里程碑</td>
+<td>看近期频繁修改/故障集中的模块、跨包耦合、慢测试与性能变化；做有限接手和相关恢复检查</td>
+<td>需要处理的少数明确任务与基线差异</td>
+</tr>
+<tr id="block-64">
+<td>候选发布/格式升级</td>
+<td>许可与依赖清单、安装/目标环境、备份恢复和回退按既有发行规程执行</td>
+<td>准确构建来源、检查和未覆盖项；发布仍按授权</td>
+</tr>
+<tr id="block-65">
+<td>真实故障</td>
+<td>保留最小复现、版本/环境、日志和失败资产身份；修根因，补有价值回归</td>
+<td>故障任务与修复验证，不叠无依据重试</td>
+</tr>
+</tbody></table></div>
+<p id="block-66">技术债记录复用<code>work/tasks</code>，字段只需：<strong>问题及影响、责任角色、触发/处理时机、最小修复、验收、涉及版本。</strong> backlog链接任务，不再存一套状态。</p>
+<p id="block-67">影响数值、原图/历史、事务或取消的已知缺陷，阻止对应能力交付；普通可读性问题按触及范围渐进清理。一个公共模块连续增加实验特判、相同算法被复制、同类故障复发，是优先处理结构的信号。没有这些证据时，不因“未来会大”就推倒重写。</p>
+<p id="block-68">度量只看趋势：高频故障/改动位置、重复实现、相关测试稳定性、固定输入下耗时/内存和取消响应。先建立基线，只有与用户体验或实际故障有关时才设阈值；本轮不新增行数/复杂度强制门禁。</p>
+<h2 id="section-7" tabindex="-1">7. 接手与渐进落地<a class="permalink" href="#section-7" aria-label="链接到此节">§</a></h2>
+<p id="block-69">下一位维护者应能仅凭仓库找到当前任务、真实代码树、公开入口、方法记录、验证方式和未完成项。每里程碑用一个小问题验证能否接手：定位一个结果的计算来源、解释一条失败路径或完成一个范围有限的修改；结果记在任务，不把阅读文档算验收通过。</p>
+<p id="block-70">实际落地分三步：先在下一次获准接入时更新受影响模块的短导航；随后每个新增实验同步留下动作→方法→入口→测试→节点的追溯；有热点和真实复用证据时再拆分或提炼。当前P-008/P-009不因这份规划中断，也不立即全仓搬目录、加注释或格式重写。</p>
+<p id="block-71">本轮只完成计划，未声称当前全部源码已经满足以上要求。科学留出、目标机/DPI/GPU、历史故障和发行未验项继续由原任务负责，不因新计划改为通过。</p>
+<footer class="document-footer">B-016 · GitHub待接入草案；不代表算法对照、产品验收或代码重构已经完成。离线可读，本地参考链接依赖对应文件。</footer></article></main><script>
+const menu=document.getElementById('menu-toggle');
+menu.addEventListener('click',()=>{const open=document.body.classList.toggle('nav-open');menu.setAttribute('aria-expanded',String(open));menu.textContent=open?'收起目录':'目录与检索'});
+document.querySelectorAll('.sidebar a').forEach(a=>a.addEventListener('click',()=>{document.body.classList.remove('nav-open');menu.setAttribute('aria-expanded','false');menu.textContent='目录与检索'}));
+document.getElementById('print').addEventListener('click',()=>window.print());
+const index=[...document.querySelectorAll('.document p,.document li,.document pre,.document tr')].map(el=>({el,text:el.textContent.trim()}));
+const search=document.getElementById('search'),results=document.getElementById('results'),status=document.getElementById('search-status');let timer;
+search.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(()=>{const q=search.value.trim().toLocaleLowerCase();results.replaceChildren();if(!q){status.textContent='搜索全文；内容始终完整保留。';return}const hits=index.filter(x=>x.text.toLocaleLowerCase().includes(q));status.textContent=hits.length?'找到 '+hits.length+' 处，显示前 12 处。':'没有找到匹配内容，请换一个关键词。';hits.slice(0,12).forEach(hit=>{const a=document.createElement('a');a.href='#'+hit.el.id;const at=hit.text.toLocaleLowerCase().indexOf(q);a.textContent=(at>24?'…':'')+hit.text.slice(Math.max(0,at-24),at+85)+'…';a.addEventListener('click',()=>{document.body.classList.remove('nav-open');menu.setAttribute('aria-expanded','false');menu.textContent='目录与检索'});results.append(a)});},130)});
+const links=[...document.querySelectorAll('.toc a')];
+const sections=[...document.querySelectorAll('.document h2')];let queued=false;function updateCurrent(){queued=false;let current=sections[0];for(const h of sections){if(h.getBoundingClientRect().top<=150)current=h;else break}links.forEach(a=>{if(a.hash==='#'+current.id)a.setAttribute('aria-current','true');else a.removeAttribute('aria-current')})}addEventListener('scroll',()=>{if(!queued){queued=true;requestAnimationFrame(updateCurrent)}},{passive:true});addEventListener('resize',updateCurrent);updateCurrent();
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.body.classList.remove('nav-open');menu.setAttribute('aria-expanded','false');menu.textContent='目录与检索'}});
+</script></body></html>
