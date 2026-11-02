@@ -118,3 +118,6 @@ ed830e1准确完整门禁1503 passed/756.15s+全部isolated wheels/exit0，HEAD/
 
 | 2026-11-02 | P006源a9bda313，Windows11/Qt6.12原生windows/disable-gpu；六例5+30，rows-normal额外四主题/准备取消 | 六命令exit0；首轮失败保留；多项超预算/前台UNKNOWN，不当目标机或算法验收 | work/evidence/P-006/results.md |
 | 2026-11-02 | P006文档候选，pytest tests/test_workbench_snapshot_benchmark.py -q / Ruff check+format / policy+import_contracts+web_quality | 30passed/3.18秒，全部exit0；独立审查/CI待完成；本地完整check --all本阶段未重跑，必需CI将跑完整 | work/tasks/P-006-interaction-performance-baseline.md |
+
+| 2026-11-02 | PR50准确b0c71e1四必需CI、main dc9618e tree等于候选 | 全部SUCCESS；Windows1569passed/723.79秒、Linux1565passed/4既有skip/497.04秒；双原评估/V0 wheels通过 | P006/integration.json |
+| 2026-11-02 | P007 pytest tests/test_workflow_contracts.py tests/test_method_validation.py tests/test_workspace.py -q，Win11/Python3.12.14 | 87passed/21.61秒；Ruff/policy/9导入合约/plan checker0，前轮全Pyright0；wheel/最终独审及完整CI待执行 | P007任务卡 |

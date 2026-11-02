@@ -1,6 +1,6 @@
 # P-006 真实工作台运行反馈与性能基线
 
-<!-- PROGRAM_TASK_META {"id":"P-006","status":"in_review","work_package":"W05","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"839fa521d9ae11ceb51f9c4c7493eb2a0251eda0","head_commit":"a2155360c61802b618a8db611ffda10ecec7cff1"} -->
+<!-- PROGRAM_TASK_META {"id":"P-006","status":"done","work_package":"W05","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"839fa521d9ae11ceb51f9c4c7493eb2a0251eda0","head_commit":"b0c71e19dc729644f73783e550e66ccd7becd48d"} -->
 
 ## 执行状态
 
@@ -70,3 +70,7 @@ PR49已正常集成main839fa52，本地保留未提交P006工具改动快进到�
 设置feedback p95四主题944.6–1134ms超100ms，前台状态未记录UNKNOWN，不能断言活跃用户根因；两上界快照、四例刷新、仪器上界payload和三例内存点超旧线。取消均preparing、run=null，无已启动worker证据；确认28.070ms、DOM85.2ms、服务关闭6396.539ms分别保留。非作者只读复算正常例Accepted with required reporting boundaries，最终全部差异/数据待准确提交独审与必需CI；合并前保持in_review。未改变产品算法、测试容差/skip、预算或门禁。
 
 收尾本地适用检查：30 tests passed/3.18秒，Ruff check/format、policy、9个import-linter合约、web格式/lint/checkJs四反例检查均exit0。Pyright全范围0 errors/0 warnings/exit0；本阶段本地完整check --all未重跑，不沿用P003完整1555项当新增观察器覆盖；PR必需双平台CI将运行完整门禁。
+
+## 正常集成完成
+
+准确839..b0c71e1最终非作者Accepted；PR50四必需CI SUCCESS后正常merge dc9618e，tree等于准确候选。基线工程done不表示预算全部通过或科学/现场已验。integration.json和review-final.md保存独审、实际检查与提交。P007继续M1，性能后续观测/优化不扩成本卡产品重写。

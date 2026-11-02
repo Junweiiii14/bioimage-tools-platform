@@ -46,7 +46,7 @@
 
 ## Current Pointer
 
-- 当前任务：[P006 工作台性能基线](work/tasks/P-006-interaction-performance-baseline.md)，P003/B011已PR49正常合main839fa52，P007依赖已满足；P006采样完成后优先接续[P007科学资产/图契约](work/tasks/P-007-scientific-workflow-contracts.md)。按4.0任务卡/snapshot与实际分支HEAD恢复，P001/P002不重做。
+- 当前任务：[P007科学资产与冻结图契约](work/tasks/P-007-scientific-workflow-contracts.md)。P006已PR50独审/四必需CI后正常合main dc9618e，基线多项超线与前台UNKNOWN保留；P003/B011/P002已正常集成不重做。按4.0和snapshot恢复，之后P005→P008→P009完成真实M1/M2。
 - T082历史工程证据及科学/目标环境待办完整保留于其[任务](work/tasks/T-082-reliability-remediation.md)，不由V0自动关闭。
 - 本轮本地工程交接：[T082 final-handoff](work/evidence/T-082/final-handoff.md)，区分冻结源码、隔离验收工件与后续交接HEAD；科学待办不由工程通过代替。
 - 最近交付：[T081 R2](work/evidence/T-081/final-delivery.md)。当前源码/构建源码/主线集成/安装包区分见 [T082 baseline](work/evidence/T-082/baseline.md)。

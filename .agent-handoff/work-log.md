@@ -1,9 +1,5 @@
 # Current Work Log
 
-## 2026-10-20 E4完成，连续进入E5
-
-T057 done，产品ff89867：完整Fig先持久化再真实原像素运行；843/579.73s、原child0、9契约/全隔离wheel/真实OCR/check0，绑定独审通过。df轮843/570.37s后wheel因顶层PIL失败1，ff延迟导入修复，独立API无PIL/核心5探针和完整复验0。分页与回源两P2已按提交关闭，UI限定ship、documenter No changes。原生UNKNOWN/344截断inventory/真实科学与目标机限制保留，无发布。下一阶段T058，详细证据work/evidence/T-057。
-
 ## 2026-10-20 E5完成，连续进入E6
 
 T058 done，产品8feffce：schema14稳定身份填表、冻结资产/run、新目录输出、索引CAS后完成、真实归档恢复不注册外来PID。858/623.78s、原child0、9契约/全wheel/真实OCR/check0；冻结run竞态和同步busy独审P2均resolved，最终绑定8fe无新P0–P2；UI ship/documenter No changes。823首轮类型失败1历史保留。科学/真实确认批次/干净Win10/物理DPI和main/安装版仍未验，不发布。下一项T059，详细证据work/evidence/T-058。
@@ -156,3 +152,7 @@ PR48准确a69b38e四必需CI成功，正常merge main f2dc5ad且树一致；P002
 ## 2026-11-02 P006真实原生基线
 
 源码a9bda313冻结后完成rows-normal四主题/准备取消5+30及其余五例R09负载，六例exit0。旧f3首轮失败保留。raw/SHA/fixture/所有分布复算见P006/native-results.json；报告明确设置四主题超100ms、前台UNKNOWN、取消全部preparing/run=null、host确认28ms与服务关闭6.4秒分开。上界快照/刷新/payload及内存超线完整保留。记录12个host/renderer均已退出，未杀进程。P006 in_review，待最终独审/CI正常PR；目标仍M1/M2，下一P007前置满足。
+
+## 2026-11-02 P007契约候选与P006正常集成
+
+P006准确839..b0c71e1非作者Accepted，PR50四必需CI后正常合dc9618e/tree同候选。Windows1569passed/723.79秒、Linux1565passed/4既有skip/497.04秒，双wheel原评估/V0通过；integration/review-final保存。性能超线/前台UNKNOWN/准备取消边界保留。P007从839开始草案，保留自身修改快进dc主线后真实context重载，无冲突；科学资产/端口/有限图/计算键/可信预检和真实P002计划保存重开已草拟，87项相关组合通过。旧23schema摘要不变；独立wheel/准确提交独审/PR尚待，仍in_progress。M1/M2目标active。

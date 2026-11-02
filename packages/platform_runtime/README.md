@@ -28,3 +28,5 @@ P003追加纯评估入口dataset_partition_issues、method_plan_digest、evaluat
 不进行文件I/O、不授予科学准入。契约见仓库docs/contracts/method-validation-v1.md。
 
 T-019：import_draft_snapshot只在尚无文档/run的新工作区保存一个外来修订，后续继续正常CAS；不注册外来run/PID。带.restore-incomplete标记的目录拒绝打开。文档内容保持opaque，格式仍为v1。
+
+P007增加纯有限图compile_workflow、定义/计划有界JSON读取、可信ModuleRegistration及冻结计划重新编译校验。平台不导入WB，参数验证由可信宿主装配；不从工作区加载代码。当前只预检/冻结，运行账本/调度/复用由P005实现，合同见docs/contracts/scientific-workflow-v1.md（仓库根相对路径）。

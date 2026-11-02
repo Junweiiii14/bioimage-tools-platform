@@ -5,6 +5,16 @@ from platform_runtime.evaluation import (
     evaluate_method,
     method_plan_digest,
 )
+from platform_runtime.workflow import (
+    ModuleRegistration,
+    WorkflowValidationError,
+    compile_workflow,
+    execution_plan_digest,
+    load_execution_plan,
+    load_workflow_definition,
+    verify_execution_plan,
+    workflow_definition_json,
+)
 from platform_runtime.workspace import (
     IntegrityError,
     StateConflict,
@@ -13,6 +23,21 @@ from platform_runtime.workspace import (
     WorkspaceError,
 )
 
-__all__ = ["Workspace", "WorkspaceError", "WorkspaceBusy", "IntegrityError", "StateConflict"]
-
-__all__ += ["dataset_partition_issues", "evaluate_method", "method_plan_digest"]
+__all__ = [
+    "Workspace",
+    "WorkspaceError",
+    "WorkspaceBusy",
+    "IntegrityError",
+    "StateConflict",
+    "dataset_partition_issues",
+    "evaluate_method",
+    "method_plan_digest",
+    "ModuleRegistration",
+    "WorkflowValidationError",
+    "load_workflow_definition",
+    "workflow_definition_json",
+    "compile_workflow",
+    "verify_execution_plan",
+    "execution_plan_digest",
+    "load_execution_plan",
+]

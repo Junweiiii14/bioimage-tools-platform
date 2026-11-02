@@ -269,6 +269,67 @@ heldout = record.model_copy(update={'record_id':'heldout','partition':'holdout'}
 assert 'source_group_leakage' in dataset_partition_issues((record,heldout))
 assert not any(name.startswith(('wb_tool', 'PySide6', 'numpy')) for name in sys.modules)
 print('Installed evaluation: literal zero, lineage leakage and no scientific approval passed')
+from platform_runtime.api import (
+    ModuleRegistration, compile_workflow, load_workflow_definition, load_execution_plan,
+    workflow_definition_json, WorkflowValidationError,
+)
+from tool_contracts.api import (
+    ScientificAsset, ScientificType, TableMetadata, TableColumn, ScientificPort,
+    PortTypeBinding, WorkflowModule, WorkflowNode, WorkflowInput, WorkflowEdge,
+    WorkflowOutput, WorkflowDefinition,
+)
+table_file = Path('workflow-input.json')
+table_file.write_text('{"value":0.0,"status":"valid"}', encoding='utf-8')
+with Workspace.open('installed-workspace') as store:
+    table_ref = store.import_asset(table_file, sha256(table_file.read_bytes()).hexdigest())
+table_type = ScientificType(kind='typed_table', unit='example', table=TableMetadata(
+    row_entity='literal', columns=(
+        TableColumn(name='value',dtype='float64',unit='example',nullable=True,state_column='status'),
+        TableColumn(name='status',dtype='string',unit=None,nullable=False))))
+scientific = ScientificAsset(payload=table_ref,sample_id='literal',description=table_type,
+    producing_method=None,parameters_sha256=None)
+schema = '{"additionalProperties":false,"properties":{},"type":"object"}'
+module = ModuleSpec(module_id='installed_contract',module_version='1',
+    method_version='no_execution@1',implementation_digest='c'*64,parameters_schema=schema,
+    input_ports=(ModulePort(name='source',kind='typed_table'),),
+    output_ports=(ModulePort(name='result',kind='typed_table',filename='result.json'),))
+interface = WorkflowModule(module=module,
+    input_ports=(ScientificPort(name='source',kind='typed_table',quantitative=True,
+        unit='example',table=table_type.table),),
+    output_ports=(PortTypeBinding(port='result',description=table_type),))
+def validate_parameters(raw):
+    if json.loads(raw) != {}:
+        raise ValueError('Only the declared empty parameters are admitted')
+registered = ModuleRegistration(interface=interface,parameters_schema=schema,
+    validate_parameters=validate_parameters)
+workflow = WorkflowDefinition(workflow_id='installed',workflow_version='1',revision=0,
+    title='Installed contracts',sample_id='literal',
+    nodes=tuple(WorkflowNode(node_id=name,module=module,parameters_json='{}')
+        for name in ('A','B')),
+    edges=(WorkflowEdge(source_node='A',source_port='result',target_node='B',target_port='source'),),
+    inputs=(WorkflowInput(node_id='A',port='source',asset=scientific),),
+    outputs=(WorkflowOutput(name='final',node_id='B',port='result'),))
+definition_file = Path('workflow.json')
+definition_file.write_text(workflow_definition_json(workflow), encoding='utf-8')
+restored = load_workflow_definition(definition_file.read_text(encoding='utf-8'))
+assert restored == workflow
+execution_plan = compile_workflow(restored,(registered,),
+    (RuntimeVersion(name='fixture',version='1'),))
+assert execution_plan.nodes[1].inputs[0].source_key == execution_plan.nodes[0].computation_key
+assert load_execution_plan(execution_plan.model_dump_json(),(registered,)) == execution_plan
+broken_node = workflow.nodes[0].model_copy(update={'parameters_json':'{"unknown":1}'})
+try:
+    compile_workflow(workflow.model_copy(update={'nodes':(broken_node,workflow.nodes[1])}),
+        (registered,),(RuntimeVersion(name='fixture',version='1'),))
+except WorkflowValidationError as error:
+    assert error.issues[0].code == 'parameters'
+else:
+    raise AssertionError('Unregistered parameters were accepted')
+with Workspace.open('installed-workspace') as store:
+    assert store.read_asset(table_ref) == table_file.read_bytes()
+assert not any(name.startswith(('wb_tool', 'PySide6', 'numpy')) for name in sys.modules)
+print('Installed workflow contracts: real file binding, DAG freeze/reopen and rejection; '
+    'no execution')
 """
 
 

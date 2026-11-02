@@ -1,6 +1,6 @@
 # P-007 M1最小科学资产、连接与冻结工作流契约
 
-<!-- PROGRAM_TASK_META {"id":"P-007","status":"planned","work_package":"W11","depends_on":["P-002","P-003"],"execution_root":"not_activated","owner":null,"base_commit":null,"head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-007","status":"in_progress","work_package":"W11","depends_on":["P-002","P-003"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"dc9618e7000eb7793067556e99d50a0d0509423d","head_commit":null} -->
 
 ## 输入与前置
 
@@ -26,4 +26,16 @@
 
 ## 当前状态
 
-尚未实施或验证；P002/P003未done前不激活。缺科学参考只限制对应方法S1，不能填成通过。
+已激活并实施契约/纯预检候选，尚未完成独审/全部必需CI与集成；执行器和编辑器留后续任务。缺科学参考只限制对应方法S1，不能填成通过。
+
+## 2026-11-02激活
+
+P002/P003已正常合PR48/49（main839fa52），本卡依赖满足。P006已完成原生基线并独立分支PR50待必需CI，不将其工具/证据夹入本任务。P007从实际main839独立分支codex/p007-scientific-workflow-contracts开始，先建立最小旧WB消费者所需的资产/端口/冻结图与纯预检，不提前宣称执行器/GUI完成。正式几何方法留P004。
+
+## 基线前移及首轮实施
+
+P006已独审/四必需CI后PR50正常合main dc9618e，P007保留自身未提交草案快进到该主线，规则回执按新base真实重载；无冲突、未丢改动。新增资产/端口/图/计划与纯编译，P002真实public API计划命令保存/重开；首轮28 tests passed/9.21秒，局部Pyright0。初次草案commit被新增wheel脚本三处行宽阻止，按格式修复，不绕过hook；尚未独审/全门禁，仍in_progress。
+
+当前受影响组合首轮84passed/13.59秒（当时28新契约+18方法+38Workspace），新增环境/端口/真实P002曲线用例后重新核实结果；先前Pyright全范围0。23旧模型schema摘要与原v1源码/JSON相同，新API不改数值；wheel检查仅追加有限图/文件保存重开反例，保留全部原断言和门禁。
+
+增量受影响组合已实际87passed/21.61秒（31契约+18方法+38Workspace）；Ruff、policy、9个import-linter合约、plan checker均exit0。新增曲线用真实P002 use case输出完整五点1000/2000/3000/2000/1000与4000信号，不用display数据。独立wheel与准确提交独审待执行，本阶段本地完整check --all未重跑，PR必需CI仍须完整执行。
