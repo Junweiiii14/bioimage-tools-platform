@@ -1,9 +1,5 @@
 # Current Work Log
 
-## 2026-10-21 T073 固定网格与精简验证
-
-用户补充固定N、原像素槽宽和5N:4比例，已实现整排对齐，不再强求N个独立连通组件；手动确认范围完整保留。只读最终重放为1行保留人工、8行自动、1行首带与标记相连仍暂停；原图SHA不变。补安全采样Y边界阻止背景扩展重新读入排除结构，并把局部第二目标传至真实quality_review。UI预审问题关闭、最后3项定向0；新两个科学反例首轮37过1败为测试构造先触发原有扩展保护，改用合法25%范围内越限反例。首全门禁8项类型错，pytest尚未启动；修正类型，无ignore/放宽。按用户要求不反复冒烟，保留必需检查。新ReliableCropTest独立安装身份，随包仅相关自动流程自检。尚未提交独审/PR/构建。
-
 ## 2026-10-21 T073 PR34与最终修复
 
 2026-10-21最终增量：首提交a0e8e77已推送草稿PR34。精确独审指出隐式配准范围外较窄第二排漏检、角度草稿冲突时按钮重启用，现已修复。全门禁第三轮本机1157过2败/562.98s，Linux1157过2败/411.84s，Windows1157过2败/658.70s，失败均为窄斜第三带误吸收和安装诊断仍检查旧geometry@1；原日志保留，未到wheel步骤。补原连通身份及初始网格单向冲突拒绝，诊断明确检查geometry@2，亮背景信号使用可验证同组白光轮廓。定向33项首轮31过2败/18.83s：窄屏GPU上下文丢失及诊断旧版本；仅重跑两项，用CI相同--disable-gpu环境后2过/11.55s。受影响6文件Ruff/format/pyright0；无断言放宽、无门禁/锁变更。最终只读10行仍1人工保持、8自动、1暂停，30资产SHA保持。按用户要求不再本地全量或冒烟，下一步绑定最终提交静态复核及PR必需检查。
@@ -147,3 +143,7 @@ PR51准确c243四必需SUCCESS，正常merge006e9f1/tree与独审候选相同。
 ## 2026-11-02 P008 final candidate review/CI
 
 323d59f isolated wheels exit0 including batch/template; independent P2 pausing/resume stall genuinely reproduced then fixed53892fd. Author batch10passed68.35s; independent frozen correction3passed30.69s Accepted full4d6..53892fd. PR53 ready; finalquality41434643209 live, rulescontext success, nativecase expectedskip. Await actual requiredCI then normalmerge; P009 stillplanned. Rawfailed/contaminatedrun retained; no repeatedlocalfullsuite. Evidence/handoff edits await integration closeout, do not push sameproduct documentation merely to restartCI.
+
+## 2026-11-02 P008 merged / P009 actual activation
+
+PR53最终b4847a5 Accepted，四必需CI SUCCESS后正常merge2755604，候选/main tree同98754bdd。Windows1675pass1306.50s/Linux1671pass4旧skip930.49s，双侧全部新wheel过；旧超时及夹具失败保留。P008done。P009在codex/p009-visual-workflow真实激活，scope .707行完整读，已有impeccable context/具体surface/craft-floor实际读；原生DOM/SVG有限图交互探针+web静态检查过，无新依赖。仅图组件，不冒充M2；下一步宿主草稿/预检/表单/实际运行。独审集中完整可运行候选，不审每小提交。B012保留。

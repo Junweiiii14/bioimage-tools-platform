@@ -156,3 +156,6 @@ ed830e1准确完整门禁1503 passed/756.15s+全部isolated wheels/exit0，HEAD/
 | 2026-11-02 | P008初始共享父存储/两个真实子图与旧开始暂停重开 | 4pass26.27秒/exit0，6真实run，目标Ruff/type0；无新全量/wheel/独审，不代表批量完成 | P008/shared-storage.json |
 
 | 2026-11-02 | P008真实批量/CLI/模板分支/缓存恢复及相关旧契约 | 8pass51.87s、3pass63.01s、80pass236.02s；最后取消修复相关16pass50.04s，原1fail/2fail保留；新增wheel/独审/CI待做 | P008/batch-mvp-validation.json |
+
+| 2026-11-02 P008 final integration | b4847a5 / PR53 / merge2755604 sametree98754bdd | 四必需SUCCESS；Win1675pass1306.50s/Linux1671pass4旧skip930.49s，双侧全部新batch wheels | 独审Accepted；旧取消/夹具失败保留，非科学/目标机/M2验收 |
+| 2026-11-02 P009 finite graph | DOM/SVG realP007 projection, nativeQt keyboard/ports/layout probe; npm check:web | probe pass, webcheck0，SHA及有限范围见P009/graph-probe.json | 图组件尚未接宿主/保存/运行，不是M2交付 |

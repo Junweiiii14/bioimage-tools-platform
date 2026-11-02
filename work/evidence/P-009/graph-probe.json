@@ -1,0 +1,38 @@
+{
+  "task": "P-009",
+  "base_commit": "275560475d39426434416c74feeb0c2f259d1402",
+  "stage": "finite interaction/selection probe, not completeeditor",
+  "choice": "Existing nativeDOM/SVG/QtWebEngine, no newcanvas dependency. Actual P007 definition projected from a real synthetic raw-input workspace; no worker execution claimed.",
+  "verified": [
+    "actualQt focusProxy keyboard Right emits layout move x300->320",
+    "Delete emits selectednode deletion command",
+    "output/input buttons emit actualportconnection command",
+    "definition JSON unchanged by layout movement",
+    "three realdeclarednodecards/two derivedSVGpaths",
+    "960x640 document has no outerhorizontaloverflow, internalgraphscroll retained"
+  ],
+  "commands": [
+    {
+      "command": "QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu uv run --locked --no-sync pytest .local/p009-probe/test_graph.py -q",
+      "exit_code": 0,
+      "log": ".local/p009-probe/result.log"
+    },
+    {
+      "command": "npm run check:web",
+      "exit_code": 0,
+      "log": ".local/p009-graph-web-check.log",
+      "limit": "existing focusedTypeScript bridgepayload gate, not fullgraph typing proof"
+    }
+  ],
+  "initial_failures": "Firstprobe key targetedQWebEngineView rather than actualfocusProxy (timeout9.63s). Second actualkey succeeded but rawJSobject return was not serialized acrossQWebEngine runJavaScript; changedprobe read toJSON.stringify (assertion2.36s). Component source unchanged across both harnesscorrections; failures retained.",
+  "artifacts": {
+    "apps/desktop/src/bioimage_app/web_ui/workflow_graph.js": "0c0d812a3a98b5645da7268e1613bc91ee045212e4ca59af40150fb49a186154",
+    "apps/desktop/src/bioimage_app/web_ui/workflow_graph.css": "b06abec81ab669895bbd0f8e8782290f6a83aef27ee925e50997a9616136f804",
+    ".local/p009-probe/result.log": "68227e737c0e85c458b333a3c49b834303896eb49873913dae47622256f86ddf",
+    ".local/p009-probe/first-focus-target-failed.log": "6272f5949df60e3222ef9f256ce86dbe36df3f35028b4fc806029a6d128eb64f",
+    ".local/p009-probe/second-object-read-failed.log": "fab29b5f67305473b8b317aad333ed3496e09c47cf28357fd90efe4a688a0770",
+    ".local/p009-graph-web-check.log": "f92b0085651fc5566f3a94981babb206334c661166220e6a2272a1e7e37e88f8",
+    ".local/p009-probe/geometry.json": "0bd3ea998789dd3ed74a95c8babb7276cfa823b7bbfc243bc797e42f00dda1f2"
+  },
+  "limitations": "Only graphwidget interaction proof. Host commands, persistence, schemaforms, admission, template binding, worker/results, fullWebEngine flows/visual/IME/performance/independentreview/CI stillpending. GPU disabled/offscreen not physical/native target acceptance."
+}

@@ -1,6 +1,6 @@
 # P-009 M2真实工作流可视编排与模板复用
 
-<!-- PROGRAM_TASK_META {"id":"P-009","status":"planned","work_package":"W13","depends_on":["P-006","P-008"],"execution_root":"not_activated","owner":null,"base_commit":null,"head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-009","status":"in_progress","work_package":"W13","depends_on":["P-006","P-008"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"275560475d39426434416c74feeb0c2f259d1402","head_commit":null} -->
 
 ## 输入与前置
 
@@ -23,3 +23,13 @@
 ## 当前状态
 
 尚未实施或验证；依赖未done不激活。其他实验/Agent/安装器发布不在本卡范围。
+
+
+## 2026-11-02激活
+
+P006已done；P008准确b4847a5独审/四必需CI/双侧wheel后PR53正常merge2755604，已核候选与main同tree。当前codex/p009-visual-workflow从同main激活真实Web编排，先加载scope .规则和设计上下文；不以CLI/预设流程替代M2，不扩新科学算法或其他实验。入口校验一次，已有授权内连续推进，集中可运行候选独审，本地定向/最终CI全量。
+
+
+## 有限画布交互探针
+
+已运行并完整读取P009 scope .上下文707行，绑定main2755604。按既有Operate设计体系，新增原生DOM/SVG图组件，有限3节点实际P007定义投影；原生focusProxy键盘移动/删除、端口按钮连线、布局不改计算定义、960×640无页面横溢的探针通过，npm check:web退出0。无需新增画布依赖。初次两轮探针的焦点目标/JS对象序列化错误保留，不算产品引擎失败或通过；修正探针后组件源码未变。work/evidence/P-009/graph-probe.json及可复现probe记录范围。当前尚无编辑器宿主/保存/表单/实际执行连接，不能将此探针称M2完成，后续接同一P008执行器。

@@ -46,7 +46,7 @@
 
 ## Current Pointer
 
-- 当前任务：[P008有限批量与恢复](work/tasks/P-008-workflow-batch-recovery.md)，P005已PR52准确独审/四必需CI后正常合main4d6ee6c并核对tree一致；P008新规则已实际完整加载。按snapshot接共享执行器的批量索引/控制/恢复，再P009可视编排。P002/P003/P006/P007不重做，科学/目标机边界保留。
+- 当前任务：[P009真实可视编排](work/tasks/P-009-visual-workflow-authoring.md)。P008已PR53准确独审/四必需CI/双侧wheel后正常合main2755604并核对同tree；P009规则已完整实际加载，当前有限画布探针通过，按snapshot接保存/表单/同一真实执行器。P001/P002/P003/P005/P006/P007/P008不重做，科学/目标机边界保留。
 - T082历史工程证据及科学/目标环境待办完整保留于其[任务](work/tasks/T-082-reliability-remediation.md)，不由V0自动关闭。
 - 本轮本地工程交接：[T082 final-handoff](work/evidence/T-082/final-handoff.md)，区分冻结源码、隔离验收工件与后续交接HEAD；科学待办不由工程通过代替。
 - 最近交付：[T081 R2](work/evidence/T-081/final-delivery.md)。当前源码/构建源码/主线集成/安装包区分见 [T082 baseline](work/evidence/T-082/baseline.md)。
