@@ -1,0 +1,69 @@
+{
+  "pr": "https://github.com/Junweiiii14/bioimage-tools-platform/pull/52",
+  "accepted_head": "2258cd5b976bb6aa28f2c1348d188ff1f534999b",
+  "merge_commit": "4d6ee6ce364780cad24ef09b808740846937714c",
+  "merged_at": "2026-11-02T09:14:53Z",
+  "head_and_merge_tree": "4a50fc0738b61303c8d495cce03272845c7876e8",
+  "tree_equal": true,
+  "required_checks": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-02T09:13:51Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41416113660/job/125180251144",
+      "name": "foundation (windows-latest)",
+      "startedAt": "2026-11-02T08:51:39Z",
+      "status": "COMPLETED",
+      "workflowName": "quality"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-02T08:51:55Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41416113668/job/125180250513",
+      "name": "rules-context",
+      "startedAt": "2026-11-02T08:51:49Z",
+      "status": "COMPLETED",
+      "workflowName": "rules-context"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-02T09:01:24Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41416113660/job/125180251142",
+      "name": "foundation (ubuntu-latest)",
+      "startedAt": "2026-11-02T08:51:43Z",
+      "status": "COMPLETED",
+      "workflowName": "quality"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-02T08:52:17Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41416113660/job/125180250767",
+      "name": "desktop-environment",
+      "startedAt": "2026-11-02T08:51:38Z",
+      "status": "COMPLETED",
+      "workflowName": "quality"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-02T08:51:35Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41416113660/job/125180252413",
+      "name": "native-case",
+      "startedAt": "2026-11-02T08:51:36Z",
+      "status": "COMPLETED",
+      "workflowName": "quality"
+    }
+  ],
+  "windows": "1659passed/10warnings/1185.30s; all four isolated wheels and genuine workflow passed",
+  "linux": "1655passed/4existing skips/10warnings/508.51s; all four isolated wheels and genuine workflow passed",
+  "independent_review": "Accepted exact006e9f1..2258cd5; product384 accepted, CI resource increment accepted; reviewer checked five log/annotation hashes and real5-run corrupt-cache recovery",
+  "log_sha256": {
+    ".local/p005-ci-final-2258cd5.json": "0a067caf66bf13a00010162a5c9601568ccd454e5aa58963a1061eb0dc681afc",
+    ".local/p005-ci-windows-2258cd5.log": "4ff8ec2f92b409f2e7d8c998be5a35816ffefb73940b5a9658ff6b0b7574cccc",
+    ".local/p005-ci-linux-2258cd5.log": "7c3ff33f60e4295a0187d0842d293a693c0ef886fa6b38b639c118925e4010a4"
+  },
+  "limits": "P005 single graph engineering only; complete M1 batch and M2 editor remain P008/P009; S1/scientific heldout/clean target/physical DPI/GPU/user acceptance not claimed"
+}

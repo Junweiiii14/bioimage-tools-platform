@@ -58,13 +58,21 @@ class WorkflowSession(QObject):
     completed = Signal(object)
     finished = Signal(object)
 
-    def __init__(self, registry: HostRegistryFactory, parent: QObject | None = None) -> None:
+    def __init__(
+        self,
+        registry: HostRegistryFactory,
+        parent: QObject | None = None,
+        *,
+        storage: AsyncStorage | None = None,
+    ) -> None:
         super().__init__(parent)
-        self._store = AsyncStorage(self)
+        self._owns_store = storage is None
+        self._store = AsyncStorage(self) if storage is None else storage
         self._prepare = WorkflowPreparation(registry, self)
         self._store.replied.connect(self._storage_reply)
         self._prepare.replied.connect(self._preparation_reply)
-        self._store.closed.connect(self._service_closed)
+        if self._owns_store:
+            self._store.closed.connect(self._service_closed)
         self._prepare.closed.connect(self._service_closed)
         self._queue: deque[_Action] = deque()
         self._waiting: tuple[str, _Action] | None = None
@@ -124,12 +132,18 @@ class WorkflowSession(QObject):
         self._claim()
         self._plan, self._execution_id, self._auto = plan, execution_id or uuid4().hex, True
         self._cache_execution_id = cache_execution_id
-        self._enqueue("open", StorageCommand("open", path=workspace))
+        if self._owns_store:
+            self._enqueue("open", StorageCommand("open", path=workspace))
+        else:
+            self._prepare_job("initial", WorkflowPreparationCommand("verify", plan))
 
     def reopen(self, workspace: str, execution_id: str) -> None:
         self._claim()
         self._execution_id, self._reopening = execution_id, True
-        self._enqueue("open", StorageCommand("open", path=workspace))
+        if self._owns_store:
+            self._enqueue("open", StorageCommand("open", path=workspace))
+        else:
+            self._workflow("load")
 
     def initialize(
         self,
@@ -422,7 +436,10 @@ class WorkflowSession(QObject):
         elif purpose == "initialize":
             assert isinstance(reply.value, ExecutionPlan)
             self._plan = reply.value
-            self._enqueue("open", StorageCommand("open", path=self._initial_workspace))
+            if self._owns_store:
+                self._enqueue("open", StorageCommand("open", path=self._initial_workspace))
+            else:
+                self._prepare_job("initial", WorkflowPreparationCommand("verify", self._plan))
         elif purpose == "initial" and self._plan is not None:
             if self._cache_execution_id:
                 self._enqueue(
@@ -582,10 +599,11 @@ class WorkflowSession(QObject):
         ):
             self._services_closing = True
             self._prepare.shutdown()
-            self._store.shutdown()
+            if self._owns_store:
+                self._store.shutdown()
 
     @Slot()
     def _service_closed(self) -> None:
         self._closed_services += 1
-        if self._closed_services == 2:
+        if self._closed_services == (2 if self._owns_store else 1):
             self.finished.emit(self.status())

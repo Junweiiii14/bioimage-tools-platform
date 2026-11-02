@@ -25,3 +25,7 @@ run41413166304/job125170776585的服务器注解明确The job has exceeded the m
 仅Windows foundation作业总墙钟上限20→25分钟，Ubuntu保持20；所有检查命令、测试集合、单测超时/预期/skip/容差、必需检查和服务器规则不变。GitHub官方workflow-syntax定义job timeout为自动取消上限，contexts文档允许timeout-minutes使用matrix。来源：https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idtimeout-minutes 与 https://docs.github.com/en/actions/reference/workflows-and-actions/contexts ，访问2026-11-02。
 
 原超时注解与完整日志SHA见ci-timeout-r1.json；资源配置增量仍需准确独审与新必需CI，不能把旧Linux/本机通过充作新Windows通过。产品源码保持384e5ba。
+
+## 资源增量与最终候选：Accepted
+
+非作者准确接受006e9f1..2258cd5b976bb6aa28f2c1348d188ff1f534999b，保留384产品结论。核对仅Windows20→25/Linux20不变，无产品/测试/单测超时/断言/容差/必需门禁变化；五份原日志/注解SHA全部匹配，实际恢复工作区5个真实run/新分析资产/4000吻合；全范围diff0、clean。未重跑产品或wheel。随后最终四必需CI全SUCCESS并正常PR52合入4d6ee6c，tree完全相同；集成事实见integration.json。不扩为M1/M2完成。

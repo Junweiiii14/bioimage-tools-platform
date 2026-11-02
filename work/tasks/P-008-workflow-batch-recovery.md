@@ -1,6 +1,6 @@
 # P-008 M1有限批量、依赖重算与崩溃对账交付
 
-<!-- PROGRAM_TASK_META {"id":"P-008","status":"planned","work_package":"W12","depends_on":["P-005","P-007"],"execution_root":"not_activated","owner":null,"base_commit":null,"head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-008","status":"in_progress","work_package":"W12","depends_on":["P-005","P-007"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"4d6ee6ce364780cad24ef09b808740846937714c","head_commit":null} -->
 
 ## 输入与前置
 
@@ -22,4 +22,4 @@ platform_runtime仅通用图/账本/失效规则；实验适配在工具api与�
 
 ## 当前状态
 
-尚未实施或验证；依赖未done不激活。不含远程调度、任意脚本、通用循环控制、其他实验算法或安装器发布。
+2026-11-02激活：P005已PR52准确独审及全部必需CI后正常合入main4d6ee6c，P007此前完成。新分支codex/p008-workflow-batch从该main接续。尚无批量产品实现/验收；先重新加载任务规则，再复用WorkflowSession/同一存储端口接线，不建立第二执行器。不含远程调度、任意脚本、通用循环控制、其他实验算法或安装器发布。

@@ -1,0 +1,12 @@
+{
+  "base_commit": "4d6ee6ce364780cad24ef09b808740846937714c",
+  "status": "initial shared-storage integration only; batch controller not implemented",
+  "change": "WorkflowSession optionally consumes parent-owned AsyncStorage; child retires only its own preparation service, parent retains workspace lifetime",
+  "command": "uv run --locked --no-sync pytest tests/test_workflow_session.py -k 'sequential_workflows or runs_actual_three_nodes or reopens_paused' -q",
+  "exit_code": 0,
+  "result": "4passed/16deselected/26.27s",
+  "proof": "two sequential real three-node executions,6 actual succeeded runs; storage remains open after each child; parent shutdown permits Workspace reopen; original standalone start/pause/reopen checks still pass",
+  "static": "targeted Ruff/Pyright exit0",
+  "not_run": "no new full suite/wheels/CI/independent review for this initial P008 change; final candidate will use targeted local checks and normal full CI",
+  "limits": "P008in_progress, batch index/exception isolation/parent controls/recovery/template binding/CLI unfinished; not M1/M2 completion"
+}
