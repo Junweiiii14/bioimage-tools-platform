@@ -22,6 +22,7 @@ from platform_runtime.api import (
     load_workflow_ledger,
     workflow_ledger_json,
 )
+from PySide6.QtCore import QThread
 from pytestqt.qtbot import QtBot
 from tool_contracts.api import NodePosition, WorkflowLayout
 
@@ -145,7 +146,13 @@ def test_editor_runs_rebinds_and_reuses_style_on_same_storage(
     tmp_path: Path,
 ) -> None:
     workspace = tmp_path / "shared-editor"
-    port = AsyncStorage()
+    processing_threads: list[QThread] = []
+
+    def process(store: Workspace, data: bytes) -> AuthoringProjection:
+        processing_threads.append(QThread.currentThread())
+        return execute_authoring_store(store, data)
+
+    port = AsyncStorage(authoring=process)
     replies: list[StorageReply] = []
     closed: list[bool] = []
     port.replied.connect(replies.append)
@@ -282,6 +289,9 @@ def test_editor_runs_rebinds_and_reuses_style_on_same_storage(
             qtbot.waitUntil(lambda outcomes=ended: bool(outcomes), timeout=30000)
         port.shutdown()
         qtbot.waitUntil(lambda: bool(closed), timeout=30000)
+    assert processing_threads and all(
+        thread == processing_threads[0] and thread != port.thread() for thread in processing_threads
+    )
     with Workspace.open(workspace) as store:
         assert store.asset_path(original_ref.payload).is_file()
         project = load_authoring_project(store, "editor")

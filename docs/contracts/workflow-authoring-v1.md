@@ -8,6 +8,8 @@ Workspace opaque文档tool_id为workflow_authoring_v1；AuthoringProject.schema_
 
 固定命令initialize/load/save/freeze/bind/export/results/open在唯一AsyncStorage所有者线程处理，GUI只消费投影。编辑命令携带previous_revision，CAS冲突保留用户本地草稿。计算图revision仅在计算定义变化时增加；文档revision包括标题/布局保存。先持久化冻结批次再派发。编辑文档CAS失败不会把未启动批次写成成功。
 
+编排宿主在线程启动前显式装配固定execute_authoring_store处理器；通用storage不导入WB或数值库。处理器在同一存储所有者线程执行，队列仍只接受固定操作及不可变数据，不接受网页/命令提供的callable或模块名；没有编排装配的端口拒绝该操作。
+
 Web端拥有当前草稿serial和表单DOM；保存回执仅确认提交时的serial，不替换其后的编辑。初始化、打开项目及显式绑定新输入才替换图；结果回执不能替换当前草稿。运行状态映射使用冻结节点和真实批次，不能用正在编辑的节点标签冒充已执行内容。
 
 ## 可移植模板

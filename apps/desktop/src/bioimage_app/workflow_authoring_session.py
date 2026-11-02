@@ -7,6 +7,7 @@ from tool_contracts.api import DraftSnapshot
 
 from bioimage_app.storage import AsyncStorage, StorageCommand, StorageReply
 from bioimage_app.workflow_authoring_models import AuthoringProjection
+from bioimage_app.workflow_authoring_store import execute_authoring_store
 from bioimage_app.workflow_batch_session import WorkflowBatchSession, WorkflowBatchStatus
 from bioimage_app.workflow_preparation import HostRegistryFactory
 
@@ -21,7 +22,7 @@ class WorkflowAuthoringSession(QObject):
     def __init__(self, registry: HostRegistryFactory, parent: QObject | None = None) -> None:
         super().__init__(parent)
         self._registry = registry
-        self._store = AsyncStorage(self)
+        self._store = AsyncStorage(self, authoring=execute_authoring_store)
         self._store.replied.connect(self._reply)
         self._store.closed.connect(self._closed)
         self._pending: dict[str, tuple[str, str]] = {}

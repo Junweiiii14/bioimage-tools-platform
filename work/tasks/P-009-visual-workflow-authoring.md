@@ -1,6 +1,6 @@
 # P-009 M2真实工作流可视编排与模板复用
 
-<!-- PROGRAM_TASK_META {"id":"P-009","status":"in_progress","work_package":"W13","depends_on":["P-006","P-008"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"275560475d39426434416c74feeb0c2f259d1402","head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-009","status":"in_review","work_package":"W13","depends_on":["P-006","P-008"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"275560475d39426434416c74feeb0c2f259d1402","head_commit":"5e69b2f67eb0aeac7db81afee4033e021b8b1917"} -->
 
 ## 输入与前置
 
@@ -22,7 +22,7 @@
 
 ## 当前状态
 
-进行中，依赖已完成；完整编排/真实执行、交互覆盖和有界视觉确认已实施。26f正式性能采样及该版隔离wheel已完成；独审确认成果选择错绑P1，当前修复待准确提交复审、受影响性能/安装验证和PR/必需CI。其他实验/Agent/安装器发布不在本卡范围。
+in_review：完整编排/真实执行、交互覆盖和有界视觉确认已实施；P1修复、受影响正式测量及64c全部wheel已通过相应验证。PR55首轮5e69b2f在双平台导入边界门禁失败，尚未运行pytest；装配边界修复待冻结准确复审及新CI，未合入，不能宣告done。其他实验/Agent/安装器发布不在本卡范围。
 
 
 ## 2026-11-02激活
@@ -71,3 +71,11 @@ Fresh reviewer首轮bb42有效12图结论fix，唯一问题为窄窗任务密度
 修复后四主题preview及35控制5+30采样exit0，独立复算一致；preview反馈329–342ms、暂停/取消UI反馈204/212ms，后台确认38/38ms、边界1523ms/批次排空389ms；renderer WS3.57GB，超参考/高值原因UNKNOWN，详见performance-final.md/json。26f完整及64c受影响两批28份原始文件已逐字节归档，不把旧数据改署新提交。
 
 64c全部隔离wheel完整exit0，旧探针全部保留，新AUTHORING_SCRIPT实际安装资产/编辑保存重开/4000→40/6workers/布局模板CLI通过；原日志将随最终记录归档。下一步仅证据/交接提交，集中准确增量复核、PR及必需CI/正常合入，仍in_progress，尚未宣告M2或目标完成。
+
+## 2026-11-03 PR55必需CI中
+
+最终纯证据5e69b2f67eb0aeac7db81afee4033e021b8b1917准确非作者Accepted延伸，.local/p009-review-5e69b2f.md，原始28文件Git blob/SHA及wheel日志逐字节吻合，无产品/工具/测试增量。已推分支并创建https://github.com/Junweiiii14/bioimage-tools-platform/pull/55。quality run41494573552，Windows job125446028782/Linux125446028523在check --all执行中；desktop-environment及rules-context run41494573809已success，native-case预期skipped。状态in_review；不得仅凭观察超时重启或更换运行。当前任务/快照更新先留本地，不推纯状态提交取消正在运行的CI；无产品源码dirty。
+
+## 2026-11-03 首轮CI边界失败与装配修复
+
+41494573552双平台已terminal failure，import-linter实际拒绝storage→authoring_store→WB/NumPy，未进入pytest/wheel；原日志及具体路径见ci-storage-boundary.md。修复为authoring Session在线程启动前固定装配处理器，通用storage不导入工具，原同一worker/Workspace/bytes命令不变，未改门禁。import-linter9 kept/0 broken；相关10passed38.59s；默认无装配拒绝和同一后台线程实测2passed15.73s，类型/目标Ruff/format通过。待冻结准确复审后更新同PR55，不重跑旧失败或在本机重复全部测试/wheel；新CI会验证当前安装。26f/64c性能及64c本地wheel仍保留原源码归属。

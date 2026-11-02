@@ -1,6 +1,6 @@
 # 当前恢复指针
 
-目标active、无预算：实际产品树bioimage-v0完成P002及4.0 M1/M2。P001/P002/P003/P005/P006/P007/P008已完成，不重做。当前唯一任务work/tasks/P-009-visual-workflow-authoring.md，in_progress；不得提前mark goal complete。
+目标active、无预算：实际产品树bioimage-v0完成P002及4.0 M1/M2。P001/P002/P003/P005/P006/P007/P008已完成，不重做。当前唯一任务work/tasks/P-009-visual-workflow-authoring.md，in_review；不得提前mark goal complete。
 
 ## 工作区
 
@@ -22,9 +22,12 @@
 
 64c受影响preview/control5+30采样exit0，独立复算一致；preview329–342ms，pause/cancel后台确认38/38ms、UI反馈204/212ms，renderer WS3.57GB，超参考/高值如实保留，不推断根因。28份两提交原始文件及SHA已归档，performance-final.md/json。64c当前全部隔离wheelexit0，handle64363终态确认，实际安装编排/保存重开/4000→40/6workers/模板CLI通过；日志.local/p009-installed-wheels-64c02d9.log。当前没有本机运行中的测量/测试/安装进程。
 
-1. 完成最终纯证据/交接提交及准确增量独审，单PR及必需CI，正常合入；无--admin/规则绕过，仓库auto-merge disabled。未建P009 PR。
+1. PR55：https://github.com/Junweiiii14/bioimage-tools-platform/pull/55。5e69b2f曾准确独审Accepted延伸，但quality41494573552两foundation已failure：import-linter发现storage→authoring_store→WB/NumPy，未运行pytest/wheel；desktop/rules成功保留，native-case预期skip。不是观察超时，旧run终态已确认，不盲目重跑。
+2. 当前装配修复：AsyncStorage构造时固定typed authoring处理器，Session显式装配；通用storage无WB导入，原同一worker/Workspace执行，命令仍只有固定操作/bytes。默认未装配端口明确拒绝。9 import contracts全过、相关10passed38.59s、默认拒绝/真实处理线程2passed15.73s，type0/Ruff/format。冻结准确提交后集中增量独审、推同PR55及新必需CI；不改门禁/容差/阈值。原性能和64c本地wheel不改署新源码。
 2. 本地不再重复全pytest/已通过wheel/原生测量；最终CI执行全量Windows/Linux已有门禁和wheel。失败按真实原因处理，不自动重跑凑绿。
 3. 集成后按objective-audit.md及原P002/M1/M2需求逐项核验，记录当前PR/check/tree，不能靠状态文字宣布完成。保持科学/设备/用户体验及性能限制。
+
+当前存储装配产品修复及相应测试/契约/交接未提交，B012仍保留。没有活跃外部CI，41494573552已失败终结；不要继续等待旧run。5e69b2f纯证据扩展报告.local/p009-review-5e69b2f.md需保留，已提交review-final.md仍为64c源码范围，装配修复需新的准确审查。
 
 旧快照已逐字节归档archive/P009-before-manifest-fix-snapshot.md；详细失败、命令和阶段证据在任务及work/evidence/P-009，不在snapshot复制长日志。
 

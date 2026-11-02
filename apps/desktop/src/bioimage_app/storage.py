@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
@@ -122,10 +123,11 @@ class StorageReply:
 class _StorageWorker(QObject):
     replied = Signal(object)
 
-    def __init__(self) -> None:
+    def __init__(self, authoring: Callable[[Workspace, bytes], AuthoringProjection] | None) -> None:
         super().__init__()
         self._owner_thread = self.thread()
         self._workspace: Workspace | None = None
+        self._authoring = authoring
 
     @Slot()
     def retire(self) -> None:
@@ -163,9 +165,9 @@ class _StorageWorker(QObject):
         if store is None:
             raise ValueError("No workspace is open")
         if op == "workflow_authoring":
-            from bioimage_app.workflow_authoring_store import execute_authoring_store
-
-            projection = execute_authoring_store(store, command.data)
+            if self._authoring is None:
+                raise ValueError("Workflow authoring is not configured on this storage port")
+            projection = self._authoring(store, command.data)
             data = projection.model_dump_json(
                 exclude={"plan": True, "batch": True, "project": {"seed": True}}
             ).encode("utf-8")
@@ -273,7 +275,13 @@ class AsyncStorage(QObject):
     _requested = Signal(str, object)
     _retire_requested = Signal()
 
-    def __init__(self, parent: QObject | None = None, *, max_pending: int = 64) -> None:
+    def __init__(
+        self,
+        parent: QObject | None = None,
+        *,
+        max_pending: int = 64,
+        authoring: Callable[[Workspace, bytes], AuthoringProjection] | None = None,
+    ) -> None:
         super().__init__(parent)
         if type(max_pending) is not int or max_pending < 1:
             raise ValueError("max_pending must be a positive integer")
@@ -281,7 +289,8 @@ class AsyncStorage(QObject):
         self._pending: set[str] = set()
         self._closing_id: str | None = None
         self._thread = QThread(self)
-        self._worker = _StorageWorker()
+        # Trusted host assembly is fixed before thread start; commands carry only data.
+        self._worker = _StorageWorker(authoring)
         self._worker.moveToThread(self._thread)
         self._requested.connect(self._worker.execute, Qt.ConnectionType.QueuedConnection)
         self._worker.replied.connect(self._deliver, Qt.ConnectionType.QueuedConnection)

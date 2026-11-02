@@ -1,0 +1,23 @@
+=============
+Import Linter
+=============
+
+
+---------
+Contracts
+---------
+
+Analyzed 269 files, 1900 dependencies.
+--------------------------------------
+
+WB domain is independent of GUI and storage KEPT
+Public API may depend on domain, never the reverse KEPT
+Analysis depends on image ports, never file adapters or GUI KEPT
+TIFF decoding and profile integration are independent KEPT
+Shared contracts never import runtime, tools, GUI, numbers or database KEPT
+Runtime never imports experiment tools, GUI or numerical processing KEPT
+WB tool and host persistence remain independent KEPT
+Host storage queue has no experimental or image processing dependencies KEPT
+Contracts runtime and WB never import the desktop assembly KEPT
+
+Contracts: 9 kept, 0 broken.
