@@ -1,0 +1,21 @@
+{
+  "previous_commit": "0edf0e0e2f3e3950dbac3bdf4dd55d3f39791991",
+  "issue": "Git LF normalization changed generated CRLF JSON bytes, breaking frozen byte digests and method-report references in clones",
+  "scope": "Only P003 frozen-evaluation*/** and generated scientific-request-report*.json; product sources retain global text policy",
+  "change": "-text preserves producer bytes; explicit default whitespace error checks retained, with CR recognized as end-of-line",
+  "index_files_verified": 30,
+  "whitespace_negative_probes": [
+    {
+      "case": "crlf",
+      "exit_code": 1,
+      "output": "warning: in the working copy of '.local\\p003-byte-policy-probe\\crlf', CRLF will be replaced by LF the next time Git touches it\n"
+    },
+    {
+      "case": "space",
+      "exit_code": 3,
+      "output": ".local\\p003-byte-policy-probe\\space:1: trailing whitespace.\n+{} \nwarning: in the working copy of '.local\\p003-byte-policy-probe\\space', CRLF will be replaced by LF the next time Git touches it\n"
+    }
+  ],
+  "original_worktree_outputs_changed": false,
+  "prior_normalized_git_versions": "Retained in 0edf0e0 history; new blobs restore original producer bytes from unchanged working files"
+}

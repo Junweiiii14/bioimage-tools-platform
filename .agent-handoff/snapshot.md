@@ -1,17 +1,28 @@
 # 当前恢复指针
 
-- 当前任务：[P002](../work/tasks/P-002-wb-headless-module.md)，状态唯一来源在任务卡。P001已完成并正常合入main；不重复合并或重启旧CI。
-- 执行树 `C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0`，分支 `codex/p002-wb-headless-module`，base `29930f62a0b158189b76e0fad7d090d632f149d6`，worker/存储增量HEAD `725fc6aef8df192f46fdceb122f6ff669251dd72`。旧主目录dirty、T082原树及安装不修改。
-- P001 PR47最终候选f4bd81e经准确提交独审及四必需CI通过；Windows1503 passed，Linux1499 passed/4既有skip；main合并树与候选一致。关闭记录及review-final.md已随P002激活记录提交。
-- P002已加载全仓规则回执 `work/evidence/P-002/rules-context.json`。本轮新增模块契约、原WB适配、静态对照worker、CSV/来源成果及RunSession存储准入；AssetRef v1及旧storage schema保持。详细文件见git状态与P002任务。
-- 2026-10-31本轮组合验证34 passed/21.99秒（工作区TEMP，exit0），真实进程成功重开、manifest后退出7、输出缺失/同尺寸篡改、取消及旧运行/存储回归；Ruff/Pyright/policy通过。初始默认TEMP权限失败和修复验证如实在任务记录。
-- p001_review对29930f62..725fc6a提出P1发布绑定遗漏；当前修复通过payload_kind强制匹配，missing_binding回归通过，尚待新提交独审。旧审查不能写Accepted。
-- 2026-11-02新增共享ComparisonSession、CLI、薄GUI及中文docs/wb-v0-acceptance.md。最新CLI/RunSession组合16 passed/56.81秒（.local/p002-final-target-a.txt），Pyright零错误；真实工作台2 passed/5.64秒，局部视觉ship/documenter No changes（详情任务卡）。wheel门禁仅追加同一用例独立安装验证。
-- 2026-11-02新执行者01a199d4-dac3-7dd3-af35-cdad7d361934已在产品HEAD78403be接手，真实goal active、无预算，证据work/evidence/B-010/goal-state.json。从旧聊天原生命令记录确认完整门禁completed/exit0（890398ms、1537 passed）及五例冻结生成exit0；接手又对原五工作区实际重开及校验全部保留成果摘要，证据P-002/recovery-verification.json。未重写冻结运行。
-- 下一步：非作者p002_independent_review已对29930f62..2591309独审Accepted，独立34项测试与输入篡改/证据核验通过，报告P-002/review-final.md。PR48待四必需CI与正常集成。4.0文档同步须随正常规则回执及阶段集成清单保留。P002为in_review，尚无集成结论，不标done。旧句柄不作为成功依据。
-- 真实goal已get确认active、无token预算。用户明确允许回传目标状态/提交号/执行树，已向原聊天01a19004-3b85-7a30-bc08-c9e59a79d209回传以上状态；无需重复索要同一许可。
-- T082科学/目标环境待办、历史失败和冻结源码/安装证据完整保留；原snapshot逐字节归档见archive/P001-before-adoption-snapshot.md。P003–006仅按V0必需范围接入，不因部分实现自动整卡完成。
+- 目标：先完成P002/M0验收与正常集成，再按已授权4.0持续完成M1通用执行、M2可视编排。真实goal active、无token预算，初始实际工具证据work/evidence/B-010/goal-state.json；恢复时再次get_goal。
+- 实际产品树C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0，唯一执行聊天01a199d4-dac3-7dd3-af35-cdad7d361934。旧执行聊天idle/interrupted，不同时写入。旧规划树、历史工作树、原图/成果/安装不修改。
+- 当前分支codex/m1-workflow-foundation，base为正常合入后的main f2dc5ad。P003产品候选0edf0e0、随后08decb6冻结字节/证据提交，最新HEAD请实际git核实。原规划7dac55d未夹入PR48。
 
-## 2026-11-02 新用户授权与执行移交
+## 当前任务和真实证据
 
-4.0方案已由B010同步到本树，准确源摘要见work/evidence/B-010/transfer-manifest.json。当前产品任务仍P002，不因同步而标完成。新聊天将使用gpt-6.1-sol/medium与真实goal接手，先当前验收，再M1通用执行、M2可视编排；详见docs/plans/phase-2-workflow-authoring.md。旧聊天目前idle/interrupted，不应与新聊天同时写本树。此段优先于历史“仅V0”范围说明。B010同步是本地改动，提交/独审/集成由新执行者正常处理；勿删除旧回执解决CI。
+- 当前[P003](../work/tasks/P-003-method-validation-foundation.md)状态in_review，以卡为唯一状态源。新契约/runtime评估/真实WB解析评估命令、性质及负例、wheel追加检查已实施，未假称科学准入。产品修复提交0edf0e0e2f3e3950dbac3bdf4dd55d3f39791991。
+- 首次debeb3e被非作者Request changes：共同未知父/不同子标签漏判泄漏、冻结polarity/band_bounds/quant_policy被忽略。均已修复，独审精确f2dc5ad..0edf0e0 Accepted，独立18passed/2.62秒及六种排序/原正反例通过；初次门禁因已知缺陷由作者核验own进程树后中止exit1，不写通过。
+- r2冻结frozen-evaluation-r2/execution-r2.json实际绑定0edf0e0：真实WB值40/4000/有效0/无效空值/复核空值，工程exit0；scientific请求exit2且S1 not_granted。初次debeb3e冻结证据原样保留为被拒候选历史。
+- 冻结JSON在Git换行规范化后SHA不一致的问题已真实复现；08decb6限定两类P003产物保留原生产字节，默认空白错误仍检查，仅识别CR行尾。30个原/r2 Git暂存blob已逐个SHA匹配，真正尾随空格负例仍拒绝，收据byte-preservation.json。该数据保留增量/最终文档提交待独审，不是放松数值或测试门禁。
+- 完整新门禁源0edf0e0正在实际执行：session52799，.local/p003-check-all-r2.txt；结果文件仅完成后写.local/p003-check-all-r2-result.json。恢复先实际poll会话，或核实结果与日志，不猜成功。产品文件自该冻结提交未再改变。
+- B011精确f2dc5ad..8710d76独审Accepted，回执已真实刷新新main。规划/治理仍需随当前PR正常集成，P007–009保持planned；新增目录/任务不等于产品完成。
+- P002已原范围done：PR48四必需CI通过且正常merge main f2dc5ad；Windows1537passed/924.48秒、Linux1533passed/4既有skip/602.27秒，双平台wheel真实V0通过。合并树等于独审候选a69b38e。收据P-002/integration.json，首轮Ruff失败及科学/现场限制保留，未发安装器。
+
+## 下一步
+
+1. 对当前最终增量准确独审，准备P003/B011正常PR；完整作者门禁及四必需CI全部真实通过后集成并记P003工程done。若再发现缺陷按新提交复审，不能沿用旧相关结论。
+2. P003的D1不等于S1；缺负责人/独立留出/阈值不能生成科学通过。随后按登记P007科学资产/连接/冻结图→P005单图真实可靠执行→P008有限批量完整M1；P006真实性能基线及P008完成后P009可视编排M2。目标仍active，不在框架或空接口处停下。
+3. P004消费P007，仅负责新WB正式分析图/几何方法；M1原整数图路径不依赖其整卡。P005完成单图依赖失效/复用/恢复，P008复用同一账本/缓存/恢复器扩展批量，P009接同一执行器。
+
+## 保留边界
+
+- 主依据docs/plans/research-platform-rd.md（4.0）和phase-2-workflow-authoring.md；B005历史治理、B009历史内容审查不是本树产品门禁。
+- P004/WB新校正方法仍单独待办，不作为M1原整数图路径的整卡前置。P003 D1不等于方法S1。
+- 科学独立留出/负责人容差、用户体验、干净Windows/物理DPI/GPU及T002/P0缺项保留，见risks/backlog；不冻结无依赖工程。未授权其他实验全部展开、Agent、安装器发布/替换、外联、花费或数据上传。
+- 整理前本次完整snapshot逐字节保留于archive/P002-before-M1-snapshot-20261102.md，旧历史及UNKNOWN不销账。workspace旧T072索引另有原字节归档。

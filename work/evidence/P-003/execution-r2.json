@@ -1,0 +1,37 @@
+{
+  "source_commit": "0edf0e0e2f3e3950dbac3bdf4dd55d3f39791991",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "engineering_exit_code": 0,
+  "scientific_exit_code": 2,
+  "commands": [
+    "uv run --locked --no-sync python -m tooling.wb_method_validation --output work/evidence/P-003/frozen-evaluation-r2",
+    "uv run --locked --no-sync python -m tooling.wb_method_validation --output .local/p003-scientific-r2 --scientific"
+  ],
+  "observed_values": [
+    40.0,
+    4000.0,
+    0.0,
+    null,
+    null
+  ],
+  "scientific_admission": "not_granted",
+  "frozen_files_sha256": {
+    "dtype_limits-actual.json": "bb2dc4d788c0856e5a3c931a4fc5f460ca2ac2ef7ef5f0193ebc9e69ad07d30a",
+    "flat_zero-actual.json": "24c757c4b35ab1020b4898deafd95fac187d6be4a2d2d5f76ccbd063e2079834",
+    "inputs/dtype_limits.tif": "99484398a4ca79550abd8f91e09e791ad84b0ea5831988df4cde80b4510a67b1",
+    "inputs/flat_zero.tif": "b5630c588edc45fcb78b6da96cf524d9f7293269dfa08ed0d04ca91e0a43b7f1",
+    "inputs/invalid_roi.tif": "c20c8589d21f2897561f5e3cfe64a3fbe5366232077d08e37dc95f236667ccfd",
+    "inputs/triangle_u16.tif": "c20c8589d21f2897561f5e3cfe64a3fbe5366232077d08e37dc95f236667ccfd",
+    "inputs/triangle_u8.tif": "dfa6fbcc71b8b96de0444f14bb73eedc3687e30762773e44c9a15093138bcaf5",
+    "invalid_roi-actual.json": "b61a8b18fe7cbbbc8ce8bac6def9e45915a4b74a40c4597baa16ecf5b01459ae",
+    "method-register.json": "b528d97d5b393c8d6d2d450498c812411ad4dc8a69819bc15e173f43b3d5a156",
+    "observations.json": "a91a5b69096ec981052dda101d474121a4224eca67123c0bc9767001213c8865",
+    "plan.json": "fb4b02686ac7ddea7f6d9d17fadb976c9a2d01d4518d24332c0f123f27fa0ee0",
+    "report.json": "2ae0eb3f4698a60c522eb3ba47fc9b2fbd009ba19e5987cf54fa7819ad803cec",
+    "source-catalog.json": "61343c8e1c1786e12b5dfdc4dd60aa0b63197f24281425f08860aae96b9e9e80",
+    "triangle_u16-actual.json": "da9dc38eb7630046274dad16135aedb4ecaed82fad3c37ced88ececd8e324d48",
+    "triangle_u8-actual.json": "dad0abd7e7efb60e6da4d25a7b693dbfb2a285df3299cbc7b09923bfb1d23e6f"
+  },
+  "supersedes_for_acceptance": "execution.json/frozen-evaluation from rejected debeb3e candidate remain immutable historical evidence",
+  "scope": "Engineering/D1 only; no S1, heldout/target-machine/user acceptance or installer publication"
+}

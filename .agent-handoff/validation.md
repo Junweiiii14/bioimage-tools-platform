@@ -111,3 +111,7 @@ ed830e1准确完整门禁1503 passed/756.15s+全部isolated wheels/exit0，HEAD/
 ## 2026-11-02 B010
 
 白名单同步4.0方案与历史证据，源目标摘要一致；保留产品文件、P卡和frozen-runs，语义更新授权与入口。检查与新聊天派发见work/tasks/B-010-v4-adoption-and-dispatch.md及work/evidence/B-010。未运行产品门禁或科学/目标机验收。
+
+## 2026-11-02 P002 PR48最终CI与集成
+
+准确a69b38e，四必需SUCCESS；Windows1537passed/924.48秒，Linux1533passed/4既有skip/602.27秒；双平台独立wheel V0真实worker/成果提交/重开通过。main f2dc5ad Git tree等于独审候选，gh pr merge --merge --match-head-commit正常集成。工程证据work/evidence/P-002/integration.json；未验科学/用户/目标机，不发布安装器。

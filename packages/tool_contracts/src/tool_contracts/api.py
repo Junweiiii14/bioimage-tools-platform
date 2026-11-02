@@ -354,3 +354,185 @@ __all__ += [
     "ExecutionEvent",
     "canonical_module_json",
 ]
+
+
+class ValidationDataRecord(FrozenContract):
+    """File evidence is distinct from a catalog citation or an analytical fixture."""
+
+    schema_version: VersionOne = 1
+    record_id: Identifier
+    dataset_id: ShortText
+    source_groups: Annotated[tuple[Identifier, ...], Field(max_length=64)] = ()
+    parent_record_ids: Annotated[tuple[Identifier, ...], Field(max_length=64)] = ()
+    partition: Literal["development", "holdout", "unassigned"]
+    evidence_kind: Literal["synthetic_analytic", "independent_reference", "catalog_reference"]
+    payload_sha256: Digest | None = None
+    file_status: Literal["verified_local", "not_verified"]
+    decode_status: Literal["decoded", "failed", "not_verified"]
+    license_use_status: Literal["allowed", "restricted", "unknown"]
+    license_and_use: Annotated[str, Field(min_length=1, max_length=8192)]
+    sample_relation: ShortText = "unknown"
+    unit: ShortText = "unknown"
+    source_record_json: Annotated[str, Field(min_length=2, max_length=65536)] = "{}"
+
+    @field_validator("source_record_json")
+    @classmethod
+    def canonical_source(cls, value: str) -> str:
+        if canonical_module_json(value) != value:
+            raise ValueError("Source evidence must be canonical JSON")
+        return value
+
+    @model_validator(mode="after")
+    def verified_file(self) -> Self:
+        if self.file_status == "verified_local" and self.payload_sha256 is None:
+            raise ValueError("Verified local data requires an actual file digest")
+        for values in (self.source_groups, self.parent_record_ids):
+            if len(values) != len(set(values)):
+                raise ValueError("Duplicate dataset lineage identity")
+        return self
+
+
+MeasurementState = Literal[
+    "valid", "invalid", "quality_review", "not_detected", "excluded", "missing", "failed"
+]
+
+
+class ValidationCase(FrozenContract):
+    case_id: Identifier
+    record_id: Identifier
+    metric_id: Identifier
+    unit: ShortText
+    parameters_sha256: Digest
+    expected_status: MeasurementState
+    expected_value: float | None
+    absolute_tolerance: Annotated[float, Field(ge=0)] | None
+    reference_source: Annotated[str, Field(min_length=1, max_length=4096)]
+
+    @model_validator(mode="after")
+    def reference_state(self) -> Self:
+        if self.expected_status != "valid" and self.expected_value is not None:
+            raise ValueError("Invalid or review reference cannot be an effective numeric value")
+        return self
+
+
+class MethodEvaluationPlan(FrozenContract):
+    schema_version: VersionOne = 1
+    evaluation_id: Identifier
+    intended_use: Literal["engineering", "scientific"]
+    module: ModuleSpec
+    environment: Annotated[tuple[RuntimeVersion, ...], Field(min_length=1, max_length=32)]
+    records: Annotated[tuple[ValidationDataRecord, ...], Field(min_length=1, max_length=256)]
+    cases: Annotated[tuple[ValidationCase, ...], Field(min_length=1, max_length=128)]
+
+    @model_validator(mode="after")
+    def unique_evaluation(self) -> Self:
+        for keys in (
+            [x.record_id for x in self.records],
+            [x.case_id for x in self.cases],
+            [x.name for x in self.environment],
+        ):
+            if len(keys) != len(set(keys)):
+                raise ValueError("Evaluation identities must be unique")
+        known = {x.record_id for x in self.records}
+        if any(x.record_id not in known for x in self.cases):
+            raise ValueError("Evaluation case has no declared data record")
+        return self
+
+
+class MethodObservation(FrozenContract):
+    case_id: Identifier
+    payload_sha256: Digest
+    parameters_sha256: Digest
+    unit: ShortText
+    status: MeasurementState
+    value: float | None
+
+    @model_validator(mode="after")
+    def effective_value(self) -> Self:
+        if (self.status == "valid") != (self.value is not None):
+            raise ValueError("Only a valid measurement has an effective numeric value")
+        return self
+
+
+class MethodEvaluationEvidence(FrozenContract):
+    schema_version: VersionOne = 1
+    plan_sha256: Digest
+    module: ModuleSpec
+    environment: Annotated[tuple[RuntimeVersion, ...], Field(min_length=1, max_length=32)]
+    observations: Annotated[tuple[MethodObservation, ...], Field(max_length=128)]
+
+    @model_validator(mode="after")
+    def unique_observations(self) -> Self:
+        keys = [item.case_id for item in self.observations]
+        if len(keys) != len(set(keys)):
+            raise ValueError("Duplicate observed evaluation case")
+        return self
+
+
+class ValidationComparison(FrozenContract):
+    case_id: Identifier
+    expected_status: MeasurementState
+    actual_status: MeasurementState | None
+    expected_value: float | None
+    actual_value: float | None
+    absolute_error: Annotated[float, Field(ge=0)] | None
+    passed: bool
+    reasons: tuple[str, ...]
+
+
+class MethodEvaluationReport(FrozenContract):
+    schema_version: VersionOne = 1
+    evaluator_id: Literal["frozen_reference_compare@1"] = "frozen_reference_compare@1"
+    evaluation_id: Identifier
+    plan_sha256: Digest
+    evidence_sha256: Digest
+    comparisons: tuple[ValidationComparison, ...]
+    engineering_passed: bool
+    requested_use_allowed: bool
+    scientific_admission: Literal["not_granted"] = "not_granted"
+    reasons: tuple[str, ...]
+
+
+class MethodReadinessRecord(FrozenContract):
+    """Design readiness and unknown methods cannot impersonate an S1 approval."""
+
+    schema_version: VersionOne = 1
+    record_id: Identifier
+    method_id: ShortText
+    method_version: ShortText | None
+    module_id: Identifier | None
+    implementation_digest: Digest | None
+    supported_inputs: Annotated[tuple[ShortText, ...], Field(min_length=1, max_length=16)]
+    responsible_role: ShortText
+    responsible_person: ShortText | None = None
+    design_readiness: Literal["pending", "ready"]
+    engineering_report_sha256: Digest | None
+    scientific_admission: Literal["not_granted"] = "not_granted"
+    remaining_evidence: Annotated[tuple[ShortText, ...], Field(min_length=1, max_length=32)]
+
+    @model_validator(mode="after")
+    def evidence_for_readiness(self) -> Self:
+        if self.design_readiness == "ready" and any(
+            value is None
+            for value in (
+                self.method_version,
+                self.module_id,
+                self.implementation_digest,
+                self.engineering_report_sha256,
+            )
+        ):
+            raise ValueError("Ready method design must reference an implementation and real report")
+        return self
+
+
+__all__ += [
+    "ValidationDataRecord",
+    "ValidationCase",
+    "MeasurementState",
+    "MethodEvaluationPlan",
+    "MethodObservation",
+    "MethodEvaluationEvidence",
+    "ValidationComparison",
+    "MethodEvaluationReport",
+    "MethodReadinessRecord",
+]

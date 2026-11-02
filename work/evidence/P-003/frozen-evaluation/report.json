@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "evaluator_id": "frozen_reference_compare@1",
+  "evaluation_id": "legacy_analytic_v1",
+  "plan_sha256": "70b7a4a823ba3e4153870471389fb08488d40259409ed1e600b1c71f809eb34b",
+  "evidence_sha256": "fb55963ea50b16a4ceae198bfa58a34b345b7e38bc97a24fc46660992b5577bb",
+  "comparisons": [
+    {
+      "case_id": "triangle_u8",
+      "expected_status": "valid",
+      "actual_status": "valid",
+      "expected_value": 40.0,
+      "actual_value": 40.0,
+      "absolute_error": 0.0,
+      "passed": true,
+      "reasons": []
+    },
+    {
+      "case_id": "triangle_u16",
+      "expected_status": "valid",
+      "actual_status": "valid",
+      "expected_value": 4000.0,
+      "actual_value": 4000.0,
+      "absolute_error": 0.0,
+      "passed": true,
+      "reasons": []
+    },
+    {
+      "case_id": "flat_zero",
+      "expected_status": "valid",
+      "actual_status": "valid",
+      "expected_value": 0.0,
+      "actual_value": 0.0,
+      "absolute_error": 0.0,
+      "passed": true,
+      "reasons": []
+    },
+    {
+      "case_id": "invalid_roi",
+      "expected_status": "invalid",
+      "actual_status": "invalid",
+      "expected_value": null,
+      "actual_value": null,
+      "absolute_error": null,
+      "passed": true,
+      "reasons": []
+    },
+    {
+      "case_id": "dtype_limits",
+      "expected_status": "quality_review",
+      "actual_status": "quality_review",
+      "expected_value": null,
+      "actual_value": null,
+      "absolute_error": null,
+      "passed": true,
+      "reasons": []
+    }
+  ],
+  "engineering_passed": true,
+  "requested_use_allowed": true,
+  "scientific_admission": "not_granted",
+  "reasons": [
+    "scientific_admission_requires_separate_review",
+    "no_independent_holdout_reference"
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "pr": {
+    "headRefOid": "a69b38e810b4fefe1d38fae845c582d17ff56aae",
+    "mergeCommit": {
+      "oid": "f2dc5ad44fba2e4f951b8987f0babb6b41c1d1a2"
+    },
+    "mergedAt": "2026-11-02T01:42:02Z",
+    "state": "MERGED",
+    "url": "https://github.com/Junweiiii14/bioimage-tools-platform/pull/48"
+  },
+  "base_commit": "29930f62a0b158189b76e0fad7d090d632f149d6",
+  "candidate": "a69b38e810b4fefe1d38fae845c582d17ff56aae",
+  "main_merge": "f2dc5ad44fba2e4f951b8987f0babb6b41c1d1a2",
+  "merge_tree_matches_reviewed_candidate": true,
+  "required_checks": [
+    {
+      "link": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41372266645/job/125045053318",
+      "name": "foundation (ubuntu-latest)",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41372266645/job/125045053555",
+      "name": "desktop-environment",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41372266645/job/125045053378",
+      "name": "foundation (windows-latest)",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41372266627/job/125045053125",
+      "name": "rules-context",
+      "state": "SUCCESS"
+    }
+  ],
+  "quality_run": 41372266645,
+  "windows": {
+    "passed": 1537,
+    "warnings": 10,
+    "pytest_seconds": 924.48,
+    "installed_v0_real_worker_commit_reopen": "passed"
+  },
+  "linux": {
+    "passed": 1533,
+    "skipped": 4,
+    "warnings": 10,
+    "pytest_seconds": 602.27,
+    "installed_v0_real_worker_commit_reopen": "passed"
+  },
+  "raw_ci_log_sha256": "542fe711dcc1e33de858e9b5bf17f099ecf77a5c6bd0955848e5b17d8b0a492e",
+  "independent_review": {
+    "reviewer": "p002_independent_review",
+    "base": "29930f62a0b158189b76e0fad7d090d632f149d6",
+    "head": "a69b38e810b4fefe1d38fae845c582d17ff56aae",
+    "conclusion": "Accepted after exact incremental reviews; product bytes unchanged from 78403be"
+  },
+  "scope": "P002 engineering integrated; no scientific/target-machine/user experience acceptance or installer publication"
+}

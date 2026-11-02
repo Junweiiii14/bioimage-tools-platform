@@ -1,0 +1,45 @@
+[
+  {
+    "schema_version": 1,
+    "record_id": "legacy_wb_reference",
+    "method_id": "wb-legacy-analysis",
+    "method_version": "profile_integral@1",
+    "module_id": "wb-legacy-analysis",
+    "implementation_digest": "dc768dfc704efc26c53f5fab820af9e94b3a85de12304c5b35a62fbfeb04c258",
+    "supported_inputs": [
+      "uint8/uint16 TIFF; explicit original-frame ROI",
+      "current report: light polarity, five P001 analytic fixtures",
+      "dark polarity: legacy module contract; not evaluated by this report"
+    ],
+    "responsible_role": "independent method owner",
+    "responsible_person": null,
+    "design_readiness": "ready",
+    "engineering_report_sha256": "2ae0eb3f4698a60c522eb3ba47fc9b2fbd009ba19e5987cf54fa7819ad803cec",
+    "scientific_admission": "not_granted",
+    "remaining_evidence": [
+      "independent heldout data",
+      "owner-approved scientific criteria"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "record_id": "wb_geometry_candidate",
+    "method_id": "WB automatic geometry candidate",
+    "method_version": null,
+    "module_id": null,
+    "implementation_digest": null,
+    "supported_inputs": [
+      "analysis-image/valid-mask contract pending P004"
+    ],
+    "responsible_role": "independent method owner",
+    "responsible_person": null,
+    "design_readiness": "pending",
+    "engineering_report_sha256": null,
+    "scientific_admission": "not_granted",
+    "remaining_evidence": [
+      "versioned angle/resampling method implementation",
+      "independent geometric and intensity reference",
+      "owner-approved tolerances and representative heldout data"
+    ]
+  }
+]

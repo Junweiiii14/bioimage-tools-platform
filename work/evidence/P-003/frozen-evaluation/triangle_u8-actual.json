@@ -1,0 +1,105 @@
+{
+  "request": {
+    "source_sha256": "dfa6fbcc71b8b96de0444f14bb73eedc3687e30762773e44c9a15093138bcaf5",
+    "revision": 0,
+    "polarity": "light",
+    "lanes": [
+      {
+        "roi": {
+          "lane_id": "triangle_u8",
+          "x0": 0,
+          "y0": 0,
+          "x1": 3,
+          "y1": 5
+        },
+        "bands": [
+          {
+            "band_id": "signal",
+            "bounds": {
+              "left": 0,
+              "right": 4
+            },
+            "baseline": null,
+            "included": true,
+            "detection_notes": []
+          }
+        ]
+      }
+    ],
+    "geometry_policy": "fixed_grid@1",
+    "quant_policy": "legacy_bounds@1"
+  },
+  "bit_depth": 8,
+  "source_conversion": null,
+  "lanes": [
+    {
+      "roi": {
+        "lane_id": "triangle_u8",
+        "x0": 0,
+        "y0": 0,
+        "x1": 3,
+        "y1": 5
+      },
+      "profiles": {
+        "roi": {
+          "lane_id": "triangle_u8",
+          "x0": 0,
+          "y0": 0,
+          "x1": 3,
+          "y1": 5
+        },
+        "raw": [
+          10.0,
+          20.0,
+          30.0,
+          20.0,
+          10.0
+        ],
+        "quantitative": [
+          10.0,
+          20.0,
+          30.0,
+          20.0,
+          10.0
+        ],
+        "polarity": "light",
+        "dtype_max": 255
+      },
+      "bands": [
+        {
+          "annotation": {
+            "band_id": "signal",
+            "bounds": {
+              "left": 0,
+              "right": 4
+            },
+            "baseline": null,
+            "included": true,
+            "detection_notes": []
+          },
+          "status": "valid",
+          "measurement": {
+            "signal": 40.0,
+            "bounds": {
+              "left": 0,
+              "right": 4
+            },
+            "baseline": {
+              "left_value": 10.0,
+              "right_value": 10.0
+            },
+            "baseline_source": "endpoints",
+            "algorithm_id": "profile_integral@1",
+            "unit": "intensity*pixel"
+          },
+          "reason": null,
+          "quality_flags": []
+        }
+      ],
+      "reason": null
+    }
+  ],
+  "algorithm_id": "profile_integral@1",
+  "quality_policy": "dtype_limits_review@1",
+  "schema_version": 1
+}

@@ -9,3 +9,8 @@
 
 # Preserve pinned upstream bytes for skill provenance on every checkout.
 /.agents/skills/impeccable/scripts/impeccable.cmd text eol=lf
+
+# Frozen evaluation outputs are byte-addressed evidence, including report self-references.
+# Preserve the producer's bytes rather than normalizing generated JSON line endings.
+/work/evidence/P-003/frozen-evaluation*/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+/work/evidence/P-003/scientific-request-report*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

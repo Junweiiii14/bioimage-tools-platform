@@ -10,3 +10,7 @@
 退出回执由宿主 OS 生命周期观察产生，模型本身不能代替实际观察。
 
 测试与隔离安装通过仓库根 `uv run --locked --no-sync python dev.py check --all`。
+
+P003新增独立schema v1的数据来源/分组、冻结评估计划/观测、工程报告与D1方法登记。
+公开模型不授予S1；有效零与无效空值严格分开，未知来源/材料不补为通过。
+见docs/contracts/method-validation-v1.md（仓库根相对路径）。旧存储schema保持。
