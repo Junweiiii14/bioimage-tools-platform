@@ -1,0 +1,36 @@
+{
+  "failed_run": 41372121935,
+  "failed_head": "6a4020d8bc7ada84d18d93f59bfee75519f95036",
+  "reason": "Ruff format rejected missing blank line in two Python documentation code blocks",
+  "change": "One blank line in each Markdown Python block, HTML rebuilt; no product/gate/threshold changes",
+  "commands": [
+    {
+      "command": "uv run --locked --no-sync python -m ruff format --check .",
+      "exit_code": 0,
+      "result": "1097 files already formatted"
+    },
+    {
+      "command": "npm run build --prefix docs/plans/renderer",
+      "exit_code": 0,
+      "result": "13 chapters,129 subheadings"
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/plans/research-platform-rd.md",
+      "before_sha256": "4124172edbe85317002e975d65b740d7bdc103d4c7e38b445b192b2abdb27e6f",
+      "after_lf_sha256": "396d637fd4d50c047aec89abb4d522d3c02052cc1d424a565eb1a94663702760"
+    },
+    {
+      "path": "docs/plans/archive/research-platform-rd-v3.md",
+      "before_sha256": "d581a908343be4a368b35b576dbb5238c8aaed99ea607b05b745ab3aeb270599",
+      "after_lf_sha256": "99755118fa5150a4db76d6da48c983d14205288eb22ddfe4440e31407a8869b3"
+    },
+    {
+      "path": "docs/plans/research-platform-rd.html",
+      "before_sha256": "9ce8df73bb7d3bfa72308ea4f2ce8a177de179c0cefcb1cce1599500779502ba",
+      "after_lf_sha256": "7071cc02d6bacbc158e95d388b5e5d4222e4a7d6807a0b048cfe3853d8fdba79"
+    }
+  ],
+  "historical_manifest": "B010 transfer-manifest records the original sync bytes at 3ff0537 and remains immutable; this receipt records the later formatting successor"
+}

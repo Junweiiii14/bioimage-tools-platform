@@ -91,3 +91,7 @@ Win11/Python3.12.14，当前未提交增量：`uv run --locked --no-sync python 
 ## 2026-11-02最终独审与PR
 
 非作者p002_independent_review已对准确29930f62..2591309eecffeb07558d3492bc3f69425dc6d24a给出Accepted，无阻断发现；独立34 passed/53.11秒、同尺寸输入篡改拒绝探针及全套同步/冻结成果摘要核验通过。详见work/evidence/P-002/review-final.md。状态in_review，PR48已创建，需四个必需CI通过后正常合并；未提前记done。此次后续仅记录报告/任务交接，不更改已审产品。
+
+## 2026-11-02 PR48首次CI失败及修复
+
+最终6a4020d的rules-context和desktop-environment通过；Windows/Linux foundation在Ruff文档代码块格式阶段失败（run41372121935），未进入测试。修复仅在4.0主方案与3.0规划归档的Python示例各加一个空行，再重建HTML；未修改产品/门禁/阈值。全仓format检查1097文件通过，HTML build exit0；前后摘要及B010原始同步清单的历史边界见ci-format-fix.json。继续等待新HEAD独审及必需CI，不把初次失败隐去。
