@@ -1,5 +1,9 @@
 # 当前恢复指针
 
+最高优先用户修正：减少防御性编程/审批开销、尽快交付MVP。社区karpathy-guidelines已项目安装并固定2c606141936f1eeef17fa3043a72095b4765b9c2，AGENTS与coding-standards明确入口一次校验/内部信任类型、不滥用异常与单次抽象，独审集中最终候选。配置完成后继续生产自动调度，不新增审批环节。原M1/M2目标不缩成仅账本或CLI。
+
+当前源码事实：节点823d首审P1已修b80b900并获准确89ba603..b80b900非作者Accepted，独立13pass22.86s（NaN/Inf/负数均无候选目录）；旧Request changes保留。后续未提交workflow_preparation.py、workflow_session.py、wb_workflow_host.py和RunSession等待确认取消排序修正，定向21pass26.43s/Pyright0；新的生产WorkflowSession尚未跑自动完整图。接下来先按新简洁规则删重复准入/无意义判空，再用真实三节点端到端测试推进。不要声称这些未提交新文件已独审/产品通过。
+
 - 原生goal仍active、无预算；完整目标是实际产品树M1真实工作流执行与M2可视编排。恢复实际get_goal，不把阶段通过标complete。
 - 执行树C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0，当前分支codex/p005-workflow-executor；base main006e9f143c830f5e13be2932e8ac37a9f3a05ed1。本地从保留P007收据的50dc61c与正常main合并14c0153开始，HEAD/dirty请实际核实。唯一写入本聊天；非作者/root/p002_independent_review只读，正在准确审89ba603..823d282节点切片，源码已冻结；不要重复派发或并行修改该范围。
 

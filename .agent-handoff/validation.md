@@ -1,5 +1,7 @@
 # Validation Index
 
+2026-11-02社区karpathy-guidelines配置：上游固定commit raw与本地2518字节/SHA逐字节一致（作者命令exit0、非作者独立确认），仅MD无执行hook；skills-lock/policy exit0，用户优先实现规则已加载并生成新P005回执。证据karpathy-skill-verification.json。未运行产品新图，不把静态技能核验冒充MVP有效性；待实际简化与端到端运行验证。
+
 ## 2026-11-02 P005 node workers and dispatch ack
 
 Windows/Python3.12.14锁定环境；默认/确认模式真实旧模块及RunSession/process28pass28.08s，关联七文件114pass57.89s（中间源码），后继确认期间取消/节点12pass28.82s及最终节点6pass22.93s。实际15次三节点worker/正式提交/重开40/4000/0/null状态与完整剖面核验；报告PNG实际查看。Ruff/Pyright/policy/九import边界0。初类型/闭包错误修正，未加ignore/skip或放宽旧科学预期。新source独审/完整门禁/wheels/CI待做，自动GraphSession与真实当前准入/完整故障矩阵未实现，详worker-slice.md。

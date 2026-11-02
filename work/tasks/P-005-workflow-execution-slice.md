@@ -73,4 +73,6 @@ work/evidence/P-005/execution-test-design.json冻结单图真实三节点、身�
 
 ## 真实节点与请求确认切片
 
+2026-11-02用户追加优先要求：入口只校验一次、内部信任不变量；拒绝重复判空/滥用try-catch、一次性抽象及低概率防御，缩短流程优先交付可运行MVP。已审阅社区multica-ai/andrej-karpathy-skills并安装项目技能karpathy-guidelines，固定2c606141936f1eeef17fa3043a72095b4765b9c2及本地tree摘要。AGENTS/coding-standards落实，普通已授权操作不再逐步确认，独审集中最终可运行候选；必要PR/CI与真实科学/事务边界保留。技能配置独立提交，不混入当前未提交自动调度代码。
+
 89ba603之后新增RunSession请求确认及原始事件保留、固定WB verify/analyze/publish三节点、实际宿主源码/依赖指纹函数。五组15次真实worker/正式提交/重开保留40/4000/真实0/无效复核null；等待确认取消与外来报告策略拒绝反例均过，精确命令/114次中间关联检查与最终定向成绩见worker-slice.md。尚由测试父进程串接，生产GraphSession/当前环境准入/完整暂停取消恢复缓存及故障矩阵未接线，准确独审/全门禁/PR仍待完成，不改整卡in_progress。
