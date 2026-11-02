@@ -1,6 +1,6 @@
 # P-002 V0成熟WB方法独立调用与真实成果对照
 
-<!-- PROGRAM_TASK_META {"id":"P-002","status":"in_review","work_package":"W02","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"29930f62a0b158189b76e0fad7d090d632f149d6","head_commit":"2591309eecffeb07558d3492bc3f69425dc6d24a"} -->
+<!-- PROGRAM_TASK_META {"id":"P-002","status":"done","work_package":"W02","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"29930f62a0b158189b76e0fad7d090d632f149d6","head_commit":"a69b38e810b4fefe1d38fae845c582d17ff56aae"} -->
 
 ## 执行状态
 
@@ -95,3 +95,7 @@ Win11/Python3.12.14，当前未提交增量：`uv run --locked --no-sync python 
 ## 2026-11-02 PR48首次CI失败及修复
 
 最终6a4020d的rules-context和desktop-environment通过；Windows/Linux foundation在Ruff文档代码块格式阶段失败（run41372121935），未进入测试。修复仅在4.0主方案与3.0规划归档的Python示例各加一个空行，再重建HTML；未修改产品/门禁/阈值。全仓format检查1097文件通过，HTML build exit0；前后摘要及B010原始同步清单的历史边界见ci-format-fix.json。继续等待新HEAD独审及必需CI，不把初次失败隐去。
+
+## 2026-11-02正常集成完成
+
+非作者增量复审确认Accepted延伸至准确29930f62..a69b38e810b4fefe1d38fae845c582d17ff56aae，产品字节保持78403be。PR48四个必需GitHub Actions均SUCCESS，Windows1537 passed/924.48秒、Linux1533 passed/4既有skip/602.27秒，双平台隔离wheel真实V0运行/正式提交/重开通过。正常merge于2026-11-02T01:42:02Z，main为f2dc5ad44fba2e4f951b8987f0babb6b41c1d1a2，已用Git tree摘要确认与准确候选完全一致。详细收据integration.json。P002原有工程验收及约定集成完成，状态done；原科学/目标环境/用户体验未验边界不变，未发布安装器。按已授权4.0接续M1/M2，不沿用历史V0终点为停止指令。

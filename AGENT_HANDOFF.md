@@ -46,7 +46,7 @@
 
 ## Current Pointer
 
-- 当前任务：[P002 成熟WB方法独立调用与真实成果对照](work/tasks/P-002-wb-headless-module.md)。P001已通过PR47合入main 29930f62；先读任务、研发总方案与阶段V0，再核对分支/HEAD。
+- 当前接续：[B011 M1/M2拆分收尾](work/tasks/B-011-m1-m2-task-decomposition.md)后从[P003 方法/数据评估基础](work/tasks/P-003-method-validation-foundation.md)进入。P002已通过PR48四必需CI正常合入main f2dc5ad4，工程收据work/evidence/P-002/integration.json；P001不重做。按4.0及phase-2-workflow-authoring.md、snapshot和实际分支/HEAD恢复。
 - T082历史工程证据及科学/目标环境待办完整保留于其[任务](work/tasks/T-082-reliability-remediation.md)，不由V0自动关闭。
 - 本轮本地工程交接：[T082 final-handoff](work/evidence/T-082/final-handoff.md)，区分冻结源码、隔离验收工件与后续交接HEAD；科学待办不由工程通过代替。
 - 最近交付：[T081 R2](work/evidence/T-081/final-delivery.md)。当前源码/构建源码/主线集成/安装包区分见 [T082 baseline](work/evidence/T-082/baseline.md)。
