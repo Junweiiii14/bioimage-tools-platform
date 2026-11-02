@@ -6,13 +6,20 @@ from typing import TYPE_CHECKING, Literal, cast
 if TYPE_CHECKING:
     from PySide6.QtWidgets import QMainWindow
 
-DesktopMode = Literal["workbench", "legacy-platform", "legacy-figure", "legacy-manual"]
+DesktopMode = Literal["workbench", "workflow", "legacy-platform", "legacy-figure", "legacy-manual"]
 
 
 def desktop_mode(arguments: list[str]) -> DesktopMode:
     parser = argparse.ArgumentParser(description="BioImage · WB 工作台")
     parser.set_defaults(mode="workbench")
     modes = parser.add_mutually_exclusive_group()
+    modes.add_argument(
+        "--workflow-ui",
+        dest="mode",
+        action="store_const",
+        const="workflow",
+        help="打开工作流执行与恢复窗口",
+    )
     modes.add_argument(
         "--web-workbench",
         "--figure-project",
@@ -41,6 +48,10 @@ def desktop_mode(arguments: list[str]) -> DesktopMode:
 
 
 def create_desktop_window(mode: DesktopMode) -> "QMainWindow":
+    if mode == "workflow":
+        from bioimage_app.workflow_window import WorkflowWindow
+
+        return WorkflowWindow()
     if mode == "workbench":
         from bioimage_app.web_window import WebWorkbenchWindow
 

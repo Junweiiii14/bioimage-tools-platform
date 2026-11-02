@@ -5,14 +5,12 @@ import json
 import sys
 from dataclasses import asdict
 from pathlib import Path
-from tempfile import TemporaryDirectory
 
-from platform_runtime.api import Workspace, WorkspaceError
+from platform_runtime.api import WorkspaceError
 from PySide6.QtCore import QCoreApplication
-from tool_contracts.api import CoordinateFrame, ImageMetadata, ScientificAsset, ScientificType
-from wb_tool.api import load_tiff, read_wb_module_input, wb_validation_input
 
-from bioimage_app.wb_workflow_host import build_wb_workflow, wb_workflow_registry
+from bioimage_app.wb_workflow_host import wb_workflow_registry
+from bioimage_app.workflow_input import prepare_wb_workspace
 from bioimage_app.workflow_session import WorkflowSession, WorkflowStatus
 
 
@@ -26,54 +24,28 @@ def run_workflow_cli(arguments: list[str]) -> int:
         choices=("triangle_u8", "triangle_u16", "flat_zero", "invalid_roi", "dtype_limits"),
     )
     group.add_argument("--resume", metavar="EXECUTION_ID")
+    group.add_argument("--rerun", metavar="EXECUTION_ID")
     parser.add_argument("--parameters")
+    parser.add_argument("--layout", choices=("compact", "comfortable"))
     args = parser.parse_args(arguments)
-    if bool(args.source) != bool(args.parameters):
-        parser.error("--source and --parameters must be supplied together")
+    if args.source and not args.parameters:
+        parser.error("--source requires --parameters")
+    if args.parameters and not (args.source or args.rerun):
+        parser.error("--parameters requires --source or --rerun")
+    if args.resume and args.layout:
+        parser.error("Use --rerun to change a frozen workflow")
     plan = None
     workspace = Path(args.workspace).resolve()
     try:
         if not args.resume:
-            supplied = (
-                read_wb_module_input(args.source, args.parameters)
-                if args.source
-                else wb_validation_input(args.validation)
+            plan = prepare_wb_workspace(
+                workspace,
+                source_path=args.source or "",
+                parameters=args.parameters or "",
+                validation=args.validation or "",
+                rerun=args.rerun or "",
+                layout=args.layout or "",
             )
-            with (
-                Workspace.create(workspace) as store,
-                TemporaryDirectory(prefix="bioimage-workflow-input-") as temporary,
-            ):
-                if supplied.source_bytes:
-                    input_path = Path(temporary) / "original.tif"
-                    input_path.write_bytes(supplied.source_bytes)
-                else:
-                    input_path = Path(supplied.source_path)
-                ref = store.import_asset(input_path, supplied.request.source_sha256)
-                image = load_tiff(store.asset_path(ref))
-                metadata = ImageMetadata(
-                    dtype="uint16" if image.pixels.dtype.itemsize == 2 else "uint8",
-                    axes=("y", "x"),
-                    shape=image.pixels.shape,
-                    acquisition_bit_depth=None,
-                    acquisition_range=None,
-                    acquisition_range_source=None,
-                    frame=CoordinateFrame(
-                        frame_id="original_pixels",
-                        origin_asset_sha256=ref.sha256,
-                        physical_pixel_size_yx=None,
-                        physical_unit=None,
-                    ),
-                )
-                source = ScientificAsset(
-                    payload=ref,
-                    sample_id="sample",
-                    producing_method=None,
-                    parameters_sha256=None,
-                    description=ScientificType(
-                        kind="raw_image", unit="pixel_intensity", image=metadata
-                    ),
-                )
-                _, plan = build_wb_workflow(source, supplied.request)
     except (ValueError, OSError, WorkspaceError) as error:
         print(
             json.dumps({"state": "input_failed", "error": str(error)}, ensure_ascii=False),
@@ -145,6 +117,6 @@ def run_workflow_cli(arguments: list[str]) -> int:
         session.reopen(str(workspace), args.resume)
     else:
         assert plan is not None
-        session.start(str(workspace), plan)
+        session.start(str(workspace), plan, cache_execution_id=args.rerun or "")
     app.exec()
     return exit_code

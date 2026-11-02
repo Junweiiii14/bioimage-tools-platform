@@ -6,7 +6,7 @@ WorkflowLedger组合P007冻结ExecutionPlan与旧RunRecord/AssetRef，不改变�
 
 running只派发下一个冻结拓扑节点；pause有活动attempt时进入pausing，当前节点真实退出并提交后才paused。resume只在无活动attempt时接受。candidate manifest不能形成成功；普通完成同时要求实际存储终态和对应worker result。恢复可缺最后worker事件，但必须从宿主存储读真实终态及已提交manifest；不得补造worker帧或PID。底层提交先完成时保留已完成物理节点；最后节点已成功则取消返回已完成。
 
-纯转移函数不观察OS、不访问文件，不证明调用者传入模型就是真实事实。宿主必须在持有Workspace的存储线程执行转移、读取真实记录、验证当前环境和全部输入/输出字节并CAS保存，再派发或通知。现组件测试有实际子进程退出/Workspace提交及重开，但尚未连接生产图执行器；P005状态仍in_progress。
+纯转移函数不观察OS、不访问文件，不证明调用者传入模型就是真实事实。宿主在持有Workspace的存储线程执行转移、读取真实记录及输入/输出字节并CAS保存，再派发或通知；当前环境准入在后台准备线程的入口及显式resume核验一次，内部信任已建立的注册与类型。WorkflowSession现已连接真实worker、存储与CLI/桌面入口；其完整集成验收状态仍只看P005任务卡。
 
 新v1预算：256 attempts、128次接受的控制、4096关键事件、16MiB账本文档。非取消控制最多占127个名额，最后一个留给取消；新attempt/控制在事件达到4080时拒绝，给活动attempt终态保留容量。重复命令ID同动作返回原账本，不同动作拒绝；关键终态不按预览消息丢弃。预算并非性能或OS硬限制。
 

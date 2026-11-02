@@ -1,6 +1,7 @@
 """One finite workflow, one real RunSession at a time, and storage-confirmed notifications."""
 
 from collections import deque
+from collections.abc import Callable
 from dataclasses import dataclass, replace
 from typing import Literal
 from uuid import uuid4
@@ -21,6 +22,7 @@ from bioimage_app.storage import AsyncStorage, StorageCommand, StorageReply
 from bioimage_app.workflow_preparation import (
     HostInputFile,
     HostRegistryFactory,
+    WorkflowInitializationCommand,
     WorkflowLaunch,
     WorkflowPreparation,
     WorkflowPreparationCommand,
@@ -40,6 +42,7 @@ class WorkflowStatus:
     run_id: str
     pid: int | None
     message: str
+    reused_nodes: int = 0
 
 
 @dataclass(frozen=True)
@@ -85,6 +88,9 @@ class WorkflowSession(QObject):
         self._message = ""
         self._fatal = False
         self._notified_revision: int | None = None
+        self._cache_execution_id = ""
+        self._cache: WorkflowLedger | None = None
+        self._initial_workspace = ""
 
     @property
     def ledger(self) -> WorkflowLedger | None:
@@ -98,23 +104,45 @@ class WorkflowSession(QObject):
             ledger.revision if ledger else None,
             len(ledger.results) if ledger else 0,
             len(self._plan.nodes) if self._plan else 0,
-            self._request.node_id if self._request else "",
+            self._request.node_id
+            if self._request
+            else (ledger.results[-1].node_id if ledger and ledger.results else ""),
             run.run_id if run else "",
             run.pid if run else None,
             self._message,
+            sum(item.reused for item in ledger.results) if ledger else 0,
         )
 
     def start(
-        self, workspace: str, plan: ExecutionPlan, *, execution_id: str | None = None
+        self,
+        workspace: str,
+        plan: ExecutionPlan,
+        *,
+        execution_id: str | None = None,
+        cache_execution_id: str = "",
     ) -> None:
         self._claim()
         self._plan, self._execution_id, self._auto = plan, execution_id or uuid4().hex, True
+        self._cache_execution_id = cache_execution_id
         self._enqueue("open", StorageCommand("open", path=workspace))
 
     def reopen(self, workspace: str, execution_id: str) -> None:
         self._claim()
         self._execution_id, self._reopening = execution_id, True
         self._enqueue("open", StorageCommand("open", path=workspace))
+
+    def initialize(
+        self,
+        workspace: str,
+        initialize: Callable[[], ExecutionPlan],
+        *,
+        cache_execution_id: str = "",
+    ) -> None:
+        """Trusted application setup owns and closes its workspace on the preparation thread."""
+        self._claim()
+        self._initial_workspace, self._execution_id, self._auto = workspace, uuid4().hex, True
+        self._cache_execution_id = cache_execution_id
+        self._prepare_job("initialize", WorkflowInitializationCommand(initialize))
 
     def _claim(self) -> None:
         if self._used or self._closing:
@@ -243,7 +271,9 @@ class WorkflowSession(QObject):
         except (ValueError, RuntimeError) as error:
             self._fail(str(error))
 
-    def _prepare_job(self, purpose: str, command: WorkflowPreparationCommand) -> None:
+    def _prepare_job(
+        self, purpose: str, command: WorkflowPreparationCommand | WorkflowInitializationCommand
+    ) -> None:
         if self._preparing is not None:
             raise RuntimeError("Overlapping workflow preparation")
         self._preparing = (self._prepare.submit(command), purpose)
@@ -258,7 +288,10 @@ class WorkflowSession(QObject):
             self._fail(reply.error_code + ": " + reply.message)
             return
         purpose = waiting[1].purpose
-        if isinstance(reply.value, WorkflowLedger):
+        if purpose == "cache_source":
+            assert isinstance(reply.value, WorkflowLedger)
+            self._cache = reply.value
+        elif isinstance(reply.value, WorkflowLedger):
             self._ledger = reply.value
             self._plan = reply.value.plan
         self._handle_storage(purpose, reply)
@@ -282,6 +315,8 @@ class WorkflowSession(QObject):
                 self._workflow("control", action="cancel", command_id=uuid4().hex)
             elif self._hold:
                 self._workflow("control", action="pause", command_id=uuid4().hex)
+        elif purpose == "cache_source":
+            self._workflow("create", plan=self._plan)
         elif purpose == "begin":
             if self._cancel_requested:
                 self._workflow(
@@ -333,7 +368,7 @@ class WorkflowSession(QObject):
             )
         elif purpose in ("retire_prepared", "fail_prepared"):
             self._finish_node()
-        elif purpose in ("finish", "abandon"):
+        elif purpose in ("finish", "abandon", "reuse"):
             self._phase = "idle"
         elif purpose == "control" and ledger is not None and ledger.state == "running":
             self._auto, self._hold = True, False
@@ -384,14 +419,32 @@ class WorkflowSession(QObject):
                 )
             else:
                 self.completed.emit(self.status())
+        elif purpose == "initialize":
+            assert isinstance(reply.value, ExecutionPlan)
+            self._plan = reply.value
+            self._enqueue("open", StorageCommand("open", path=self._initial_workspace))
         elif purpose == "initial" and self._plan is not None:
-            self._workflow("create", plan=self._plan)
+            if self._cache_execution_id:
+                self._enqueue(
+                    "cache_source",
+                    StorageCommand(
+                        "workflow", workflow=WorkflowStoreCommand("load", self._cache_execution_id)
+                    ),
+                )
+            else:
+                self._workflow("create", plan=self._plan)
         elif purpose == "resume" and self._ledger is not None:
             if self._ledger.state == "running":
                 self._auto, self._hold = True, False
             else:
                 self._workflow("control", action="resume", command_id=self._message)
             self._message = ""
+        elif purpose == "request" and isinstance(reply.value, str):
+            if not self._hold and not self._closing:
+                self._request, self._run, self._phase = None, None, "cache"
+                self._workflow(
+                    "reuse", source_document_id=self._cache_execution_id, source_node_id=reply.value
+                )
         elif purpose == "request" and isinstance(reply.value, ExecutionRequest):
             if not self._hold and not self._closing:
                 self._request = reply.value
@@ -502,7 +555,10 @@ class WorkflowSession(QObject):
             and not self._fatal
         ):
             self._prepare_job(
-                "request", WorkflowPreparationCommand("request", ledger.plan, ledger=ledger)
+                "request",
+                WorkflowPreparationCommand(
+                    "request", ledger.plan, ledger=ledger, cache=self._cache
+                ),
             )
 
     def _fail(self, message: str) -> None:

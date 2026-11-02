@@ -585,6 +585,40 @@ assert reopened['files'] == comparison['files']
 assert all(Path(path).is_file() and Path(path).is_relative_to(comparison_root)
            for path in reopened['files'].values())
 print('Installed V0: real worker, 4000 exact comparison, committed assets and reopen passed')
+from bioimage_app.desktop_entry import create_desktop_window, desktop_mode
+from bioimage_app.workflow_window import WorkflowWindow
+workflow_window = create_desktop_window(desktop_mode(['--workflow-ui']))
+assert isinstance(workflow_window, WorkflowWindow)
+workflow_window.show()
+workflow_window.close()
+app.processEvents()
+assert not workflow_window.isVisible()
+workflow_root = Path('installed-three-node-workflow').resolve()
+def workflow_command(*arguments):
+    process = subprocess.run(
+        [sys.executable, '-I', '-m', 'bioimage_app', '--workflow',
+         '--workspace', str(workflow_root), *arguments],
+        capture_output=True, timeout=60)
+    assert process.returncode == 0, (process.stdout, process.stderr)
+    return json.loads(process.stdout.splitlines()[-1])
+initial = workflow_command('--validation', 'triangle_u16')
+assert initial['state'] == 'succeeded' and initial['completed_nodes'] == 3
+assert initial['reused_nodes'] == 0 and initial['quality'] == 'complete'
+original_table = Path(initial['outputs']['measurements']).read_bytes()
+import csv, io
+records = list(csv.DictReader(io.StringIO(original_table.decode('utf-8-sig'))))
+assert records[0]['value'] == '4000.0' and records[0]['status'] == 'text:valid'
+reopened_workflow = workflow_command('--resume', initial['execution_id'])
+assert reopened_workflow['outputs'] == initial['outputs']
+adjusted = workflow_command('--rerun', initial['execution_id'], '--layout', 'compact')
+assert adjusted['state'] == 'succeeded' and adjusted['reused_nodes'] == 2
+assert adjusted['execution_id'] != initial['execution_id']
+assert Path(initial['outputs']['measurements']).read_bytes() == original_table
+with Workspace.open(workflow_root) as store:
+    assert len(store.list_runs()) == 4
+    assert all(run.pid is not None and run.pid > 0 and run.state == 'succeeded'
+               for run in store.list_runs())
+print('Installed workflow: visible entry, three workers, 4000, reopen, style reuse, four real runs')
 """
 
 

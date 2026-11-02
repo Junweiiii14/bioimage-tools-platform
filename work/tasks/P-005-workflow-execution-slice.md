@@ -1,6 +1,6 @@
 # P-005 工作流与事件协议的最小可靠执行切片
 
-当前进展（2026-11-02）：生产WorkflowSession和--workflow CLI已实际自动完成三节点/正式提交/账本落盘/重开4000数值；节点边界暂停继续通过。入口核验一次、显式resume一次且均后台执行，有实际次数/线程断言。相关23pass36.34s及最终控制器2pass10.86s；auto-session.json保存精确源码指纹与真实run记录。缓存/取消恢复完整矩阵、可见UI、最终独审/完整CI仍待完成，整卡仍in_progress，不是M1/M2交付完成。优先遵守用户简洁MVP要求，独审集中最终可运行候选，不再逐小提交审批。
+当前进展（2026-11-02）：真实三节点控制器、CLI及--workflow-ui桌面入口已贯通。19项控制器成功/暂停/取消/故障恢复/缓存试验通过；23项联合检查101.88秒，新增暂停调整与5项界面检查通过。输入准备后台执行、同一执行器；修改排版复用前两步，旧成果不覆盖。四wheel隔离运行验证三节点/4000/重开/样式复用通过，原生Windows截图已复查，精确源码/边界见runtime-gui-recovery.json。最后样式修复后的完整检查、准确独审、PR/CI尚待完成，整卡仍in_progress；不是完整M1/M2交付。
 
 <!-- PROGRAM_TASK_META {"id":"P-005","status":"in_progress","work_package":"W04","depends_on":["P-002","P-007"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"006e9f143c830f5e13be2932e8ac37a9f3a05ed1","head_commit":null} -->
 

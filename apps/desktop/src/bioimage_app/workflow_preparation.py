@@ -51,6 +51,11 @@ HostRegistryFactory = Callable[[ExecutionPlan], tuple[WorkflowHostModule, ...]]
 
 
 @dataclass(frozen=True)
+class WorkflowInitializationCommand:
+    initialize: Callable[[], ExecutionPlan]
+
+
+@dataclass(frozen=True)
 class WorkflowPreparationCommand:
     operation: Literal["verify", "request", "launch"]
     plan: ExecutionPlan
@@ -58,12 +63,13 @@ class WorkflowPreparationCommand:
     request: ExecutionRequest | None = None
     run: RunRecord | None = None
     files: tuple[HostInputFile, ...] = ()
+    cache: WorkflowLedger | None = None
 
 
 @dataclass(frozen=True)
 class WorkflowPreparationReply:
     request_id: str
-    value: ExecutionPlan | ExecutionRequest | WorkflowLaunch | None = None
+    value: ExecutionPlan | ExecutionRequest | WorkflowLaunch | str | None = None
     error: str = ""
 
 
@@ -78,7 +84,9 @@ class _PrepareWorker(QObject):
         self._modules: dict[str, WorkflowHostModule] = {}
 
     @Slot(str, object)
-    def execute(self, request_id: str, command: WorkflowPreparationCommand) -> None:
+    def execute(
+        self, request_id: str, command: WorkflowPreparationCommand | WorkflowInitializationCommand
+    ) -> None:
         try:
             value = self._execute(command)
             reply = WorkflowPreparationReply(request_id, value)
@@ -89,8 +97,10 @@ class _PrepareWorker(QObject):
         self.replied.emit(reply)
 
     def _execute(
-        self, command: WorkflowPreparationCommand
-    ) -> ExecutionPlan | ExecutionRequest | WorkflowLaunch:
+        self, command: WorkflowPreparationCommand | WorkflowInitializationCommand
+    ) -> ExecutionPlan | ExecutionRequest | WorkflowLaunch | str:
+        if isinstance(command, WorkflowInitializationCommand):
+            return command.initialize()
         if command.operation == "verify":
             modules = self._factory(command.plan)
             self._modules = {item.registration.interface.module.module_id: item for item in modules}
@@ -103,6 +113,13 @@ class _PrepareWorker(QObject):
             ledger = command.ledger
             assert ledger is not None  # Internal command shape established by WorkflowSession.
             node = command.plan.nodes[len(ledger.results)]
+            if command.cache is not None:
+                key = node.computation_key
+                cached = next(
+                    (item for item in command.cache.results if item.computation_key == key), None
+                )
+                if cached is not None:
+                    return cached.node_id
             previous = {item.node_id: item for item in ledger.results}
             bindings: list[BoundAsset] = []
             for item in node.inputs:
@@ -160,6 +177,7 @@ class WorkflowPreparation(QObject):
         super().__init__(parent)
         self._pending: set[str] = set()
         self._closing = False
+        self._retiring = False
         self._thread = QThread(self)
         self._worker = _PrepareWorker(factory)
         self._worker.moveToThread(self._thread)
@@ -170,12 +188,12 @@ class WorkflowPreparation(QObject):
         self._worker.destroyed.connect(self._destroyed, Qt.ConnectionType.QueuedConnection)
         self._thread.start()
 
-    def submit(self, command: WorkflowPreparationCommand) -> str:
+    def submit(self, command: WorkflowPreparationCommand | WorkflowInitializationCommand) -> str:
         if QThread.currentThread() != self.thread():
             raise RuntimeError("Preparation must be used from its owning thread")
         if self._closing or len(self._pending) >= 64:
             raise RuntimeError("Preparation is closing or full")
-        if type(command) is not WorkflowPreparationCommand:
+        if type(command) not in (WorkflowPreparationCommand, WorkflowInitializationCommand):
             raise TypeError("Expected an immutable preparation command")
         request_id = uuid4().hex
         self._pending.add(request_id)
@@ -188,16 +206,19 @@ class WorkflowPreparation(QObject):
             return
         self._pending.remove(reply.request_id)
         self.replied.emit(reply)
-        if self._closing and not self._pending:
-            self._retire.emit()
+        self._retire_if_ready()
 
     def shutdown(self) -> None:
         if QThread.currentThread() != self.thread():
             raise RuntimeError("Preparation must close from its owning thread")
         if not self._closing:
             self._closing = True
-            if not self._pending:
-                self._retire.emit()
+            self._retire_if_ready()
+
+    def _retire_if_ready(self) -> None:
+        if self._closing and not self._pending and not self._retiring:
+            self._retiring = True
+            self._retire.emit()
 
     @Slot()
     def _stopped(self) -> None:

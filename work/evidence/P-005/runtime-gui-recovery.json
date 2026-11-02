@@ -1,0 +1,87 @@
+{
+  "tested_base": "3d6654cc02ca9037596cce2c269be8b91769682f",
+  "tested_worktree": "exact normalized source hashes below; final CI and independent review still pending",
+  "environment": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "native_gui": {
+    "workspace": ".local\\p005-visible-mvp-20261102-r3",
+    "execution_id": "79642e988ed046e2beebc1ab633c5bd3",
+    "runs": [
+      {
+        "run_id": "bfb5f0b611d443df9d0d1cc8da69fe19",
+        "pid": 32300,
+        "state": "succeeded"
+      },
+      {
+        "run_id": "52342f4fc8984926a4b01932fb87947d",
+        "pid": 45640,
+        "state": "succeeded"
+      },
+      {
+        "run_id": "6f77fb9c055146839fa3ee21f5059737",
+        "pid": 50476,
+        "state": "succeeded"
+      }
+    ],
+    "value": "4000.0",
+    "status": "text:valid",
+    "host_runtime_source": "217831d26b539ad9b79f0b9bb532af74b0264f11d3e9d3a39a9b08da18ea39bc",
+    "current_source_matches": true,
+    "screenshot": ".local/p005-workflow-window-native-r2.png",
+    "screenshot_sha256": "123b49938adc98679ae58ff2b0e1db324b2af6f0936e1fbca40414269738a0e6"
+  },
+  "checks": [
+    {
+      "command": "uv run --locked --no-sync pytest tests/test_workflow_window.py tests/test_workflow_session.py -q",
+      "exit_code": 0,
+      "result": "23 passed in 101.88s; before extra paused-adjust case"
+    },
+    {
+      "command": "uv run --locked --no-sync pytest tests/test_workflow_window.py -k pause_adjust -q",
+      "exit_code": 0,
+      "result": "1 passed, 4 deselected in 8.59s"
+    },
+    {
+      "command": "uv run --locked --no-sync pytest tests/test_workflow_window.py -q",
+      "exit_code": 0,
+      "result": "5 passed in 18.38s; final palette fix afterward, full checks pending"
+    },
+    {
+      "command": "uv run --locked --no-sync python -m tooling.installed_wheels > .local/p005-runtime-wheels.log 2>&1",
+      "exit_code": 0,
+      "result": "all four wheels; isolated original V0/OCR plus three real nodes, 4000, reopen, style reuse/four real runs; final palette/print changes afterward"
+    },
+    {
+      "command": "uv run --locked --no-sync python dev.py policy",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --locked --no-sync lint-imports",
+      "exit_code": 0,
+      "result": "9 kept/0 broken"
+    },
+    {
+      "command": "uv run --locked --no-sync pyright",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --locked --no-sync python work/programs/scientific-agent-platform/check_plan.py",
+      "exit_code": 0
+    }
+  ],
+  "wheel_log_sha256": "58680e774b2c003b2f3be34ba1d0bc7ca43f2f4a62863378112cc10c0beae87a",
+  "source_sha256_lf": {
+    "apps/desktop/src/bioimage_app/workflow_cli.py": "3818af57a1533e303235a2c942dd91854afb3fdd9409ce6c71a1ae210865e2d3",
+    "apps/desktop/src/bioimage_app/workflow_environment.py": "9b4834b3de3fbd18edc4d213500de584a2634c25babd7914c67d2204ffccf397",
+    "apps/desktop/src/bioimage_app/workflow_input.py": "663b94bf674811d83093103ed31557ef8476133a1ea2d4f6cf790ed1b6a60a37",
+    "apps/desktop/src/bioimage_app/workflow_preparation.py": "26f681b2e7ee8f162ce42d5d77c89a83b49f42945710662306fd3dc2062fd997",
+    "apps/desktop/src/bioimage_app/workflow_session.py": "4ae24bd1bbccfda8db042ef2b0050f213d5080596dcc74628e91c7d6d281cde9",
+    "apps/desktop/src/bioimage_app/workflow_storage.py": "b6d63b96707c2e8aaf4a62240815ed3796556dbc1a75534217e599fce8877d09",
+    "apps/desktop/src/bioimage_app/workflow_window.py": "b6b01d36c1be71c0581210f49663eb0fc369dff1fd92b365961806ee9709f11e",
+    "apps/desktop/src/bioimage_app/desktop_entry.py": "6c0751d732b4dd5f1d06d40e5c4fe6f5678550ba4850a8c38b347786bf5e2509",
+    "tests/test_workflow_window.py": "3b94f4d34f0766b71eb35392add86eab73a92abeca02d5f95415835b7d569383",
+    "tests/test_workflow_session.py": "251911f32c157f18296dcb19b443e63156f5c334d99b81bf865b607c3e01fd5a",
+    "tooling/installed_wheels.py": "7622d7eb32001ad67563f367ff211fa93068c5a9a09585b63bd1df86f150a1f0"
+  },
+  "limits": "synthetic engineering evidence; no S1, clean-target or physical DPI claim; P005 not yet reviewed/integrated, P008/P009 unfinished"
+}
