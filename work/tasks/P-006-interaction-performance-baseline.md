@@ -56,3 +56,9 @@ PR49已正常集成main839fa52，本地保留未提交P006工具改动快进到�
 保留原R09四个负载/seed/预算/5+30默认采样，追加两类normal负载（32行/8Fig/12泳道）及显式schema2的--interaction-baseline。真实原生settings/theme/close/cancel控制，四主题各5+30，区分DOM+绘制机会反馈、动画settled、真实host取消确认和idle服务关闭；未对齐的preview/node/pause明确未测/待实现，不把它们写成预算通过。测量设计measurement-design.json及contracts/workbench-performance-baseline-v1.md已冻结定义，当前还没有性能成绩。
 
 工具局部23项观察器测试exit0/2.53秒，包含生产render回执与新观察器非可信/旧/缺动作/异常/未settled拒绝；六类fixture严格校验均通过，局部Pyright0。原预算/上界/断言未降低。纯Node测试不是实际性能证据；下一步准确提交预审、干净冻结后运行真实原生测量并保留失败/超线。
+
+## 首轮真实原生采样失败及可见性修复
+
+源f3e50fef的rows-normal --interaction-baseline实际exit1，无完整性能报告，不能写预算通过。确切观测为原生目标几何JS未返回坐标，主题设置click中JSONDecodeError；源代码只等DOM存在后立即要求控件完全在viewport，缺少动画/可命中等待，故采用可见性/稳定性修复假设，不将既有GLES日志统一定因。原log/exit/environment完整保留在原.local及frozen-runs/native-f3e50fe-failed，摘要和原host/wrapper PID实际已退出的核实见native-failure-r1.json。
+
+新工具定位会等可见、静止、可命中目标，再在紧邻QTest派发前计时；未改变5+30、负载/预算/反馈终点。增加moving/offscreen/disabled/hidden/occluded等守卫，30 tests exit0/3.00秒、类型0；主题原始值分阶段写log，避免后继失败丢失诊断。取消的neutral主题范围明确。只扩展P006冻结raw目录的字节保留属性，与P003同策略，不隐藏真正尾空格等错误。待新准确提交复审，在新目录重新采样，旧失败不覆盖。

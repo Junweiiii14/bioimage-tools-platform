@@ -9,6 +9,7 @@ from tooling.benchmark_workbench_snapshot import (
     CLICK_DRIVER,
     INTERACTION_DRIVER,
     forward_benchmark_request,
+    native_target_expression,
 )
 
 HARNESS = r"""
@@ -181,7 +182,7 @@ drawer.hidden=!drawer.hidden;
 const status={textContent:'正在执行'};
 const context={state:{projectId:'real-observer-fixture',revision:1,selectedId:'row-1'},
   performance:{now:()=>clock+=16},requestAnimationFrame:callback=>frames.push(callback),
-  boundaryDiagnostics:{report(){}},document:{
+  boundaryDiagnostics:{report(){}},document:{documentElement:{dataset:{theme:'forest'}},
     addEventListener:(_,callback)=>capture=callback,
     activeElement:{closest:()=>drawer.hidden ? null : drawer},
     querySelector:selector=>selector==='#drawer' ? drawer :
@@ -230,3 +231,35 @@ def test_native_interaction_observer_cannot_accept_stale_or_unrendered_receipts(
         assert observed["samples"][0]["trusted"] is True and observed["errors"] == []
     else:
         assert observed["errors"]
+
+
+@pytest.mark.parametrize(
+    "condition", ["visible", "missing", "offscreen", "moving", "disabled", "hidden", "occluded"]
+)
+def test_native_target_waits_for_real_stationary_visible_geometry(condition: str) -> None:
+    script = r"""
+const vm=require('node:vm');
+const input=JSON.parse(require('node:fs').readFileSync(0,'utf8'));
+const rect={x:10,y:20,left:10,top:20,right:110,bottom:60,width:100,height:40};
+if(input.condition==='offscreen')rect.right=1100;
+const drawer={getAnimations:()=>input.condition==='moving' ? [{playState:'running'}] : []};
+const element={disabled:input.condition==='disabled', getBoundingClientRect:()=>rect,
+  closest:selector=>selector==='#drawer' ? drawer : null,contains:()=>false};
+const context={innerWidth:1000,innerHeight:800,
+  getComputedStyle:()=>({visibility:input.condition==='hidden' ? 'hidden' : 'visible'}),
+  document:{querySelectorAll:()=>input.condition==='missing' ? [] : [element],
+    elementFromPoint:()=>input.condition==='occluded' ? {} : element}};
+console.log(vm.runInNewContext(input.expression,context));
+"""
+    result = subprocess.run(
+        ["node", "-e", script],
+        input=json.dumps(
+            {"condition": condition, "expression": native_target_expression("button")}
+        ),
+        text=True,
+        capture_output=True,
+        check=False,
+        timeout=10,
+    )
+    assert result.returncode == 0, result.stderr
+    assert json.loads(result.stdout) == ([60, 40] if condition == "visible" else None)

@@ -112,5 +112,7 @@
     "sequential_native_processes": true,
     "local_full_tests_or_builds_during_measurement": false
   },
-  "scope": "Synthetic metadata/thumbnail/real production render plus current controls; no scientific/target-machine acceptance; node/pause/host-ready preview gaps explicit"
+  "scope": "Synthetic metadata/thumbnail/real production render plus current controls; no scientific/target-machine acceptance; node/pause/host-ready preview gaps explicit",
+  "cancel_theme": "neutral",
+  "native_target_guard": "Wait for stationary, in-viewport, enabled, non-inert, non-hidden, hit-testable target before dispatch; setup wait excluded from click clock"
 }

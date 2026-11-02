@@ -392,6 +392,7 @@ INTERACTION_DRIVER = r"""
             const elapsed=performance.now()-started;
             if(feedback<0 || elapsed<feedback) { fail('Invalid browser clock'); return; }
             p006.samples.push({kind, feedback_ms:feedback, settled_ms:elapsed, trusted:true,
+              theme:document.documentElement.dataset.theme,
               focus_inside_drawer:!!document.activeElement.closest('#drawer')});
             p006.pending=false;
           }));
@@ -404,6 +405,24 @@ INTERACTION_DRIVER = r"""
   return true;
 })()
 """
+
+
+def native_target_expression(selector: str) -> str:
+    """An absent, clipped, disabled or moving target is not a usable click coordinate."""
+    return (
+        "JSON.stringify((()=>{const items=[...document.querySelectorAll("
+        + json.dumps(selector)
+        + ")];const el=items.find(x=>{const r=x.getBoundingClientRect();"
+        "const drawer=x.closest('#drawer');"
+        "const top=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);"
+        "return !x.disabled && !x.closest('[inert]') && "
+        "getComputedStyle(x).visibility!=='hidden' && (top===x || x.contains(top)) && "
+        "(!drawer || !drawer.getAnimations().some(a=>a.playState==='running')) && "
+        "r.width>0 && r.height>0 && r.left>=0 && r.top>=0 && "
+        "r.right<=innerWidth && r.bottom<=innerHeight;});"
+        "if(!el)return null;const r=el.getBoundingClientRect();"
+        "return [r.x+r.width/2,r.y+r.height/2];})())"
+    )
 
 
 def production_interactions(
@@ -423,18 +442,32 @@ def production_interactions(
     window.session_timer.start()
 
     def click(selector: str) -> float:
-        position = javascript(
-            window,
-            pump,
-            "JSON.stringify((()=>{const items=[...document.querySelectorAll("
-            + json.dumps(selector)
-            + ")];const el=items.find(x=>{const r=x.getBoundingClientRect();"
-            "return r.width>0 && r.height>0 && r.left>=0 && r.top>=0 && "
-            "r.right<=innerWidth && r.bottom<=innerHeight;});"
-            "if(!el)throw new Error('No visible native target');"
-            "const r=el.getBoundingClientRect();return [r.x+r.width/2,r.y+r.height/2];})())",
-        )
-        x, y = cast(list[float], json.loads(str(position)))
+        coordinates: list[float] = []
+
+        def visible_target() -> bool:
+            raw = javascript(window, pump, native_target_expression(selector))
+            if not isinstance(raw, str):
+                raise RuntimeError(f"Native geometry query returned no JSON for {selector}")
+            point: object = json.loads(raw)
+            if point is None:
+                return False
+            if not isinstance(point, list):
+                raise RuntimeError("Native click coordinate must contain exactly two numbers")
+            values = cast(list[object], point)
+            if len(values) != 2:
+                raise RuntimeError("Native click coordinate must contain exactly two numbers")
+            if any(
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(value)
+                for value in values
+            ):
+                raise RuntimeError("Native click coordinate must be finite")
+            coordinates[:] = [float(value) for value in cast(list[int | float], values)]
+            return True
+
+        pump.waitUntil(visible_target)
+        x, y = coordinates
         started = time.perf_counter()
         QTest.mouseClick(
             target,
@@ -456,7 +489,8 @@ def production_interactions(
         pump.waitUntil(lambda: javascript(window, pump, "!p006.pending") is True)
         errors = javascript(window, pump, "JSON.stringify(p006.errors)")
         if errors != "[]":
-            raise RuntimeError(f"Production interaction probe failed: {errors}")
+            diagnostic = javascript(window, pump, "JSON.stringify(p006)")
+            raise RuntimeError(f"Production interaction probe failed: {diagnostic}")
         if javascript(window, pump, "p006.samples.length") != count + 1:
             raise RuntimeError("A native action did not produce exactly one observation")
         return (
@@ -475,6 +509,7 @@ def production_interactions(
 
     themes: dict[str, object] = {}
     for theme in ("forest", "ember", "iris", "neutral"):
+        print(f"P006 native theme {theme}: begin {warmup}+{samples}", file=sys.stderr, flush=True)
         click('[data-action="settings"]')
         pump.waitUntil(
             lambda: (
@@ -499,6 +534,8 @@ def production_interactions(
         restored: list[bool] = []
         for _ in range(samples + warmup):
             observed, _ = observe("settings", '[data-action="settings"]')
+            if observed["theme"] != theme:
+                raise RuntimeError("The sampled theme differs from the frozen scenario")
             values.append(observed)
             close_drawer()
             restored.append(
@@ -514,8 +551,12 @@ def production_interactions(
             "focus_restored_after_close": restored[warmup:],
             "native_trusted": all(x["trusted"] is True for x in values),
         }
+        print(
+            json.dumps({"p006_theme": theme, "metrics": themes[theme]}), file=sys.stderr, flush=True
+        )
 
     cancelled: list[dict[str, object]] = []
+    print(f"P006 native cancel: begin {warmup}+{samples}", file=sys.stderr, flush=True)
     javascript(window, pump, "document.querySelector('[data-module-open]').click();true")
     with tempfile.TemporaryDirectory(prefix="bioimage-p006-cancel-") as directory:
         latest: list[dict[str, Any]] = []
@@ -580,6 +621,7 @@ def production_interactions(
         "schema": 1,
         "themes": themes,
         "cancel": {
+            "theme": "neutral",
             "observations": cancelled[warmup:],
             "warmup_observations": cancelled[:warmup],
             "feedback_ms": distribution(
