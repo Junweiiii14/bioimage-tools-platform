@@ -1,19 +1,5 @@
 # Current Work Log
 
-## 2026-10-21 T073 固定网格与精简验证
-
-用户补充固定N、原像素槽宽和5N:4比例，已实现整排对齐，不再强求N个独立连通组件；手动确认范围完整保留。只读最终重放为1行保留人工、8行自动、1行首带与标记相连仍暂停；原图SHA不变。补安全采样Y边界阻止背景扩展重新读入排除结构，并把局部第二目标传至真实quality_review。UI预审问题关闭、最后3项定向0；新两个科学反例首轮37过1败为测试构造先触发原有扩展保护，改用合法25%范围内越限反例。首全门禁8项类型错，pytest尚未启动；修正类型，无ignore/放宽。按用户要求不反复冒烟，保留必需检查。新ReliableCropTest独立安装身份，随包仅相关自动流程自检。尚未提交独审/PR/构建。
-
-## 2026-10-21 T073 PR34与最终修复
-
-2026-10-21最终增量：首提交a0e8e77已推送草稿PR34。精确独审指出隐式配准范围外较窄第二排漏检、角度草稿冲突时按钮重启用，现已修复。全门禁第三轮本机1157过2败/562.98s，Linux1157过2败/411.84s，Windows1157过2败/658.70s，失败均为窄斜第三带误吸收和安装诊断仍检查旧geometry@1；原日志保留，未到wheel步骤。补原连通身份及初始网格单向冲突拒绝，诊断明确检查geometry@2，亮背景信号使用可验证同组白光轮廓。定向33项首轮31过2败/18.83s：窄屏GPU上下文丢失及诊断旧版本；仅重跑两项，用CI相同--disable-gpu环境后2过/11.55s。受影响6文件Ruff/format/pyright0；无断言放宽、无门禁/锁变更。最终只读10行仍1人工保持、8自动、1暂停，30资产SHA保持。按用户要求不再本地全量或冒烟，下一步绑定最终提交静态复核及PR必需检查。
-
-
-## 2026-10-21 T074 曲线与整版拼图
-
-批次封底复用独立曲线、CAS后重测；单Fig定位与裁剪分开；schema15网格持久化与同布局导出。独审修复来源草稿/分组顺序/后台有界预览；包态修复JSON数组边界及view字段保留。最终569674a新独立安装19checks通过。PR35待用户决定集成；旧目录/安装/数据保持。详见T074任务与delivery证据。
-
-
 ## T074 用户实测补齐
 
 用户确认全部泳道并排点选封底编辑，e47af46补固定高度卡片/编辑器、整卡点击、拖动反馈/过期保护及原图视口，独审Accepted后新安装19checks通过。另修已保存阶段即时发布防快compose漏页。最终服务器门禁以PR35当前HEAD为准；保留真实失败记录，不追加无关测试。
@@ -22,20 +8,6 @@
 ## T074 整个Fig矩阵交付
 
 用户明确整组Fig展示，现为蛋白行×泳道列，跨蛋白编辑等正确快照、缺项保留草稿入口。86c9产品及c90诊断独审Accepted；新包19checks/11.437秒通过，首重开超时真实保留。使用与交付入口已更新，最终服务器检查看PR35，合并另行确认。
-
-## 2026-10-22：T075 同源前端与真实高级工作流
-
-从最新 T074 0376f23 独立树实施，目标已设 ACTIVE。完成本地字体/四主题/可中断动效、appearance@1、模板/元信息/OCR/归一化网页适配及 Intake 版本语义保护。真实网页四工具保存、导出、重开以及冲突核对测试通过。首轮抓图机械滞后改CDP；UI仍需最终确认和安装对照。未最终独审、CI、构建安装，不宣称交付完成；原失败及遗留限制见T075任务。
-
-## 2026-10-22：T075 安装与 CI 闭环
-
-最终产品5c56f55：同源34前端文件、7780安装载荷、26图逐像素核对，真实安装高级四工具/跨窗口/输入保护及19项主链自检通过；独审与桌面完整交付目录齐备。GCC长路径、旧候选open revision/busy、原IME刷新去重等失败与修正链均保留，不替换科学语义。697c428诊断增量不改产品并获独审Accepted。CI180角度复合断言/关闭回收失败UNKNOWN，后继CI181双平台1192及全部wheel/四必需检查成功。最后仅证据提交须核对当前HEAD CI，成功后结束目标；不再重复视觉检查或本地全量，不合并或公开发布。
-
-## 2026-10-22 T076 用户批准的平台首页与整 Fig 滚动
-
-从最新T075 7fcb819建立codex/t076-platform-home-scroll，旧树/预览/安装保留。产品d3aff15完成平台/WB/项目分层、保持会话与草稿的浏览、矩阵双向滚动/固定身份/编辑返回。独审发现首页导入追加旧项目与快照丢失定位，修复后21项独立回归通过。作者56项通过，12张有限静态ship，36资源源/wheel/预览一致；桌面T076-d3aff15提供两HTML入口。最后证据提交四必要CI成功即完成当前任务，无新安装器/合并/发布。详见T076任务和validation；旧GPU/native/科学/目标机限制保留。
-
-T076用户验收首页后追加实际安装授权：971d860构建/显式新DIR安装0，私有runtime19项与主链19检查通过，7782载荷/36资源一致；更新当前UI测试通道入口和卸载注册，旧目录保留。用户可见新窗口已启动。安装交付独审971d860 Accepted。Linux首CI1201过1败，跨窗主题用例由等JS对象改等宿主首快照，断言/超时不变；Windows单项1过4.18s。最终等待测试/证据增量独审与HEAD CI另核，不改已批准UI。
 
 ## 2026-10-23 T077 两项整改
 
@@ -147,3 +119,27 @@ PR51准确c243四必需SUCCESS，正常merge006e9f1/tree与独审候选相同。
 ## 2026-11-02 P008 final candidate review/CI
 
 323d59f isolated wheels exit0 including batch/template; independent P2 pausing/resume stall genuinely reproduced then fixed53892fd. Author batch10passed68.35s; independent frozen correction3passed30.69s Accepted full4d6..53892fd. PR53 ready; finalquality41434643209 live, rulescontext success, nativecase expectedskip. Await actual requiredCI then normalmerge; P009 stillplanned. Rawfailed/contaminatedrun retained; no repeatedlocalfullsuite. Evidence/handoff edits await integration closeout, do not push sameproduct documentation merely to restartCI.
+
+## 2026-11-02 P008 merged / P009 actual activation
+
+PR53最终b4847a5 Accepted，四必需CI SUCCESS后正常merge2755604，候选/main tree同98754bdd。Windows1675pass1306.50s/Linux1671pass4旧skip930.49s，双侧全部新wheel过；旧超时及夹具失败保留。P008done。P009在codex/p009-visual-workflow真实激活，scope .707行完整读，已有impeccable context/具体surface/craft-floor实际读；原生DOM/SVG有限图交互探针+web静态检查过，无新依赖。仅图组件，不冒充M2；下一步宿主草稿/预检/表单/实际运行。独审集中完整可运行候选，不审每小提交。B012保留。
+
+## 2026-11-02 P009 connected editor checkpoint
+
+后台/桥/首版schema表单接同一真实批次执行；11项定向47.73秒过，两批4000.0→40.0/保存保焦点及模板版本布局证据见P009/connected-editor-progress。修复真实schema固定元组和bind图同步问题，测试固定成果数/40字符串误写分别记录，不增ignore不改科学结果。尚无最终UI视觉/性能/IME全矩阵、wheel/独审/PRCI，继续P009。保留B012他人untracked。
+
+## 2026-11-02 P009 full web flows and valid capture
+
+五流程通过39.93秒；布尔false/空数组添加/IME标记/窄窗步骤选择/模板初始化N及bridge-ready修正，完整GUI模板新TIFF与CLI、缓存/新草稿焦点验证。12图有效采集15.42秒，失败和颜色/RAF/readback范围完整保留ui-edit-validation。一次detect0主要+1advisory。原生性能、集中视觉/代码独审及wheel/PRCI待做；不重复本机全量。
+
+## 2026-11-02 P009 bounded visual finish
+
+独审首轮唯一窄窗密度fix，一批压缩顶部/高级元数据后置/图起点修正，相同12图确认15.57秒，原reviewer scored fix ship。6相关tests41.34秒过，type/web0。documenter只写conformance，保留既有系统/旧drift。视觉两轮预算耗尽，后续性能/wheel/最终代码独审/PRCI，不重复本地全量或截图循环。
+
+## 2026-11-03 P009 performance/wheel preparation
+
+最小实验qWait无Python存储执行，nestedLoop立即执行/回执；只新工具改AsyncEventPump，不修改产品或旧P006。1test1.80s过，r5原生prefs/前台/trusted两场景1+0诊断过；正式5+30待冻结。wheel probe增加真实已安装编排GUI/模板链，仅编译未运行。所有旧失败保留，视觉预算结束。
+
+## 2026-11-03 P009 installed authoring passed / formal fix
+
+隔离wheel全环境第二轮exit0，旧探针不删，新独立GUI进程避免app.quit轮询/Chromium生命周期冲突；原自建PID29120核CommandLine/父52988后终止，旧exit1保留。坏TIFF混合输入GUI1pass9.48s。正式5d0首轮控制第二次注入顶层const失败，IIFE修正/2轮诊断过，数据不覆盖。P009 raw字节属性仅保留CRLF。下一步新冻结完整采样及准确独审/PRCI。

@@ -1,6 +1,6 @@
 # P-008 M1有限批量、依赖重算与崩溃对账交付
 
-<!-- PROGRAM_TASK_META {"id":"P-008","status":"in_progress","work_package":"W12","depends_on":["P-005","P-007"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"4d6ee6ce364780cad24ef09b808740846937714c","head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-008","status":"done","work_package":"W12","depends_on":["P-005","P-007"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"4d6ee6ce364780cad24ef09b808740846937714c","head_commit":"b4847a56b682e71356129e34fac59262c08659e7"} -->
 
 ## 输入与前置
 
@@ -47,3 +47,8 @@ platform_runtime仅通用图/账本/失效规则；实验适配在工具api与�
 ## 旧网页测试夹具时序修正
 
 资源候选0c33的CI41438503742：Linux1671pass4旧skip820.52秒/allwheels通过；Windows1failed1674passed875.13秒，旧advanced真实网页用例在手工未保存的并发修订后，与700ms自动保存竞争，下一次template_apply被宿主busy正确拒绝。实际调用自动保存回调的有界探针重现相同断言（探针1pass8.16秒表示观察到预期旧失败，不是产品通过）。仅补3行：真实保存并发修订、等待原20秒预算内hostidle、断言current_draft_saved，再原流程验证冲突/24值/保存重开导出；原断言/容差/skip/单测时限均不改。修正后该完整文件2pass8.88秒。产品代码保持53892fd，准确新提交独审/CI待完成。
+
+
+## 正常集成完成
+
+准确b4847a5全范围独审Accepted，PR53四必需CI SUCCESS后于2026-11-02T12:27:06Z正常merge275560475d39426434416c74feeb0c2f259d1402；main与候选tree同98754bddc520b38bdaa8f5c7ce2c5882d9fc4f04。最终quality41441375415 Windows1675passed10warnings1306.50秒，Linux1671passed4既有skip10warnings930.49秒，双侧全部隔离wheel含真实批量4000/40/6run/重开/样式/模板第二批通过。native-case按定义SKIPPED。旧超时/夹具失败仍保留，不冒充通过。M1工程本卡done，P009可接续；科学留出/用户体验/目标环境不代签。

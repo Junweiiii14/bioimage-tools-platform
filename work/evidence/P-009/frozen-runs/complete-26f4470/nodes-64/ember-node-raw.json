@@ -1,0 +1,317 @@
+[
+  {
+    "warmup": true,
+    "kind": "node",
+    "feedback_ms": 1761.199999988079,
+    "settled_ms": 1850.4000000357628,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": true,
+    "kind": "node",
+    "feedback_ms": 87.39999997615814,
+    "settled_ms": 211.5999999642372,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": true,
+    "kind": "node",
+    "feedback_ms": 55.10000002384186,
+    "settled_ms": 188.10000002384186,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": true,
+    "kind": "node",
+    "feedback_ms": 76.89999997615814,
+    "settled_ms": 215.39999997615814,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": true,
+    "kind": "node",
+    "feedback_ms": 57.30000001192093,
+    "settled_ms": 187.80000001192093,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 95.60000002384186,
+    "settled_ms": 212,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 59.5,
+    "settled_ms": 190.19999998807907,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 93.90000003576279,
+    "settled_ms": 224,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 58.39999997615814,
+    "settled_ms": 177.80000001192093,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 96,
+    "settled_ms": 210.60000002384186,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 60.5,
+    "settled_ms": 183.5,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 99.59999996423721,
+    "settled_ms": 226.39999997615814,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 63.60000002384186,
+    "settled_ms": 181.39999997615814,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 101,
+    "settled_ms": 217.4000000357628,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 60.40000003576279,
+    "settled_ms": 183,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 70.60000002384186,
+    "settled_ms": 200.10000002384186,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 48.30000001192093,
+    "settled_ms": 178.10000002384186,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 70.09999996423721,
+    "settled_ms": 197,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 81.20000004768372,
+    "settled_ms": 183.30000001192093,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 71.39999997615814,
+    "settled_ms": 184,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 78,
+    "settled_ms": 178.5,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 56.60000002384186,
+    "settled_ms": 193.60000002384186,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 79.10000002384186,
+    "settled_ms": 181,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 73.80000001192093,
+    "settled_ms": 192.70000004768372,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 51.59999996423721,
+    "settled_ms": 174.5,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 75.39999997615814,
+    "settled_ms": 193.19999998807907,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 55.59999996423721,
+    "settled_ms": 184.19999998807907,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 74.59999996423721,
+    "settled_ms": 193.80000001192093,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 49.19999998807907,
+    "settled_ms": 178.5,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 76.5,
+    "settled_ms": 190.20000004768372,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 54.5,
+    "settled_ms": 183.10000002384186,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 75.69999998807907,
+    "settled_ms": 194,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 30.399999976158142,
+    "settled_ms": 172.89999997615814,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 79.19999998807907,
+    "settled_ms": 194.60000002384186,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "node",
+    "feedback_ms": 52.5,
+    "settled_ms": 173.0999999642372,
+    "trusted": true,
+    "theme": "ember",
+    "native_foreground": true
+  }
+]

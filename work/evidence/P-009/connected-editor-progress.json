@@ -1,0 +1,45 @@
+{
+  "status": "in_progress",
+  "base_main": "275560475d39426434416c74feeb0c2f259d1402",
+  "parent_commit": "f45aecc52c11c58fe749ccc33a6787e4418bdc1a",
+  "source_sha256_normalized_lf": {
+    "apps/desktop/src/bioimage_app/storage.py": "0906b85006ca73d47d25f92ad424a35903d173db29e628b1ee2d1e2b928bfed7",
+    "apps/desktop/src/bioimage_app/wb_workflow_host.py": "10a914ac89f361496b988859a604250eb70ef1eac41a7d32b387fa32ad13c5a3",
+    "apps/desktop/src/bioimage_app/web_ui/app.js": "000503293350f3fa23a8c8cc8d0f06f680670cb4b2b000c1897b0333763c4909",
+    "apps/desktop/src/bioimage_app/web_ui/index.html": "3f94be17e4baeff53b35a842b5b2b0fbf427f5a41b3bf3fb7b142974a1d9074a",
+    "apps/desktop/src/bioimage_app/web_ui/workflow_authoring.css": "e7dc9b11df72d69d05caccd1a2bd2311132bf63244a80e6689112a4ae5d5fe53",
+    "apps/desktop/src/bioimage_app/web_ui/workflow_authoring.js": "5ad75638ea274f220394e063437a5e38dd36f844518ca49d2523f81161249540",
+    "apps/desktop/src/bioimage_app/web_ui/workflow_graph.js": "e3ca3c73b1127631c403d340d7dc34cbb1702eddfc9bc2d6fe0516c06d583d70",
+    "apps/desktop/src/bioimage_app/web_window.py": "b5c0bc4aad1f0139a8508549e2f2ca4b84c4ec55b311090b07c28858f0a34563",
+    "apps/desktop/src/bioimage_app/workflow_authoring_bridge.py": "c5658f5482b240de274cd76e9ab57e201e5968ff425fd458e60cb6c6ccb0911a",
+    "apps/desktop/src/bioimage_app/workflow_authoring_models.py": "4b4eba2aa41f9f901278a112f45fbd2cc600e98cb2269b62df316c52fcfcf1de",
+    "apps/desktop/src/bioimage_app/workflow_authoring_session.py": "18c27e6d5236d06fea1f4adfe7372e8795cf21f54107280904755b9f4eb26513",
+    "apps/desktop/src/bioimage_app/workflow_authoring_store.py": "cf67ffc287920e93bed656634f8c9e4e960c246b529016e3b043e9d68b5f73c8",
+    "apps/desktop/src/bioimage_app/workflow_batch_cli.py": "d2de7adb90cd17e1f066bf04339b0fb8bc48f15181e7a380b490b67f218c0d26",
+    "apps/desktop/src/bioimage_app/workflow_batch_session.py": "bf2e199bc3e8732df4151c9d1fd76a518d09a5a118f43b190183bc07dc17feb0",
+    "apps/desktop/src/bioimage_app/workflow_template.py": "bac58ba2070d81dd2af82997ea030669d9ec3b32b23045c987f1264d9885a522",
+    "tests/test_workflow_authoring_bridge.py": "09d8e490304b6d56fb7522f194b67fbabd6a6028f2cb3169bf506ed5ad5c29fe",
+    "tests/test_workflow_authoring_session.py": "91cf9abc8451b98b0702f9978850d0cd939dd5a871c06da2a457e99711be7aa6",
+    "tests/test_workflow_authoring_store.py": "a670ac4a1df3a58870be063ad58fd12d8f867aad94ba86975937aed12123e2ec",
+    "tests/test_workflow_authoring_web.py": "80af4994a1665dad4a474a329256e888ea2caa666f4be0e5a650074bbc7e543b",
+    "tooling/qt_test_lifecycle.py": "03749fd9c69bd868b306ac62b779ff6a87b638fbdd7d256fe8fa7899f137a2af",
+    "work/evidence/P-009/graph_interaction_probe.py": "cb837740be1d2970346174520698a753ae60bffd9b678694f8affedb5dfff740"
+  },
+  "log_sha256": {
+    "p009-authoring-connected-targeted.log": "32595234d01c4889ef90bec6f99862cdbb794df3d1b7102a2fa7e287c87b7797",
+    "p009-portable-template.log": "3e09c8981460f478598f01cdf739622ab68223bb352f6a201018d1fc5278f1c6",
+    "p009-web-two-batch-values.log": "51403e4597dc4e74fc68b7d297f30cb882414c9e5fa5e723729c0e472f0989ce",
+    "p009-template-web-types.log": "c584b21ee012de391dc2799d5455db619d3fefbb192ab07ea4ba83fb0d704c14",
+    "p009-web-schema-static.log": "36ca7fb79efd41df69b7d8c79fcf406890f902056800e64ffd530a5d4dac05a7"
+  },
+  "targeted": {
+    "passed": 11,
+    "seconds": 47.73,
+    "exit_code": 0
+  },
+  "limits": [
+    "not final M2 acceptance",
+    "no final visual/performance/wheel/independent review/PR CI yet",
+    "scientific and target-machine limits retained"
+  ]
+}

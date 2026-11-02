@@ -28,6 +28,7 @@ from platform_runtime.workflow_execution import (
     record_workflow_run_started,
     record_workflow_worker_event,
     reuse_workflow_result,
+    validate_workflow_result_selection,
     workflow_ledger_json,
 )
 from platform_runtime.workspace import (
@@ -69,6 +70,7 @@ __all__ += [
     "record_workflow_worker_event",
     "finish_workflow_attempt",
     "reuse_workflow_result",
+    "validate_workflow_result_selection",
     "control_workflow",
     "abandon_workflow_intent",
 ]

@@ -40,6 +40,7 @@ def close_and_dispose_window(
             }.get(window.shutdown_stage)
             if choice:
                 window.bridge.session("reply", '{"choice":"' + choice + '"}')
+            return resources_closed() and window.authoring.resources_closed
         return resources_closed()
 
     qtbot.waitUntil(close_completed, timeout=timeout)

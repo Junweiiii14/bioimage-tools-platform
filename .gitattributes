@@ -15,3 +15,4 @@
 /work/evidence/P-003/frozen-evaluation*/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 /work/evidence/P-003/scientific-request-report*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 /work/evidence/P-006/frozen-runs/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+/work/evidence/P-009/frozen-runs/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

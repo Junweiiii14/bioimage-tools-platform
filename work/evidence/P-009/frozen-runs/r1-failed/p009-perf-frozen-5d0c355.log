@@ -1,0 +1,20 @@
+[52300:10348:1103/001128.334:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/gpu_channel_manager.cc:920] Failed to create GLES3 context, fallback to GLES2.
+[52300:10348:1103/001128.334:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/gpu_channel_manager.cc:931] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+[52300:10348:1103/001128.338:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/gpu_channel_manager.cc:920] Failed to create GLES3 context, fallback to GLES2.
+[52300:10348:1103/001128.338:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/gpu_channel_manager.cc:931] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+[52300:10348:1103/001128.338:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/gpu_channel_manager.cc:920] Failed to create GLES3 context, fallback to GLES2.
+[52300:10348:1103/001128.338:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/gpu_channel_manager.cc:931] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\70236\ResearchVault\Codex-Workbench\bioimage-v0\tooling\benchmark_workflow_authoring.py", line 520, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "C:\Users\70236\ResearchVault\Codex-Workbench\bioimage-v0\tooling\benchmark_workflow_authoring.py", line 493, in main
+    results = [run_case(output / f"nodes-{n}", n, args.warmup, args.samples) for n in cases]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\70236\ResearchVault\Codex-Workbench\bioimage-v0\tooling\benchmark_workflow_authoring.py", line 375, in run_case
+    pump.waitUntil(
+  File "C:\Users\70236\ResearchVault\Codex-Workbench\bioimage-v0\tooling\benchmark_workflow_authoring.py", line 109, in waitUntil
+    raise TimeoutError("Benchmark Qt/JavaScript deadline exceeded")
+TimeoutError: Benchmark Qt/JavaScript deadline exceeded

@@ -156,3 +156,16 @@ ed830e1准确完整门禁1503 passed/756.15s+全部isolated wheels/exit0，HEAD/
 | 2026-11-02 | P008初始共享父存储/两个真实子图与旧开始暂停重开 | 4pass26.27秒/exit0，6真实run，目标Ruff/type0；无新全量/wheel/独审，不代表批量完成 | P008/shared-storage.json |
 
 | 2026-11-02 | P008真实批量/CLI/模板分支/缓存恢复及相关旧契约 | 8pass51.87s、3pass63.01s、80pass236.02s；最后取消修复相关16pass50.04s，原1fail/2fail保留；新增wheel/独审/CI待做 | P008/batch-mvp-validation.json |
+
+| 2026-11-02 P008 final integration | b4847a5 / PR53 / merge2755604 sametree98754bdd | 四必需SUCCESS；Win1675pass1306.50s/Linux1671pass4旧skip930.49s，双侧全部新batch wheels | 独审Accepted；旧取消/夹具失败保留，非科学/目标机/M2验收 |
+| 2026-11-02 P009 finite graph | DOM/SVG realP007 projection, nativeQt keyboard/ports/layout probe; npm check:web | probe pass, webcheck0，SHA及有限范围见P009/graph-probe.json | 图组件尚未接宿主/保存/运行，不是M2交付 |
+
+| 2026-11-02 P009 connected editor | 四文件定向store/session/bridge/web | 11passed47.73s/exit0；Web两批精确4000.0→40.0/保存焦点，模板布局跨项目；Ruff/pyright/web静态通过 | connected-editor-progress.md/json；最终视觉/性能/wheel/独审/CI尚未运行 |
+
+| 2026-11-02 P009 full web editing | 五流程真实WebChannel/worker/CLI，native12截图 | 5passed39.93s，capture15.42s；type/Ruff/web0，detect0主要+1advisory | ui-edit-validation.md/json；capture失败保留，尚无视觉判定/性能/wheel/最终独审CI |
+
+| 2026-11-02 P009 responsive confirmation | 相同12图/原独立reviewer verdict；documenter | scored fix resolved/ship only；capture15.57s/6tests41.34s/type+web+Ruff0 | visual-review.md、visual-confirmation.json、design-conformance.md；非全页/性能/科学/现场通过 |
+
+| 2026-11-03 P009 measurement preparation | async pump test + r5 diagnostic both3/64 | 1passed1.80s；1+0原生两场景exit0，仅诊断；type/Ruff0 | performance-measurement.md；正式分布/wheel新probe尚未运行 |
+
+| 2026-11-03 P009 delivery probes | wheel all isolated envs + mixed invalid TIFF GUI | wheel secondexit0；GUI1pass9.48s；type/Ruff0；first formalexit1/原数据保留 | delivery-probes.md/json；正式重测、独审/PRCI待做 |

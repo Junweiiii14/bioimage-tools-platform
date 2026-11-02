@@ -1,0 +1,49 @@
+{
+  "status": "in_progress",
+  "failed_formal_commit": "5d0c355ef4f930cb6f8ffa9fd129e496abd98c2b",
+  "failed_formal_exit": 1,
+  "failed_formal_scope": "eight complete standard UI groups; one control warmup; upper not run",
+  "wheel_exit": 0,
+  "wheel_environment": {
+    "QT_QPA_PLATFORM": "offscreen",
+    "QTWEBENGINE_CHROMIUM_FLAGS": "--disable-gpu"
+  },
+  "input_isolation": {
+    "passed": 1,
+    "seconds": 9.48,
+    "exit": 0
+  },
+  "control_repeat_diagnostic": {
+    "samples": 2,
+    "warmup": 0,
+    "exit": 0
+  },
+  "source_sha256_lf": {
+    "tooling/benchmark_workflow_authoring.py": "88050a90f08e334c364c58ac79f0387f13da793dd7d016dca034da27e8c2a5ee",
+    "tooling/installed_wheels.py": "811aded20d1574c40144758cc7fc2d1a3abb3c72278097752a4b7d7ee2dd777f",
+    "tests/test_workflow_authoring_web.py": "c0197b09f095dc2b0bae63c1475e58d3ce6ab1e83fa2e248be6581a4c62e25f6"
+  },
+  "raw_sha256": {
+    "controls-raw.json": "c9f69b6daa537cb0f9457790896bf1cd1e4c9c7529ab0d80c00b3120c1c43e9a",
+    "ember-node-raw.json": "4cebdc2602df633a8ced7559151a88cdd113770cb62d536a50715b37e755edf9",
+    "ember-preview-raw.json": "23a7ad45b22119f5d3cac03d905debe9804c3ddbfb078d4045dd1e4a64b16d94",
+    "forest-node-raw.json": "e01e4def907382fac22f8ab544f84052bb8e71c64bbf3bd040824a0800a209b7",
+    "forest-preview-raw.json": "e993955f367ed284489c2a8543d2cc65f9d6221429b72a01b5468c2e90359fb4",
+    "iris-node-raw.json": "61dc741c3fad548c67053d46cd79d30118354267d40148fc0feb6a715a01369f",
+    "iris-preview-raw.json": "a6262d06ba2ee3dd32bf199ae90dc9484e4dea65fb6d67e110f33a3e7b930dd7",
+    "neutral-node-raw.json": "5496650ff92defc0d5aa9aece8847558b184d6b5ef89a81196c8868af4c52203",
+    "neutral-preview-raw.json": "653897b9319882706e2f1ba0344d22dc91ca4326bd5f33dfb343f03c2224a5de",
+    "p009-installed-wheels-first.log": "8a1e7086d251813f0c3bc439e5d711d200f1469b1b55cc3f7eb0625ef3f44d99",
+    "p009-installed-wheels-second.log": "b5c08d4e469313088014c2d291c55d27667d6a37ebba58a24fe94284c223f16a",
+    "p009-perf-frozen-5d0c355.log": "20a936a4925116e2f271cbd8385c4aef7a217374f759da239327b1ca247658d7",
+    "p009-perf-probe-r6.log": "81585e1a7e9af7a5046975bec6468dc8ce1e724b0665bb35af903216f5da4403",
+    "p009-refined-probes-types.log": "c584b21ee012de391dc2799d5455db619d3fefbb192ab07ea4ba83fb0d704c14",
+    "p009-web-input-isolation.log": "0a23ca806c6153d1e1cf6a52d983d5a03433d213ec96f2b8d6242eb2775bfa2b"
+  },
+  "raw_bytes_preservation": "P009 frozen-runs -text attributes only; CR-at-EOL recognized; no tests or whitespace checks removed",
+  "remaining": [
+    "new frozen full measurement",
+    "exact candidate independent review",
+    "required PR CI and normal merge"
+  ]
+}

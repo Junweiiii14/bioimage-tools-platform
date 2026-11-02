@@ -1,6 +1,6 @@
 # P-009 M2真实工作流可视编排与模板复用
 
-<!-- PROGRAM_TASK_META {"id":"P-009","status":"planned","work_package":"W13","depends_on":["P-006","P-008"],"execution_root":"not_activated","owner":null,"base_commit":null,"head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-009","status":"in_review","work_package":"W13","depends_on":["P-006","P-008"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"275560475d39426434416c74feeb0c2f259d1402","head_commit":"5e69b2f67eb0aeac7db81afee4033e021b8b1917"} -->
 
 ## 输入与前置
 
@@ -22,4 +22,62 @@
 
 ## 当前状态
 
-尚未实施或验证；依赖未done不激活。其他实验/Agent/安装器发布不在本卡范围。
+in_review：完整编排/真实执行、交互覆盖和有界视觉确认已实施；P1修复、受影响正式测量及64c全部wheel已通过相应验证。PR55首轮5e69b2f在双平台导入边界门禁失败，尚未运行pytest；装配边界修复待冻结准确复审及新CI，未合入，不能宣告done。其他实验/Agent/安装器发布不在本卡范围。
+
+
+## 2026-11-02激活
+
+P006已done；P008准确b4847a5独审/四必需CI/双侧wheel后PR53正常merge2755604，已核候选与main同tree。当前codex/p009-visual-workflow从同main激活真实Web编排，先加载scope .规则和设计上下文；不以CLI/预设流程替代M2，不扩新科学算法或其他实验。入口校验一次，已有授权内连续推进，集中可运行候选独审，本地定向/最终CI全量。
+
+
+## 有限画布交互探针
+
+已运行并完整读取P009 scope .上下文707行，绑定main2755604。按既有Operate设计体系，新增原生DOM/SVG图组件，有限3节点实际P007定义投影；原生focusProxy键盘移动/删除、端口按钮连线、布局不改计算定义、960×640无页面横溢的探针通过，npm check:web退出0。无需新增画布依赖。初次两轮探针的焦点目标/JS对象序列化错误保留，不算产品引擎失败或通过；修正探针后组件源码未变。work/evidence/P-009/graph-probe.json及可复现probe记录范围。当前尚无编辑器宿主/保存/表单/实际执行连接，不能将此探针称M2完成，后续接同一P008执行器。
+
+## 2026-11-02 已连接后台与实际编排界面
+
+后台固定命令、单一共享存储所有者、真实批次执行/暂停恢复/取消排空及成果核验已接WebChannel。图/步骤/目录/schema表单、保存运行和成果区已有首版。模板template_version=1封装保存definition+layout，GUI及CLI加载器接受新旧格式。完整范围与失败修正见work/evidence/P-009/connected-editor-progress.md。
+
+最新定向四文件11passed47.73秒，退出0：store/session/bridge/web。界面实际按钮完成两批合成输入4000.0→40.0，保存保持ROI输入DOM/焦点；模板布局跨项目保存/重绑定验证通过。pyright0 errors，目标Ruff通过，web静态检查通过（范围保留）。本轮未运行本地全量、隔离wheel、最终视觉/性能或独审/CI。仍in_progress，不能作为M2完成。
+
+## 2026-11-02 完整界面链路及有效视觉采集
+
+真实Web五流程5passed39.93秒，覆盖节点编辑/预检/重开、GUI实验室模板新TIFF+CLI、参数边界/模拟IME、依赖复用和运行中新草稿焦点。Ruff/type/web静态通过。有效原生Windows12图采集15.42秒，通过非纯色/颜色一致性校验；离屏纯色/旧帧/RAF失败原证据保留，不算视觉通过。一次detect无主要项、有1backdrop advisory。详见work/evidence/P-009/ui-edit-validation.md/json。已写中文操作单和模板v1契约；视觉独审/性能/wheel/准确代码独审/PR必需CI仍待做，不改in_progress。
+
+## 2026-11-02 独立视觉修正与确认
+
+Fresh reviewer首轮bb42有效12图结论fix，唯一问题为窄窗任务密度。一批顶部/高级元数据折叠/图起点修正后，同12图确认15.57秒，原独立审查者评分resolved，disposition ship仅覆盖该fix。完整原结论visual-review.md，设计一致性documenter证据design-conformance.md。真实Web5流程+原生图探针6passed41.34秒，type/web/Ruff通过。所有失败和原图保留；有效主检+确认预算已用完，不再自主视觉循环或第二detector。性能、wheel、最终准确代码独审和PRCI仍未做，保持in_progress。
+
+## 2026-11-03 正式性能/隔离安装准备
+
+新增原生采样工具及performance-measurement.md，r5两场景1+0诊断退出0，非正式分布。最小Qt等待实验定位旧qWait线程饥饿，新AsyncEventPump的真实存储创建/回执/排空1passed1.80秒；失败不改写为通过、不改产品/P006旧工具。type/Ruff通过。tooling/installed_wheels.py新增实际已安装Web编排资产/保存重开/4000→40/6worker/布局模板+CLI校验，已静态编译但还没运行，不能当安装通过。正式默认5+30冻结后新目录串行运行；详细样本与终点边界按新测量说明。
+
+## 2026-11-03 已安装编排器验证通过与测量修正
+
+全环境wheel第二轮exit0，新P009独立GUI探针验证真实已安装JS/CSS、保存重开、4000→40、6实际RunRecord/PID和布局模板CLI；旧probe全部保留，-u只增强输出。第一轮app.quit轮询问题已记录为主动终止/exit1，不算通过。坏TIFF混合输入GUI1passed9.48秒，坏输入隔离、有效40、原字节保留。正式5d0c355采样exit1，8组UI数据完整，控制第二轮顶层const重复声明修为IIFE并检查true回执；2轮诊断过，待重新冻结完整默认采样。无阈值/超时/断言弱化；.gitattributes只追加P009 frozen-runs字节保留规则。详见delivery-probes.md/json及原始失败数据。
+
+## 2026-11-03 正式采样完成与独审P1修复
+
+26f4470完整默认采样exit0，12组UI及35轮控制（5预热/30正式）已由独审重算。普通iris/neutral节点137–149ms、预览332–345ms超过100ms参考；normal renderer工作集约3.93GB，保留原值与原因UNKNOWN，不写性能全面通过。原始.local/p009-perf-frozen-26f4470/results.json；最终证据归档待做。
+
+准确2755604..26f4470代码独审Request changes：真实manifest和run不变，合法子账本修订可把成果选择错绑已有9999 CSV，results/open此前接受。当前共享纯validate_workflow_result_selection由缓存与展示两个实际消费者调用；展示读取实际run.result，对照完整outputs/quality、原始source身份和冻结请求，缓存保留旧来源。未改科学公式、schema或门禁。原独审对损坏manifest的猜测已撤回，Workspace.get_run原本会拒绝。
+
+作者execution/store/session定向21passed38.06s；新增/连线、替换、删除后分别保存重开测试1passed4.11s。最终type0，目标Ruff/format通过；回归测试变量类型问题已修，不加忽略。新候选尚未冻结/独审，新增IO影响preview及closed后自动results，故仅重测四主题预览和neutral真实控制5+30；纯node/upper沿用26f历史数据，明确不称新候选实测。安装需对当前修复重验，之后集中独审/PR必需CI，不本地重跑全量。
+
+## 2026-11-03 准确修复候选通过独审与安装验证
+
+64c02d94b0da1596ee9cb372d60e44b24cf23b33已冻结。非作者准确2755604..64c02d9 Accepted工程候选，原持久错绑反例results/open均StateConflict；缓存旧来源及加强Web重开独立2passed17.73s/exit0。原Request changes和最终独审分别保留review-26f4470-request-changes.md、review-final.md。
+
+修复后四主题preview及35控制5+30采样exit0，独立复算一致；preview反馈329–342ms、暂停/取消UI反馈204/212ms，后台确认38/38ms、边界1523ms/批次排空389ms；renderer WS3.57GB，超参考/高值原因UNKNOWN，详见performance-final.md/json。26f完整及64c受影响两批28份原始文件已逐字节归档，不把旧数据改署新提交。
+
+64c全部隔离wheel完整exit0，旧探针全部保留，新AUTHORING_SCRIPT实际安装资产/编辑保存重开/4000→40/6workers/布局模板CLI通过；原日志将随最终记录归档。下一步仅证据/交接提交，集中准确增量复核、PR及必需CI/正常合入，仍in_progress，尚未宣告M2或目标完成。
+
+## 2026-11-03 PR55必需CI中
+
+最终纯证据5e69b2f67eb0aeac7db81afee4033e021b8b1917准确非作者Accepted延伸，.local/p009-review-5e69b2f.md，原始28文件Git blob/SHA及wheel日志逐字节吻合，无产品/工具/测试增量。已推分支并创建https://github.com/Junweiiii14/bioimage-tools-platform/pull/55。quality run41494573552，Windows job125446028782/Linux125446028523在check --all执行中；desktop-environment及rules-context run41494573809已success，native-case预期skipped。状态in_review；不得仅凭观察超时重启或更换运行。当前任务/快照更新先留本地，不推纯状态提交取消正在运行的CI；无产品源码dirty。
+
+## 2026-11-03 首轮CI边界失败与装配修复
+
+41494573552双平台已terminal failure，import-linter实际拒绝storage→authoring_store→WB/NumPy，未进入pytest/wheel；原日志及具体路径见ci-storage-boundary.md。修复为authoring Session在线程启动前固定装配处理器，通用storage不导入工具，原同一worker/Workspace/bytes命令不变，未改门禁。import-linter9 kept/0 broken；相关10passed38.59s；默认无装配拒绝和同一后台线程实测2passed15.73s，类型/目标Ruff/format通过。待冻结准确复审后更新同PR55，不重跑旧失败或在本机重复全部测试/wheel；新CI会验证当前安装。26f/64c性能及64c本地wheel仍保留原源码归属。
+
+742c5d2装配修复已推同PR55，quality41495505039/rules41495504928启动；独立9导入契约及2真实线程/拒绝测试通过15.32s，产品增量Accepted。独审发现仅新增原CI文本行尾空格使diff检查失败，改无损gzip+原/压缩SHA后全范围检查通过，不修改whitespace门禁。下一纯证据提交将替代742c运行，旧CI取消须如实记录，不称其测试失败或通过。
