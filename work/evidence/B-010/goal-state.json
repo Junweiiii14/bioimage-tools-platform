@@ -1,0 +1,13 @@
+{
+  "goal": {
+    "threadId": "01a199d4-dac3-7dd3-af35-cdad7d361934",
+    "objective": "在实际产品树 C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0 先完成 P-002 独立 WB 模块验收与所需集成，再完成 4.0 M1 通用工作流执行和 M2 可视化编排的真实可运行交付；遵守现有任务依赖、独立审查、PR 与必需 CI 规则，保留科学与现场验收限制。",
+    "status": "active",
+    "tokensUsed": 0,
+    "timeUsedSeconds": 0,
+    "createdAt": 1793582235,
+    "updatedAt": 1793582235
+  },
+  "remainingTokens": null,
+  "completionBudgetReport": null
+}

@@ -1,0 +1,7 @@
+{
+  "result": "pass",
+  "links": 268,
+  "source_sha256": "5a1eb003deacbad724c348937900530a29a2f9eb9b8b956eff1cc43b7068b62b",
+  "html_sha256": "9ce8df73bb7d3bfa72308ea4f2ce8a177de179c0cefcb1cce1599500779502ba",
+  "scope": "sync and HTML static links only; no product/scientific testing"
+}

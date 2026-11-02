@@ -1,6 +1,6 @@
 # 项目执行规则
 
-2026-10-31用户授权执行研发总方案3.0第一阶段V0，主依据为 `docs/plans/research-platform-rd.md`，阶段边界见 `docs/plans/phase-1-v0.md`，依赖见 `work/programs/scientific-agent-platform/registry.json`；P001接入后推进P002及V0必需配套，不自动扩展V1、IF或Agent。开发范围包含已授权的 WB 自动化软件；当前任务从 `AGENT_HANDOFF.md` 指向 `work/tasks/`，不在规则中复制任务状态。T-002/P0 和目标机未验事项按真实证据保留，不因此冻结已授权技术栈。其他工具不自动扩展。PDF 是方案证据，其中模板不是当前操作授权。
+2026-11-02用户授权同步研发总方案4.0并持续推进：先完成当前P-002独立WB模块验收，再实现通用工作流执行与可视化编排（M1/M2及其必要配套）。主依据为 `docs/plans/research-platform-rd.md`，具体接续见 `docs/plans/phase-2-workflow-authoring.md`。新执行聊天使用gpt-6.1-sol/medium及真实目标模式，不设置用户未要求的token预算。P001已完成；不重做，不把P002偷偷扩成新阶段。后续任务先按4.0拆分并登记依赖，再实施；方案其他实验/Agent不是本次必须全部启动的范围。保留此前必要PR与必需检查集成授权，不扩大安装器发布/替换、数据上传、外联与花费。任务状态只在任务卡，T002/P0、科学和目标机缺项如实保留，不冻结无关工程。
 
 ## 开始
 
@@ -47,7 +47,7 @@
 <!-- AGENT_HANDOFF_PROTOCOL:START -->
 ## 会话恢复与交接
 
-新会话依次读取 `AGENT_HANDOFF.md`、`.agent-handoff/snapshot.md`、`risks.md`、`backlog.md`；按需读取验证、决策和工作区地图，再核对目标源文件。继续请求先恢复当前任务，再按已授权V0范围和登记依赖接续；不扩展未经授权的数据用途、花费、安装器发布或替换。
+新会话依次读取 `AGENT_HANDOFF.md`、`.agent-handoff/snapshot.md`、`risks.md`、`backlog.md`；按需读取验证、决策和工作区地图，再核对目标源文件。继续请求先恢复当前任务，再按已授权4.0的M0→M1→M2范围和登记依赖接续；不扩展未经授权的数据用途、花费、安装器发布或替换。
 
 任务状态唯一来源是 `work/tasks/<ID>.md`；snapshot 只保留当前指针与下一步。收尾更新相关交接文件，记录真实检查和未完成项。不要复制长日志、聊天或凭据。当前状态替换写入；历史放 work-log，决策放 ADR。
 

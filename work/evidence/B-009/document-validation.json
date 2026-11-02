@@ -1,0 +1,13 @@
+{
+  "result": "pass",
+  "json_examples": 3,
+  "workflow_nodes": 6,
+  "top_level_chapters": 13,
+  "tables": 51,
+  "heading_hierarchy": "valid",
+  "local_evidence_links": "all exist",
+  "external_scripts": 0,
+  "source_sha256": "5a1eb003deacbad724c348937900530a29a2f9eb9b8b956eff1cc43b7068b62b",
+  "html_sha256": "8af568702e21836bd4bec52a49b0a41d12c1ff1ef0c7b0203926efb81ad67359",
+  "scope": "Document integrity and static illustrative DAG only; no product/scientific execution."
+}
