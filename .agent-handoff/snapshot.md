@@ -5,7 +5,7 @@
 
 ## 当前任务
 
-- [P005](../work/tasks/P-005-workflow-execution-slice.md)保持in_progress；scope . / base006e9f1真实context已完整读。新增WorkflowLedger/纯转移及AsyncStorage固定workflow命令，11新组件/存储测试；受影响99pass。首版26f独审Request changes：图revision与新节点文档revision混用，作者已修正并加plan7/document0实际准备回归，新head须复审。日志/首轮失败见journal-component.md与journal-review-r1.md。生产GraphSession/共享RunSession事件接线/正式三节点WB worker图及当前环境实测准入尚未实现，不能标整卡或M1完成。
+- [P005](../work/tasks/P-005-workflow-execution-slice.md)保持in_progress；scope . / base006e9f1真实context已完整读。WorkflowLedger/纯转移及AsyncStorage固定workflow命令已实现；26f独审P1图generation/文档revision混用已修，8bb独审P2存储封装丢事件来源attempt/run已补绑定并新增真实旧hello/finish重试反例。12新组件/存储测试，日志/首轮失败与两次Request changes均保留journal-component.md及journal-review-r1/r2.md。新head须准确复审；生产GraphSession/共享RunSession事件接线/正式三节点WB及当前环境认证仍未实现，不能标整卡/M1完成。
 - 设计明确原图→真实校验凭据→旧WB数值→状态表/完整曲线/显示报告，同一有限调度/RunSession/Workspace/CAS，不让runtime含WB特判。既有模块成果总16MiB，不能复制大型TIFF当校验输出；引用原AssetRef并检查凭据同源。256 attempts/128 controls/4096 critical events为新v1防失控预算，预留关键终态容量，不当性能通过。
 - .local/p005-design-candidate-20261102.md有只读工作笔记（非既定实现），包括已读module_session/module_cli/run_session/storage/process/module_results、真实IO/worker路径/身份、缓存/恢复、可疑竞态与P009草稿问题。以实际任务/源码/冻结设计为准，读到旧截断片段重新定位，不猜代码。
 

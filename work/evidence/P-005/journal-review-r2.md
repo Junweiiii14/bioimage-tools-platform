@@ -1,0 +1,7 @@
+# 第二版账本/存储组件独审：Request changes
+
+非作者/root/p002_independent_review只读准确审查3215e3e1ff6cbb6e4894922fb1fe628ecafa6edc..8bb3ee67fd8cdce2a863c85b61baeaa90a179214；独立pytest新11项2.71秒/exit0，额外真实Workspace脚本exit0。首P1已独立验证：plan9/document0可真实准备。
+
+新增P2：WorkflowStoreCommand(worker)没有来源attempt/run字段，宿主使用当前active.attempt_id调用纯函数。匿名hello本身没有identity；旧attempt收到hello后失败，resume/新attempt prepared，再以当前CAS重送旧hello，被错误记到新attempt sequence0，新worker自己的hello会被判重复。刷新CAS不应重新绑定事件来源；应显式携带并核对来源attempt/run。该反例已由非作者独立复现，Request changes保留。
+
+此审查未改共享文件/提交，未跑全门禁；仅组件/存储范围，不批准GraphSession、正式WB图、当前环境认证或P005/M1完成。作者后继将同样绑定worker/started/finish/abandon来源，以免其他迟到通知也被替换为当前身份；新提交须准确复审。

@@ -66,3 +66,5 @@ work/evidence/P-005/execution-test-design.json冻结单图真实三节点、身�
 2026-11-02新增版本化WorkflowLedger与纯转移及8项组件测试，详细真实成绩/首轮失败见work/evidence/P-005/journal-component.md。关联P007/Workspace共77pass；真实两节点子进程退出与存储提交/重开仅为组件夹具，不是生产三节点WB图。取消最后名额保留、科学计算键与原物理输入双重匹配纳入新v1契约。未改旧公式/schema/测试门禁。下一步存储线程接线、共享RunSession/正式worker与冻结故障矩阵，准确提交独审/正常PR与必需CI仍需完成。
 
 首版26f准确组件独审Request changes（图generation/新节点document revision混用）已保留；修为新节点document0、冻结plan保留generation，并补真实plan7准备回归。AsyncStorage固定workflow操作已接现有存储线程，真实run/manifest/缓存字节核验与CAS、ENOSPC后重开唯一run、GUI响应屏障测试已加入；11项组件/存储测试及受影响99项通过，完整说明见journal-component.md。GraphSession/正式WB三节点/当前环境认证及完整故障矩阵仍未实现，新head独审待做；未标整卡done/未PR集成。
+
+第二版8bb独审确认上述P1已修，但新P2：封装匿名hello漏来源attempt/run，可刷新CAS后错误关联新attempt；Request changes及独立11pass保留journal-review-r2.md。后继补worker/started/finish/abandon来源绑定，新增真实失败重试旧hello/finish反例；作者最终12新测试/受影响100pass27.19s，Ruff/Pyright0，新准确提交仍须复审。整卡继续in_progress。

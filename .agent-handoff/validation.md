@@ -2,6 +2,8 @@
 
 ## 2026-11-02 P005 journal component only
 
+8bb独立11passed2.71s但P2旧hello来源丢失反例成立；后继补显式attempt/run与新回归，作者六文件100passed27.19s/exit0，新测试12项；Ruff/Pyright0。两次Request changes保留，待新head准确复审，未跑完整门禁或正式图。
+
 接线后新增11项账本/存储测试；受影响六文件99passed26.76s/exit0（RunSession/模块RunSession仍通过）；Ruff/Pyright及policy/import-linter九约束均0。首版26f独审Request changes的非零图generation冲突已有plan7/document0真实回归修正；首次测试类型错误及修正保留证据。未运行生产GraphSession/WB图/当前环境认证及完整门禁/wheels/CI，新head准确独审待做。
 
 现有Windows/Python3.12.14；uv --locked --no-sync：pytest tests/test_workflow_execution.py tests/test_workflow_contracts.py tests/test_workspace.py为77passed9.12s/exit0；Ruff format/check、Pyright contracts/runtime/新测试0errors、dev.py policy及lint-imports九边界均exit0。首轮7pass1fail及修正保留P005/journal-component.md；未运行正式WB图、完整门禁、wheels或本提交CI，不能称M1/P005完成。精确源提交随后由git与独审绑定。

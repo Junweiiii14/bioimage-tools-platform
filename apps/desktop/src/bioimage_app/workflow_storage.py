@@ -54,6 +54,8 @@ class WorkflowStoreCommand:
     reason: str = ""
     source_document_id: str = ""
     source_node_id: str = ""
+    attempt_id: str = ""
+    run_id: str = ""
 
 
 def _load(store: Workspace, document_id: str) -> WorkflowLedger:
@@ -122,6 +124,15 @@ def execute_workflow_store(store: Workspace, command: WorkflowStoreCommand) -> W
         ):
             raise StateConflict("Workflow journal CAS revision changed")
         active = ledger.active_attempt
+        if command.operation in ("worker", "started", "finish", "abandon"):
+            if active is None or command.attempt_id != active.attempt_id:
+                raise StateConflict("Notification source attempt differs from the active attempt")
+            if command.operation != "abandon" and (
+                active.run is None or command.run_id != active.run.run_id
+            ):
+                raise StateConflict(
+                    "Notification source run differs from the associated physical run"
+                )
         if command.operation == "control":
             changed = control_workflow(ledger, command.action, command.command_id)
         elif command.operation == "begin":

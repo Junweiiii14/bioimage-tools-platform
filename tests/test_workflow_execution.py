@@ -741,3 +741,132 @@ def test_async_workflow_serialization_runs_off_gui_thread(
             port.shutdown()
     assert len(replies) == 3 and all(reply.error_code is None for reply in replies)
     assert isinstance(replies[1].value, WorkflowLedger)
+
+
+def test_storage_late_hello_cannot_be_rebound_after_retry(tmp_path: Path) -> None:
+    with Workspace.create(tmp_path / "workspace") as store:
+        initial, source = fixture(store, tmp_path)
+        ledger = execute_workflow_store(
+            store, WorkflowStoreCommand("create", initial.execution_id, plan=initial.plan)
+        )
+        old = request(ledger, source)
+        ledger = execute_workflow_store(
+            store,
+            WorkflowStoreCommand(
+                "begin", ledger.execution_id, expected_revision=ledger.revision, request=old
+            ),
+        )
+        ledger = execute_workflow_store(
+            store,
+            WorkflowStoreCommand(
+                "prepare", ledger.execution_id, expected_revision=ledger.revision, request=old
+            ),
+        )
+        active = ledger.active_attempt
+        assert active is not None and active.run is not None
+        old_run = active.run
+        hello = ExecutionEvent(kind="hello", sequence=0)
+        ledger = execute_workflow_store(
+            store,
+            WorkflowStoreCommand(
+                "worker",
+                ledger.execution_id,
+                expected_revision=ledger.revision,
+                event=hello,
+                attempt_id=old.attempt_id,
+                run_id=old_run.run_id,
+            ),
+        )
+        store.finish_failure(
+            old_run.run_id,
+            ProcessExitReceipt(run_id=old_run.run_id, pid=0, exit_code=None),
+            reason="not_started_fixture_failure",
+        )
+        ledger = execute_workflow_store(
+            store,
+            WorkflowStoreCommand(
+                "finish",
+                ledger.execution_id,
+                expected_revision=ledger.revision,
+                attempt_id=old.attempt_id,
+                run_id=old_run.run_id,
+            ),
+        )
+        ledger = execute_workflow_store(
+            store,
+            WorkflowStoreCommand(
+                "control",
+                ledger.execution_id,
+                expected_revision=ledger.revision,
+                action="resume",
+                command_id="retry",
+            ),
+        )
+        fresh = request(ledger, source)
+        ledger = execute_workflow_store(
+            store,
+            WorkflowStoreCommand(
+                "begin", ledger.execution_id, expected_revision=ledger.revision, request=fresh
+            ),
+        )
+        ledger = execute_workflow_store(
+            store,
+            WorkflowStoreCommand(
+                "prepare", ledger.execution_id, expected_revision=ledger.revision, request=fresh
+            ),
+        )
+        active = ledger.active_attempt
+        assert active is not None and active.run is not None
+        fresh_run = active.run
+        # CAS is deliberately current: refreshing it must not reassign old notifications.
+        with pytest.raises(StateConflict, match="source attempt"):
+            execute_workflow_store(
+                store,
+                WorkflowStoreCommand(
+                    "worker",
+                    ledger.execution_id,
+                    expected_revision=ledger.revision,
+                    event=hello,
+                    attempt_id=old.attempt_id,
+                    run_id=old_run.run_id,
+                ),
+            )
+        with pytest.raises(StateConflict, match="source run"):
+            execute_workflow_store(
+                store,
+                WorkflowStoreCommand(
+                    "worker",
+                    ledger.execution_id,
+                    expected_revision=ledger.revision,
+                    event=hello,
+                    attempt_id=fresh.attempt_id,
+                    run_id=old_run.run_id,
+                ),
+            )
+        with pytest.raises(StateConflict, match="source attempt"):
+            execute_workflow_store(
+                store,
+                WorkflowStoreCommand(
+                    "finish",
+                    ledger.execution_id,
+                    expected_revision=ledger.revision,
+                    attempt_id=old.attempt_id,
+                    run_id=old_run.run_id,
+                ),
+            )
+        assert (
+            execute_workflow_store(store, WorkflowStoreCommand("load", ledger.execution_id))
+            == ledger
+        )
+        ledger = execute_workflow_store(
+            store,
+            WorkflowStoreCommand(
+                "worker",
+                ledger.execution_id,
+                expected_revision=ledger.revision,
+                event=hello,
+                attempt_id=fresh.attempt_id,
+                run_id=fresh_run.run_id,
+            ),
+        )
+        assert ledger.active_attempt is not None and ledger.active_attempt.worker_sequence == 0

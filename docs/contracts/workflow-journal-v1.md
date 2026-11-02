@@ -13,3 +13,5 @@ running只派发下一个冻结拓扑节点；pause有活动attempt时进入paus
 复用必须携带持久旧账本的WorkflowNodeResult，计算键与当前节点完全相同；旧run、manifest、输出及原始execution/node/attempt身份一致，实际解析输入AssetRef也一致。只校验旧ExecutionRequest不足以覆盖P007科学元信息。复用引用原run/PID，不制造新attempt；调用前仍须重新检查当前准入、环境和存储字节，后续宿主接线负责该部分。
 
 纯函数API见platform_runtime.api；模型见tool_contracts.api。旧入口不变，图定义/布局/计划仍沿P007契约。科学方法、数值、阈值和旧格式没有在本组件中改变。
+
+固定存储命令中的worker/started/finish通知必须显式携带来源attempt_id及run_id；abandon须携带来源attempt_id。匿名hello也不能由存储层自动绑定为当前attempt；最新CAS不能为旧通知重新赋身份。恢复是宿主对当前持久意图的显式对账，另用recover操作，不伪造迟到worker消息。第二版8bb3ee6遗漏封装来源字段的P2独审Request changes保留，后继增加真实失败→重试→旧hello/旧finish反例。

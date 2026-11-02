@@ -11,6 +11,8 @@
 
 ## 后续存储线程接线与修订分离
 
+后继8bb3ee6独审Request changes保留journal-review-r2.md：存储封装遗漏来源attempt/run，旧匿名hello可在刷新CAS后错误记到新attempt。作者新增来源字段并在worker/started/finish/abandon归约前验证；新增真实Workspace旧attempt失败/重试/新prepared后旧hello与旧finish拒绝、正确新hello接受的回归（合计12项新组件/存储测试）。未放宽原断言/序号规则，准确后继须复审。
+
 首版26f7f78独审Request changes见journal-review-r1.md；非零图generation不能直接当新请求文档revision。后续新attempt请求固定新文档revision0，图generation仍保留在冻结plan。新增实际plan revision7/真实Workspace准备反例验证修正。
 
 AsyncStorage新增固定workflow命令，在既有存储线程读取/校验/归约/序列化/CAS，仍无新SQLite DDL。调用者不能传入RunRecord/manifest充当存储事实；从实际Workspace读对应记录和已提交manifest，并检查其请求/全部输入输出文件。复用另从旧持久账本读取科学计算键。关联写盘失败后保留真实run，重开按独立文档/请求摘要精确查找，不造第二个run。
