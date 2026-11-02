@@ -1,0 +1,31 @@
+{
+  "source_commit": "23d405645097fa07b7949522e020b75a7a4cd3cf",
+  "run_id": 41386938547,
+  "failed_job_id": 125089740507,
+  "failed_test": "tests/test_manual_lanes_workbench.py::test_copy_manual_multipeak_history_new_group_save_and_reopen",
+  "failure": "waitUntil imagePan.x===40&&imagePan.y===25 timeout5000ms",
+  "windows_result": {
+    "failed": 1,
+    "passed": 1599,
+    "seconds": 929.22,
+    "exit_code": 1
+  },
+  "linux_result": {
+    "passed": 1596,
+    "skipped": 4,
+    "seconds": 613.11,
+    "full_gate": "success including isolated workflow/P002 wheels"
+  },
+  "original_log": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p007-ci-all-23d4056.log",
+  "original_log_sha256": "46240629e509651068745a985c2b826fb12bb4b56175283a36fcf6d76b94a166",
+  "isolated_unchanged_test": {
+    "exit_code": 0,
+    "seconds": 25.34,
+    "log": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p007-pan-unchanged-local.log"
+  },
+  "controlled_probes": {
+    "cursor_at_move_destination": "passed, native trusted movement observed; not the reproduced cause",
+    "held_initial_requestAnimationFrame": "failed at same exact pan assertion; trusted delta40/25 reaches event, pan reset0/0;4 frames queued; image naturalWidth100"
+  },
+  "scope": "Controlled local reproduction establishes a pending-layout race; does not prove the historical CI execution had exactly that timing"
+}

@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "original_product_commit": "23d405645097fa07b7949522e020b75a7a4cd3cf",
+  "scope": "Display-pan initialization only; no changed scientific values, assertions, tolerances or timeouts",
+  "environment": {
+    "platform": "Windows11",
+    "python": "3.12.14",
+    "qt": "6.12.0",
+    "qpa": "offscreen",
+    "chromium_flags": "--disable-gpu"
+  },
+  "controlled_event_traces": {
+    "cursor": {
+      "pan": {
+        "x": 40,
+        "y": 25,
+        "key": "quant:true:9e9a36f1332a4a1b94c45b2f7b06b23b:false",
+        "hand": true,
+        "space": false,
+        "drag": {
+          "clientX": 694,
+          "clientY": 416,
+          "x": 0,
+          "y": 0
+        }
+      },
+      "expectedKey": "quant:true:9e9a36f1332a4a1b94c45b2f7b06b23b:false",
+      "trace": [
+        {
+          "type": "pointermove",
+          "x": 734,
+          "y": 441,
+          "buttons": 0,
+          "trusted": true
+        },
+        {
+          "type": "pointerdown",
+          "x": 694,
+          "y": 416,
+          "buttons": 1,
+          "trusted": true
+        },
+        {
+          "type": "pointermove",
+          "x": 734,
+          "y": 441,
+          "buttons": 1,
+          "trusted": true
+        }
+      ],
+      "naturalWidth": 100
+    },
+    "raf": {
+      "pan": {
+        "x": 0,
+        "y": 0,
+        "key": "quant:true:e91e8b0349d14fa7ac5d28fcacec8544:false",
+        "hand": true,
+        "space": false,
+        "drag": {
+          "clientX": 694,
+          "clientY": 416,
+          "x": 0,
+          "y": 0
+        }
+      },
+      "expectedKey": "quant:true:e91e8b0349d14fa7ac5d28fcacec8544:false",
+      "trace": [
+        {
+          "type": "pointerdown",
+          "x": 694,
+          "y": 416,
+          "buttons": 1,
+          "trusted": true
+        },
+        {
+          "type": "pointermove",
+          "x": 734,
+          "y": 441,
+          "buttons": 1,
+          "trusted": true
+        }
+      ],
+      "frames": 4,
+      "naturalWidth": 100
+    }
+  },
+  "tracked_regression_before_fix": {
+    "exit_code": 1,
+    "seconds": 8.38,
+    "failed_assertion": "imagePan.x===40&&imagePan.y===25",
+    "timeout_ms": 5000
+  },
+  "after_fix": {
+    "manual_workflow_cases": 2,
+    "exit_code": 0,
+    "seconds": 17.2,
+    "neighbor_cases": 7,
+    "neighbor_exit_code": 0,
+    "neighbor_seconds": 12.76,
+    "web_quality": "exit0 including format/lint/checkJs gate counterexamples",
+    "impeccable_detector": "exit0, empty JSON findings",
+    "ruff_final": "exit0, decorator formatting corrected",
+    "pyright": "0 errors/0 warnings/exit0"
+  },
+  "artifacts": [
+    {
+      "path": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p007-pan-unchanged-local.log",
+      "sha256": "030149b5d2350979e2b2a36d2faadea23450bb761e1fed6444c7ec5b0a1e8094",
+      "size_bytes": 101
+    },
+    {
+      "path": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p007-pan-cursor-probe.log",
+      "sha256": "1468e2b8a90c3dce6283565c46cf40924772993c1c7df7704cead8158f7a3a4c",
+      "size_bytes": 5992
+    },
+    {
+      "path": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p007-pan-raf-probe.log",
+      "sha256": "38d7d5eb75d18bd25ffc7fce8b231db7baa13ed1eb38b5d3c7c895b3f1ba9f28",
+      "size_bytes": 12597
+    },
+    {
+      "path": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p007-pan-regression-before-fix.log",
+      "sha256": "a06b24cd9f20c054de213349b0cb7215082029bc20e92ce3e275593366eb7d7c",
+      "size_bytes": 13532
+    },
+    {
+      "path": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p007-pan-regression-after-fix.log",
+      "sha256": "f248cf6727875a8cacea53acd5a5c7d5a79c60b694f34f05dc1fd285bde5161f",
+      "size_bytes": 101
+    },
+    {
+      "path": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p007-pan-neighbor-regression.log",
+      "sha256": "4b4dcfcb4afcc1b758bd4992119af8a8596280526de24576e35e4fceecfefc6f",
+      "size_bytes": 101
+    },
+    {
+      "path": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p007-impeccable-pan-detect.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "size_bytes": 3
+    }
+  ],
+  "causal_limit": "Held-layout controlled reproduction is causal for the reproduced bug; original CI has no pointer trace, so its complete root cause remains unproven"
+}

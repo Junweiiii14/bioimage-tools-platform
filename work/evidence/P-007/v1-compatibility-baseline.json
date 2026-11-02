@@ -1,0 +1,30 @@
+{
+  "source_commit": "839fa521d9ae11ceb51f9c4c7493eb2a0251eda0",
+  "source_path": "packages/tool_contracts/src/tool_contracts/api.py",
+  "scope": "All existing exported Pydantic model JSON schemas, before file separation",
+  "model_schema_sha256": {
+    "WorkspaceFormat": "752cc33c58e4ce7c33f7933ac018d3e5cb1cf1d5a976c108a55dfcde8023e31f",
+    "DocumentRevision": "235a2fd39607f192f1a7878bb39a0d224618698f51a30f640a68f62e5c43ba9a",
+    "AssetRef": "2f782ae5017ed78ae1eb1ff532eeeb78f8bf314af4630275dc265ae66cd241c0",
+    "DraftSnapshot": "459282107a8c48159c8b422275915cd6bdc3a4a6fe770250d0c0b1fd55d04299",
+    "RunRecord": "3c1140a78e48d221932e96a58328a5bf993f2bfb766c9f3731ffcf2f376357a8",
+    "ProcessExitReceipt": "de5cebe2712a767650b60d8d9aa5bc7c874dd1db31bfa10f310128618b79095e",
+    "RecoveryReport": "55554ef415165243ea8f6b48c722b3e2fa49951f4a178129e6b50b6e315a6aa2",
+    "ModulePort": "b9397dbf0d36eb8dfa59fda00796a7fa71973241f09400b3d08294c11359264b",
+    "ModuleSpec": "103e23c807154b571e1d3c4658cfa4bdc00dbd7d7c4f33249586f456f1e0c47c",
+    "BoundAsset": "abb9b0721c39ca30f27a8c81af9b6d6e5dd3eaaf9fcd464d68691a5d33f87fa9",
+    "RuntimeVersion": "8b3ff21956e9219d53e5358f03a4df7461cbd5b416a58f9f3a4bf7c7d6ca9490",
+    "ExecutionRequest": "98365cd8ec64befc87e26415978c1d548e8164cc6b250e2c8ca5888df5e951ac",
+    "OutputManifest": "93f21fe86fe5454e5202c5944d720889299e7b6d0334b70d0607fcb54f0fc94f",
+    "ExecutionIdentity": "f125b38c085853be32fcfbcfad3b4b8631a563c1732db7ca961cd4aaefec8472",
+    "ExecutionEvent": "28d6843d8357bf6fd2fc5cd0a81765053ccaf4245d2493897909bd43b7621bd8",
+    "ValidationDataRecord": "53efcb6a6f85104095de788c0ff8e4fd8f2aa907c20b528aa8414d067d2bc573",
+    "ValidationCase": "ebce18bed4b5288f298f70bfe9f3efa41cb4d8e0de6518be04aa21dd6f64eb92",
+    "MethodEvaluationPlan": "04c60a63fe9b386877a0299940dd4792a3482d4020af1e34af0e78556a78bd62",
+    "MethodObservation": "f3ae3b9edf48d48d8757bfe0e4494cee46f066422c31f415dd5f12537efa68aa",
+    "MethodEvaluationEvidence": "c7c20704d6771a7e85b8f38afce9909dc3e254dd6381ea5e138e65d894141251",
+    "ValidationComparison": "23682f46797888e0c213f0a4eee09163f1171add73036fd2c4d4fcf8163f6536",
+    "MethodEvaluationReport": "2e87eb7a179298b134d7ec85073f1d96f5e91d90c0020f031da6ad7eebb8fa85",
+    "MethodReadinessRecord": "4166c674258f5f4c889abe0ab1f7fdfe65b127135551b048c3bd286e35395861"
+  }
+}

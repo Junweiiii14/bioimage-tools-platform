@@ -14,3 +14,5 @@
 P003新增独立schema v1的数据来源/分组、冻结评估计划/观测、工程报告与D1方法登记。
 公开模型不授予S1；有效零与无效空值严格分开，未知来源/材料不补为通过。
 见docs/contracts/method-validation-v1.md（仓库根相对路径）。旧存储schema保持。
+
+P007新增ScientificAsset/ScientificType、科学端口、WorkflowDefinition/WorkflowLayout与ExecutionPlan；组合原AssetRef，旧28项显式导出与JSON schema保持。新内部文件按契约职责分开，外部仍只用api。见docs/contracts/scientific-workflow-v1.md（仓库根相对路径）；模型存在不代表执行器、正式几何方法或科学准入已实现。

@@ -1,0 +1,67 @@
+{
+  "source_commit": "6bb3168ad145a70d0851703826b4813057ae42e5",
+  "contract_command": {
+    "exit_code": 0,
+    "source_commit": "6bb3168ad145a70d0851703826b4813057ae42e5",
+    "command": "uv run --locked --no-sync python -m tooling.wb_workflow_plan --output .local/p007-proof-6bb3168",
+    "scope": "Real P002 contract compilation/save/reopen only; no graph execution"
+  },
+  "original_contract_directory": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p007-proof-6bb3168",
+  "frozen_files": [
+    {
+      "file": "execution-plan.json",
+      "sha256": "09d89c4e8b187485c9a29f59a96506cd2b15b8be1b7f6215c1fd954fea3d4165",
+      "size_bytes": 10208
+    },
+    {
+      "file": "receipt.json",
+      "sha256": "86f340309a60c56245349608ba8b937fe12c46e9d88a93984aebeea42ddfc2d9",
+      "size_bytes": 4409
+    },
+    {
+      "file": "source.tif",
+      "sha256": "c20c8589d21f2897561f5e3cfe64a3fbe5366232077d08e37dc95f236667ccfd",
+      "size_bytes": 238
+    },
+    {
+      "file": "workflow.json",
+      "sha256": "422929f71fb661de33c58c259571dd998a0338e69a6afcfab1a26c75511aa3a5",
+      "size_bytes": 5402
+    }
+  ],
+  "installed_wheels": {
+    "source_commit": "6bb3168ad145a70d0851703826b4813057ae42e5",
+    "finished_utc": "2026-11-02T04:06:58.3736588Z",
+    "command": "uv run --locked --no-sync python -m tooling.installed_wheels",
+    "exit_code": 0,
+    "QT_QPA_PLATFORM": "offscreen",
+    "QTWEBENGINE_CHROMIUM_FLAGS": "--disable-gpu",
+    "started_utc": "2026-11-02T04:06:01.5363668Z",
+    "TEMP": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p002-process-temp"
+  },
+  "original_wheel_log": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p007-installed-wheels-6bb3168.log",
+  "original_wheel_log_sha256": "8b84cde81e2f763dec724331e0e250ae92dd647d8df46b0f00d7e13850315f11",
+  "installed_wheel_pass_lines": [
+    "Installed 5 packages in 57ms",
+    "Installed 2 packages in 9ms",
+    "Isolated runtime/contracts wheels: immutable input, run commit/reopen; no tool/GUI/numerics",
+    "Installed evaluation: literal zero, lineage leakage and no scientific approval passed",
+    "Installed workflow contracts: real file binding, DAG freeze/reopen and rejection; no execution",
+    "Installed 8 packages in 961ms",
+    "Installed 2 packages in 35ms",
+    "Installed 11 packages in 1.62s",
+    "Installed 3 packages in 25ms",
+    "Installed 34 packages in 1.38s",
+    "Installed 4 packages in 40ms",
+    "Installed direct TIFF/PNG: same full pixels/provenance/DPI; OCR only, original unchanged",
+    "Installed schema7 render/read and portable settings-only template passed",
+    "Installed project v4: OCR evidence, explicit binding, roundtrip and literal XLSX passed",
+    "Installed project v5: explicit pairing, optional OCR, roundtrip and XLSX passed",
+    "Installed WB desktop window: real widgets/entry assembly and async close passed",
+    "Installed optional OCR: verified bundled PP-OCRv6 CPU recognition passed",
+    "Installed OCR worker: real protocol, bundled models and static route passed",
+    "Installed PNG OCR: separate loader and real worker preserve known text/coordinates",
+    "Installed V0: real worker, 4000 exact comparison, committed assets and reopen passed"
+  ],
+  "scope": "Contract/preflight/save/reopen and existing real P002 wheel verification; no workflow execution claim"
+}

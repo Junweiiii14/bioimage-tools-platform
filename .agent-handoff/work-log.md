@@ -1,21 +1,5 @@
 # Current Work Log
 
-## 2026-10-20 E4完成，连续进入E5
-
-T057 done，产品ff89867：完整Fig先持久化再真实原像素运行；843/579.73s、原child0、9契约/全隔离wheel/真实OCR/check0，绑定独审通过。df轮843/570.37s后wheel因顶层PIL失败1，ff延迟导入修复，独立API无PIL/核心5探针和完整复验0。分页与回源两P2已按提交关闭，UI限定ship、documenter No changes。原生UNKNOWN/344截断inventory/真实科学与目标机限制保留，无发布。下一阶段T058，详细证据work/evidence/T-057。
-
-## 2026-10-20 E5完成，连续进入E6
-
-T058 done，产品8feffce：schema14稳定身份填表、冻结资产/run、新目录输出、索引CAS后完成、真实归档恢复不注册外来PID。858/623.78s、原child0、9契约/全wheel/真实OCR/check0；冻结run竞态和同步busy独审P2均resolved，最终绑定8fe无新P0–P2；UI ship/documenter No changes。823首轮类型失败1历史保留。科学/真实确认批次/干净Win10/物理DPI和main/安装版仍未验，不发布。下一项T059，详细证据work/evidence/T-058。
-
-## 2026-10-20 E6 closeout
-
-Completed ea7ed55 frozen render reuse, exact-owned widgets and full stage pagination. 862/624.64s + original child0/all wheels/real OCR/full gate0; independent scoped review/UI ship. Export20x2 thresholds passed; desktop20/phase1/cancel5 explicitly limited. Inventory4 does not resolve purecall UNKNOWN. Auto-next E7, including historical OCR late cancellation P2 discovered by separate high-risk audit. No remote mutation/new installer yet.
-
-## 2026-10-19 T050 规划回复（保留main记录）
-
-根据用户回复更新第5/6/7/8节：批准局部暂停与独立结果目录，独立灰度定量OCR作为继续支持的功能。主流程不加载OCR与安装发行拆分是不同事项，后者未决；同步任务/风险/待办和交接。未改产品/PDF/依赖，旧审查不外推本轮修订。
-
 ## 2026-10-20 E7 governance integration
 
 INT001 resumes authorized E7 only in this temporary historical integration tree. Merged planning main43d520f into original governance0b7, retained immutable RULE001 receipt source; loaded/read exact rules and current full scope. Main PR/CI not yet accepted. WB product development/checks remain in t051, not represented by this zero-product checkout.
@@ -156,3 +140,19 @@ PR48准确a69b38e四必需CI成功，正常merge main f2dc5ad且树一致；P002
 ## 2026-11-02 P006真实原生基线
 
 源码a9bda313冻结后完成rows-normal四主题/准备取消5+30及其余五例R09负载，六例exit0。旧f3首轮失败保留。raw/SHA/fixture/所有分布复算见P006/native-results.json；报告明确设置四主题超100ms、前台UNKNOWN、取消全部preparing/run=null、host确认28ms与服务关闭6.4秒分开。上界快照/刷新/payload及内存超线完整保留。记录12个host/renderer均已退出，未杀进程。P006 in_review，待最终独审/CI正常PR；目标仍M1/M2，下一P007前置满足。
+
+## 2026-11-02 P007契约候选与P006正常集成
+
+P006准确839..b0c71e1非作者Accepted，PR50四必需CI后正常合dc9618e/tree同候选。Windows1569passed/723.79秒、Linux1565passed/4既有skip/497.04秒，双wheel原评估/V0通过；integration/review-final保存。性能超线/前台UNKNOWN/准备取消边界保留。P007从839开始草案，保留自身修改快进dc主线后真实context重载，无冲突；科学资产/端口/有限图/计算键/可信预检和真实P002计划保存重开已草拟，87项相关组合通过。旧23schema摘要不变；独立wheel/准确提交独审/PR尚待，仍in_progress。M1/M2目标active。
+
+## 2026-11-02 P007最终独审及PR51 CI
+
+准确dc9618e..23d4056 Accepted，独立31tests/4秒和六组攻击、四原件SHA、v1 Git字节与真实wheel日志校验通过。作者准确6bb合同命令/完整独立wheel0，最终Pyright0、plan/rulecheck0。PR51 ready、远端冻结23d4056，双平台完整CI尚进行；本地仅保存独审/交接记录，不推送重启CI。保持in_review，下一正常merge前核实四必需成功/tree一致，之后P005→P008→P009。P005只读草拟笔记在.local，未激活/实现。
+
+## 2026-11-02 P007首轮CI失败后的显示pan竞态修复
+
+PR51旧23d Linux1596pass/4skip/613.11秒/wheels过，Windows1fail1599pass/929.22秒，旧manual pan40/25超时，未合。原样单测过不足定因；扣留首个rAF的trusted事件40/25被fitImage首次panKey初始化归零，受控新回归修前确切失败、修后两支完整测试2pass/17.20秒，邻近7pass/12.76秒。共享视图pan同步在pointerdown捕获offset前完成，未改ROI/原像素/1000-800/取消/历史/超时/容差。Ruff/type/web/detector过，等待新准确提交独审/CI。历史CI现场同因未证，不统一销账native/GPU。
+
+## 2026-11-02 P007显示pan新候选独审
+
+准确dc..dc4cc24新完整候选Accepted；独立Qt完整两支2pass/17.23秒、12组实际处理器/视图/取消组合及原件/日志SHA、rule/plan/diff/detect0。原断言/5000ms/数值/ROI未放宽，历史CI现场根因未冒称全证。P007转in_review绑定dc4cc；状态记录增量复核后更新PR51重新执行必需全门禁。P005仍等实际集成，不提前实施。
