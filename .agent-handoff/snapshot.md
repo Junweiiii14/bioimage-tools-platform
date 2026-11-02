@@ -1,7 +1,7 @@
 # 当前恢复指针
 
 - 原生goal仍active、无预算；完整目标是实际产品树M1真实工作流执行与M2可视编排。恢复实际get_goal，不把阶段通过标complete。
-- 执行树C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0，当前分支codex/p005-workflow-executor；base main006e9f143c830f5e13be2932e8ac37a9f3a05ed1。本地从保留P007收据的50dc61c与正常main合并14c0153开始，HEAD/dirty请实际核实。唯一写入本聊天；非作者/root/p002_independent_review只读、目前idle。
+- 执行树C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0，当前分支codex/p005-workflow-executor；base main006e9f143c830f5e13be2932e8ac37a9f3a05ed1。本地从保留P007收据的50dc61c与正常main合并14c0153开始，HEAD/dirty请实际核实。唯一写入本聊天；非作者/root/p002_independent_review只读，正在准确审89ba603..823d282节点切片，源码已冻结；不要重复派发或并行修改该范围。
 
 ## 当前任务
 
@@ -16,6 +16,8 @@
 - P006原生性能基线PR50正常集成done，多项超线/前台UNKNOWN/准备取消run=null仍保留，不复测或当预算全过。P003 D1框架PR49 done不授S1；P002 PR48原范围done，不重做；完整证据见各卡。
 
 ## 下一步
+
+当前独审目标HEAD823d282a90e65c93b5b2db927d1f1e75b68712b9（base89ba603b38c77bd45689c48c2918f43f423f7a4f），尚无结论；live agent已确认running。实际PR基线main006e9f1规则回执核对及全增量diff检查均exit0。14受影响文件format和全仓Pyright0。无本机测试/CI/wheel进程仍在运行；本后继只记状态，不改变冻结源码。
 
 先前账本/wheel组件3215..41812c55已Accepted（journal-review-r3.md）；后续新增请求确认/三节点源码须单独准确独审。无活动CI/wheel；下一步是真实GraphSession自动调度，不重复先前账本验收或请求用户继续。
 
