@@ -6,7 +6,7 @@
 ## 当前状态与证据
 
 - [P006](../work/tasks/P-006-interaction-performance-baseline.md)已按前置P001 done激活；P003等待CI期间仅在独立本地分支准备观测工具，未夹进PR49。现本地全门禁实际退出0、PR49也已正常集成，P006 context已按新main839重载。
-- 观测工具保留R09四原案例/预算/seed，新增两类normal（32行/8Fig/12泳道）和显式schema2交互模式；四主题真实native settings/close，当前P002取消UI确认/绘制机会/idle排空分开。23项观察器守卫测试与局部类型/格式/六fixture校验通过；尚无实际性能成绩，不以Node测试当性能。
+- 观测工具保留R09四原案例/预算/seed，新增两类normal（32行/8Fig/12泳道）和显式schema2交互模式；四主题真实native settings/close，当前P002取消UI确认/绘制机会/idle排空分开。30项观察器守卫测试与局部类型/格式/六fixture校验通过；源码a9第二轮六例原生exit0，四主题settings超100ms、取消均preparing且run=null，前台状态UNKNOWN。原失败/完整原值保留P006/results.md；in_review待最终独审/CI，不以Node测试当性能。
 - [P003](../work/tasks/P-003-method-validation-foundation.md)done：PR49准确c02c2ed经非作者f2dc5ad..c02c2ed Accepted，四必需CI SUCCESS；Windows1555passed/923.34秒、Linux1551passed/4既有Windows skip/528.76秒，双平台评估/V0 wheel通过。main839fa52 tree等于候选，integration.json。作者本地1555passed/787.44秒/wheels exit0，local-gate-r2.json。
 - P003初审P1共同父身份漏判、P2冻结参数忽略均已真实复现并修复；准确复审18passed/2.62秒、原正反例/六排序通过。旧debeb冻结/主动中止门禁exit1历史保留；r2源0edf0e0真实WB值40/4000/有效0/无效空值/复核空值，工程0、scientific请求2、S1 not_granted。
 - P003冻结字节保留策略经独立Git blobs及报告引用30份SHA核实，普通CRLF通过、三类真实空白错误拒绝。并非放松数值/测试，见byte-preservation/review-final。B011已随PR49正常集成done，新P007–009仍planned。
@@ -14,9 +14,8 @@
 
 ## 下一步
 
-1. P006冻结当前工具/测量设计及准确提交预审后，在干净源码、无本地全量测试/构建并行的条件下实际串行原生采样；每次新输出到.local，保留错误/超线，不缩上界或删样本。measurement-design.json定义六类负载、5预热+30正式及初始预算。
-2. 记录四主题焦点/选择、当前取消请求阶段、真实终态/PID/服务关闭，区分浏览器绘制机会与物理显示；未实现节点/暂停和无对齐时间戳预览明示未测，后续P005/P009再验。旧R09仅按可比证据对照，不从摘要伪造现值。
-3. P006基线完成后优先按已满足前置激活P007并真实context；之后P005单图可靠执行→P008有限批量完整M1，P006/P008完成后P009接同一执行器实现M2。各任务准确独审、适当检查、正常PR/必需CI后done，不在框架或画图处停止。
+1. P006原生采样已终态，完成准确提交独审和正常PR/四必需CI；不把测量exit0当预算通过。报告保留前台UNKNOWN、服务关闭6.4秒和未实现node/pause/host-ready预览；不需重复测已得样本。
+2. 激活前置已满足的P007并真实context；之后P005单图可靠执行→P008有限批量完整M1，P006/P008完成后P009接同一执行器实现M2。各任务准确独审、适当检查、正常PR/必需CI后done，不在框架或画图处停止。
 
 ## 保留边界
 

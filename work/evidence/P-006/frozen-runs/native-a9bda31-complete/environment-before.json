@@ -1,0 +1,18 @@
+{
+  "source_commit": "a9bda31365ac892719d5bdeae4f58f8051504863",
+  "power_scheme": "电源方案 GUID: 27fa6203-3987-4dcc-918d-748559d549ec  (Performance)",
+  "cpu": {
+    "Name": "Intel(R) Core(TM) Ultra 7 255HX",
+    "NumberOfCores": 20,
+    "NumberOfLogicalProcessors": 20,
+    "LoadPercentage": 2
+  },
+  "os": {
+    "Caption": "Microsoft Windows 11 家庭版 中文版",
+    "Version": "10.0.26200",
+    "TotalVisibleMemorySize": 16110096,
+    "FreePhysicalMemory": 3367856
+  },
+  "conditions": "Single-point load/memory; no local full tests/builds in parallel; sequential native sampling; previous failed run preserved",
+  "captured_at": "2026-11-02T11:10:45.8905892+08:00"
+}
