@@ -1,0 +1,43 @@
+{
+  "candidate": "384e5ba1137e55385e3a4b10f2e694b51840229a",
+  "command": "uv run --locked --no-sync python dev.py check --all",
+  "exit_code": 0,
+  "environment": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "env_overrides": {
+    "QTWEBENGINE_CHROMIUM_FLAGS": "--disable-gpu",
+    "PYTEST_ADDOPTS": "-vv -o faulthandler_timeout=60",
+    "PYTHONUNBUFFERED": "1",
+    "PYTHONFAULTHANDLER": "1",
+    "BIOIMAGE_NATIVE_STACKS": "1",
+    "BIOIMAGE_WINDOWS_FAULTS": "1"
+  },
+  "tests": "1659 passed, 10 warnings in 928.26s",
+  "wheels": "all four built and independently installed; original V0/OCR plus new workflow three real nodes, 4000, reopen, style reuse/four real runs",
+  "log": ".local\\p005-final-check-384e5ba.log",
+  "sha256": "3d2ccdb4da226b6d95aa26d20a3de19a74f3ba54a80c00ee0132bc443786eea0",
+  "independent_review": {
+    "scope": "006e9f143c830f5e13be2932e8ac37a9f3a05ed1..384e5ba1137e55385e3a4b10f2e694b51840229a",
+    "reviewer": "/root/p002_independent_review",
+    "conclusion": "Accepted",
+    "final_tests": "6 passed /19.46s/exit0 plus previous24 passed/116.56s",
+    "reproduction": "Original non-WB journal now receives one ValueError reply and creates no run; exact diff check0; no shared edits; no fullgate/wheel rerun by reviewer"
+  },
+  "additional_corrupt_cache_probe": {
+    "candidate": "384e5ba1137e55385e3a4b10f2e694b51840229a",
+    "workspace": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p005-cache-recovery-384e5ba",
+    "original_execution": "867b9e39e9ef47ad816a918fe56a615b",
+    "recovered_execution": "069fe8c0fffe45d4ba1b346f538b7310",
+    "reused_verify": true,
+    "actual_runs": 5,
+    "new_analysis_asset": "bcf8048369244c8e8fc71112cf397970",
+    "damaged_old_asset": "8bc08fe5ba52428f8175c260488156ee",
+    "original_table_unchanged": true,
+    "value": "4000.0",
+    "scope": "owned synthetic output deliberately damaged; explicit reopen/resume computes fresh descendants with same engine; no source overwritten",
+    "final_message": "",
+    "reuse_integrity_error_asserted": true,
+    "receipt_correction": "error_observed held the final successful status; renamed final_message; the initial IntegrityError was asserted before recovery"
+  },
+  "limits": "synthetic/local engineering; S1/clean target/physical DPI unverified; P008/P009 unfinished; Windows CI resource timeout requires new full check"
+}

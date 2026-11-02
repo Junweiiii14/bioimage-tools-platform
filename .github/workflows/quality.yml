@@ -24,7 +24,8 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
+    # P005 adds real worker/recovery cases; the 20-minute Windows run reached 82% before timeout.
+    timeout-minutes: ${{ matrix.os == 'windows-latest' && 25 || 20 }}
     env:
       QT_QPA_PLATFORM: offscreen
       QTWEBENGINE_CHROMIUM_FLAGS: --disable-gpu
