@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "tested_base": "bab41e0",
+  "tested_worktree": "new controller sources, exact normalized source hashes below; not product-integrated",
+  "command": "uv run --locked --no-sync python -m bioimage_app --workflow --workspace .local/p005-auto-mvp-20261102-verified-r2 --validation triangle_u16",
+  "exit_code": 0,
+  "execution_id": "d29b8bfc69dc4c37985112e409bd1ae2",
+  "state": "succeeded",
+  "real_run_ids": [
+    "0cb78a5d1a054fb1b58ac326de80a9ce",
+    "6c9e22a234344957acdfcdabe7febf81",
+    "c36d297463e7465e9c4defb87708dc9b"
+  ],
+  "stored_value": "4000.0",
+  "stored_status": "text:valid",
+  "host_runtime_source": "ca4efc50599cf67a590ecd2ca9b6fd787d47b89077d94cbd32b2ce011599d9b1",
+  "current_runtime_source_matches": true,
+  "log": ".local/p005-auto-mvp-cli-r2.log",
+  "log_sha256": "c7c8facfa95258427db41935261df5a93175b23a0f00d480adee722cc088c370",
+  "source_sha256_lf": {
+    "__main__.py": "901e16c13dd65215668fa16a09eed25f55d6e1eb69140d216ad92ea4a25b4200",
+    "run_session.py": "127e9b624782b4544409ec47f245916484e1028adf2eb348dc953d2f29457c63",
+    "workflow_preparation.py": "ce79bf236327216d9474cfd665aaaff4195e39de77b8e34ccebc171a9a7fe49c",
+    "workflow_session.py": "b8298343af74e7a1ee455db4c0b37c7b9453a38bb9328fc5b36c0ba284c3f184",
+    "wb_workflow_host.py": "4c45fba3a4ff26789d2dc361b164a8cee688b367c626098ddce90af83cd373af",
+    "workflow_cli.py": "f0b3a4fc2045fec42db5345fab755c50a1d26ce9eece684b47482fc9106528d0"
+  },
+  "checks": [
+    "23 related tests passed in 36.34s",
+    "2 controller tests with registry count/thread assertions passed in 10.86s",
+    "Ruff/Pyright/policy and nine import-linter constraints exit0"
+  ],
+  "remaining": [
+    "full cancel/recovery/cache fault matrix",
+    "GUI and finite-batch integration",
+    "final candidate independent review and required CI"
+  ],
+  "scope": "actual automatic single-graph controller and CLI, not full M1/M2 or scientific admission"
+}

@@ -145,6 +145,8 @@ PR51准确c243四必需SUCCESS，正常merge006e9f1/tree与独审候选相同。
 
 ## 2026-11-02 P005 real node workers and dispatch acknowledgement
 
+节点修复b80非作者Accepted后，新增生产WorkflowSession/后台准备/固定WB装配/--workflow CLI，真实自动3节点正式提交及暂停继续通过；删内部重复全图/env核验和检查回调，开始一次/resume一次后台核验有测试断言。相关23pass36.34s、最后控制器2pass10.86s；CLI自有triangle_u16实际退出0，关闭重开4000.0/三run及runtime源码指纹相同，auto-session.json。当前是可运行单图后端原型，cache/取消恢复矩阵/UI/完整CI及最终候选独审仍待完成，不标整卡done。旧snapshot已完整归档再替换短入口。
+
 用户追加要求先验证社区简洁代码项目再配置、减少防御编程与审批耗时。Karpathy-guidelines固定2c60614项目安装，作者/非作者各自核对raw2518B与SHA一致、仅SKILL无脚本/hook，policy/固定树摘要通过后完成配置；AGENTS/coding-standards落实入口一次校验/内部信任、无一次性抽象与臆测异常，候选集中独审，不新增审批。配置独立提交，保留未提交生产WorkflowSession文件，后续直接MVP测试，不把规则技能当自动有效性保证。
 
 89ba603之后实现RunSession可选请求确认/原始ExecutionEvent、三固定WB原值节点和实际宿主源码/依赖身份函数；旧对照入口/数值/schema不变。五组15次实际worker/正式存储提交/重开40/4000/真0/invalid-review空值通过；最终6节点22.93s、新增确认期间取消与节点12项28.82s、此前关联114项57.89s；Ruff/type/policy/九边界0。报告PNG已查看可读（首次预览目录名错误已纠正）。来源/预算/状态及精确范围worker-slice.md。仍由测试父进程串接，GraphSession/后台当前准入和完整故障矩阵未实现；新源准确独审/完整门禁/新wheels/CI待做，不标M1/P005完成。

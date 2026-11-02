@@ -137,3 +137,4 @@ T050初次归档复制因archive目录尚不存在失败，随后从未修改的
 - [work-log-20261102T053838281121Z.md](archive/work-log-20261102T053838281121Z.md): work log exceeded 64 KiB or 30 dated sections
 - [work-log-20261102T054525811744Z.md](archive/work-log-20261102T054525811744Z.md): work log exceeded 64 KiB or 30 dated sections
 - [work-log-20261102T062440139095Z.md](archive/work-log-20261102T062440139095Z.md): work log exceeded 64 KiB or 30 dated sections
+- [2026-11-02-before-auto-session-snapshot.md](archive/2026-11-02-before-auto-session-snapshot.md): preserved verbatim before the current automatic-session pointer replaced stale node-only status.

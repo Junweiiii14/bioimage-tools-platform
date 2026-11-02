@@ -96,9 +96,16 @@ class RunSession(QObject):
         run = self._started_record
         if run is None or (run.run_id, run.pid) != (run_id, pid):
             raise ValueError("Dispatch acknowledgement differs from the persisted process")
-        if self._done or self._outcome is not None or self._cancellation.is_set():
+        if self._done:
             return False
         self._dispatch_ack = True
+        if self._cancellation.is_set():
+            self._record_cancel()
+            self._try_terminal()
+            return False
+        if self._outcome is not None:
+            self._try_terminal()
+            return False
         self._allow_request()
         return True
 
@@ -123,7 +130,18 @@ class RunSession(QObject):
         if self._start_registered or self._outcome is not None and self._outcome.pid == 0:
             self._record_cancel()
 
+    def abort(self, reason: str) -> None:
+        """Stop an owned process after a host error without pretending the user cancelled."""
+        if not self._done:
+            self._dispatch_ack = True  # A failed journal cannot strand an observed exit.
+            self._runner.abort(reason)
+            if self._cancellation.is_set():
+                self._record_cancel()
+            self._try_terminal()
+
     def _record_cancel(self) -> None:
+        if not self._dispatch_ack:
+            return
         if self._cancel_recorded or "cancel" in self._pending.values():
             return
         self._submit("cancel", StorageCommand("cancel", run_id=self._prepared.run_id))
