@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "scope": "P007 contract/preflight only; execution and UI not implemented here",
+  "source_sha256": "c20c8589d21f2897561f5e3cfe64a3fbe5366232077d08e37dc95f236667ccfd",
+  "module": {
+    "schema_version": 1,
+    "module_id": "wb-legacy-analysis",
+    "module_version": "1.0",
+    "method_version": "profile_integral@1",
+    "implementation_digest": "dc768dfc704efc26c53f5fab820af9e94b3a85de12304c5b35a62fbfeb04c258",
+    "input_ports": [
+      {
+        "name": "source",
+        "kind": "raw_image",
+        "filename": ""
+      }
+    ],
+    "output_ports": [
+      {
+        "name": "measurements",
+        "kind": "typed_table",
+        "filename": "measurements.csv"
+      },
+      {
+        "name": "differences",
+        "kind": "typed_table",
+        "filename": "differences.csv"
+      },
+      {
+        "name": "provenance",
+        "kind": "run_manifest",
+        "filename": "run-manifest.json"
+      },
+      {
+        "name": "analysis",
+        "kind": "analysis_result",
+        "filename": "analysis.json"
+      },
+      {
+        "name": "baseline",
+        "kind": "analysis_result",
+        "filename": "baseline.json"
+      }
+    ],
+    "parameters_schema": "{\"$defs\":{\"BandAnnotation\":{\"properties\":{\"band_id\":{\"title\":\"Band Id\",\"type\":\"string\"},\"baseline\":{\"anyOf\":[{\"$ref\":\"#/$defs/Baseline\"},{\"type\":\"null\"}],\"default\":null},\"bounds\":{\"anyOf\":[{\"$ref\":\"#/$defs/BandBounds\"},{\"type\":\"null\"}]},\"detection_notes\":{\"default\":[],\"items\":{\"type\":\"string\"},\"title\":\"Detection Notes\",\"type\":\"array\"},\"included\":{\"default\":true,\"title\":\"Included\",\"type\":\"boolean\"}},\"required\":[\"band_id\",\"bounds\"],\"title\":\"BandAnnotation\",\"type\":\"object\"},\"BandBounds\":{\"description\":\"Inclusive endpoints relative to the original, unsmoothed lane profile.\",\"properties\":{\"left\":{\"title\":\"Left\",\"type\":\"integer\"},\"right\":{\"title\":\"Right\",\"type\":\"integer\"}},\"required\":[\"left\",\"right\"],\"title\":\"BandBounds\",\"type\":\"object\"},\"Baseline\":{\"description\":\"Endpoint intensities in the same polarity and units as the profile.\",\"properties\":{\"left_value\":{\"title\":\"Left Value\",\"type\":\"number\"},\"right_value\":{\"title\":\"Right Value\",\"type\":\"number\"}},\"required\":[\"left_value\",\"right_value\"],\"title\":\"Baseline\",\"type\":\"object\"},\"LaneAnnotation\":{\"properties\":{\"bands\":{\"items\":{\"$ref\":\"#/$defs/BandAnnotation\"},\"title\":\"Bands\",\"type\":\"array\"},\"context_expansion_percent\":{\"default\":0,\"title\":\"Context Expansion Percent\",\"type\":\"integer\"},\"roi\":{\"$ref\":\"#/$defs/LaneROI\"},\"target_roi\":{\"anyOf\":[{\"$ref\":\"#/$defs/LaneROI\"},{\"type\":\"null\"}],\"default\":null}},\"required\":[\"roi\",\"bands\"],\"title\":\"LaneAnnotation\",\"type\":\"object\"},\"LaneROI\":{\"properties\":{\"lane_id\":{\"title\":\"Lane Id\",\"type\":\"string\"},\"x0\":{\"title\":\"X0\",\"type\":\"integer\"},\"x1\":{\"title\":\"X1\",\"type\":\"integer\"},\"y0\":{\"title\":\"Y0\",\"type\":\"integer\"},\"y1\":{\"title\":\"Y1\",\"type\":\"integer\"}},\"required\":[\"lane_id\",\"x0\",\"y0\",\"x1\",\"y1\"],\"title\":\"LaneROI\",\"type\":\"object\"}},\"properties\":{\"geometry_policy\":{\"default\":\"fixed_grid@1\",\"enum\":[\"fixed_grid@1\",\"independent_lanes@1\",\"anchored_context@1\"],\"title\":\"Geometry Policy\",\"type\":\"string\"},\"lanes\":{\"items\":{\"$ref\":\"#/$defs/LaneAnnotation\"},\"title\":\"Lanes\",\"type\":\"array\"},\"polarity\":{\"enum\":[\"dark\",\"light\"],\"title\":\"Polarity\",\"type\":\"string\"},\"quant_policy\":{\"default\":\"legacy_bounds@1\",\"enum\":[\"legacy_bounds@1\",\"wbquant_1_4_3@1\",\"peak_envelope@1\",\"background_support@1\",\"anchored_background@1\"],\"title\":\"Quant Policy\",\"type\":\"string\"},\"revision\":{\"title\":\"Revision\",\"type\":\"integer\"},\"source_sha256\":{\"title\":\"Source Sha256\",\"type\":\"string\"}},\"required\":[\"source_sha256\",\"revision\",\"polarity\",\"lanes\"],\"title\":\"AnalysisRequest\",\"type\":\"object\"}"
+  },
+  "plan_sha256": "a76c070e04c7bfc1e6df192826d319087723a774879d6d50c233348e35cbf9b6",
+  "node_key": "ca71108110cd8092ff45099bb038b120338af85e76cfb213d81b086eeeacc6c0",
+  "definition_roundtrip_equal": true,
+  "scientific_admission": "not_granted",
+  "acquisition_bit_depth": null,
+  "physical_calibration": null
+}

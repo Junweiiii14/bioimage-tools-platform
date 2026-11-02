@@ -1,6 +1,6 @@
 # P-007 M1最小科学资产、连接与冻结工作流契约
 
-<!-- PROGRAM_TASK_META {"id":"P-007","status":"in_progress","work_package":"W11","depends_on":["P-002","P-003"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"dc9618e7000eb7793067556e99d50a0d0509423d","head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-007","status":"in_review","work_package":"W11","depends_on":["P-002","P-003"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"dc9618e7000eb7793067556e99d50a0d0509423d","head_commit":"6bb3168ad145a70d0851703826b4813057ae42e5"} -->
 
 ## 输入与前置
 
@@ -39,3 +39,9 @@ P006已独审/四必需CI后PR50正常合main dc9618e，P007保留自身未提�
 当前受影响组合首轮84passed/13.59秒（当时28新契约+18方法+38Workspace），新增环境/端口/真实P002曲线用例后重新核实结果；先前Pyright全范围0。23旧模型schema摘要与原v1源码/JSON相同，新API不改数值；wheel检查仅追加有限图/文件保存重开反例，保留全部原断言和门禁。
 
 增量受影响组合已实际87passed/21.61秒（31契约+18方法+38Workspace）；Ruff、policy、9个import-linter合约、plan checker均exit0。新增曲线用真实P002 use case输出完整五点1000/2000/3000/2000/1000与4000信号，不用display数据。独立wheel与准确提交独审待执行，本阶段本地完整check --all未重跑，PR必需CI仍须完整执行。
+
+## 冻结提交与真实独立安装验证
+
+首个成功冻结源码6bb3168ad145a70d0851703826b4813057ae42e5。实际命令tooling.wb_workflow_plan --output .local/p007-proof-6bb3168 exit0，原图/定义/计划/receipt保持原生产字节；仅合同预检保存重开，不冒充图执行。tooling.installed_wheels准确该源实际exit0（Win11/Python3.12.14、offscreen/disable-gpu），包括新增runtime/contracts两节点文件绑定/预检/重开反例，既有科学评估、WB真实4000/提交重开、桌面和OCR等全部原检查也通过。原v1实现Git blob与新contracts_v1逐字节相同；execution.json/v1-source-preservation.json保留。
+
+准确dc9618e..6bb3168非作者审查正在进行，后继只有证据/状态变化仍需审查；本卡转in_review绑定已冻结候选。当前不宣布最终Accepted或M1完成；本阶段本地完整check --all未重跑，正常PR必需双平台全门禁仍须通过。

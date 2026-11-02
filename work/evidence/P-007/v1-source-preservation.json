@@ -1,0 +1,10 @@
+{
+  "original_commit": "dc9618e7000eb7793067556e99d50a0d0509423d",
+  "original_file": "packages/tool_contracts/src/tool_contracts/api.py",
+  "candidate_commit": "6bb3168ad145a70d0851703826b4813057ae42e5",
+  "new_internal_file": "packages/tool_contracts/src/tool_contracts/contracts_v1.py",
+  "git_blobs_byte_identical": true,
+  "sha256": "41164ccbe237e1643c1690939350236102864df99e55340d141f81ed0959c9fd",
+  "old_explicit_exports": 28,
+  "old_model_schemas": 23
+}

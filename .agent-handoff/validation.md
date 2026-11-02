@@ -121,3 +121,5 @@ ed830e1准确完整门禁1503 passed/756.15s+全部isolated wheels/exit0，HEAD/
 
 | 2026-11-02 | PR50准确b0c71e1四必需CI、main dc9618e tree等于候选 | 全部SUCCESS；Windows1569passed/723.79秒、Linux1565passed/4既有skip/497.04秒；双原评估/V0 wheels通过 | P006/integration.json |
 | 2026-11-02 | P007 pytest tests/test_workflow_contracts.py tests/test_method_validation.py tests/test_workspace.py -q，Win11/Python3.12.14 | 87passed/21.61秒；Ruff/policy/9导入合约/plan checker0，前轮全Pyright0；wheel/最终独审及完整CI待执行 | P007任务卡 |
+
+| 2026-11-02 | P007准确6bb3168真实wb_workflow_plan及tooling.installed_wheels，Win11/Python3.12.14/offscreen/disable-gpu | 均exit0；合同定义/计划重开、新两节点预检wheel及所有既有真实WB4000/提交重开/桌面/OCR保留检查通过；非图执行 | P007/execution.json |

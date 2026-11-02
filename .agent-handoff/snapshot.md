@@ -5,9 +5,9 @@
 
 ## 当前任务
 
-- P007 in_progress，已真实context按dc9618e重载。科学资产/端口/有限图、冻结计划/计算键与纯预检、真实P002契约保存重开命令、旧23模型schema兼容、隔离wheel追加检查已草拟。首轮28tests/9.21秒，随后资产/环境/端口/真实曲线增量尚待复验；未独审、未完成全门禁/PR，不宣称执行器或GUI。
+- P007 in_review，已真实context按dc9618e重载。科学资产/端口/有限图、冻结计划/计算键与纯预检、真实P002契约保存重开命令、旧23模型schema兼容、隔离wheel追加检查已草拟。当前31契约+18方法+38Workspace共87passed/21.61秒；准确源6bb3168的P002合同命令/完整独立wheel实际均exit0，冻结证据P007/execution.json。非作者独审正在进行、完整PR全门禁未完成，不宣称执行器或GUI。
 - 新契约docs/contracts/scientific-workflow-v1.md，公开api不变入口；原api实现原样移contracts_v1.py避免循环，23模型schema摘要由main839源产生。不能从typed模型存在推断文件已验或科学方法已准入。
-- 初次草案commit被新增wheel脚本3处行宽拦住，已按格式修复；没有绕过hook。P007代码尚未成功提交（需git实际核实后更新）。
+- 初次草案commit被新增wheel脚本3处行宽拦住，已按格式修复；没有绕过hook。P007源码已成功冻结6bb3168，旧v1 Git blob逐字节相同（v1-source-preservation.json）；当前后继仅文档/证据/状态。
 - P006 done：PR50准确839..b0c71e1非作者Accepted、四必需CI SUCCESS，正常合main dc9618e且tree相同；Windows1569passed/723.79秒、Linux1565passed/4既有skip/497.04秒，双平台原评估/V0 wheels通过。收据P006/integration.json/review-final.md。
 - P006源码a9真实六例5+30、四主题设置超100ms、前台UNKNOWN、准备取消run=null/无PID，host确认28ms与service_closed6.4秒分列；多项快照/刷新/payload/内存超线完整保留。首次f3失败不覆盖，raw/results.md。基线done不代表预算/目标机已过。
 - P003/B011已PR49正常合839，P003 D1不授S1；原失败、r2真实WB与完整1555项/isolated wheels、独审/冻结字节30SHA均保留其证据。P002原范围PR48正常合f2dc5ad，真实worker/持久成果/重开五例保留，不重做。
