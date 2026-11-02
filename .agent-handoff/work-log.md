@@ -1,9 +1,5 @@
 # Current Work Log
 
-## 2026-10-19 T050 规划回复（保留main记录）
-
-根据用户回复更新第5/6/7/8节：批准局部暂停与独立结果目录，独立灰度定量OCR作为继续支持的功能。主流程不加载OCR与安装发行拆分是不同事项，后者未决；同步任务/风险/待办和交接。未改产品/PDF/依赖，旧审查不外推本轮修订。
-
 ## 2026-10-20 E7 governance integration
 
 INT001 resumes authorized E7 only in this temporary historical integration tree. Merged planning main43d520f into original governance0b7, retained immutable RULE001 receipt source; loaded/read exact rules and current full scope. Main PR/CI not yet accepted. WB product development/checks remain in t051, not represented by this zero-product checkout.
@@ -156,3 +152,7 @@ P006准确839..b0c71e1非作者Accepted，PR50四必需CI后正常合dc9618e/tre
 ## 2026-11-02 P007首轮CI失败后的显示pan竞态修复
 
 PR51旧23d Linux1596pass/4skip/613.11秒/wheels过，Windows1fail1599pass/929.22秒，旧manual pan40/25超时，未合。原样单测过不足定因；扣留首个rAF的trusted事件40/25被fitImage首次panKey初始化归零，受控新回归修前确切失败、修后两支完整测试2pass/17.20秒，邻近7pass/12.76秒。共享视图pan同步在pointerdown捕获offset前完成，未改ROI/原像素/1000-800/取消/历史/超时/容差。Ruff/type/web/detector过，等待新准确提交独审/CI。历史CI现场同因未证，不统一销账native/GPU。
+
+## 2026-11-02 P007显示pan新候选独审
+
+准确dc..dc4cc24新完整候选Accepted；独立Qt完整两支2pass/17.23秒、12组实际处理器/视图/取消组合及原件/日志SHA、rule/plan/diff/detect0。原断言/5000ms/数值/ROI未放宽，历史CI现场根因未冒称全证。P007转in_review绑定dc4cc；状态记录增量复核后更新PR51重新执行必需全门禁。P005仍等实际集成，不提前实施。

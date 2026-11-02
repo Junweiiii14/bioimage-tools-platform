@@ -1,6 +1,6 @@
 # P-007 M1最小科学资产、连接与冻结工作流契约
 
-<!-- PROGRAM_TASK_META {"id":"P-007","status":"in_progress","work_package":"W11","depends_on":["P-002","P-003"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"dc9618e7000eb7793067556e99d50a0d0509423d","head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-007","status":"in_review","work_package":"W11","depends_on":["P-002","P-003"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"dc9618e7000eb7793067556e99d50a0d0509423d","head_commit":"dc4cc24a0248396de711b1e7f820280cc23de157"} -->
 
 ## 输入与前置
 
@@ -57,3 +57,9 @@ P006已独审/四必需CI后PR50正常合main dc9618e，P007保留自身未提�
 修复限定显示平移：在pointerdown采集初始offset前同步当前视图panKey，fitImage共用同一状态同步；保留原数值/ROI/原始输入。原完整测试增加扣留初始布局帧的分支，原40/25、取消恢复、原坐标ROI和1000/800数值断言、5000ms超时不改。适用scope仍为已加载的.，已读desktop README/当前实现及impeccable上下文/交互边界；不升级技能、不修复无关sidecar。旧独审23d产品结论不覆盖本UI增量，修后新准确提交独审与全部必需CI再验，不靠重跑或放宽门禁销账。
 
 修复后普通/扣留布局两支完整手动流程2passed/17.20秒，邻近源身份/独立灰度7passed/12.76秒；保留原40/25、55/35、取消40/25与ROI/1000/800/原图/历史断言，未改5000ms或容差。新增回归修前实际exit1/8.38秒、修后0。Ruff/format（折行decorator后）、全Pyright0、web质量四反例检查0，impeccable单次机械detect0/[]。详情pan-race-regression.json和research最小实验。转in_progress等待新准确提交独审，不沿用旧Accepted宣称UI增量已审。
+
+## 显示修复后准确候选独审
+
+非作者准确dc9618e..dc4cc24a0248396de711b1e7f820280cc23de157 **Accepted，无新增阻断**。独立普通/延迟完整WebEngine2passed/17.23秒，实际生产函数/指针处理器12组偏移/同新视图/延迟fit/取消组合均通过；探针不替代真实Qt测试。七份回归原件和原CI完整日志SHA、规则回执/diff/plan checker/机械检测[]均核实。未改科学坐标/ROI/数值/超时/容差，保留首轮失败和受控因果限制。
+
+转in_review绑定dc4cc24；后继仅状态/独审记录，仍复核准确新最终HEAD后更新PR51运行四必需CI。没有将旧失败重跑改成功，也不提前合并或激活P005。

@@ -127,3 +127,5 @@ ed830e1准确完整门禁1503 passed/756.15s+全部isolated wheels/exit0，HEAD/
 | 2026-11-02 | P007最终dc9618e..23d4056独审、最终Pyright及规则/plan checker | Accepted；独立31passed/4秒、六组攻击拒绝；作者Pyright0/plan/rule0。PR51 Windows/Linux完整CI尚进行，不能写通过/集成 | P007/review-final.md |
 
 | 2026-11-02 | P007 CI首轮23d Windows旧manual pan失败；受控pending_layout新回归与修复 | 修前同断言exit1/8.38秒；修后2pass/17.20秒、邻近7pass/12.76秒；Ruff/type/web/detect0。首轮Linux1596pass/4skip/613.11秒/wheels过，Windows1fail1599pass/929.22秒，不作通过 | P007/ci-failure-r1.json、pan-race-regression.json |
+
+| 2026-11-02 | P007准确dc..dc4cc24新增UI及全部增量非作者独审 | Accepted；独立Qt2pass/17.23秒、12组处理器组合/原件与CI日志SHA/规则/plan/diff/detect0；完整新CI待执行 | P007/review-final.md |
