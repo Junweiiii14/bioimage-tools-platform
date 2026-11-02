@@ -1,6 +1,6 @@
 # P-007 M1最小科学资产、连接与冻结工作流契约
 
-<!-- PROGRAM_TASK_META {"id":"P-007","status":"in_review","work_package":"W11","depends_on":["P-002","P-003"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"dc9618e7000eb7793067556e99d50a0d0509423d","head_commit":"6bb3168ad145a70d0851703826b4813057ae42e5"} -->
+<!-- PROGRAM_TASK_META {"id":"P-007","status":"in_review","work_package":"W11","depends_on":["P-002","P-003"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"dc9618e7000eb7793067556e99d50a0d0509423d","head_commit":"23d405645097fa07b7949522e020b75a7a4cd3cf"} -->
 
 ## 输入与前置
 
@@ -45,3 +45,7 @@ P006已独审/四必需CI后PR50正常合main dc9618e，P007保留自身未提�
 首个成功冻结源码6bb3168ad145a70d0851703826b4813057ae42e5。实际命令tooling.wb_workflow_plan --output .local/p007-proof-6bb3168 exit0，原图/定义/计划/receipt保持原生产字节；仅合同预检保存重开，不冒充图执行。tooling.installed_wheels准确该源实际exit0（Win11/Python3.12.14、offscreen/disable-gpu），包括新增runtime/contracts两节点文件绑定/预检/重开反例，既有科学评估、WB真实4000/提交重开、桌面和OCR等全部原检查也通过。原v1实现Git blob与新contracts_v1逐字节相同；execution.json/v1-source-preservation.json保留。
 
 准确dc9618e..6bb3168非作者审查正在进行，后继只有证据/状态变化仍需审查；本卡转in_review绑定已冻结候选。当前不宣布最终Accepted或M1完成；本阶段本地完整check --all未重跑，正常PR必需双平台全门禁仍须通过。
+
+## PR51冻结候选最终独审
+
+非作者准确dc9618e..23d4056最终Accepted，产品6bb独立31passed/4.00秒及六组额外计划攻击均拒绝；四原件/receipt/旧v1 Git字节与实际wheel日志独立核对通过。PR51远端HEAD固定23d4056并已ready，规则/desktop已SUCCESS，Windows/Linux全门禁仍在执行，尚未合并；保持in_review。当前本地后继仅独审/交接记录，不推送更改远端冻结候选；待其正常集成后，真实集成收据随下一任务PR提交。
