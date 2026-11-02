@@ -63,3 +63,11 @@ Fresh reviewer首轮bb42有效12图结论fix，唯一问题为窄窗任务密度
 准确2755604..26f4470代码独审Request changes：真实manifest和run不变，合法子账本修订可把成果选择错绑已有9999 CSV，results/open此前接受。当前共享纯validate_workflow_result_selection由缓存与展示两个实际消费者调用；展示读取实际run.result，对照完整outputs/quality、原始source身份和冻结请求，缓存保留旧来源。未改科学公式、schema或门禁。原独审对损坏manifest的猜测已撤回，Workspace.get_run原本会拒绝。
 
 作者execution/store/session定向21passed38.06s；新增/连线、替换、删除后分别保存重开测试1passed4.11s。最终type0，目标Ruff/format通过；回归测试变量类型问题已修，不加忽略。新候选尚未冻结/独审，新增IO影响preview及closed后自动results，故仅重测四主题预览和neutral真实控制5+30；纯node/upper沿用26f历史数据，明确不称新候选实测。安装需对当前修复重验，之后集中独审/PR必需CI，不本地重跑全量。
+
+## 2026-11-03 准确修复候选通过独审与安装验证
+
+64c02d94b0da1596ee9cb372d60e44b24cf23b33已冻结。非作者准确2755604..64c02d9 Accepted工程候选，原持久错绑反例results/open均StateConflict；缓存旧来源及加强Web重开独立2passed17.73s/exit0。原Request changes和最终独审分别保留review-26f4470-request-changes.md、review-final.md。
+
+修复后四主题preview及35控制5+30采样exit0，独立复算一致；preview反馈329–342ms、暂停/取消UI反馈204/212ms，后台确认38/38ms、边界1523ms/批次排空389ms；renderer WS3.57GB，超参考/高值原因UNKNOWN，详见performance-final.md/json。26f完整及64c受影响两批28份原始文件已逐字节归档，不把旧数据改署新提交。
+
+64c全部隔离wheel完整exit0，旧探针全部保留，新AUTHORING_SCRIPT实际安装资产/编辑保存重开/4000→40/6workers/布局模板CLI通过；原日志将随最终记录归档。下一步仅证据/交接提交，集中准确增量复核、PR及必需CI/正常合入，仍in_progress，尚未宣告M2或目标完成。

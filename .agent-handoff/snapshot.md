@@ -18,12 +18,13 @@
 
 独审/root/p002_independent_review准确2755604..26f4470 Request changes P1：合法子账本改outputs可错绑已有9999 CSV，真实run/manifest未变。持久副本.local/p009-independent-26f-selection，报告.local/p009-review-26f4470.md。损坏manifest假设已撤回（Workspace.get_run本就拒绝）。
 
-当前未提交修复共享纯validate_workflow_result_selection，两个真实消费者reuse/display；展示由实际run.result读取manifest，对照完整输出/质量/原始source身份、计算键和冻结请求。缓存保留原execution/node/attempt，不强绑当前标签。无公式/schema/门禁变化。作者execution/store/session21passed38.06s；补强新增连线、替换、删除分别保存重开，最终store+单GUI4passed18.95s，日志.local/p009-manifest-reopen-final.log（保留Qt context lost诊断，不据此统一解释历史）。type0、目标Ruff/format通过。
+修复已冻结64c02d94b0da1596ee9cb372d60e44b24cf23b33，共享纯validate_workflow_result_selection，reuse/display两真实消费者；缓存保留原身份。无公式/schema/门禁变化。作者21passed38.06s、最终store+加强GUI4passed18.95s、type/Ruff/format通过。非作者准确2755604..64c Accepted，原持久反例results/open拒绝，缓存/真实GUI独立2passed17.73s。报告work/evidence/P-009/review-final.md，原拒绝报告保留。
 
-1. 冻结修复候选，准确提交独审原持久反例results/open拒绝+缓存旧来源正例；当前agent可复用，遵守已有独审授权，不新建无关代理。
-2. 串行执行受影响性能：--case standard --action results，四主题preview和neutral暂停/继续/取消5+30。closed自动results可能影响取消UI，因此也重测；未改同步node/upper保留26f历史数据，不称新提交实测。采样期间不并行测试/打包/改源码。
-3. 当前候选全隔离wheel一次；保留26f旧通过及新准确提交证据，不本地重复全pytest。最终归档正式原始样本/日志/哈希和真实超线。
-4. 完整候选集中独审、单PR及必需CI，正常合入；无--admin/规则绕过，仓库auto-merge disabled。未建P009 PR。集成后按原P002/M1/M2需求逐项审计，不能靠状态文字宣布完成。
+64c受影响preview/control5+30采样exit0，独立复算一致；preview329–342ms，pause/cancel后台确认38/38ms、UI反馈204/212ms，renderer WS3.57GB，超参考/高值如实保留，不推断根因。28份两提交原始文件及SHA已归档，performance-final.md/json。64c当前全部隔离wheelexit0，handle64363终态确认，实际安装编排/保存重开/4000→40/6workers/模板CLI通过；日志.local/p009-installed-wheels-64c02d9.log。当前没有本机运行中的测量/测试/安装进程。
+
+1. 完成最终纯证据/交接提交及准确增量独审，单PR及必需CI，正常合入；无--admin/规则绕过，仓库auto-merge disabled。未建P009 PR。
+2. 本地不再重复全pytest/已通过wheel/原生测量；最终CI执行全量Windows/Linux已有门禁和wheel。失败按真实原因处理，不自动重跑凑绿。
+3. 集成后按objective-audit.md及原P002/M1/M2需求逐项核验，记录当前PR/check/tree，不能靠状态文字宣布完成。保持科学/设备/用户体验及性能限制。
 
 旧快照已逐字节归档archive/P009-before-manifest-fix-snapshot.md；详细失败、命令和阶段证据在任务及work/evidence/P-009，不在snapshot复制长日志。
 
