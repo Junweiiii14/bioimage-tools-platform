@@ -22,7 +22,7 @@
 
 ## 当前状态
 
-进行中，依赖已完成；后台和首版实际界面已实施，仍需完成交互覆盖、视觉/性能验证、准确提交独立审查及PR/必需CI。其他实验/Agent/安装器发布不在本卡范围。
+进行中，依赖已完成；完整编排/真实执行、交互覆盖和有界视觉确认已实施。26f正式性能采样及该版隔离wheel已完成；独审确认成果选择错绑P1，当前修复待准确提交复审、受影响性能/安装验证和PR/必需CI。其他实验/Agent/安装器发布不在本卡范围。
 
 
 ## 2026-11-02激活
@@ -55,3 +55,11 @@ Fresh reviewer首轮bb42有效12图结论fix，唯一问题为窄窗任务密度
 ## 2026-11-03 已安装编排器验证通过与测量修正
 
 全环境wheel第二轮exit0，新P009独立GUI探针验证真实已安装JS/CSS、保存重开、4000→40、6实际RunRecord/PID和布局模板CLI；旧probe全部保留，-u只增强输出。第一轮app.quit轮询问题已记录为主动终止/exit1，不算通过。坏TIFF混合输入GUI1passed9.48秒，坏输入隔离、有效40、原字节保留。正式5d0c355采样exit1，8组UI数据完整，控制第二轮顶层const重复声明修为IIFE并检查true回执；2轮诊断过，待重新冻结完整默认采样。无阈值/超时/断言弱化；.gitattributes只追加P009 frozen-runs字节保留规则。详见delivery-probes.md/json及原始失败数据。
+
+## 2026-11-03 正式采样完成与独审P1修复
+
+26f4470完整默认采样exit0，12组UI及35轮控制（5预热/30正式）已由独审重算。普通iris/neutral节点137–149ms、预览332–345ms超过100ms参考；normal renderer工作集约3.93GB，保留原值与原因UNKNOWN，不写性能全面通过。原始.local/p009-perf-frozen-26f4470/results.json；最终证据归档待做。
+
+准确2755604..26f4470代码独审Request changes：真实manifest和run不变，合法子账本修订可把成果选择错绑已有9999 CSV，results/open此前接受。当前共享纯validate_workflow_result_selection由缓存与展示两个实际消费者调用；展示读取实际run.result，对照完整outputs/quality、原始source身份和冻结请求，缓存保留旧来源。未改科学公式、schema或门禁。原独审对损坏manifest的猜测已撤回，Workspace.get_run原本会拒绝。
+
+作者execution/store/session定向21passed38.06s；新增/连线、替换、删除后分别保存重开测试1passed4.11s。最终type0，目标Ruff/format通过；回归测试变量类型问题已修，不加忽略。新候选尚未冻结/独审，新增IO影响preview及closed后自动results，故仅重测四主题预览和neutral真实控制5+30；纯node/upper沿用26f历史数据，明确不称新候选实测。安装需对当前修复重验，之后集中独审/PR必需CI，不本地重跑全量。

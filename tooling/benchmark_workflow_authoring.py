@@ -183,7 +183,7 @@ def wait_idle(window: "WebWorkbenchWindow", pump: EventPump) -> None:
     )
 
 
-def run_case(folder: Path, nodes: int, warmup: int, samples: int) -> dict[str, object]:
+def run_case(folder: Path, nodes: int, warmup: int, samples: int, action: str) -> dict[str, object]:
     from bioimage_app.web_window import WebWorkbenchWindow
     from bioimage_app.workflow_batch_session import WorkflowBatchStatus
     from platform_runtime.api import Workspace
@@ -328,7 +328,8 @@ def run_case(folder: Path, nodes: int, warmup: int, samples: int) -> dict[str, o
                     is True
                 )
             )
-            for kind in ("node", "preview") if nodes == 3 else ("node",):
+            kinds = ("preview",) if action == "results" else ("node", "preview")
+            for kind in kinds if nodes == 3 else ("node",):
                 raw: list[dict[str, object]] = []
                 for index in range(warmup + samples):
                     javascript(
@@ -479,11 +480,14 @@ def main() -> int:
     parser.add_argument("--samples", type=int, default=30)
     parser.add_argument("--warmup", type=int, default=5)
     parser.add_argument("--case", choices=("standard", "upper", "both"), default="both")
+    parser.add_argument("--action", choices=("all", "results"), default="all")
     args = parser.parse_args()
     if platform.system() != "Windows" or os.environ.get("QT_QPA_PLATFORM", "windows") != "windows":
         parser.error("Requires native Windows Qt platform")
     if args.samples < 1 or args.warmup < 0:
         parser.error("Invalid sample counts")
+    if args.action == "results" and args.case != "standard":
+        parser.error("Results-path measurement requires --case standard")
     from PySide6.QtCore import qVersion
     from PySide6.QtWidgets import QApplication
 
@@ -493,10 +497,13 @@ def main() -> int:
     app = QApplication([])
     app.setQuitOnLastWindowClosed(False)
     cases = (3, 64) if args.case == "both" else (3,) if args.case == "standard" else (64,)
-    results = [run_case(output / f"nodes-{n}", n, args.warmup, args.samples) for n in cases]
+    results = [
+        run_case(output / f"nodes-{n}", n, args.warmup, args.samples, args.action) for n in cases
+    ]
     report = {
         "schema_version": 1,
         "source_commit": source_commit,
+        "action": args.action,
         "qpa": app.platformName(),
         "samples": args.samples,
         "warmup": args.warmup,

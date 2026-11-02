@@ -13,10 +13,12 @@ from platform_runtime.api import (
     Workspace,
     compile_workflow,
     load_workflow_ledger,
+    validate_workflow_result_selection,
 )
 from pydantic import ValidationError
 from tool_contracts.api import (
     NodePosition,
+    OutputManifest,
     WorkflowBatch,
     WorkflowBatchItem,
     WorkflowDefinition,
@@ -330,8 +332,12 @@ def _outputs(
         for result in child.results:
             if command.node_id and result.node_id != command.node_id:
                 continue
-            if store.get_run(result.run.run_id) != result.run:
-                raise StateConflict("Result receipt differs from the actual committed run")
+            run = store.get_run(result.run.run_id)
+            if run.result is None:
+                raise StateConflict("Selected run has no committed result manifest")
+            manifest = OutputManifest.model_validate_json(store.read_asset(run.result))
+            node = next(node for node in child.plan.nodes if node.node_id == result.node_id)
+            validate_workflow_result_selection(child, node, result, run, manifest)
             for output in result.outputs:
                 if command.port and output.port != command.port:
                     continue

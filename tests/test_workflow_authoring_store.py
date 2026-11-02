@@ -16,7 +16,12 @@ from bioimage_app.workflow_authoring_models import (
 from bioimage_app.workflow_authoring_store import execute_authoring_store, load_authoring_project
 from bioimage_app.workflow_batch_session import WorkflowBatchSession, WorkflowBatchStatus
 from bioimage_app.workflow_template import load_workflow_template
-from platform_runtime.api import StateConflict, Workspace, load_workflow_ledger
+from platform_runtime.api import (
+    StateConflict,
+    Workspace,
+    load_workflow_ledger,
+    workflow_ledger_json,
+)
 from pytestqt.qtbot import QtBot
 from tool_contracts.api import NodePosition, WorkflowLayout
 
@@ -287,4 +292,77 @@ def test_editor_runs_rebinds_and_reuses_style_on_same_storage(
             store.read_asset(store.load_draft(batch.items[0].execution_id).asset).decode()
         )
         assert [r.reused for r in child.results] == [True, True, False]
+        assert len(store.list_runs()) == 7
+        # A valid opaque journal revision is not authority to substitute an asset.
+        # Exercise both an original publisher and a cached result with an older origin.
+        original_results = child.results
+        assert original_results[0].source_execution_id != child.execution_id
+        fake_csv = tmp_path / "unrelated.csv"
+        fake_csv.write_text("value\n9999\n", encoding="utf-8")
+        from hashlib import sha256
+
+        foreign = store.import_asset(fake_csv, sha256(fake_csv.read_bytes()).hexdigest())
+        publisher = original_results[-1]
+        original_manifest = publisher.run.result
+        assert original_manifest is not None
+        manifest_bytes = store.read_asset(original_manifest)
+        for selected, field in (
+            (original_results[0], "outputs"),
+            (publisher, "outputs"),
+            (original_results[0], "origin"),
+        ):
+            selected_output = next(
+                (output for output in selected.outputs if output.port == "measurements"),
+                selected.outputs[0],
+            )
+            altered = selected.model_copy(
+                update={
+                    "outputs": tuple(
+                        output.model_copy(update={"asset": foreign})
+                        if output == selected_output
+                        else output
+                        for output in selected.outputs
+                    )
+                }
+                if field == "outputs"
+                else {"source_node_id": "unrelated_origin"}
+            )
+            draft = store.load_draft(child.execution_id)
+            current_child = load_workflow_ledger(store.read_asset(draft.asset).decode())
+            forged = current_child.model_copy(
+                update={
+                    "revision": current_child.revision + 1,
+                    "events": (
+                        *current_child.events,
+                        current_child.events[-1].model_copy(
+                            update={"sequence": len(current_child.events) + 1}
+                        ),
+                    ),
+                    "results": tuple(
+                        altered if result.node_id == selected.node_id else result
+                        for result in original_results
+                    ),
+                }
+            )
+            store.save_draft(
+                child.execution_id,
+                draft.tool_id,
+                forged.revision,
+                workflow_ledger_json(forged).encode(),
+                expected_previous_revision=draft.revision,
+            )
+            for operation in ("results", "open"):
+                with pytest.raises(StateConflict, match="committed result|original execution"):
+                    execute_authoring_store(
+                        store,
+                        payload(
+                            operation,
+                            "editor",
+                            batch_id=batch.batch_id,
+                            sample_id=batch.items[0].sample_id,
+                            node_id=selected.node_id,
+                            port=selected_output.port,
+                        ),
+                    )
+        assert store.read_asset(original_manifest) == manifest_bytes
         assert len(store.list_runs()) == 7

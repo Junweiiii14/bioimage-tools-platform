@@ -405,6 +405,31 @@ def finish_workflow_attempt(
     )
 
 
+def validate_workflow_result_selection(
+    ledger: WorkflowLedger,
+    node: PlannedNode,
+    source: WorkflowNodeResult,
+    run: RunRecord,
+    manifest: OutputManifest,
+) -> None:
+    """Check validated frozen models against the actual committed manifest.
+
+    The caller admits store bytes and supplies a node from this frozen plan.
+    Cached selections retain their original execution/node/attempt identity.
+    """
+    if source.computation_key != node.computation_key:
+        raise StateConflict("Selected scientific computation key differs from the frozen node")
+    if (source.run, source.outputs, source.quality) != (run, manifest.outputs, manifest.quality):
+        raise StateConflict("Selection differs from its real committed result")
+    if (source.source_execution_id, source.source_node_id, source.source_attempt_id) != (
+        manifest.request.execution_id,
+        manifest.request.node_id,
+        manifest.request.attempt_id,
+    ):
+        raise StateConflict("Selection changed the original execution identity")
+    _admit_result(ledger, node, run, manifest)
+
+
 def reuse_workflow_result(
     ledger: WorkflowLedger, source: WorkflowNodeResult, run: RunRecord, manifest: OutputManifest
 ) -> WorkflowLedger:
@@ -417,17 +442,7 @@ def reuse_workflow_result(
     if node is None:
         raise StateConflict("Workflow cannot reuse a result at this boundary")
     _reserve(ledger)
-    if source.computation_key != node.computation_key:
-        raise StateConflict("Cached scientific computation key differs from the frozen node")
-    if (source.run, source.outputs, source.quality) != (run, manifest.outputs, manifest.quality):
-        raise StateConflict("Cached selection differs from its real committed result")
-    if (source.source_execution_id, source.source_node_id, source.source_attempt_id) != (
-        manifest.request.execution_id,
-        manifest.request.node_id,
-        manifest.request.attempt_id,
-    ):
-        raise StateConflict("Cached selection changed the original execution identity")
-    _admit_result(ledger, node, run, manifest)
+    validate_workflow_result_selection(ledger, node, source, run, manifest)
     request = manifest.request
     result = WorkflowNodeResult(
         node_id=node.node_id,

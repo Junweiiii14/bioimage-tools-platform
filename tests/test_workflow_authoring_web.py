@@ -155,6 +155,25 @@ def test_graph_editing_preflight_and_saved_reopen(
     assert isinstance(workspace, str) and Path(workspace).is_dir()
     original = window.authoring.projection.project
 
+    def directory(*_args: object, **_kwargs: object) -> str:
+        return workspace
+
+    monkeypatch.setattr(QFileDialog, "getExistingDirectory", directory)
+
+    def reopen() -> None:
+        assert window.authoring.projection is not None
+        expected = window.authoring.projection.project
+        js(window, qtbot, "document.querySelector('[data-wf-choose=open_project]').click();true")
+        qtbot.waitUntil(
+            lambda: js(window, qtbot, "!workflowEditor.snapshot().pending") is True,
+            timeout=15000,
+        )
+        assert window.authoring.projection is not None
+        assert window.authoring.projection.project == expected
+        assert js(window, qtbot, "workflowEditor.snapshot().graph.nodes.length") == len(
+            expected.graph.nodes
+        )
+
     def save() -> None:
         js(window, qtbot, "document.querySelector('#wf-save').click();true")
         qtbot.waitUntil(
@@ -202,6 +221,8 @@ def test_graph_editing_preflight_and_saved_reopen(
     )
     save()
     assert not window.authoring.projection.issues
+    reopen()
+    js(window, qtbot, f"document.querySelector('[data-wf-select=\"{added}\"]').click();true")
     # Replace the added publisher by a verifier, then delete it; original edges survive.
     js(
         window,
@@ -214,25 +235,17 @@ def test_graph_editing_preflight_and_saved_reopen(
         js(window, qtbot, "workflowEditor.snapshot().graph.nodes.at(-1).module.module_id")
         == "wb-verify-original"
     )
+    save()
+    reopen()
+    js(window, qtbot, f"document.querySelector('[data-wf-select=\"{added}\"]').click();true")
     js(window, qtbot, "document.querySelector('#wf-delete-node').click();true")
     save()
     assert len(window.authoring.projection.project.graph.nodes) == 3
     assert window.authoring.projection.project.graph.edges == original.graph.edges
     assert not window.authoring.projection.issues
 
-    # Reopen through the native file action rather than injecting another draft into the JS view.
-    def directory(*_args: object, **_kwargs: object) -> str:
-        return workspace
-
-    monkeypatch.setattr(QFileDialog, "getExistingDirectory", directory)
-    expected_revision = window.authoring.projection.project.revision
-    js(window, qtbot, "document.querySelector('[data-wf-choose=open_project]').click();true")
-    qtbot.waitUntil(
-        lambda: js(window, qtbot, "!workflowEditor.snapshot().pending") is True,
-        timeout=15000,
-    )
-    assert window.authoring.projection.project.revision == expected_revision
-    assert js(window, qtbot, "workflowEditor.snapshot().graph.nodes.length") == 3
+    # Native file action verifies persisted add/wire, replacement and deletion separately.
+    reopen()
 
 
 def test_schema_form_boolean_empty_array_and_composition(

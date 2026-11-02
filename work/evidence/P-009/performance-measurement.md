@@ -31,4 +31,6 @@
 - r3已走通四主题节点/预览后，取消确认在自动读取成果的短暂中间状态被误判失效；保留错误。取消回执增加真实终态下取消按钮隐藏这一持续可见结果，仍要求最终真实cancelled/closed、真实run_id及身份不变，未放宽终态/可信事件/时钟守卫。
 - r4及加入原生偏好保存/前台核验的r5小样本两场景均退出0，验证测量流程，不称正式p95。诊断时测量工具尚未提交，不能当作冻结基线。各次均新目录，不覆盖原错误。最小等待实验可用storage_event_loop_probe.py及全新workspace路径复现，输出随环境如实记录，不断言所有平台必然相同。
 
-正式命令（冻结后运行）：`uv run --locked --no-sync python -m tooling.benchmark_workflow_authoring --run --output <全新目录>`。进程环境QT_QPA_PLATFORM=windows，GPU flags如实记录；--samples/--warmup仅供明确诊断，非默认数量不冒充完整分布。正式结果尚未产生，后续另记准确提交、原命令、退出码及原始数据摘要。
+正式命令：`uv run --locked --no-sync python -m tooling.benchmark_workflow_authoring --run --output <全新目录>`。进程环境QT_QPA_PLATFORM=windows，GPU flags如实记录；--samples/--warmup仅供明确诊断，非默认数量不冒充完整分布。26f4470完整正式采样已退出0，原始.local/p009-perf-frozen-26f4470；部分普通节点及全部预览超100ms参考，不能称预算全部满足。
+
+成果清单P1修复后，`--case standard --action results`只复测四主题预览及neutral真实暂停/继续/取消，仍默认5+30，原native/终态/样本断言不变。取消closed事件会触发自动results，也纳入受影响范围。默认action=all保留原完整协议。未改的同步节点选择/64节点数据保留26f原提交，不冒充修复提交实测；新报告显式记录action。内存仍记录实际进程快照，不以限定动作规避旧全协议高值或推断根因。
