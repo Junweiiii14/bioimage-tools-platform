@@ -1,6 +1,6 @@
 # P-007 M1最小科学资产、连接与冻结工作流契约
 
-<!-- PROGRAM_TASK_META {"id":"P-007","status":"in_review","work_package":"W11","depends_on":["P-002","P-003"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"dc9618e7000eb7793067556e99d50a0d0509423d","head_commit":"dc4cc24a0248396de711b1e7f820280cc23de157"} -->
+<!-- PROGRAM_TASK_META {"id":"P-007","status":"done","work_package":"W11","depends_on":["P-002","P-003"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"dc9618e7000eb7793067556e99d50a0d0509423d","head_commit":"c243933569db3ce4e9377283645c6f578ddd4b4e"} -->
 
 ## 输入与前置
 
@@ -63,3 +63,11 @@ P006已独审/四必需CI后PR50正常合main dc9618e，P007保留自身未提�
 非作者准确dc9618e..dc4cc24a0248396de711b1e7f820280cc23de157 **Accepted，无新增阻断**。独立普通/延迟完整WebEngine2passed/17.23秒，实际生产函数/指针处理器12组偏移/同新视图/延迟fit/取消组合均通过；探针不替代真实Qt测试。七份回归原件和原CI完整日志SHA、规则回执/diff/plan checker/机械检测[]均核实。未改科学坐标/ROI/数值/超时/容差，保留首轮失败和受控因果限制。
 
 转in_review绑定dc4cc24；后继仅状态/独审记录，仍复核准确新最终HEAD后更新PR51运行四必需CI。没有将旧失败重跑改成功，也不提前合并或激活P005。
+
+## r2最终候选已派发CI
+
+最终准确dc..c243933非作者Accepted：dc4cc后仅7文档/状态/完整归档，无源码变化，准确规则/plan/diff0。已push PR51新head c243933，quality41390321525实时in_progress、rules41390321566 SUCCESS；保持in_review，不作完整门禁通过/已合并。ci-r2-dispatch.json只证明已派发/当时状态，需实际终态。当前本地后继收据不push重启该冻结CI；四必需通过后按c243933正常合入并核对tree再done。
+
+## PR51正常集成完成
+
+最终准确c243933四必需检查全部SUCCESS，PR51于2026-11-02T05:06:03Z正常merge main006e9f143c830f5e13be2932e8ac37a9f3a05ed1，主线tree逐项等于准确独审候选。Windows1601passed/945.30秒、Linux1597passed/4既有skip/602.61秒，双平台新增workflow合同及原V0真实4000/提交重开等完整wheel均通过。原23d失败、受控修复和独审历史保留，integration.json记录实际CI/merge/tree。工程契约done，不表示M1执行器/M2编辑器或科学S1/目标机已完成。P005依赖现已满足。

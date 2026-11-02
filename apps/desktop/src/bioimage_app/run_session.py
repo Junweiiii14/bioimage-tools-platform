@@ -22,6 +22,7 @@ class RunSession(QObject):
     """Own until completed. Tools get neither Workspace nor DB; results retain run revision."""
 
     received = Signal(object)
+    started = Signal(object)
     completed = Signal(object)
 
     def __init__(
@@ -33,6 +34,7 @@ class RunSession(QObject):
         *,
         module_request: ExecutionRequest | None = None,
         module_output_directory: str = "",
+        require_dispatch_ack: bool = False,
     ) -> None:
         super().__init__(parent)
         if prepared.state != "prepared" or prepared.pid is not None:
@@ -50,6 +52,11 @@ class RunSession(QObject):
         ):
             raise ValueError("Module request differs from the prepared document revision")
         self._module_output_directory = module_output_directory
+        if type(require_dispatch_ack) is not bool:
+            raise TypeError("Dispatch acknowledgement option must be boolean")
+        self._dispatch_ack = not require_dispatch_ack
+        self._request_authorized = False
+        self._started_record: RunRecord | None = None
         self._store = storage
         self._prepared = prepared
         self._runner = ProcessRunner(codec, self)
@@ -84,6 +91,38 @@ class RunSession(QObject):
     def _started(self, pid: int) -> None:
         self._submit("start", StorageCommand("start", run_id=self._prepared.run_id, pid=pid))
 
+    def authorize_request(self, run_id: str, pid: int) -> bool:
+        """Workflow host calls only after its started journal CAS has been acknowledged."""
+        run = self._started_record
+        if run is None or (run.run_id, run.pid) != (run_id, pid):
+            raise ValueError("Dispatch acknowledgement differs from the persisted process")
+        if self._done:
+            return False
+        self._dispatch_ack = True
+        if self._cancellation.is_set():
+            self._record_cancel()
+            self._try_terminal()
+            return False
+        if self._outcome is not None:
+            self._try_terminal()
+            return False
+        self._allow_request()
+        return True
+
+    def _allow_request(self) -> None:
+        run = self._started_record
+        if (
+            self._dispatch_ack
+            and not self._request_authorized
+            and run is not None
+            and run.pid is not None
+            and not self._cancellation.is_set()
+            and self._outcome is None
+            and not self._done
+        ):
+            self._request_authorized = True
+            self._runner.allow_request(run.pid)
+
     def cancel(self) -> None:
         if self._done:
             return
@@ -91,7 +130,18 @@ class RunSession(QObject):
         if self._start_registered or self._outcome is not None and self._outcome.pid == 0:
             self._record_cancel()
 
+    def abort(self, reason: str) -> None:
+        """Stop an owned process after a host error without pretending the user cancelled."""
+        if not self._done:
+            self._dispatch_ack = True  # A failed journal cannot strand an observed exit.
+            self._runner.abort(reason)
+            if self._cancellation.is_set():
+                self._record_cancel()
+            self._try_terminal()
+
     def _record_cancel(self) -> None:
+        if not self._dispatch_ack:
+            return
         if self._cancel_recorded or "cancel" in self._pending.values():
             return
         self._submit("cancel", StorageCommand("cancel", run_id=self._prepared.run_id))
@@ -116,11 +166,17 @@ class RunSession(QObject):
                 self._finish(None, reply.error_code)
             return
         if purpose == "start":
+            if not isinstance(reply.value, RunRecord) or reply.value.pid is None:
+                self._start_failed = True
+                self._runner.abort("invalid_storage_start_reply")
+                return
             self._start_registered = True
+            self._started_record = reply.value
+            self.started.emit(reply.value)
             if self._cancellation.is_set():
                 self._record_cancel()
             else:
-                self._runner.allow_request(self._runner_pid(reply))
+                self._allow_request()
         elif purpose == "cancel":
             self._cancel_recorded = True
             self._runner.cancel()
@@ -131,12 +187,6 @@ class RunSession(QObject):
                 self._finish(reply.value, "")
             return
         self._try_terminal()
-
-    @staticmethod
-    def _runner_pid(reply: StorageReply) -> int:
-        if not isinstance(reply.value, RunRecord) or reply.value.pid is None:
-            raise ValueError("Storage did not confirm process ownership")
-        return reply.value.pid
 
     @Slot(object)
     def _exited(self, outcome: ProcessOutcome) -> None:

@@ -1,0 +1,11 @@
+# 下一接线点（设计笔记，不是已实现）
+
+账本/存储组件8d0a4ec已准确独审Accepted，后续必须实现真实单图三节点和完整故障矩阵，不能到组件验证停止。
+
+现RunSession在真实start_run存储回复后立即allow_request；ProcessEvent也未保留原始ExecutionEvent。通用GraphSession需保留原协议身份/序号，并明确真实PID/账本started的顺序。不能等worker极快完成再读取get_run来代替running过渡；可在allow_request前等待账本写入确认，或在同一存储线程固定操作完成此过渡。设计选择尚未实现，需实际竞态实验，旧入口默认行为保持。
+
+GraphSession只在账本CAS回复后更新可观察状态/派发，不在GUI执行账本JSON/大文件/注册源码摘要I/O。运行时/模块环境必须从实际安装重新计算并核对，包含OS/CPU、依赖与运行时源码身份；现P007自报env/当前workflow_storage文件完整性检查不替代此准入。
+
+真实工具适配需新固定注册verify/analyze/publish三节点，旧wb_v0_compare对照入口与旧数值不变。原输入只引用；验证凭据小型且绑定原AssetRef和解码dtype/shape/frame；分析同时接原图+凭据，源SHA及节点document revision从实际请求注入旧AnalysisRequest，科学参数不携带显示布局。完整多lane剖面保留旧AnalysisResult或有实际需求的集合schema，不冒充单SeriesMetadata。正式几何仍未实施，不调用P004方法。
+
+缓存当前字节检查/旧计算键仅是必要条件；所有实际执行/恢复复用仍须当前注册方法、科学元信息和环境准入。真实终态要等OS树退出、严格候选文件验证、正式存储提交和账本关联。完整取消/提交竞态、关闭重开、实际worker崩溃/非零与磁盘满等还要逐项运行；组件试验不能代替。

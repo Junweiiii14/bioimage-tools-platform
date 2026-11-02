@@ -3,7 +3,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from wb_tool.api import StartFrame, WBModuleStart
+    from wb_tool.api import StartFrame, WBModuleStart, WBWorkflowStart
 
     from bioimage_app.figure_window import FigureProjectWindow as FigureProjectWindow
     from bioimage_app.module_session import ComparisonSession
@@ -25,6 +25,7 @@ __all__ = [
     "ProcessRunner",
     "create_wb_codec",
     "create_wb_module_codec",
+    "create_wb_workflow_codec",
     "create_comparison_session",
     "RunCompletion",
     "RunSession",
@@ -52,6 +53,12 @@ def create_wb_module_codec(start: "WBModuleStart") -> ProcessCodec:
     from bioimage_app.wb_registration import WBModuleProcessCodec
 
     return WBModuleProcessCodec(start)
+
+
+def create_wb_workflow_codec(start: "WBWorkflowStart") -> ProcessCodec:
+    from bioimage_app.wb_registration import WBWorkflowProcessCodec
+
+    return WBWorkflowProcessCodec(start)
 
 
 def create_comparison_session() -> "ComparisonSession":

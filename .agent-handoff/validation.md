@@ -1,5 +1,23 @@
 # Validation Index
 
+2026-11-02生产自动会话：tests/test_workflow_session.py + RunSession/模块共23passed36.34s；加入口核验一次/后台线程断言后控制器2passed10.86s。真实--workflow CLI三节点/正式提交/账本succeeded、重开4000、三RunRecord及current runtime源码指纹同源均exit0。Ruff/Pyright/policy/九import约束0；精确源SHA/日志/run IDs见auto-session.json。新控制器完整故障/cache/UI、全门禁/新wheels/CI与最终独审未完成。
+
+2026-11-02社区karpathy-guidelines配置：上游固定commit raw与本地2518字节/SHA逐字节一致（作者命令exit0、非作者独立确认），仅MD无执行hook；skills-lock/policy exit0，用户优先实现规则已加载并生成新P005回执。证据karpathy-skill-verification.json。未运行产品新图，不把静态技能核验冒充MVP有效性；待实际简化与端到端运行验证。
+
+## 2026-11-02 P005 node workers and dispatch ack
+
+Windows/Python3.12.14锁定环境；默认/确认模式真实旧模块及RunSession/process28pass28.08s，关联七文件114pass57.89s（中间源码），后继确认期间取消/节点12pass28.82s及最终节点6pass22.93s。实际15次三节点worker/正式提交/重开40/4000/0/null状态与完整剖面核验；报告PNG实际查看。Ruff/Pyright/policy/九import边界0。初类型/闭包错误修正，未加ignore/skip或放宽旧科学预期。新source独审/完整门禁/wheels/CI待做，自动GraphSession与真实当前准入/完整故障矩阵未实现，详worker-slice.md。
+
+## 2026-11-02 P005 journal component only
+
+准确3215..8d0非作者Accepted，仅组件：独立12pass3.29s及真实旧事件反例/plan9-document0；作者100pass27.19s。四wheel构建/全部隔离安装exit0，新账本API与原V0实际4000/提交重开/桌面OCR均过，原日志6663B/SHA见journal-wheels.json。规则main006基线/plan/Ruff/Pyright tooling0。全量pytest/CI、GraphSession/当前环境认证/正式WB图仍未执行或未实现，不替代P005/M1。
+
+8bb独立11passed2.71s但P2旧hello来源丢失反例成立；后继补显式attempt/run与新回归，作者六文件100passed27.19s/exit0，新测试12项；Ruff/Pyright0。两次Request changes保留，待新head准确复审，未跑完整门禁或正式图。
+
+接线后新增11项账本/存储测试；受影响六文件99passed26.76s/exit0（RunSession/模块RunSession仍通过）；Ruff/Pyright及policy/import-linter九约束均0。首版26f独审Request changes的非零图generation冲突已有plan7/document0真实回归修正；首次测试类型错误及修正保留证据。未运行生产GraphSession/WB图/当前环境认证及完整门禁/wheels/CI，新head准确独审待做。
+
+现有Windows/Python3.12.14；uv --locked --no-sync：pytest tests/test_workflow_execution.py tests/test_workflow_contracts.py tests/test_workspace.py为77passed9.12s/exit0；Ruff format/check、Pyright contracts/runtime/新测试0errors、dev.py policy及lint-imports九边界均exit0。首轮7pass1fail及修正保留P005/journal-component.md；未运行正式WB图、完整门禁、wheels或本提交CI，不能称M1/P005完成。精确源提交随后由git与独审绑定。
+
 ## 2026-10-31 B008 文档发布
 
 文档构建、17登记/13章49表/相对链接核验、计划检查、Ruff及policy exit0；仓库HTML实际Edge字体loaded、无页面/请求错误。首commit钩子缺ruff退出2，选择已装venv后通过；首CI run41181434999两平台Markdown代码块空行格式失败，补空行后全仓format990文件通过。初P卡独审Accepted、便携链接独审Blocked后修正；准确最后HEAD独审与四必需CI只认PR46实况。派发证据见work/evidence/B-008/thread-dispatch.json。未本地运行产品测试、安装或独立科学验收。
@@ -129,3 +147,7 @@ ed830e1准确完整门禁1503 passed/756.15s+全部isolated wheels/exit0，HEAD/
 | 2026-11-02 | P007 CI首轮23d Windows旧manual pan失败；受控pending_layout新回归与修复 | 修前同断言exit1/8.38秒；修后2pass/17.20秒、邻近7pass/12.76秒；Ruff/type/web/detect0。首轮Linux1596pass/4skip/613.11秒/wheels过，Windows1fail1599pass/929.22秒，不作通过 | P007/ci-failure-r1.json、pan-race-regression.json |
 
 | 2026-11-02 | P007准确dc..dc4cc24新增UI及全部增量非作者独审 | Accepted；独立Qt2pass/17.23秒、12组处理器组合/原件与CI日志SHA/规则/plan/diff/detect0；完整新CI待执行 | P007/review-final.md |
+
+| 2026-11-02 | PR51 r2 c243四必需CI与正常merge006e9f1/tree核对 | 全SUCCESS；Windows1601pass/945.30秒、Linux1597pass/4既有skip/602.61秒；双完整workflow+旧V0/wheel过。P005仅设计/规则已加载，未实施/验证 | P007/integration.json；P005/execution-test-design.json |
+
+| 2026-11-02 | P005控制器/桌面真实运行与恢复、缓存及四wheel隔离 | 23pass101.88秒；新增暂停调整1pass8.59秒/5界面18.38秒；四wheel0；原生三run4000/截图已查。首轮输入失败重入关闭1fail3pass71.83秒已修，最后样式后全量待跑 | P005/runtime-gui-recovery.json |

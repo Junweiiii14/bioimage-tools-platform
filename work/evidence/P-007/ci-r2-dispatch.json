@@ -1,0 +1,60 @@
+{
+  "baseRefOid": "dc9618e7000eb7793067556e99d50a0d0509423d",
+  "headRefOid": "c243933569db3ce4e9377283645c6f578ddd4b4e",
+  "number": 51,
+  "state": "OPEN",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41390321525/job/125100056659",
+      "name": "foundation (windows-latest)",
+      "startedAt": "2026-11-02T04:46:41Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "quality"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-02T04:46:45Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41390321566/job/125100056436",
+      "name": "rules-context",
+      "startedAt": "2026-11-02T04:46:40Z",
+      "status": "COMPLETED",
+      "workflowName": "rules-context"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41390321525/job/125100056626",
+      "name": "foundation (ubuntu-latest)",
+      "startedAt": "2026-11-02T04:46:41Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "quality"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-02T04:47:12Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41390321525/job/125100056432",
+      "name": "desktop-environment",
+      "startedAt": "2026-11-02T04:46:41Z",
+      "status": "COMPLETED",
+      "workflowName": "quality"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-02T04:46:38Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41390321525/job/125100057600",
+      "name": "native-case",
+      "startedAt": "2026-11-02T04:46:38Z",
+      "status": "COMPLETED",
+      "workflowName": "quality"
+    }
+  ],
+  "quality_run_id": 41390321525,
+  "scope": "Dispatch/status snapshot only; not a successful completed gate"
+}

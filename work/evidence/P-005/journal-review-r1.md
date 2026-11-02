@@ -1,0 +1,7 @@
+# 首版账本组件独审：Request changes
+
+非作者/root/p002_independent_review只读审查准确3215e3e1ff6cbb6e4894922fb1fe628ecafa6edc..26f7f78b57ca58fea7526c816046d4b2bc1bb723；以Git对象内存加载冻结源码/测试，排除作者后续工作树。
+
+P1：begin_workflow_attempt把新节点请求文档revision强制等于plan.revision。图revision4时组件接受request revision4，但真实Workspace.save_draft首次保存拒绝“新草稿须从修订0开始”。作者接线时先发现并通知审查者；审查者独立真实Workspace复现，非作者脚本exit0。需要分离图generation与节点document revision，新head须复审。
+
+独立冻结8项组件测试全部通过，脚本exit0；除此未发现其他明确阻断。审查不认证传入模型就是OS/存储事实，未审后续生产接线，不批准P005或M1完成。无共享文件/提交修改；临时工作区仅审查脚本拥有。该Request changes保留，后续修正不改写此结论。

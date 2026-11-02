@@ -47,8 +47,9 @@ from wb_tool.api import (
         "hard_link",
     ],
 )
+@pytest.mark.parametrize("gated", [False, True])
 def test_module_run_commits_only_verified_real_success(
-    qtbot: QtBot, tmp_path: Path, mode: str
+    qtbot: QtBot, tmp_path: Path, mode: str, gated: bool
 ) -> None:
     source = tmp_path / "original.tif"
     tifffile.imwrite(
@@ -111,7 +112,12 @@ def test_module_run_commits_only_verified_real_success(
             create_wb_module_codec(start),
             module_request=None if mode == "missing_binding" else request,
             module_output_directory="" if mode == "missing_binding" else str(output),
+            require_dispatch_ack=gated,
         )
+        starts: list[RunRecord] = []
+        events: list[ProcessEvent] = []
+        session.started.connect(starts.append)
+        session.received.connect(events.append)
         session.completed.connect(completions.append)
         if mode == "cancel":
 
@@ -143,10 +149,22 @@ def test_module_run_commits_only_verified_real_success(
         session.start(
             (sys.executable, "-c", script, str(output)), str(tmp_path), encode_module_frame(start)
         )
+        if gated:
+            qtbot.waitUntil(lambda: bool(starts) and bool(events), timeout=15000)
+            assert [event.kind for event in events] == ["hello"]
+            assert events[0].module_event is not None and events[0].module_event.sequence == 0
+            assert not output.exists() and not completions
+            assert starts[0].pid is not None and starts[0].state == "running"
+            with pytest.raises(ValueError, match="persisted process"):
+                session.authorize_request("wrong_run", starts[0].pid)
+            assert session.authorize_request(starts[0].run_id, starts[0].pid)
         qtbot.waitUntil(lambda: bool(completions), timeout=30000)
         completion = completions[0]
         assert completion.error == "" and completion.record is not None
         assert completion.outcome.pid > 0
+        assert starts[0].pid == completion.outcome.pid
+        for event in events:
+            assert event.module_event is not None and event.module_event.kind == event.kind
         expected = (
             "succeeded" if mode == "success" else "cancelled" if mode == "cancel" else "failed"
         )

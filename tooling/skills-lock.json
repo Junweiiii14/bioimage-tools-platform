@@ -70,6 +70,15 @@
         "release": "https://github.com/pbakaus/impeccable/releases/tag/engine-v0.1.14",
         "location": "user cache: ~/.impeccable/bin/0.1.14/impeccable.exe (not committed)"
       }
+    },
+    {
+      "name": "karpathy-guidelines",
+      "repository": "multica-ai/andrej-karpathy-skills",
+      "commit": "2c606141936f1eeef17fa3043a72095b4765b9c2",
+      "source_path": "skills/karpathy-guidelines",
+      "tree_sha256": "5e8a1677df986d47abaf3d42f1ce0c7427ea030f50370c52baf9ba1e2c7c3db9",
+      "license": "MIT (declared in upstream SKILL.md)",
+      "modifications": "none"
     }
   ],
   "hash_format": "UTF-8 relative POSIX path, NUL, file bytes, NUL; case-sensitive path sort; Git LF checkout"

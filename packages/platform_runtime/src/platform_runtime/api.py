@@ -15,6 +15,20 @@ from platform_runtime.workflow import (
     verify_execution_plan,
     workflow_definition_json,
 )
+from platform_runtime.workflow_execution import (
+    abandon_workflow_intent,
+    associate_workflow_run,
+    begin_workflow_attempt,
+    control_workflow,
+    create_workflow_ledger,
+    finish_workflow_attempt,
+    load_workflow_ledger,
+    next_workflow_node,
+    record_workflow_run_started,
+    record_workflow_worker_event,
+    reuse_workflow_result,
+    workflow_ledger_json,
+)
 from platform_runtime.workspace import (
     IntegrityError,
     StateConflict,
@@ -40,4 +54,19 @@ __all__ = [
     "verify_execution_plan",
     "execution_plan_digest",
     "load_execution_plan",
+]
+
+__all__ += [
+    "create_workflow_ledger",
+    "load_workflow_ledger",
+    "workflow_ledger_json",
+    "next_workflow_node",
+    "begin_workflow_attempt",
+    "associate_workflow_run",
+    "record_workflow_run_started",
+    "record_workflow_worker_event",
+    "finish_workflow_attempt",
+    "reuse_workflow_result",
+    "control_workflow",
+    "abandon_workflow_intent",
 ]

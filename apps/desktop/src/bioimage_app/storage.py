@@ -22,9 +22,11 @@ from tool_contracts.api import (
     ProcessExitReceipt,
     RecoveryReport,
     RunRecord,
+    WorkflowLedger,
 )
 
 from bioimage_app.module_results import commit_module_result
+from bioimage_app.workflow_storage import WorkflowStoreCommand, execute_workflow_store
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -62,12 +64,14 @@ Operation = Literal[
     "run",
     "backup",
     "close",
+    "workflow",
 ]
 Value = (
     AssetRef
     | DraftSnapshot
     | RunRecord
     | RecoveryReport
+    | WorkflowLedger
     | tuple[DraftSnapshot, ...]
     | tuple[RunRecord, ...]
     | str
@@ -95,6 +99,7 @@ class StorageCommand:
     interrupted: bool = False
     cancellation: Event | None = None
     module_request: ExecutionRequest | None = None
+    workflow: WorkflowStoreCommand | None = None
 
 
 @dataclass(frozen=True)
@@ -149,6 +154,10 @@ class _StorageWorker(QObject):
         store = self._workspace
         if store is None:
             raise ValueError("No workspace is open")
+        if op == "workflow":
+            if command.workflow is None:
+                raise ValueError("Workflow operation requires an explicit journal command")
+            return execute_workflow_store(store, command.workflow), b""
         if op == "import":
             return store.import_asset(command.path, command.source_sha256), b""
         if op == "import_bytes":

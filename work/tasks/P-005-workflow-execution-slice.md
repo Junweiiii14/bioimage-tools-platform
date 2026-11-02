@@ -1,6 +1,8 @@
 # P-005 工作流与事件协议的最小可靠执行切片
 
-<!-- PROGRAM_TASK_META {"id":"P-005","status":"planned","work_package":"W04","depends_on":["P-002","P-007"],"execution_root":"not_activated","owner":null,"base_commit":null,"head_commit":null} -->
+当前进展（2026-11-02）：真实三节点控制器、CLI及--workflow-ui桌面入口已贯通。19项控制器成功/暂停/取消/故障恢复/缓存试验通过；23项联合检查101.88秒，新增暂停调整与5项界面检查通过。输入准备后台执行、同一执行器；修改排版复用前两步，旧成果不覆盖。四wheel隔离运行验证三节点/4000/重开/样式复用通过，原生Windows截图已复查，精确源码/边界见runtime-gui-recovery.json。最后样式修复后的完整检查、准确独审、PR/CI尚待完成，整卡仍in_progress；不是完整M1/M2交付。
+
+<!-- PROGRAM_TASK_META {"id":"P-005","status":"in_progress","work_package":"W04","depends_on":["P-002","P-007"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"006e9f143c830f5e13be2932e8ac37a9f3a05ed1","head_commit":null} -->
 
 ## 执行状态
 
@@ -46,3 +48,33 @@ P-002独立WB模块及实际契约、既有RunSession/Workspace/CAS与worker协�
 ## 2026-11-02 4.0依赖拆分（尚未实施）
 
 保留原P002依赖，新增P007科学资产/冻结图契约前置。本卡以旧原值WB粗模块与至少一个真实技术节点贯通固定图串行执行、节点边界暂停/取消、持久提交及幂等恢复；本卡完成单个固定图的依赖失效、复用校验和幂等恢复及既定反例；P008复用这些实现扩展有限多样本隔离、跨样本身份/预算并做完整M1工程交付，不建立第二套账本/缓存/恢复器，P009另做M2。原本卡的事件/缓存/重试反例不删除，不以P008分拆为由省略既定可靠性验收；新几何仍依P004具体实现，不假称新WB方法完成。
+
+## 2026-11-02激活
+
+前置P002/P007已通过准确独审、PR48/51与全部必需CI正常集成，当前base main006e9f1。分支codex/p005-workflow-executor从保留P007本地交接收据后与main正常合并的14c0153开始；原样保护既有证据/原图/历史，P007收尾记录随本分支提交。不再等待科学/目标机材料，也不将它们补为通过。
+
+实际范围：同一有限图/同一RunSession与Workspace/CAS贯通真实输入校验、旧WB数值分析、带状态表/完整曲线发布；先单图串行，账本/缓存/重开/节点边界暂停取消和既定故障反例完整实现，P008复用它扩有限批量，P009接同一执行器。旧worker和旧UI入口保留。所有前端/后台/CLI状态只在实际退出、校验、正式提交和账本登记后完成。
+
+实施前先冻结版本化事件/ledger/技术节点与验证设计。注意既有模块成果总预算16MiB，不能用复制大型原TIFF作为校验节点输出；小型校验凭据绑定原AssetRef，分析节点须核对它与原输入的身份和实际类型。现只有只读架构笔记.local/p005-design-candidate-20261102.md，非既定实现或准入。本卡尚无产品实现/验收成绩。
+
+## 执行与验收设计冻结
+
+work/evidence/P-005/execution-test-design.json冻结单图真实三节点、身份/状态、当前环境准入、预算和12类成功/故障实验。v1新增上限256 attempts、128 controls、4096 critical events为有限执行的防失控预算，不是性能成绩；实现必须预留终态容量，不能丢关键状态。沿用64节点/256连接/1MiB图、旧8/16端口、16MiB成果/文档预算，未改既有门禁或科学预期。原图通过引用传递，校验输出为小凭据，避免大型TIFF复制使既有预算失真。
+
+计划冻结不等于实现；P005产品/测试尚未执行。下一步具体实现版本化ledger/事件模型和纯状态转移，再接同一异步存储/RunSession，按真实实验逐项检验后独审/PR。
+
+## 账本组件实施（整卡未完成）
+
+2026-11-02新增版本化WorkflowLedger与纯转移及8项组件测试，详细真实成绩/首轮失败见work/evidence/P-005/journal-component.md。关联P007/Workspace共77pass；真实两节点子进程退出与存储提交/重开仅为组件夹具，不是生产三节点WB图。取消最后名额保留、科学计算键与原物理输入双重匹配纳入新v1契约。未改旧公式/schema/测试门禁。下一步存储线程接线、共享RunSession/正式worker与冻结故障矩阵，准确提交独审/正常PR与必需CI仍需完成。
+
+首版26f准确组件独审Request changes（图generation/新节点document revision混用）已保留；修为新节点document0、冻结plan保留generation，并补真实plan7准备回归。AsyncStorage固定workflow操作已接现有存储线程，真实run/manifest/缓存字节核验与CAS、ENOSPC后重开唯一run、GUI响应屏障测试已加入；11项组件/存储测试及受影响99项通过，完整说明见journal-component.md。GraphSession/正式WB三节点/当前环境认证及完整故障矩阵仍未实现，新head独审待做；未标整卡done/未PR集成。
+
+第二版8bb独审确认上述P1已修，但新P2：封装匿名hello漏来源attempt/run，可刷新CAS后错误关联新attempt；Request changes及独立11pass保留journal-review-r2.md。后继补worker/started/finish/abandon来源绑定，新增真实失败重试旧hello/finish反例；作者最终12新测试/受影响100pass27.19s，Ruff/Pyright0，新准确提交仍须复审。整卡继续in_progress。
+
+准确3215..8d0组件非作者Accepted（journal-review-r3.md），独立12pass3.29s及旧消息反例、plan9/document0；原两次Request changes不改写。随后全部四wheel实际构建/隔离安装0，新ledger API保存重开/幂等和原V0真实4000/提交重开/桌面OCR均过，原日志摘要journal-wheels.json。未实现GraphSession/实际环境准入/正式三节点及完整故障矩阵，未跑完整pytest/CI/PR集成，整卡仍in_progress。下一设计点host-integration-pending.md不是实现证据。
+
+## 真实节点与请求确认切片
+
+2026-11-02用户追加优先要求：入口只校验一次、内部信任不变量；拒绝重复判空/滥用try-catch、一次性抽象及低概率防御，缩短流程优先交付可运行MVP。已审阅社区multica-ai/andrej-karpathy-skills并安装项目技能karpathy-guidelines，固定2c606141936f1eeef17fa3043a72095b4765b9c2及本地tree摘要。AGENTS/coding-standards落实，普通已授权操作不再逐步确认，独审集中最终可运行候选；必要PR/CI与真实科学/事务边界保留。技能配置独立提交，不混入当前未提交自动调度代码。
+
+89ba603之后新增RunSession请求确认及原始事件保留、固定WB verify/analyze/publish三节点、实际宿主源码/依赖指纹函数。五组15次真实worker/正式提交/重开保留40/4000/真实0/无效复核null；等待确认取消与外来报告策略拒绝反例均过，精确命令/114次中间关联检查与最终定向成绩见worker-slice.md。尚由测试父进程串接，生产GraphSession/当前环境准入/完整暂停取消恢复缓存及故障矩阵未接线，准确独审/全门禁/PR仍待完成，不改整卡in_progress。

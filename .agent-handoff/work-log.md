@@ -1,41 +1,5 @@
 # Current Work Log
 
-## 2026-10-20 E7 governance integration
-
-INT001 resumes authorized E7 only in this temporary historical integration tree. Merged planning main43d520f into original governance0b7, retained immutable RULE001 receipt source; loaded/read exact rules and current full scope. Main PR/CI not yet accepted. WB product development/checks remain in t051, not represented by this zero-product checkout.
-
-## 2026-10-20 E7 OCR, candidate and dependency integration
-
-80a84ef OCR取消/CAS修复13边界与42兼容0/独审关闭；ea8f914候选与14检查自检，32d9733启动故障关闭2/8.17s0/独审关闭。首E7 gate主动中止，32d gate单一standalone失败后UTF8/GBK监视器异常，原OS exit未知/outer1/wheels未跑；8日志回归0及原页独立重放0不销未知失败。PR7经最终69a/四项CI/独审后merge7730bcd，primary合入并重载T060实际base；临时集成树继续PR3/SYNC001。暂无新安装包或正式发布。
-
-## 2026-10-20 E7 final gate and accepted quant stage
-
-8e11028完整910/705.48s、原pytest0/u32=0、全部隔离wheel/真实OCR/check0，inventory4非截断；单事件测试P2独审关闭。旧5bb/d7f失败保留，产品运行文件等e579。PR12/13实际四CI和独审接受main6e8b1e6，主树合1891仅元数据；77b文档刷新及交接。PR14最终b1四CI中，PR15准备3748，最终集成未完成。安装候选工程验证已通过，科学/干净Win10/物理DPI仍待验。
-
-## 2026-10-20 E0–E7 engineering closeout
-
-Final3680790 actualbase842独审/13历史来源规则0；产品PR17 Windows910/666.50s、Linux910/353.99s及全部wheel/真实OCR/四检查SUCCESS，精确merge main0f358ac（00:29:51Z）。本机8e910/705.48s与安装e579工程验证另列，不混作服务器证据；运行文件相同。桌面setup SHA复核一致，旧原图/历史/安装/用户窗口保留。当前仅更新任务done、README/验收索引和handoff；旧validation已先复制校验再归档。科学留出/明确样本配对、干净Win10/物理DPI仍未验，原失败和UNKNOWN保留，无正式发布/定时任务。
-
-2026-10-20 CI收尾：main0f的910/762.24s及wheel功能通过后清理遭15分钟取消，整命令未通过；旧main3b702/590.48s后原退出0xc0000005/wheel未跑，原因UNKNOWN。原306四CI通过不销旧失败。仅foundation TEMP/TMP同盘与实际路径诊断实验，保留时限/测试/退出检查；新head待绑定独审及四CI。详见work/evidence/T-060/ci-temp-filesystem.md。
-
-2026-10-20 T061：导出组/角色/候选原坐标与集中确认已接入；真实82图仅开发候选无监督真值；新增必要4core、11Web相关、1host重开及1回执修正通过，首次核心2fail及原因保留。完整门禁/最终独审/安装候选待验，状态与细节见T061任务。
-
-T061收尾：冻结710一次916/763.69s及全wheel/OCR/check0；非作者接受、安装/PS5.1双流程/新私有识别probe0，用户数据不变。三旧安装卸载0与桌面旧包/过期shortcut移除；递归残余清理被自动审批blocked by policy阻止，未绕过。最终PR19四检查待验，详见T061/validation.md。
-
-2026-10-20 T063：用户批准完整采集组交付计划；新受管wb-grouped-intake树从main f3fb2ff建立，uv sync0，原t051/T062未提交资料保留。规划/导航和历史基线标识更新，尚无产品改动/测试/独审。
-
-2026-10-20 T064：PR21已合main1625ae5并重载；新增v3采集组草稿/稳定投影、正式无侧栏网格及后台大图预览，70相关测试0/类型静态0。三目录95图只读识别19信号/23区域，仅开发证据；具体首败及修复见T064。后续独审/产品PR/快捷键/精简/完整验收/新包仍待。
-
-2026-10-20 T065：T064已完成冻结实现与界面原问题复审，PR22创建并附着；Linux/规则/桌面环境成功，Windows仍运行。新codex/intake-crop-revision分支接候选区域与完成后原图范围修正，保留其他Fig及全部历史文件/修订；核心33与网页/宿主41实际0。冻结非作者审查、集成基线重载和总计划后继继续，未全量候选门禁/新离线包。
-
-2026-10-20 T063–T069本机交付收尾：完整P0–P8工程范围经PR21–24/26–28独审及四检查集成。PR28最终93d1ef0双平台956/全部wheel/OCR成功，精确合main6080867；手动完整原生取证956/382.32s debugger0，旧失败UNKNOWN保留。真实19组主链/4A局部重算/两份新旧输出/重开已独审，114原文件与旧树dirty保持。冻结608构建并非管理员安装新GroupedIntakeTest候选，7,749载荷文件相同、分组17项及灰度OCR/PS5.1双流程实际0；安装包361,584,364字节、SHA99c0ec55…bb6d97。非作者绑定608只读交付接受；首观察器null和首审查归档假设错误均留证。桌面交付BioImage-WB-采集组测试版-T069，索引docs/wb-grouped-intake-delivery.md；最终收尾分支仅文档，不改已验产物。干净Win10/物理DPI/独立科学真值仍待外部验收，无正式Release或依赖升级。
-
-## 2026-10-21 T071 Fig顺序工程交付
-
-产品5f独审Accepted，PR30四必需检查后精确合main710bb85；最终Linux979/332.14s/debugger0与Windows979/615.77s/raw0、全部wheel/OCR/check0。本机a952完整979/825.65s0，不冒充覆盖后续诊断。冻结main新FigSequenceTest构建/安装、三流程OS0、PS5.1随包三流程0、7751载荷校验0，桌面新交付已生成，旧成果摘要不变。首PS5.1外层脚本无BOM中文路径失败保留，仅补本地BOM后新轮0；原CI初败/native/手工坐标UNKNOWN不销账。最终交付审计及记录集成见T071任务。此前新段按维护器顺序归档仍保留；本段按时间追加于尾部。
-
-最终包态独审Accepted：冻结main/安装器、41校验成员/37证据副本、源码302/四wheel176包文件/7751载荷及1257额外pyc核对，无新增P0–P2；CIM采样不声称采全。当前安装根进程0，旧成果保持。最终记录随文档PR正常集成，不重建已验包。
-
 ## 2026-10-21 T072 自动流程与预览修复交付
 
 获批六项及128缩略图误作中央图问题已修：source_signal/guide共享原信号校验、机器采纳不冒充人工、按Fig显示纠偏、灰度图/区域、统一表和说明折叠。初审两P1/一P2及衍生caller问题修复后44a非作者Accepted；PR32最终46a四检查正常合main0630604。两平台各1013、本机1013/880.70s及全部wheel/OCR/check0。干净冻结main构建独立AutomaticFlowTest安装69.395s0，四单独流程OS0、PS5.1新轮56.548s0、7753载荷一致。首外层observer误收旧OneDrive并停止，已同exe重启确认，修为严格时序/身份且完全不自动终止，非作者Accepted，原失败永久保留；产品字节未变。桌面交付与最终审计/限制见T072任务及交付记录；旧dirty/原图/历史/安装保持，不扩展新任务。
@@ -156,3 +120,32 @@ PR51旧23d Linux1596pass/4skip/613.11秒/wheels过，Windows1fail1599pass/929.22
 ## 2026-11-02 P007显示pan新候选独审
 
 准确dc..dc4cc24新完整候选Accepted；独立Qt完整两支2pass/17.23秒、12组实际处理器/视图/取消组合及原件/日志SHA、rule/plan/diff/detect0。原断言/5000ms/数值/ROI未放宽，历史CI现场根因未冒称全证。P007转in_review绑定dc4cc；状态记录增量复核后更新PR51重新执行必需全门禁。P005仍等实际集成，不提前实施。
+
+## 2026-11-02 P007 r2完整候选CI派发
+
+最终dc..c243933非作者Accepted，7份后继meta/档案核实且无源码变化。已push PR51 c243933，quality41390321525实际running、rules41390321566 SUCCESS，尚无全部通过/集成结论；ci-r2-dispatch只快照。本地后继仅独审/交接收据不push重启CI，正常merge须matchc243且四必需成功/tree一致。P005仍未激活，P007 done后接续M1/M2。
+
+## 2026-11-02 P007正常集成，P005依赖就绪激活
+
+PR51准确c243四必需SUCCESS，正常merge006e9f1/tree与独审候选相同。Windows1601pass/945.30秒、Linux1597pass/4既有skip/602.61秒，双完整wheels通过；原失败/竞态修复证据保留，integration.json。保留本地交接50dc与main正常合14c后切codex/p005-workflow-executor，P007 done、P005 in_progress；按新base真实context并完整读取。冻结execution-test-design，尚无P005产品实现/测试；后续实现真实三节点/ledger/state/control/cache/recovery，P008同一实现扩批量、P009同一后端编辑。
+
+## 2026-11-02 P005 journal storage integration
+
+固定workflow操作接AsyncStorage后台归约/序列化/CAS，真实RunRecord/manifest与全输入输出核验；新增plan7/document0、准备后关联ENOSPC重开唯一run、GUI响应屏障与物理缓存损坏反例。最终受影响99pass26.76s，Ruff/Pyright/policy/九import边界0。首版26f独审Request changes的修订混用P1已修，新head须复审；正式GraphSession/三节点WB和当前环境认证仍未实现。首轮组件记录保留于自动轮转work-log-20261102T053838281121Z.md，非删除。
+
+8bb独审11pass/2.71秒确认P1修复，但独立旧hello反例发现存储封装漏来源attempt/run的P2（Request changes）。已补worker/started/finish/abandon来源核对，新增真实失败→重试→旧hello/finish拒绝且新hello可接受。最终12新测试/受影响100passed27.19s，Ruff/Pyright0；新准确提交须复审，正式图仍待实现。
+
+准确3215..8d0非作者组件Accepted，独立12pass3.29s及缺来源/旧hello-started-finish-abandon反例/plan9-document0均过。全部四wheel构建与各隔离安装实际exit0，新增ledger API保存重开/幂等及原V0真实4000、正式提交重开、桌面/OCR仍过，logSHA见journal-wheels.json。规则实际main基线/计划检查0，新增wheel脚本Ruff长行已分行通过；没有完整pytest/CI或正式图结论。下一工作点host-integration-pending记录PID-started/allow_request排序与真实环境/三节点接线。
+
+## 2026-11-02 P005 real node workers and dispatch acknowledgement
+
+节点修复b80非作者Accepted后，新增生产WorkflowSession/后台准备/固定WB装配/--workflow CLI，真实自动3节点正式提交及暂停继续通过；删内部重复全图/env核验和检查回调，开始一次/resume一次后台核验有测试断言。相关23pass36.34s、最后控制器2pass10.86s；CLI自有triangle_u16实际退出0，关闭重开4000.0/三run及runtime源码指纹相同，auto-session.json。当前是可运行单图后端原型，cache/取消恢复矩阵/UI/完整CI及最终候选独审仍待完成，不标整卡done。旧snapshot已完整归档再替换短入口。
+
+用户追加要求先验证社区简洁代码项目再配置、减少防御编程与审批耗时。Karpathy-guidelines固定2c60614项目安装，作者/非作者各自核对raw2518B与SHA一致、仅SKILL无脚本/hook，policy/固定树摘要通过后完成配置；AGENTS/coding-standards落实入口一次校验/内部信任、无一次性抽象与臆测异常，候选集中独审，不新增审批。配置独立提交，保留未提交生产WorkflowSession文件，后续直接MVP测试，不把规则技能当自动有效性保证。
+
+89ba603之后实现RunSession可选请求确认/原始ExecutionEvent、三固定WB原值节点和实际宿主源码/依赖身份函数；旧对照入口/数值/schema不变。五组15次实际worker/正式存储提交/重开40/4000/真0/invalid-review空值通过；最终6节点22.93s、新增确认期间取消与节点12项28.82s、此前关联114项57.89s；Ruff/type/policy/九边界0。报告PNG已查看可读（首次预览目录名错误已纠正）。来源/预算/状态及精确范围worker-slice.md。仍由测试父进程串接，GraphSession/后台当前准入和完整故障矩阵未实现；新源准确独审/完整门禁/新wheels/CI待做，不标M1/P005完成。
+
+
+## 2026-11-02 P005同一执行器的缓存、恢复与桌面入口
+
+实际取消五阶段、worker非零/崩溃/重复错身份、ENOSPC前后及重开对账、五类缓存矩阵19项通过。新增--workflow-ui共享WorkflowSession，后台输入导入、新运行/暂停/继续/取消/重开/应用调整；23联合101.88秒及新增暂停调整、5界面18.38秒通过。输入失败重入关闭首轮1fail3pass71.83秒，定位双retire后修复，原失败不销账。四wheel隔离三节点/4000/重开/两节点复用通过；随后最后样式/打印修补待全量最终验。原生windows字体与系统主题对比度实际查看后修正；截图与准确SHA见P005/runtime-gui-recovery.json。整卡仍in_progress，下一步一次最终候选独审/完整门禁/PR，之后P008/P009。

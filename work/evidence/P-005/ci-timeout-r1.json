@@ -1,0 +1,16 @@
+{
+  "candidate": "384e5ba1137e55385e3a4b10f2e694b51840229a",
+  "run_id": 41413166304,
+  "windows_job": 125170776585,
+  "annotation": "The job has exceeded the maximum execution time of 20m0s",
+  "windows_conclusion": "cancelled at 20m11s; tests reached82%; observed FAILED assertion lines0; not success",
+  "linux_job": 125170776551,
+  "linux_result": "success,1655passed/4existing skips/10warnings/738.87s; allwheels0",
+  "change": "only Windows foundation total walltime20->25min, Linux remains20; no check/expectation/skip/tolerance/required-check changes",
+  "files": {
+    ".local/p005-ci-run-384e5ba.json": "ae0d79a215bb23f8e213a3ac5823bd48c99e341083125168a172534f9db83932",
+    ".local/p005-ci-windows-384e5ba.log": "94c2bb3b91e476804effdb1b96ad531097fcbdeaf3826095dd0c8c5039bd6806",
+    ".local/p005-ci-windows-annotations-384e5ba.json": "a54b858ccd80acb27b927a4ddb042c76e5112f788fbe1b26d31e9281f2427c74",
+    ".local/p005-ci-linux-384e5ba.log": "ac1b8943e31eb2286e7eca7864eb60c5cce0ea27e779fe2df3e252a4cd869397"
+  }
+}

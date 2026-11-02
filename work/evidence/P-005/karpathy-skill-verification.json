@@ -1,0 +1,12 @@
+{
+  "repository": "multica-ai/andrej-karpathy-skills",
+  "commit": "2c606141936f1eeef17fa3043a72095b4765b9c2",
+  "source_path": "skills/karpathy-guidelines/SKILL.md",
+  "installed_path": ".agents/skills/karpathy-guidelines/SKILL.md",
+  "sha256": "6e22cc54cb02a5e98ae42d06d9d7292db0c1b43894831b32879beb0166b2aea7",
+  "bytes": 2518,
+  "verification": "Author and independent reviewer fetched the pinned upstream raw file; installed bytes match exactly; only SKILL.md, no scripts or hooks; skills-lock tree digest and dev.py policy pass",
+  "independent_review": "Configuration verified before final activation/commit; no product code approval",
+  "effect": "Project rules apply validate-once boundaries, trusted interiors, no speculative fallbacks or one-use abstractions, and review of runnable candidates instead of every small commit",
+  "limits": "Community-maintained guidelines, not a Karpathy endorsement or automatic code fixer; behavioral effectiveness must be checked in real code; MIT is upstream textual declaration"
+}

@@ -153,3 +153,5 @@ CSV/XLSX来源审计记录稳定身份；新目录发布原值/显示裁剪、Fi
 T067新增明确执行后分组编辑与intake_workflow@2，未选源/未定N草稿可保存重开；换源/N/移组失效受影响证据，标签重建显示时可复用完全一致数值输入的真实运行。历史修订与原图不改。见 ../../docs/contracts/wb-intake-group-revision-v1.md。
 
 T080 新增 intake_delivery@1 / 内部清单 schema5：命名配置保存后建立 Fig/蛋白目录，成功裁图逐行归位，同代封存完整项目、分 Fig 表与恢复 ZIP。输出位置随项目保存，旧格式与计算摘要兼容。公开 API、严格辅助裁图证据及不覆盖边界见 ../../docs/contracts/wb-intake-delivery-v1.md。
+
+P005开发中新增固定原值工作流verify/analyze/publish三节点，WBWorkflowStart多输入文件引用、原TIFF真实校验凭据、既有AnalysisResult与状态表/完整曲线/显示报告。旧对照worker与数值不变；节点仅返回candidate，正式提交由宿主负责。见 ../../docs/contracts/wb-original-workflow-v1.md；三个真实节点通过不代表通用调度器或整卡完成。

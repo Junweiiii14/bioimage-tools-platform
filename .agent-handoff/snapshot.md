@@ -1,26 +1,30 @@
 # 当前恢复指针
 
-- 目标仍为实际产品树M1通用执行和M2可视编排；原生goal active、无预算。恢复再次get_goal，不提前complete。
-- 执行树C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0，当前分支codex/p007-scientific-workflow-contracts，base main dc9618e7000eb7793067556e99d50a0d0509423d；HEAD/dirty实际核实。当前唯一写入本聊天；非作者/root/p002_independent_review只读审查。
+目标仍active、无预算：在bioimage-v0完成4.0 M1通用执行与M2真实可视编排，不缩成仅CLI或账本。分支codex/p005-workflow-executor，main基线006e9f143c830f5e13be2932e8ac37a9f3a05ed1；核对实际HEAD/dirty后接续。
+
+用户最新要求优先：入口一次校验、内部信任不变量，删重复判空/验证，不滥用try/except，不为单次逻辑抽象，不写低概率防御。社区karpathy-guidelines已验证后项目配置，固定2c606141936f1eeef17fa3043a72095b4765b9c2，原文SHA一致、仅MD无hook、非作者独立核验/policy通过；配置提交bab41e0。技能不是自动修复保证。普通已授权操作连续做，独审集中可运行最终候选，不再逐个小提交循环审批。
 
 ## 当前任务
 
-- P007 in_review，已真实context按dc9618e重载。科学资产/端口/有限图、冻结计划/计算键与纯预检、真实P002契约保存重开命令、旧23模型schema兼容、隔离wheel追加检查已草拟。当前31契约+18方法+38Workspace共87passed/21.61秒；准确源6bb3168的P002合同命令/完整独立wheel实际均exit0，冻结证据P007/execution.json。非作者准确dc..23d4056最终Accepted（独立31tests/4.00秒、六组额外攻击拒绝、原件/wheel日志/旧schema校验），PR51首轮Linux完整1596passed/4skip/613.11秒及wheel通过；Windows1failed/1599passed/929.22秒，旧manual pan40/25超时，未合并。最小显示panKey初始化修复及新延迟布局回归已完成，准确完整范围dc..dc4cc24非作者Accepted（独立Qt2pass/17.23秒、12组处理器组合）；后继状态记录增量复核后更新PR51，再验当前HEAD全部必需CI，不宣称执行器或GUI。
-- 新契约docs/contracts/scientific-workflow-v1.md，公开api不变入口；原api实现原样移contracts_v1.py避免循环，23模型schema摘要由main839源产生。不能从typed模型存在推断文件已验或科学方法已准入。
-- 初次草案commit被新增wheel脚本3处行宽拦住，已按格式修复；没有绕过hook。P007源码已成功冻结6bb3168，旧v1 Git blob逐字节相同（v1-source-preservation.json）；6bb之后有显示pan修复dc4cc24，已另行准确独审；当前仅收尾状态记录，不冒充旧23d/6bb已包含该UI。旧23d实际Windows失败；核对PR51新HEAD与四必需CI，不合并旧失败候选。
-- P006 done：PR50准确839..b0c71e1非作者Accepted、四必需CI SUCCESS，正常合main dc9618e且tree相同；Windows1569passed/723.79秒、Linux1565passed/4既有skip/497.04秒，双平台原评估/V0 wheels通过。收据P006/integration.json/review-final.md。
-- P006源码a9真实六例5+30、四主题设置超100ms、前台UNKNOWN、准备取消run=null/无PID，host确认28ms与service_closed6.4秒分列；多项快照/刷新/payload/内存超线完整保留。首次f3失败不覆盖，raw/results.md。基线done不代表预算/目标机已过。
-- P003/B011已PR49正常合839，P003 D1不授S1；原失败、r2真实WB与完整1555项/isolated wheels、独审/冻结字节30SHA均保留其证据。P002原范围PR48正常合f2dc5ad，真实worker/持久成果/重开五例保留，不重做。
+权威卡work/tasks/P-005-workflow-execution-slice.md保持in_progress，当前scope . 的新规则回执已实际加载，AGENTS/coding-standards为新简洁规则。P002/P003/P006/P007已分别通过既有PR集成done，不重做；P004仍单独planned，P008/P009待依赖。
 
-## 下一步
+- 账本/存储组件准确3215..418已独审/隔离wheels通过；证据journal-review-r1/r2/r3与journal-wheels，旧失败保留。
+- 三固定WB节点及请求确认：823d首审发现NaN/负数可误发布valid；b80b900已复用旧ResultFrame完整校验并获89ba603..b80b900 Accepted，独立13pass22.86s，worker-review-r1保留Request changes。不要把该接受扩大到后继调度代码。
+- 新WorkflowSession已实际自动派发verify/analyze/publish，后台可信注册/当前环境核验，PID账本确认后再发送请求，正式提交后更新账本。原来测试父循环已由生产控制器取代。单图与节点边界暂停/继续测试2pass；相关RunSession/模块共23pass36.34s。新增核验调用次数/线程断言后2pass10.86s：开始仅核验一次，明确resume重新核验一次，全部在后台。
+- 新--workflow CLI实际执行triangle_u16三真实run、journal revision21/succeeded、表4000.0/text:valid，退出0；关闭后重开比对当前runtime源码指纹相同。work/evidence/P-005/auto-session.json记录实际源码SHA、日志、run IDs。Ruff/Pyright/policy/九import边界通过。新代码尚未最终独审/完整门禁/新wheels/CI，不是整卡或M1完成。
 
-1. 核对新最终状态记录的准确增量复核及PR51当前HEAD；新完整候选须四必需CI全成功，正常merge并核实main tree/真实集成收据后P007才done。首轮失败/旧Accepted适用范围保留；更新main后真实context重载。
-2. 可参考ignored .local/p005-design-candidate-20261102.md只读架构工作笔记（不是既定契约/实现）。P005尚未激活/实施，必须等P007正常集成并从真实任务/源码恢复。随后P005单图真实串行调度/安全暂停取消/依赖失效/缓存校验/恢复→P008同一实现有限批量完整M1；P006/P008后P009接真实执行器完成编辑保存重开/模板第二批M2。
+## 下一步：直接推进MVP
+
+1. 控制器取消/关闭重开/存储故障/缓存矩阵19项已通过；桌面入口--workflow-ui复用同一执行器，后台输入准备、开始/暂停/继续/取消/重开/应用参数或样式新修订均已接通，5项真实界面测试通过。输入准备失败的重入关闭竞态已实际复现并修为只退休一次；旧失败证据保留。runtime-gui-recovery.json记录原生截图/真实4000三run与准确源码。
+2. 当前冻结可运行候选，集中独审和完整dev.py check --all、四wheel最终重验与正常PR/四必需CI。此前四wheel/23联合/5界面通过不覆盖随后最后样式修补，不提前认整卡完成。主线base仍006e9f1，规则scope .有效。
+3. P008复用同一账本/cache/recovery扩有限批量完整M1，随后P009真实增删/连接/替换/参数/保存重开/模板第二批M2；不重建第二执行器，不以静态图或JSON预检收尾。
+
+## 当前代码与运行入口
+
+apps/desktop/src/bioimage_app/workflow_session.py、workflow_preparation.py、wb_workflow_host.py、workflow_cli.py与RunSession是下一修改范围；tests/test_workflow_session.py实际控制器测试。CLI：uv run --locked --no-sync python -m bioimage_app --workflow --workspace <全新目录> --validation triangle_u16；原图/参数用--source和--parameters，恢复用--resume <execution_id>。不要覆盖已存在示例工作区。
+
+本轮实际案例.local/p005-auto-mvp-20261102-verified-r2与日志.local/p005-auto-mvp-cli-r2.log保留，都是自有合成数据。旧snapshot完整归档archive/2026-11-02-before-auto-session-snapshot.md。PR52生产候选384e5ba已准确非作者Accepted（原P2入口修复）；37定向109.40秒、完整本机1659pass928.26秒/四wheels0，LinuxCI1655pass4既有skip738.87秒/四wheels0。Windows run41413166304/job125170776585明确20分钟作业超时取消，82%无FAILED但不认通过；现仅将Windows foundation总时限20→25、Linux20保留，检查集合/单测超时/预期和必需门禁不变，单独记录runtime-review.md及ci-timeout-r1.json。资源增量独审/新CI待做，P005仍in_progress；新CI实际handle从.local/p005-live-dispatch.json核验。旧local check session19645因修正主动中止exit1（约13%有F与GPU日志，原因未定位）；PID29552已查不存在。原日志保留，不能写通过；新全量使用CI同款--disable-gpu。实际HEAD/dirty必须核对。
 
 ## 保留边界
 
-- 主方案4.0及phase-2-workflow-authoring.md；状态只看任务卡，B005/B009历史不覆盖当前。
-- P004几何/正式分析资产方法另行版本化，不是M1旧整数图整卡前置；当前无其生产器/科学准入。
-- 科学独立留出/负责人容差、用户体验、干净Windows/物理DPI/GPU/T002-P0及历史原生UNKNOWN保留risks/backlog，不冻结无依赖工程。原图/旧树/历史/在用安装不覆盖；不扩到其他实验全套、Agent、发布安装器、外联、花费或数据上传。
-
-- 当前CI修复证据：新受控pending_layout旧断言修前失败8.38秒；修后2完整手动流程/17.20秒、7邻近回归/12.76秒、web/Ruff/全类型均0，机械detect[]。仅显示状态同步；受控时序不证明历史CI完整根因。P007/pan-race-regression.json和docs/research/2026-11-02-initial-pan-layout-race.md。
+科学留出/负责人容差/S1、用户体验与干净Windows/物理DPI/GPU/T002-P0及旧native UNKNOWN仍见risks/backlog；这些不冻结无依赖工程。原图/历史/旧dirty树/在用安装不覆盖；不扩到新校正、其他实验全套、Agent、正式安装器发布/替换、外联、花费或数据上传。

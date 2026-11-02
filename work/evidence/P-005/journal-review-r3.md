@@ -1,0 +1,11 @@
+# 第三版账本/存储组件独审：Accepted（仅组件）
+
+非作者/root/p002_independent_review只读准确审查3215e3e1ff6cbb6e4894922fb1fe628ecafa6edc..8d0a4ecf480d0188938a2ae53d69a21b0840b6fc，Accepted。独立12项tests/test_workflow_execution.py全部通过3.29秒/exit0；额外真实Workspace验证缺来源及旧attempt的hello/started/finish/abandon均拒绝，正确新hello接受，旧事件未推进新序号。plan9/document0真实准备通过，全范围diff检查exit0。
+
+原P1/P2均修复，未发现新增阻断。recover独立对账真实持久事实，不伪造worker帧。规则检查首次误以组件起点3215为PR基线退出1；改用回执实际绑定main006e9f143c830f5e13be2932e8ac37a9f3a05ed1后exit0，未改回执。先前Request changes及失败完整保留。
+
+审查者未修改文件/提交、未跑全量；该接受不涵盖GraphSession、当前环境准入、正式三节点WB执行或整卡/M1完成。
+
+## 后继wheel验证增量复核
+
+准确最终组件范围3215e3e1ff6cbb6e4894922fb1fe628ecafa6edc..41812c55ffb06737d200bc2de768d012a42ee4c5非作者Accepted。产品组件与其测试未变；新增22行wheel检查与记录。独立核实原日志6663字节/SHA与新账本、旧DAG、实际V0 4000/提交重开/OCR通过行，CAS0→1及旧断言保留；main006基线规则和全范围diff检查exit0。未独立重跑全部wheel，收据如实披露运行时未提交脚本/打印折行边界。仅组件及新增隔离安装检查接受，整卡边界不变。
