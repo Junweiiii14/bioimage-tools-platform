@@ -1,0 +1,89 @@
+[
+  {
+    "warmup": true,
+    "pause": {
+      "kind": "pause",
+      "feedback_ms": 187,
+      "settled_ms": 303.39999997615814,
+      "trusted": true,
+      "theme": "neutral",
+      "native_foreground": true
+    },
+    "cancel": {
+      "kind": "cancel",
+      "feedback_ms": 110.19999998807907,
+      "settled_ms": 485.5999999642372,
+      "trusted": true,
+      "theme": "neutral",
+      "native_foreground": true
+    },
+    "pause_ack_ms": 33.01909996662289,
+    "pause_boundary_ms": 1289.3860999611206,
+    "cancel_ack_ms": 27.438500022981316,
+    "cancel_to_batch_closed_ms": 175.48269999679178,
+    "pause_request": {
+      "batch_id": "4eaf0f2b47294400a5f10ae11025b081",
+      "state": "running",
+      "phase": "running",
+      "total": 1,
+      "succeeded": 0,
+      "issues": 0,
+      "failed": 0,
+      "cancelled": 0,
+      "sample_id": "5a4a1523c9dd48209c171ba553638485",
+      "child": {
+        "execution_id": "699c9f274edb49cfbb14c1b0cbb21501",
+        "state": "running",
+        "revision": 4,
+        "completed_nodes": 1,
+        "total_nodes": 3,
+        "node_id": "analyze",
+        "run_id": "a83a257d2432467aba43b37411c6d8ae",
+        "pid": 52288,
+        "message": "",
+        "reused_nodes": 1,
+        "error_code": ""
+      },
+      "message": ""
+    },
+    "cancel_request": {
+      "batch_id": "4eaf0f2b47294400a5f10ae11025b081",
+      "state": "running",
+      "phase": "running",
+      "total": 1,
+      "succeeded": 0,
+      "issues": 0,
+      "failed": 0,
+      "cancelled": 0,
+      "sample_id": "5a4a1523c9dd48209c171ba553638485",
+      "child": {
+        "execution_id": "699c9f274edb49cfbb14c1b0cbb21501",
+        "state": "running",
+        "revision": 13,
+        "completed_nodes": 2,
+        "total_nodes": 3,
+        "node_id": "publish",
+        "run_id": "199990043ec64c9b985e7ef93f1cee7f",
+        "pid": 51612,
+        "message": "",
+        "reused_nodes": 1,
+        "error_code": ""
+      },
+      "message": ""
+    },
+    "terminal": {
+      "batch_id": "4eaf0f2b47294400a5f10ae11025b081",
+      "state": "cancelled",
+      "phase": "closed",
+      "total": 1,
+      "succeeded": 0,
+      "issues": 0,
+      "failed": 0,
+      "cancelled": 1,
+      "sample_id": "",
+      "child": null,
+      "message": ""
+    },
+    "editor_store_retained": true
+  }
+]

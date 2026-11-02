@@ -38,7 +38,7 @@ PR53最终b4847a56b682e71356129e34fac59262c08659e7非作者Accepted，全4d6..b4
 
 本会话impeccable context一次已跑，.local/p009-ui-context.txt506行已完整实际读（含后补200–350），PRODUCT/DESIGN均为沿用T075四主题、本地NotoSansSC、40px控件的Operate扩展。已实际surface-brief read module_compare.js和craft-floor；新局部brief.impeccable/surfaces/workflow-authoring.md，不改全局DESIGN。用户已有明确授权，不按技能通用模板重问已定需求/审批。图探针截图只功能证据，不是最终视觉主检；最终完整UI一次主检+最多一次确认，detect在完成UI后一次，视觉独审按skill要求在最终候选集中做。
 
-下一步：新tooling/benchmark_workflow_authoring.py已完成两场景小样本诊断r5/exit0（非正式，1+0）。冻结工具提交后，QT_QPA_PLATFORM=windows、QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu，默认5+30、全新.local/p009-perf-frozen输出正式采样。等待实际handle终态，期间不跑测试/打包或修改采样源。正常3节点/12合成注释与64驻留节点（不执行64worker）；四主题node/preview，neutral真实PID暂停/继续/取消。指标与失败历史见performance-measurement.md。之后运行已补P009 GUI/模板/6真实worker的tooling.installed_wheels（尚未跑），再完整候选准确代码独审/PR必需CI。视觉已结束，不重开截图循环或第二detector，不重复本机全量。
+下一步：冻结修正后的测量/安装探针提交，重新默认5+30、全新输出目录完整采样。5d0c355正式首轮exit1（8组UI各35已落盘，控制第2轮因顶层const重复声明未派发，upper未跑），只修准备脚本IIFE/执行true回执，2轮诊断r6过。当前wheel第二轮全环境exit0（新P009独立GUI进程真实6workers/4000→40/保存重开/布局模板+CLI），旧第一轮因app.quit轮询损坏新WebEngine已确认自建PID身份后终止/exit1。新坏TIFF混合GUI1test9.48秒过。见delivery-probes.md/json和frozen-runs/r1-failed。正式采样时不跑测试/打包/修改源；独审可只读代码暂缓命令。完成再准确代码独审/PR必需CI集成。视觉预算结束，不再截图/第二detector或本机全量。
 
 P009当前只是本地工作提交，不建小步PR/逐提交审查；可运行完整候选后集中独审，局部验证/最终CI全量，不重复本机1675全套。已有独审/root/p002_independent_review可复用最终代码审查，当前idle。保留task/规则回执、P008closeout及轮转archive一起提交，别漏新未跟踪源码或误收B012。
 

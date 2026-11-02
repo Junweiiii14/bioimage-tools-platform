@@ -15,7 +15,7 @@ def installed_check(
     folder: Path,
     package: str,
     wheels: list[Path],
-    script: str,
+    script: str | tuple[str, ...],
     extras: tuple[str, ...] = (),
 ) -> int:
     environment = folder / (package + "-".join(extras))
@@ -60,7 +60,13 @@ def installed_check(
     ).returncode
     if code:
         return code
-    return subprocess.run([str(python), "-I", "-c", script], cwd=folder, check=False).returncode
+    for probe in (script,) if isinstance(script, str) else script:
+        code = subprocess.run(
+            [str(python), "-I", "-u", "-c", probe], cwd=folder, check=False
+        ).returncode
+        if code:
+            return code
+    return 0
 
 
 WB_SCRIPT = """
@@ -660,18 +666,29 @@ rows = list(csv.DictReader(Path(second_batch['samples'][0]['outputs']['measureme
     encoding='utf-8-sig').splitlines()))
 assert rows[0]['value'] == '40.0'
 print('Installed batch: 4000/40, six runs, reopen, two publisher reruns, template/second batch')
+"""
 
-# The installed authoring surface must ship its JS/CSS and use the same real engine.
+
+AUTHORING_SCRIPT = """
+import csv
+import json
+import sys
+import subprocess
 import time
+from pathlib import Path
 from unittest.mock import patch
-from PySide6.QtCore import QSettings
-from PySide6.QtWidgets import QFileDialog
+from PySide6.QtCore import QEventLoop, QSettings, QTimer
+from PySide6.QtWidgets import QApplication, QFileDialog
+from platform_runtime.api import Workspace
 from bioimage_app.web_window import WebWorkbenchWindow
+import bioimage_app.api
 import bioimage_app.workflow_authoring_bridge
+from shiboken6 import isValid
 assert Path(bioimage_app.workflow_authoring_bridge.__file__).is_relative_to(Path(sys.prefix))
 web_assets = Path(bioimage_app.api.__file__).parent / 'web_ui'
 assert all((web_assets / name).is_file() for name in (
     'workflow_authoring.js', 'workflow_authoring.css', 'workflow_graph.js', 'workflow_graph.css'))
+app = QApplication([])
 app.setQuitOnLastWindowClosed(False)
 editor = WebWorkbenchWindow(settings=QSettings(str(Path('authoring-ui.ini').resolve()),
                                                QSettings.Format.IniFormat))
@@ -679,10 +696,11 @@ editor.show()
 
 def authoring_wait(predicate, timeout=45):
     deadline = time.monotonic() + timeout
+    loop = QEventLoop()
     while not predicate():
         assert time.monotonic() < deadline, 'Installed authoring deadline exceeded'
-        QTimer.singleShot(5, app.quit)
-        app.exec()
+        QTimer.singleShot(5, loop.quit)
+        loop.exec()
 
 def authoring_js(code):
     replies = []
@@ -736,11 +754,17 @@ assert editor.authoring.projection.project.graph.title == 'Wheel authoring round
 assert editor.host.workspace_path == ''
 editor.close()
 authoring_wait(lambda: editor.authoring.resources_closed and editor.host.resources_closed)
+editor.deleteLater()
+authoring_wait(lambda: not isValid(editor))
 with Workspace.open(authoring_workspace) as store:
     authoring_runs = store.list_runs()
     assert len(authoring_runs) == 6 and all(r.state=='succeeded' and r.pid for r in authoring_runs)
-portable_batch = batch_command(Path('installed-visual-template-cli').resolve(), '--validation',
-                               'triangle_u8', '--template', str(authoring_template))
+portable_process = subprocess.run([sys.executable, '-I', '-m', 'bioimage_app', '--workflow-batch',
+    '--workspace', str(Path('installed-visual-template-cli').resolve()), '--validation',
+    'triangle_u8', '--template', str(authoring_template)], capture_output=True, timeout=90)
+assert portable_process.returncode == 0, (portable_process.stdout, portable_process.stderr)
+portable_batch = json.loads(portable_process.stdout.splitlines()[-1])
+assert portable_batch['state'] == 'completed'
 portable_rows = list(csv.DictReader(Path(portable_batch['samples'][0]['outputs']['measurements'])
                                     .read_text(encoding='utf-8-sig').splitlines()))
 assert portable_rows[0]['value'] == '40.0'
@@ -844,7 +868,7 @@ def main() -> int:
                 built["wb-tool"],
                 built["bioimage-app"],
             ],
-            GUI_SCRIPT,
+            (GUI_SCRIPT, AUTHORING_SCRIPT),
             ("wb",),
         )
 

@@ -464,3 +464,62 @@ def test_gui_dependency_reuse_and_running_draft_survives_results(
         ),
         timeout=15000,
     )
+
+
+def test_gui_bad_tiff_isolated_from_valid_batch_input(
+    editor_window: WebWorkbenchWindow,
+    qtbot: QtBot,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    window = editor_window
+    corrupt = tmp_path / "corrupt.tif"
+    corrupt.write_bytes(b"not a TIFF")
+    valid = tmp_path / "valid.tif"
+    fixture = wb_validation_input("triangle_u8")
+    assert fixture.source_bytes is not None
+    valid.write_bytes(fixture.source_bytes)
+
+    def originals(*_args: object, **_kwargs: object) -> tuple[list[str], str]:
+        return [str(corrupt), str(valid)], ""
+
+    monkeypatch.setattr(QFileDialog, "getOpenFileNames", originals)
+    js(window, qtbot, "document.querySelector('[data-wf-choose=bind_sources]').click();true")
+    qtbot.waitUntil(
+        lambda: js(window, qtbot, "!workflowEditor.snapshot().pending") is True,
+        timeout=15000,
+    )
+    assert window.authoring.projection is not None
+    sources = window.authoring.projection.project.sources
+    assert len(sources) == 2 and sources[0].asset is None and sources[0].reason
+    assert sources[1].asset is not None
+    js(window, qtbot, "document.querySelector('#wf-run').click();true")
+    qtbot.waitUntil(
+        lambda: (
+            js(
+                window,
+                qtbot,
+                "Array.from(document.querySelectorAll('#wf-output-list td'))"
+                ".some(cell=>cell.textContent==='40.0')",
+            )
+            is True
+        ),
+        timeout=40000,
+    )
+    assert window.authoring.projection.batch is not None
+    assert window.authoring.projection.batch.state == "completed_with_issues"
+    samples = window.authoring.projection.samples
+    assert [s.state for s in samples] == ["failed", "succeeded"]
+    assert samples[0].reason
+    assert all(
+        output.sample_id == sources[1].sample_id for output in window.authoring.projection.outputs
+    )
+    assert (
+        js(
+            window,
+            qtbot,
+            "document.querySelector('#wf-sample-states').textContent.includes('corrupt.tif')",
+        )
+        is True
+    )
+    assert corrupt.read_bytes() == b"not a TIFF" and valid.read_bytes() == fixture.source_bytes

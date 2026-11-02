@@ -360,17 +360,20 @@ def run_case(folder: Path, nodes: int, warmup: int, samples: int) -> dict[str, o
         controls: list[dict[str, object]] = []
         if nodes == 3:
             for index in range(warmup + samples):
-                javascript(
-                    window,
-                    pump,
-                    """
+                assert (
+                    javascript(
+                        window,
+                        pump,
+                        """(() => {
                   document.querySelector('[data-wf-view=graph]').click();
                   document.querySelector('[data-wf-select=analyze]').click();
                   const polarity=document.querySelector('[data-wf-field=polarity]');
                   polarity.value=polarity.value==='light'?'dark':'light';
                   polarity.dispatchEvent(new Event('change'));
-                  document.querySelector('#wf-run').click();true
-                """,
+                  document.querySelector('#wf-run').click();return true;
+                })()""",
+                    )
+                    is True
                 )
                 pump.waitUntil(
                     lambda: (

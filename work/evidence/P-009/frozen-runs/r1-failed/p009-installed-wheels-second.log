@@ -1,0 +1,140 @@
+Building wheel...
+Successfully built C:\Users\70236\AppData\Local\Temp\bioimage-wheel-k7vbli0y\wheels\wb_tool-0.19.0-py3-none-any.whl
+Building wheel...
+Successfully built C:\Users\70236\AppData\Local\Temp\bioimage-wheel-k7vbli0y\wheels\tool_contracts-0.1.0-py3-none-any.whl
+Building wheel...
+Successfully built C:\Users\70236\AppData\Local\Temp\bioimage-wheel-k7vbli0y\wheels\platform_runtime-0.2.0-py3-none-any.whl
+Building wheel...
+Successfully built C:\Users\70236\AppData\Local\Temp\bioimage-wheel-k7vbli0y\wheels\bioimage_app-0.14.0-py3-none-any.whl
+Using CPython 3.12.14 interpreter at: .venv\Scripts\python.exe
+Creating virtual environment at: C:\Users\70236\AppData\Local\Temp\bioimage-wheel-k7vbli0y\platform-runtime
+Activate with: C:\Users\70236\AppData\Local\Temp\bioimage-wheel-k7vbli0y\platform-runtime\Scripts\activate
+Resolved 83 packages in 1ms
+Installed 5 packages in 32ms
+ + annotated-types==0.8.0
+ + pydantic==2.14.1
+ + pydantic-core==2.50.1
+ + typing-extensions==4.16.0
+ + typing-inspection==0.4.4
+Using Python 3.12.14 environment at: platform-runtime
+Resolved 2 packages in 1ms
+Prepared 2 packages in 14ms
+Installed 2 packages in 9ms
+ + platform-runtime==0.2.0 (from file:///C:/Users/70236/AppData/Local/Temp/bioimage-wheel-k7vbli0y/wheels/platform_runtime-0.2.0-py3-none-any.whl)
+ + tool-contracts==0.1.0 (from file:///C:/Users/70236/AppData/Local/Temp/bioimage-wheel-k7vbli0y/wheels/tool_contracts-0.1.0-py3-none-any.whl)
+Isolated runtime/contracts wheels: immutable input, run commit/reopen; no tool/GUI/numerics
+Installed evaluation: literal zero, lineage leakage and no scientific approval passed
+Installed workflow contracts: real file binding, DAG freeze/reopen and rejection; no execution
+Installed journal component: pause, immutable save/reopen, control idempotency; no graph worker
+Installed finite batch models and graph reconstruction: no Qt/WB or workspace side effects
+Using CPython 3.12.14 interpreter at: .venv\Scripts\python.exe
+Creating virtual environment at: C:\Users\70236\AppData\Local\Temp\bioimage-wheel-k7vbli0y\wb-tool
+Activate with: C:\Users\70236\AppData\Local\Temp\bioimage-wheel-k7vbli0y\wb-tool\Scripts\activate
+Resolved 83 packages in 1ms
+Installed 8 packages in 611ms
+ + annotated-types==0.8.0
+ + numpy==2.5.4
+ + pydantic==2.14.1
+ + pydantic-core==2.50.1
+ + scipy==1.18.1
+ + tifffile==2026.9.20
+ + typing-extensions==4.16.0
+ + typing-inspection==0.4.4
+Using Python 3.12.14 environment at: wb-tool
+Resolved 2 packages in 1ms
+Prepared 1 package in 28ms
+Installed 2 packages in 33ms
+ + tool-contracts==0.1.0 (from file:///C:/Users/70236/AppData/Local/Temp/bioimage-wheel-k7vbli0y/wheels/tool_contracts-0.1.0-py3-none-any.whl)
+ + wb-tool==0.19.0 (from file:///C:/Users/70236/AppData/Local/Temp/bioimage-wheel-k7vbli0y/wheels/wb_tool-0.19.0-py3-none-any.whl)
+Isolated WB wheel: TIFF/analysis, crop/grid and worker; no GUI/storage dependencies
+Using CPython 3.12.14 interpreter at: .venv\Scripts\python.exe
+Creating virtual environment at: C:\Users\70236\AppData\Local\Temp\bioimage-wheel-k7vbli0y\bioimage-app
+Activate with: C:\Users\70236\AppData\Local\Temp\bioimage-wheel-k7vbli0y\bioimage-app\Scripts\activate
+Resolved 83 packages in 1ms
+Installed 11 packages in 977ms
+ + annotated-types==0.8.0
+ + pydantic==2.14.1
+ + pydantic-core==2.50.1
+ + pyside6==6.12.0
+ + pyside6-addons==6.12.0
+ + pyside6-essentials==6.12.0
+ + pyside6-pdf==6.12.0.140
+ + pyside6-webengine==6.12.0.140
+ + shiboken6==6.12.0
+ + typing-extensions==4.16.0
+ + typing-inspection==0.4.4
+Using Python 3.12.14 environment at: bioimage-app
+Resolved 3 packages in 3ms
+Prepared 1 package in 60ms
+Installed 3 packages in 28ms
+ + bioimage-app==0.14.0 (from file:///C:/Users/70236/AppData/Local/Temp/bioimage-wheel-k7vbli0y/wheels/bioimage_app-0.14.0-py3-none-any.whl)
+ + platform-runtime==0.2.0 (from file:///C:/Users/70236/AppData/Local/Temp/bioimage-wheel-k7vbli0y/wheels/platform_runtime-0.2.0-py3-none-any.whl)
+ + tool-contracts==0.1.0 (from file:///C:/Users/70236/AppData/Local/Temp/bioimage-wheel-k7vbli0y/wheels/tool_contracts-0.1.0-py3-none-any.whl)
+Isolated desktop wheel: Qt storage/process/terminal persistence; no experiment imports
+Using CPython 3.12.14 interpreter at: .venv\Scripts\python.exe
+Creating virtual environment at: C:\Users\70236\AppData\Local\Temp\bioimage-wheel-k7vbli0y\bioimage-appwb
+Activate with: C:\Users\70236\AppData\Local\Temp\bioimage-wheel-k7vbli0y\bioimage-appwb\Scripts\activate
+Resolved 83 packages in 2ms
+Installed 34 packages in 1.27s
+ + annotated-types==0.8.0
+ + certifi==2026.7.22
+ + charset-normalizer==3.5.2
+ + colorama==0.4.6
+ + colorlog==6.12.0
+ + flatbuffers==25.12.19
+ + idna==3.20
+ + numpy==2.5.4
+ + omegaconf==2.4.0
+ + onnxruntime==1.31.0
+ + opencv-python==5.0.0.93
+ + packaging==26.3
+ + pillow==12.3.0
+ + protobuf==7.36.2
+ + pyclipper==1.4.0
+ + pydantic==2.14.1
+ + pydantic-core==2.50.1
+ + pyside6==6.12.0
+ + pyside6-addons==6.12.0
+ + pyside6-essentials==6.12.0
+ + pyside6-pdf==6.12.0.140
+ + pyside6-webengine==6.12.0.140
+ + pyyaml==6.0.3
+ + rapidocr==3.9.2
+ + requests==2.34.2
+ + scipy==1.18.1
+ + shapely==2.2.0
+ + shiboken6==6.12.0
+ + six==1.17.0
+ + tifffile==2026.9.20
+ + tqdm==4.70.1
+ + typing-extensions==4.16.0
+ + typing-inspection==0.4.4
+ + urllib3==2.8.0
+Using Python 3.12.14 environment at: bioimage-appwb
+Resolved 4 packages in 3ms
+Installed 4 packages in 40ms
+ + bioimage-app==0.14.0 (from file:///C:/Users/70236/AppData/Local/Temp/bioimage-wheel-k7vbli0y/wheels/bioimage_app-0.14.0-py3-none-any.whl)
+ + platform-runtime==0.2.0 (from file:///C:/Users/70236/AppData/Local/Temp/bioimage-wheel-k7vbli0y/wheels/platform_runtime-0.2.0-py3-none-any.whl)
+ + tool-contracts==0.1.0 (from file:///C:/Users/70236/AppData/Local/Temp/bioimage-wheel-k7vbli0y/wheels/tool_contracts-0.1.0-py3-none-any.whl)
+ + wb-tool==0.19.0 (from file:///C:/Users/70236/AppData/Local/Temp/bioimage-wheel-k7vbli0y/wheels/wb_tool-0.19.0-py3-none-any.whl)
+QFontDatabase: Cannot find font directory C:/Users/70236/AppData/Local/Temp/bioimage-wheel-k7vbli0y/bioimage-appwb/Lib/site-packages/PySide6/lib/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+This plugin does not support propagateSizeHints()
+Installed direct TIFF/PNG: same full pixels/provenance/DPI; OCR only, original unchanged
+Installed schema7 render/read and portable settings-only template passed
+Installed project v4: OCR evidence, explicit binding, roundtrip and literal XLSX passed
+Installed project v5: explicit pairing, optional OCR, roundtrip and XLSX passed
+Installed WB desktop window: real widgets/entry assembly and async close passed
+Installed optional OCR: verified bundled PP-OCRv6 CPU recognition passed
+Installed OCR worker: real protocol, bundled models and static route passed
+Installed PNG OCR: separate loader and real worker preserve known text/coordinates
+Installed V0: real worker, 4000 exact comparison, committed assets and reopen passed
+Installed workflow: visible entry, three workers, 4000, reopen, style reuse, four real runs
+Installed batch: 4000/40, six runs, reopen, two publisher reruns, template/second batch
+[32168:49948:1103/003922.561:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/gpu_channel_manager.cc:920] Failed to create GLES3 context, fallback to GLES2.
+[32168:49948:1103/003922.561:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/gpu_channel_manager.cc:931] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+[32168:49948:1103/003922.652:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/gpu_channel_manager.cc:920] Failed to create GLES3 context, fallback to GLES2.
+[32168:49948:1103/003922.652:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/gpu_channel_manager.cc:931] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+[32168:49948:1103/003922.652:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/gpu_channel_manager.cc:920] Failed to create GLES3 context, fallback to GLES2.
+[32168:49948:1103/003922.652:ERROR:../../../qtwebengine/src/3rdparty/chromium/gpu/ipc/service/gpu_channel_manager.cc:931] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+Installed authoring: actual WebChannel assets, edit/save/reopen, 4000/40, six real workers, layout-preserving template and shared CLI

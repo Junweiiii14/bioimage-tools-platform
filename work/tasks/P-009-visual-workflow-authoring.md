@@ -51,3 +51,7 @@ Fresh reviewer首轮bb42有效12图结论fix，唯一问题为窄窗任务密度
 ## 2026-11-03 正式性能/隔离安装准备
 
 新增原生采样工具及performance-measurement.md，r5两场景1+0诊断退出0，非正式分布。最小Qt等待实验定位旧qWait线程饥饿，新AsyncEventPump的真实存储创建/回执/排空1passed1.80秒；失败不改写为通过、不改产品/P006旧工具。type/Ruff通过。tooling/installed_wheels.py新增实际已安装Web编排资产/保存重开/4000→40/6worker/布局模板+CLI校验，已静态编译但还没运行，不能当安装通过。正式默认5+30冻结后新目录串行运行；详细样本与终点边界按新测量说明。
+
+## 2026-11-03 已安装编排器验证通过与测量修正
+
+全环境wheel第二轮exit0，新P009独立GUI探针验证真实已安装JS/CSS、保存重开、4000→40、6实际RunRecord/PID和布局模板CLI；旧probe全部保留，-u只增强输出。第一轮app.quit轮询问题已记录为主动终止/exit1，不算通过。坏TIFF混合输入GUI1passed9.48秒，坏输入隔离、有效40、原字节保留。正式5d0c355采样exit1，8组UI数据完整，控制第二轮顶层const重复声明修为IIFE并检查true回执；2轮诊断过，待重新冻结完整默认采样。无阈值/超时/断言弱化；.gitattributes只追加P009 frozen-runs字节保留规则。详见delivery-probes.md/json及原始失败数据。
