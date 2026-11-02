@@ -1,6 +1,6 @@
 # P-005 工作流与事件协议的最小可靠执行切片
 
-<!-- PROGRAM_TASK_META {"id":"P-005","status":"planned","work_package":"W04","depends_on":["P-002"],"execution_root":"not_activated","owner":null,"base_commit":null,"head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-005","status":"planned","work_package":"W04","depends_on":["P-002","P-007"],"execution_root":"not_activated","owner":null,"base_commit":null,"head_commit":null} -->
 
 ## 执行状态
 
@@ -42,3 +42,7 @@ P-002独立WB模块及实际契约、既有RunSession/Workspace/CAS与worker协�
 ## 继续入口
 
 本卡未完成步骤为继续位置；主依据为docs/plans/research-platform-rd.md第3/5/6/12.4章，B-005仅作治理历史。修改规则或范围后重载context，收尾更新任务与handoff。
+
+## 2026-11-02 4.0依赖拆分（尚未实施）
+
+保留原P002依赖，新增P007科学资产/冻结图契约前置。本卡以旧原值WB粗模块与至少一个真实技术节点贯通固定图串行执行、节点边界暂停/取消、持久提交及幂等恢复；本卡完成单个固定图的依赖失效、复用校验和幂等恢复及既定反例；P008复用这些实现扩展有限多样本隔离、跨样本身份/预算并做完整M1工程交付，不建立第二套账本/缓存/恢复器，P009另做M2。原本卡的事件/缓存/重试反例不删除，不以P008分拆为由省略既定可靠性验收；新几何仍依P004具体实现，不假称新WB方法完成。

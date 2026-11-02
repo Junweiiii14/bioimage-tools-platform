@@ -9,6 +9,8 @@
 - 2026-11-02新增共享ComparisonSession、CLI、薄GUI及中文docs/wb-v0-acceptance.md。最新CLI/RunSession组合16 passed/56.81秒（.local/p002-final-target-a.txt），Pyright零错误；真实工作台2 passed/5.64秒，局部视觉ship/documenter No changes（详情任务卡）。wheel门禁仅追加同一用例独立安装验证。
 - 2026-11-02新执行者01a199d4-dac3-7dd3-af35-cdad7d361934已在产品HEAD78403be接手，真实goal active、无预算，证据work/evidence/B-010/goal-state.json。从旧聊天原生命令记录确认完整门禁completed/exit0（890398ms、1537 passed）及五例冻结生成exit0；接手又对原五工作区实际重开及校验全部保留成果摘要，证据P-002/recovery-verification.json。未重写冻结运行。
 - 下一步：非作者p002_independent_review已对29930f62..2591309独审Accepted，独立34项测试与输入篡改/证据核验通过，报告P-002/review-final.md。PR48待四必需CI与正常集成。4.0文档同步须随正常规则回执及阶段集成清单保留。P002为in_review，尚无集成结论，不标done。旧句柄不作为成功依据。
+- 最新候选a69b38e810b4fefe1d38fae845c582d17ff56aae：首次PR48 Windows/Linux因两份Markdown Python示例各缺空行在Ruff阶段失败，已最小格式修复和HTML重建；ci-format-fix.json保留前后摘要。独立审查者已核实Accepted可沿用到29930f62..a69b38e（仅文档/证据变化，无产品变化）。当前必需CI run41372266645进行中，rules-context及desktop-environment已通过，foundation Windows/Linux待结果；勿将in_progress当通过。
+- 等CI期间仅准备B011及P007–009 planned卡，registry/P004/P005依赖拆分在工作区尚未提交，绝不能推入P002已审PR。先完成PR48，再新分支按新main重新加载B011规则和审查集成。P003/P006仍planned；P004几何方法不作为M1原整数图整卡前置。科学/现场缺项保留。
 - 真实goal已get确认active、无token预算。用户明确允许回传目标状态/提交号/执行树，已向原聊天01a19004-3b85-7a30-bc08-c9e59a79d209回传以上状态；无需重复索要同一许可。
 - T082科学/目标环境待办、历史失败和冻结源码/安装证据完整保留；原snapshot逐字节归档见archive/P001-before-adoption-snapshot.md。P003–006仅按V0必需范围接入，不因部分实现自动整卡完成。
 

@@ -1,6 +1,6 @@
 # P-004 自动校正分析资产与版本化数值输入契约
 
-<!-- PROGRAM_TASK_META {"id":"P-004","status":"planned","work_package":"W03","depends_on":["P-002","P-003"],"execution_root":"not_activated","owner":null,"base_commit":null,"head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-004","status":"planned","work_package":"W03","depends_on":["P-002","P-003","P-007"],"execution_root":"not_activated","owner":null,"base_commit":null,"head_commit":null} -->
 
 ## 执行状态
 
@@ -16,7 +16,7 @@ P-002旧WB模块入口及已冻结最小契约、P-003方法/评估登记；B-00
 
 ## 执行步骤
 
-1. 保留AssetRef v1，新增ScientificAsset组合载荷引用与科学元信息。定义采集强度单位/范围及其来源、acquisition_bit_depth、analysis_dtype、坐标矩阵/方向、像素中心、valid_mask与质量来源；反相上限不由float dtype或每图峰值猜出。
+1. 保留AssetRef v1，消费P007的ScientificAsset组合契约，版本化补analysis_image、valid_mask与几何字段，不重复建立基础资产类型。定义采集强度单位/范围及其来源、acquisition_bit_depth、analysis_dtype、坐标矩阵/方向、像素中心、valid_mask与质量来源；反相上限不由float dtype或每图峰值猜出。
 2. 设计自动估角的estimated/validated_zero/unknown状态和候选方法身份，不把启发式score当概率；unknown不能伪装成成功0度。默认自动链形成统一分析几何，人工覆盖仅为可选接管。
 3. 从不可变原图按累计几何单次重采样，首版float64计算并保存无pickle的npy载荷及元信息，临时8位预览保持独立kind/generation。预览、ROI与测量绑定同一正式分析资产；不能量化回整数冒充兼容。
 4. ROI绑定analysis_asset_id/revision/frame，明确重新定位或显式迁移策略；不得用原图外接矩形代替旋转区域。全部非零插值贡献源像素有效时才标valid；首版WB定量ROI要求全部有效，原始端点/饱和提示保守传播。
@@ -42,3 +42,7 @@ P-002旧WB模块入口及已冻结最小契约、P-003方法/评估登记；B-00
 ## 继续入口
 
 本卡未完成步骤为继续位置；主依据为docs/plans/research-platform-rd.md第3/6/7章WB候选链及第12.3节，B-005仅作治理历史。修改规则或范围后重载context，收尾更新任务与handoff。
+
+## 2026-11-02 4.0依赖拆分（尚未实施）
+
+保留原P002/P003依赖，新增P007前置。最小原值/表/连接契约由P007负责，本卡消费该契约并另行版本化扩展正式analysis_image、valid mask、几何方法及兼容；不重复创建资产身份。原估角/单次重采样/有效域/旧科学兼容验收保留，本卡仍是WB方法线，不作为M1整数原图引擎的整卡前置。

@@ -3,7 +3,7 @@
   "program_id": "scientific-agent-platform",
   "plan_version": "4.0",
   "plan_path": "docs/plans/research-platform-rd.md",
-  "purpose": "Task states remain authoritative here. V4 M1/M2 task decomposition follows P002 acceptance; existing dependencies preserved until explicit migration.",
+  "purpose": "V4 M0→M1→M2 authorized sequence. Task cards are the only status source. P004 geometry remains separate from narrow P007 data/graph contracts.",
   "dependency_semantics": "Work package edges name required prior capabilities; D1 design readiness and S1 method admission are distinct gates in the plan. Task dependencies require done. If narrower handoff is needed, split and register a separate task instead of overriding the dependency check.",
   "tasks": [
     {
@@ -29,6 +29,18 @@
     {
       "id": "P-006",
       "path": "work/tasks/P-006-interaction-performance-baseline.md"
+    },
+    {
+      "id": "P-007",
+      "path": "work/tasks/P-007-scientific-workflow-contracts.md"
+    },
+    {
+      "id": "P-008",
+      "path": "work/tasks/P-008-workflow-batch-recovery.md"
+    },
+    {
+      "id": "P-009",
+      "path": "work/tasks/P-009-visual-workflow-authoring.md"
     }
   ],
   "work_packages": [
@@ -65,7 +77,8 @@
       "title": "自动校正分析链",
       "depends_on": [
         "W01",
-        "W02"
+        "W02",
+        "W11"
       ],
       "task_ids": [
         "P-004"
@@ -75,7 +88,8 @@
       "id": "W04",
       "title": "确定性工作流",
       "depends_on": [
-        "W02"
+        "W02",
+        "W11"
       ],
       "task_ids": [
         "P-005"
@@ -136,6 +150,39 @@
         "W00"
       ],
       "task_ids": []
+    },
+    {
+      "id": "W11",
+      "title": "最小科学资产与冻结图契约",
+      "depends_on": [
+        "W01",
+        "W02"
+      ],
+      "task_ids": [
+        "P-007"
+      ]
+    },
+    {
+      "id": "W12",
+      "title": "M1有限批量与恢复交付",
+      "depends_on": [
+        "W04",
+        "W11"
+      ],
+      "task_ids": [
+        "P-008"
+      ]
+    },
+    {
+      "id": "W13",
+      "title": "M2可视编排与模板",
+      "depends_on": [
+        "W05",
+        "W12"
+      ],
+      "task_ids": [
+        "P-009"
+      ]
     }
   ],
   "task_execution_root": ".",
