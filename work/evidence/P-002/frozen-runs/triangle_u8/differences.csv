@@ -1,0 +1,2 @@
+﻿sample_id,metric,method,source_asset_id,source_sha256,run_id,request_id,baseline_value,module_value,baseline_status,module_status,baseline_reason,module_reason,difference,numerically_comparable,exact_match,absolute_tolerance
+text:triangle_u8,text:signal,text:profile_integral@1,text:59cb3dc9c78a4ae0adf5e6faf0c0d17c,text:dfa6fbcc71b8b96de0444f14bb73eedc3687e30762773e44c9a15093138bcaf5,text:54c2b5a4efa04e49892881de905d3cd1,text:98bd403104a24b30a7ab5c7587394c7e,40.0,40.0,text:valid,text:valid,text:,text:,0.0,True,True,0

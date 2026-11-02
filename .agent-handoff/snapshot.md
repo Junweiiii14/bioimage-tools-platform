@@ -7,6 +7,11 @@
 - 2026-10-31本轮组合验证34 passed/21.99秒（工作区TEMP，exit0），真实进程成功重开、manifest后退出7、输出缺失/同尺寸篡改、取消及旧运行/存储回归；Ruff/Pyright/policy通过。初始默认TEMP权限失败和修复验证如实在任务记录。
 - p001_review对29930f62..725fc6a提出P1发布绑定遗漏；当前修复通过payload_kind强制匹配，missing_binding回归通过，尚待新提交独审。旧审查不能写Accepted。
 - 2026-11-02新增共享ComparisonSession、CLI、薄GUI及中文docs/wb-v0-acceptance.md。最新CLI/RunSession组合16 passed/56.81秒（.local/p002-final-target-a.txt），Pyright零错误；真实工作台2 passed/5.64秒，局部视觉ship/documenter No changes（详情任务卡）。wheel门禁仅追加同一用例独立安装验证。
-- 下一步：完整门禁正在执行（会话4515，.local/p002-check-all-a.txt；恢复先查实际句柄），冻结提交后独立审查、生成正式输出证据、PR与CI集成。未完成前不标V0完成。旧会话63032恢复时已不存在，未猜测结果，另一次Pyright已实际exit0。
+- 2026-11-02新执行者01a199d4-dac3-7dd3-af35-cdad7d361934已在产品HEAD78403be接手，真实goal active、无预算，证据work/evidence/B-010/goal-state.json。从旧聊天原生命令记录确认完整门禁completed/exit0（890398ms、1537 passed）及五例冻结生成exit0；接手又对原五工作区实际重开及校验全部保留成果摘要，证据P-002/recovery-verification.json。未重写冻结运行。
+- 下一步：非作者p002_independent_review正在只读审查29930f62..78403be；待处理发现、准确提交复审、PR与必需CI集成。4.0文档同步须随正常规则回执及阶段集成清单保留。尚无P002最终独审或集成结论，不标done。旧句柄不作为成功依据。
 - 真实goal已get确认active、无token预算。用户明确允许回传目标状态/提交号/执行树，已向原聊天01a19004-3b85-7a30-bc08-c9e59a79d209回传以上状态；无需重复索要同一许可。
 - T082科学/目标环境待办、历史失败和冻结源码/安装证据完整保留；原snapshot逐字节归档见archive/P001-before-adoption-snapshot.md。P003–006仅按V0必需范围接入，不因部分实现自动整卡完成。
+
+## 2026-11-02 新用户授权与执行移交
+
+4.0方案已由B010同步到本树，准确源摘要见work/evidence/B-010/transfer-manifest.json。当前产品任务仍P002，不因同步而标完成。新聊天将使用gpt-6.1-sol/medium与真实goal接手，先当前验收，再M1通用执行、M2可视编排；详见docs/plans/phase-2-workflow-authoring.md。旧聊天目前idle/interrupted，不应与新聊天同时写本树。此段优先于历史“仅V0”范围说明。B010同步是本地改动，提交/独审/集成由新执行者正常处理；勿删除旧回执解决CI。

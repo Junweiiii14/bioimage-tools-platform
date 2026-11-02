@@ -1,0 +1,2 @@
+﻿sample_id,metric,method,source_asset_id,source_sha256,run_id,request_id,value,status,reason,unit,raw_integral_for_review
+text:invalid_roi,text:signal,text:profile_integral@1,text:289941a0416f44da87fe3f7b73694453,text:c20c8589d21f2897561f5e3cfe64a3fbe5366232077d08e37dc95f236667ccfd,text:fd723912d17f40ab81d0e67eb63d6f83,text:aebf5a51ddee411b80eeb22798bc2e71,,text:invalid,text:泳道矩形超出图像,text:mean_pixel_intensity_times_pixel,

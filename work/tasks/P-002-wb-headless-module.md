@@ -1,6 +1,6 @@
 # P-002 V0成熟WB方法独立调用与真实成果对照
 
-<!-- PROGRAM_TASK_META {"id":"P-002","status":"in_progress","work_package":"W02","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a190e6-02b1-74e3-a7b9-bd5fbc3f36fe","base_commit":"29930f62a0b158189b76e0fad7d090d632f149d6","head_commit":"725fc6aef8df192f46fdceb122f6ff669251dd72"} -->
+<!-- PROGRAM_TASK_META {"id":"P-002","status":"in_progress","work_package":"W02","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"29930f62a0b158189b76e0fad7d090d632f149d6","head_commit":"78403be43b225da3626e3a6ef0a8aeda2cbbbaec"} -->
 
 ## 执行状态
 
@@ -45,6 +45,16 @@ P-001接入并确认的实际产品树；B-007第2/3/4/12.2/13.1节；冻结旧�
 ## 继续入口
 
 本卡未完成步骤为继续位置；主依据为docs/plans/research-platform-rd.md第2/3/4/12.2/13.1节。V0交付是本次第一阶段终点，不自动推进V1、IF或Agent；后续按已授权范围与前置依赖激活。修改规则或范围后重载context，收尾更新任务与handoff。
+
+## 2026-11-02实际接手与完整门禁核实
+
+接手分支codex/p002-wb-headless-module、HEAD78403be43b225da3626e3a6ef0a8aeda2cbbbaec；新执行聊天01a199d4-dac3-7dd3-af35-cdad7d361934独占产品实施。真实goal为active、无token预算，初始证据work/evidence/B-010/goal-state.json。4.0同步成果保留；本卡仍只收拢原P002范围。
+
+通过旧聊天原生命令记录核实`uv run --locked --no-sync python dev.py check --all`实际completed、exit0、890398ms；对应日志.local/p002-check-all-a.txt。Windows/Python3.12.14，工作区TEMP/TMP，Qt offscreen/disable-gpu。1537 passed、10 warnings、796.95秒；Ruff、format、Pyright（0 errors）、导入契约、JS检查与独立wheel安装均通过；隔离桌面wheel实际验证4000精确对照、正式资产和重开。没有从失效句柄或日志23%猜测成功。此为原产品HEAD的工程门禁；新文档规则/PR仍需正常集成检查。
+
+同样从原生命令记录核实冻结证据脚本exit0、26145ms，五组真实运行位于work/evidence/P-002/frozen-runs/，source_commit为78403be。接手后重新对原五个Workspace执行`python -I -m bioimage_app --v0-open`，逐组exit0、真实RunRecord一致，并校验每份保留成果SHA256；恢复验证命令exit0，证据recovery-verification.json。原冻结证据和历史运行未重写。有效40/4000/0、无效ROI空值、位深端点待复核空值分别保留。
+
+已向非作者审查者派发准确29930f62..78403be的只读审查，尚无最终结论；不得据既有局部UI审查宣称产品独审通过。PR与必需CI尚待完成。中文操作单docs/wb-v0-acceptance.md已存在；用户尚未实际体验，科学/目标环境未验，不代签。
 
 ## 2026-10-31激活
 

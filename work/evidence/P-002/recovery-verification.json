@@ -1,0 +1,44 @@
+{
+  "source_commit": "78403be43b225da3626e3a6ef0a8aeda2cbbbaec",
+  "recovery_head": "78403be43b225da3626e3a6ef0a8aeda2cbbbaec",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "command": "python -I -m bioimage_app --v0-open <each original frozen workspace>; SHA256 verify every frozen artifact",
+  "cases": [
+    {
+      "case": "triangle_u8",
+      "run_id": "54c2b5a4efa04e49892881de905d3cd1",
+      "exit_code": 0,
+      "reopen_verified": true,
+      "frozen_artifact_hashes_verified": true
+    },
+    {
+      "case": "triangle_u16",
+      "run_id": "4263a5de53e44e22a50847f220e94553",
+      "exit_code": 0,
+      "reopen_verified": true,
+      "frozen_artifact_hashes_verified": true
+    },
+    {
+      "case": "flat_zero",
+      "run_id": "b2ea4d76fc964db7bc5fc1e3492fd0b7",
+      "exit_code": 0,
+      "reopen_verified": true,
+      "frozen_artifact_hashes_verified": true
+    },
+    {
+      "case": "invalid_roi",
+      "run_id": "fd723912d17f40ab81d0e67eb63d6f83",
+      "exit_code": 0,
+      "reopen_verified": true,
+      "frozen_artifact_hashes_verified": true
+    },
+    {
+      "case": "dtype_limits",
+      "run_id": "8a4a02ab12304425aafde99d47a07395",
+      "exit_code": 0,
+      "reopen_verified": true,
+      "frozen_artifact_hashes_verified": true
+    }
+  ],
+  "scope": "Engineering persistence and frozen artifacts; no scientific or target-machine acceptance"
+}

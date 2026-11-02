@@ -6,11 +6,11 @@
     "."
   ],
   "rules": {
-    "AGENTS.md": "2ab9cabd48b08ae2e5373be5c74586e74c22b813b082b3e7f41dcc5230ea0240",
-    "docs/ai-workflow.md": "e38a4bcecd927071975afeb19b8af12cc6c21053b1f78322b8711aa2952a7d71",
+    "AGENTS.md": "32a056a89cb53f26e874df160432dd8352ee8aa76573ba45c9c731c8877d02ae",
+    "docs/ai-workflow.md": "319edc4ad29ce059e09aa8b18e73a7b519e69b52373406cd49b4b9776769f20f",
     "docs/architecture.md": "7a4c4ae9f6c7be020df13ad9b431a5ce396ffab2e588fcdc0aa6a00fdc74bc1e",
     "docs/coding-standards.md": "40fe9541a84163e6df6be9d2a57b836b9703471440f412bd16456f1ef0382d71",
-    "docs/module-map.md": "18d9fa4d64ec8871cf0efca7d7f883290a9f5bac3578aff88c2c15bf1ba1ea37",
+    "docs/module-map.md": "591ca8184c6032864437a24f58f7a9f5fd8075c6d576cd9a84ed1626dd8872bd",
     "docs/research-protocol.md": "b1ab0f9bf291e50f5872e01147f7af2671fdc5885bf2f065c804c5f4a240aa51",
     "docs/runbooks/rule-enforcement.md": "6db3eacb3d49b8015ac54fca756236dbc8906ba5a0746741a28afd12fb7398e0"
   },
