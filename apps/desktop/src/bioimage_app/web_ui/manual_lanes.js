@@ -446,6 +446,9 @@ laneViewport.addEventListener(
         if (event.button !== 0 && event.button !== 1) return;
         event.preventDefault();
         event.stopImmediatePropagation();
+        // A real gesture can precede render's queued fitImage frame. Establish
+        // this view's origin before capturing the offset for its first movement.
+        syncImagePanView();
         imagePan.drag = {
             clientX: event.clientX,
             clientY: event.clientY,

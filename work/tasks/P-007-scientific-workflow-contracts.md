@@ -1,6 +1,6 @@
 # P-007 M1最小科学资产、连接与冻结工作流契约
 
-<!-- PROGRAM_TASK_META {"id":"P-007","status":"in_review","work_package":"W11","depends_on":["P-002","P-003"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"dc9618e7000eb7793067556e99d50a0d0509423d","head_commit":"23d405645097fa07b7949522e020b75a7a4cd3cf"} -->
+<!-- PROGRAM_TASK_META {"id":"P-007","status":"in_progress","work_package":"W11","depends_on":["P-002","P-003"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"dc9618e7000eb7793067556e99d50a0d0509423d","head_commit":null} -->
 
 ## 输入与前置
 
@@ -49,3 +49,11 @@ P006已独审/四必需CI后PR50正常合main dc9618e，P007保留自身未提�
 ## PR51冻结候选最终独审
 
 非作者准确dc9618e..23d4056最终Accepted，产品6bb独立31passed/4.00秒及六组额外计划攻击均拒绝；四原件/receipt/旧v1 Git字节与实际wheel日志独立核对通过。PR51远端HEAD固定23d4056并已ready，规则/desktop已SUCCESS，Windows/Linux全门禁仍在执行，尚未合并；保持in_review。当前本地后继仅独审/交接记录，不推送更改远端冻结候选；待其正常集成后，真实集成收据随下一任务PR提交。
+
+## PR51首轮Windows失败与最小交互修复范围
+
+准确23d4056 Linux完整1596passed/4既有skip/613.11秒且新增/旧wheel均过；Windows1 failed/1599passed/929.22秒，旧manual_lanes真实pan等待40/25超5000ms，未合并。作者原样单测1passed/25.34秒，不能推断CI根因消失。受控探针：把OS鼠标放终点仍收到可信move并过；扣留初始rAF时可信事件delta40/25到达而fitImage首次panKey初始化把位移归零，4个回调未执行/naturalWidth100，确定可复现pending-layout竞态，不冒称CI当时也已定因。原日志/退出/来源SHA见ci-failure-r1.json和.local原件。
+
+修复限定显示平移：在pointerdown采集初始offset前同步当前视图panKey，fitImage共用同一状态同步；保留原数值/ROI/原始输入。原完整测试增加扣留初始布局帧的分支，原40/25、取消恢复、原坐标ROI和1000/800数值断言、5000ms超时不改。适用scope仍为已加载的.，已读desktop README/当前实现及impeccable上下文/交互边界；不升级技能、不修复无关sidecar。旧独审23d产品结论不覆盖本UI增量，修后新准确提交独审与全部必需CI再验，不靠重跑或放宽门禁销账。
+
+修复后普通/扣留布局两支完整手动流程2passed/17.20秒，邻近源身份/独立灰度7passed/12.76秒；保留原40/25、55/35、取消40/25与ROI/1000/800/原图/历史断言，未改5000ms或容差。新增回归修前实际exit1/8.38秒、修后0。Ruff/format（折行decorator后）、全Pyright0、web质量四反例检查0，impeccable单次机械detect0/[]。详情pan-race-regression.json和research最小实验。转in_progress等待新准确提交独审，不沿用旧Accepted宣称UI增量已审。

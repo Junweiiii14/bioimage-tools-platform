@@ -488,6 +488,13 @@ function renderCanvas() {
     renderMontageRegions();
     requestAnimationFrame(fitImage);
 }
+function syncImagePanView() {
+    const panKey = [mode, quantDetail, row()?.id, focusCrop].join(':');
+    if (imagePan.key === panKey) return;
+    imagePan.key = panKey;
+    imagePan.x = 0;
+    imagePan.y = 0;
+}
 function fitImage() {
     const img = $('#source-image'),
         vp = $('#image-viewport'),
@@ -541,12 +548,7 @@ function fitImage() {
             ty = (0.5 - (box.y + box.height / 2) / size.height) * h * actualZoom;
         }
     }
-    const panKey = [mode, quantDetail, r?.id, focusCrop].join(':');
-    if (imagePan.key !== panKey) {
-        imagePan.key = panKey;
-        imagePan.x = 0;
-        imagePan.y = 0;
-    }
+    syncImagePanView();
     target.style.transform = `translate(${tx + imagePan.x}px,${ty + imagePan.y}px) scale(${actualZoom})`;
     $('#zoom-label').textContent =
         zoom === 1 ? (focusCrop && r?.roi ? '聚焦泳道' : '适应窗口') : Math.round(zoom * 100) + '%';

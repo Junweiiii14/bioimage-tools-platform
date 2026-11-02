@@ -17,8 +17,11 @@ from wb_tool.api import WBAnalysisProject
 from tooling.qt_test_lifecycle import close_and_dispose_window
 
 
+@pytest.mark.parametrize(
+    "defer_initial_layout", [False, True], ids=["normal_layout", "pending_layout"]
+)
 def test_copy_manual_multipeak_history_new_group_save_and_reopen(
-    qtbot: QtBot, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    qtbot: QtBot, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, defer_initial_layout: bool
 ) -> None:
     (tmp_path / "originals").mkdir()
     source = tmp_path / "originals/source.tif"
@@ -69,6 +72,18 @@ def test_copy_manual_multipeak_history_new_group_save_and_reopen(
             timeout=10000,
         )
 
+    layout_deferred = False
+
+    def restore_layout_frames() -> None:
+        nonlocal layout_deferred
+        if layout_deferred:
+            js(
+                "window.requestAnimationFrame=window.panNativeFrame;"
+                "for(const callback of panDeferredFrames.splice(0))requestAnimationFrame(callback);"
+                "delete window.panNativeFrame;delete window.panDeferredFrames;true"
+            )
+            layout_deferred = False
+
     try:
         window.show()
         qtbot.waitUntil(lambda: js("Boolean(typeof bridge!=='undefined'&&bridge)") is True)
@@ -97,6 +112,14 @@ def test_copy_manual_multipeak_history_new_group_save_and_reopen(
             timeout=10000,
         )
         js("desktopSession.route();true")
+        if defer_initial_layout:
+            # Exercise the actual pointer path before render's first fitImage frame.
+            # The original exact translation and source-coordinate oracles stay intact.
+            js(
+                "window.panNativeFrame=window.requestAnimationFrame;window.panDeferredFrames=[];"
+                "window.requestAnimationFrame=callback=>panDeferredFrames.push(callback);true"
+            )
+            layout_deferred = True
         # Real Qt pointer events verify view translation, cancellation and the
         # original-coordinate mapping after zoom/pan; numerical fixtures follow.
         js("manualLanes.activate();focusCrop=false;zoom=1.4;render();true")
@@ -124,6 +147,7 @@ def test_copy_manual_multipeak_history_new_group_save_and_reopen(
         QTest.mouseRelease(target_widget, Qt.MouseButton.LeftButton, pos=start + QPoint(40, 25))
         qtbot.waitUntil(lambda: js("imagePan.drag===null") is True)
         assert js("JSON.stringify([imagePan.x,imagePan.y,manualLanes.boxes.length])") == "[40,25,0]"
+        restore_layout_frames()
         # Cancel restores only the view; it must not create or alter lane boxes.
         QTest.mousePress(target_widget, Qt.MouseButton.LeftButton, pos=start)
         qtbot.waitUntil(lambda: js("Boolean(imagePan.drag)") is True)
@@ -283,6 +307,7 @@ def test_copy_manual_multipeak_history_new_group_save_and_reopen(
         assert len(window.host.view.project().rows) == 2
         assert plan().request == completed.request and source.read_bytes() == original
     finally:
+        restore_layout_frames()
         close_and_dispose_window(
             window, qtbot, resources_closed=lambda: window.host.resources_closed, timeout=20000
         )

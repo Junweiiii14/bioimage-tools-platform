@@ -1,9 +1,5 @@
 # Current Work Log
 
-## 2026-10-20 E6 closeout
-
-Completed ea7ed55 frozen render reuse, exact-owned widgets and full stage pagination. 862/624.64s + original child0/all wheels/real OCR/full gate0; independent scoped review/UI ship. Export20x2 thresholds passed; desktop20/phase1/cancel5 explicitly limited. Inventory4 does not resolve purecall UNKNOWN. Auto-next E7, including historical OCR late cancellation P2 discovered by separate high-risk audit. No remote mutation/new installer yet.
-
 ## 2026-10-19 T050 规划回复（保留main记录）
 
 根据用户回复更新第5/6/7/8节：批准局部暂停与独立结果目录，独立灰度定量OCR作为继续支持的功能。主流程不加载OCR与安装发行拆分是不同事项，后者未决；同步任务/风险/待办和交接。未改产品/PDF/依赖，旧审查不外推本轮修订。
@@ -156,3 +152,7 @@ P006准确839..b0c71e1非作者Accepted，PR50四必需CI后正常合dc9618e/tre
 ## 2026-11-02 P007最终独审及PR51 CI
 
 准确dc9618e..23d4056 Accepted，独立31tests/4秒和六组攻击、四原件SHA、v1 Git字节与真实wheel日志校验通过。作者准确6bb合同命令/完整独立wheel0，最终Pyright0、plan/rulecheck0。PR51 ready、远端冻结23d4056，双平台完整CI尚进行；本地仅保存独审/交接记录，不推送重启CI。保持in_review，下一正常merge前核实四必需成功/tree一致，之后P005→P008→P009。P005只读草拟笔记在.local，未激活/实现。
+
+## 2026-11-02 P007首轮CI失败后的显示pan竞态修复
+
+PR51旧23d Linux1596pass/4skip/613.11秒/wheels过，Windows1fail1599pass/929.22秒，旧manual pan40/25超时，未合。原样单测过不足定因；扣留首个rAF的trusted事件40/25被fitImage首次panKey初始化归零，受控新回归修前确切失败、修后两支完整测试2pass/17.20秒，邻近7pass/12.76秒。共享视图pan同步在pointerdown捕获offset前完成，未改ROI/原像素/1000-800/取消/历史/超时/容差。Ruff/type/web/detector过，等待新准确提交独审/CI。历史CI现场同因未证，不统一销账native/GPU。
