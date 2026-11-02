@@ -32,6 +32,7 @@ from wb_tool.application.analysis import (
     AnalysisResult,
     analyze_annotations,
 )
+from wb_tool.application.worker_protocol import ResultFrame
 from wb_tool.application.workflow_parameters import (
     OriginalValidation,
     VerifyOriginalParameters,
@@ -50,6 +51,7 @@ _FILES = (
     "application/workflow_parameters.py",
     "adapters/tiff_input.py",
     "application/analysis.py",
+    "application/worker_protocol.py",
     "domain/lanes.py",
     "domain/quantify.py",
 )
@@ -167,6 +169,19 @@ def _original(
 
 def _json(value: object) -> bytes:
     return json.dumps(value, ensure_ascii=False, allow_nan=False, separators=(",", ":")).encode()
+
+
+def _validated_result(result: AnalysisResult, start: WBWorkflowStart) -> AnalysisResult:
+    # Validate before JSON serialization can replace a nonfinite value with null.
+    return ResultFrame(
+        protocol_version=1,
+        kind="result",
+        sequence=2,
+        run_id=start.identity.run_id,
+        attempt_id=start.request.attempt_id,
+        request_id=start.request.request_id,
+        result=result,
+    ).result
 
 
 def _report(
@@ -319,6 +334,7 @@ def execute_wb_workflow_node(
         if (planned.source_sha256, planned.revision) != (ref.sha256, req.revision):
             raise ValueError("Analysis parameters do not bind the original/request document")
         result = analyze_annotations(image, planned, cancelled=cancelled)
+        result = _validated_result(result, start)
         payloads = {"analysis": TypeAdapter(AnalysisResult).dump_json(result)}
         quality = (
             "complete"
@@ -328,6 +344,7 @@ def execute_wb_workflow_node(
     else:
         _, _, raw = _read(start, "analysis")
         result = TypeAdapter(AnalysisResult).validate_json(raw, strict=True, extra="forbid")
+        result = _validated_result(result, start)
         if (
             result.request.revision,
             result.request.geometry_policy,

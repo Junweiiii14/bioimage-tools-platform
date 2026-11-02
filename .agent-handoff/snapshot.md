@@ -19,6 +19,8 @@
 
 当前独审目标HEAD823d282a90e65c93b5b2db927d1f1e75b68712b9（base89ba603b38c77bd45689c48c2918f43f423f7a4f），尚无结论；live agent已确认running。实际PR基线main006e9f1规则回执核对及全增量diff检查均exit0。14受影响文件format和全仓Pyright0。无本机测试/CI/wheel进程仍在运行；本后继只记状态，不改变冻结源码。
 
+823d首轮已返回Request changes：发布直读AnalysisResult跳过旧ResultFrame，NaN/负数可误发valid。已在分析出口/发布入口复用旧完整校验，新增八种策略/数值/ROI/剖面/状态反例，13节点测试23.04s通过；详情worker-review-r1.md。新准确提交须复审，不能沿用823d接受（它未被接受）。后续在新文件实现自动调度，旧切片新head需准确只读复审。
+
 先前账本/wheel组件3215..41812c55已Accepted（journal-review-r3.md）；后续新增请求确认/三节点源码须单独准确独审。无活动CI/wheel；下一步是真实GraphSession自动调度，不重复先前账本验收或请求用户继续。
 
 1. 请求确认/三节点代码冻结准确独审后，直接实现通用WorkflowSession/后台可信HostModule注册与准备端口。已有RunSession.started→宿主存储workflow started CAS→authorize_request(run,pid)；原ProcessEvent.module_event及source attempt/run直接用于worker事件，closure须绑定原attempt/run。固定三节点public WB APIs、wb_workflow_spec/environment、workflow_runtime_environment可用；生成通用ExecutionRequest时document0与plan.generation分开。IO/源码摘要/大型JSON只在后台。当前worker只验证自身环境，不认证宿主字段，必须真正后台重算当前注册/env再执行或复用。

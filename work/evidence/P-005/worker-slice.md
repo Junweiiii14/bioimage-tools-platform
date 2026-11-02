@@ -17,3 +17,5 @@
 新模块指纹固定生产源码（含LineReader与协议依赖），自身环境核对Python/OS/CPU、依赖、codec及TIFF资源配置。宿主摘要函数实际读取已安装contracts/runtime/desktop源码并记录Qt/宿主包版本，但生产GraphSession还未调用它做当前准入；不能把节点收到host_runtime_source字段当作真实宿主认证。
 
 **未完成：** 测试父进程目前显式串接三节点，尚不是生产通用自动调度。GraphSession/可信模块装配与后台准备、账本started确认、当前环境准入、cache/recovery/暂停取消完整接线及故障矩阵仍需实施。本轮新源未跑完整门禁/新wheels/CI，准确提交独审待做；前轮418的wheel/独审只属于前轮源码。P005继续in_progress，M1/M2未完成，不授S1/现场验收。
+
+首轮823d独审Request changes见worker-review-r1.md：发布绕过旧完整结果校验，可输出非有限/负数为valid。后继分析/发布共用旧ResultFrame验证，13项最终节点测试23.04秒通过，错误输入无候选目录；新准确源码仍须复审。

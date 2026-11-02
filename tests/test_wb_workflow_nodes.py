@@ -5,7 +5,6 @@ import hashlib
 import io
 import json
 import sys
-from dataclasses import replace
 from pathlib import Path
 from uuid import uuid4
 
@@ -217,14 +216,47 @@ def test_actual_original_validation_analysis_publish_nodes(
         assert hashlib.sha256(source_file.read_bytes()).hexdigest() == source_hash
 
 
-def test_original_report_rejects_foreign_policy_before_creating_candidate(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    "mutation, message",
+    [
+        ("foreign_policy", "different analysis policy"),
+        ("nan", "测量边界或信号不一致"),
+        ("infinity", "测量边界或信号不一致"),
+        ("negative", "测量边界或信号不一致"),
+        ("profile_infinity", "结果剖面包含无效强度"),
+        ("profile_mismatch", "定量剖面与原始均值及极性不一致"),
+        ("roi_mismatch", "结果泳道或条带标注与请求不一致"),
+        ("invalid_status", "缺失/失败/排除结果不能携带测量"),
+    ],
+)
+def test_original_report_rejects_inconsistent_results_before_creating_candidate(
+    tmp_path: Path,
+    mutation: str,
+    message: str,
+) -> None:
     # A deliberately altered in-memory fixture is not a real committed analysis run.
     original = wb_validation_input("triangle_u16")
     source = tmp_path / "original.tif"
     source.write_bytes(original.source_bytes)
     result = analyze_annotations(load_tiff(source), original.request)
-    altered = replace(result, request=replace(result.request, quant_policy="wbquant_1_4_3@1"))
-    payload = TypeAdapter(AnalysisResult).dump_json(altered)
+    altered = json.loads(TypeAdapter(AnalysisResult).dump_json(result))
+    if mutation == "foreign_policy":
+        altered["request"]["quant_policy"] = "wbquant_1_4_3@1"
+    elif mutation in ("nan", "infinity", "negative"):
+        altered["lanes"][0]["bands"][0]["measurement"]["signal"] = {
+            "nan": float("nan"),
+            "infinity": float("inf"),
+            "negative": -123.0,
+        }[mutation]
+    elif mutation == "profile_infinity":
+        altered["lanes"][0]["profiles"]["raw"][0] = float("inf")
+    elif mutation == "profile_mismatch":
+        altered["lanes"][0]["profiles"]["quantitative"][0] = 999.0
+    elif mutation == "roi_mismatch":
+        altered["lanes"][0]["roi"]["x1"] = 2
+    else:
+        altered["lanes"][0]["bands"][0]["status"] = "invalid"
+    payload = json.dumps(altered, allow_nan=True).encode()
     analysis = tmp_path / "foreign-analysis.json"
     analysis.write_bytes(payload)
     asset = AssetRef(
@@ -254,6 +286,6 @@ def test_original_report_rejects_foreign_policy_before_creating_candidate(tmp_pa
         inputs=(WorkflowInputPath(port="analysis", path=str(analysis)),),
         output_directory=str(output),
     )
-    with pytest.raises(ValueError, match="different analysis policy"):
+    with pytest.raises(ValueError, match=message):
         execute_wb_workflow_node(start)
     assert not output.exists()

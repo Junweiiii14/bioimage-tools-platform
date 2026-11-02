@@ -1,0 +1,7 @@
+# 节点切片首轮独审：Request changes
+
+准确范围89ba603b38c77bd45689c48c2918f43f423f7a4f..823d282a90e65c93b5b2db927d1f1e75b68712b9；非作者/root/p002_independent_review只读独立27项针对性测试48.10秒/exit0，全范围diff0。
+
+P1：发布入口直接TypeAdapter读取AnalysisResult，绕过旧ResultFrame语义校验。独立真实文件反例把4000结果的measurement.signal改成NaN或-123并更新输入文件摘要，均发布quality=complete和valid CSV值。旧协议已有有限/非负、ROI、剖面、位深和状态一致性校验，新入口不能跳过。额外反例脚本exit0，未修改共享文件。
+
+作者修正在分析出口及发布入口共同复用旧ResultFrame完整一致性校验，序列化之前验证非有限值，固定实现源摘要加入worker_protocol.py；新增NaN/Inf/负数、错剖面/ROI及状态矛盾拒绝并确认无候选目录。13项节点测试23.04秒/exit0，Ruff/format/Pyright0；原正常数值和状态断言保持。首轮Request changes不销账，新准确提交须复审；生产GraphSession仍待接入，非整卡完成。
