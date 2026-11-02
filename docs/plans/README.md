@@ -12,3 +12,8 @@
 ## GitHub 任务导航
 
 [第一阶段 V0（#44）](https://github.com/Junweiiii14/bioimage-tools-platform/issues/44) · [阶段里程碑](https://github.com/Junweiiii14/bioimage-tools-platform/milestone/2) · [依赖维护索引（#45）](https://github.com/Junweiiii14/bioimage-tools-platform/issues/45)。任务执行状态仍以仓库任务卡为准；历史日志 #6 保留原时间语境。
+
+
+## 2026-11-02 4.0接续（优先于上述历史阶段限制）
+
+当前主方案已同步4.0。P002先按原范围验收，随后持续推进M1通用执行与M2可视编排，见docs/plans/phase-2-workflow-authoring.md（仓库根相对路径）。旧3.0/V0终点说明保留为历史；任务依赖由新执行者按4.0拆卡登记，不从文档推断产品已实现。HTML继续用docs/plans/renderer/build.mjs；不使用旧规划树的本机B009构建器。

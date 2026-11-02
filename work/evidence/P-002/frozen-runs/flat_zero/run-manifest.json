@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "kind": "wb_v0_comparison@1",
+  "run_id": "b2ea4d76fc964db7bc5fc1e3492fd0b7",
+  "request": {
+    "schema_version": 1,
+    "request_id": "dfda93bf8ca1442fb915d455e05d400d",
+    "execution_id": "a2f89338846744d398ebc4c142e5c8da",
+    "node_id": "analysis",
+    "attempt_id": "f48c3cbcafe84008b594b8fdf175068f",
+    "document_id": "compare-ce3a8636941846439999045e1c5f36df",
+    "revision": 0,
+    "module": {
+      "schema_version": 1,
+      "module_id": "wb-legacy-analysis",
+      "module_version": "1.0",
+      "method_version": "profile_integral@1",
+      "implementation_digest": "dc768dfc704efc26c53f5fab820af9e94b3a85de12304c5b35a62fbfeb04c258",
+      "input_ports": [
+        {
+          "name": "source",
+          "kind": "raw_image",
+          "filename": ""
+        }
+      ],
+      "output_ports": [
+        {
+          "name": "measurements",
+          "kind": "typed_table",
+          "filename": "measurements.csv"
+        },
+        {
+          "name": "differences",
+          "kind": "typed_table",
+          "filename": "differences.csv"
+        },
+        {
+          "name": "provenance",
+          "kind": "run_manifest",
+          "filename": "run-manifest.json"
+        },
+        {
+          "name": "analysis",
+          "kind": "analysis_result",
+          "filename": "analysis.json"
+        },
+        {
+          "name": "baseline",
+          "kind": "analysis_result",
+          "filename": "baseline.json"
+        }
+      ],
+      "parameters_schema": "{\"$defs\":{\"BandAnnotation\":{\"properties\":{\"band_id\":{\"title\":\"Band Id\",\"type\":\"string\"},\"baseline\":{\"anyOf\":[{\"$ref\":\"#/$defs/Baseline\"},{\"type\":\"null\"}],\"default\":null},\"bounds\":{\"anyOf\":[{\"$ref\":\"#/$defs/BandBounds\"},{\"type\":\"null\"}]},\"detection_notes\":{\"default\":[],\"items\":{\"type\":\"string\"},\"title\":\"Detection Notes\",\"type\":\"array\"},\"included\":{\"default\":true,\"title\":\"Included\",\"type\":\"boolean\"}},\"required\":[\"band_id\",\"bounds\"],\"title\":\"BandAnnotation\",\"type\":\"object\"},\"BandBounds\":{\"description\":\"Inclusive endpoints relative to the original, unsmoothed lane profile.\",\"properties\":{\"left\":{\"title\":\"Left\",\"type\":\"integer\"},\"right\":{\"title\":\"Right\",\"type\":\"integer\"}},\"required\":[\"left\",\"right\"],\"title\":\"BandBounds\",\"type\":\"object\"},\"Baseline\":{\"description\":\"Endpoint intensities in the same polarity and units as the profile.\",\"properties\":{\"left_value\":{\"title\":\"Left Value\",\"type\":\"number\"},\"right_value\":{\"title\":\"Right Value\",\"type\":\"number\"}},\"required\":[\"left_value\",\"right_value\"],\"title\":\"Baseline\",\"type\":\"object\"},\"LaneAnnotation\":{\"properties\":{\"bands\":{\"items\":{\"$ref\":\"#/$defs/BandAnnotation\"},\"title\":\"Bands\",\"type\":\"array\"},\"context_expansion_percent\":{\"default\":0,\"title\":\"Context Expansion Percent\",\"type\":\"integer\"},\"roi\":{\"$ref\":\"#/$defs/LaneROI\"},\"target_roi\":{\"anyOf\":[{\"$ref\":\"#/$defs/LaneROI\"},{\"type\":\"null\"}],\"default\":null}},\"required\":[\"roi\",\"bands\"],\"title\":\"LaneAnnotation\",\"type\":\"object\"},\"LaneROI\":{\"properties\":{\"lane_id\":{\"title\":\"Lane Id\",\"type\":\"string\"},\"x0\":{\"title\":\"X0\",\"type\":\"integer\"},\"x1\":{\"title\":\"X1\",\"type\":\"integer\"},\"y0\":{\"title\":\"Y0\",\"type\":\"integer\"},\"y1\":{\"title\":\"Y1\",\"type\":\"integer\"}},\"required\":[\"lane_id\",\"x0\",\"y0\",\"x1\",\"y1\"],\"title\":\"LaneROI\",\"type\":\"object\"}},\"properties\":{\"geometry_policy\":{\"default\":\"fixed_grid@1\",\"enum\":[\"fixed_grid@1\",\"independent_lanes@1\",\"anchored_context@1\"],\"title\":\"Geometry Policy\",\"type\":\"string\"},\"lanes\":{\"items\":{\"$ref\":\"#/$defs/LaneAnnotation\"},\"title\":\"Lanes\",\"type\":\"array\"},\"polarity\":{\"enum\":[\"dark\",\"light\"],\"title\":\"Polarity\",\"type\":\"string\"},\"quant_policy\":{\"default\":\"legacy_bounds@1\",\"enum\":[\"legacy_bounds@1\",\"wbquant_1_4_3@1\",\"peak_envelope@1\",\"background_support@1\",\"anchored_background@1\"],\"title\":\"Quant Policy\",\"type\":\"string\"},\"revision\":{\"title\":\"Revision\",\"type\":\"integer\"},\"source_sha256\":{\"title\":\"Source Sha256\",\"type\":\"string\"}},\"required\":[\"source_sha256\",\"revision\",\"polarity\",\"lanes\"],\"title\":\"AnalysisRequest\",\"type\":\"object\"}"
+    },
+    "inputs": [
+      {
+        "port": "source",
+        "kind": "raw_image",
+        "asset": {
+          "asset_id": "63dda394b5de4884b8ca6291e0c229cf",
+          "relative_path": "assets/6cb007bf1b4f427dbbcb08e5f065c4e1/source.tif",
+          "sha256": "b5630c588edc45fcb78b6da96cf524d9f7293269dfa08ed0d04ca91e0a43b7f1",
+          "size_bytes": 238,
+          "schema_version": 1
+        }
+      }
+    ],
+    "parameters_json": "{\"geometry_policy\":\"fixed_grid@1\",\"lanes\":[{\"bands\":[{\"band_id\":\"signal\",\"baseline\":null,\"bounds\":{\"left\":0,\"right\":4},\"detection_notes\":[],\"included\":true}],\"roi\":{\"lane_id\":\"flat_zero\",\"x0\":0,\"x1\":3,\"y0\":0,\"y1\":5}}],\"polarity\":\"light\",\"quant_policy\":\"legacy_bounds@1\",\"revision\":0,\"source_sha256\":\"b5630c588edc45fcb78b6da96cf524d9f7293269dfa08ed0d04ca91e0a43b7f1\"}",
+    "parameters_sha256": "8538d74d2076cf47fcba6d54adec20e187e7967662dcb812daa91af39cde9ae2",
+    "environment": [
+      {
+        "name": "python",
+        "version": "3.12.14"
+      },
+      {
+        "name": "wb-tool",
+        "version": "0.19.0"
+      },
+      {
+        "name": "tool-contracts",
+        "version": "0.1.0"
+      },
+      {
+        "name": "numpy",
+        "version": "2.5.4"
+      },
+      {
+        "name": "tifffile",
+        "version": "2026.9.20"
+      },
+      {
+        "name": "pydantic",
+        "version": "2.14.1"
+      }
+    ]
+  },
+  "summary": {
+    "comparison_policy": "legacy_exact@1",
+    "csv_text_encoding": "text_prefix@1",
+    "rows": 1,
+    "exact_match": true,
+    "valid_rows": 1,
+    "absolute_tolerance": 0
+  },
+  "output_sha256": {
+    "measurements": "e0b74815eb3d7a33bcd11d0b2099839993c20aea7e977e325f897e5ab8969919",
+    "differences": "e49001c25f6d15b2b358d27b1cbfd8c4efe2cb62b1f080b397d6d3efb0156769",
+    "analysis": "86d814da26db387d1d7f49bd6a5dee9cf3ace0bcc4a58383c04b4a06273505b7",
+    "baseline": "86d814da26db387d1d7f49bd6a5dee9cf3ace0bcc4a58383c04b4a06273505b7"
+  },
+  "interpretation": "工程等价对照；旧方法不构成独立科学真值。状态非valid的value为空。"
+}

@@ -1,0 +1,196 @@
+{
+  "source_commit": "78403be43b225da3626e3a6ef0a8aeda2cbbbaec",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "cases": [
+    {
+      "name": "triangle_u8",
+      "workspace": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p002-proof-78403be4\\triangle_u8",
+      "run": {
+        "document_id": "compare-e363d8f0f80549178c1e73c1475bac47",
+        "tool_id": "wb-v0-compare",
+        "revision": 0,
+        "run_id": "54c2b5a4efa04e49892881de905d3cd1",
+        "state": "succeeded",
+        "request": {
+          "asset_id": "d1eb410d0f6b42b8a77b195f3be1aa6a",
+          "relative_path": "runs/54c2b5a4efa04e49892881de905d3cd1/request.json",
+          "sha256": "2a7291dbbb8865242469c571b15d336ca4c4c804c27a0d5e336dbc6752633ca8",
+          "size_bytes": 4897,
+          "schema_version": 1
+        },
+        "pid": 21428,
+        "result": {
+          "asset_id": "bf698c4a69f040d581c03ef112905b83",
+          "relative_path": "results/54c2b5a4efa04e49892881de905d3cd1/result.json",
+          "sha256": "0dc171533ddc329342dc240c18421a8ba91eb46b631e85384afa0803974221ad",
+          "size_bytes": 6619,
+          "schema_version": 1
+        },
+        "reason": null
+      },
+      "quality": "complete",
+      "expected_status": "valid",
+      "expected_value": 40.0,
+      "reopen_verified": true,
+      "artifacts_sha256": {
+        "measurements.csv": "fdf6f3d5df706959e94d7e01925145e3221be139a0c6ddc881ec5c040375d982",
+        "differences.csv": "9dd32be9acbb4949593a2c77a893aef223c0689fc7213c729b7f0571ede1b639",
+        "run-manifest.json": "45fa727a9824e96d98d727c0e93a279ab4dce46809b79363f29a276e1882b108",
+        "analysis.json": "ddc54398f74ece7f147274448c82e43818f2f28fbb31f6e4f09047d5c5e49356",
+        "baseline.json": "ddc54398f74ece7f147274448c82e43818f2f28fbb31f6e4f09047d5c5e49356"
+      }
+    },
+    {
+      "name": "triangle_u16",
+      "workspace": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p002-proof-78403be4\\triangle_u16",
+      "run": {
+        "document_id": "compare-7e08482fd4cb4864875517fadf70d8d0",
+        "tool_id": "wb-v0-compare",
+        "revision": 0,
+        "run_id": "4263a5de53e44e22a50847f220e94553",
+        "state": "succeeded",
+        "request": {
+          "asset_id": "dc01ca0594fd48309a58554442f3478d",
+          "relative_path": "runs/4263a5de53e44e22a50847f220e94553/request.json",
+          "sha256": "adb59453317f3bcdf16639a12d6199d4237d90f32af5cb061daeca00e11663d8",
+          "size_bytes": 4898,
+          "schema_version": 1
+        },
+        "pid": 50976,
+        "result": {
+          "asset_id": "580710ac97234698b08b27ab71f01341",
+          "relative_path": "results/4263a5de53e44e22a50847f220e94553/result.json",
+          "sha256": "84665606455ba7ec95b0ce0c4ee0ec5ee4f03f14eab53f29763333ffaef68b72",
+          "size_bytes": 6620,
+          "schema_version": 1
+        },
+        "reason": null
+      },
+      "quality": "complete",
+      "expected_status": "valid",
+      "expected_value": 4000.0,
+      "reopen_verified": true,
+      "artifacts_sha256": {
+        "measurements.csv": "7e88e3f49712fef4bef1347625da257b900ed659caac6c606a90c6195dcf6749",
+        "differences.csv": "2c21f7f4bdf6149694e58fcbb97059f218db8dcf0495cc996b4e40cd1359ad2a",
+        "run-manifest.json": "69cc869419b23d48331fdc908ed7c1663df398d9369e5be80ecb365ded50acd2",
+        "analysis.json": "16b9b11f1e869f293ce14bae33eff8136919740bc3d39a1ee4046983fd6e1b8d",
+        "baseline.json": "16b9b11f1e869f293ce14bae33eff8136919740bc3d39a1ee4046983fd6e1b8d"
+      }
+    },
+    {
+      "name": "flat_zero",
+      "workspace": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p002-proof-78403be4\\flat_zero",
+      "run": {
+        "document_id": "compare-ce3a8636941846439999045e1c5f36df",
+        "tool_id": "wb-v0-compare",
+        "revision": 0,
+        "run_id": "b2ea4d76fc964db7bc5fc1e3492fd0b7",
+        "state": "succeeded",
+        "request": {
+          "asset_id": "7372b825f7a14309846f16932d487a0e",
+          "relative_path": "runs/b2ea4d76fc964db7bc5fc1e3492fd0b7/request.json",
+          "sha256": "3be4dc69f5d2d07d01f719138f73d240cd65bd4450d51ce1d2e17c6df7cabb66",
+          "size_bytes": 4895,
+          "schema_version": 1
+        },
+        "pid": 9564,
+        "result": {
+          "asset_id": "0b8bdff4a8d24ad7a3bd8a6b9db49d90",
+          "relative_path": "results/b2ea4d76fc964db7bc5fc1e3492fd0b7/result.json",
+          "sha256": "4fe1d57257b133c2135da023e2d1b51ad6dd69ab06b92ca89a74ea3bd155f3d4",
+          "size_bytes": 6617,
+          "schema_version": 1
+        },
+        "reason": null
+      },
+      "quality": "complete",
+      "expected_status": "valid",
+      "expected_value": 0.0,
+      "reopen_verified": true,
+      "artifacts_sha256": {
+        "measurements.csv": "e0b74815eb3d7a33bcd11d0b2099839993c20aea7e977e325f897e5ab8969919",
+        "differences.csv": "e49001c25f6d15b2b358d27b1cbfd8c4efe2cb62b1f080b397d6d3efb0156769",
+        "run-manifest.json": "b4f4a4530f28572d57b89c72f52333b6a58a88e1191ed7caf9c852b5f9d7f110",
+        "analysis.json": "86d814da26db387d1d7f49bd6a5dee9cf3ace0bcc4a58383c04b4a06273505b7",
+        "baseline.json": "86d814da26db387d1d7f49bd6a5dee9cf3ace0bcc4a58383c04b4a06273505b7"
+      }
+    },
+    {
+      "name": "invalid_roi",
+      "workspace": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p002-proof-78403be4\\invalid_roi",
+      "run": {
+        "document_id": "compare-be36265e4c3c43f498e7988b31ea75e0",
+        "tool_id": "wb-v0-compare",
+        "revision": 0,
+        "run_id": "fd723912d17f40ab81d0e67eb63d6f83",
+        "state": "succeeded",
+        "request": {
+          "asset_id": "0f99c3d26c0e40aeab92a07c97876003",
+          "relative_path": "runs/fd723912d17f40ab81d0e67eb63d6f83/request.json",
+          "sha256": "551a26e6516f6f01b0e9873d1bc4bb343e9f40efb7cd172390b2d432609e8884",
+          "size_bytes": 4897,
+          "schema_version": 1
+        },
+        "pid": 32336,
+        "result": {
+          "asset_id": "a1825fc4d05148c0a2927fb86a3a553d",
+          "relative_path": "results/fd723912d17f40ab81d0e67eb63d6f83/result.json",
+          "sha256": "c60256b301251c58663d330a2f8f50f6a0ff2065e736f04c067344436d3792c4",
+          "size_bytes": 6615,
+          "schema_version": 1
+        },
+        "reason": null
+      },
+      "quality": "issues",
+      "expected_status": "invalid",
+      "expected_value": null,
+      "reopen_verified": true,
+      "artifacts_sha256": {
+        "measurements.csv": "1c232d62d5c5d89194a816c84569b538e135f9c3a53b859001b0ccff4c76da37",
+        "differences.csv": "7776bfe2fdb1f6b4263965373d0f79f8eb95fe0957f7401bc9de5d8f104ad33c",
+        "run-manifest.json": "9b9da85c1fd1d0dbc04edb824937d54692a491c4abd3828202ebde5e490cbbe4",
+        "analysis.json": "a1fa4f2826632af028e622dee48183f58590aff90854f2387bfe29c0078425fe",
+        "baseline.json": "a1fa4f2826632af028e622dee48183f58590aff90854f2387bfe29c0078425fe"
+      }
+    },
+    {
+      "name": "dtype_limits",
+      "workspace": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0\\.local\\p002-proof-78403be4\\dtype_limits",
+      "run": {
+        "document_id": "compare-75d27753ff77425b9b3aa8275bed8b6f",
+        "tool_id": "wb-v0-compare",
+        "revision": 0,
+        "run_id": "8a4a02ab12304425aafde99d47a07395",
+        "state": "succeeded",
+        "request": {
+          "asset_id": "0725cf566c3b4588aa030c2ae8aa872d",
+          "relative_path": "runs/8a4a02ab12304425aafde99d47a07395/request.json",
+          "sha256": "c50818e6474c37988169ae9e5fade1b6149a6c04ee23d1754a02d7ecbf3fc92a",
+          "size_bytes": 4898,
+          "schema_version": 1
+        },
+        "pid": 7804,
+        "result": {
+          "asset_id": "9ae1cebd12ac489d92c30d234c83a57e",
+          "relative_path": "results/8a4a02ab12304425aafde99d47a07395/result.json",
+          "sha256": "f88d72395f8a26bdd9dce728e2b8dbad60c52e3792ac1a802229068ad57b7503",
+          "size_bytes": 6618,
+          "schema_version": 1
+        },
+        "reason": null
+      },
+      "quality": "issues",
+      "expected_status": "quality_review",
+      "expected_value": null,
+      "reopen_verified": true,
+      "artifacts_sha256": {
+        "measurements.csv": "bfda3c643c05f7ec9a8bb0243b0cbb228ea838b8054636f9bd4cd78fda1e53dd",
+        "differences.csv": "a387b0b43e8b4e35ffb5634a49514a57c3b276e6e758f5181dfc2b48da74a939",
+        "run-manifest.json": "5ca461c4f74ea265288b0fa3e2b78a103f7d41896cdd9a615fd5cbd841a0f0b8",
+        "analysis.json": "981ece082aeb6409ead8a1579ceebf00499e45db2ab483a597eeb3ba3d2cd7d9",
+        "baseline.json": "981ece082aeb6409ead8a1579ceebf00499e45db2ab483a597eeb3ba3d2cd7d9"
+      }
+    }
+  ]
+}

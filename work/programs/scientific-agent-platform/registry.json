@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "program_id": "scientific-agent-platform",
-  "plan_version": "3.0",
+  "plan_version": "4.0",
   "plan_path": "docs/plans/research-platform-rd.md",
-  "purpose": "Dependencies and task locations only; execution states live in task cards.",
+  "purpose": "Task states remain authoritative here. V4 M1/M2 task decomposition follows P002 acceptance; existing dependencies preserved until explicit migration.",
   "dependency_semantics": "Work package edges name required prior capabilities; D1 design readiness and S1 method admission are distinct gates in the plan. Task dependencies require done. If narrower handoff is needed, split and register a separate task instead of overriding the dependency check.",
   "tasks": [
     {

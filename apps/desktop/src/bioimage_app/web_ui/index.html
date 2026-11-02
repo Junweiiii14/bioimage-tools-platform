@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="components.css">
   <link rel="stylesheet" href="advanced.css">
   <link rel="stylesheet" href="platform_home.css">
+  <link rel="stylesheet" href="module_compare.css">
 </head>
 <body>
   <aside class="platform-rail" aria-label="工具平台">
@@ -27,7 +28,7 @@
     <header class="project-header">
       <button class="intake-brand" data-action="home" aria-label="返回 BioImage 工具平台" hidden><svg viewBox="0 0 32 32" fill="none"><path d="M7 5h10a7 7 0 0 1 0 14H7V5Z M7 13h12a7 7 0 1 1 0 14H7V13Z" stroke="currentColor" stroke-width="2"/></svg><span>BioImage</span></button>
       <div class="breadcrumb"><button data-page="platform">工具平台</button><i id="breadcrumb-tool-separator" data-icon="chevron" hidden></i><button id="breadcrumb-tool" data-page="wb" hidden>WB</button><i id="breadcrumb-project-separator" data-icon="chevron" hidden></i><strong id="project-name" hidden>新建实验项目</strong></div>
-      <div class="header-actions"><button id="platform-open" class="button primary" data-session="open"><i data-icon="folder"></i>打开项目</button><button class="icon-button" data-action="settings" aria-label="外观与交互" title="外观与交互"><i data-icon="settings"></i></button><details id="session-menu"><summary>文件</summary><nav><button data-session="new_intake_folder">新建仪器导入项目…</button><button data-session="new">新建灰度项目</button><button data-session="open">打开项目文件夹…</button><button data-session="restore">打开项目恢复包…</button><button data-session="save">保存项目</button><button data-action="shortcut-settings">快捷键设置…</button><button data-session="home">关闭项目并返回 WB 首页</button><button data-session="exit">退出软件</button></nav></details><span id="save-status" class="save-status"><i data-icon="check"></i>就绪</span><span id="runtime-badge" class="runtime-badge">网页预览</span><button class="button subtle" data-action="import"><i data-icon="plus"></i><span>添加原图</span></button><button class="button primary" data-action="export"><i data-icon="download"></i><span>导出结果</span></button></div>
+      <div class="header-actions"><button id="platform-open" class="button primary" data-session="open"><i data-icon="folder"></i>打开项目</button><button class="icon-button" data-action="settings" aria-label="外观与交互" title="外观与交互"><i data-icon="settings"></i></button><button class="button subtle" data-module-open>旧方法对照</button><details id="session-menu"><summary>文件</summary><nav><button data-session="new_intake_folder">新建仪器导入项目…</button><button data-session="new">新建灰度项目</button><button data-session="open">打开项目文件夹…</button><button data-session="restore">打开项目恢复包…</button><button data-session="save">保存项目</button><button data-action="shortcut-settings">快捷键设置…</button><button data-session="home">关闭项目并返回 WB 首页</button><button data-session="exit">退出软件</button></nav></details><span id="save-status" class="save-status"><i data-icon="check"></i>就绪</span><span id="runtime-badge" class="runtime-badge">网页预览</span><button class="button subtle" data-action="import"><i data-icon="plus"></i><span>添加原图</span></button><button class="button primary" data-action="export"><i data-icon="download"></i><span>导出结果</span></button></div>
     </header>
     <main id="platform-view" class="platform-view" aria-label="工具平台首页">
       <header class="platform-intro"><div><h1>选择工具，开始工作。</h1><p>图像处理与分析，都在你的工作空间。</p></div></header>
@@ -86,6 +87,7 @@
   <script src="appearance.js" defer></script>
   <script src="manual_quant.js" defer></script>
   <script src="app.js" defer></script>
+  <script src="module_compare.js" defer></script>
   <script src="manual_lanes.js" defer></script>
   <script src="group_review.js" defer></script>
   <script src="intake_groups.js" defer></script>
@@ -100,5 +102,16 @@
   <script src="interactions.js" defer></script>
   <script src="preview_adapter.js" defer></script>
   <dialog id="session-dialog" aria-labelledby="session-dialog-title"><div id="session-dialog-body"></div></dialog>
+  <dialog id="module-compare-dialog" aria-labelledby="module-title">
+    <header class="module-heading"><h2 id="module-title">旧方法对照</h2><button id="module-close" class="button subtle">关闭</button></header>
+    <div class="module-body">
+      <p class="module-intro">同一张原图、同一组参数，分别经过旧入口与独立模块。选择固定合成样例，在新工程中运行，再查看数值、差异和保存依据。</p>
+      <div class="module-controls"><label for="module-case">验收样例<select id="module-case"><option value="triangle_u16">16 位三角峰 · 预期 4000</option><option value="triangle_u8">8 位三角峰 · 预期 40</option><option value="flat_zero">平坦剖面 · 有效零值</option><option value="invalid_roi">越界 ROI · 无效，数值为空</option><option value="dtype_limits">位深端点 · 待复核，数值为空</option></select></label><button id="module-run" class="button primary" disabled>运行对照</button><button id="module-open" class="button subtle" disabled>打开对照工程</button><button id="module-cancel" class="button subtle" hidden>取消运行</button></div>
+      <p id="module-status" class="module-status" role="status" aria-live="polite">选择样例，开始对照。</p>
+      <section class="module-results" aria-label="真实对照成果"><div class="module-tabs"><button class="button subtle" data-module-view="differences" aria-pressed="true">差异</button><button class="button subtle" data-module-view="measurements" aria-pressed="false">数值</button><strong id="module-count"></strong></div><p id="module-empty" class="module-empty">运行后，这里展示真实生成的差异和数值。</p><div id="module-table-wrap" class="module-table-wrap" hidden tabindex="0" aria-label="对照结果表，可横向滚动"><table id="module-table"></table></div><p class="module-caption">“—”表示不适用或无有效信号，真实零保留为 0。旧方法一致性不代替独立科学验证。</p></section>
+      <details id="module-provenance" class="module-provenance" hidden><summary>保存与来源依据</summary><dl><dt>工程</dt><dd id="module-workspace"></dd><dt>运行</dt><dd id="module-run-id"></dd><dt>进程</dt><dd id="module-pid"></dd><dt>方法</dt><dd id="module-method"></dd></dl><p>完整参数、输入摘要和运行环境保存在 run-manifest.json。表格从已提交的工作区资产重读核验。</p></details>
+    </div>
+    <footer class="module-footer"><button id="module-reopen" class="button subtle" disabled>关闭并重开核验</button><button id="module-folder" class="text-button" disabled>打开工程文件夹</button></footer>
+  </dialog>
 </body>
 </html>

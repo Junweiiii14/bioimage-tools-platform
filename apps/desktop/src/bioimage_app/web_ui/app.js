@@ -1540,6 +1540,7 @@ async function bootstrap() {
         script.onload = () =>
             new QWebChannel(qt.webChannelTransport, (channel) => {
                 bridge = channel.objects.workbench;
+                window.moduleComparison?.connect(channel.objects.comparison);
                 boundaryDiagnostics.connect(bridge);
                 window.desktopSession?.connect(bridge);
                 bridge.progressChanged?.connect((raw) => {

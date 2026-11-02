@@ -1,0 +1,2 @@
+﻿sample_id,metric,method,source_asset_id,source_sha256,run_id,request_id,value,status,reason,unit,raw_integral_for_review
+text:triangle_u16,text:signal,text:profile_integral@1,text:b783b9f964fc4a35bef57afe23c8697b,text:c20c8589d21f2897561f5e3cfe64a3fbe5366232077d08e37dc95f236667ccfd,text:4263a5de53e44e22a50847f220e94553,text:bcecea5cd42b49e4a3bf4ca765d53529,4000.0,text:valid,text:,text:mean_pixel_intensity_times_pixel,4000.0

@@ -1,6 +1,6 @@
 # 待办入口
 
-当前V0授权从 [P001](../work/tasks/P-001-platform-baseline-adoption.md)进入；后续按[登记表](../work/programs/scientific-agent-platform/registry.json)与任务状态推进。T082以下条目作为历史及外部待办保留。按依赖和风险继续可执行项，阶段总结不等待用户“继续”，不从历史列表自动重启旧开发或扩展其他工具。
+当前V0授权从 [P002](../work/tasks/P-002-wb-headless-module.md)进入；P001已完成，后续按[登记表](../work/programs/scientific-agent-platform/registry.json)与任务状态推进。T082以下条目作为历史及外部待办保留。按依赖和风险继续可执行项，阶段总结不等待用户“继续”，不从历史列表自动重启旧开发或扩展其他工具。
 
 - 本轮代码、完整门禁、准确提交独审、构建/安装验收、条件项和交接：从 T082 的 R00–R12 台账读取，证据位于 `work/evidence/T-082/`。不要在此复制勾选状态。
 - 外部依赖：R10 独立留出与负责人判定标准由用户确认暂无材料；目标 Windows/物理交互等未验只阻塞各自结论。解除条件和工程/科学/安装态区分见 [risks](risks.md) 及任务，不因缺材料冻结无依赖工作。

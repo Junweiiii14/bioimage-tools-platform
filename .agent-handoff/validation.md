@@ -107,3 +107,7 @@ T082 R02：旧16红→新101定向19.24s/0、Ruff/严格Pyright0；39新输入�
 ed830e1准确完整门禁1503 passed/756.15s+全部isolated wheels/exit0，HEAD/clean保持，独立审计Accepted；未运行远端CI。最终Temp外持久短路径标准构建exit0、包SHA5c493091…724268；新检出私有PythonPS5.1/7各7794文件严格核验0。真实244c5da→ed830e1升级0、schema1–6安装态旧金样0、7/19项双诊断0/0、真实卸载0；独立实算173文件保持、5快捷方式/登记移除、设置/Lab保持。完整命令、SHA、exit与原始日志见work/evidence/T-082/r11-execution.md及r11-raw/。源码/工件独审Accepted；后续交接差异独审按任务记录。
 
 44ee78c原2失败1499过保留，d103撤销修复先红后绿/独审；f5d7ac9 wrapper补-B双shell先红后绿/独审；深Inno路径失败、Temp98零长文件遗失UNKNOWN和双诊断GPU日志均保留。原生DPR1.5仅屏幕观测，科学留出/负责人标准与干净Win10/物理交互/其他机器/Office未验，不用工程通过替代。
+
+## 2026-11-02 B010
+
+白名单同步4.0方案与历史证据，源目标摘要一致；保留产品文件、P卡和frozen-runs，语义更新授权与入口。检查与新聊天派发见work/tasks/B-010-v4-adoption-and-dispatch.md及work/evidence/B-010。未运行产品门禁或科学/目标机验收。

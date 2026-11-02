@@ -1,0 +1,47 @@
+{
+  "source": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-tools-platform",
+  "target": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0",
+  "files": [
+    {
+      "path": "docs/plans/research-platform-rd.md",
+      "sha256": "5a1eb003deacbad724c348937900530a29a2f9eb9b8b956eff1cc43b7068b62b"
+    },
+    {
+      "path": "docs/plans/archive/research-platform-rd-v3.md",
+      "sha256": "8cdf685973da5fb7c7b60162d233e09c2a22c07724466102df34d914fb783f07"
+    },
+    {
+      "path": "docs/research/2026-11-02-modular-workflow-platform.md",
+      "sha256": "f2c2e8006206d8c0383749d6f38d98cbf6ed9e047d76aaf5e1004366745f4511"
+    },
+    {
+      "path": "work/tasks/B-009-modular-workflow-blueprint.md",
+      "sha256": "8802a5ff2cd83b4b577f07aa867ed6deaf464ef6efb9b1f3f99193a27bb06bbc"
+    },
+    {
+      "path": "work/evidence/B-009/baseline-audit.md",
+      "sha256": "e32022db244116b034d63ccb6b2f466218fee95e767f4739bede9b1977e20ced"
+    },
+    {
+      "path": "work/evidence/B-009/content-review.md",
+      "sha256": "4253280b30d3a9500b82f5430dc3a0e9345bfd4358481eff1fc4d89e3960bd78"
+    },
+    {
+      "path": "work/evidence/B-009/document-validation.json",
+      "sha256": "eab63ad0b83c6c2adadba199483b286e63a0afb15023bfb6e0517f18d25bd7f9"
+    },
+    {
+      "path": "work/evidence/B-009/html-validation.json",
+      "sha256": "ac41f261e6a747724c4202dadee0e4debe943d6374b9017da2c6843f01c044e2"
+    },
+    {
+      "path": "work/evidence/B-009/previous-version.json",
+      "sha256": "8ff95fe65602b44d357a451095e1a29e49b56ee0d9acf5eaea463fc6f7e1cb41"
+    },
+    {
+      "path": "work/evidence/B-009/validation.md",
+      "sha256": "eaecafb3530e42c6db8cf080f7118995bc5926234d1d0af53e9314888e3a8c39"
+    }
+  ],
+  "note": "B009 evidence is historical source evidence; no rules receipts or product files copied."
+}

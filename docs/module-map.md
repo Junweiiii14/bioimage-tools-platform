@@ -30,3 +30,8 @@
 ## V0研发接续
 
 设计主依据为[研发总方案3.0](plans/research-platform-rd.md)，本轮只实施[第一阶段V0](plans/phase-1-v0.md)。任务及依赖入口在[登记表](../work/programs/scientific-agent-platform/registry.json)，状态仅在P任务卡。现有四包、当前worker/Workspace和最新T082治理保留；设计中的新接口尚未实现。
+
+
+## 2026-11-02 4.0接续（优先于上述历史阶段限制）
+
+当前主方案已同步4.0。P002先按原范围验收，随后持续推进M1通用执行与M2可视编排，见docs/plans/phase-2-workflow-authoring.md（仓库根相对路径）。旧3.0/V0终点说明保留为历史；任务依赖由新执行者按4.0拆卡登记，不从文档推断产品已实现。HTML继续用docs/plans/renderer/build.mjs；不使用旧规划树的本机B009构建器。

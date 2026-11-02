@@ -27,6 +27,7 @@ from wb_tool.api import WBIntakeProject
 from bioimage_app.appearance import WorkbenchAppearance
 from bioimage_app.figure_window import FigureProjectWindow
 from bioimage_app.folder_drop import FolderDropView, folder_paths
+from bioimage_app.module_bridge import ComparisonBridge
 from bioimage_app.project_navigation import MODES, ProjectNavigation
 from bioimage_app.shortcuts import WorkbenchShortcuts
 from bioimage_app.source_origins import SourceOrigins
@@ -191,6 +192,17 @@ class WebWorkbenchWindow(QMainWindow):
         self.bridge = WorkbenchBridge(self.host, self.choose, self)
         self.bridge.sessionRequested.connect(self._session_request)
         self.channel.registerObject("workbench", self.bridge)
+        self._comparison_transition: tuple[str, Callable[[], None] | None] | None = None
+        self.comparison = ComparisonBridge(
+            self,
+            lambda: (
+                self.host.operation_busy
+                or self._stage != "idle"
+                or self._comparison_transition is not None
+            ),
+        )
+        self.comparison.idle.connect(self._comparison_idle)
+        self.channel.registerObject("comparison", self.comparison)
         page.setWebChannel(self.channel)
         self.setCentralWidget(self.web)
         self.web.setUrl(QUrl.fromLocalFile(str(index.resolve())))
@@ -202,6 +214,8 @@ class WebWorkbenchWindow(QMainWindow):
 
     def _folder_dropped(self, urls: tuple[QUrl, ...]) -> None:
         try:
+            if self.comparison.busy:
+                raise ValueError("请先完成或取消旧方法对照")
             if self._closing or self._starting or self._stage != "idle" or self.host.operation_busy:
                 raise ValueError("当前任务仍在处理中，请完成或取消后再拖入文件夹。")
             paths = folder_paths(urls)
@@ -430,6 +444,10 @@ class WebWorkbenchWindow(QMainWindow):
     def _request_transition(
         self, intent: str, continuation: Callable[[], None] | None = None
     ) -> None:
+        if self.comparison.busy:
+            self._comparison_transition = (intent, continuation)
+            self.comparison.cancel()
+            return
         if self._stage in {"confirm_busy", "confirm_dirty", "confirm_draft", "cancel", "shutdown"}:
             if intent == "exit":
                 self._intent = "exit"
@@ -452,6 +470,13 @@ class WebWorkbenchWindow(QMainWindow):
         else:
             self._begin_shutdown()
         self._publish_session()
+
+    @Slot()
+    def _comparison_idle(self) -> None:
+        pending = self._comparison_transition
+        self._comparison_transition = None
+        if pending is not None:
+            QTimer.singleShot(0, lambda: self._request_transition(*pending))
 
     def _begin_shutdown(self) -> None:
         self._stage = "shutdown"

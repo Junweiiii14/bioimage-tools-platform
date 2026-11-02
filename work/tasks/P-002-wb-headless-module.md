@@ -1,6 +1,6 @@
 # P-002 V0成熟WB方法独立调用与真实成果对照
 
-<!-- PROGRAM_TASK_META {"id":"P-002","status":"planned","work_package":"W02","depends_on":["P-001"],"execution_root":"not_activated","owner":null,"base_commit":null,"head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-002","status":"in_review","work_package":"W02","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"29930f62a0b158189b76e0fad7d090d632f149d6","head_commit":"2591309eecffeb07558d3492bc3f69425dc6d24a"} -->
 
 ## 执行状态
 
@@ -45,3 +45,53 @@ P-001接入并确认的实际产品树；B-007第2/3/4/12.2/13.1节；冻结旧�
 ## 继续入口
 
 本卡未完成步骤为继续位置；主依据为docs/plans/research-platform-rd.md第2/3/4/12.2/13.1节。V0交付是本次第一阶段终点，不自动推进V1、IF或Agent；后续按已授权范围与前置依赖激活。修改规则或范围后重载context，收尾更新任务与handoff。
+
+## 2026-11-02实际接手与完整门禁核实
+
+接手分支codex/p002-wb-headless-module、HEAD78403be43b225da3626e3a6ef0a8aeda2cbbbaec；新执行聊天01a199d4-dac3-7dd3-af35-cdad7d361934独占产品实施。真实goal为active、无token预算，初始证据work/evidence/B-010/goal-state.json。4.0同步成果保留；本卡仍只收拢原P002范围。
+
+通过旧聊天原生命令记录核实`uv run --locked --no-sync python dev.py check --all`实际completed、exit0、890398ms；对应日志.local/p002-check-all-a.txt。Windows/Python3.12.14，工作区TEMP/TMP，Qt offscreen/disable-gpu。1537 passed、10 warnings、796.95秒；Ruff、format、Pyright（0 errors）、导入契约、JS检查与独立wheel安装均通过；隔离桌面wheel实际验证4000精确对照、正式资产和重开。没有从失效句柄或日志23%猜测成功。此为原产品HEAD的工程门禁；新文档规则/PR仍需正常集成检查。
+
+同样从原生命令记录核实冻结证据脚本exit0、26145ms，五组真实运行位于work/evidence/P-002/frozen-runs/，source_commit为78403be。接手后重新对原五个Workspace执行`python -I -m bioimage_app --v0-open`，逐组exit0、真实RunRecord一致，并校验每份保留成果SHA256；恢复验证命令exit0，证据recovery-verification.json。原冻结证据和历史运行未重写。有效40/4000/0、无效ROI空值、位深端点待复核空值分别保留。
+
+已向非作者审查者派发准确29930f62..78403be的只读审查，尚无最终结论；不得据既有局部UI审查宣称产品独审通过。PR与必需CI尚待完成。中文操作单docs/wb-v0-acceptance.md已存在；用户尚未实际体验，科学/目标环境未验，不代签。
+
+## 2026-10-31激活
+
+P001已独审并经PR47四必需CI正常合main29930f62，当前从该准确main建立codex/p002-wb-headless-module（执行树bioimage-v0）。成熟用例冻结预期与旧worker真实证据见work/evidence/P-001/frozen-case-design.json和frozen-baseline-result.json；无归一化公式扩展。接入调查是候选，按实际代码验证，不以空接口、单元测试或文档代替完整V0。
+
+## 2026-10-31局部实现验证
+
+当前未提交模块契约及成熟用例适配；未修改原科学公式、AssetRef v1或旧storage schema。Win11/Python3.12.14，base/HEAD29930f62，执行 `.venv/Scripts/python.exe -m pytest tools/wb/tests/test_module_execution.py tests/test_workspace.py::test_contract_schema_snapshot -q --basetemp=.local/pytest-p002-module-b`：exit0，12 passed，3.30秒。覆盖解析独立预期40/4000、旧调用一致、原图不变、请求摘要/角色/修订/实现拒绝、非法ROI空值及原因、取消、未知dtype、JSON异常、成果端口和事件身份。此为局部检查；新worker、持久成果、薄GUI、隔离wheel、全门禁、独审及PR集成尚未完成。
+
+## 2026-10-31真实worker与持久化增量
+
+已实现静态wb_v0_compare worker与工具独立module_worker；旧分析和新模块分别真实计算，生成两张非空CSV、来源清单及两份机器结果。RunSession沿原PID/退出/取消路径，在存储线程验证候选成果、导入登记资产并最终commit_result。格式与兼容边界见docs/contracts/wb-module-v0.md。现有原方法/旧默认运行路径保持。
+
+本树未提交增量，base29930f62，Win11/Python3.12.14。指定工作区TEMP/TMP=.local/p002-process-temp后，执行 `.venv/Scripts/python.exe -m pytest tools/wb/tests/test_module_execution.py tests/test_module_run_session.py tests/test_run_session.py tests/test_async_storage.py tests/test_workspace.py::test_contract_schema_snapshot -q --basetemp=.local/pytest-p002-integrated-c`：exit0，34 passed，21.99秒；日志.local/p002-integrated-tests.txt。证明真实新worker数值40/4000、身份/文件摘要、无覆盖/非法ROI空值；真实RunSession成功重开、manifest后退出7、输出缺失/同尺寸篡改、取消，以及原RunSession/异步存储行为。
+
+首次组合检查16 passed/1 failed：既有import_bytes测试因沙箱默认TEMP写入PermissionError失败；独立TemporaryDirectory写入复现权限错误，未改产品或测试预期，改为工作区TEMP后该项1 passed，再完成上述34项组合验证。初始JSON极深嵌套测试发现仅依赖Python递归上限不确定，改为显式32层准入后通过；首轮Pyright提示未知容器类型，已用边界cast明确类型，无ignore。受影响文件Ruff、Pyright（0errors）和dev.py policy（180产品文件）均exit0；全门禁、隔离wheel及独审未运行。
+
+下一步：共享会话控制器与完整无GUI宿主命令、现有工作台薄对照入口及中文验收流程；扩大路径/成果准入负例，最终全门禁与准确提交独审/PR集成。不得据本增量将P002或V0标done。
+
+本阶段实现已提交 `725fc6aef8df192f46fdceb122f6ff669251dd72`；提交钩子Ruff/format/policy通过。已请求独立审查者按29930f62..该head只读审查，结果待回报，不代替完整V0验收。
+
+## 2026-11-02完整入口增量（等待最终门禁及独审）
+
+在725fc6a基础上接入共享ComparisonSession、无窗口命令--v0-compare/--v0-open和现有工作台薄对照入口；原图读取、请求冻结、CSV解析在后台完成，真实worker及Workspace服务关闭后才报告会话完成。支持五个冻结样例及CLI显式原图/参数，成功、失败与取消可追溯；重开核验请求、输入及所有输出。中文操作单为docs/wb-v0-acceptance.md。
+
+阶段独审p001_review对29930f62..725fc6a给出Request changes：模块codec遗漏宿主绑定会落入旧发布路径，候选manifest可能错误提交。现已通过ProcessEvent.payload_kind及RunSession强制匹配拒绝，回归包含missing_binding；本轮修复尚待准确新提交复审，不沿用旧结论。
+
+Win11/Python3.12.14，当前未提交增量：`uv run --locked --no-sync python -m pytest tests/test_module_cli.py tests/test_module_run_session.py -q --basetemp=.local/pytest-p002-final-target-a`，工作区TEMP/TMP与Qt offscreen/disable-gpu：exit0，16 passed/56.81秒。覆盖五样例独立预期、重开、原输入不变、拒绝已有目的地、篡改后重开拒绝、运行前/中取消、float失败持久化、manifest后非零/缺失/篡改/硬链接/绑定遗漏拒绝。日志.local/p002-final-target-a.txt。完整Pyright exit0（0 errors），日志.local/p002-final-pyright.txt；旧会话63032恢复时句柄不存在，不据此猜测旧运行结果。
+
+上一轮真实工作台两项测试2 passed/5.64秒，日志.local/p002-ui-capture-check.txt，1440与960宽截图在.impeccable/review/p002。impeccable_finish_reviewer局部视觉ship，documenter No changes；代码最终独审仍待执行。初始沙箱QWebEngineProfile异常退出0x80000003，使用既有CI离屏环境后通过，不宣称根因修复。CLI首次Windows -I忽略PYTHONIOENCODING导致输出gbk，改为显式UTF-8字节后8 passed/46.37秒；无放松断言。
+
+门禁变更仅在tooling/installed_wheels.py追加验证：裸WB安装调用新公共用例得4000且不加载Qt/数据库；桌面wb extra安装通过真实CLI运行、差异与关闭重开，并检查UI资源随wheel存在。原安装检查、边界和阈值不删改，锁文件无变化。完整`dev.py check --all`当前运行中，不能提前写通过。最终准确提交独审、PR/CI及正式冻结输出证据待完成；P002保持in_progress。
+
+## 2026-11-02最终独审与PR
+
+非作者p002_independent_review已对准确29930f62..2591309eecffeb07558d3492bc3f69425dc6d24a给出Accepted，无阻断发现；独立34 passed/53.11秒、同尺寸输入篡改拒绝探针及全套同步/冻结成果摘要核验通过。详见work/evidence/P-002/review-final.md。状态in_review，PR48已创建，需四个必需CI通过后正常合并；未提前记done。此次后续仅记录报告/任务交接，不更改已审产品。
+
+## 2026-11-02 PR48首次CI失败及修复
+
+最终6a4020d的rules-context和desktop-environment通过；Windows/Linux foundation在Ruff文档代码块格式阶段失败（run41372121935），未进入测试。修复仅在4.0主方案与3.0规划归档的Python示例各加一个空行，再重建HTML；未修改产品/门禁/阈值。全仓format检查1097文件通过，HTML build exit0；前后摘要及B010原始同步清单的历史边界见ci-format-fix.json。继续等待新HEAD独审及必需CI，不把初次失败隐去。

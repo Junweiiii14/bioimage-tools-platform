@@ -1,0 +1,14 @@
+{
+  "threadId": "01a199d4-dac3-7dd3-af35-cdad7d361934",
+  "hostId": "local",
+  "model": "gpt-6.1-sol",
+  "thinking": "medium",
+  "execution_root": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0",
+  "goal_verification": "active, verified from goal-state.json and new-thread progress",
+  "sequence": [
+    "P002 acceptance",
+    "M1 workflow execution",
+    "M2 visual authoring"
+  ],
+  "token_budget": null
+}

@@ -10,6 +10,7 @@ from uuid import uuid4
 import numpy as np
 from pydantic import TypeAdapter
 from PySide6.QtCore import QObject, Qt, QThread, QTimer, Signal, Slot, qWarning
+from tool_contracts.api import ExecutionRequest, OutputManifest, canonical_module_json
 
 from wb_tool.adapters.crop_export import export_crop
 from wb_tool.adapters.tiff_input import load_tiff
@@ -25,6 +26,7 @@ from wb_tool.application.intake_crop import IntakeCropEvidence, IntakeCropFile
 from wb_tool.application.intake_delivery import IntakeDeliveryReceipt
 from wb_tool.application.intake_figure import IntakeFigurePreparation
 from wb_tool.application.intake_output import IntakeOutputPreparation
+from wb_tool.application.module_execution import WBModuleInput
 from wb_tool.application.project_analysis import (
     LoadedProjectResult,
     ProjectTableSnapshot,
@@ -143,8 +145,49 @@ class _Work(QObject):
             | OCRRecognition
             | bytes
             | str
+            | ExecutionRequest
+            | OutputManifest
+            | WBModuleInput
         )
-        if job.operation == "return_crop":
+        if job.operation == "module_fixture":
+            from wb_tool.adapters.module_input import wb_validation_input
+
+            value = wb_validation_input(job.row_id)
+        elif job.operation == "module_input":
+            from wb_tool.adapters.module_input import read_wb_module_input
+
+            value = read_wb_module_input(job.path, job.destination)
+        elif job.operation == "module_prepare":
+            from wb_tool.adapters.module_execution import prepare_wb_execution
+
+            if job.module_asset is None or job.module_parameters is None:
+                raise ValueError("模块准备缺少原图资产或显式参数")
+            value = prepare_wb_execution(job.module_asset, job.module_parameters, job.row_id)
+        elif job.operation == "module_manifest":
+            value = OutputManifest.model_validate_json(
+                canonical_module_json(job.data.decode("utf-8"))
+            )
+        elif job.operation == "module_table":
+            import csv
+            import io
+            import json
+
+            reader = csv.reader(io.StringIO(job.data.decode("utf-8-sig")))
+            columns = next(reader)
+            if not columns or len(columns) > 32:
+                raise ValueError("对照表列定义无效")
+            rows: list[list[str]] = []
+            total = 0
+            for cells in reader:
+                if len(cells) != len(columns):
+                    raise ValueError("对照表行宽不一致")
+                total += 1
+                if total <= 200:
+                    rows.append([cell.removeprefix("text:")[:2048] for cell in cells])
+            value = json.dumps(
+                {"columns": columns, "rows": rows, "total_rows": total}, ensure_ascii=False
+            )
+        elif job.operation == "return_crop":
             from wb_tool.adapters.crop_return import return_reviewed_crop
 
             if not isinstance(job.document, WBFigureProject):

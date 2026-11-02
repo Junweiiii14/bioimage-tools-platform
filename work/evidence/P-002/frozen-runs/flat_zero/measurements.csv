@@ -1,0 +1,2 @@
+﻿sample_id,metric,method,source_asset_id,source_sha256,run_id,request_id,value,status,reason,unit,raw_integral_for_review
+text:flat_zero,text:signal,text:profile_integral@1,text:63dda394b5de4884b8ca6291e0c229cf,text:b5630c588edc45fcb78b6da96cf524d9f7293269dfa08ed0d04ca91e0a43b7f1,text:b2ea4d76fc964db7bc5fc1e3492fd0b7,text:dfda93bf8ca1442fb915d455e05d400d,0.0,text:valid,text:,text:mean_pixel_intensity_times_pixel,0.0

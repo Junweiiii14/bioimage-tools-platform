@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "run_id": "8a4a02ab12304425aafde99d47a07395",
+  "request": {
+    "schema_version": 1,
+    "request_id": "054c44dce0fe4a209e3d1249c7315ebe",
+    "execution_id": "ffec3e20b17d4df9a0411982d583d0ce",
+    "node_id": "analysis",
+    "attempt_id": "399263eab16b4baf97b2327309a53248",
+    "document_id": "compare-75d27753ff77425b9b3aa8275bed8b6f",
+    "revision": 0,
+    "module": {
+      "schema_version": 1,
+      "module_id": "wb-legacy-analysis",
+      "module_version": "1.0",
+      "method_version": "profile_integral@1",
+      "implementation_digest": "dc768dfc704efc26c53f5fab820af9e94b3a85de12304c5b35a62fbfeb04c258",
+      "input_ports": [
+        {
+          "name": "source",
+          "kind": "raw_image",
+          "filename": ""
+        }
+      ],
+      "output_ports": [
+        {
+          "name": "measurements",
+          "kind": "typed_table",
+          "filename": "measurements.csv"
+        },
+        {
+          "name": "differences",
+          "kind": "typed_table",
+          "filename": "differences.csv"
+        },
+        {
+          "name": "provenance",
+          "kind": "run_manifest",
+          "filename": "run-manifest.json"
+        },
+        {
+          "name": "analysis",
+          "kind": "analysis_result",
+          "filename": "analysis.json"
+        },
+        {
+          "name": "baseline",
+          "kind": "analysis_result",
+          "filename": "baseline.json"
+        }
+      ],
+      "parameters_schema": "{\"$defs\":{\"BandAnnotation\":{\"properties\":{\"band_id\":{\"title\":\"Band Id\",\"type\":\"string\"},\"baseline\":{\"anyOf\":[{\"$ref\":\"#/$defs/Baseline\"},{\"type\":\"null\"}],\"default\":null},\"bounds\":{\"anyOf\":[{\"$ref\":\"#/$defs/BandBounds\"},{\"type\":\"null\"}]},\"detection_notes\":{\"default\":[],\"items\":{\"type\":\"string\"},\"title\":\"Detection Notes\",\"type\":\"array\"},\"included\":{\"default\":true,\"title\":\"Included\",\"type\":\"boolean\"}},\"required\":[\"band_id\",\"bounds\"],\"title\":\"BandAnnotation\",\"type\":\"object\"},\"BandBounds\":{\"description\":\"Inclusive endpoints relative to the original, unsmoothed lane profile.\",\"properties\":{\"left\":{\"title\":\"Left\",\"type\":\"integer\"},\"right\":{\"title\":\"Right\",\"type\":\"integer\"}},\"required\":[\"left\",\"right\"],\"title\":\"BandBounds\",\"type\":\"object\"},\"Baseline\":{\"description\":\"Endpoint intensities in the same polarity and units as the profile.\",\"properties\":{\"left_value\":{\"title\":\"Left Value\",\"type\":\"number\"},\"right_value\":{\"title\":\"Right Value\",\"type\":\"number\"}},\"required\":[\"left_value\",\"right_value\"],\"title\":\"Baseline\",\"type\":\"object\"},\"LaneAnnotation\":{\"properties\":{\"bands\":{\"items\":{\"$ref\":\"#/$defs/BandAnnotation\"},\"title\":\"Bands\",\"type\":\"array\"},\"context_expansion_percent\":{\"default\":0,\"title\":\"Context Expansion Percent\",\"type\":\"integer\"},\"roi\":{\"$ref\":\"#/$defs/LaneROI\"},\"target_roi\":{\"anyOf\":[{\"$ref\":\"#/$defs/LaneROI\"},{\"type\":\"null\"}],\"default\":null}},\"required\":[\"roi\",\"bands\"],\"title\":\"LaneAnnotation\",\"type\":\"object\"},\"LaneROI\":{\"properties\":{\"lane_id\":{\"title\":\"Lane Id\",\"type\":\"string\"},\"x0\":{\"title\":\"X0\",\"type\":\"integer\"},\"x1\":{\"title\":\"X1\",\"type\":\"integer\"},\"y0\":{\"title\":\"Y0\",\"type\":\"integer\"},\"y1\":{\"title\":\"Y1\",\"type\":\"integer\"}},\"required\":[\"lane_id\",\"x0\",\"y0\",\"x1\",\"y1\"],\"title\":\"LaneROI\",\"type\":\"object\"}},\"properties\":{\"geometry_policy\":{\"default\":\"fixed_grid@1\",\"enum\":[\"fixed_grid@1\",\"independent_lanes@1\",\"anchored_context@1\"],\"title\":\"Geometry Policy\",\"type\":\"string\"},\"lanes\":{\"items\":{\"$ref\":\"#/$defs/LaneAnnotation\"},\"title\":\"Lanes\",\"type\":\"array\"},\"polarity\":{\"enum\":[\"dark\",\"light\"],\"title\":\"Polarity\",\"type\":\"string\"},\"quant_policy\":{\"default\":\"legacy_bounds@1\",\"enum\":[\"legacy_bounds@1\",\"wbquant_1_4_3@1\",\"peak_envelope@1\",\"background_support@1\",\"anchored_background@1\"],\"title\":\"Quant Policy\",\"type\":\"string\"},\"revision\":{\"title\":\"Revision\",\"type\":\"integer\"},\"source_sha256\":{\"title\":\"Source Sha256\",\"type\":\"string\"}},\"required\":[\"source_sha256\",\"revision\",\"polarity\",\"lanes\"],\"title\":\"AnalysisRequest\",\"type\":\"object\"}"
+    },
+    "inputs": [
+      {
+        "port": "source",
+        "kind": "raw_image",
+        "asset": {
+          "asset_id": "7a74e59df0a7415ca12d6e9cab77dad0",
+          "relative_path": "assets/e22b9f1e1e724944908ef1010f3c2d77/source.tif",
+          "sha256": "99484398a4ca79550abd8f91e09e791ad84b0ea5831988df4cde80b4510a67b1",
+          "size_bytes": 223,
+          "schema_version": 1
+        }
+      }
+    ],
+    "parameters_json": "{\"geometry_policy\":\"fixed_grid@1\",\"lanes\":[{\"bands\":[{\"band_id\":\"signal\",\"baseline\":null,\"bounds\":{\"left\":0,\"right\":4},\"detection_notes\":[],\"included\":true}],\"roi\":{\"lane_id\":\"dtype_limits\",\"x0\":0,\"x1\":3,\"y0\":0,\"y1\":5}}],\"polarity\":\"light\",\"quant_policy\":\"legacy_bounds@1\",\"revision\":0,\"source_sha256\":\"99484398a4ca79550abd8f91e09e791ad84b0ea5831988df4cde80b4510a67b1\"}",
+    "parameters_sha256": "2dc7bf316ae399dc155e1d559723e90be8dae1b40fd24701558fc04e9eb46a59",
+    "environment": [
+      {
+        "name": "python",
+        "version": "3.12.14"
+      },
+      {
+        "name": "wb-tool",
+        "version": "0.19.0"
+      },
+      {
+        "name": "tool-contracts",
+        "version": "0.1.0"
+      },
+      {
+        "name": "numpy",
+        "version": "2.5.4"
+      },
+      {
+        "name": "tifffile",
+        "version": "2026.9.20"
+      },
+      {
+        "name": "pydantic",
+        "version": "2.14.1"
+      }
+    ]
+  },
+  "publication": "committed",
+  "outputs": [
+    {
+      "port": "measurements",
+      "kind": "typed_table",
+      "asset": {
+        "asset_id": "6d2f1d5a43574b61ba65e7a38be736c1",
+        "relative_path": "assets/41a9a63836f7479c96cc32036d1cf28b/source.csv",
+        "sha256": "bfda3c643c05f7ec9a8bb0243b0cbb228ea838b8054636f9bd4cd78fda1e53dd",
+        "size_bytes": 500,
+        "schema_version": 1
+      }
+    },
+    {
+      "port": "differences",
+      "kind": "typed_table",
+      "asset": {
+        "asset_id": "6e91a7155f5d47809e10b8dc88e3a4cc",
+        "relative_path": "assets/edcb1a58b6b645b3b364b46a1fd043f6/source.csv",
+        "sha256": "a387b0b43e8b4e35ffb5634a49514a57c3b276e6e758f5181dfc2b48da74a939",
+        "size_bytes": 670,
+        "schema_version": 1
+      }
+    },
+    {
+      "port": "provenance",
+      "kind": "run_manifest",
+      "asset": {
+        "asset_id": "2498214c3b814719accda15d22516ab6",
+        "relative_path": "assets/6372077a421f4d308f3a82049a7b8676/source.json",
+        "sha256": "5ca461c4f74ea265288b0fa3e2b78a103f7d41896cdd9a615fd5cbd841a0f0b8",
+        "size_bytes": 6504,
+        "schema_version": 1
+      }
+    },
+    {
+      "port": "analysis",
+      "kind": "analysis_result",
+      "asset": {
+        "asset_id": "2a9c8f70e2c847be8ae953d8c902c5bf",
+        "relative_path": "assets/11ee5a6a1d13458f9621bb9e15a4ab4e/source.json",
+        "sha256": "981ece082aeb6409ead8a1579ceebf00499e45db2ab483a597eeb3ba3d2cd7d9",
+        "size_bytes": 1255,
+        "schema_version": 1
+      }
+    },
+    {
+      "port": "baseline",
+      "kind": "analysis_result",
+      "asset": {
+        "asset_id": "327e481c114542c785f4a0a33618480a",
+        "relative_path": "assets/2c285be99f7c4323b4b857d462141d3b/source.json",
+        "sha256": "981ece082aeb6409ead8a1579ceebf00499e45db2ab483a597eeb3ba3d2cd7d9",
+        "size_bytes": 1255,
+        "schema_version": 1
+      }
+    }
+  ],
+  "quality": "issues",
+  "summary_json": "{\"absolute_tolerance\":0,\"comparison_policy\":\"legacy_exact@1\",\"csv_text_encoding\":\"text_prefix@1\",\"exact_match\":true,\"rows\":1,\"valid_rows\":0}"
+}
