@@ -330,6 +330,28 @@ with Workspace.open('installed-workspace') as store:
 assert not any(name.startswith(('wb_tool', 'PySide6', 'numpy')) for name in sys.modules)
 print('Installed workflow contracts: real file binding, DAG freeze/reopen and rejection; '
     'no execution')
+from platform_runtime.api import (
+    create_workflow_ledger, control_workflow, load_workflow_ledger, workflow_ledger_json,
+)
+journal = create_workflow_ledger(execution_plan, 'installed_journal')
+with Workspace.open('installed-workspace') as store:
+    store.save_draft(journal.execution_id, 'workflow_journal_v1', 0,
+        workflow_ledger_json(journal).encode(), expected_previous_revision=None)
+journal = control_workflow(journal, 'pause', 'pause_1')
+assert journal.state == 'paused' and not journal.attempts and not journal.results
+assert journal.events[-1].state == 'paused'
+with Workspace.open('installed-workspace') as store:
+    store.save_draft(journal.execution_id, 'workflow_journal_v1', 1,
+        workflow_ledger_json(journal).encode(), expected_previous_revision=0)
+with Workspace.open('installed-workspace') as store:
+    restored_journal = load_workflow_ledger(store.read_asset(
+        store.load_draft(journal.execution_id).asset).decode())
+assert restored_journal == journal
+assert control_workflow(restored_journal, 'pause', 'pause_1') == journal
+assert control_workflow(restored_journal, 'resume', 'resume_1').state == 'running'
+assert not any(name.startswith(('wb_tool', 'PySide6', 'numpy')) for name in sys.modules)
+print('Installed journal component: pause, immutable save/reopen, control idempotency; '
+    'no graph worker')
 """
 
 

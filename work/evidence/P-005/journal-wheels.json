@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "source_commit": "8d0a4ecf480d0188938a2ae53d69a21b0840b6fc",
+  "uncommitted_change_at_run": "additive journal component checks in tooling/installed_wheels.py; product sources unchanged",
+  "command": "uv run --locked --no-sync python -m tooling.installed_wheels",
+  "exit_code": 0,
+  "environment": "Windows/Python3.12.14 existing locked dependencies, offscreen installed checks",
+  "raw_log": ".local/p005-journal-wheels.log",
+  "raw_log_sha256": "b2d3e8e4cfdf40821f80b12e7c8bda9827f578fdbc51c8e76caa979cc96d386f",
+  "raw_log_bytes": 6663,
+  "checks": [
+    "build all four wheels and install isolated runtime/contracts, WB, host-only and full desktop",
+    "new journal API pause/CAS save revisions0/1/reopen/control idempotency without WB/Qt/NumPy imports",
+    "old evaluation, DAG contract and immutable storage/process checks preserved",
+    "actual installed WB worker 4000 exact comparison, committed assets and reopen",
+    "existing desktop/template/PNG TIFF/OCR and real OCR worker checks"
+  ],
+  "limits": "Not a production workflow runner, current environment admission, full pytest/CI or P005/M1/M2 completion",
+  "other_checks": "Ruff format/check, Pyright tooling, plan check and rules check with actual main006e9f1 all exit0; initial added print line exceeded Ruff100 and was split without changing behavior"
+}

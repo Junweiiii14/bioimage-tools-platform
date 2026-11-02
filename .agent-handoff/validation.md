@@ -2,6 +2,8 @@
 
 ## 2026-11-02 P005 journal component only
 
+准确3215..8d0非作者Accepted，仅组件：独立12pass3.29s及真实旧事件反例/plan9-document0；作者100pass27.19s。四wheel构建/全部隔离安装exit0，新账本API与原V0实际4000/提交重开/桌面OCR均过，原日志6663B/SHA见journal-wheels.json。规则main006基线/plan/Ruff/Pyright tooling0。全量pytest/CI、GraphSession/当前环境认证/正式WB图仍未执行或未实现，不替代P005/M1。
+
 8bb独立11passed2.71s但P2旧hello来源丢失反例成立；后继补显式attempt/run与新回归，作者六文件100passed27.19s/exit0，新测试12项；Ruff/Pyright0。两次Request changes保留，待新head准确复审，未跑完整门禁或正式图。
 
 接线后新增11项账本/存储测试；受影响六文件99passed26.76s/exit0（RunSession/模块RunSession仍通过）；Ruff/Pyright及policy/import-linter九约束均0。首版26f独审Request changes的非零图generation冲突已有plan7/document0真实回归修正；首次测试类型错误及修正保留证据。未运行生产GraphSession/WB图/当前环境认证及完整门禁/wheels/CI，新head准确独审待做。
