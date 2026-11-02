@@ -17,6 +17,8 @@
 
 ## 下一步
 
+最终组件/新增wheel检查准确3215..41812c55已非作者Accepted（journal-review-r3.md后继段），产品源码等于已审8d0；本后继只记录审查回复，不新改源码。无活动CI或wheel命令，审查者idle。下一步直接真实GraphSession/worker接线，不重复重跑组件验收或请求用户继续。
+
 1. 读work/evidence/P-005/host-integration-pending.md，接RunSession实际PID与原始ExecutionEvent，同一GraphSession/固定注册校验-分析-发布worker图。特别处理started账本确认与allow_request排序，防快速worker终态先到导致读取当前RunRecord丢过渡。新workflow_storage负责后台归约/序列化/CAS/真实run及文件；尚无当前环境认证，不能当完整缓存准入。仍须完整取消/提交竞态/崩溃/非零/磁盘满/旧消息/关闭重开矩阵。无需再让用户批准已有范围。
 2. 完成P005准确提交独审、适用检查和正常PR四必需CI后done；P008复用同一ledger/cache/recovery扩有限多样本完整M1，再P009接同一执行器真实编辑/连接/替换/保存重开/模板第二批M2。不在JSON预检或图示停止。
 
