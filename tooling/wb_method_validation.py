@@ -77,7 +77,7 @@ def run_wb_validation(
     cases = TypeAdapter(list[dict[str, object]]).validate_python(design["cases"])
     if not 1 <= len(cases) <= 128:
         raise ValueError("Validation requires 1–128 frozen cases")
-    if float(cast(float, design["absolute_tolerance"])) != 0:
+    if TypeAdapter(float).validate_python(design["absolute_tolerance"], strict=True) != 0:
         raise ValueError("This analytical reference runner only admits frozen exact tolerance")
     references = catalog_evidence(catalog_path)
     output.mkdir(parents=True, exist_ok=False)
@@ -104,6 +104,17 @@ def run_wb_validation(
     for row in cases:
         name = str(row["name"])
         fixture = wb_validation_input(name)
+        bounds = fixture.request.lanes[0].bands[0].bounds
+        if (
+            design["polarity"] != fixture.request.polarity
+            or design["quant_policy"] != fixture.request.quant_policy
+            or bounds is None
+            or TypeAdapter(list[int]).validate_python(design["band_bounds"], strict=True)
+            != [bounds.left, bounds.right]
+        ):
+            raise ValueError(
+                "Frozen analysis parameters differ from the supported reference fixture"
+            )
         if not fixture.source_bytes:
             raise ValueError("Analytical fixture has no original bytes")
         data = fixture.source_bytes
@@ -111,13 +122,14 @@ def run_wb_validation(
         path.write_bytes(data)
         source_digest = sha256(data).hexdigest()
         decoded = load_tiff(path)
-        profile = TypeAdapter(list[int]).validate_python(row["profile"])
-        width = TypeAdapter(int).validate_python(design["pixel_width"])
+        profile = TypeAdapter(list[int]).validate_python(row["profile"], strict=True)
+        width = TypeAdapter(int).validate_python(design["pixel_width"], strict=True)
         roi = fixture.request.lanes[0].roi
         if (
             decoded.pixels.tolist() != [[value] * width for value in profile]
             or str(decoded.pixels.dtype) != row["dtype"]
-            or [roi.x0, roi.y0, roi.x1, roi.y1] != row["roi"]
+            or [roi.x0, roi.y0, roi.x1, roi.y1]
+            != TypeAdapter(list[int]).validate_python(row["roi"], strict=True)
         ):
             raise ValueError("Generated fixture differs from the frozen source definition")
         asset = AssetRef(
@@ -157,7 +169,9 @@ def run_wb_validation(
                 expected_status=TypeAdapter(MeasurementState).validate_python(
                     row["expected_status"]
                 ),
-                expected_value=TypeAdapter(float | None).validate_python(row["expected_signal"]),
+                expected_value=TypeAdapter(float | None).validate_python(
+                    row["expected_signal"], strict=True
+                ),
                 absolute_tolerance=0.0,
                 reference_source=str(design["expectation_source"]),
             )
@@ -208,7 +222,9 @@ def run_wb_validation(
             module_id=spec.module_id,
             implementation_digest=spec.implementation_digest,
             supported_inputs=(
-                "uint8/uint16 TIFF; explicit original-frame ROI; light/dark polarity",
+                "uint8/uint16 TIFF; explicit original-frame ROI",
+                "current report: light polarity, five P001 analytic fixtures",
+                "dark polarity: legacy module contract; not evaluated by this report",
             ),
             responsible_role="independent method owner",
             design_readiness="ready" if report.engineering_passed else "pending",

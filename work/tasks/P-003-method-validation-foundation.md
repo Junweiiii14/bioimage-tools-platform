@@ -54,3 +54,7 @@ P002已PR48正常合main f2dc5ad，四必需CI及准确独审通过。本树code
 Win11/Python3.12.14，当前未提交实现：`uv run --locked --no-sync python -m pytest tests/test_method_validation.py tests/test_workspace.py::test_contract_schema_snapshot tools/wb/tests/test_module_execution.py -q --basetemp=.local/pytest-p003-integrated-c` exit0，30 passed/3.85秒；包含Hypothesis合成数值不晋级S1、派生链分组闭包，身份/输入/单位/缺参考/无效空值及实际40/4000/0/空值报告。局部评估首次12passed/1failed发现model_copy的True经JSON变1.0，现先严格Python重新校验，再序列化；后13项exit0/2.35秒，未改测试期望。早期工具适配字段误用已按实际request/x0/y0/x1/y1 API修正，保留.local/p003-first-run部分失败目录，不冒充成功。
 
 真实命令`python -m tooling.wb_method_validation --output .local/p003-analytic-run-b` exit0，五例工程通过，scientific_admission=not_granted。全仓Ruff/format（1109文件）、policy（185产品文件）与完整Pyright（0errors）exit0；最终完整门禁/隔离wheel、冻结证据、准确提交独审与PR集成尚待完成，不据局部结果标done。
+
+## 初次独审Request changes与修复
+
+准确f2dc5ad..debeb3e被非作者提出P1共同父身份未闭包导致同源泄漏漏判、P2冻结polarity/band_bounds/quant_policy被工具忽略；独立反例均实际复现。报告work/evidence/P-003/review-request-changes.md，不把初次13项通过当独审接受。现闭包同时跟踪祖先record身份/分组，严格核对全部实际设计参数及整数类型；新增性质/真实评估拒绝与三字段/布尔坐标反例，18 passed/3.08秒、局部Pyright0。源debeb3e的全门禁在pytest阶段因这些缺陷主动停止，exit1；通过CIM核对本树python/uv及所属shell后停止自己进程树，复查遗留子PID均已退出。该次仅早期Ruff/类型/导入/JS通过，不宣称完整门禁通过，旧冻结证据与execution.json原样保留，新候选另冻结/全验/独审。追加方法登记断言时曾误插到纯性质测试导致NameError及precommit失败，已移到实际文件测试，未改期望/容差，修后13passed/2.43秒且提交钩子通过。

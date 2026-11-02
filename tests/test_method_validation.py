@@ -127,6 +127,34 @@ def test_derivative_parent_closure_cannot_hide_holdout_leakage(depth: int, rever
     assert "source_group_leakage" in dataset_partition_issues(tuple(records))
 
 
+@given(order=st.permutations((0, 1, 2)), suffix=st.integers(min_value=0, max_value=1000))
+def test_different_child_group_labels_cannot_hide_a_shared_unknown_parent(
+    order: list[int], suffix: int
+) -> None:
+    root = data_record(f"root_{suffix}", partition="unassigned", groups=())
+    dev = data_record("dev", groups=("dev_label",), parents=(root.record_id,))
+    hold = data_record(
+        "hold", partition="holdout", groups=("heldout_label",), parents=(root.record_id,)
+    )
+    records = (root, dev, hold)
+    assert "source_group_leakage" in dataset_partition_issues(tuple(records[i] for i in order))
+    plan, evidence = evaluation_pair()
+    plan = plan.model_copy(
+        update={
+            "records": tuple(records[i] for i in order),
+            "cases": (plan.cases[0].model_copy(update={"record_id": "dev"}),),
+        }
+    )
+    report = evaluate_method(
+        plan, evidence.model_copy(update={"plan_sha256": method_plan_digest(plan)})
+    )
+    assert not report.engineering_passed and not report.requested_use_allowed
+    # With distinct original records, different declared groups remain distinct.
+    separate = data_record("separate_root", partition="unassigned", groups=())
+    independent = hold.model_copy(update={"parent_record_ids": ("separate_root",)})
+    assert dataset_partition_issues((root, dev, separate, independent)) == ()
+
+
 @pytest.mark.parametrize("change", ["input", "parameters", "unit", "implementation", "environment"])
 def test_changed_attempt_identity_cannot_pass(change: str) -> None:
     plan, evidence = evaluation_pair()
@@ -247,3 +275,30 @@ def test_changed_frozen_source_definition_is_not_silently_ignored(tmp_path: Path
     with pytest.raises(ValueError, match="source definition"):
         run_wb_validation(tmp_path / "rejected", design_path=changed)
     assert not (tmp_path / "rejected/report.json").exists()
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [("polarity", "dark"), ("band_bounds", [1, 3]), ("quant_policy", "invented@9")],
+)
+def test_changed_frozen_analysis_parameters_are_rejected(
+    tmp_path: Path, field: str, value: object
+) -> None:
+    path = ROOT / "work/evidence/P-001/frozen-case-design.json"
+    design = json.loads(path.read_text(encoding="utf-8"))
+    design[field] = value
+    changed = tmp_path / "reference.json"
+    changed.write_text(json.dumps(design), encoding="utf-8")
+    with pytest.raises(ValueError, match="analysis parameters"):
+        run_wb_validation(tmp_path / "rejected", design_path=changed)
+    assert not (tmp_path / "rejected/report.json").exists()
+
+
+def test_boolean_reference_coordinates_cannot_be_accepted_as_integer_zero(tmp_path: Path) -> None:
+    path = ROOT / "work/evidence/P-001/frozen-case-design.json"
+    design = json.loads(path.read_text(encoding="utf-8"))
+    design["band_bounds"][0] = False
+    changed = tmp_path / "reference.json"
+    changed.write_text(json.dumps(design), encoding="utf-8")
+    with pytest.raises(ValidationError):
+        run_wb_validation(tmp_path / "rejected", design_path=changed)

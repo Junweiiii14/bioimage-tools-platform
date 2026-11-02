@@ -2,7 +2,7 @@
 
 本契约对应P003的D1设计/工程评估基础，不授予任何方法S1。公开入口为tool_contracts.api的数据/方法/计划/观测/报告模型，以及platform_runtime.api的method_plan_digest、dataset_partition_issues和evaluate_method。旧AssetRef v1、Workspace/schema及WB公式保持。
 
-ValidationDataRecord区分合成解析预期、独立参考和来源目录引用，记录payload SHA、实际文件/解码/许可用途状态、来源分组及父记录、分区、单位和完整原来源JSON。目录条目保留其原始访问/下载/标注/许可说明；本次未实际核验的源文件payload SHA仍为空、文件/解码状态not_verified，不能因论文或目录可读便写成本地已下载。来源分组ID须在当前登记集合内具有全局含义，父子闭包防止同源裁片/缩放/同采集派生物跨开发和留出。未知分组、缺父、环和同源泄漏阻止评估通过。
+ValidationDataRecord区分合成解析预期、独立参考和来源目录引用，记录payload SHA、实际文件/解码/许可用途状态、来源分组及父记录、分区、单位和完整原来源JSON。目录条目保留其原始访问/下载/标注/许可说明；本次未实际核验的源文件payload SHA仍为空、文件/解码状态not_verified，不能因论文或目录可读便写成本地已下载。来源分组ID须在当前登记集合内具有全局含义；闭包同时携带来源分组和全部祖先record身份，即使共同父分组未知、子节点另起不同标签也拒绝跨开发/留出。未知分组、缺父、环和同源泄漏阻止评估通过。
 
 MethodEvaluationPlan在执行前冻结精确ModuleSpec、方法/实现摘要、环境、输入记录、参数摘要、每例期望状态/值/单位、参考来源与绝对容差。method_plan_digest按本版本模型JSON字节SHA256计算；字段/序列化语义改变需版本化，不以重新计算摘要伪装旧运行。MethodEvaluationEvidence包含绑定计划摘要、实际实现/环境及每例输入/参数/观测；缺失、额外或重复观测、身份变化、缺参考/容差和未准入数据不能通过。严格Python值先重新校验，再序列化，避免model_copy注入的bool被JSON数值序列化掩盖。
 

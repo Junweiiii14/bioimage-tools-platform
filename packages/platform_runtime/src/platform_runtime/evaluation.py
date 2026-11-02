@@ -38,10 +38,16 @@ def dataset_partition_issues(records: tuple[ValidationDataRecord, ...]) -> tuple
         if record is None:
             issues.add("missing_parent_record")
             return set()
-        result = set(record.source_groups)
+        # Shared original records prove common ancestry even when a descendant
+        # supplies a new group label or the original group is still unknown.
+        result = {"record:" + record_id}
+        result.update("group:" + item for item in record.source_groups)
         for parent in record.parent_record_ids:
             result.update(groups(parent, active | {record_id}))
-        if not result and record.partition != "unassigned":
+        if (
+            not any(item.startswith("group:") for item in result)
+            and record.partition != "unassigned"
+        ):
             issues.add("unknown_source_group:" + record_id)
         resolved[record_id] = result
         return result
