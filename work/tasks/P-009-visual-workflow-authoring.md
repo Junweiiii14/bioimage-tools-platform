@@ -39,3 +39,7 @@ P006已done；P008准确b4847a5独审/四必需CI/双侧wheel后PR53正常merge2
 后台固定命令、单一共享存储所有者、真实批次执行/暂停恢复/取消排空及成果核验已接WebChannel。图/步骤/目录/schema表单、保存运行和成果区已有首版。模板template_version=1封装保存definition+layout，GUI及CLI加载器接受新旧格式。完整范围与失败修正见work/evidence/P-009/connected-editor-progress.md。
 
 最新定向四文件11passed47.73秒，退出0：store/session/bridge/web。界面实际按钮完成两批合成输入4000.0→40.0，保存保持ROI输入DOM/焦点；模板布局跨项目保存/重绑定验证通过。pyright0 errors，目标Ruff通过，web静态检查通过（范围保留）。本轮未运行本地全量、隔离wheel、最终视觉/性能或独审/CI。仍in_progress，不能作为M2完成。
+
+## 2026-11-02 完整界面链路及有效视觉采集
+
+真实Web五流程5passed39.93秒，覆盖节点编辑/预检/重开、GUI实验室模板新TIFF+CLI、参数边界/模拟IME、依赖复用和运行中新草稿焦点。Ruff/type/web静态通过。有效原生Windows12图采集15.42秒，通过非纯色/颜色一致性校验；离屏纯色/旧帧/RAF失败原证据保留，不算视觉通过。一次detect无主要项、有1backdrop advisory。详见work/evidence/P-009/ui-edit-validation.md/json。已写中文操作单和模板v1契约；视觉独审/性能/wheel/准确代码独审/PR必需CI仍待做，不改in_progress。

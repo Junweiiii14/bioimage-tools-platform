@@ -134,10 +134,11 @@ class WorkflowAuthoringBridge(QObject):
                 else:
                     values.update(
                         source_paths=[source],
-                        lane_count=options.get("lane_count"),
                         polarity=options.get("polarity", "dark"),
                         template_path=template,
                     )
+                    if action == "new_original":
+                        values["lane_count"] = options.get("lane_count")
                 self._switch(token, str(path), json.dumps(values).encode("utf-8"))
                 return
             if self._session is None or self._session.projection is None:

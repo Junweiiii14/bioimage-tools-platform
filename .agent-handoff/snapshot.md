@@ -22,15 +22,19 @@ PR53最终b4847a56b682e71356129e34fac59262c08659e7非作者Accepted，全4d6..b4
 - 首版后台/原生桥/Web编排已连接同一P008执行器，源文件workflow_authoring_{models,store,session,bridge}.py及web_ui/workflow_authoring.js/.css；共享AsyncStorage单所有者，不复制运行器。
 - 图/目录/步骤、增删替换/连线、schema参数表单/高级JSON、保存/运行、暂停继续取消、已核验表图已实现。完整行为矩阵仍未验，不能从控件存在宣称完成。
 - 最新四文件定向11passed47.73秒/exit0，日志.local/p009-authoring-connected-targeted.log；真实WebChannel两批4000.0→40.0且保存保留ROI输入DOM/焦点。store/session覆盖CAS/不完整草稿、缓存、冻结前取消/关闭无worker、提交中间结果、暂停冷重开显式继续、原生两个所有者退出排空。
-- 模板workflow_template.py新增template_version1封装definition+layout；GUI导出/GUI及CLI加载器接受新旧格式。模板跨项目绑定新原图并保留位置已定向验证，新封装实际CLI进程启动尚未测。
+- 模板workflow_template.py新增template_version1封装definition+layout；GUI导出/GUI及CLI加载器接受新旧格式。模板跨项目绑定新原图并保留位置已定向验证，新封装实际CLI进程及GUI模板新建第二批已通过，见ui-edit-validation.md。
 - 失败记录/当前源码与日志摘要见work/evidence/P-009/connected-editor-progress.md及json。初始Web固定成果数、schema元组prefixItems漏实现、第二批回执未替换当前graph、精确40字符串应为40.0均已区分保留。目标Ruff/pyright/web静态通过；不是全产品类型/性能证明。
 - 旧图探针仍只组件证据；最终视觉主检尚未开始，无新依赖、无P009 PR/独审/CI，不mark goal complete。
+
+- 新增真实Web五流程最新5passed39.93秒，覆盖完整节点增删替换/错误连线解释/重开、布尔false和空数组恢复、模拟IME、GUI导出模板/另一TIFF新建+CLI启动、GUI缓存(3,0)/(0,3)/(1,2)/(2,1)及运行中新草稿焦点。来源/失败历史见P009/ui-edit-validation.md及json。最终type/Ruff/web静态通过。
+- 视觉有效采集已开始：offscreen纯色、Windows readback滞后及静态RAF超时均保留。最新原生windows/--disable-gpu/active、capture-only关闭动画+500ms交付、图片非纯色及按钮像素对计算颜色核对12图通过15.42秒；.local/p009-ui-main-windows-active与.impeccable/review有效，其他目录不能作最终证据。仅首轮有效截图，仍待独立视觉审查，最多一次有效确认；无生产GPU配置修改或科学/物理DPI结论。
+- 一次UI detect已运行，.local/p009-ui-detect.json只有1 backdrop advisory/0主要项，禁止再跑detector。中文操作单和模板v1兼容契约已写，不再重复建文档。
 
 ## 设计上下文与后继
 
 本会话impeccable context一次已跑，.local/p009-ui-context.txt506行已完整实际读（含后补200–350），PRODUCT/DESIGN均为沿用T075四主题、本地NotoSansSC、40px控件的Operate扩展。已实际surface-brief read module_compare.js和craft-floor；新局部brief.impeccable/surfaces/workflow-authoring.md，不改全局DESIGN。用户已有明确授权，不按技能通用模板重问已定需求/审批。图探针截图只功能证据，不是最终视觉主检；最终完整UI一次主检+最多一次确认，detect在完成UI后一次，视觉独审按skill要求在最终候选集中做。
 
-下一步：完成实际GUI增删替换/非法连线解释、重开与实验室模板第二批链路，参数依赖/样式/布局缓存的界面证据、IME/旧任务新草稿与表单边界；有界主题/尺寸视觉与P006范围性能、操作单、隔离wheel、完整候选准确独审/PR必需CI。尤其注意空数组新增/nullable字段及高级JSON与表单同步的可操作性，不能把初版表单当完整M2。CLI新模板进程回归仍需做。修改前核源文件，不重复已过全量。
+下一步：按impeccable既有Operate扩展范围用有效12图做fresh独立视觉审查，依据其问题一批修正/最多一次有效确认，不能重新开不必要设计采访/seed选型。保持原主题。P006口径性能（5预热+30正式，准确反馈/settled/原生ack/排空分开、超线保留）尚未做；再隔离wheel、准确提交独立代码审查/PR必需CI正常合并。无需重做完整功能矩阵或重复本地全量。根目标仍active。
 
 P009当前只是本地工作提交，不建小步PR/逐提交审查；可运行完整候选后集中独审，局部验证/最终CI全量，不重复本机1675全套。已有独审/root/p002_independent_review可复用最终代码审查，当前idle。保留task/规则回执、P008closeout及轮转archive一起提交，别漏新未跟踪源码或误收B012。
 

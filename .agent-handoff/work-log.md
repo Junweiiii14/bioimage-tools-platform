@@ -1,10 +1,5 @@
 # Current Work Log
 
-## 2026-10-21 T074 曲线与整版拼图
-
-批次封底复用独立曲线、CAS后重测；单Fig定位与裁剪分开；schema15网格持久化与同布局导出。独审修复来源草稿/分组顺序/后台有界预览；包态修复JSON数组边界及view字段保留。最终569674a新独立安装19checks通过。PR35待用户决定集成；旧目录/安装/数据保持。详见T074任务与delivery证据。
-
-
 ## T074 用户实测补齐
 
 用户确认全部泳道并排点选封底编辑，e47af46补固定高度卡片/编辑器、整卡点击、拖动反馈/过期保护及原图视口，独审Accepted后新安装19checks通过。另修已保存阶段即时发布防快compose漏页。最终服务器门禁以PR35当前HEAD为准；保留真实失败记录，不追加无关测试。
@@ -146,3 +141,7 @@ PR53最终b4847a5 Accepted，四必需CI SUCCESS后正常merge2755604，候选/m
 ## 2026-11-02 P009 connected editor checkpoint
 
 后台/桥/首版schema表单接同一真实批次执行；11项定向47.73秒过，两批4000.0→40.0/保存保焦点及模板版本布局证据见P009/connected-editor-progress。修复真实schema固定元组和bind图同步问题，测试固定成果数/40字符串误写分别记录，不增ignore不改科学结果。尚无最终UI视觉/性能/IME全矩阵、wheel/独审/PRCI，继续P009。保留B012他人untracked。
+
+## 2026-11-02 P009 full web flows and valid capture
+
+五流程通过39.93秒；布尔false/空数组添加/IME标记/窄窗步骤选择/模板初始化N及bridge-ready修正，完整GUI模板新TIFF与CLI、缓存/新草稿焦点验证。12图有效采集15.42秒，失败和颜色/RAF/readback范围完整保留ui-edit-validation。一次detect0主要+1advisory。原生性能、集中视觉/代码独审及wheel/PRCI待做；不重复本机全量。

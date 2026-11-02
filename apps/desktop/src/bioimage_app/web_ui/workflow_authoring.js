@@ -269,6 +269,18 @@
             root.append(element('h3', '从目录添加或选择一个步骤'));
             return;
         }
+        const stepLabel = element('label', '当前步骤');
+        const stepSelect = element('select');
+        stepSelect.id = 'wf-current-step';
+        for (const step of graph.nodes) {
+            const option = element('option', name(step.node_id));
+            option.value = step.node_id;
+            stepSelect.append(option);
+        }
+        stepSelect.value = selected;
+        stepSelect.addEventListener('change', () => select(stepSelect.value));
+        stepLabel.append(stepSelect);
+        root.append(stepLabel);
         root.append(element('h3', name(node.node_id)));
         const version = element(
             'p',
@@ -336,6 +348,7 @@
                     title = labels[key] || key;
                 if (value !== null && typeof value === 'object') {
                     const group = element('fieldset', '', 'wf-param-group');
+                    group.dataset.wfGroup = path.join('.');
                     group.append(element('legend', title));
                     if (Array.isArray(value)) {
                         value.forEach((entry, index) => {
@@ -348,6 +361,7 @@
                                 [...path, index],
                             );
                             const remove = element('button', '删除此项', 'button subtle');
+                            remove.dataset.wfRemove = [...path, index].join('.');
                             remove.addEventListener('click', () => {
                                 if (!readParameters()) return;
                                 let current = JSON.parse(node.parameters_json);
@@ -361,19 +375,28 @@
                             if (!spec.prefixItems) row.append(remove);
                             group.append(row);
                         });
-                        if (value.length && !spec.prefixItems) {
+                        let directory = JSON.parse(item.parameters_json);
+                        for (const key of path)
+                            directory = directory?.[typeof key === 'number' ? 0 : key];
+                        if (!spec.prefixItems && (value.length || directory?.length)) {
                             const add = element(
                                 'button',
-                                '复制末项（请修改标识与坐标）',
+                                value.length
+                                    ? '复制末项（请修改标识与坐标）'
+                                    : '从目录参数添加一项（请核对标识与坐标）',
                                 'button subtle',
                             );
+                            add.dataset.wfCopyArray = path.join('.');
                             add.addEventListener('click', () => {
                                 if (!readParameters()) return;
                                 // The copied values remain explicit drafts; host preflight checks identity.
                                 const params = JSON.parse(node.parameters_json);
                                 let current = params;
                                 for (const key of path) current = current[key];
-                                update(path, [...current, copy(current.at(-1))]);
+                                update(path, [
+                                    ...current,
+                                    copy(current.length ? current.at(-1) : directory[0]),
+                                ]);
                                 renderInspector();
                             });
                             group.append(add);
@@ -409,13 +432,13 @@
                             : typeof value === 'boolean'
                               ? 'checkbox'
                               : 'text';
-                    input.required = true;
+                    input.required = input.type !== 'checkbox';
                     if (input.type === 'number') input.step = spec.type === 'integer' ? '1' : 'any';
                 }
                 input.value = String(value);
                 if (typeof value === 'boolean') input.checked = value;
                 input.disabled = spec.const !== undefined;
-                input.addEventListener(spec.enum ? 'change' : 'input', () => {
+                const changed = () => {
                     if (!input.validity.valid) {
                         markDirty();
                         return;
@@ -429,12 +452,15 @@
                               ? input.checked
                               : input.value,
                     );
-                });
+                };
+                input.addEventListener(spec.enum ? 'change' : 'input', changed);
                 input.addEventListener('compositionstart', () => {
                     composing = true;
+                    markDirty();
                 });
                 input.addEventListener('compositionend', () => {
                     composing = false;
+                    changed();
                 });
                 label.append(input);
                 parent.append(label);
@@ -448,6 +474,12 @@
         const label = element('label', '原图像素坐标；编辑后保存并预检');
         label.append(json);
         advanced.append(label);
+        const apply = element('button', '将 JSON 应用到表单', 'button subtle');
+        apply.id = 'wf-apply-json';
+        apply.addEventListener('click', () => {
+            if (readParameters()) renderInspector();
+        });
+        advanced.append(apply);
         root.append(advanced);
         json.addEventListener('input', markDirty);
         json.addEventListener('compositionstart', () => {
@@ -575,6 +607,13 @@
         });
     }
     function renderChrome() {
+        dialog.querySelectorAll('[data-wf-choose]').forEach((button) => {
+            button.disabled =
+                !bridge ||
+                !!pending ||
+                nativePending ||
+                (running && lastStatus?.state !== 'paused');
+        });
         get('wf-start').hidden = contextReady;
         get('wf-workspace').hidden = !contextReady;
         get('wf-title').disabled = !contextReady;
@@ -864,6 +903,7 @@
     window.workflowEditor = {
         connect(value) {
             bridge = value;
+            status('请新建或打开工作流项目。');
             bridge.documentChanged.connect(received);
             bridge.workspaceChanged.connect((path) => {
                 get('wf-workspace-path').textContent = path;
@@ -916,6 +956,7 @@
         },
         hasDraft: () => dirty,
         snapshot: () => ({
+            connected: !!bridge,
             selected,
             dirty,
             serial,
@@ -926,4 +967,5 @@
             layout: copy(layout),
         }),
     };
+    renderChrome();
 })();
