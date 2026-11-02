@@ -34,6 +34,7 @@ class WBModuleProcessCodec:
             event.kind,
             event.manifest.model_dump_json().encode("utf-8") if event.manifest is not None else b"",
             event.reason,
+            "module_manifest",
         )
 
     def cancellation(self) -> bytes:

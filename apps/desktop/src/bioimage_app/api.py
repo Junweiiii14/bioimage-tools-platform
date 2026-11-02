@@ -6,6 +6,7 @@ if TYPE_CHECKING:
     from wb_tool.api import StartFrame, WBModuleStart
 
     from bioimage_app.figure_window import FigureProjectWindow as FigureProjectWindow
+    from bioimage_app.module_session import ComparisonSession
     from bioimage_app.wb_window import WBWindow as WBWindow
 
 from bioimage_app.diagnostics import DesktopDiagnostics
@@ -24,6 +25,7 @@ __all__ = [
     "ProcessRunner",
     "create_wb_codec",
     "create_wb_module_codec",
+    "create_comparison_session",
     "RunCompletion",
     "RunSession",
     "create_wb_window",
@@ -50,6 +52,12 @@ def create_wb_module_codec(start: "WBModuleStart") -> ProcessCodec:
     from bioimage_app.wb_registration import WBModuleProcessCodec
 
     return WBModuleProcessCodec(start)
+
+
+def create_comparison_session() -> "ComparisonSession":
+    from bioimage_app.module_session import ComparisonSession
+
+    return ComparisonSession()
 
 
 def create_wb_window() -> "WBWindow":

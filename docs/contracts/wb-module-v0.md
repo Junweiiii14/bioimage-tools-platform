@@ -34,6 +34,6 @@ CSV为UTF-8 BOM，文本字段使用可逆`text_prefix@1`（每个字符串加`t
 
 宿主复用ProcessRunner和RunSession，收到真实成功退出回执后由现有存储线程校验冻结持久请求、输入注册资产、候选身份、声明文件集合、路径、非链接/非硬链接、大小和SHA。必需输出缺失/篡改、manifest后非零退出、无终态或错误身份不得成功。文件经Workspace不可变导入，再用原commit_result事务保存publication=committed的正式清单；正式引用为Workspace登记AssetRef。原图、请求和旧结果不覆盖。
 
-导入与最终结果CAS不是一个文件系统原子事务。取消或失败可能留下暂存文件和未被结果引用的导入资产，保留诊断，不当作成功结果，不自动删除。取消token继续传入最终commit_result，终态先后沿原提交规则。宿主关停必须等实际worker退出和存储线程排空；薄GUI及完整headless宿主尚待P002接入。
+导入与最终结果CAS不是一个文件系统原子事务。取消或失败可能留下暂存文件和未被结果引用的导入资产，保留诊断，不当作成功结果，不自动删除。取消token继续传入最终commit_result，终态先后沿原提交规则。宿主关停必须等实际worker退出和存储线程排空。薄GUI与`--v0-compare`/`--v0-open`共用ComparisonSession，重开核验输入、冻结请求和全部成果资产；操作见[中文验收说明](../wb-v0-acceptance.md)，实际验证状态见P002任务。
 
 `run-manifest.json`记录计算阶段的来源，不自证宿主已提交；最终RunRecord及其result引用的OutputManifest才是成功发布依据。重开后必须用Workspace校验资产再展示。旧AnalysisResult/项目记录继续走旧读取路径。

@@ -186,6 +186,18 @@ assert not any(name == 'PIL' or name.startswith('PIL.') for name in sys.modules)
 assert isinstance(pipeline_reopened, WBIntakeWorkflowProject) and pipeline_reopened == pipeline
 assert all(step.status == 'pending' for step in pipeline.workflow.steps)
 assert not pipeline.analyses and pipeline.ocr is None
+from hashlib import sha256
+from wb_tool.api import wb_validation_input, prepare_wb_execution, execute_wb_module
+fixture = wb_validation_input('triangle_u16')
+module_source = Path('installed-module-source.tif')
+module_source.write_bytes(fixture.source_bytes)
+module_asset = AssetRef(asset_id='module-source', relative_path='inputs/source.tif',
+    sha256=sha256(fixture.source_bytes).hexdigest(), size_bytes=len(fixture.source_bytes))
+module_request = prepare_wb_execution(module_asset, fixture.request, 'installed-module')
+module_result = execute_wb_module(load_tiff(module_source), module_request)
+assert module_result.lanes[0].bands[0].signal == 4000.0
+assert module_result.lanes[0].bands[0].status == 'valid'
+assert module_source.read_bytes() == fixture.source_bytes
 assert not any(name.startswith(('PySide6', 'sqlite3')) for name in sys.modules)
 assert not any(name.startswith(('rapidocr', 'onnxruntime', 'cv2')) for name in sys.modules)
 print('Isolated WB wheel: TIFF/analysis, crop/grid and worker; no GUI/storage dependencies')
@@ -427,6 +439,35 @@ assert isinstance(png_result, OCRResultFrame)
 assert png_result.result.preprocess_id == png_source.preprocess_id
 assert [t.text for t in png_result.result.tokens] == ['Fig 1A', 'AKT']
 print('Installed PNG OCR: separate loader and real worker preserve known text/coordinates')
+import json
+import bioimage_app
+web_root = Path(bioimage_app.__file__).parent / 'web_ui'
+assert (web_root / 'module_compare.js').is_file()
+assert (web_root / 'module_compare.css').is_file()
+comparison_root = Path('installed-v0-comparison').resolve()
+def comparison_command(*arguments):
+    completed = subprocess.run(
+        [sys.executable, '-I', '-m', 'bioimage_app', *arguments],
+        capture_output=True, timeout=45)
+    assert completed.returncode == 0, (completed.stdout, completed.stderr)
+    return json.loads(completed.stdout)
+comparison = comparison_command('--v0-compare', str(comparison_root),
+                                '--case', 'triangle_u16')
+assert comparison['state'] == 'succeeded' and comparison['run']['pid'] > 0
+assert comparison['quality'] == 'complete'
+table = json.loads(comparison['tables_json']['measurements'])
+values = dict(zip(table['columns'], table['rows'][0], strict=True))
+assert values['value'] == '4000.0' and values['status'] == 'valid'
+table = json.loads(comparison['tables_json']['differences'])
+values = dict(zip(table['columns'], table['rows'][0], strict=True))
+assert values['difference'] == '0.0' and values['exact_match'] == 'True'
+reopened = comparison_command('--v0-open', str(comparison_root))
+assert reopened['run'] == comparison['run']
+assert reopened['tables_json'] == comparison['tables_json']
+assert reopened['files'] == comparison['files']
+assert all(Path(path).is_file() and Path(path).is_relative_to(comparison_root)
+           for path in reopened['files'].values())
+print('Installed V0: real worker, 4000 exact comparison, committed assets and reopen passed')
 """
 
 

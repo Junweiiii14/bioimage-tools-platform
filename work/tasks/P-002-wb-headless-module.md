@@ -1,6 +1,6 @@
 # P-002 V0成熟WB方法独立调用与真实成果对照
 
-<!-- PROGRAM_TASK_META {"id":"P-002","status":"in_progress","work_package":"W02","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a190e6-02b1-74e3-a7b9-bd5fbc3f36fe","base_commit":"29930f62a0b158189b76e0fad7d090d632f149d6","head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-002","status":"in_progress","work_package":"W02","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a190e6-02b1-74e3-a7b9-bd5fbc3f36fe","base_commit":"29930f62a0b158189b76e0fad7d090d632f149d6","head_commit":"725fc6aef8df192f46fdceb122f6ff669251dd72"} -->
 
 ## 执行状态
 
@@ -63,3 +63,17 @@ P001已独审并经PR47四必需CI正常合main29930f62，当前从该准确main
 首次组合检查16 passed/1 failed：既有import_bytes测试因沙箱默认TEMP写入PermissionError失败；独立TemporaryDirectory写入复现权限错误，未改产品或测试预期，改为工作区TEMP后该项1 passed，再完成上述34项组合验证。初始JSON极深嵌套测试发现仅依赖Python递归上限不确定，改为显式32层准入后通过；首轮Pyright提示未知容器类型，已用边界cast明确类型，无ignore。受影响文件Ruff、Pyright（0errors）和dev.py policy（180产品文件）均exit0；全门禁、隔离wheel及独审未运行。
 
 下一步：共享会话控制器与完整无GUI宿主命令、现有工作台薄对照入口及中文验收流程；扩大路径/成果准入负例，最终全门禁与准确提交独审/PR集成。不得据本增量将P002或V0标done。
+
+本阶段实现已提交 `725fc6aef8df192f46fdceb122f6ff669251dd72`；提交钩子Ruff/format/policy通过。已请求独立审查者按29930f62..该head只读审查，结果待回报，不代替完整V0验收。
+
+## 2026-11-02完整入口增量（等待最终门禁及独审）
+
+在725fc6a基础上接入共享ComparisonSession、无窗口命令--v0-compare/--v0-open和现有工作台薄对照入口；原图读取、请求冻结、CSV解析在后台完成，真实worker及Workspace服务关闭后才报告会话完成。支持五个冻结样例及CLI显式原图/参数，成功、失败与取消可追溯；重开核验请求、输入及所有输出。中文操作单为docs/wb-v0-acceptance.md。
+
+阶段独审p001_review对29930f62..725fc6a给出Request changes：模块codec遗漏宿主绑定会落入旧发布路径，候选manifest可能错误提交。现已通过ProcessEvent.payload_kind及RunSession强制匹配拒绝，回归包含missing_binding；本轮修复尚待准确新提交复审，不沿用旧结论。
+
+Win11/Python3.12.14，当前未提交增量：`uv run --locked --no-sync python -m pytest tests/test_module_cli.py tests/test_module_run_session.py -q --basetemp=.local/pytest-p002-final-target-a`，工作区TEMP/TMP与Qt offscreen/disable-gpu：exit0，16 passed/56.81秒。覆盖五样例独立预期、重开、原输入不变、拒绝已有目的地、篡改后重开拒绝、运行前/中取消、float失败持久化、manifest后非零/缺失/篡改/硬链接/绑定遗漏拒绝。日志.local/p002-final-target-a.txt。完整Pyright exit0（0 errors），日志.local/p002-final-pyright.txt；旧会话63032恢复时句柄不存在，不据此猜测旧运行结果。
+
+上一轮真实工作台两项测试2 passed/5.64秒，日志.local/p002-ui-capture-check.txt，1440与960宽截图在.impeccable/review/p002。impeccable_finish_reviewer局部视觉ship，documenter No changes；代码最终独审仍待执行。初始沙箱QWebEngineProfile异常退出0x80000003，使用既有CI离屏环境后通过，不宣称根因修复。CLI首次Windows -I忽略PYTHONIOENCODING导致输出gbk，改为显式UTF-8字节后8 passed/46.37秒；无放松断言。
+
+门禁变更仅在tooling/installed_wheels.py追加验证：裸WB安装调用新公共用例得4000且不加载Qt/数据库；桌面wb extra安装通过真实CLI运行、差异与关闭重开，并检查UI资源随wheel存在。原安装检查、边界和阈值不删改，锁文件无变化。完整`dev.py check --all`当前运行中，不能提前写通过。最终准确提交独审、PR/CI及正式冻结输出证据待完成；P002保持in_progress。

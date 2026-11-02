@@ -1,6 +1,7 @@
 """A single legacy WB module: immutable envelopes, unchanged scientific use case."""
 
 from collections.abc import Callable
+from dataclasses import dataclass
 
 from pydantic import TypeAdapter
 from tool_contracts.api import ExecutionRequest, canonical_module_json
@@ -16,6 +17,13 @@ from wb_tool.application.analysis import (
 MODULE_ID = "wb-legacy-analysis"
 MODULE_VERSION = "1.0"
 METHOD_VERSION = "profile_integral@1"
+
+
+@dataclass(frozen=True)
+class WBModuleInput:
+    request: AnalysisRequest
+    source_path: str = ""
+    source_bytes: bytes = b""
 
 
 def legacy_module_parameters(request: AnalysisRequest) -> str:

@@ -19,6 +19,7 @@ class ProcessEvent:
     kind: Literal["hello", "accepted", "result", "failure", "cancelled"]
     data: bytes = b""
     reason: str = ""
+    payload_kind: Literal["inline", "module_manifest"] = "inline"
 
 
 class ProcessCodec(Protocol):

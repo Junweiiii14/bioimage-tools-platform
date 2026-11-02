@@ -36,7 +36,16 @@ from wb_tool.api import (
 
 
 @pytest.mark.parametrize(
-    "mode", ["success", "nonzero_after_manifest", "missing_output", "changed_output", "cancel"]
+    "mode",
+    [
+        "success",
+        "nonzero_after_manifest",
+        "missing_output",
+        "changed_output",
+        "cancel",
+        "missing_binding",
+        "hard_link",
+    ],
 )
 def test_module_run_commits_only_verified_real_success(
     qtbot: QtBot, tmp_path: Path, mode: str
@@ -100,8 +109,8 @@ def test_module_run_commits_only_verified_real_success(
             storage,
             prepared,
             create_wb_module_codec(start),
-            module_request=request,
-            module_output_directory=str(output),
+            module_request=None if mode == "missing_binding" else request,
+            module_output_directory="" if mode == "missing_binding" else str(output),
         )
         session.completed.connect(completions.append)
         if mode == "cancel":
@@ -113,6 +122,12 @@ def test_module_run_commits_only_verified_real_success(
             session.received.connect(cancel)
         tail = {
             "success": "sys.exit(code)",
+            "missing_binding": "sys.exit(code)",
+            "hard_link": (
+                "p=Path(sys.argv[1]) / 'measurements.csv'; "
+                "alias=p.parent.parent / 'outside.csv'; p.rename(alias); "
+                "p.hardlink_to(alias); sys.exit(code)"
+            ),
             "cancel": "sys.exit(code)",
             "nonzero_after_manifest": "sys.exit(7)",
             "missing_output": "(Path(sys.argv[1]) / 'measurements.csv').unlink(); sys.exit(code)",
@@ -144,7 +159,9 @@ def test_module_run_commits_only_verified_real_success(
             )
         if mode != "success":
             assert completion.record.result is None
-        if mode in ("missing_output", "changed_output"):
+        if mode == "missing_binding":
+            assert completion.record.reason == "module_publication_binding_missing"
+        if mode in ("missing_output", "changed_output", "hard_link"):
             assert completion.record.reason and "module_output_invalid" in completion.record.reason
     finally:
         with qtbot.waitSignal(storage.closed, timeout=10000):

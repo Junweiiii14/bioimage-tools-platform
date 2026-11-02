@@ -13,6 +13,10 @@ for variable in (
 
 
 def main() -> int:
+    if len(sys.argv) > 1 and sys.argv[1] in ("--v0-compare", "--v0-open"):
+        from bioimage_app.module_cli import run_comparison_cli
+
+        return run_comparison_cli(sys.argv[1:])
     if sys.argv[1:] == ["--worker", "wb_v0_compare"]:
         from wb_tool.api import run_wb_module_worker
 

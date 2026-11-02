@@ -29,6 +29,7 @@ from wb_tool.adapters.module_execution import (
     wb_module_environment,
     wb_module_spec,
 )
+from wb_tool.adapters.module_input import read_wb_module_input, wb_validation_input
 from wb_tool.adapters.module_protocol import (
     WBModuleCancel,
     WBModuleConversation,
@@ -237,6 +238,7 @@ from wb_tool.application.laboratory_layout import (
     with_figure_layout,
 )
 from wb_tool.application.manual_groups import add_manual_group, edit_quant_band
+from wb_tool.application.module_execution import WBModuleInput
 from wb_tool.application.ocr_protocol import (
     OCRConversation,
     OCRRequest,
@@ -372,6 +374,9 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "WBModuleInput",
+    "read_wb_module_input",
+    "wb_validation_input",
     "compare_wb_module",
     "WBModuleStart",
     "WBModuleCancel",

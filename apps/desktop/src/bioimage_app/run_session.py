@@ -168,6 +168,8 @@ class RunSession(QObject):
             or outcome.terminal is None
             or outcome.terminal.kind != "result"
             or outcome.exit_code != 0
+            or (outcome.terminal.payload_kind == "module_manifest")
+            != (self._module_request is not None)
         ):
             reason = outcome.error or (
                 outcome.terminal.reason if outcome.terminal else "missing_result"
@@ -176,7 +178,15 @@ class RunSession(QObject):
                 "failed",
                 run_id=run_id,
                 receipt=receipt,
-                reason=reason or "worker_nonzero_exit",
+                reason=reason
+                or (
+                    "module_publication_binding_missing"
+                    if outcome.exit_code == 0
+                    and outcome.terminal is not None
+                    and (outcome.terminal.payload_kind == "module_manifest")
+                    != (self._module_request is not None)
+                    else "worker_nonzero_exit"
+                ),
                 interrupted=bool(outcome.error),
             )
         else:

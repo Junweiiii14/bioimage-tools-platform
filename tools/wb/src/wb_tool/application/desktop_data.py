@@ -4,9 +4,9 @@ from dataclasses import dataclass
 from threading import Event
 from typing import Literal
 
-from tool_contracts.api import RunRecord
+from tool_contracts.api import AssetRef, ExecutionRequest, OutputManifest, RunRecord
 
-from wb_tool.application.analysis import AnalysisResult
+from wb_tool.application.analysis import AnalysisRequest, AnalysisResult
 from wb_tool.application.crop import CropRequest
 from wb_tool.application.crop_return import ReturnedCrop
 from wb_tool.application.crop_suggestions import CropSuggestion
@@ -22,6 +22,7 @@ from wb_tool.application.intake_crop import IntakeCropEvidence, IntakeCropFile
 from wb_tool.application.intake_delivery import IntakeDeliveryReceipt
 from wb_tool.application.intake_figure import IntakeFigurePreparation
 from wb_tool.application.intake_output import IntakeOutputPreparation
+from wb_tool.application.module_execution import WBModuleInput
 from wb_tool.application.project_analysis import (
     LoadedProjectResult,
     ProjectRowAnalysis,
@@ -58,6 +59,11 @@ class PreviewRaster:
 @dataclass(frozen=True)
 class WBJob:
     operation: Literal[
+        "module_input",
+        "module_fixture",
+        "module_prepare",
+        "module_manifest",
+        "module_table",
         "preview",
         "discover_tiffs",
         "intake_discover",
@@ -136,6 +142,8 @@ class WBJob:
     preview_edge: int = 2048
     archive_runs: tuple[ArchiveRunEvidence, ...] | None = None
     processing_errors: tuple[str, ...] = ()
+    module_asset: AssetRef | None = None
+    module_parameters: AnalysisRequest | None = None
 
 
 @dataclass(frozen=True)
@@ -172,6 +180,9 @@ class WBReply:
         | OCRRecognition
         | bytes
         | str
+        | ExecutionRequest
+        | OutputManifest
+        | WBModuleInput
         | None
     ) = None
     error: str = ""
