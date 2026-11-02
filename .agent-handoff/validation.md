@@ -1,5 +1,9 @@
 # Validation Index
 
+## 2026-11-02 P005 journal component only
+
+现有Windows/Python3.12.14；uv --locked --no-sync：pytest tests/test_workflow_execution.py tests/test_workflow_contracts.py tests/test_workspace.py为77passed9.12s/exit0；Ruff format/check、Pyright contracts/runtime/新测试0errors、dev.py policy及lint-imports九边界均exit0。首轮7pass1fail及修正保留P005/journal-component.md；未运行正式WB图、完整门禁、wheels或本提交CI，不能称M1/P005完成。精确源提交随后由git与独审绑定。
+
 ## 2026-10-31 B008 文档发布
 
 文档构建、17登记/13章49表/相对链接核验、计划检查、Ruff及policy exit0；仓库HTML实际Edge字体loaded、无页面/请求错误。首commit钩子缺ruff退出2，选择已装venv后通过；首CI run41181434999两平台Markdown代码块空行格式失败，补空行后全仓format990文件通过。初P卡独审Accepted、便携链接独审Blocked后修正；准确最后HEAD独审与四必需CI只认PR46实况。派发证据见work/evidence/B-008/thread-dispatch.json。未本地运行产品测试、安装或独立科学验收。

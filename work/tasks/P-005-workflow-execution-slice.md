@@ -60,3 +60,7 @@ P-002独立WB模块及实际契约、既有RunSession/Workspace/CAS与worker协�
 work/evidence/P-005/execution-test-design.json冻结单图真实三节点、身份/状态、当前环境准入、预算和12类成功/故障实验。v1新增上限256 attempts、128 controls、4096 critical events为有限执行的防失控预算，不是性能成绩；实现必须预留终态容量，不能丢关键状态。沿用64节点/256连接/1MiB图、旧8/16端口、16MiB成果/文档预算，未改既有门禁或科学预期。原图通过引用传递，校验输出为小凭据，避免大型TIFF复制使既有预算失真。
 
 计划冻结不等于实现；P005产品/测试尚未执行。下一步具体实现版本化ledger/事件模型和纯状态转移，再接同一异步存储/RunSession，按真实实验逐项检验后独审/PR。
+
+## 账本组件实施（整卡未完成）
+
+2026-11-02新增版本化WorkflowLedger与纯转移及8项组件测试，详细真实成绩/首轮失败见work/evidence/P-005/journal-component.md。关联P007/Workspace共77pass；真实两节点子进程退出与存储提交/重开仅为组件夹具，不是生产三节点WB图。取消最后名额保留、科学计算键与原物理输入双重匹配纳入新v1契约。未改旧公式/schema/测试门禁。下一步存储线程接线、共享RunSession/正式worker与冻结故障矩阵，准确提交独审/正常PR与必需CI仍需完成。

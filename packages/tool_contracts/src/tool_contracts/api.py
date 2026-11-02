@@ -39,6 +39,14 @@ from tool_contracts.scientific_assets import (
     TableColumn,
     TableMetadata,
 )
+from tool_contracts.workflow_execution import (
+    WorkflowAttempt,
+    WorkflowEventKind,
+    WorkflowJournalEvent,
+    WorkflowLedger,
+    WorkflowNodeResult,
+    WorkflowState,
+)
 from tool_contracts.workflows import (
     ExecutionPlan,
     NodePosition,
@@ -106,4 +114,13 @@ __all__ = [
     "PlannedNode",
     "ExecutionPlan",
     "WorkflowIssue",
+]
+
+__all__ += [
+    "WorkflowAttempt",
+    "WorkflowNodeResult",
+    "WorkflowJournalEvent",
+    "WorkflowLedger",
+    "WorkflowState",
+    "WorkflowEventKind",
 ]

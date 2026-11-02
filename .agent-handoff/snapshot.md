@@ -5,7 +5,7 @@
 
 ## 当前任务
 
-- [P005](../work/tasks/P-005-workflow-execution-slice.md)已在P002/P007实际done后激活in_progress；scope . / base006e9f1的真实context已加载且完整输出已读，rules-context.json。P005当前只有已冻结execution-test-design.json，**尚无产品实现或P005运行/测试成绩**。
+- [P005](../work/tasks/P-005-workflow-execution-slice.md)在P002/P007实际done后激活in_progress；scope . / base006e9f1的真实context已加载且完整输出已读，rules-context.json。新增WorkflowLedger/纯转移组件，8新测试与P007/Workspace合计77pass；首轮7pass1fail的修订保存错误及修正保留journal-component.md。生产存储线程/共享RunSession/正式三节点WB图尚未接线，不能标整卡或M1完成。
 - 设计明确原图→真实校验凭据→旧WB数值→状态表/完整曲线/显示报告，同一有限调度/RunSession/Workspace/CAS，不让runtime含WB特判。既有模块成果总16MiB，不能复制大型TIFF当校验输出；引用原AssetRef并检查凭据同源。256 attempts/128 controls/4096 critical events为新v1防失控预算，预留关键终态容量，不当性能通过。
 - .local/p005-design-candidate-20261102.md有只读工作笔记（非既定实现），包括已读module_session/module_cli/run_session/storage/process/module_results、真实IO/worker路径/身份、缓存/恢复、可疑竞态与P009草稿问题。以实际任务/源码/冻结设计为准，读到旧截断片段重新定位，不猜代码。
 
