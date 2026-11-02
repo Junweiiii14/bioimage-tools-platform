@@ -1,6 +1,6 @@
 # P-006 真实工作台运行反馈与性能基线
 
-<!-- PROGRAM_TASK_META {"id":"P-006","status":"planned","work_package":"W05","depends_on":["P-001"],"execution_root":"not_activated","owner":null,"base_commit":null,"head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-006","status":"in_progress","work_package":"W05","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"839fa521d9ae11ceb51f9c4c7493eb2a0251eda0","head_commit":null} -->
 
 ## 执行状态
 
@@ -42,3 +42,17 @@ B-007第4/5/6/12/13.3章、实际桌面入口、T-082 R09原数据与限制、�
 ## 继续入口
 
 本卡未完成步骤为继续位置；主依据为docs/plans/research-platform-rd.md第4/5/6/12/13.3章，B-005仅作治理历史。修改规则或范围后重载context，收尾更新任务与handoff。
+
+## 2026-11-02激活
+
+前置P001已done，P002也已正常集成；P003准确候选c02c2ed独审/完整本地1555项门禁通过，PR49尚等待远端双平台CI。本任务独立本地分支codex/p006-interaction-baseline从c02c2ed开始，不夹入PR49，不阻断其现有检查。先准备可复现测量设计/现有R09工具适配，在本地完整门禁实际退出后才测性能；不把并行全量测试负载下的成绩作为静态基线。测前冻结源码/工具/输入/重复次数，产品或规则变化后真实重载上下文。
+
+## 当前基线刷新
+
+PR49已正常集成main839fa52，本地保留未提交P006工具改动快进到同一main；真实重载P006 context --scope . --base 839fa52 --record。P003本地完整门禁实际退出0后才安排本任务性能测量，避免把全量测试并行负载当作静态基线。当前仍仅准备/验证观测工具，没有实际性能成绩。
+
+## 观测工具准备
+
+保留原R09四个负载/seed/预算/5+30默认采样，追加两类normal负载（32行/8Fig/12泳道）及显式schema2的--interaction-baseline。真实原生settings/theme/close/cancel控制，四主题各5+30，区分DOM+绘制机会反馈、动画settled、真实host取消确认和idle服务关闭；未对齐的preview/node/pause明确未测/待实现，不把它们写成预算通过。测量设计measurement-design.json及contracts/workbench-performance-baseline-v1.md已冻结定义，当前还没有性能成绩。
+
+工具局部23项观察器测试exit0/2.53秒，包含生产render回执与新观察器非可信/旧/缺动作/异常/未settled拒绝；六类fixture严格校验均通过，局部Pyright0。原预算/上界/断言未降低。纯Node测试不是实际性能证据；下一步准确提交预审、干净冻结后运行真实原生测量并保留失败/超线。

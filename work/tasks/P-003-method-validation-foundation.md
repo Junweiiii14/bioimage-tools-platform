@@ -1,6 +1,6 @@
 # P-003 方法和数据验证登记及评估基础
 
-<!-- PROGRAM_TASK_META {"id":"P-003","status":"in_review","work_package":"W01","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"f2dc5ad44fba2e4f951b8987f0babb6b41c1d1a2","head_commit":"0edf0e0e2f3e3950dbac3bdf4dd55d3f39791991"} -->
+<!-- PROGRAM_TASK_META {"id":"P-003","status":"done","work_package":"W01","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"f2dc5ad44fba2e4f951b8987f0babb6b41c1d1a2","head_commit":"c02c2ed65238d553d923a2f7f72e1cc1f7381f7c"} -->
 
 ## 执行状态
 
@@ -66,3 +66,11 @@ Win11/Python3.12.14，当前未提交实现：`uv run --locked --no-sync python 
 另发现Git自动LF规范化会改变Windows生成报告的原字节，导致clone后原SHA和method-report引用不一致。对P003两类冻结产物限定-text，显式保留默认blank-at-eol/blank-at-eof/space-before-tab错误检查，仅将CR识别为行尾。不是产品代码/数值/门禁阈值放宽；原工作区产物不改，旧规范化Git版本留在0edf0e0，新blob保存真正原生产字节。实际验证两批30个暂存blob均等于原冻结SHA；负例证明真正尾随空格仍被拒，收据byte-preservation.json。该属性/冻结证据增量尚待独审。
 
 新完整`dev.py check --all`在源0edf0e0实际运行，日志.local/p003-check-all-r2.txt、会话52799；恢复须核实实际句柄或结果JSON，不提前写通过。P003保持in_review，待最终增量独审、完整门禁/安装和正常PR/必需CI集成。
+
+## 完整本地门禁实际结束
+
+源0edf0e0的新完整门禁实际exit0，1555 passed/787.44秒、10既有警告；全部isolated wheels通过，新增评估有效0/来源泄漏/S1拒绝与旧V0真实4000提交重开均通过。源Python产品/测试/门禁文件与最终c02c2ed逐字节相同（gitdiff为空）；最终证据/属性增量已独审并等待PR49自身CI，不把源提交冒写为最终文档检查。完整收据local-gate-r2.json、日志.local/p003-check-all-r2.txt。非作者已精确Accepted延伸至f2dc5ad..c02c2ed，独立从Git blobs核验30份SHA与报告引用、属性正反例通过。PR49规则与桌面已通过，双平台full CI仍在运行，状态in_review。
+
+## 正常集成完成
+
+PR49最终准确c02c2ed经非作者f2dc5ad..c02c2ed独审Accepted，四必需GitHub Actions均SUCCESS；Windows1555passed/923.34秒，Linux1551passed/4既有Windows边界skip/528.76秒，双平台新评估入口与旧V0独立wheel真实调用通过。2026-11-02T02:38:32Z正常合main839fa521d9ae11ceb51f9c4c7493eb2a0251eda0，Git tree等于独审候选。完整收据integration.json。P003工程/D1框架done，S1仍未授予，科学/用户/目标环境限制保留。按依赖继续P007，不以框架当M1/M2完成。

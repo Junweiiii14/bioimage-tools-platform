@@ -64,8 +64,10 @@ SCENARIOS = {
     item.name: item
     for item in (
         Scenario("rows-small", False, 4, 2, 6),
+        Scenario("rows-normal", False, 32, 8, 12),
         Scenario("rows-limit", False, 512, 128, 96),
         Scenario("intake-small", True, 4, 2, 6),
+        Scenario("intake-normal", True, 32, 8, 12),
         Scenario("intake-limit", True, 512, 128, 96),
     )
 }
@@ -345,7 +347,275 @@ CLICK_DRIVER = r"""
 """
 
 
-def measure(case: Scenario, samples: int, warmup: int) -> dict[str, object]:
+INTERACTION_DRIVER = r"""
+(() => {
+  window.p006 = {pending:false, armed:false, sequence:0, samples:[], errors:[]};
+  const fail = message => { p006.errors.push(message); p006.pending=false; };
+  const previousReport = boundaryDiagnostics.report;
+  boundaryDiagnostics.report = function(...args) {
+    if(p006.pending) fail('Production boundary failure: '+args[0]);
+    return previousReport(...args);
+  };
+  document.addEventListener('click', event => {
+    if(!p006.armed || !event.target.closest(p006.selector)) return;
+    p006.armed=false;
+    if(!event.isTrusted) { fail('Non-native click'); return; }
+    const token=++p006.sequence, started=event.timeStamp, kind=p006.kind;
+    const identity=JSON.stringify([state.projectId,state.revision,state.selectedId]);
+    const safe=()=>token===p006.sequence && !p006.errors.length &&
+      identity===JSON.stringify([state.projectId,state.revision,state.selectedId]);
+    const ready=()=>kind==='settings'
+      ? !document.querySelector('#drawer').hidden &&
+        !!document.querySelector('[data-appearance-theme]')
+      : /取消/.test(document.querySelector('#module-status').textContent);
+    if(ready()) { fail('Action receipt was already visible before this click'); return; }
+    let frames=0, feedback=null;
+    const observe=()=> {
+      if(!safe()) { fail('Project/revision/selection changed during click'); return; }
+      if(!ready()) {
+        if(++frames>600) { fail('Production action did not update its visible state'); return; }
+        requestAnimationFrame(observe); return;
+      }
+      requestAnimationFrame(()=>requestAnimationFrame(()=> {
+        if(!safe() || !ready()) { fail('Action receipt changed before paint opportunity'); return; }
+        feedback=performance.now()-started;
+        const settle=()=> {
+          if(!safe() || !ready()) { fail('Action changed before settling'); return; }
+          const drawer=document.querySelector('#drawer');
+          if(kind==='settings' &&
+             drawer.getAnimations({subtree:true}).some(a=>a.playState==='running')) {
+            if(++frames>600) { fail('Drawer animation did not settle'); return; }
+            requestAnimationFrame(settle); return;
+          }
+          requestAnimationFrame(()=>requestAnimationFrame(()=> {
+            if(!safe() || !ready()) { fail('Settled receipt became stale'); return; }
+            const elapsed=performance.now()-started;
+            if(feedback<0 || elapsed<feedback) { fail('Invalid browser clock'); return; }
+            p006.samples.push({kind, feedback_ms:feedback, settled_ms:elapsed, trusted:true,
+              focus_inside_drawer:!!document.activeElement.closest('#drawer')});
+            p006.pending=false;
+          }));
+        };
+        settle();
+      }));
+    };
+    requestAnimationFrame(observe);
+  },true);
+  return true;
+})()
+"""
+
+
+def production_interactions(
+    window: "WebWorkbenchWindow", pump: EventPump, samples: int, warmup: int
+) -> dict[str, object]:
+    """Observe actual native controls; DOM clocks exclude physical input/display scanout."""
+    from PySide6.QtCore import QPoint, Qt
+    from PySide6.QtTest import QTest
+
+    target = window.web.focusProxy()
+    if target is None:
+        raise RuntimeError("WebEngine has no native input target")
+    original = window.host.view.project().model_dump_json()
+    javascript(window, pump, "document.querySelector('#r09-refresh').remove();true")
+    javascript(window, pump, INTERACTION_DRIVER)
+    window.bridge.timer.start()
+    window.session_timer.start()
+
+    def click(selector: str) -> float:
+        position = javascript(
+            window,
+            pump,
+            "JSON.stringify((()=>{const items=[...document.querySelectorAll("
+            + json.dumps(selector)
+            + ")];const el=items.find(x=>{const r=x.getBoundingClientRect();"
+            "return r.width>0 && r.height>0 && r.left>=0 && r.top>=0 && "
+            "r.right<=innerWidth && r.bottom<=innerHeight;});"
+            "if(!el)throw new Error('No visible native target');"
+            "const r=el.getBoundingClientRect();return [r.x+r.width/2,r.y+r.height/2];})())",
+        )
+        x, y = cast(list[float], json.loads(str(position)))
+        started = time.perf_counter()
+        QTest.mouseClick(
+            target,
+            Qt.MouseButton.LeftButton,
+            Qt.KeyboardModifier.NoModifier,
+            QPoint(round(x), round(y)),
+        )
+        return started
+
+    def observe(kind: str, selector: str) -> tuple[dict[str, object], float]:
+        count = cast(int, javascript(window, pump, "p006.samples.length"))
+        javascript(
+            window,
+            pump,
+            f"Object.assign(p006,{{kind:{json.dumps(kind)},selector:{json.dumps(selector)},"
+            "pending:true,armed:true});true",
+        )
+        started = click(selector)
+        pump.waitUntil(lambda: javascript(window, pump, "!p006.pending") is True)
+        errors = javascript(window, pump, "JSON.stringify(p006.errors)")
+        if errors != "[]":
+            raise RuntimeError(f"Production interaction probe failed: {errors}")
+        if javascript(window, pump, "p006.samples.length") != count + 1:
+            raise RuntimeError("A native action did not produce exactly one observation")
+        return (
+            cast(
+                dict[str, object],
+                json.loads(str(javascript(window, pump, "JSON.stringify(p006.samples.at(-1))"))),
+            ),
+            started,
+        )
+
+    def close_drawer() -> None:
+        click('[data-action="close-drawer"]')
+        pump.waitUntil(
+            lambda: javascript(window, pump, "document.querySelector('#drawer').hidden") is True
+        )
+
+    themes: dict[str, object] = {}
+    for theme in ("forest", "ember", "iris", "neutral"):
+        click('[data-action="settings"]')
+        pump.waitUntil(
+            lambda: (
+                javascript(window, pump, "!!document.querySelector('[data-appearance-theme]')")
+                is True
+            )
+        )
+        click(f'[data-appearance-theme="{theme}"]')
+        pump.waitUntil(lambda theme=theme: window.appearance.values["theme"] == theme)
+        pump.waitUntil(
+            lambda: (
+                javascript(
+                    window,
+                    pump,
+                    "document.querySelector('#appearance-status').textContent.includes('已保存')",
+                )
+                is True
+            )
+        )
+        close_drawer()
+        values: list[dict[str, object]] = []
+        restored: list[bool] = []
+        for _ in range(samples + warmup):
+            observed, _ = observe("settings", '[data-action="settings"]')
+            values.append(observed)
+            close_drawer()
+            restored.append(
+                javascript(window, pump, "document.activeElement.matches('[data-action=settings]')")
+                is True
+            )
+        selected = values[warmup:]
+        themes[theme] = {
+            "feedback_ms": distribution([cast(float, x["feedback_ms"]) for x in selected]),
+            "settled_ms": distribution([cast(float, x["settled_ms"]) for x in selected]),
+            "warmup_observations": values[:warmup],
+            "focus_inside_drawer": [x["focus_inside_drawer"] for x in selected],
+            "focus_restored_after_close": restored[warmup:],
+            "native_trusted": all(x["trusted"] is True for x in values),
+        }
+
+    cancelled: list[dict[str, object]] = []
+    javascript(window, pump, "document.querySelector('[data-module-open]').click();true")
+    with tempfile.TemporaryDirectory(prefix="bioimage-p006-cancel-") as directory:
+        latest: list[dict[str, Any]] = []
+        acknowledged: list[float] = []
+        closed: list[float] = []
+
+        def changed(raw: str) -> None:
+            latest.append(json.loads(raw))
+            if latest[-1]["state"] == "cancelling":
+                acknowledged.append(time.perf_counter())
+
+        def service_closed() -> None:
+            closed.append(time.perf_counter())
+
+        window.comparison.stateChanged.connect(changed)
+        window.comparison.idle.connect(service_closed)
+        try:
+            for index in range(samples + warmup):
+                latest.clear()
+                acknowledged.clear()
+                closed.clear()
+                window.comparison.start_fixture_at(str(Path(directory) / f"attempt-{index}"))
+                pump.waitUntil(
+                    lambda: (
+                        javascript(window, pump, "!document.querySelector('#module-cancel').hidden")
+                        is True
+                    )
+                )
+                phase = str(latest[-1]["state"])
+                observed, started = observe("cancel", "#module-cancel")
+                pump.waitUntil(lambda: not window.comparison.busy)
+                if not acknowledged or not closed or min(acknowledged[0], closed[0]) < started:
+                    raise RuntimeError(
+                        "Cancellation has no current host acknowledgement/close receipt"
+                    )
+                elapsed = (closed[0] - started) * 1000
+                final = latest[-1]
+                if final["state"] != "cancelled":
+                    raise RuntimeError(
+                        f"Cancellation ended as {final['state']}; no timing accepted"
+                    )
+                cancelled.append(
+                    {
+                        **observed,
+                        "request_phase": phase,
+                        "host_command_ack_ms": (acknowledged[0] - started) * 1000,
+                        "request_to_service_closed_ms": elapsed,
+                        "final_run": final["run"],
+                        "workspace": final["workspace"],
+                    }
+                )
+        finally:
+            window.comparison.stateChanged.disconnect(changed)
+            window.comparison.idle.disconnect(service_closed)
+            if window.comparison.busy:
+                window.comparison.cancel()
+                pump.waitUntil(lambda: not window.comparison.busy)
+    javascript(window, pump, "document.querySelector('#module-close').click();true")
+    if original != window.host.view.project().model_dump_json():
+        raise RuntimeError("View-only interactions changed the project definition")
+    return {
+        "schema": 1,
+        "themes": themes,
+        "cancel": {
+            "observations": cancelled[warmup:],
+            "warmup_observations": cancelled[:warmup],
+            "feedback_ms": distribution(
+                [cast(float, x["feedback_ms"]) for x in cancelled[warmup:]]
+            ),
+            "host_command_ack_ms": distribution(
+                [cast(float, x["host_command_ack_ms"]) for x in cancelled[warmup:]]
+            ),
+            "request_to_service_closed_ms": distribution(
+                [cast(float, x["request_to_service_closed_ms"]) for x in cancelled[warmup:]]
+            ),
+            "scope": (
+                "Real fixture cancellation at observed preparing/starting phase; "
+                "not a long-algorithm interrupt benchmark"
+            ),
+        },
+        "project_definition_unchanged": True,
+        "scope": (
+            "Qt trusted click dispatch to DOM change plus two paint opportunities; "
+            "not physical display latency"
+        ),
+        "initial_budgets_ms": {"routine_feedback_p95": 100, "cancel_feedback_p95": 200},
+        "not_measured": {
+            "workflow_node_navigation": "not implemented before P005/P009",
+            "workflow_pause": "not implemented before P005",
+            "preview_host_ready_to_ui": (
+                "current preview pipeline has no aligned readiness timestamp"
+            ),
+            "physical_display_and_OS_input": "requires separate target-machine evidence",
+        },
+    }
+
+
+def measure(
+    case: Scenario, samples: int, warmup: int, *, interaction_baseline: bool = False
+) -> dict[str, object]:
     from bioimage_app.web_bridge import WorkbenchBridge
     from bioimage_app.web_window import WebWorkbenchWindow
     from PySide6.QtCore import QPoint, QSettings, Qt, Slot, qVersion
@@ -469,6 +739,11 @@ def measure(case: Scenario, samples: int, warmup: int) -> dict[str, object]:
             )[warmup:]
             if javascript(window, pump, "r09.trusted.every(Boolean)") is not True:
                 raise RuntimeError("Click driver did not deliver native trusted input")
+            interactions = (
+                production_interactions(window, pump, samples, warmup)
+                if interaction_baseline
+                else None
+            )
             memory_after = {
                 "host": windows_memory(os.getpid()),
                 "renderer": windows_memory(window.web.page().renderProcessPid()),
@@ -496,6 +771,7 @@ def measure(case: Scenario, samples: int, warmup: int) -> dict[str, object]:
                         ),
                     )[warmup:]
                 ),
+                **({"production_interactions": interactions} if interaction_baseline else {}),
                 "native_clicks": True,
                 "memory_before": memory_before,
                 "memory_after": memory_after,
@@ -534,6 +810,7 @@ def main() -> int:
     parser.add_argument("--warmup", type=int, default=5)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--validate-fixtures", action="store_true")
+    parser.add_argument("--interaction-baseline", action="store_true")
     parser.add_argument(
         "--run", action="store_true", help="Open one native window and measure one case"
     )
@@ -572,7 +849,7 @@ def main() -> int:
         raise RuntimeError("Commit/freeze the benchmark and product before performance measurement")
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     result = {
-        "schema": 1,
+        "schema": 2 if args.interaction_baseline else 1,
         "commit": commit,
         "platform": platform.platform(),
         "processor": platform.processor(),
@@ -589,7 +866,12 @@ def main() -> int:
         },
         "budgets_frozen_before_measurement": BUDGETS,
         "warmup": args.warmup,
-        "measurement": measure(SCENARIOS[args.case], args.samples, args.warmup),
+        "measurement": measure(
+            SCENARIOS[args.case],
+            args.samples,
+            args.warmup,
+            interaction_baseline=args.interaction_baseline,
+        ),
         "scope": "Synthetic metadata/thumbnail/bridge/renderer only; not real-project acceptance",
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)

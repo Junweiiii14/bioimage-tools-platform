@@ -1,0 +1,7 @@
+# P003最终准确提交独审及正常集成
+
+非作者p002_independent_review最终明确Accepted延伸至准确f2dc5ad44fba2e4f951b8987f0babb6b41c1d1a2..c02c2ed65238d553d923a2f7f72e1cc1f7381f7c。初次Request changes及0edf0e0修复复审分别保留，不将初次13项测试通过冒充接受。
+
+最终增量实际独立核实：直接读取Git blobs，两批30份冻结SHA及两份method-register报告引用均匹配；旧初候选内容仅恢复真正原CRLF字节、原Git历史保留，初次/修复候选区分明确。0edf0e0..c02c2ed无Python变化。独立临时Git仓库以真实属性和匹配路径测试：正常CRLF exit0；尾随空格、EOF多空行、空格后Tab均exit2并检出对应错误。准确base/head rule_context与全范围diffcheck均exit0；核验脚本exit0，临时目录.local/p003-attributes-independent-20261102。未改产品/证据，未重复全量。
+
+该准确候选四必需CI通过后PR49正常集成main839fa52，树完全一致，详见integration.json。作者本地完整门禁源0edf0e0与最终候选Python字节一致，1555passed/787.44秒及全部wheel通过，local-gate-r2.json记录真实源。S1/科学/用户/目标机/安装发布不由本结论授予。

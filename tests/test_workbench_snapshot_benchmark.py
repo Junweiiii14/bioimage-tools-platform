@@ -5,7 +5,11 @@ import subprocess
 
 import pytest
 
-from tooling.benchmark_workbench_snapshot import CLICK_DRIVER, forward_benchmark_request
+from tooling.benchmark_workbench_snapshot import (
+    CLICK_DRIVER,
+    INTERACTION_DRIVER,
+    forward_benchmark_request,
+)
 
 HARNESS = r"""
 const vm = require('node:vm');
@@ -165,3 +169,64 @@ def test_unmarked_requests_do_not_stamp_snapshot_or_rewrite_real_validation(
         assert source.snapshot() == {"original": True}
 
     forward_benchmark_request(source, request, action, payload)
+
+
+INTERACTION_HARNESS = r"""
+const vm=require('node:vm');
+const input=JSON.parse(require('node:fs').readFileSync(0,'utf8'));
+const frames=[]; let capture,clock=100;
+const drawer={hidden:input.scenario==='already_open',
+  getAnimations:()=>input.scenario==='never_settled' ? [{playState:'running'}] : []};
+drawer.hidden=!drawer.hidden;
+const status={textContent:'正在执行'};
+const context={state:{projectId:'real-observer-fixture',revision:1,selectedId:'row-1'},
+  performance:{now:()=>clock+=16},requestAnimationFrame:callback=>frames.push(callback),
+  boundaryDiagnostics:{report(){}},document:{
+    addEventListener:(_,callback)=>capture=callback,
+    activeElement:{closest:()=>drawer.hidden ? null : drawer},
+    querySelector:selector=>selector==='#drawer' ? drawer :
+      selector==='#module-status' ? status : (drawer.hidden ? null : {})
+  }};
+context.window=context;vm.createContext(context);vm.runInContext(input.driver,context);
+Object.assign(context.p006,{pending:true,armed:true,selector:'button',kind:'settings'});
+capture({isTrusted:input.scenario!=='untrusted',timeStamp:90,target:{closest:()=>({})}});
+if(input.scenario!=='missing_action')drawer.hidden=false;
+if(input.scenario==='stale')context.state.revision++;
+if(input.scenario==='boundary_error')
+  context.boundaryDiagnostics.report('controlled renderer failure');
+let flushed=0;
+while(frames.length){if(++flushed>1000)throw new Error('Observer did not stop');frames.shift()();}
+console.log(JSON.stringify(context.p006));
+"""
+
+
+@pytest.mark.parametrize(
+    "scenario,expected",
+    [
+        ("happy", 1),
+        ("already_open", 0),
+        ("untrusted", 0),
+        ("missing_action", 0),
+        ("stale", 0),
+        ("boundary_error", 0),
+        ("never_settled", 0),
+    ],
+)
+def test_native_interaction_observer_cannot_accept_stale_or_unrendered_receipts(
+    scenario: str, expected: int
+) -> None:
+    result = subprocess.run(
+        ["node", "-e", INTERACTION_HARNESS],
+        input=json.dumps({"driver": INTERACTION_DRIVER, "scenario": scenario}),
+        text=True,
+        capture_output=True,
+        timeout=10,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    observed = json.loads(result.stdout)
+    assert len(observed["samples"]) == expected
+    if expected:
+        assert observed["samples"][0]["trusted"] is True and observed["errors"] == []
+    else:
+        assert observed["errors"]
