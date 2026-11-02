@@ -129,3 +129,5 @@ ed830e1准确完整门禁1503 passed/756.15s+全部isolated wheels/exit0，HEAD/
 | 2026-11-02 | P007 CI首轮23d Windows旧manual pan失败；受控pending_layout新回归与修复 | 修前同断言exit1/8.38秒；修后2pass/17.20秒、邻近7pass/12.76秒；Ruff/type/web/detect0。首轮Linux1596pass/4skip/613.11秒/wheels过，Windows1fail1599pass/929.22秒，不作通过 | P007/ci-failure-r1.json、pan-race-regression.json |
 
 | 2026-11-02 | P007准确dc..dc4cc24新增UI及全部增量非作者独审 | Accepted；独立Qt2pass/17.23秒、12组处理器组合/原件与CI日志SHA/规则/plan/diff/detect0；完整新CI待执行 | P007/review-final.md |
+
+| 2026-11-02 | PR51 r2 c243四必需CI与正常merge006e9f1/tree核对 | 全SUCCESS；Windows1601pass/945.30秒、Linux1597pass/4既有skip/602.61秒；双完整workflow+旧V0/wheel过。P005仅设计/规则已加载，未实施/验证 | P007/integration.json；P005/execution-test-design.json |

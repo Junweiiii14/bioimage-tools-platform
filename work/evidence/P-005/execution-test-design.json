@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "status": "frozen_design_not_executed",
+  "product_base": "006e9f143c830f5e13be2932e8ac37a9f3a05ed1",
+  "scope": "Single finite workflow execution; P008 reuses ledger/cache/recovery for finite batches; P009 shares the same host session",
+  "must_reuse": [
+    "P007 ExecutionPlan and node computation keys",
+    "Workspace opaque drafts/CAS, original storage schema v1",
+    "RunSession PID persistence, OS/tree exit and output transaction",
+    "fixed host module registration, package.api only"
+  ],
+  "proposed_first_graph": {
+    "sample_input": "immutable original integer TIFF + explicit existing AnalysisRequest",
+    "nodes": [
+      {
+        "node": "verify",
+        "purpose": "Actual file SHA/size and TIFF dtype/shape/frame-source verification",
+        "output": "small versioned validation attestation; never copy the raw TIFF into the 16MiB result budget"
+      },
+      {
+        "node": "analyze",
+        "purpose": "Original source + matching validation attestation -> unchanged mature WB numeric use case",
+        "method": "profile_integral@1",
+        "output": "real AnalysisResult with states and full original profiles"
+      },
+      {
+        "node": "publish",
+        "purpose": "Actual stateful table/full curves and display report files, source-attributable provenance",
+        "output": "valid zero vs invalid/missing/review preserved; no renderer data quantitation"
+      }
+    ],
+    "all_nodes_automatic": true,
+    "no_new_geometry_or_scientific_admission": true
+  },
+  "identity_and_state": [
+    "workflow execution ID, node ID, attempt ID, real RunRecord ID and workflow draft generation kept distinct",
+    "persist prepare intent and actual run association before sending worker request",
+    "at most one active process; pausing stops dispatch, paused only after current terminal commit and observed exit",
+    "worker hello/accepted/terminal sequence separate from persisted host global event sequence",
+    "cancel accepted before node commit cannot yield success; completed transaction remains completed; explicit CAS ordering for overlapping workflow terminal/control operations",
+    "notify success only after actual exit, byte/type checks, committed result and ledger association",
+    "old result references retain original process/run identity; reuse never creates a fictitious PID/succeeded RunRecord"
+  ],
+  "initial_limits": {
+    "graph_nodes": 64,
+    "graph_connections": 256,
+    "module_input_ports": 8,
+    "module_output_ports": 16,
+    "graph_json_bytes": 1048576,
+    "workspace_document_bytes": 16777216,
+    "module_output_total_bytes": 16777216,
+    "attempts_per_execution": 256,
+    "control_commands_per_execution": 128,
+    "persisted_critical_events_per_execution": 4096,
+    "scope": "new workflow v1 finite limits, not OS hard quotas or measured performance; reserve terminal event capacity, never drop critical state"
+  },
+  "current_environment_admission": "Recompute actual module/implementation/dependency/OS/runtime source identities; P007 verify_execution_plan alone does not certify actual environment",
+  "cache_checks": [
+    "exact frozen key, current registered implementation/method/environment admission",
+    "actual immutable input and committed output bytes, complete manifest/request/run identity",
+    "source or result corruption never becomes a valid zero",
+    "changed analysis parameter invalidates descendants only, view layout does not compute, publication style affects export only"
+  ],
+  "required_experiments": [
+    {
+      "case": "real_pipeline",
+      "expected": "original TIFF -> three actual node workers -> committed table/curve/report -> reopen identities and original bytes unchanged"
+    },
+    {
+      "case": "analytical_values",
+      "expected": "P001/P003 independent triangle values40/4000 and genuine0; invalid/review rows remain null, no S1"
+    },
+    {
+      "case": "pause_boundary",
+      "expected": "no next node dispatch while pausing; current node exits/commits before paused; resume uses frozen plan"
+    },
+    {
+      "case": "cancel_and_commit",
+      "expected": "real running/pre-start/commit-boundary requests, observed exit and persisted final state; no manifest-only success"
+    },
+    {
+      "case": "nonzero_after_manifest",
+      "expected": "actual child nonzero exit prevents success despite valid candidate files"
+    },
+    {
+      "case": "child_crash",
+      "expected": "interrupted/failed with reason and no successful outputs; retry uses new attempt/run ID"
+    },
+    {
+      "case": "disk_failure",
+      "expected": "failure/unknown persistence explicitly reported, no fabricated success; recovery preserves evidence"
+    },
+    {
+      "case": "commit_before_ledger_association",
+      "expected": "reopen reconciles exact genuine completed run idempotently, no duplicate compute or fake PID"
+    },
+    {
+      "case": "late_duplicate_events",
+      "expected": "run/node/attempt/revision and worker/global sequence checks prevent stale success or new-draft overwrite"
+    },
+    {
+      "case": "cache_corruption_and_invalidation",
+      "expected": "tampered committed result cannot be reused; fresh attempt/new output; unaffected nodes reuse checked originals"
+    },
+    {
+      "case": "close_reopen",
+      "expected": "unobserved running nodes become interrupted; no algorithm memory resume claim; original inputs/results immutable"
+    },
+    {
+      "case": "public_wheels",
+      "expected": "installed public contracts/runtime remain Qt/WB-free, installed real workflow and old V0 routes run without source-tree leakage"
+    }
+  ],
+  "not_yet_implemented_or_run": [
+    "All P005 product code and experiments",
+    "P008 finite batch integration",
+    "P009 visual authoring and actual native focus/performance"
+  ],
+  "preserved_external_limits": [
+    "independent scientific holdout/owner tolerances/S1",
+    "clean Windows and physical DPI/GPU/input acceptance",
+    "historical native UNKNOWN not erased by later passes"
+  ]
+}

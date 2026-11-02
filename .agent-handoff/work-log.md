@@ -1,9 +1,5 @@
 # Current Work Log
 
-## 2026-10-20 E7 OCR, candidate and dependency integration
-
-80a84ef OCR取消/CAS修复13边界与42兼容0/独审关闭；ea8f914候选与14检查自检，32d9733启动故障关闭2/8.17s0/独审关闭。首E7 gate主动中止，32d gate单一standalone失败后UTF8/GBK监视器异常，原OS exit未知/outer1/wheels未跑；8日志回归0及原页独立重放0不销未知失败。PR7经最终69a/四项CI/独审后merge7730bcd，primary合入并重载T060实际base；临时集成树继续PR3/SYNC001。暂无新安装包或正式发布。
-
 ## 2026-10-20 E7 final gate and accepted quant stage
 
 8e11028完整910/705.48s、原pytest0/u32=0、全部隔离wheel/真实OCR/check0，inventory4非截断；单事件测试P2独审关闭。旧5bb/d7f失败保留，产品运行文件等e579。PR12/13实际四CI和独审接受main6e8b1e6，主树合1891仅元数据；77b文档刷新及交接。PR14最终b1四CI中，PR15准备3748，最终集成未完成。安装候选工程验证已通过，科学/干净Win10/物理DPI仍待验。
@@ -156,3 +152,7 @@ PR51旧23d Linux1596pass/4skip/613.11秒/wheels过，Windows1fail1599pass/929.22
 ## 2026-11-02 P007 r2完整候选CI派发
 
 最终dc..c243933非作者Accepted，7份后继meta/档案核实且无源码变化。已push PR51 c243933，quality41390321525实际running、rules41390321566 SUCCESS，尚无全部通过/集成结论；ci-r2-dispatch只快照。本地后继仅独审/交接收据不push重启CI，正常merge须matchc243且四必需成功/tree一致。P005仍未激活，P007 done后接续M1/M2。
+
+## 2026-11-02 P007正常集成，P005依赖就绪激活
+
+PR51准确c243四必需SUCCESS，正常merge006e9f1/tree与独审候选相同。Windows1601pass/945.30秒、Linux1597pass/4既有skip/602.61秒，双完整wheels通过；原失败/竞态修复证据保留，integration.json。保留本地交接50dc与main正常合14c后切codex/p005-workflow-executor，P007 done、P005 in_progress；按新base真实context并完整读取。冻结execution-test-design，尚无P005产品实现/测试；后续实现真实三节点/ledger/state/control/cache/recovery，P008同一实现扩批量、P009同一后端编辑。

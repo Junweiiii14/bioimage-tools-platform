@@ -1,6 +1,6 @@
 # P-005 工作流与事件协议的最小可靠执行切片
 
-<!-- PROGRAM_TASK_META {"id":"P-005","status":"planned","work_package":"W04","depends_on":["P-002","P-007"],"execution_root":"not_activated","owner":null,"base_commit":null,"head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-005","status":"in_progress","work_package":"W04","depends_on":["P-002","P-007"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"006e9f143c830f5e13be2932e8ac37a9f3a05ed1","head_commit":null} -->
 
 ## 执行状态
 
@@ -46,3 +46,17 @@ P-002独立WB模块及实际契约、既有RunSession/Workspace/CAS与worker协�
 ## 2026-11-02 4.0依赖拆分（尚未实施）
 
 保留原P002依赖，新增P007科学资产/冻结图契约前置。本卡以旧原值WB粗模块与至少一个真实技术节点贯通固定图串行执行、节点边界暂停/取消、持久提交及幂等恢复；本卡完成单个固定图的依赖失效、复用校验和幂等恢复及既定反例；P008复用这些实现扩展有限多样本隔离、跨样本身份/预算并做完整M1工程交付，不建立第二套账本/缓存/恢复器，P009另做M2。原本卡的事件/缓存/重试反例不删除，不以P008分拆为由省略既定可靠性验收；新几何仍依P004具体实现，不假称新WB方法完成。
+
+## 2026-11-02激活
+
+前置P002/P007已通过准确独审、PR48/51与全部必需CI正常集成，当前base main006e9f1。分支codex/p005-workflow-executor从保留P007本地交接收据后与main正常合并的14c0153开始；原样保护既有证据/原图/历史，P007收尾记录随本分支提交。不再等待科学/目标机材料，也不将它们补为通过。
+
+实际范围：同一有限图/同一RunSession与Workspace/CAS贯通真实输入校验、旧WB数值分析、带状态表/完整曲线发布；先单图串行，账本/缓存/重开/节点边界暂停取消和既定故障反例完整实现，P008复用它扩有限批量，P009接同一执行器。旧worker和旧UI入口保留。所有前端/后台/CLI状态只在实际退出、校验、正式提交和账本登记后完成。
+
+实施前先冻结版本化事件/ledger/技术节点与验证设计。注意既有模块成果总预算16MiB，不能用复制大型原TIFF作为校验节点输出；小型校验凭据绑定原AssetRef，分析节点须核对它与原输入的身份和实际类型。现只有只读架构笔记.local/p005-design-candidate-20261102.md，非既定实现或准入。本卡尚无产品实现/验收成绩。
+
+## 执行与验收设计冻结
+
+work/evidence/P-005/execution-test-design.json冻结单图真实三节点、身份/状态、当前环境准入、预算和12类成功/故障实验。v1新增上限256 attempts、128 controls、4096 critical events为有限执行的防失控预算，不是性能成绩；实现必须预留终态容量，不能丢关键状态。沿用64节点/256连接/1MiB图、旧8/16端口、16MiB成果/文档预算，未改既有门禁或科学预期。原图通过引用传递，校验输出为小凭据，避免大型TIFF复制使既有预算失真。
+
+计划冻结不等于实现；P005产品/测试尚未执行。下一步具体实现版本化ledger/事件模型和纯状态转移，再接同一异步存储/RunSession，按真实实验逐项检验后独审/PR。
