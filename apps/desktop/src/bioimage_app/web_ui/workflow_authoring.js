@@ -282,11 +282,13 @@
         stepLabel.append(stepSelect);
         root.append(stepLabel);
         root.append(element('h3', name(node.node_id)));
+        const moduleSettings = element('details', '', 'wf-module-settings');
+        moduleSettings.append(element('summary', '高级：模块版本、替换与方法参数'));
         const version = element(
             'p',
             '模块 ' + node.module.module_version + ' · 方法 ' + node.module.method_version,
         );
-        root.append(version);
+        moduleSettings.append(version);
         const replacement = element('select');
         replacement.id = 'wf-replacement';
         for (const item of catalogue) {
@@ -295,10 +297,10 @@
             replacement.append(option);
         }
         replacement.value = node.module.module_id;
-        root.append(replacement);
+        moduleSettings.append(replacement);
         const replace = element('button', '用目录模块替换此步骤', 'button subtle');
         replace.id = 'wf-replace';
-        root.append(replace);
+        moduleSettings.append(replace);
         const json = element('textarea');
         json.id = 'wf-parameters';
         json.setAttribute('aria-label', '步骤完整参数');
@@ -466,9 +468,28 @@
                 parent.append(label);
             }
             const params = JSON.parse(node.parameters_json);
-            for (const [key, value] of Object.entries(params))
-                field(root, key, value, schema.properties[key] || {}, [key]);
+            const technical = new Set([
+                'source_sha256',
+                'revision',
+                'schema_version',
+                'geometry_policy',
+                'quant_policy',
+                'image',
+            ]);
+            const primary = new Set(['polarity', 'layout', 'expected_rows']);
+            const entries = Object.entries(params).sort(
+                ([a], [b]) => Number(primary.has(b)) - Number(primary.has(a)),
+            );
+            for (const [key, value] of entries)
+                field(
+                    technical.has(key) ? moduleSettings : root,
+                    key,
+                    value,
+                    schema.properties[key] || {},
+                    [key],
+                );
         }
+        root.append(moduleSettings);
         const advanced = element('details');
         advanced.append(element('summary', '高级：完整参数 JSON'));
         const label = element('label', '原图像素坐标；编辑后保存并预检');
@@ -907,6 +928,7 @@
             bridge.documentChanged.connect(received);
             bridge.workspaceChanged.connect((path) => {
                 get('wf-workspace-path').textContent = path;
+                get('wf-workspace-path').title = path;
             });
             bridge.activityChanged.connect((p, r) => {
                 nativePending = p;

@@ -163,3 +163,5 @@ ed830e1准确完整门禁1503 passed/756.15s+全部isolated wheels/exit0，HEAD/
 | 2026-11-02 P009 connected editor | 四文件定向store/session/bridge/web | 11passed47.73s/exit0；Web两批精确4000.0→40.0/保存焦点，模板布局跨项目；Ruff/pyright/web静态通过 | connected-editor-progress.md/json；最终视觉/性能/wheel/独审/CI尚未运行 |
 
 | 2026-11-02 P009 full web editing | 五流程真实WebChannel/worker/CLI，native12截图 | 5passed39.93s，capture15.42s；type/Ruff/web0，detect0主要+1advisory | ui-edit-validation.md/json；capture失败保留，尚无视觉判定/性能/wheel/最终独审CI |
+
+| 2026-11-02 P009 responsive confirmation | 相同12图/原独立reviewer verdict；documenter | scored fix resolved/ship only；capture15.57s/6tests41.34s/type+web+Ruff0 | visual-review.md、visual-confirmation.json、design-conformance.md；非全页/性能/科学/现场通过 |

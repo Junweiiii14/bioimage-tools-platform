@@ -43,3 +43,7 @@ P006已done；P008准确b4847a5独审/四必需CI/双侧wheel后PR53正常merge2
 ## 2026-11-02 完整界面链路及有效视觉采集
 
 真实Web五流程5passed39.93秒，覆盖节点编辑/预检/重开、GUI实验室模板新TIFF+CLI、参数边界/模拟IME、依赖复用和运行中新草稿焦点。Ruff/type/web静态通过。有效原生Windows12图采集15.42秒，通过非纯色/颜色一致性校验；离屏纯色/旧帧/RAF失败原证据保留，不算视觉通过。一次detect无主要项、有1backdrop advisory。详见work/evidence/P-009/ui-edit-validation.md/json。已写中文操作单和模板v1契约；视觉独审/性能/wheel/准确代码独审/PR必需CI仍待做，不改in_progress。
+
+## 2026-11-02 独立视觉修正与确认
+
+Fresh reviewer首轮bb42有效12图结论fix，唯一问题为窄窗任务密度。一批顶部/高级元数据折叠/图起点修正后，同12图确认15.57秒，原独立审查者评分resolved，disposition ship仅覆盖该fix。完整原结论visual-review.md，设计一致性documenter证据design-conformance.md。真实Web5流程+原生图探针6passed41.34秒，type/web/Ruff通过。所有失败和原图保留；有效主检+确认预算已用完，不再自主视觉循环或第二detector。性能、wheel、最终准确代码独审和PRCI仍未做，保持in_progress。

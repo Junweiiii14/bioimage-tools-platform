@@ -187,7 +187,7 @@ window.WorkflowGraph = class WorkflowGraph {
         const positions = [...this.positions.values()];
         this.origin = {
             x: Math.min(0, ...positions.map((p) => p.x)) - 40,
-            y: Math.min(0, ...positions.map((p) => p.y)) - 40,
+            y: Math.min(0, ...positions.map((p) => p.y)),
         };
         this.stage.style.width =
             Math.max(960, ...positions.map((p) => p.x - this.origin.x + 300)) + 'px';

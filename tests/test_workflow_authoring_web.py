@@ -206,6 +206,7 @@ def test_graph_editing_preflight_and_saved_reopen(
     js(
         window,
         qtbot,
+        "document.querySelector('.wf-module-settings').open=true;"
         "document.querySelector('#wf-replacement').value='wb-verify-original';"
         "document.querySelector('#wf-replace').click();true",
     )
