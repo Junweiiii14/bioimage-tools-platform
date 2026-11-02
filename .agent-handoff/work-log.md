@@ -1,9 +1,5 @@
 # Current Work Log
 
-## 2026-10-20 E7 final gate and accepted quant stage
-
-8e11028完整910/705.48s、原pytest0/u32=0、全部隔离wheel/真实OCR/check0，inventory4非截断；单事件测试P2独审关闭。旧5bb/d7f失败保留，产品运行文件等e579。PR12/13实际四CI和独审接受main6e8b1e6，主树合1891仅元数据；77b文档刷新及交接。PR14最终b1四CI中，PR15准备3748，最终集成未完成。安装候选工程验证已通过，科学/干净Win10/物理DPI仍待验。
-
 ## 2026-10-20 E0–E7 engineering closeout
 
 Final3680790 actualbase842独审/13历史来源规则0；产品PR17 Windows910/666.50s、Linux910/353.99s及全部wheel/真实OCR/四检查SUCCESS，精确merge main0f358ac（00:29:51Z）。本机8e910/705.48s与安装e579工程验证另列，不混作服务器证据；运行文件相同。桌面setup SHA复核一致，旧原图/历史/安装/用户窗口保留。当前仅更新任务done、README/验收索引和handoff；旧validation已先复制校验再归档。科学留出/明确样本配对、干净Win10/物理DPI仍未验，原失败和UNKNOWN保留，无正式发布/定时任务。
@@ -156,3 +152,7 @@ PR51旧23d Linux1596pass/4skip/613.11秒/wheels过，Windows1fail1599pass/929.22
 ## 2026-11-02 P007正常集成，P005依赖就绪激活
 
 PR51准确c243四必需SUCCESS，正常merge006e9f1/tree与独审候选相同。Windows1601pass/945.30秒、Linux1597pass/4既有skip/602.61秒，双完整wheels通过；原失败/竞态修复证据保留，integration.json。保留本地交接50dc与main正常合14c后切codex/p005-workflow-executor，P007 done、P005 in_progress；按新base真实context并完整读取。冻结execution-test-design，尚无P005产品实现/测试；后续实现真实三节点/ledger/state/control/cache/recovery，P008同一实现扩批量、P009同一后端编辑。
+
+## 2026-11-02 P005 journal storage integration
+
+固定workflow操作接AsyncStorage后台归约/序列化/CAS，真实RunRecord/manifest与全输入输出核验；新增plan7/document0、准备后关联ENOSPC重开唯一run、GUI响应屏障与物理缓存损坏反例。最终受影响99pass26.76s，Ruff/Pyright/policy/九import边界0。首版26f独审Request changes的修订混用P1已修，新head须复审；正式GraphSession/三节点WB和当前环境认证仍未实现。首轮组件记录保留于自动轮转work-log-20261102T053838281121Z.md，非删除。

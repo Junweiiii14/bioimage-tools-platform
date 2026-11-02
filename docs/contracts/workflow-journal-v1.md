@@ -2,6 +2,8 @@
 
 WorkflowLedger组合P007冻结ExecutionPlan与旧RunRecord/AssetRef，不改变旧23项schema、工作区格式或数据库。宿主全局事件从1连续增长，revision=事件数-1；worker序号独立为hello0/accepted1/terminal2，身份必须匹配execution/node/attempt/request/document/revision和真实run。新attempt使用新请求/文档身份；算法内存现场不恢复。
 
+工作流定义generation保存在ledger.plan.revision，节点请求及RunRecord的revision属于新建的独立请求文档，从0开始。execution_id绑定冻结计划，不把图修订数当新文档初始修订。首版26f7f78混用了两者，非零修订图的真实Workspace反例已由作者与非作者各自发现/复现；该版独审Request changes保留，不当作接受。
+
 running只派发下一个冻结拓扑节点；pause有活动attempt时进入pausing，当前节点真实退出并提交后才paused。resume只在无活动attempt时接受。candidate manifest不能形成成功；普通完成同时要求实际存储终态和对应worker result。恢复可缺最后worker事件，但必须从宿主存储读真实终态及已提交manifest；不得补造worker帧或PID。底层提交先完成时保留已完成物理节点；最后节点已成功则取消返回已完成。
 
 纯转移函数不观察OS、不访问文件，不证明调用者传入模型就是真实事实。宿主必须在持有Workspace的存储线程执行转移、读取真实记录、验证当前环境和全部输入/输出字节并CAS保存，再派发或通知。现组件测试有实际子进程退出/Workspace提交及重开，但尚未连接生产图执行器；P005状态仍in_progress。

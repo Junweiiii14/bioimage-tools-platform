@@ -168,9 +168,11 @@ def begin_workflow_attempt(ledger: WorkflowLedger, request: ExecutionRequest) ->
     if (request.execution_id, request.node_id, request.revision) != (
         ledger.execution_id,
         node.node_id,
-        ledger.plan.revision,
+        0,
     ):
-        raise StateConflict("Request does not belong to this frozen workflow generation")
+        raise StateConflict(
+            "Request must use this execution/node and a fresh document revision zero"
+        )
     _request_matches(ledger, node, request)
     attempt = WorkflowAttempt(
         node_id=node.node_id,

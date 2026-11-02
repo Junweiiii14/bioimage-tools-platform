@@ -9,7 +9,9 @@ from pathlib import Path
 from uuid import uuid4
 
 import pytest
+from bioimage_app.workflow_storage import WorkflowStoreCommand, execute_workflow_store
 from platform_runtime.api import (
+    IntegrityError,
     ModuleRegistration,
     StateConflict,
     Workspace,
@@ -28,6 +30,7 @@ from platform_runtime.api import (
     workflow_ledger_json,
 )
 from pydantic import ValidationError
+from pytestqt.qtbot import QtBot
 from tool_contracts.api import (
     AssetRef,
     BoundAsset,
@@ -150,7 +153,7 @@ def request(ledger: WorkflowLedger, source: AssetRef) -> ExecutionRequest:
         node_id=node.node_id,
         attempt_id=uuid4().hex,
         document_id=uuid4().hex,
-        revision=ledger.plan.revision,
+        revision=0,
         module=node.interface.module,
         inputs=(BoundAsset(port="source", kind="typed_table", asset=bound),),
         parameters_json="{}",
@@ -345,8 +348,8 @@ def test_commit_before_journal_association_reconciles_idempotently(
 
         def persist(value: WorkflowLedger) -> WorkflowLedger:
             store.save_draft(
-                "journal",
-                "workflow",
+                value.execution_id,
+                "workflow_journal_v1",
                 value.revision,
                 workflow_ledger_json(value).encode(),
                 expected_previous_revision=value.revision - 1 if value.revision else None,
@@ -388,13 +391,16 @@ def test_commit_before_journal_association_reconciles_idempotently(
         succeeded, actual = committed(store, manifest, output, run, child)
     with Workspace.open(workspace) as store:
         restored = load_workflow_ledger(
-            store.read_asset(store.load_draft("journal").asset).decode()
+            store.read_asset(store.load_draft(ledger.execution_id).asset).decode()
         )
         observed = store.get_run(succeeded.run_id)
         assert observed == succeeded and observed.result is not None
         actual = OutputManifest.model_validate_json(store.read_asset(observed.result))
-        recovered = finish_workflow_attempt(
-            restored, req.attempt_id, observed, actual, recovered=True
+        recovered = execute_workflow_store(
+            store,
+            WorkflowStoreCommand(
+                "recover", restored.execution_id, expected_revision=restored.revision
+            ),
         )
         assert recovered.results[0].run == observed and recovered.attempts[0].worker_sequence == 1
         assert (
@@ -405,6 +411,40 @@ def test_commit_before_journal_association_reconciles_idempotently(
         altered = actual.model_copy(update={"quality": "issues"})
         with pytest.raises(StateConflict, match="committed result asset"):
             finish_workflow_attempt(recovered, req.attempt_id, observed, altered, recovered=True)
+        target = execute_workflow_store(
+            store, WorkflowStoreCommand("create", "cache_target", plan=restored.plan)
+        )
+        reused = execute_workflow_store(
+            store,
+            WorkflowStoreCommand(
+                "reuse",
+                target.execution_id,
+                expected_revision=target.revision,
+                source_document_id=recovered.execution_id,
+                source_node_id="A",
+            ),
+        )
+        assert reused.results[0].run == observed and not reused.attempts
+        store.asset_path(actual.outputs[0].asset).write_bytes(b"corrupted owned test result")
+        target = execute_workflow_store(
+            store, WorkflowStoreCommand("create", "corrupt_cache_target", plan=restored.plan)
+        )
+        with pytest.raises(IntegrityError):
+            execute_workflow_store(
+                store,
+                WorkflowStoreCommand(
+                    "reuse",
+                    target.execution_id,
+                    expected_revision=target.revision,
+                    source_document_id=recovered.execution_id,
+                    source_node_id="A",
+                ),
+            )
+        assert (
+            execute_workflow_store(store, WorkflowStoreCommand("load", target.execution_id))
+            == target
+        )
+        assert len(store.list_runs()) == 1
 
 
 def test_cache_references_original_run_without_creating_attempt(
@@ -521,3 +561,183 @@ def test_saved_journal_rejects_schema_boolean_duplicates_and_tampered_sequence(
             load_workflow_ledger('{"schema_version":1,"schema_version":2}')
         with pytest.raises(ValueError, match="Nonfinite"):
             load_workflow_ledger('{"x":NaN}')
+
+
+def test_storage_separates_plan_generation_and_attempt_document_revision(tmp_path: Path) -> None:
+    with Workspace.create(tmp_path / "workspace") as store:
+        initial, source = fixture(store, tmp_path)
+        plan = initial.plan.model_copy(update={"revision": 7})
+        ledger = execute_workflow_store(
+            store, WorkflowStoreCommand("create", initial.execution_id, plan=plan)
+        )
+        req = request(ledger, source)
+        ledger = execute_workflow_store(
+            store,
+            WorkflowStoreCommand(
+                "begin", ledger.execution_id, expected_revision=ledger.revision, request=req
+            ),
+        )
+        ledger = execute_workflow_store(
+            store,
+            WorkflowStoreCommand(
+                "prepare", ledger.execution_id, expected_revision=ledger.revision, request=req
+            ),
+        )
+        active = ledger.active_attempt
+        assert active is not None and active.run is not None
+        assert ledger.plan.revision == 7 and active.revision == 0 and active.run.revision == 0
+        assert store.load_draft(req.document_id).revision == 0
+        assert (
+            execute_workflow_store(store, WorkflowStoreCommand("load", ledger.execution_id))
+            == ledger
+        )
+        pause = WorkflowStoreCommand(
+            "control",
+            ledger.execution_id,
+            expected_revision=ledger.revision,
+            action="pause",
+            command_id="pause_with_lost_reply",
+        )
+        paused = execute_workflow_store(store, pause)
+        assert execute_workflow_store(store, pause) == paused
+        with pytest.raises(StateConflict, match="CAS"):
+            execute_workflow_store(
+                store,
+                WorkflowStoreCommand(
+                    "control",
+                    ledger.execution_id,
+                    expected_revision=ledger.revision,
+                    action="cancel",
+                    command_id="new_command",
+                ),
+            )
+
+
+def test_storage_prepare_failure_after_physical_run_reopens_without_duplicate(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    workspace = tmp_path / "workspace"
+    with Workspace.create(workspace) as store:
+        initial, source = fixture(store, tmp_path)
+        ledger = execute_workflow_store(
+            store, WorkflowStoreCommand("create", initial.execution_id, plan=initial.plan)
+        )
+        req = request(ledger, source)
+        ledger = execute_workflow_store(
+            store,
+            WorkflowStoreCommand(
+                "begin", ledger.execution_id, expected_revision=ledger.revision, request=req
+            ),
+        )
+        original = Workspace.save_draft
+
+        def disk_full(
+            owner: Workspace,
+            document_id: str,
+            tool_id: str,
+            revision: int,
+            data: bytes,
+            *,
+            expected_previous_revision: int | None,
+        ):
+            if tool_id == "workflow_journal_v1":
+                raise OSError(28, "injected journal disk full")
+            return original(
+                owner,
+                document_id,
+                tool_id,
+                revision,
+                data,
+                expected_previous_revision=expected_previous_revision,
+            )
+
+        with monkeypatch.context() as patch:
+            patch.setattr(Workspace, "save_draft", disk_full)
+            with pytest.raises(OSError, match="disk full"):
+                execute_workflow_store(
+                    store,
+                    WorkflowStoreCommand(
+                        "prepare",
+                        ledger.execution_id,
+                        expected_revision=ledger.revision,
+                        request=req,
+                    ),
+                )
+        assert len(store.list_runs()) == 1 and store.list_runs()[0].state == "prepared"
+        assert (
+            execute_workflow_store(store, WorkflowStoreCommand("load", ledger.execution_id))
+            == ledger
+        )
+    with Workspace.open(workspace) as store:
+        recovered = execute_workflow_store(
+            store,
+            WorkflowStoreCommand("recover", ledger.execution_id, expected_revision=ledger.revision),
+        )
+        assert recovered.state == "interrupted" and not recovered.results
+        assert len(store.list_runs()) == 1
+        physical = recovered.attempts[0].run
+        assert physical is not None and physical.pid is None and physical.state == "interrupted"
+        assert (
+            execute_workflow_store(
+                store,
+                WorkflowStoreCommand(
+                    "recover", ledger.execution_id, expected_revision=ledger.revision
+                ),
+            )
+            == recovered
+        )
+
+
+def test_async_workflow_serialization_runs_off_gui_thread(
+    tmp_path: Path,
+    qtbot: QtBot,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from threading import Event
+
+    import bioimage_app.workflow_storage as journal_storage
+    from bioimage_app.api import AsyncStorage, StorageCommand, StorageReply
+    from PySide6.QtCore import QThread, QTimer
+
+    with Workspace.create(tmp_path / "fixture") as store:
+        initial, _ = fixture(store, tmp_path)
+    entered, release = Event(), Event()
+    threads: list[QThread] = []
+    original = workflow_ledger_json
+
+    def slow_json(ledger: WorkflowLedger) -> str:
+        threads.append(QThread.currentThread())
+        entered.set()
+        if not release.wait(5):
+            raise ValueError("test serialization barrier expired")
+        return original(ledger)
+
+    monkeypatch.setattr(journal_storage, "workflow_ledger_json", slow_json)
+    port = AsyncStorage()
+    replies: list[StorageReply] = []
+    port.replied.connect(replies.append)
+    ticks: list[int] = []
+    timer = QTimer()
+    timer.setInterval(10)
+    timer.timeout.connect(lambda: ticks.append(1))
+    timer.start()
+    port.submit(StorageCommand("create", path=str(tmp_path / "async")))
+    port.submit(
+        StorageCommand(
+            "workflow",
+            workflow=WorkflowStoreCommand("create", initial.execution_id, plan=initial.plan),
+        )
+    )
+    try:
+        qtbot.waitUntil(entered.is_set)
+        baseline = len(ticks)
+        qtbot.waitUntil(lambda: len(ticks) >= baseline + 3)
+        assert len(replies) == 1 and threads[0] != port.thread()
+    finally:
+        release.set()
+        timer.stop()
+        with qtbot.waitSignal(port.closed, timeout=10000):
+            port.shutdown()
+    assert len(replies) == 3 and all(reply.error_code is None for reply in replies)
+    assert isinstance(replies[1].value, WorkflowLedger)

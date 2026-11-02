@@ -5,7 +5,7 @@
 
 ## 当前任务
 
-- [P005](../work/tasks/P-005-workflow-execution-slice.md)在P002/P007实际done后激活in_progress；scope . / base006e9f1的真实context已加载且完整输出已读，rules-context.json。新增WorkflowLedger/纯转移组件，8新测试与P007/Workspace合计77pass；首轮7pass1fail的修订保存错误及修正保留journal-component.md。生产存储线程/共享RunSession/正式三节点WB图尚未接线，不能标整卡或M1完成。
+- [P005](../work/tasks/P-005-workflow-execution-slice.md)保持in_progress；scope . / base006e9f1真实context已完整读。新增WorkflowLedger/纯转移及AsyncStorage固定workflow命令，11新组件/存储测试；受影响99pass。首版26f独审Request changes：图revision与新节点文档revision混用，作者已修正并加plan7/document0实际准备回归，新head须复审。日志/首轮失败见journal-component.md与journal-review-r1.md。生产GraphSession/共享RunSession事件接线/正式三节点WB worker图及当前环境实测准入尚未实现，不能标整卡或M1完成。
 - 设计明确原图→真实校验凭据→旧WB数值→状态表/完整曲线/显示报告，同一有限调度/RunSession/Workspace/CAS，不让runtime含WB特判。既有模块成果总16MiB，不能复制大型TIFF当校验输出；引用原AssetRef并检查凭据同源。256 attempts/128 controls/4096 critical events为新v1防失控预算，预留关键终态容量，不当性能通过。
 - .local/p005-design-candidate-20261102.md有只读工作笔记（非既定实现），包括已读module_session/module_cli/run_session/storage/process/module_results、真实IO/worker路径/身份、缓存/恢复、可疑竞态与P009草稿问题。以实际任务/源码/冻结设计为准，读到旧截断片段重新定位，不猜代码。
 
@@ -17,7 +17,7 @@
 
 ## 下一步
 
-1. P005按冻结设计实现版本化ledger/可靠事件与纯串行状态机，复用旧单活动进程/提交证明；真实校验/分析/发布worker贯通。暂停/取消/磁盘满/崩溃/非零后manifest/账本关联前崩溃/旧事件/cache损坏/重开反例不能删。实际环境重新核对，不仅相信P007持久计划自报环境。
+1. P005新head先准确复审账本/存储组件，再接RunSession实际PID状态与原始ExecutionEvent，构建同一GraphSession和固定注册校验/分析/发布worker图。新workflow_storage在存储线程负责转移/序列化/CAS与真实run/manifest/输入输出校验；目前无当前环境认证，不能把缓存字节验证当方法准入。仍须完整运行中取消/提交竞态/崩溃/非零/磁盘满/旧消息与关闭重开矩阵，复用旧单活动进程/提交证明。
 2. 完成P005准确提交独审、适用检查和正常PR四必需CI后done；P008复用同一ledger/cache/recovery扩有限多样本完整M1，再P009接同一执行器真实编辑/连接/替换/保存重开/模板第二批M2。不在JSON预检或图示停止。
 
 ## 保留边界

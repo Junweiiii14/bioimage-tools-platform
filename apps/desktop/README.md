@@ -175,6 +175,11 @@ The QObject worker owns Workspace/SQLite on its own QThread. Commands are an exp
 immutable FIFO, with request IDs, 64 pending-operation and 16 MiB document budgets.
 Callbacks run on the owning GUI thread. Errors retain identity and do not stop the queue.
 Keep the port alive until its asynchronous `closed` signal; shutdown drains accepted work.
+P005 development adds a fixed `workflow` operation whose journal reduction, JSON
+serialization, CAS, physical-run reconciliation and committed file checks run on this
+same storage thread. It adds no database schema. The journal component is not yet a
+production workflow runner; current environment admission and GraphSession/worker
+integration remain pending. See `../../docs/contracts/workflow-journal-v1.md`.
 Drained QObject workers retire on their own thread, move back to the owner, and stop
 their former QThread. The owner checks thread exit without blocking, schedules deletion,
 and publishes closure only after a queued destruction acknowledgement. The same lifecycle
