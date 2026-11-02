@@ -9,6 +9,9 @@ from pathlib import Path
 from uuid import uuid4
 
 import pytest
+from bioimage_app.wb_workflow_host import wb_workflow_registry
+from bioimage_app.workflow_input import prepare_wb_workspace
+from bioimage_app.workflow_session import WorkflowSession, WorkflowStatus
 from bioimage_app.workflow_storage import WorkflowStoreCommand, execute_workflow_store
 from platform_runtime.api import (
     IntegrityError,
@@ -870,3 +873,36 @@ def test_storage_late_hello_cannot_be_rebound_after_retry(tmp_path: Path) -> Non
             ),
         )
         assert ledger.active_attempt is not None and ledger.active_attempt.worker_sequence == 0
+
+
+def test_non_wb_adjustment_reports_failure_and_closes(qtbot: QtBot, tmp_path: Path) -> None:
+    workspace = tmp_path / "generic-workspace"
+    with Workspace.create(workspace) as store:
+        ledger, _ = fixture(store, tmp_path)
+        execute_workflow_store(
+            store, WorkflowStoreCommand("create", ledger.execution_id, plan=ledger.plan)
+        )
+    session = WorkflowSession(wb_workflow_registry)
+    ended: list[WorkflowStatus] = []
+
+    def completed(_status: WorkflowStatus) -> None:
+        session.close()
+
+    session.completed.connect(completed)
+    session.finished.connect(ended.append)
+    try:
+        session.initialize(
+            str(workspace), lambda: prepare_wb_workspace(workspace, rerun=ledger.execution_id)
+        )
+        qtbot.waitUntil(lambda: bool(ended), timeout=10000)
+        assert "three-node WB workflow" in ended[0].message
+        assert ended[0].state != "succeeded"
+    finally:
+        session.close()
+        qtbot.waitUntil(lambda: bool(ended), timeout=10000)
+    with Workspace.open(workspace) as store:
+        assert not store.list_runs()
+        assert (
+            execute_workflow_store(store, WorkflowStoreCommand("load", ledger.execution_id))
+            == ledger
+        )

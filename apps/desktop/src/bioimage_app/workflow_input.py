@@ -37,22 +37,23 @@ def prepare_wb_workspace(
             previous = load_workflow_ledger(
                 store.read_asset(store.load_draft(rerun).asset).decode()
             )
-            source = next(
+            nodes = {node.interface.module.module_id: node for node in previous.plan.nodes}
+            if len(previous.plan.nodes) != 3 or set(nodes) != {
+                "wb-verify-original",
+                "wb-analyze-original",
+                "wb-publish-original",
+            }:
+                raise ValueError("Only the fixed three-node WB workflow supports this adjustment")
+            sources = tuple(
                 item.asset
                 for node in previous.plan.nodes
                 for item in node.inputs
                 if item.asset is not None
             )
-            analysis_node = next(
-                node
-                for node in previous.plan.nodes
-                if node.interface.module.module_id == "wb-analyze-original"
-            )
-            report_node = next(
-                node
-                for node in previous.plan.nodes
-                if node.interface.module.module_id == "wb-publish-original"
-            )
+            if not sources or any(item != sources[0] for item in sources):
+                raise ValueError("The WB workflow must bind one original source")
+            source = sources[0]
+            analysis_node, report_node = nodes["wb-analyze-original"], nodes["wb-publish-original"]
             planned = (
                 read_wb_module_input(str(store.asset_path(source.payload)), parameters).request
                 if parameters

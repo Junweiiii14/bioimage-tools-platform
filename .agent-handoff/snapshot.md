@@ -23,7 +23,7 @@
 
 apps/desktop/src/bioimage_app/workflow_session.py、workflow_preparation.py、wb_workflow_host.py、workflow_cli.py与RunSession是下一修改范围；tests/test_workflow_session.py实际控制器测试。CLI：uv run --locked --no-sync python -m bioimage_app --workflow --workspace <全新目录> --validation triangle_u16；原图/参数用--source和--parameters，恢复用--resume <execution_id>。不要覆盖已存在示例工作区。
 
-本轮实际案例.local/p005-auto-mvp-20261102-verified-r2与日志.local/p005-auto-mvp-cli-r2.log保留，都是自有合成数据。旧snapshot完整归档archive/2026-11-02-before-auto-session-snapshot.md。无活动测试/CI/wheel或运行中独审；新源接下来提交，实际HEAD/dirty必须核对。
+本轮实际案例.local/p005-auto-mvp-20261102-verified-r2与日志.local/p005-auto-mvp-cli-r2.log保留，都是自有合成数据。旧snapshot完整归档archive/2026-11-02-before-auto-session-snapshot.md。PR52候选5814已推送，独审首轮P2非WB rerun无回执/关闭等待，作者正在入口修正并补真实回归，准确复审与新CI待做。旧local check session19645因修正主动中止exit1（约13%有F与GPU日志，原因未定位）；PID29552已查不存在。原日志保留，不能写通过；新全量使用CI同款--disable-gpu。实际HEAD/dirty必须核对。
 
 ## 保留边界
 
