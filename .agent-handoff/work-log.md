@@ -1,23 +1,5 @@
 # Current Work Log
 
-## 2026-10-20 E0–E7 engineering closeout
-
-Final3680790 actualbase842独审/13历史来源规则0；产品PR17 Windows910/666.50s、Linux910/353.99s及全部wheel/真实OCR/四检查SUCCESS，精确merge main0f358ac（00:29:51Z）。本机8e910/705.48s与安装e579工程验证另列，不混作服务器证据；运行文件相同。桌面setup SHA复核一致，旧原图/历史/安装/用户窗口保留。当前仅更新任务done、README/验收索引和handoff；旧validation已先复制校验再归档。科学留出/明确样本配对、干净Win10/物理DPI仍未验，原失败和UNKNOWN保留，无正式发布/定时任务。
-
-2026-10-20 CI收尾：main0f的910/762.24s及wheel功能通过后清理遭15分钟取消，整命令未通过；旧main3b702/590.48s后原退出0xc0000005/wheel未跑，原因UNKNOWN。原306四CI通过不销旧失败。仅foundation TEMP/TMP同盘与实际路径诊断实验，保留时限/测试/退出检查；新head待绑定独审及四CI。详见work/evidence/T-060/ci-temp-filesystem.md。
-
-2026-10-20 T061：导出组/角色/候选原坐标与集中确认已接入；真实82图仅开发候选无监督真值；新增必要4core、11Web相关、1host重开及1回执修正通过，首次核心2fail及原因保留。完整门禁/最终独审/安装候选待验，状态与细节见T061任务。
-
-T061收尾：冻结710一次916/763.69s及全wheel/OCR/check0；非作者接受、安装/PS5.1双流程/新私有识别probe0，用户数据不变。三旧安装卸载0与桌面旧包/过期shortcut移除；递归残余清理被自动审批blocked by policy阻止，未绕过。最终PR19四检查待验，详见T061/validation.md。
-
-2026-10-20 T063：用户批准完整采集组交付计划；新受管wb-grouped-intake树从main f3fb2ff建立，uv sync0，原t051/T062未提交资料保留。规划/导航和历史基线标识更新，尚无产品改动/测试/独审。
-
-2026-10-20 T064：PR21已合main1625ae5并重载；新增v3采集组草稿/稳定投影、正式无侧栏网格及后台大图预览，70相关测试0/类型静态0。三目录95图只读识别19信号/23区域，仅开发证据；具体首败及修复见T064。后续独审/产品PR/快捷键/精简/完整验收/新包仍待。
-
-2026-10-20 T065：T064已完成冻结实现与界面原问题复审，PR22创建并附着；Linux/规则/桌面环境成功，Windows仍运行。新codex/intake-crop-revision分支接候选区域与完成后原图范围修正，保留其他Fig及全部历史文件/修订；核心33与网页/宿主41实际0。冻结非作者审查、集成基线重载和总计划后继继续，未全量候选门禁/新离线包。
-
-2026-10-20 T063–T069本机交付收尾：完整P0–P8工程范围经PR21–24/26–28独审及四检查集成。PR28最终93d1ef0双平台956/全部wheel/OCR成功，精确合main6080867；手动完整原生取证956/382.32s debugger0，旧失败UNKNOWN保留。真实19组主链/4A局部重算/两份新旧输出/重开已独审，114原文件与旧树dirty保持。冻结608构建并非管理员安装新GroupedIntakeTest候选，7,749载荷文件相同、分组17项及灰度OCR/PS5.1双流程实际0；安装包361,584,364字节、SHA99c0ec55…bb6d97。非作者绑定608只读交付接受；首观察器null和首审查归档假设错误均留证。桌面交付BioImage-WB-采集组测试版-T069，索引docs/wb-grouped-intake-delivery.md；最终收尾分支仅文档，不改已验产物。干净Win10/物理DPI/独立科学真值仍待外部验收，无正式Release或依赖升级。
-
 ## 2026-10-21 T071 Fig顺序工程交付
 
 产品5f独审Accepted，PR30四必需检查后精确合main710bb85；最终Linux979/332.14s/debugger0与Windows979/615.77s/raw0、全部wheel/OCR/check0。本机a952完整979/825.65s0，不冒充覆盖后续诊断。冻结main新FigSequenceTest构建/安装、三流程OS0、PS5.1随包三流程0、7751载荷校验0，桌面新交付已生成，旧成果摘要不变。首PS5.1外层脚本无BOM中文路径失败保留，仅补本地BOM后新轮0；原CI初败/native/手工坐标UNKNOWN不销账。最终交付审计及记录集成见T071任务。此前新段按维护器顺序归档仍保留；本段按时间追加于尾部。
@@ -160,3 +142,7 @@ PR51准确c243四必需SUCCESS，正常merge006e9f1/tree与独审候选相同。
 8bb独审11pass/2.71秒确认P1修复，但独立旧hello反例发现存储封装漏来源attempt/run的P2（Request changes）。已补worker/started/finish/abandon来源核对，新增真实失败→重试→旧hello/finish拒绝且新hello可接受。最终12新测试/受影响100passed27.19s，Ruff/Pyright0；新准确提交须复审，正式图仍待实现。
 
 准确3215..8d0非作者组件Accepted，独立12pass3.29s及缺来源/旧hello-started-finish-abandon反例/plan9-document0均过。全部四wheel构建与各隔离安装实际exit0，新增ledger API保存重开/幂等及原V0真实4000、正式提交重开、桌面/OCR仍过，logSHA见journal-wheels.json。规则实际main基线/计划检查0，新增wheel脚本Ruff长行已分行通过；没有完整pytest/CI或正式图结论。下一工作点host-integration-pending记录PID-started/allow_request排序与真实环境/三节点接线。
+
+## 2026-11-02 P005 real node workers and dispatch acknowledgement
+
+89ba603之后实现RunSession可选请求确认/原始ExecutionEvent、三固定WB原值节点和实际宿主源码/依赖身份函数；旧对照入口/数值/schema不变。五组15次实际worker/正式存储提交/重开40/4000/真0/invalid-review空值通过；最终6节点22.93s、新增确认期间取消与节点12项28.82s、此前关联114项57.89s；Ruff/type/policy/九边界0。报告PNG已查看可读（首次预览目录名错误已纠正）。来源/预算/状态及精确范围worker-slice.md。仍由测试父进程串接，GraphSession/后台当前准入和完整故障矩阵未实现；新源准确独审/完整门禁/新wheels/CI待做，不标M1/P005完成。

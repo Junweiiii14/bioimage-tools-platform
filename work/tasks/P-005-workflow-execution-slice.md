@@ -70,3 +70,7 @@ work/evidence/P-005/execution-test-design.json冻结单图真实三节点、身�
 第二版8bb独审确认上述P1已修，但新P2：封装匿名hello漏来源attempt/run，可刷新CAS后错误关联新attempt；Request changes及独立11pass保留journal-review-r2.md。后继补worker/started/finish/abandon来源绑定，新增真实失败重试旧hello/finish反例；作者最终12新测试/受影响100pass27.19s，Ruff/Pyright0，新准确提交仍须复审。整卡继续in_progress。
 
 准确3215..8d0组件非作者Accepted（journal-review-r3.md），独立12pass3.29s及旧消息反例、plan9/document0；原两次Request changes不改写。随后全部四wheel实际构建/隔离安装0，新ledger API保存重开/幂等和原V0真实4000/提交重开/桌面OCR均过，原日志摘要journal-wheels.json。未实现GraphSession/实际环境准入/正式三节点及完整故障矩阵，未跑完整pytest/CI/PR集成，整卡仍in_progress。下一设计点host-integration-pending.md不是实现证据。
+
+## 真实节点与请求确认切片
+
+89ba603之后新增RunSession请求确认及原始事件保留、固定WB verify/analyze/publish三节点、实际宿主源码/依赖指纹函数。五组15次真实worker/正式提交/重开保留40/4000/真实0/无效复核null；等待确认取消与外来报告策略拒绝反例均过，精确命令/114次中间关联检查与最终定向成绩见worker-slice.md。尚由测试父进程串接，生产GraphSession/当前环境准入/完整暂停取消恢复缓存及故障矩阵未接线，准确独审/全门禁/PR仍待完成，不改整卡in_progress。

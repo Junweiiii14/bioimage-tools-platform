@@ -273,3 +273,5 @@ platform/native routes remain available. This is a developer entry, not a packag
 T067执行计划页可明确进入采集组修改；编辑中禁止继续处理，保存并确认后按失效范围继续。原Storage/CAS和历史结果保留，见 ../../docs/contracts/wb-intake-group-revision-v1.md。
 
 T080 将命名交付接入真实阶段链：配置 CAS → worker 建目录并整理组内原图 → 每次裁图资产 CAS 后归位 → 原目录最终封存、索引 CAS。输出位置随项目保存；迁移工作区后使用新位置，主动输出当前快照始终另建新代。所有批量 I/O 在 worker，旧回复按会话/修订拒绝。见 ../../docs/contracts/wb-intake-delivery-v1.md。
+
+P005开发中RunSession增加可选require_dispatch_ack：真实PID入库后通知started，宿主在账本CAS确认后用匹配run/pid授权请求。默认旧入口保持；等待时取消不发请求，ProcessEvent保留原始模块事件。固定--worker wb_workflow消费公开WB多输入协议；通用GraphSession/后台当前环境准入尚待接入，见 ../../docs/contracts/wb-original-workflow-v1.md。

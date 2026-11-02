@@ -5,7 +5,7 @@
 
 ## 当前任务
 
-- [P005](../work/tasks/P-005-workflow-execution-slice.md)保持in_progress；scope . / base006e9f1真实context已完整读。账本/AsyncStorage组件准确3215..8d0a4ec非作者Accepted，独立12pass3.29s及旧事件攻击/plan9-document0；两轮Request changes与失败保留r1/r2，修正后r3。作者受影响100pass27.19s；四wheel实际构建/隔离安装、新ledger API及原V0真实4000/提交重开/全桌面OCR通过exit0，journal-wheels.json。后继只有新增wheel检查与收据；生产GraphSession/共享RunSession事件接线/正式三节点WB/当前环境认证仍未实现，不是整卡/M1完成。
+- [P005](../work/tasks/P-005-workflow-execution-slice.md)保持in_progress；scope . / base006e9f1真实context已完整读。先前账本/AsyncStorage准确3215..418独审Accepted/100pass/隔离wheels完成，r1-r3及journal-wheels保留。89ba603之后已新增RunSession请求确认、原始事件、多输入WB verify/analyze/publish真实节点和宿主实际源码/依赖摘要函数；五组15次真实worker/正式提交重开保留40/4000/0/invalid-review null，6最终节点测试22.93s、确认取消等12项28.82s、关联中间114项57.89s通过，详见worker-slice.md。新源独审尚待准确提交，未跑新完整wheels/CI。生产GraphSession/后台可信注册及当前环境准入、完整cache/recovery/control尚未接线；测试父进程串接不是M1完成。
 - 设计明确原图→真实校验凭据→旧WB数值→状态表/完整曲线/显示报告，同一有限调度/RunSession/Workspace/CAS，不让runtime含WB特判。既有模块成果总16MiB，不能复制大型TIFF当校验输出；引用原AssetRef并检查凭据同源。256 attempts/128 controls/4096 critical events为新v1防失控预算，预留关键终态容量，不当性能通过。
 - .local/p005-design-candidate-20261102.md有只读工作笔记（非既定实现），包括已读module_session/module_cli/run_session/storage/process/module_results、真实IO/worker路径/身份、缓存/恢复、可疑竞态与P009草稿问题。以实际任务/源码/冻结设计为准，读到旧截断片段重新定位，不猜代码。
 
@@ -17,10 +17,11 @@
 
 ## 下一步
 
-最终组件/新增wheel检查准确3215..41812c55已非作者Accepted（journal-review-r3.md后继段），产品源码等于已审8d0；本后继只记录审查回复，不新改源码。无活动CI或wheel命令，审查者idle。下一步直接真实GraphSession/worker接线，不重复重跑组件验收或请求用户继续。
+先前账本/wheel组件3215..41812c55已Accepted（journal-review-r3.md）；后续新增请求确认/三节点源码须单独准确独审。无活动CI/wheel；下一步是真实GraphSession自动调度，不重复先前账本验收或请求用户继续。
 
-1. 读work/evidence/P-005/host-integration-pending.md，接RunSession实际PID与原始ExecutionEvent，同一GraphSession/固定注册校验-分析-发布worker图。特别处理started账本确认与allow_request排序，防快速worker终态先到导致读取当前RunRecord丢过渡。新workflow_storage负责后台归约/序列化/CAS/真实run及文件；尚无当前环境认证，不能当完整缓存准入。仍须完整取消/提交竞态/崩溃/非零/磁盘满/旧消息/关闭重开矩阵。无需再让用户批准已有范围。
-2. 完成P005准确提交独审、适用检查和正常PR四必需CI后done；P008复用同一ledger/cache/recovery扩有限多样本完整M1，再P009接同一执行器真实编辑/连接/替换/保存重开/模板第二批M2。不在JSON预检或图示停止。
+1. 请求确认/三节点代码冻结准确独审后，直接实现通用WorkflowSession/后台可信HostModule注册与准备端口。已有RunSession.started→宿主存储workflow started CAS→authorize_request(run,pid)；原ProcessEvent.module_event及source attempt/run直接用于worker事件，closure须绑定原attempt/run。固定三节点public WB APIs、wb_workflow_spec/environment、workflow_runtime_environment可用；生成通用ExecutionRequest时document0与plan.generation分开。IO/源码摘要/大型JSON只在后台。当前worker只验证自身环境，不认证宿主字段，必须真正后台重算当前注册/env再执行或复用。
+2. GraphSession内部串行队列仅在最新账本CAS回复后派发/通知，缓存须同时当前准入、科学键与真实输入输出字节；历史查看与允许当前执行分开。绑定同一RunSession与AsyncStorage，实际三节点、CLI/GUI同会话，完整取消/提交竞态/崩溃/非零/磁盘满/旧事件/关闭重开矩阵仍需运行，不用测试父进程循环代替生产自动调度。
+3. 完成P005准确提交独审、适用检查和正常PR四必需CI后done；P008复用同一ledger/cache/recovery扩有限多样本完整M1，再P009接同一执行器真实编辑/连接/替换/保存重开/模板第二批M2。不在JSON预检或图示停止。
 
 ## 保留边界
 

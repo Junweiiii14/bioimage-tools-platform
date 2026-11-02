@@ -46,6 +46,18 @@ from wb_tool.adapters.quant_export import (
 )
 from wb_tool.adapters.quant_supervision import replan_quant_lanes
 from wb_tool.adapters.tiff_input import ImageInputError, LoadedTiff, load_tiff
+from wb_tool.adapters.workflow_nodes import (
+    execute_wb_workflow_node,
+    wb_report_shape,
+    wb_workflow_environment,
+    wb_workflow_spec,
+)
+from wb_tool.adapters.workflow_protocol import (
+    WBWorkflowConversation,
+    WBWorkflowStart,
+    WorkflowInputPath,
+    encode_wb_workflow_frame,
+)
 from wb_tool.application.analysis import (
     AnalysisCancelled,
     AnalysisError,
@@ -333,6 +345,12 @@ from wb_tool.application.worker_protocol import (
     parse_worker_frame,
     worker_protocol_schema,
 )
+from wb_tool.application.workflow_parameters import (
+    OriginalValidation,
+    VerifyOriginalParameters,
+    WBReportParameters,
+    validate_wb_workflow_parameters,
+)
 from wb_tool.application.worksheet import WorksheetCell, fill_worksheet, propose_worksheet
 from wb_tool.domain.automatic import (
     AutoWBSettings,
@@ -374,6 +392,19 @@ from wb_tool.domain.worksheet import (
 )
 
 __all__ = [
+    "execute_wb_workflow_node",
+    "wb_report_shape",
+    "wb_workflow_environment",
+    "wb_workflow_spec",
+    "WBWorkflowConversation",
+    "WBWorkflowStart",
+    "WorkflowInputPath",
+    "encode_wb_workflow_frame",
+    "OriginalValidation",
+    "VerifyOriginalParameters",
+    "WBReportParameters",
+    "validate_wb_workflow_parameters",
+    "run_wb_workflow_worker",
     "WBModuleInput",
     "read_wb_module_input",
     "wb_validation_input",
@@ -782,6 +813,12 @@ def run_wb_worker() -> int:
 
 def run_wb_module_worker() -> int:
     from wb_tool.module_worker import main
+
+    return main()
+
+
+def run_wb_workflow_worker() -> int:
+    from wb_tool.adapters.workflow_worker import main
 
     return main()
 

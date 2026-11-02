@@ -1,5 +1,9 @@
 # Validation Index
 
+## 2026-11-02 P005 node workers and dispatch ack
+
+Windows/Python3.12.14锁定环境；默认/确认模式真实旧模块及RunSession/process28pass28.08s，关联七文件114pass57.89s（中间源码），后继确认期间取消/节点12pass28.82s及最终节点6pass22.93s。实际15次三节点worker/正式提交/重开40/4000/0/null状态与完整剖面核验；报告PNG实际查看。Ruff/Pyright/policy/九import边界0。初类型/闭包错误修正，未加ignore/skip或放宽旧科学预期。新source独审/完整门禁/wheels/CI待做，自动GraphSession与真实当前准入/完整故障矩阵未实现，详worker-slice.md。
+
 ## 2026-11-02 P005 journal component only
 
 准确3215..8d0非作者Accepted，仅组件：独立12pass3.29s及真实旧事件反例/plan9-document0；作者100pass27.19s。四wheel构建/全部隔离安装exit0，新账本API与原V0实际4000/提交重开/桌面OCR均过，原日志6663B/SHA见journal-wheels.json。规则main006基线/plan/Ruff/Pyright tooling0。全量pytest/CI、GraphSession/当前环境认证/正式WB图仍未执行或未实现，不替代P005/M1。

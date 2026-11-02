@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import Literal, Protocol
 
 from PySide6.QtCore import QElapsedTimer, QObject, QProcess, Qt, QThread, QTimer, Signal, Slot
+from tool_contracts.api import ExecutionEvent
 
 from bioimage_app.process_tree import OwnedProcessTree
 
@@ -20,6 +21,7 @@ class ProcessEvent:
     data: bytes = b""
     reason: str = ""
     payload_kind: Literal["inline", "module_manifest"] = "inline"
+    module_event: ExecutionEvent | None = None
 
 
 class ProcessCodec(Protocol):

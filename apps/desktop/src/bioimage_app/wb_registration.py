@@ -15,9 +15,12 @@ from wb_tool.api import (
     StartFrame,
     WBModuleConversation,
     WBModuleStart,
+    WBWorkflowConversation,
+    WBWorkflowStart,
     WorkerConversation,
     encode_module_frame,
     encode_ocr_frame,
+    encode_wb_workflow_frame,
     encode_worker_frame,
 )
 
@@ -35,10 +38,29 @@ class WBModuleProcessCodec:
             event.manifest.model_dump_json().encode("utf-8") if event.manifest is not None else b"",
             event.reason,
             "module_manifest",
+            event,
         )
 
     def cancellation(self) -> bytes:
         return encode_module_frame(self._conversation.cancellation())
+
+
+class WBWorkflowProcessCodec:
+    def __init__(self, start: WBWorkflowStart) -> None:
+        self._conversation = WBWorkflowConversation(start)
+
+    def accept(self, data: bytes) -> ProcessEvent:
+        event = self._conversation.accept(data)
+        return ProcessEvent(
+            event.kind,
+            event.manifest.model_dump_json().encode() if event.manifest is not None else b"",
+            event.reason,
+            "module_manifest",
+            event,
+        )
+
+    def cancellation(self) -> bytes:
+        return encode_wb_workflow_frame(self._conversation.cancellation())
 
 
 class WBProcessCodec:

@@ -127,3 +127,58 @@ def test_cancel_token_during_result_publication(tmp_path: Path) -> None:
             )
         assert store.get_run(run.run_id).state == "cancelling"
         assert store.finish_cancelled(run.run_id, receipt).state == "cancelled"
+
+
+def test_cancel_while_dispatch_ack_is_pending_never_sends_request(
+    qtbot: QtBot, tmp_path: Path
+) -> None:
+    storage = AsyncStorage()
+    replies: list[StorageReply] = []
+    starts: list[RunRecord] = []
+    events: list[ProcessEvent] = []
+    completions: list[RunCompletion] = []
+    storage.replied.connect(replies.append)
+
+    def call(command: StorageCommand) -> StorageReply:
+        request_id = storage.submit(command)
+        qtbot.waitUntil(
+            lambda: any(reply.request_id == request_id for reply in replies), timeout=10000
+        )
+        reply = next(reply for reply in replies if reply.request_id == request_id)
+        assert reply.error_code is None, reply
+        return reply
+
+    workspace = tmp_path / "pending_ack"
+    try:
+        call(StorageCommand("create", path=str(workspace)))
+        call(StorageCommand("save", document_id="request", tool_id="probe", revision=0, data=b"{}"))
+        prepared = call(StorageCommand("prepare", document_id="request")).value
+        assert isinstance(prepared, RunRecord)
+        session = RunSession(storage, prepared, ProbeCodec(), require_dispatch_ack=True)
+        session.started.connect(starts.append)
+        session.received.connect(events.append)
+        session.completed.connect(completions.append)
+        session.start(
+            (
+                sys.executable,
+                "-I",
+                "-c",
+                PREAMBLE + "print('accepted',flush=True); print('result',flush=True)",
+            ),
+            str(tmp_path),
+            b"start\n",
+        )
+        qtbot.waitUntil(lambda: bool(starts) and bool(events), timeout=15000)
+        assert [event.kind for event in events] == ["hello"] and starts[0].pid is not None
+        session.cancel()
+        assert not session.authorize_request(starts[0].run_id, starts[0].pid)
+        qtbot.waitUntil(lambda: bool(completions), timeout=15000)
+        completion = completions[0]
+        assert completion.record is not None and completion.record.state == "cancelled"
+        assert completion.outcome.pid == starts[0].pid and completion.outcome.exit_code is not None
+        assert completion.record.result is None and [event.kind for event in events] == ["hello"]
+    finally:
+        with qtbot.waitSignal(storage.closed, timeout=10000):
+            storage.shutdown()
+    with Workspace.open(workspace) as store:
+        assert store.get_run(prepared.run_id) == completion.record
