@@ -159,3 +159,5 @@ ed830e1准确完整门禁1503 passed/756.15s+全部isolated wheels/exit0，HEAD/
 
 | 2026-11-02 P008 final integration | b4847a5 / PR53 / merge2755604 sametree98754bdd | 四必需SUCCESS；Win1675pass1306.50s/Linux1671pass4旧skip930.49s，双侧全部新batch wheels | 独审Accepted；旧取消/夹具失败保留，非科学/目标机/M2验收 |
 | 2026-11-02 P009 finite graph | DOM/SVG realP007 projection, nativeQt keyboard/ports/layout probe; npm check:web | probe pass, webcheck0，SHA及有限范围见P009/graph-probe.json | 图组件尚未接宿主/保存/运行，不是M2交付 |
+
+| 2026-11-02 P009 connected editor | 四文件定向store/session/bridge/web | 11passed47.73s/exit0；Web两批精确4000.0→40.0/保存焦点，模板布局跨项目；Ruff/pyright/web静态通过 | connected-editor-progress.md/json；最终视觉/性能/wheel/独审/CI尚未运行 |

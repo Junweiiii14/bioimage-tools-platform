@@ -27,6 +27,7 @@ from tool_contracts.api import (
 )
 
 from bioimage_app.module_results import commit_module_result
+from bioimage_app.workflow_authoring_models import AuthoringProjection
 from bioimage_app.workflow_batch_storage import WorkflowBatchStoreCommand, execute_batch_store
 from bioimage_app.workflow_storage import WorkflowStoreCommand, execute_workflow_store
 
@@ -68,6 +69,7 @@ Operation = Literal[
     "close",
     "workflow",
     "workflow_batch",
+    "workflow_authoring",
 ]
 Value = (
     AssetRef
@@ -76,6 +78,7 @@ Value = (
     | RecoveryReport
     | WorkflowLedger
     | WorkflowBatch
+    | AuthoringProjection
     | tuple[DraftSnapshot, ...]
     | tuple[RunRecord, ...]
     | str
@@ -159,6 +162,14 @@ class _StorageWorker(QObject):
         store = self._workspace
         if store is None:
             raise ValueError("No workspace is open")
+        if op == "workflow_authoring":
+            from bioimage_app.workflow_authoring_store import execute_authoring_store
+
+            projection = execute_authoring_store(store, command.data)
+            data = projection.model_dump_json(
+                exclude={"plan": True, "batch": True, "project": {"seed": True}}
+            ).encode("utf-8")
+            return projection, data
         if op == "workflow_batch":
             if command.workflow_batch is None:
                 raise ValueError("Batch operation requires an explicit index command")

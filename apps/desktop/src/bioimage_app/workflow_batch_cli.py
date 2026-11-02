@@ -9,7 +9,6 @@ from pathlib import Path
 from platform_runtime.api import (
     Workspace,
     WorkspaceError,
-    load_workflow_definition,
     load_workflow_ledger,
 )
 from PySide6.QtCore import QCoreApplication
@@ -23,6 +22,7 @@ from bioimage_app.wb_workflow_batch_input import (
 )
 from bioimage_app.wb_workflow_host import wb_workflow_registry
 from bioimage_app.workflow_batch_session import WorkflowBatchSession, WorkflowBatchStatus
+from bioimage_app.workflow_template import load_workflow_template
 
 
 def run_workflow_batch_cli(arguments: list[str]) -> int:
@@ -55,7 +55,9 @@ def run_workflow_batch_cli(arguments: list[str]) -> int:
             template = None
             if args.template:
                 with Path(args.template).open("rb") as stream:
-                    template = load_workflow_definition(stream.read(1048577).decode("utf-8"))
+                    template = load_workflow_template(
+                        stream.read(1048577).decode("utf-8")
+                    ).definition
             if args.rerun:
                 batch = prepare_wb_batch_rerun(
                     workspace,

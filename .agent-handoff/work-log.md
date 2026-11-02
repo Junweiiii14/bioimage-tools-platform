@@ -1,10 +1,5 @@
 # Current Work Log
 
-## 2026-10-21 T073 PR34与最终修复
-
-2026-10-21最终增量：首提交a0e8e77已推送草稿PR34。精确独审指出隐式配准范围外较窄第二排漏检、角度草稿冲突时按钮重启用，现已修复。全门禁第三轮本机1157过2败/562.98s，Linux1157过2败/411.84s，Windows1157过2败/658.70s，失败均为窄斜第三带误吸收和安装诊断仍检查旧geometry@1；原日志保留，未到wheel步骤。补原连通身份及初始网格单向冲突拒绝，诊断明确检查geometry@2，亮背景信号使用可验证同组白光轮廓。定向33项首轮31过2败/18.83s：窄屏GPU上下文丢失及诊断旧版本；仅重跑两项，用CI相同--disable-gpu环境后2过/11.55s。受影响6文件Ruff/format/pyright0；无断言放宽、无门禁/锁变更。最终只读10行仍1人工保持、8自动、1暂停，30资产SHA保持。按用户要求不再本地全量或冒烟，下一步绑定最终提交静态复核及PR必需检查。
-
-
 ## 2026-10-21 T074 曲线与整版拼图
 
 批次封底复用独立曲线、CAS后重测；单Fig定位与裁剪分开；schema15网格持久化与同布局导出。独审修复来源草稿/分组顺序/后台有界预览；包态修复JSON数组边界及view字段保留。最终569674a新独立安装19checks通过。PR35待用户决定集成；旧目录/安装/数据保持。详见T074任务与delivery证据。
@@ -147,3 +142,7 @@ PR51准确c243四必需SUCCESS，正常merge006e9f1/tree与独审候选相同。
 ## 2026-11-02 P008 merged / P009 actual activation
 
 PR53最终b4847a5 Accepted，四必需CI SUCCESS后正常merge2755604，候选/main tree同98754bdd。Windows1675pass1306.50s/Linux1671pass4旧skip930.49s，双侧全部新wheel过；旧超时及夹具失败保留。P008done。P009在codex/p009-visual-workflow真实激活，scope .707行完整读，已有impeccable context/具体surface/craft-floor实际读；原生DOM/SVG有限图交互探针+web静态检查过，无新依赖。仅图组件，不冒充M2；下一步宿主草稿/预检/表单/实际运行。独审集中完整可运行候选，不审每小提交。B012保留。
+
+## 2026-11-02 P009 connected editor checkpoint
+
+后台/桥/首版schema表单接同一真实批次执行；11项定向47.73秒过，两批4000.0→40.0/保存保焦点及模板版本布局证据见P009/connected-editor-progress。修复真实schema固定元组和bind图同步问题，测试固定成果数/40字符串误写分别记录，不增ignore不改科学结果。尚无最终UI视觉/性能/IME全矩阵、wheel/独审/PRCI，继续P009。保留B012他人untracked。

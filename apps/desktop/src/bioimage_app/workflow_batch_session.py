@@ -34,12 +34,20 @@ class WorkflowBatchSession(QObject):
     completed = Signal(object)
     finished = Signal(object)
 
-    def __init__(self, registry: HostRegistryFactory, parent: QObject | None = None) -> None:
+    def __init__(
+        self,
+        registry: HostRegistryFactory,
+        parent: QObject | None = None,
+        *,
+        storage: AsyncStorage | None = None,
+    ) -> None:
         super().__init__(parent)
         self._registry = registry
-        self._store = AsyncStorage(self)
+        self._owns_store = storage is None
+        self._store = AsyncStorage(self) if storage is None else storage
         self._store.replied.connect(self._reply)
-        self._store.closed.connect(self._closed)
+        if self._owns_store:
+            self._store.closed.connect(self._closed)
         self._batch: WorkflowBatch | None = None
         self._initial: WorkflowBatch | None = None
         self._workspace = ""
@@ -85,11 +93,19 @@ class WorkflowBatchSession(QObject):
     def start(self, workspace: str, batch: WorkflowBatch) -> None:
         self._claim(workspace, batch.batch_id)
         self._initial, self._auto = batch, True
-        self._submit("open", StorageCommand("open", path=workspace))
+        if self._owns_store:
+            self._submit("open", StorageCommand("open", path=workspace))
+        else:
+            self._queue.append(WorkflowBatchStoreCommand("create", batch.batch_id, batch=batch))
+            self._drive()
 
     def reopen(self, workspace: str, batch_id: str) -> None:
         self._claim(workspace, batch_id)
-        self._submit("open", StorageCommand("open", path=workspace))
+        if self._owns_store:
+            self._submit("open", StorageCommand("open", path=workspace))
+        else:
+            self._queue.append(WorkflowBatchStoreCommand("load", batch_id))
+            self._drive()
 
     def _claim(self, workspace: str, document: str) -> None:
         if self._used or self._closing:
@@ -173,7 +189,10 @@ class WorkflowBatchSession(QObject):
             self._fatal or batch is None or batch.state not in ("running", "pausing", "cancelling")
         ):
             self._shutting_down = True
-            self._store.shutdown()
+            if self._owns_store:
+                self._store.shutdown()
+            else:
+                self._closed()
             return
         if self._fatal or batch is None:
             return

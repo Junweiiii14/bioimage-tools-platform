@@ -88,7 +88,9 @@ def _parameters(
         raise ValueError("Report parameters differ from its frozen display dimensions")
 
 
-def _modules(source: ScientificAsset, report: WBReportParameters) -> tuple[WorkflowHostModule, ...]:
+def wb_workflow_modules(
+    source: ScientificAsset, report: WBReportParameters
+) -> tuple[WorkflowHostModule, ...]:
     environment = _environment()
     image = source.description.image
     if (
@@ -203,7 +205,7 @@ def wb_workflow_registry(plan: ExecutionPlan) -> tuple[WorkflowHostModule, ...]:
     )
     if not reports or any(wb_report_shape(item) != wb_report_shape(reports[0]) for item in reports):
         raise ValueError("WB report nodes need a single consistent frozen canvas declaration")
-    return _modules(originals[0], reports[0])
+    return wb_workflow_modules(originals[0], reports[0])
 
 
 def build_wb_workflow(
@@ -220,7 +222,7 @@ def build_wb_workflow(
     report = WBReportParameters.model_validate(
         {"layout": layout, "expected_rows": sum(len(lane.bands) for lane in planned.lanes)}
     )
-    modules = _modules(source, report)
+    modules = wb_workflow_modules(source, report)
     interfaces = {
         item.registration.interface.module.module_id: item.registration.interface
         for item in modules
@@ -322,7 +324,7 @@ def bind_wb_workflow_template(
             ),
         }
     )
-    modules = _modules(source, reports[0])
+    modules = wb_workflow_modules(source, reports[0])
     return bound, compile_workflow(
         bound, tuple(module.registration for module in modules), modules[0].environment
     )

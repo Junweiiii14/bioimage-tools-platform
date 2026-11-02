@@ -1,7 +1,6 @@
 import json
 from pathlib import Path
 
-from bioimage_app.wb_workflow_host import wb_workflow_registry
 from bioimage_app.workflow_input import prepare_wb_workspace
 from platform_runtime.api import execution_plan_definition
 from PySide6.QtCore import Qt, QUrl
@@ -20,14 +19,18 @@ def test_native_graph_keyboard_and_ports(qtbot, tmp_path):
         "wb-publish-original": "发布表与曲线",
     }
     catalogue = []
-    for host in wb_workflow_registry(plan):
-        interface = host.registration.interface
+    for node in definition["nodes"]:
+        interface = node["module"]
         catalogue.append(
             {
-                "module_id": interface.module.module_id,
-                "title": titles[interface.module.module_id],
-                "inputs": [{"name": p.name, "label": p.name} for p in interface.input_ports],
-                "outputs": [{"name": p.port, "label": p.port} for p in interface.output_ports],
+                "node_id": node["node_id"],
+                "title": titles[interface["module_id"]],
+                "inputs": [
+                    {"name": p["name"], "label": p["name"]} for p in interface["input_ports"]
+                ],
+                "outputs": [
+                    {"name": p["name"], "label": p["name"]} for p in interface["output_ports"]
+                ],
             }
         )
     layout = {
@@ -110,6 +113,13 @@ def test_native_graph_keyboard_and_ports(qtbot, tmp_path):
             "target_node": "analyze",
             "target_port": "validation",
         }
+        js(
+            'definition.edges.push({source_node:"absent",source_port:"absent",'
+            'target_node:"analyze",target_port:"validation"});'
+            "graph.render(definition,layout,catalogue)"
+        )
+        assert js("definition.edges.length") == 3
+        assert js('document.querySelectorAll(".wf-graph-lines path").length') == 2
         qtbot.waitUntil(lambda: js("document.fonts.status") == "loaded")
         Path(".local/p009-probe/geometry.json").write_text(
             js(

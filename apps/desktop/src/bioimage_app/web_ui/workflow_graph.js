@@ -111,8 +111,24 @@ window.WorkflowGraph = class WorkflowGraph {
     }
     render(definition, layout, catalogue) {
         this.definition = definition;
-        this.positions = new Map(layout.positions.map((p) => [p.node_id, { x: p.x, y: p.y }]));
         const ids = new Set(definition.nodes.map((node) => node.node_id));
+        this.positions = new Map(
+            layout.positions
+                .filter((p) => ids.has(p.node_id))
+                .map((p) => [p.node_id, { x: p.x, y: p.y }]),
+        );
+        const nodes = new Map(definition.nodes.map((node) => [node.node_id, node]));
+        // Incomplete saved drafts retain unresolved edges for the owner's issue
+        // list. Only edges with two declared visible endpoints have geometry.
+        this.visibleEdges = definition.edges.filter(
+            (edge) =>
+                nodes
+                    .get(edge.source_node)
+                    ?.module.output_ports.some((p) => p.name === edge.source_port) &&
+                nodes
+                    .get(edge.target_node)
+                    ?.module.input_ports.some((p) => p.name === edge.target_port),
+        );
         for (const [id, card] of this.cards) {
             if (!ids.has(id)) {
                 card.remove();
@@ -122,7 +138,7 @@ window.WorkflowGraph = class WorkflowGraph {
         definition.nodes.forEach((node, index) => {
             if (!this.positions.has(node.node_id))
                 this.positions.set(node.node_id, { x: index * 300, y: 40 });
-            const module = catalogue.find((item) => item.module_id === node.module.module_id);
+            const module = catalogue.find((item) => item.node_id === node.node_id);
             let card = this.cards.get(node.node_id);
             if (!card) {
                 card = document.createElement('article');
@@ -139,7 +155,8 @@ window.WorkflowGraph = class WorkflowGraph {
             title.textContent = module.title;
             title.setAttribute('aria-pressed', String(node.node_id === this.selected));
             // Replacement changes a module's ports; stable cards keep keyboard focus.
-            if (card.dataset.module !== node.module.module_id) {
+            const signature = JSON.stringify([node.module, module.inputs, module.outputs]);
+            if (card.dataset.module !== signature) {
                 card.querySelectorAll('.wf-ports').forEach((ports) => ports.remove());
                 const ports = document.createElement('div');
                 ports.className = 'wf-ports';
@@ -164,7 +181,7 @@ window.WorkflowGraph = class WorkflowGraph {
                     ports.append(column);
                 }
                 card.append(ports);
-                card.dataset.module = node.module.module_id;
+                card.dataset.module = signature;
             }
         });
         const positions = [...this.positions.values()];
@@ -188,7 +205,7 @@ window.WorkflowGraph = class WorkflowGraph {
     drawEdges() {
         this.lines.replaceChildren();
         const origin = this.stage.getBoundingClientRect();
-        for (const edge of this.definition.edges) {
+        for (const edge of this.visibleEdges) {
             const source = this.cards
                 .get(edge.source_node)
                 .querySelector(

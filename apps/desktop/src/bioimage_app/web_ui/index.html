@@ -17,6 +17,8 @@
   <link rel="stylesheet" href="advanced.css">
   <link rel="stylesheet" href="platform_home.css">
   <link rel="stylesheet" href="module_compare.css">
+  <link rel="stylesheet" href="workflow_graph.css">
+  <link rel="stylesheet" href="workflow_authoring.css">
 </head>
 <body>
   <aside class="platform-rail" aria-label="工具平台">
@@ -28,7 +30,7 @@
     <header class="project-header">
       <button class="intake-brand" data-action="home" aria-label="返回 BioImage 工具平台" hidden><svg viewBox="0 0 32 32" fill="none"><path d="M7 5h10a7 7 0 0 1 0 14H7V5Z M7 13h12a7 7 0 1 1 0 14H7V13Z" stroke="currentColor" stroke-width="2"/></svg><span>BioImage</span></button>
       <div class="breadcrumb"><button data-page="platform">工具平台</button><i id="breadcrumb-tool-separator" data-icon="chevron" hidden></i><button id="breadcrumb-tool" data-page="wb" hidden>WB</button><i id="breadcrumb-project-separator" data-icon="chevron" hidden></i><strong id="project-name" hidden>新建实验项目</strong></div>
-      <div class="header-actions"><button id="platform-open" class="button primary" data-session="open"><i data-icon="folder"></i>打开项目</button><button class="icon-button" data-action="settings" aria-label="外观与交互" title="外观与交互"><i data-icon="settings"></i></button><button class="button subtle" data-module-open>旧方法对照</button><details id="session-menu"><summary>文件</summary><nav><button data-session="new_intake_folder">新建仪器导入项目…</button><button data-session="new">新建灰度项目</button><button data-session="open">打开项目文件夹…</button><button data-session="restore">打开项目恢复包…</button><button data-session="save">保存项目</button><button data-action="shortcut-settings">快捷键设置…</button><button data-session="home">关闭项目并返回 WB 首页</button><button data-session="exit">退出软件</button></nav></details><span id="save-status" class="save-status"><i data-icon="check"></i>就绪</span><span id="runtime-badge" class="runtime-badge">网页预览</span><button class="button subtle" data-action="import"><i data-icon="plus"></i><span>添加原图</span></button><button class="button primary" data-action="export"><i data-icon="download"></i><span>导出结果</span></button></div>
+      <div class="header-actions"><button id="platform-open" class="button primary" data-session="open"><i data-icon="folder"></i>打开项目</button><button class="icon-button" data-action="settings" aria-label="外观与交互" title="外观与交互"><i data-icon="settings"></i></button><button class="button subtle" data-workflow-open>工作流编排</button><button class="button subtle" data-module-open>旧方法对照</button><details id="session-menu"><summary>文件</summary><nav><button data-session="new_intake_folder">新建仪器导入项目…</button><button data-session="new">新建灰度项目</button><button data-session="open">打开项目文件夹…</button><button data-session="restore">打开项目恢复包…</button><button data-session="save">保存项目</button><button data-action="shortcut-settings">快捷键设置…</button><button data-session="home">关闭项目并返回 WB 首页</button><button data-session="exit">退出软件</button></nav></details><span id="save-status" class="save-status"><i data-icon="check"></i>就绪</span><span id="runtime-badge" class="runtime-badge">网页预览</span><button class="button subtle" data-action="import"><i data-icon="plus"></i><span>添加原图</span></button><button class="button primary" data-action="export"><i data-icon="download"></i><span>导出结果</span></button></div>
     </header>
     <main id="platform-view" class="platform-view" aria-label="工具平台首页">
       <header class="platform-intro"><div><h1>选择工具，开始工作。</h1><p>图像处理与分析，都在你的工作空间。</p></div></header>
@@ -86,6 +88,8 @@
   <script src="motion.js" defer></script>
   <script src="appearance.js" defer></script>
   <script src="manual_quant.js" defer></script>
+  <script src="workflow_graph.js" defer></script>
+  <script src="workflow_authoring.js" defer></script>
   <script src="app.js" defer></script>
   <script src="module_compare.js" defer></script>
   <script src="manual_lanes.js" defer></script>
@@ -112,6 +116,14 @@
       <details id="module-provenance" class="module-provenance" hidden><summary>保存与来源依据</summary><dl><dt>工程</dt><dd id="module-workspace"></dd><dt>运行</dt><dd id="module-run-id"></dd><dt>进程</dt><dd id="module-pid"></dd><dt>方法</dt><dd id="module-method"></dd></dl><p>完整参数、输入摘要和运行环境保存在 run-manifest.json。表格从已提交的工作区资产重读核验。</p></details>
     </div>
     <footer class="module-footer"><button id="module-reopen" class="button subtle" disabled>关闭并重开核验</button><button id="module-folder" class="text-button" disabled>打开工程文件夹</button></footer>
+  </dialog>
+  <dialog id="workflow-editor-dialog" class="wf-editor" data-view="graph" aria-labelledby="wf-heading">
+    <header class="wf-heading"><div><h2 id="wf-heading">工作流编排</h2><p id="wf-workspace-path">独立工作流项目，保留原图与历史成果。</p></div><button id="wf-hide" class="button subtle">收起编排</button></header>
+    <div class="wf-toolbar"><details class="wf-menu"><summary>项目与模板</summary><nav><button data-wf-choose="new_original">从原图新建…</button><button data-wf-choose="new_example">用合成样例新建…</button><button data-wf-choose="new_template">从实验室模板新建…</button><button data-wf-choose="open_project">打开工作流项目…</button><button data-wf-choose="bind_sources">绑定下一批原图…</button><button data-wf-choose="bind_example">绑定另一个合成样例</button><button data-wf-choose="export_template">保存为实验室模板…</button></nav></details><label class="wf-title-label">流程名称<input id="wf-title" aria-label="流程名称" disabled></label><button id="wf-save" class="button subtle" disabled>保存并预检</button><button id="wf-run" class="button primary" disabled>运行当前流程</button><button id="wf-pause" class="button subtle" hidden>暂停</button><button id="wf-resume" class="button subtle" hidden>继续批次</button><button id="wf-cancel" class="button subtle" hidden>取消批次</button></div>
+    <p id="wf-status" class="wf-status" role="status" aria-live="polite">新建或打开一个工作流项目。</p>
+    <section id="wf-start" class="wf-start"><h3>从一个可运行流程开始</h3><p>选择原始 TIFF，用现有 WB 旧方法生成整图的自动建议；也可以绑定已保存的实验室模板。建议、工程完成与科学审核分开。</p><div class="wf-start-options"><label>已知泳道数<input id="wf-lane-count" type="number" min="1" max="96" step="1" placeholder="从原图新建时必填"></label><label>信号极性<select id="wf-polarity"><option value="dark">暗条带</option><option value="light">亮条带</option></select></label><label>工程样例<select id="wf-example"><option value="triangle_u16">16 位三角峰 · 4000</option><option value="triangle_u8">8 位三角峰 · 40</option><option value="flat_zero">平坦剖面 · 有效零</option><option value="invalid_roi">越界 ROI · 无效空值</option></select></label></div><div class="wf-start-actions"><button class="button primary" data-wf-choose="new_original">选择原图并新建</button><button class="button subtle" data-wf-choose="new_example">用合成样例开始</button><button class="button subtle" data-wf-choose="open_project">打开工作流项目</button></div></section>
+    <section id="wf-workspace" class="wf-workspace" hidden><nav class="wf-views" aria-label="编排视图"><button class="button subtle" data-wf-view="graph" aria-pressed="true">画布</button><button class="button subtle" data-wf-view="parameters" aria-pressed="false">步骤参数</button><button class="button subtle" data-wf-view="results" aria-pressed="false">已提交成果</button><span id="wf-save-state"></span></nav><div class="wf-body"><aside class="wf-catalogue"><h3>模块目录</h3><div id="wf-catalogue-list"></div><h3>当前步骤</h3><ol id="wf-steps"></ol></aside><section class="wf-canvas"><div id="wf-graph"></div><section class="wf-checks"><h3>预检与输入</h3><p id="wf-check-summary"></p><ul id="wf-issues"></ul><div id="wf-sources"></div></section></section><aside class="wf-inspector"><section id="wf-node-panel" class="wf-node-panel"><h3>选择一个步骤</h3></section><section id="wf-results" class="wf-results"><h3>已提交成果</h3><button id="wf-refresh-results" class="button subtle">读取本批成果</button><div id="wf-sample-states"></div><div id="wf-output-list"><p>运行后可以查看真实表格、报告与曲线数据；中间成果只在提交后出现。</p></div></section></aside></div></section>
+    <footer class="wf-footer"><span>原图与历史结果保留；科学适用性仍待独立验证。</span><button id="wf-revert" class="button subtle" disabled>撤销未保存修改</button></footer>
   </dialog>
 </body>
 </html>
