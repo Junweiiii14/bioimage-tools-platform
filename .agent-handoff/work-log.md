@@ -1,9 +1,5 @@
 # Current Work Log
 
-## 2026-10-20 E7 governance integration
-
-INT001 resumes authorized E7 only in this temporary historical integration tree. Merged planning main43d520f into original governance0b7, retained immutable RULE001 receipt source; loaded/read exact rules and current full scope. Main PR/CI not yet accepted. WB product development/checks remain in t051, not represented by this zero-product checkout.
-
 ## 2026-10-20 E7 OCR, candidate and dependency integration
 
 80a84ef OCR取消/CAS修复13边界与42兼容0/独审关闭；ea8f914候选与14检查自检，32d9733启动故障关闭2/8.17s0/独审关闭。首E7 gate主动中止，32d gate单一standalone失败后UTF8/GBK监视器异常，原OS exit未知/outer1/wheels未跑；8日志回归0及原页独立重放0不销未知失败。PR7经最终69a/四项CI/独审后merge7730bcd，primary合入并重载T060实际base；临时集成树继续PR3/SYNC001。暂无新安装包或正式发布。
@@ -156,3 +152,7 @@ PR51旧23d Linux1596pass/4skip/613.11秒/wheels过，Windows1fail1599pass/929.22
 ## 2026-11-02 P007显示pan新候选独审
 
 准确dc..dc4cc24新完整候选Accepted；独立Qt完整两支2pass/17.23秒、12组实际处理器/视图/取消组合及原件/日志SHA、rule/plan/diff/detect0。原断言/5000ms/数值/ROI未放宽，历史CI现场根因未冒称全证。P007转in_review绑定dc4cc；状态记录增量复核后更新PR51重新执行必需全门禁。P005仍等实际集成，不提前实施。
+
+## 2026-11-02 P007 r2完整候选CI派发
+
+最终dc..c243933非作者Accepted，7份后继meta/档案核实且无源码变化。已push PR51 c243933，quality41390321525实际running、rules41390321566 SUCCESS，尚无全部通过/集成结论；ci-r2-dispatch只快照。本地后继仅独审/交接收据不push重启CI，正常merge须matchc243且四必需成功/tree一致。P005仍未激活，P007 done后接续M1/M2。
