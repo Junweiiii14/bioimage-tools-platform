@@ -1,30 +1,36 @@
 # 当前恢复指针
 
-目标仍active、无预算：在bioimage-v0完成4.0 M1通用执行与M2真实可视编排，不缩成仅CLI或账本。分支codex/p005-workflow-executor，main基线006e9f143c830f5e13be2932e8ac37a9f3a05ed1；核对实际HEAD/dirty后接续。
+目标active、无预算：实际产品树bioimage-v0完成4.0 M1通用执行及M2真实可视编排。当前分支codex/p008-workflow-batch，最终产品53892fd及CI资源提交HEAD0c33e705d3010e89a86c0fc5c99ffb797bfdf9d8，main基线4d6ee6ce364780cad24ef09b808740846937714c；核对HEAD/dirty再接续。任务状态唯一来源为work/tasks/P-008-workflow-batch-recovery.md。
 
-用户最新要求优先：入口一次校验、内部信任不变量，删重复判空/验证，不滥用try/except，不为单次逻辑抽象，不写低概率防御。社区karpathy-guidelines已验证后项目配置，固定2c606141936f1eeef17fa3043a72095b4765b9c2，原文SHA一致、仅MD无hook、非作者独立核验/policy通过；配置提交bab41e0。技能不是自动修复保证。普通已授权操作连续做，独审集中可运行最终候选，不再逐个小提交循环审批。
+用户要求：入口一次校验，内部信任类型，不重复判空/滥用catch、不抽一次性函数、不写臆测容错；授权内连续推进，集中最终候选独审，不逐小提交审批。karpathy-guidelines已固定核验安装。用户本轮进一步追问全量测试必要性：已解释因共用运行/存储变化需最终防回归；本机/CI有重叠，后续本地先定向、最终候选CI做全量；纯文档/资源配置不额外本机全量，必需CI/断言保持。
 
-## 当前任务
+## 已完成与保留证据
 
-权威卡work/tasks/P-005-workflow-execution-slice.md保持in_progress，当前scope . 的新规则回执已实际加载，AGENTS/coding-standards为新简洁规则。P002/P003/P006/P007已分别通过既有PR集成done，不重做；P004仍单独planned，P008/P009待依赖。
+P002/P003/P005/P006/P007已正常集成，不重做。P005准确2258cd5非作者Accepted，PR52四必需CI全SUCCESS后正常merge4d6ee6c，tree同为4a50fc0738b61303c8d495cce03272845c7876e8。Windows1659pass1185.30秒/Linux1655pass4既有skip508.51秒，双侧全部隔离wheel及真实三节点/4000/重开/两步缓存通过。integration.json及runtime-review.md保留准确事实；首轮P2、旧本机F/GPU未知及旧Windows20分钟超时不销账。最终Windows总25分钟/Linux20，未改测试/断言/单测超时/必需门禁。
 
-- 账本/存储组件准确3215..418已独审/隔离wheels通过；证据journal-review-r1/r2/r3与journal-wheels，旧失败保留。
-- 三固定WB节点及请求确认：823d首审发现NaN/负数可误发布valid；b80b900已复用旧ResultFrame完整校验并获89ba603..b80b900 Accepted，独立13pass22.86s，worker-review-r1保留Request changes。不要把该接受扩大到后继调度代码。
-- 新WorkflowSession已实际自动派发verify/analyze/publish，后台可信注册/当前环境核验，PID账本确认后再发送请求，正式提交后更新账本。原来测试父循环已由生产控制器取代。单图与节点边界暂停/继续测试2pass；相关RunSession/模块共23pass36.34s。新增核验调用次数/线程断言后2pass10.86s：开始仅核验一次，明确resume重新核验一次，全部在后台。
-- 新--workflow CLI实际执行triangle_u16三真实run、journal revision21/succeeded、表4000.0/text:valid，退出0；关闭后重开比对当前runtime源码指纹相同。work/evidence/P-005/auto-session.json记录实际源码SHA、日志、run IDs。Ruff/Pyright/policy/九import边界通过。新代码尚未最终独审/完整门禁/新wheels/CI，不是整卡或M1完成。
+P004新几何方法仍独立planned，P009依赖P008完成；完整M1/M2未完成，不能以P005固定图或CLI替代。
 
-## 下一步：直接推进MVP
+## P008当前实现与下一步
 
-1. 控制器取消/关闭重开/存储故障/缓存矩阵19项已通过；桌面入口--workflow-ui复用同一执行器，后台输入准备、开始/暂停/继续/取消/重开/应用参数或样式新修订均已接通，5项真实界面测试通过。输入准备失败的重入关闭竞态已实际复现并修为只退休一次；旧失败证据保留。runtime-gui-recovery.json记录原生截图/真实4000三run与准确源码。
-2. 当前冻结可运行候选，集中独审和完整dev.py check --all、四wheel最终重验与正常PR/四必需CI。此前四wheel/23联合/5界面通过不覆盖随后最后样式修补，不提前认整卡完成。主线base仍006e9f1，规则scope .有效。
-3. P008复用同一账本/cache/recovery扩有限批量完整M1，随后P009真实增删/连接/替换/参数/保存重开/模板第二批M2；不重建第二执行器，不以静态图或JSON预检收尾。
+P008已按满足的依赖激活，scope .规则回执已运行并完整读完.local/p008-context.txt全部541行，绑定新main4d6ee6c；不必重复加载，除非main/规则/范围再变。
 
-## 当前代码与运行入口
+1. 当前真实批次候选已实现：纯WorkflowBatch索引/预算、固定storage命令、父BatchSession共享同一WorkflowSession、独立样本隔离、暂停/取消/重开与父子对账；--workflow-batch CLI含manifest/validation/resume/rerun/template/template-out。模板保存真实节点/连接/参数并绑定第二批，合法分支图实际执行。中文runbooks/workflow-batch.md及版本契约已写。不是仅共享存储骨架。
+2. CLI3项63.01秒（含14真实run的缓存损坏/重算链）、批次8项51.87秒（含父进程真实os._exit37后重开、ENOSPC、控制预算）、相关80项236.02秒已过。随后最后取消修正：坏源回执竞争双终态/重开加载前取消漏应用/父取消在忙存储后才传子导致提交先成功，均先原样复现再修；原失败不销账。最终相关16项50.04秒过。batch-mvp-validation.json记录每次作用范围和最终源码SHA。
+3. 下一步直接冻结准确候选，一次最终独审及最终隔离wheels/正常PR/必需CI；本地不再重复全量1659套件。新wheel脚本纯批次/图恢复及真实批量4000/40、重开、样式8run、模板第二批已在323d59f全部通过。最终独审用现有/root/p002_independent_review；不要逐个小提交反复审。源码不能在wheel/test期间改动以免环境指纹失配。
+4. 若检查/独审发现问题按真实反例修，保留原失败。P008候选323d59f独审Request changes：真实暂停中继续会停滞，现已限制resume入口并10项定向通过，准确53892fd已独审Accepted（独立3项30.69秒/日志SHA/diffcheck0），须新HEAD CI，整卡in_progress。P009仍planned；完成本卡并正常集成后接真实Web节点目录/增删连接/参数/保存重开模板/结果定位，不能用当前固定单图UI或CLI冒充M2。
 
-apps/desktop/src/bioimage_app/workflow_session.py、workflow_preparation.py、wb_workflow_host.py、workflow_cli.py与RunSession是下一修改范围；tests/test_workflow_session.py实际控制器测试。CLI：uv run --locked --no-sync python -m bioimage_app --workflow --workspace <全新目录> --validation triangle_u16；原图/参数用--source和--parameters，恢复用--resume <execution_id>。不要覆盖已存在示例工作区。
+## 并行规划写入
 
-本轮实际案例.local/p005-auto-mvp-20261102-verified-r2与日志.local/p005-auto-mvp-cli-r2.log保留，都是自有合成数据。旧snapshot完整归档archive/2026-11-02-before-auto-session-snapshot.md。PR52生产候选384e5ba已准确非作者Accepted（原P2入口修复）；37定向109.40秒、完整本机1659pass928.26秒/四wheels0，LinuxCI1655pass4既有skip738.87秒/四wheels0。Windows run41413166304/job125170776585明确20分钟作业超时取消，82%无FAILED但不认通过；现仅将Windows foundation总时限20→25、Linux20保留，检查集合/单测超时/预期和必需门禁不变，单独记录runtime-review.md及ci-timeout-r1.json。资源增量独审/新CI待做，P005仍in_progress；新CI实际handle从.local/p005-live-dispatch.json核验。旧local check session19645因修正主动中止exit1（约13%有F与GPU日志，原因未定位）；PID29552已查不存在。原日志保留，不能写通过；新全量使用CI同款--disable-gpu。实际HEAD/dirty必须核对。
+外部规划聊天通知正同步B012：根据数据判断、自动调整、人工纠正与方案精简。它只写docs/plans/research-platform-rd.md/.html、独立适应性说明及B012任务证据，不改P任务/registry/产品/handoff；请保留其dirty、不要提交或覆盖这些文件。等待最终具体指引后核对已授权M1/M2验收，不据预告猜科学阈值或扩展算法。当前git status已有B012 untracked，属于该规划者。
 
-## 保留边界
+## 当前验证句柄与限制
 
-科学留出/负责人容差/S1、用户体验与干净Windows/物理DPI/GPU/T002-P0及旧native UNKNOWN仍见risks/backlog；这些不冻结无依赖工程。原图/历史/旧dirty树/在用安装不覆盖；不扩到新校正、其他实验全套、Agent、正式安装器发布/替换、外联、花费或数据上传。
+本机最终wheel323d59f退出0，批量暂停修正后10项68.35秒退出0；当前无本机测试。PR53已ready，最终53892fd独审Accepted，quality41434643209已终止：Linux1671passed4旧skip728.40秒及全部新wheel/desktop/rulescontext通过；Windows1675pass1347.61秒+全部wheel/checkstep成功，但job总25m24超25m被cancelled，非通过。现仅Windows总时限25→30，需增量独审与新HEAD CI，native-case预期SKIPPED。先轮询这个运行，不重启；旧323d候选已自动取消。最终审查记录.local/p008-review-53892fd.md，已写入PR正文；待正常合入后随P009 closeout提交，避免纯证据提交再触发同产品全套CI。P005已合并，不再轮询旧PR52；main push产生同树CI可按需观察，不重跑同源产品。当前P008共享存储源需接完整批量，不以其4个初验当整卡。
+
+科学留出/S1、用户体验、干净Windows/物理DPI/GPU/T002-P0及历史native UNKNOWN仍见risks/backlog；不冻结无依赖工程。原图/历史/旧dirty树/在用安装不覆盖；不扩新校正、其他实验全套、Agent、安装器正式发布/替换、外联、花费或数据上传。
+
+P009准备：本会话已按skill运行impeccable context一次，完整输出.local/p009-ui-context.txt 506行已读（PRODUCT/DESIGN及候选surface信息）；尚未改UI/激活P009。保留现有Operate体系，无需重跑context。开始UI前需选择适用surface并按skill读craft-floor，最终有界视觉/真实WebEngine验收。
+
+当前准确待验：0c33e70（仅Windows总时限30）独审已Accepted全4d6..0c33，独立核验旧双平台日志SHA/API/max25m注解。新quality run41438503742当前IN_PROGRESS，rules-context41438503472 SUCCESS。直接观察这个运行/PR53，不重跑本机全量。integration.json旧采样Windows状态已本地修正CANCELLED，review增量同样本地补充，待正常合入后随P009 closeout提交，不纯为回执重启同源CI。仓库禁用auto-merge，CI全绿后用正常gh pr merge --merge --match-head-commit准确HEAD，不--admin。
+
+最新CI41438503742已failure（不能继续轮询）：Linux1671pass4旧skip820.52/allwheels0，Windows旧advanced网页用例1failed1674pass875.13。真实autosave回调探针复现原因：测试手工注入未保存并发revision，700ms自动保存恰在resolve与apply之间启动，host正确busy拒绝。仅test_workbench_advanced.py补真实host.save+waitidle+assertcurrent_draft_saved3行，2项8.88秒过；产品仍53892fd，下一步提交此夹具/证据并准确增量独审，再推送最终CI。无活动测试/观察脚本，B012保留。

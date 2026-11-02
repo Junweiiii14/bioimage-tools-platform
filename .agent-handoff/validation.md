@@ -151,3 +151,8 @@ ed830e1准确完整门禁1503 passed/756.15s+全部isolated wheels/exit0，HEAD/
 | 2026-11-02 | PR51 r2 c243四必需CI与正常merge006e9f1/tree核对 | 全SUCCESS；Windows1601pass/945.30秒、Linux1597pass/4既有skip/602.61秒；双完整workflow+旧V0/wheel过。P005仅设计/规则已加载，未实施/验证 | P007/integration.json；P005/execution-test-design.json |
 
 | 2026-11-02 | P005控制器/桌面真实运行与恢复、缓存及四wheel隔离 | 23pass101.88秒；新增暂停调整1pass8.59秒/5界面18.38秒；四wheel0；原生三run4000/截图已查。首轮输入失败重入关闭1fail3pass71.83秒已修，最后样式后全量待跑 | P005/runtime-gui-recovery.json |
+
+| 2026-11-02 | P005准确2258四必需CI、PR52正常合4d6ee6c/tree同 | 全SUCCESS；Windows1659pass1185.30秒/Linux1655pass4既有skip508.51秒，双完整wheel真实流程通过 | P005/integration.json |
+| 2026-11-02 | P008初始共享父存储/两个真实子图与旧开始暂停重开 | 4pass26.27秒/exit0，6真实run，目标Ruff/type0；无新全量/wheel/独审，不代表批量完成 | P008/shared-storage.json |
+
+| 2026-11-02 | P008真实批量/CLI/模板分支/缓存恢复及相关旧契约 | 8pass51.87s、3pass63.01s、80pass236.02s；最后取消修复相关16pass50.04s，原1fail/2fail保留；新增wheel/独审/CI待做 | P008/batch-mvp-validation.json |

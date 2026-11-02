@@ -1,6 +1,6 @@
 # P-008 M1有限批量、依赖重算与崩溃对账交付
 
-<!-- PROGRAM_TASK_META {"id":"P-008","status":"planned","work_package":"W12","depends_on":["P-005","P-007"],"execution_root":"not_activated","owner":null,"base_commit":null,"head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-008","status":"in_progress","work_package":"W12","depends_on":["P-005","P-007"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"4d6ee6ce364780cad24ef09b808740846937714c","head_commit":null} -->
 
 ## 输入与前置
 
@@ -22,4 +22,28 @@ platform_runtime仅通用图/账本/失效规则；实验适配在工具api与�
 
 ## 当前状态
 
-尚未实施或验证；依赖未done不激活。不含远程调度、任意脚本、通用循环控制、其他实验算法或安装器发布。
+2026-11-02激活：P005已PR52准确独审及全部必需CI后正常合入main4d6ee6c，P007此前完成。新分支codex/p008-workflow-batch从该main接续。尚无批量产品实现/验收；先重新加载任务规则，再复用WorkflowSession/同一存储端口接线，不建立第二执行器。不含远程调度、任意脚本、通用循环控制、其他实验算法或安装器发布。
+
+
+## 真实批量候选（整卡仍in_progress）
+
+现有同一WorkflowSession/父存储已贯通版本化批次索引、样本失败隔离、暂停/取消/关闭重开、父子未关联恢复及CLI。模板沿P007保存真实图和参数，可绑定第二批原始输入；分支图实际worker按拓扑运行，不是绘图。WB绑定只更新资产/输入元信息/源SHA，不猜ROI或新科学阈值。--rerun创建新批次，样式仅重发布，参数重分析及后继；损坏缓存该样本失败，其他样本继续，下一新批次从完好检查点重算缺项，旧资产/运行保持。
+
+真实输入CSV4000/40、合法零0/invalid空值分别核验；批次8项51.87秒、CLI3项63.01秒、关联80项236.02秒通过。之后为两个已复现取消问题补丁：坏输入回执与取消双终态，及取消请求被父存储阻挡/重开加载前取消未应用；原失败保留，最终相关16项50.04秒通过，未弱化预期或容差。精确范围/原日志摘要/源码SHA见batch-mvp-validation.json；最终准确独审/隔离wheels/CI尚待完成，不提前done。
+
+新增有限预算16样本/合计64节点256边/1MiB计划/256派发/128父控制（保留最后取消名额），父文档沿旧16MiB；不是性能或OS硬配额。公开纯模型不依赖WB/Qt；父索引仅指向旧WorkflowLedger，不另造结果/资产/PID。中文操作单docs/runbooks/workflow-batch.md，版本契约docs/contracts/workflow-batch-v1.md。
+
+
+## 最终候选独审修正
+
+候选323d59f四组隔离wheel全部退出0，含安装后批量4000/40、6run/重开、样式8run和模板第二批。独审真实复现P2：pausing时接受resume使父running/子paused停滞，Request changes。已明确仅完成暂停或重开awaiting_resume才接受继续；新增回归先1failed2.94秒，修复后批量整文件10passed68.35秒。无容差/预期弱化。独审自身并发pytest与作者编辑重叠的2failed8passed50.91秒不归属冻结候选、不作为新增缺陷或通过。最终修正准确提交复审及PR53修正后CI待完成。
+
+
+## 最终CI资源实测
+
+53892fd独审Accepted；PR53 quality41434643209 Linux1671passed4旧skip10warnings728.40秒、所有wheel通过，desktop/rulescontext成功。Windows1675passed10warnings1347.61秒、全部wheel及dev.py最终成功标记均实际出现，checkstep为success；但job总25分24秒，被服务器25分钟上限标cancelled，不能作为必需CI通过。现仅Windows作业总时限25→30分钟，Linux20不变，无断言/单测时限/跳过/门禁削弱；纯CI资源变更不重复本机全量。需准确增量独审及新HEAD正常CI。
+
+
+## 旧网页测试夹具时序修正
+
+资源候选0c33的CI41438503742：Linux1671pass4旧skip820.52秒/allwheels通过；Windows1failed1674passed875.13秒，旧advanced真实网页用例在手工未保存的并发修订后，与700ms自动保存竞争，下一次template_apply被宿主busy正确拒绝。实际调用自动保存回调的有界探针重现相同断言（探针1pass8.16秒表示观察到预期旧失败，不是产品通过）。仅补3行：真实保存并发修订、等待原20秒预算内hostidle、断言current_draft_saved，再原流程验证冲突/24值/保存重开导出；原断言/容差/skip/单测时限均不改。修正后该完整文件2pass8.88秒。产品代码保持53892fd，准确新提交独审/CI待完成。

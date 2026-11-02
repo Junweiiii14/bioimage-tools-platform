@@ -1,5 +1,6 @@
 """Original-image workspace setup shared by CLI and background desktop preparation."""
 
+from hashlib import file_digest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -14,6 +15,7 @@ from tool_contracts.api import (
 )
 from wb_tool.api import (
     AnalysisRequest,
+    WBModuleInput,
     WBReportParameters,
     load_tiff,
     read_wb_module_input,
@@ -77,39 +79,50 @@ def prepare_wb_workspace(
             if source_path
             else wb_validation_input(validation)
         )
-        with (
-            Workspace.create(workspace) as store,
-            TemporaryDirectory(prefix="bioimage-workflow-input-") as temporary,
-        ):
-            if supplied.source_bytes:
-                input_path = Path(temporary) / "original.tif"
-                input_path.write_bytes(supplied.source_bytes)
-            else:
-                input_path = Path(supplied.source_path)
-            ref = store.import_asset(input_path, supplied.request.source_sha256)
-            image = load_tiff(store.asset_path(ref))
-            metadata = ImageMetadata(
-                dtype="uint16" if image.pixels.dtype.itemsize == 2 else "uint8",
-                axes=("y", "x"),
-                shape=image.pixels.shape,
-                acquisition_bit_depth=None,
-                acquisition_range=None,
-                acquisition_range_source=None,
-                frame=CoordinateFrame(
-                    frame_id="original_pixels",
-                    origin_asset_sha256=ref.sha256,
-                    physical_pixel_size_yx=None,
-                    physical_unit=None,
-                ),
-            )
-            source = ScientificAsset(
-                payload=ref,
-                sample_id="sample",
-                producing_method=None,
-                parameters_sha256=None,
-                description=ScientificType(
-                    kind="raw_image", unit="pixel_intensity", image=metadata
-                ),
-            )
+        with Workspace.create(workspace) as store:
+            source = import_wb_workflow_source(store, supplied, "sample")
             _, plan = build_wb_workflow(source, supplied.request, layout=layout or "comfortable")
     return plan
+
+
+def import_wb_workflow_source(
+    store: Workspace,
+    supplied: WBModuleInput | str,
+    sample_id: str,
+) -> ScientificAsset:
+    """Shared by single-run and finite-batch setup; caller owns the workspace thread."""
+    with TemporaryDirectory(prefix="bioimage-workflow-input-") as temporary:
+        if isinstance(supplied, str):
+            input_path = Path(supplied)
+            with input_path.open("rb") as stream:
+                source_sha256 = file_digest(stream, "sha256").hexdigest()
+        elif supplied.source_bytes:
+            input_path = Path(temporary) / "original.tif"
+            input_path.write_bytes(supplied.source_bytes)
+            source_sha256 = supplied.request.source_sha256
+        else:
+            input_path = Path(supplied.source_path)
+            source_sha256 = supplied.request.source_sha256
+        ref = store.import_asset(input_path, source_sha256)
+        image = load_tiff(store.asset_path(ref))
+        metadata = ImageMetadata(
+            dtype="uint16" if image.pixels.dtype.itemsize == 2 else "uint8",
+            axes=("y", "x"),
+            shape=image.pixels.shape,
+            acquisition_bit_depth=None,
+            acquisition_range=None,
+            acquisition_range_source=None,
+            frame=CoordinateFrame(
+                frame_id="original_pixels",
+                origin_asset_sha256=ref.sha256,
+                physical_pixel_size_yx=None,
+                physical_unit=None,
+            ),
+        )
+        return ScientificAsset(
+            payload=ref,
+            sample_id=sample_id,
+            producing_method=None,
+            parameters_sha256=None,
+            description=ScientificType(kind="raw_image", unit="pixel_intensity", image=metadata),
+        )

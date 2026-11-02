@@ -1,8 +1,8 @@
 # P-005 工作流与事件协议的最小可靠执行切片
 
-当前进展（2026-11-02）：真实三节点控制器、CLI及--workflow-ui桌面入口已贯通。19项控制器成功/暂停/取消/故障恢复/缓存试验通过；23项联合检查101.88秒，新增暂停调整与5项界面检查通过。输入准备后台执行、同一执行器；修改排版复用前两步，旧成果不覆盖。四wheel隔离运行验证三节点/4000/重开/样式复用通过，原生Windows截图已复查，精确源码/边界见runtime-gui-recovery.json。最后样式修复后的完整检查、准确独审、PR/CI尚待完成，整卡仍in_progress；不是完整M1/M2交付。
+当前进展（2026-11-02）：单图真实执行切片工程完成。准确候选2258cd5已非作者Accepted并经PR52及四项必需CI正常合入main4d6ee6c，tree完全一致。Windows1659pass1185.30秒/Linux1655pass4既有skip508.51秒及两侧全部隔离wheels通过；真实桌面/CLI、暂停调整、取消、重开、故障对账和依赖缓存证据见integration.json、final-runtime-validation.json及runtime-review.md。原超时/首轮Request changes保留；科学留出、用户体验和干净目标机不代签。完整M1批量/P008和M2编排/P009仍未完成。
 
-<!-- PROGRAM_TASK_META {"id":"P-005","status":"in_progress","work_package":"W04","depends_on":["P-002","P-007"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"006e9f143c830f5e13be2932e8ac37a9f3a05ed1","head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-005","status":"done","work_package":"W04","depends_on":["P-002","P-007"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"006e9f143c830f5e13be2932e8ac37a9f3a05ed1","head_commit":"2258cd5b976bb6aa28f2c1348d188ff1f534999b"} -->
 
 ## 执行状态
 

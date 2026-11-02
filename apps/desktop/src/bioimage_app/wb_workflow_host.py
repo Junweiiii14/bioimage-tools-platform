@@ -276,3 +276,53 @@ def build_wb_workflow(
     return definition, compile_workflow(
         definition, tuple(item.registration for item in modules), modules[0].environment
     )
+
+
+def bind_wb_workflow_template(
+    definition: WorkflowDefinition,
+    source: ScientificAsset,
+    *,
+    layout: str | None = None,
+) -> tuple[WorkflowDefinition, ExecutionPlan]:
+    """Bind new raw pixels while retaining the saved graph and numerical parameters."""
+    if any(binding.asset.description.kind != "raw_image" for binding in definition.inputs):
+        raise ValueError("This WB template binds raw-image roots only")
+    nodes: list[WorkflowNode] = []
+    reports: list[WBReportParameters] = []
+    for node in definition.nodes:
+        module_id = node.module.module_id
+        if module_id == "wb-verify-original":
+            raw = VerifyOriginalParameters.model_validate(
+                {"image": source.description.image}
+            ).model_dump_json()
+        elif module_id == "wb-analyze-original":
+            planned = TypeAdapter(AnalysisRequest).validate_json(node.parameters_json, strict=True)
+            planned = replace(planned, source_sha256=source.payload.sha256, revision=0)
+            raw = TypeAdapter(AnalysisRequest).dump_json(planned).decode()
+        elif module_id == "wb-publish-original":
+            report = WBReportParameters.model_validate_json(node.parameters_json)
+            if layout is not None:
+                report = WBReportParameters.model_validate(
+                    {"layout": layout, "expected_rows": report.expected_rows}
+                )
+            reports.append(report)
+            raw = report.model_dump_json()
+        else:
+            raise ValueError("Template contains an unavailable WB module: " + module_id)
+        nodes.append(node.model_copy(update={"parameters_json": canonical_module_json(raw)}))
+    if not reports or any(wb_report_shape(r) != wb_report_shape(reports[0]) for r in reports):
+        raise ValueError("WB template report nodes need one consistent canvas declaration")
+    bound = definition.model_copy(
+        update={
+            "sample_id": source.sample_id,
+            "revision": definition.revision + 1,
+            "nodes": tuple(nodes),
+            "inputs": tuple(
+                binding.model_copy(update={"asset": source}) for binding in definition.inputs
+            ),
+        }
+    )
+    modules = _modules(source, reports[0])
+    return bound, compile_workflow(
+        bound, tuple(module.registration for module in modules), modules[0].environment
+    )

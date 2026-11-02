@@ -1,21 +1,5 @@
 # Current Work Log
 
-## 2026-10-21 T072 自动流程与预览修复交付
-
-获批六项及128缩略图误作中央图问题已修：source_signal/guide共享原信号校验、机器采纳不冒充人工、按Fig显示纠偏、灰度图/区域、统一表和说明折叠。初审两P1/一P2及衍生caller问题修复后44a非作者Accepted；PR32最终46a四检查正常合main0630604。两平台各1013、本机1013/880.70s及全部wheel/OCR/check0。干净冻结main构建独立AutomaticFlowTest安装69.395s0，四单独流程OS0、PS5.1新轮56.548s0、7753载荷一致。首外层observer误收旧OneDrive并停止，已同exe重启确认，修为严格时序/身份且完全不自动终止，非作者Accepted，原失败永久保留；产品字节未变。桌面交付与最终审计/限制见T072任务及交付记录；旧dirty/原图/历史/安装保持，不扩展新任务。
-
-收尾PR33/be38双平台全检各1012/1失败于既有双Fig测试抢读1行占位；原始日志保留，明确本轮wheel未运行。仅补等待完整9行、可见与results模式，原断言/10秒截止不变，作者两相关E2E17.54s0及静态0。真实重载增加tests范围，a65经非作者Accepted/独立两项15.66s0；最终head全部检查及merge按PR33实际记录，不拿旧头代替。安装器继续冻结0630604，不为测试等待重打包。
-
-## 2026-10-21 T073 频繁裁图确认诊断与待审方案
-
-用户明确先查原因列清单、审核后修复。新规划分支基于main941b424，仅记录文档；保留T072安装/窗口。只读一致快照rev11和两例重放确认：N2假3槽、唯一两泳道旧候选被源图后置膜校验清零；所选10张均被角色启发式分merge，伙伴角色条件使白光未执行，另有≥3条带方向硬门槛。已确认第一人工后自动进入第二，重点是判定而非继续按钮。30原资产SHA保持。六项原因/修复/正反验收在T073，等待审核，未产品实现/独审/PR/打包。首诊断脚本dataclass取值错误与后继0均留证。T072收尾278两平台1013及全wheel/OCR四SUCCESS，正常合PR33→941b424，原失败不销账。
-
-## 2026-10-21 T073 批准执行与UI原型
-
-- 用户批准六项及追加UI完整方案，create_goal记录全部范围；新树wb-reliable-crop-ui/main941b424，分支codex/t073-reliable-crop-ui。旧四树SHA/HEAD/dirty保存，新树只复制旧T073文档，不动旧文件。
-- 研究Linear/Figma/Carbon与MDN/web.dev，写研究和本地HTML原型并打开IAB；合成图/示例流程，未接科学计算。第一轮视觉含1440/1024/390；确认真实示例自动暂停→一次继续→5行结果。检测一次及JS语法已执行，最终视觉和代码独审待完成。
-- uv sync0；既有两模块28用例110.36s0。一次浏览器reload/检查批次超时，重取原tab成功，不作产品失败；一次动态页签旧名称定位失败，按实时名称成功。产品算法/安装未改。
-
 ## 2026-10-21 T073 固定网格与精简验证
 
 用户补充固定N、原像素槽宽和5N:4比例，已实现整排对齐，不再强求N个独立连通组件；手动确认范围完整保留。只读最终重放为1行保留人工、8行自动、1行首带与标记相连仍暂停；原图SHA不变。补安全采样Y边界阻止背景扩展重新读入排除结构，并把局部第二目标传至真实quality_review。UI预审问题关闭、最后3项定向0；新两个科学反例首轮37过1败为测试构造先触发原有扩展保护，改用合法25%范围内越限反例。首全门禁8项类型错，pytest尚未启动；修正类型，无ignore/放宽。按用户要求不反复冒烟，保留必需检查。新ReliableCropTest独立安装身份，随包仅相关自动流程自检。尚未提交独审/PR/构建。
@@ -149,3 +133,17 @@ PR51准确c243四必需SUCCESS，正常merge006e9f1/tree与独审候选相同。
 ## 2026-11-02 P005同一执行器的缓存、恢复与桌面入口
 
 实际取消五阶段、worker非零/崩溃/重复错身份、ENOSPC前后及重开对账、五类缓存矩阵19项通过。新增--workflow-ui共享WorkflowSession，后台输入导入、新运行/暂停/继续/取消/重开/应用调整；23联合101.88秒及新增暂停调整、5界面18.38秒通过。输入失败重入关闭首轮1fail3pass71.83秒，定位双retire后修复，原失败不销账。四wheel隔离三节点/4000/重开/两节点复用通过；随后最后样式/打印修补待全量最终验。原生windows字体与系统主题对比度实际查看后修正；截图与准确SHA见P005/runtime-gui-recovery.json。整卡仍in_progress，下一步一次最终候选独审/完整门禁/PR，之后P008/P009。
+
+
+## 2026-11-02 P005正常集成与P008激活
+
+最终2258独审Accepted/四必需CI全SUCCESS，PR52正常merge4d6ee6c/tree一致。Windows1659pass1185.30秒/Linux1655pass4既有skip508.51秒及双wheels真实三节点通过，P005工程done/科学现场用户验收不代签。用户追问全量用途，明确以后本地定向、最终候选CI全量，减少重叠。P008从新main激活并完整读541行新规则；WorkflowSession初步共享父存储、两个顺序子图6真实run，关联4pass26.27秒，Ruff/type0。批次索引/隔离/恢复/CLI仍未实现，不认完整M1。B012外部规划dirty保留不提交，待其最终指引。
+
+
+## 2026-11-02 P008真实批次候选
+
+父索引/共享WorkflowSession顺序执行、样本隔离、暂停取消恢复、真实claim后进程崩溃对账、CLI及模板第二批/分支图/缓存重算贯通。批次8pass51.87s、CLI3pass63.01s、关联80pass236.02s。最后取消问题均实际先失败后修：坏源回执双终态1fail2.40s；重开提前取消/父取消阻塞2fail8.81s；最终相关16pass50.04s。static/policy/9边界过；最后源码只定向检查，不重复全量。新增wheels探针/集中准确独审/PRCI待做，不认整卡/M1完成。外部B012规划dirty未提交。
+
+## 2026-11-02 P008 final candidate review/CI
+
+323d59f isolated wheels exit0 including batch/template; independent P2 pausing/resume stall genuinely reproduced then fixed53892fd. Author batch10passed68.35s; independent frozen correction3passed30.69s Accepted full4d6..53892fd. PR53 ready; finalquality41434643209 live, rulescontext success, nativecase expectedskip. Await actual requiredCI then normalmerge; P009 stillplanned. Rawfailed/contaminatedrun retained; no repeatedlocalfullsuite. Evidence/handoff edits await integration closeout, do not push sameproduct documentation merely to restartCI.
