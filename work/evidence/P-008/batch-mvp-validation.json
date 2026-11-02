@@ -1,0 +1,65 @@
+{
+  "tested_base": "5d5dd226a7dc6bf16879c16257a0d3754b814ff3",
+  "tested_worktree": "normalized final source hashes; read individual result scope before claiming coverage",
+  "environment": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "logs": {
+    ".local/p008-batch-first-tests.log": {
+      "result": "5pass37.43s; before later cancellation changes",
+      "sha256": "0c9748a59ac4ff41e0658ba6e8ad64ccfbbf0cb54e5bb0d51fe214809d51cc7d"
+    },
+    ".local/p008-batch-cli-rerun-tests.log": {
+      "result": "3pass63.01s; saved branched template/second input; missing/invalid/zero distinct; style/parameter reuse; damaged cache isolation/fresh repair14actualruns; before final cancel changes",
+      "sha256": "5bc1a3b18ea1efcef91198152b03cf135c9c2bb4db39f6426380742d717c6584"
+    },
+    ".local/p008-batch-control-crash-tests.log": {
+      "result": "8pass51.87s; actual parent os._exit37 after durableclaim,6actualruns afterreopen; running/prestartcancel, pause, parentENOSPC, budgets; before final cancel changes",
+      "sha256": "5f832c33ac067dccf06894c0a004722736c9cfa119b2247a057a4a3687d6456b"
+    },
+    ".local/p008-targeted-final-r1.log": {
+      "result": "80pass236.02s; new batch+CLI and previous contracts/executor/recovery/UI; before final cancel changes",
+      "sha256": "1fcce909cd4851c99444f15054509f5ea971c6c787c3bfc62f9b4981a60f34c1"
+    },
+    ".local/p008-corrupt-cancel-before.log": {
+      "result": "1failed2.40s; actual conflicting failure/cancel terminal writes",
+      "sha256": "b24e3e563b82050633a586a1c2df1acae8c1235297b97c0494b98f5e927d696d"
+    },
+    ".local/p008-corrupt-cancel-after.log": {
+      "result": "6pass10.01s; corrupt-input cancellation and previous cancel boundaries",
+      "sha256": "404f2071e9a3275bfc7efc01aa174e7098580b833d04196e0a0a254a40ff5671"
+    },
+    ".local/p008-parent-cancel-before.log": {
+      "result": "2failed8.81s; pending reopen cancel did not settle; parent cancel waited behind child commit and allowed succeeded",
+      "sha256": "86b927a95e6248a999dbd26e9981bde5a8023b2e389a43c91d57689062f74d80"
+    },
+    ".local/p008-parent-cancel-after.log": {
+      "result": "2pass3.63s; same exact expectations, fixed real paths",
+      "sha256": "daa1033d291ceab192d5c3aa678c0330b4bd64e8307a7aa67fcb922712c56ee3"
+    },
+    ".local/p008-cancel-recovery-final.log": {
+      "result": "16pass50.04s; final cancel/reopen/oldstartpause + batch pause/reopen coverage",
+      "sha256": "0f571f61f77c78bbdff406f3f63793a2ff2fa482cadb37701f3f3312627ddf1d"
+    }
+  },
+  "final_static": "all Ruff/format/Pyright, policy and nine import contracts passed before final cancellation changes; targeted Ruff/Pyright passed after those changes",
+  "source_sha256_lf": {
+    "apps/desktop/src/bioimage_app/__main__.py": "ea960794bf9c0b02b704da470724efc0f0a2a2ab908d3ba9db912c364cf79211",
+    "apps/desktop/src/bioimage_app/storage.py": "62430b75cc89396aa9b486b248a480fbbfcaa9e60e6ab5127e30cd006c734370",
+    "apps/desktop/src/bioimage_app/workflow_session.py": "7a162411f0ab5b131afd1584c703ecfbe9a6bca18417cce66c151c7f7bf99206",
+    "apps/desktop/src/bioimage_app/workflow_input.py": "f102242141ce4c3d8ceea223e29a6a6c6f93a662da4703da67ce7eeeb908c49a",
+    "apps/desktop/src/bioimage_app/wb_workflow_host.py": "250d3692ae44b2996e92121e513524d6835fa38cb8ef7d26d5dbc26bd6bd9b36",
+    "apps/desktop/src/bioimage_app/workflow_batch_session.py": "4b3257d554d339e4e3ae613c0b36e3fbb3200a0ad3f0a823ceefd617edf129cb",
+    "apps/desktop/src/bioimage_app/workflow_batch_storage.py": "115a6799c254770f81492d1aa2cbf8030698ec87cadd94a76ee7f864ef7427e8",
+    "apps/desktop/src/bioimage_app/workflow_batch_cli.py": "d5d1d2c429cb07f430b7244fe8ac44bd699dc972553b1f695a6a1bde7037053b",
+    "apps/desktop/src/bioimage_app/wb_workflow_batch_input.py": "04f68c4a017fb3716c05d3abfe2edf017c6e08d10139cb86cc6c7d87e78f2ebf",
+    "packages/tool_contracts/src/tool_contracts/workflow_batch.py": "2b5245227dfa5f9bcfe44fce01648381fd58a1aa496f8c3e9674ed833cfaff54",
+    "packages/tool_contracts/src/tool_contracts/api.py": "a02ce6021a38bf9b40834d12799eedcd77a5520eba5f6c477fe12a32ee434c00",
+    "packages/platform_runtime/src/platform_runtime/workflow.py": "12501cbfb8dfcc6ec8f32c82b3de4538f8af13d144f92717a256946eabe5cf6a",
+    "packages/platform_runtime/src/platform_runtime/api.py": "706c3a572924f6acc9ce319ecd2bac53cf9bb0b0cc6e17d1df51af21f87db85e",
+    "tests/test_workflow_batch_session.py": "7dfb39048682101f2c07423bbfee80df7621f6dbacfcfbe634dc24478f29b7eb",
+    "tests/test_workflow_batch_cli.py": "37f496a5161d84249a8d1cf7fda5a33c9a831f3088fb5d67fe3d741e1ebabebf",
+    "tests/test_workflow_session.py": "c68bc9885700b20be16bb9b7f701a624f5797480dc2b3d1b5b91c95f21fcf67d",
+    "tooling/installed_wheels.py": "197ce713c107f21ae6fcea85a631c9cf76d20376b467857e76933fb2b14f0380"
+  },
+  "limits": "engineering synthetic/fixture evidence only; whole P008 review/wheels/fullCI pending, P009 not started; no scientificS1/clean target/physicalDPI/user acceptance claim"
+}

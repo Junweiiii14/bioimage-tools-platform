@@ -587,3 +587,77 @@ def test_sequential_workflows_share_one_parent_storage_owner(
                 store.read_asset(store.load_draft(f"shared_child_{index}").asset).decode()
             )
             assert actual.state == "succeeded" and len(actual.results) == 3
+
+
+def test_cancel_while_corrupt_input_reply_is_pending_has_one_terminal_path(
+    qtbot: QtBot,
+    workflow_fixture: tuple[Path, ExecutionPlan, AssetRef, bytes],
+) -> None:
+    workspace, plan, source, _original = workflow_fixture
+    with Workspace.open(workspace) as store:
+        store.asset_path(source).write_bytes(b"owned corrupt source")
+    session = WorkflowSession(wb_workflow_registry)
+    ended: list[WorkflowStatus] = []
+    cancelled = False
+
+    def changed(status: WorkflowStatus) -> None:
+        nonlocal cancelled
+        if status.run_id and status.pid is None and not cancelled:
+            cancelled = True
+            assert session.cancel()
+
+    def completed(_status: WorkflowStatus) -> None:
+        session.close()
+
+    session.changed.connect(changed)
+    session.completed.connect(completed)
+    session.finished.connect(ended.append)
+    try:
+        session.start(str(workspace), plan)
+        qtbot.waitUntil(lambda: bool(ended), timeout=30000)
+        assert cancelled and ended[0].state == "cancelled" and not ended[0].message, ended
+    finally:
+        session.close()
+        qtbot.waitUntil(lambda: bool(ended), timeout=30000)
+    with Workspace.open(workspace) as store:
+        runs = store.list_runs()
+        assert len(runs) == 1 and runs[0].state == "cancelled" and runs[0].pid is None
+
+
+def test_cancel_requested_before_reopen_load_is_applied(
+    qtbot: QtBot,
+    workflow_fixture: tuple[Path, ExecutionPlan, AssetRef, bytes],
+) -> None:
+    workspace, plan, _source, _original = workflow_fixture
+    first = WorkflowSession(wb_workflow_registry)
+    first_ended: list[WorkflowStatus] = []
+    first.finished.connect(first_ended.append)
+    first.start(str(workspace), plan)
+    first.pause()
+    try:
+        qtbot.waitUntil(
+            lambda: first.ledger is not None and first.ledger.state == "paused", timeout=10000
+        )
+        assert first.ledger is not None
+        execution_id = first.ledger.execution_id
+    finally:
+        first.close()
+        qtbot.waitUntil(lambda: bool(first_ended), timeout=10000)
+    second = WorkflowSession(wb_workflow_registry)
+    ended: list[WorkflowStatus] = []
+
+    def completed(_status: WorkflowStatus) -> None:
+        second.close()
+
+    second.completed.connect(completed)
+    second.finished.connect(ended.append)
+    try:
+        second.reopen(str(workspace), execution_id)
+        assert second.cancel()
+        qtbot.waitUntil(lambda: bool(ended), timeout=3000)
+        assert ended[0].state == "cancelled" and not ended[0].message
+    finally:
+        second.close()
+        qtbot.waitUntil(lambda: bool(ended), timeout=10000)
+    with Workspace.open(workspace) as store:
+        assert not store.list_runs()

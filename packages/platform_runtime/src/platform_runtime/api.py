@@ -9,6 +9,7 @@ from platform_runtime.workflow import (
     ModuleRegistration,
     WorkflowValidationError,
     compile_workflow,
+    execution_plan_definition,
     execution_plan_digest,
     load_execution_plan,
     load_workflow_definition,
@@ -53,6 +54,7 @@ __all__ = [
     "compile_workflow",
     "verify_execution_plan",
     "execution_plan_digest",
+    "execution_plan_definition",
     "load_execution_plan",
 ]
 

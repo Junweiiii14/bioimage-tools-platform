@@ -14,9 +14,10 @@ P004新几何方法仍独立planned，P009依赖P008完成；完整M1/M2未完�
 
 P008已按满足的依赖激活，scope .规则回执已运行并完整读完.local/p008-context.txt全部541行，绑定新main4d6ee6c；不必重复加载，除非main/规则/范围再变。
 
-1. 初始产品改动仅WorkflowSession支持父拥有AsyncStorage，子关闭仅退自己的准备线程，单独入口仍拥有两个服务。实际两个顺序子图/6真实run、父存储持续可用/最后关闭重开已验证；关联旧start/pause/reopen共4pass26.27秒，Ruff/Pyright0。证据P008/shared-storage.json。尚未最终独审/新wheels/新CI，无完整批量产品。
-2. 下一步实现有限批次的opaque/CAS持久索引，先存子execution_id与冻结plan再派发，顺序复用同一WorkflowSession。独立样本失败继续、父暂停取消与关闭重开、父子记录未关联时对账、第二批模板绑定与依赖重算；不建立第二缓存/恢复器，不再每小步全量或独审。
-3. 具体接线笔记.local/p008-integration-notes.md为设计线索，不是实现证据。批量模型/预算与新故障验收须冻结后实现；保留原始资产、RunRecord/attempt身份和P005事务语义。公共纯模型不依赖Qt/WB，宿主固定注册，不加载工作区代码。CLI/中文操作单/最终隔离wheels/准确独审/必需CI完成后才认P008done，再接P009。
+1. 当前真实批次候选已实现：纯WorkflowBatch索引/预算、固定storage命令、父BatchSession共享同一WorkflowSession、独立样本隔离、暂停/取消/重开与父子对账；--workflow-batch CLI含manifest/validation/resume/rerun/template/template-out。模板保存真实节点/连接/参数并绑定第二批，合法分支图实际执行。中文runbooks/workflow-batch.md及版本契约已写。不是仅共享存储骨架。
+2. CLI3项63.01秒（含14真实run的缓存损坏/重算链）、批次8项51.87秒（含父进程真实os._exit37后重开、ENOSPC、控制预算）、相关80项236.02秒已过。随后最后取消修正：坏源回执竞争双终态/重开加载前取消漏应用/父取消在忙存储后才传子导致提交先成功，均先原样复现再修；原失败不销账。最终相关16项50.04秒过。batch-mvp-validation.json记录每次作用范围和最终源码SHA。
+3. 下一步直接冻结准确候选，一次最终独审及最终隔离wheels/正常PR/必需CI；本地不再重复全量1659套件。新wheel脚本已加入纯批次/图恢复及真实批量4000/40、重开、样式8run、模板第二批，但尚未运行本次新增段。最终独审用现有/root/p002_independent_review；不要逐个小提交反复审。源码不能在wheel/test期间改动以免环境指纹失配。
+4. 若检查/独审发现问题按真实反例修，保留原失败。P008尚未最终独审/新wheels/CI，整卡in_progress。P009仍planned；完成本卡并正常集成后接真实Web节点目录/增删连接/参数/保存重开模板/结果定位，不能用当前固定单图UI或CLI冒充M2。
 
 ## 并行规划写入
 
@@ -24,6 +25,6 @@ P008已按满足的依赖激活，scope .规则回执已运行并完整读完.lo
 
 ## 当前验证句柄与限制
 
-没有活动本机测试或独审。P005已合并，不再轮询旧PR52；main push产生同树CI可按需观察，不重跑同源产品。当前P008共享存储源需接完整批量，不以其4个初验当整卡。
+当前没有活动本机测试或独审；准备启动最终候选验证，后继恢复时核实实际handle。P005已合并，不再轮询旧PR52；main push产生同树CI可按需观察，不重跑同源产品。当前P008共享存储源需接完整批量，不以其4个初验当整卡。
 
 科学留出/S1、用户体验、干净Windows/物理DPI/GPU/T002-P0及历史native UNKNOWN仍见risks/backlog；不冻结无依赖工程。原图/历史/旧dirty树/在用安装不覆盖；不扩新校正、其他实验全套、Agent、安装器正式发布/替换、外联、花费或数据上传。

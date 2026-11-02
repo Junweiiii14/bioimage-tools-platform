@@ -352,6 +352,16 @@ assert control_workflow(restored_journal, 'resume', 'resume_1').state == 'runnin
 assert not any(name.startswith(('wb_tool', 'PySide6', 'numpy')) for name in sys.modules)
 print('Installed journal component: pause, immutable save/reopen, control idempotency; '
     'no graph worker')
+from tool_contracts.api import WorkflowBatch, WorkflowBatchItem
+from platform_runtime.api import execution_plan_definition
+assert compile_workflow(execution_plan_definition(execution_plan), (registered,),
+    execution_plan.nodes[0].environment) == execution_plan
+batch_index = WorkflowBatch(batch_id='installed_batch', items=(WorkflowBatchItem(
+    sample_id=execution_plan.sample_id, execution_id='installed_batch_child',
+    plan=execution_plan),))
+assert WorkflowBatch.model_validate_json(batch_index.model_dump_json(), strict=True) == batch_index
+assert not any(name.startswith(('wb_tool', 'PySide6', 'numpy')) for name in sys.modules)
+print('Installed finite batch models and graph reconstruction: no Qt/WB or workspace side effects')
 """
 
 
@@ -619,6 +629,37 @@ with Workspace.open(workflow_root) as store:
     assert all(run.pid is not None and run.pid > 0 and run.state == 'succeeded'
                for run in store.list_runs())
 print('Installed workflow: visible entry, three workers, 4000, reopen, style reuse, four real runs')
+batch_root = Path('installed-workflow-batch').resolve()
+template_path = Path('installed-workflow-template.json').resolve()
+def batch_command(root, *arguments):
+    process = subprocess.run(
+        [sys.executable, '-I', '-m', 'bioimage_app', '--workflow-batch',
+         '--workspace', str(root), *arguments], capture_output=True, timeout=90)
+    assert process.returncode == 0, (process.stdout, process.stderr)
+    result = json.loads(process.stdout.splitlines()[-1])
+    assert result['kind'] == 'finished' and result['state'] == 'completed'
+    return result
+batch = batch_command(batch_root, '--validation', 'triangle_u16', '--validation', 'triangle_u8',
+                      '--template-out', str(template_path))
+assert batch['succeeded'] == 2 and batch['failed'] == batch['issues'] == 0
+batch_values = []
+for item in batch['samples']:
+    rows = list(csv.DictReader(Path(item['outputs']['measurements']).read_text(
+        encoding='utf-8-sig').splitlines()))
+    batch_values.append(rows[0]['value'])
+assert batch_values == ['4000.0', '40.0']
+reopened_batch = batch_command(batch_root, '--resume', batch['batch_id'])
+assert reopened_batch['samples'] == batch['samples']
+styled_batch = batch_command(batch_root, '--rerun', batch['batch_id'], '--layout', 'compact')
+assert styled_batch['batch_id'] != batch['batch_id']
+with Workspace.open(batch_root) as store:
+    assert len(store.list_runs()) == 8
+second_batch = batch_command(Path('installed-second-batch').resolve(), '--validation',
+                            'triangle_u8', '--template', str(template_path))
+rows = list(csv.DictReader(Path(second_batch['samples'][0]['outputs']['measurements']).read_text(
+    encoding='utf-8-sig').splitlines()))
+assert rows[0]['value'] == '40.0'
+print('Installed batch: 4000/40, six runs, reopen, two publisher reruns, template/second batch')
 """
 
 

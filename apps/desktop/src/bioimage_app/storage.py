@@ -22,10 +22,12 @@ from tool_contracts.api import (
     ProcessExitReceipt,
     RecoveryReport,
     RunRecord,
+    WorkflowBatch,
     WorkflowLedger,
 )
 
 from bioimage_app.module_results import commit_module_result
+from bioimage_app.workflow_batch_storage import WorkflowBatchStoreCommand, execute_batch_store
 from bioimage_app.workflow_storage import WorkflowStoreCommand, execute_workflow_store
 
 _LOGGER = logging.getLogger(__name__)
@@ -65,6 +67,7 @@ Operation = Literal[
     "backup",
     "close",
     "workflow",
+    "workflow_batch",
 ]
 Value = (
     AssetRef
@@ -72,6 +75,7 @@ Value = (
     | RunRecord
     | RecoveryReport
     | WorkflowLedger
+    | WorkflowBatch
     | tuple[DraftSnapshot, ...]
     | tuple[RunRecord, ...]
     | str
@@ -100,6 +104,7 @@ class StorageCommand:
     cancellation: Event | None = None
     module_request: ExecutionRequest | None = None
     workflow: WorkflowStoreCommand | None = None
+    workflow_batch: WorkflowBatchStoreCommand | None = None
 
 
 @dataclass(frozen=True)
@@ -154,6 +159,10 @@ class _StorageWorker(QObject):
         store = self._workspace
         if store is None:
             raise ValueError("No workspace is open")
+        if op == "workflow_batch":
+            if command.workflow_batch is None:
+                raise ValueError("Batch operation requires an explicit index command")
+            return execute_batch_store(store, command.workflow_batch), b""
         if op == "workflow":
             if command.workflow is None:
                 raise ValueError("Workflow operation requires an explicit journal command")

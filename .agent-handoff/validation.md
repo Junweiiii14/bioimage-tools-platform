@@ -154,3 +154,5 @@ ed830e1准确完整门禁1503 passed/756.15s+全部isolated wheels/exit0，HEAD/
 
 | 2026-11-02 | P005准确2258四必需CI、PR52正常合4d6ee6c/tree同 | 全SUCCESS；Windows1659pass1185.30秒/Linux1655pass4既有skip508.51秒，双完整wheel真实流程通过 | P005/integration.json |
 | 2026-11-02 | P008初始共享父存储/两个真实子图与旧开始暂停重开 | 4pass26.27秒/exit0，6真实run，目标Ruff/type0；无新全量/wheel/独审，不代表批量完成 | P008/shared-storage.json |
+
+| 2026-11-02 | P008真实批量/CLI/模板分支/缓存恢复及相关旧契约 | 8pass51.87s、3pass63.01s、80pass236.02s；最后取消修复相关16pass50.04s，原1fail/2fail保留；新增wheel/独审/CI待做 | P008/batch-mvp-validation.json |

@@ -39,6 +39,13 @@ from tool_contracts.scientific_assets import (
     TableColumn,
     TableMetadata,
 )
+from tool_contracts.workflow_batch import (
+    BatchItemState,
+    BatchState,
+    WorkflowBatch,
+    WorkflowBatchControl,
+    WorkflowBatchItem,
+)
 from tool_contracts.workflow_execution import (
     WorkflowAttempt,
     WorkflowEventKind,
@@ -117,6 +124,11 @@ __all__ = [
 ]
 
 __all__ += [
+    "BatchItemState",
+    "BatchState",
+    "WorkflowBatch",
+    "WorkflowBatchControl",
+    "WorkflowBatchItem",
     "WorkflowAttempt",
     "WorkflowNodeResult",
     "WorkflowJournalEvent",

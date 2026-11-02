@@ -269,6 +269,15 @@ def verify_execution_plan(
 ) -> ExecutionPlan:
     """Recompile untrusted persisted plans; a digest alone is not admission or integrity."""
     plan = ExecutionPlan.model_validate(plan.model_dump(mode="python"))
+    definition = execution_plan_definition(plan)
+    rebuilt = compile_workflow(definition, registrations, plan.nodes[0].environment)
+    if rebuilt != plan:
+        raise ValueError("Execution plan differs from trusted recompilation")
+    return rebuilt
+
+
+def execution_plan_definition(plan: ExecutionPlan) -> WorkflowDefinition:
+    """Recover declared graph structure; trusted compilation still decides admission."""
     roots: list[WorkflowInput] = []
     edges: list[WorkflowEdge] = []
     for node in plan.nodes:
@@ -284,7 +293,7 @@ def verify_execution_plan(
                         target_port=item.port,
                     )
                 )
-    definition = WorkflowDefinition(
+    return WorkflowDefinition(
         workflow_id=plan.workflow_id,
         workflow_version=plan.workflow_version,
         revision=plan.revision,
@@ -300,10 +309,6 @@ def verify_execution_plan(
         inputs=tuple(roots),
         outputs=plan.outputs,
     )
-    rebuilt = compile_workflow(definition, registrations, plan.nodes[0].environment)
-    if rebuilt != plan:
-        raise ValueError("Execution plan differs from trusted recompilation")
-    return rebuilt
 
 
 def execution_plan_digest(plan: ExecutionPlan) -> str:
