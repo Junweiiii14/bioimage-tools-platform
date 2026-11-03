@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "task": "F-008",
+  "base_commit": "6e0dcd44ae726caffa9215da49bcf569737258cd",
+  "scopes": [
+    ".github",
+    "apps/desktop/pyproject.toml",
+    "packages/platform_runtime/pyproject.toml",
+    "packages/tool_contracts/pyproject.toml",
+    "tools/wb/pyproject.toml",
+    "uv.lock",
+    "work/evidence/F-008",
+    "work/tasks/F-008-dependency-closeout.md"
+  ],
+  "rules": {
+    "AGENTS.md": "ac18f57a3534fa6e0f60ee3c9fabbb58c405aa55b437358e47328223645272cf",
+    "docs/ai-workflow.md": "319edc4ad29ce059e09aa8b18e73a7b519e69b52373406cd49b4b9776769f20f",
+    "docs/architecture.md": "7a4c4ae9f6c7be020df13ad9b431a5ce396ffab2e588fcdc0aa6a00fdc74bc1e",
+    "docs/coding-standards.md": "f1ff3ed5bb1c4ac5256ec1b6b85cc71684b713b8b6b08df51723f62644b11974",
+    "docs/module-map.md": "591ca8184c6032864437a24f58f7a9f5fd8075c6d576cd9a84ed1626dd8872bd",
+    "docs/research-protocol.md": "b1ab0f9bf291e50f5872e01147f7af2671fdc5885bf2f065c804c5f4a240aa51",
+    "docs/runbooks/rule-enforcement.md": "6db3eacb3d49b8015ac54fca756236dbc8906ba5a0746741a28afd12fb7398e0"
+  },
+  "base_rules": {
+    "AGENTS.md": "ac18f57a3534fa6e0f60ee3c9fabbb58c405aa55b437358e47328223645272cf",
+    "docs/ai-workflow.md": "319edc4ad29ce059e09aa8b18e73a7b519e69b52373406cd49b4b9776769f20f",
+    "docs/architecture.md": "7a4c4ae9f6c7be020df13ad9b431a5ce396ffab2e588fcdc0aa6a00fdc74bc1e",
+    "docs/coding-standards.md": "f1ff3ed5bb1c4ac5256ec1b6b85cc71684b713b8b6b08df51723f62644b11974",
+    "docs/module-map.md": "591ca8184c6032864437a24f58f7a9f5fd8075c6d576cd9a84ed1626dd8872bd",
+    "docs/research-protocol.md": "b1ab0f9bf291e50f5872e01147f7af2671fdc5885bf2f065c804c5f4a240aa51",
+    "docs/runbooks/rule-enforcement.md": "6db3eacb3d49b8015ac54fca756236dbc8906ba5a0746741a28afd12fb7398e0"
+  }
+}

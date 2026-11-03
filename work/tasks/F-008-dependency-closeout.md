@@ -1,0 +1,9 @@
+# F-008 收尾遗留依赖 PR
+
+- Status: in_progress
+- 授权：2026-11-03 用户要求先查看并处理之前未完成事项，再重写开发方案。
+- 基线：origin/main 6e0dcd44ae726caffa9215da49bcf569737258cd。
+- 范围：既有 PR4 checkout、PR5 setup-uv、PR20 uv_build 的候选升级，逐项核验来源及差异；合并为一个独立维护 PR，保留原 PR 历史，成功集成后标注替代关系。
+- 不修改产品算法、检查规则、测试预期、权限和 uv CLI 固定版本。不带入旧 PR5 的过时 handoff。
+- 验证：固定 SHA / 版本与来源、锁一致性、格式 / policy、准确提交规则回执、远端四项必需检查；不将旧 CI 冒充新候选通过。
+- 收尾：实际结果记 work/evidence/F-008/validation.md；若候选不可行，记录具体原因，不为清空待办强行合并。
