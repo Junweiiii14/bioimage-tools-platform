@@ -15,6 +15,12 @@
 
 当前日常入口为 `python -m bioimage_app` → `desktop_entry.py` → `WebWorkbenchWindow`。历史 `--figure-project` / `--platform` 同样进入工作台；旧 `PlatformWindow` / `FigureProjectWindow` / `WBWindow` 保留显式兼容入口，不替代当前产品验收。Windows `Start-BioImage.ps1` 固定自身检出目录；门禁默认离屏，不能把旧测试窗口当产品演示。
 
+## 通用工作流入口
+
+- 数据与预检：tool_contracts.api 的科学类型/WorkflowDefinition/ExecutionPlan；platform_runtime.api 的 compile_workflow、账本转移与结果选择核验。见[科学工作流](contracts/scientific-workflow-v1.md)。
+- 宿主执行：WorkflowSession、批次控制、真实worker/存储提交；操作见[批量工作流](runbooks/workflow-batch.md)。图编辑及成果展示沿用同一冻结执行与提交结果，准确交付范围见[P009审计](../work/evidence/P-009/objective-audit.md)。
+- 这些能力不等于第二实验、正式几何方法、科学准入或Agent已完成；新增工具仍按独立任务验证。
+
 ## WB 当前流程与契约
 
 - 定量与输入：`domain/lanes.py` / `quantify.py`、`application/fig_quant.py`、`adapters/tiff_input.py`；[Fig 定量](contracts/wb-fig-quant-v1.md)、[TIFF 资源准入](contracts/wb-tiff-resource-admission-v1.md)。原图与显示副本分离，科学定义和失败语义不得因界面重构改变。
