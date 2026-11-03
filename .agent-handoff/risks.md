@@ -1,6 +1,6 @@
 # 当前风险与外部验收边界
 
-当前收尾入口为[B018](../work/tasks/B-018-repository-closeout.md)。P002/M1/M2已集成，任务状态在对应P卡；旧风险不因完成工程而关闭。后续方案在清理后重写，不从历史待办自动启动新实验。
+当前入口为[B019方案重写](../work/tasks/B-019-student-experiment-plan.md)。B018旧事项已收尾，5.0后续P010仅登记未执行；P002/M1/M2工程已集成，旧风险不会由方案或工程完成关闭。公开缺口见[Issue57](https://github.com/Junweiiii14/bioimage-tools-platform/issues/57)。
 
 - **科学适用性未验。** 用户确认暂时没有未用于调参的留出实验图及负责人认可的比较方法/指标/容差，R10 保留待办；工程继续。开发图、合成回归、参考辅助裁图及高置信 OCR 不证明独立准确率或“80%整项目成功率”。方法冻结见 [scientific-baseline](../work/evidence/T-082/scientific-baseline.md)。原值、行宽均值/积分、显式归一化及人工确认口径不变。
 - **目标环境未验。** 历史本机 Win11 安装证据不代替干净 Win10、全部员工设备、物理 DPI/拖放/GPU 或外部 Excel/WPS/LibreOffice 验收。T-002/P0 原生按钮/ROI/DPI 缺项继续保留；历史用户 Esc 中止不写成通过。R07/R11 的本轮实际范围与未运行矩阵以任务及对应证据为准。

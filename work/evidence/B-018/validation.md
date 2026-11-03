@@ -15,3 +15,7 @@
 - 历史构建 `npm run historical-v4 --prefix docs/plans/renderer`：退出0，固定4.0源输出到.local历史目录，当前五份HTML未覆盖。根AGENTS仅更新过期恢复指令，不变更质量/数据/合并约束；重新加载回执。
 
 - 合入依赖main5d6e03b后重新加载准确规则回执。四模块README只加当前/历史边界，未改src、测试或公共契约；325个本地Markdown链接核验无缺失。旧主目录先归档再更新短恢复路由，未覆盖旧源码/规划；handoff检查无未解决项。手机HTML截图人工查看未见裁切。
+
+## 最终集成
+
+候选8e99409be20de20856e7dd1b52d5743559344340；质量run41642082896、规则run41642082867，四项必需检查success。Windows1692 passed/10 warnings/1098.46s；Linux1688 passed/4既有平台skip/10 warnings/998.09s；两平台独立安装后的真实工作流通过。条件native-case跳过，不当作目标机验收。PR54正常merge至f2a7a7801930a3ea5a14565c11eda84636bec933。Issue57保留真实缺口；新方案从B019开始。

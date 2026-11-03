@@ -174,3 +174,7 @@ ed830e1准确完整门禁1503 passed/756.15s+全部isolated wheels/exit0，HEAD/
 | 2026-11-03 P009 measurement preparation | async pump test + r5 diagnostic both3/64 | 1passed1.80s；1+0原生两场景exit0，仅诊断；type/Ruff0 | performance-measurement.md；正式分布/wheel新probe尚未运行 |
 
 | 2026-11-03 P009 delivery probes | wheel all isolated envs + mixed invalid TIFF GUI | wheel secondexit0；GUI1pass9.48s；type/Ruff0；first formalexit1/原数据保留 | delivery-probes.md/json；正式重测、独审/PRCI待做 |
+
+## 2026-11-03 B019文档检查
+
+五HTML桌面/窄屏/搜索/菜单/打印通过，250本地MD链接无缺失，3历史Git blob摘要一致，15工作包/10卡检查通过，1243文件格式与policy通过。未验新实验/科学/用户/付费；准确提交PR检查另核验，详细见work/evidence/B-019/validation.md。

@@ -46,7 +46,7 @@
 
 ## Current Pointer
 
-- 当前任务：[B018旧事项收尾](work/tasks/B-018-repository-closeout.md)；依赖维护见F008/PR56。P009已由PR55正常集成，工程交付收据见其任务和integration.json；科学/性能/用户/目标机限制保留。不重启已完成任务；下一步以snapshot为准。
+- 当前任务：[B019方案重写](work/tasks/B-019-student-experiment-plan.md)。B018/PR54与F008/PR56已收尾；P002/M1/M2工程不重做。P010需求调研仅planned；科学/用户/目标机/性能限制见Issue57与risks。下一步以snapshot为准。
 - T082历史工程证据及科学/目标环境待办完整保留于其[任务](work/tasks/T-082-reliability-remediation.md)，不由V0自动关闭。
 - 本轮本地工程交接：[T082 final-handoff](work/evidence/T-082/final-handoff.md)，区分冻结源码、隔离验收工件与后续交接HEAD；科学待办不由工程通过代替。
 - 最近交付：[T081 R2](work/evidence/T-081/final-delivery.md)。当前源码/构建源码/主线集成/安装包区分见 [T082 baseline](work/evidence/T-082/baseline.md)。
