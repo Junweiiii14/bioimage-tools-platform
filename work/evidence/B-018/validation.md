@@ -11,3 +11,5 @@
 - `python -m ruff format --check .`：退出0，1232文件格式通过。
 - 一次整理脚本在默认GBK读取build.mjs时停止；改为显式UTF-8并从中断点继续，已重新生成与验证，不覆盖源数据，不把首次脚本视为成功。
 - 本轮未运行产品全量/科学/真实用户/目标机验证。原P009 CI保留准确提交归属；本PR完整必需CI尚需核验，不以文档检查代替。
+
+- 历史构建 `npm run historical-v4 --prefix docs/plans/renderer`：退出0，固定4.0源输出到.local历史目录，当前五份HTML未覆盖。根AGENTS仅更新过期恢复指令，不变更质量/数据/合并约束；重新加载回执。
