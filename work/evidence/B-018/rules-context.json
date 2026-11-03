@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "task": "B-018",
-  "base_commit": "6e0dcd44ae726caffa9215da49bcf569737258cd",
+  "base_commit": "5d6e03be849d678e5f27e220fcf3fc4917e85fd5",
   "scopes": [
     ".agent-handoff",
     "AGENTS.md",
