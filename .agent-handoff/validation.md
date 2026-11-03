@@ -1,5 +1,10 @@
 # Validation Index
 
+## 2026-11-03 B018
+
+B018：P009转移文件逐字节复制，集成候选/main tree一致，两个gzip及解压SHA核验通过；后续给P卡新增版本导航说明，原科学/性能/CI记录不改署。格式/链接/HTML/回执检查见work/evidence/B-018/validation.md。
+
+
 2026-11-02生产自动会话：tests/test_workflow_session.py + RunSession/模块共23passed36.34s；加入口核验一次/后台线程断言后控制器2passed10.86s。真实--workflow CLI三节点/正式提交/账本succeeded、重开4000、三RunRecord及current runtime源码指纹同源均exit0。Ruff/Pyright/policy/九import约束0；精确源SHA/日志/run IDs见auto-session.json。新控制器完整故障/cache/UI、全门禁/新wheels/CI与最终独审未完成。
 
 2026-11-02社区karpathy-guidelines配置：上游固定commit raw与本地2518字节/SHA逐字节一致（作者命令exit0、非作者独立确认），仅MD无执行hook；skills-lock/policy exit0，用户优先实现规则已加载并生成新P005回执。证据karpathy-skill-verification.json。未运行产品新图，不把静态技能核验冒充MVP有效性；待实际简化与端到端运行验证。

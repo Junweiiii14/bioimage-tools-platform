@@ -32,11 +32,8 @@
 
 长期维护的优先级、责任、触发和验收清单见 [maintenance-plan.md](maintenance-plan.md)。2026-10-15 起先收拢既有审查与验收缺口，再扩展新工具。
 
-## 第一阶段V0接续
+## 当前阶段与历史
 
-2026-10-31用户授权执行[总方案3.0](plans/research-platform-rd.md)的[第一阶段V0](plans/phase-1-v0.md)。P001接入正确产品树、保留历史回执并生成实际PR基线integration清单后，按登记依赖推进P002及必要配套。任务卡是唯一状态源，B005是历史治理补充。新增方案不覆盖T082工程证据或科学/目标环境待办。本轮原生goal已真实创建；恢复时通过get_goal核对，不从文档文字推断客户端状态。
+P002独立WB、M1执行及M2可视编排已通过PR集成，证据见[P009交付审计](../work/evidence/P-009/objective-audit.md)。当前从[交接入口](../AGENT_HANDOFF.md)恢复；不要从旧V0/P001起步。规划入口为[研发方案](plans/README.md)，历史章节与当时授权见[版本索引](plans/history.md)。
 
-
-## 2026-11-02 4.0接续（优先于上述历史阶段限制）
-
-当前主方案已同步4.0。P002先按原范围验收，随后持续推进M1通用执行与M2可视编排，见docs/plans/phase-2-workflow-authoring.md（仓库根相对路径）。旧3.0/V0终点说明保留为历史；任务依赖由新执行者按4.0拆卡登记，不从文档推断产品已实现。HTML继续用docs/plans/renderer/build.mjs；不使用旧规划树的本机B009构建器。
+新增实验、方法和Agent按新任务范围推进，既有工程不重做。HTML默认使用renderer内npm run build；任务状态只在任务卡，科学/用户/环境缺项保持独立。

@@ -1,5 +1,7 @@
 # P-006 真实工作台运行反馈与性能基线
 
+> 历史设计引用：本卡原始3.0章节见[固定版本](../../docs/plans/archive/research-platform-rd-v3-published.md)，不按新版主文同号章节解释。完成状态以本卡元数据与准确集成收据为准。
+
 <!-- PROGRAM_TASK_META {"id":"P-006","status":"done","work_package":"W05","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"839fa521d9ae11ceb51f9c4c7493eb2a0251eda0","head_commit":"b0c71e19dc729644f73783e550e66ccd7becd48d"} -->
 
 ## 执行状态

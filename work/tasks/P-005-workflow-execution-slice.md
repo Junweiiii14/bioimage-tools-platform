@@ -1,5 +1,7 @@
 # P-005 工作流与事件协议的最小可靠执行切片
 
+> 历史设计引用：本卡原始3.0章节见[固定版本](../../docs/plans/archive/research-platform-rd-v3-published.md)，不按新版主文同号章节解释。完成状态以本卡元数据与准确集成收据为准。
+
 当前进展（2026-11-02）：单图真实执行切片工程完成。准确候选2258cd5已非作者Accepted并经PR52及四项必需CI正常合入main4d6ee6c，tree完全一致。Windows1659pass1185.30秒/Linux1655pass4既有skip508.51秒及两侧全部隔离wheels通过；真实桌面/CLI、暂停调整、取消、重开、故障对账和依赖缓存证据见integration.json、final-runtime-validation.json及runtime-review.md。原超时/首轮Request changes保留；科学留出、用户体验和干净目标机不代签。完整M1批量/P008和M2编排/P009仍未完成。
 
 <!-- PROGRAM_TASK_META {"id":"P-005","status":"done","work_package":"W04","depends_on":["P-002","P-007"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"006e9f143c830f5e13be2932e8ac37a9f3a05ed1","head_commit":"2258cd5b976bb6aa28f2c1348d188ff1f534999b"} -->

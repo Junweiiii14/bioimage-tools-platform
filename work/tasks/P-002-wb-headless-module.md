@@ -1,5 +1,7 @@
 # P-002 V0成熟WB方法独立调用与真实成果对照
 
+> 历史设计引用：本卡原始3.0章节见[固定版本](../../docs/plans/archive/research-platform-rd-v3-published.md)，不按新版主文同号章节解释。完成状态以本卡元数据与准确集成收据为准。
+
 <!-- PROGRAM_TASK_META {"id":"P-002","status":"done","work_package":"W02","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"29930f62a0b158189b76e0fad7d090d632f149d6","head_commit":"a69b38e810b4fefe1d38fae845c582d17ff56aae"} -->
 
 ## 执行状态

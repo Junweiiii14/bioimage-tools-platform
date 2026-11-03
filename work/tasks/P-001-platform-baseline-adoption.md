@@ -1,5 +1,7 @@
 # P-001 正确产品基线与长期计划接入
 
+> 历史设计引用：本卡原始3.0章节见[固定版本](../../docs/plans/archive/research-platform-rd-v3-published.md)，不按新版主文同号章节解释。完成状态以本卡元数据与准确集成收据为准。
+
 <!-- PROGRAM_TASK_META {"id":"P-001","status":"done","work_package":"W00","depends_on":[],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a190e6-02b1-74e3-a7b9-bd5fbc3f36fe","base_commit":"dfc48ed7c2c944dc8f03c3931bc7985452a31393","head_commit":"f4bd81e182ee4b982949e99eb51136dabcea7701"} -->
 
 ## 执行状态
