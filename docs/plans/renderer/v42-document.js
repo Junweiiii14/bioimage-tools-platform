@@ -1,0 +1,11 @@
+
+const menu=document.getElementById('menu-toggle');
+menu.addEventListener('click',()=>{const open=document.body.classList.toggle('nav-open');menu.setAttribute('aria-expanded',String(open));menu.textContent=open?'收起目录':'目录与检索'});
+document.querySelectorAll('.sidebar a').forEach(a=>a.addEventListener('click',()=>{document.body.classList.remove('nav-open');menu.setAttribute('aria-expanded','false');menu.textContent='目录与检索'}));
+document.getElementById('print').addEventListener('click',()=>window.print());
+const index=[...document.querySelectorAll('.document p,.document li,.document pre,.document tr')].map(el=>({el,text:el.textContent.trim()}));
+const search=document.getElementById('search'),results=document.getElementById('results'),status=document.getElementById('search-status');let timer;
+search.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(()=>{const q=search.value.trim().toLocaleLowerCase();results.replaceChildren();if(!q){status.textContent='搜索全文；内容始终完整保留。';return}const hits=index.filter(x=>x.text.toLocaleLowerCase().includes(q));status.textContent=hits.length?'找到 '+hits.length+' 处，显示前 12 处。':'没有找到匹配内容，请换一个关键词。';hits.slice(0,12).forEach(hit=>{const a=document.createElement('a');a.href='#'+hit.el.id;const at=hit.text.toLocaleLowerCase().indexOf(q);a.textContent=(at>24?'…':'')+hit.text.slice(Math.max(0,at-24),at+85)+'…';a.addEventListener('click',()=>{document.body.classList.remove('nav-open');menu.setAttribute('aria-expanded','false');menu.textContent='目录与检索'});results.append(a)});},130)});
+const links=[...document.querySelectorAll('.toc a')];
+const sections=[...document.querySelectorAll('.document h2')];let queued=false;function updateCurrent(){queued=false;let current=sections[0];for(const h of sections){if(h.getBoundingClientRect().top<=150)current=h;else break}links.forEach(a=>{if(a.hash==='#'+current.id)a.setAttribute('aria-current','true');else a.removeAttribute('aria-current')})}addEventListener('scroll',()=>{if(!queued){queued=true;requestAnimationFrame(updateCurrent)}},{passive:true});addEventListener('resize',updateCurrent);updateCurrent();
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.body.classList.remove('nav-open');menu.setAttribute('aria-expanded','false');menu.textContent='目录与检索'}});

@@ -1,10 +1,10 @@
 # 生物图像工具平台
 
-[研发总方案3.0与HTML](docs/plans/README.md) · [第一阶段V0](docs/plans/phase-1-v0.md) · [公开开发数据](docs/plans/development-data.md) · [任务依赖](work/programs/scientific-agent-platform/README.md)。本轮范围为成熟WB用例独立运行与真实成果对照；规划不表示实现、科学准入或安装器发布。
+[研发方案与历史](docs/plans/README.md) · [当前任务](AGENT_HANDOFF.md) · [代码入口](docs/module-map.md) · [工作流操作说明](docs/runbooks/workflow-authoring.md)。
 
-当前开发任务：[P001 正确基线接入](work/tasks/P-001-platform-baseline-adoption.md) → [交接索引](AGENT_HANDOFF.md)。最近已交付实验室安装包及其实际验收：[T081 R2 交付记录](work/evidence/T-081/final-delivery.md)；本轮已构建并完成本机可弃安装验收，见 [T082 本地交接](work/evidence/T-082/final-handoff.md)。冻结源码、验收包与交接提交分别记录，未替换在用实验室版本。
+当前主线已包含WB独立执行、通用工作流和可视编排，集成与验收证据见[P009交付审计](work/evidence/P-009/objective-audit.md)。当前先收尾旧事项，再重写研发方案，见[B018清单](work/evidence/B-018/closeout.md)。规划、工程集成、科学验证、用户验收和安装器发布是不同状态。
 
-历史版本及证据保留，旧检查不作为本轮通过证明。实验室发行的实际安装验证、源码集成和目标机限制以T081记录为准；科学留出、干净Win10与物理DPI验收另列。开发范围保持WB，IF/IHC不自动扩展。
+在用实验室安装与本地验收仍见[T081交付](work/evidence/T-081/final-delivery.md)和[T082交接](work/evidence/T-082/final-handoff.md)；最新源码合入不表示已替换安装包。科学留出、目标机和性能限制见[风险入口](.agent-handoff/risks.md)。
 
 实验室使用者运行随附Setup.exe即可安装，包含私有Python、Qt/WebEngine、本地OCR模型和VC运行库，无需开发环境或Office。安装目标为Windows10 1809+或Windows11的x64机器，按当前用户安装；首次部署运行开始菜单环境自检并用合成练习素材核对流程。构建配方为 `python -m tooling.build_runtime_candidate --laboratory --iscc <固定编译器> --gcc <固定编译器>`；只从干净提交构建，安装器通过实验室交付包分发，不自动公开上传二进制。
 

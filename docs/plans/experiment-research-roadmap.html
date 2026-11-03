@@ -1,0 +1,101 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>后续实验：先调研，再开发的具体路线</title><style>
+:root{--paper:#fefff9;--canvas:#f1f3e9;--ink:#203b2e;--muted:#52634c;--line:#dce3d4;--accent:#24745a;--wash:#e6efcf;--code:#f1f4e9;--focus:#24745a;color-scheme:light}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:30px}body{margin:0;background:var(--canvas);color:var(--ink);font:16px/1.9 'WB Sans','Microsoft YaHei',sans-serif;font-synthesis:none}::selection{background:#c9dfce;color:#152b22}a{color:var(--accent);text-underline-offset:4px}a:hover{text-decoration-thickness:2px}button,input{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--focus);outline-offset:4px}input{caret-color:var(--accent)}
+.skip{position:fixed;left:20px;top:-100px;background:var(--paper);padding:8px;z-index:20}.skip:focus{top:12px}.sidebar{position:fixed;left:0;top:0;bottom:0;width:288px;padding:35px 24px;overflow:auto;background:var(--paper);border-right:1px solid var(--line)}.brand{display:block;font-size:20px;font-weight:700;margin-bottom:6px;text-decoration:none}.edition{font-size:13px;color:var(--muted);margin:0 0 24px}.search-label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}.search-box{width:100%;border:1px solid #879b92;background:var(--paper);border-radius:8px;padding:10px 11px;line-height:1.5;color:var(--ink)}.search-box::placeholder{color:#64756d}.search-status{font-size:12px;color:var(--muted);margin:8px 0;min-height:22px}.search-results{display:grid;gap:0;max-height:40vh;overflow:auto}.search-results a{font-size:12px;padding:8px 0;border-bottom:1px solid var(--line);line-height:1.7}.toc{margin-top:22px;display:grid;gap:3px}.toc>a{display:block;padding:8px 10px;text-decoration:none;font-size:14px;line-height:1.7;border-radius:4px}.toc>a[aria-current=true]{background:var(--wash);font-weight:700}.toc>a:hover{background:#f1f4ef}.side-note{font-size:12px;line-height:1.8;color:var(--muted);margin-top:28px;padding-top:16px;border-top:1px solid var(--line)}.print-button{padding:8px 12px;border:1px solid #8fa498;border-radius:8px;background:transparent;color:var(--accent);margin-top:18px;font-size:13px}.mobile-bar{display:none}
+.page{margin-left:288px;padding:0 48px 60px}.document{max-width:1120px;margin:auto;background:var(--paper);padding:52px 52px 80px;box-shadow:0 8px 32px #173b2210}.document>h1{font-family:'Microsoft YaHei',sans-serif;font-weight:650;font-size:clamp(30px,3vw,43px);line-height:1.45;margin:0 0 12px;letter-spacing:0}.document>h1+p{color:var(--muted);font-size:13px;margin-bottom:28px}.document>p,.document>ul,.document>ol{max-width:74ch}.document>p{margin:16px 0}h2{font-size:27px;line-height:1.55;margin:70px 0 24px;padding-top:26px;border-top:1px solid var(--line);font-weight:700}h3{font-size:21px;line-height:1.6;margin:38px 0 15px}h4{font-size:17px;margin:28px 0 12px;line-height:1.65}h2,h3,h4{scroll-margin-top:26px;text-wrap:balance}h2:target,h3:target,h4:target,[id^=block]:target{background:var(--wash);outline:2px solid #b5ccbc;outline-offset:6px}.permalink{font-weight:400;font-size:.7em;margin-left:10px;color:var(--muted);text-decoration:none;opacity:0}h2:hover .permalink,h3:hover .permalink,h4:hover .permalink,.permalink:focus-visible{opacity:1}p,li,td,th{overflow-wrap:anywhere}li{margin:7px 0}ul,ol{padding-left:1.7em}strong{font-weight:700}code{font-family:Consolas,'Cascadia Code',monospace;font-size:.89em;background:var(--code);border-radius:3px;padding:2px 4px;overflow-wrap:anywhere}pre{overflow:auto;background:#edf2ef;border:1px solid var(--line);border-radius:6px;padding:22px;line-height:1.65;font-size:14px;tab-size:2;max-height:600px}pre code{padding:0;border-radius:0;background:transparent;overflow-wrap:normal;white-space:pre}.table-wrap{max-width:100%;overflow:auto;margin:22px 0 28px;border:1px solid var(--line);border-radius:8px;scrollbar-color:#8da396 #e8eeea}table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.85}th,td{text-align:left;vertical-align:top;padding:13px 15px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-width:135px;font-variant-numeric:tabular-nums}th{background:#edf2ed;font-weight:700;color:#294b3e}td:last-child,th:last-child{border-right:none}tbody tr:last-child td{border-bottom:none}tbody tr:nth-child(even){background:#fafbf7}td code{font-size:12px}.flow-diagram{margin:36px 0 0;padding:22px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}figcaption{font-weight:700;margin-bottom:18px}.flow-row{display:flex;gap:8px;align-items:center}.flow-row>div{flex:1;padding:12px 7px;background:var(--wash);text-align:center;font-size:13px;font-weight:700;line-height:1.6;min-width:0}.flow-row small{display:block;font-size:11px;color:#486153;font-weight:400;margin-top:7px}.flow-row>span{color:var(--accent)}.flow-diagram p{font-size:12px;color:var(--muted);margin:15px 0 0}.document-footer{margin-top:65px;border-top:1px solid var(--line);padding-top:20px;font-size:12px;color:var(--muted)}.reading-links{display:flex;flex-wrap:wrap;gap:10px 22px;padding:16px 0 24px;border-bottom:1px solid var(--line);margin-bottom:28px;font-size:13px}.reading-links a{text-decoration:none}.reading-links a:hover{text-decoration:underline}button:hover{background:var(--wash)}
+@media(min-width:1700px){.document{padding-left:68px;padding-right:68px}}@media(max-width:1200px){.sidebar{width:248px;padding:28px 18px}.page{margin-left:248px;padding:0 22px 40px}.document{padding:36px 28px 60px}.flow-row{flex-wrap:wrap}.flow-row>div{min-width:100px}}@media(max-width:780px){html{scroll-padding-top:85px}.mobile-bar{display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;padding:12px 18px;background:var(--paper);border-bottom:1px solid var(--line);font-size:14px}.mobile-bar button{border:1px solid #8fa498;padding:5px 12px;border-radius:4px;background:transparent;color:var(--accent)}.sidebar{display:none;position:fixed;top:65px;width:100%;bottom:auto;max-height:calc(100vh - 65px);padding:18px 24px;z-index:9;border-bottom:1px solid var(--line)}body.nav-open .sidebar{display:block}.sidebar .brand,.sidebar .edition,.side-note{display:none}.toc{margin-top:12px}.toc>a{padding:6px 8px}.page{margin-left:0;padding:0}.document{padding:26px 20px 48px;box-shadow:none}.document>h1{font-size:31px}.document>p{font-size:15px}.document h2{font-size:23px;margin-top:50px;padding-top:20px;scroll-margin-top:85px}.document h3{font-size:19px;scroll-margin-top:85px}.document h4{scroll-margin-top:85px}.table-wrap{margin-right:0}th,td{min-width:165px;font-size:12px;padding:11px}pre{font-size:12px;padding:15px}.flow-row{display:grid;grid-template-columns:1fr}.flow-row>div{padding:10px}.flow-row small{display:inline;margin-left:8px}.flow-row>span{text-align:center;line-height:1;transform:rotate(90deg)}.search-results{max-height:25vh}.permalink{opacity:1}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}@media print{@page{size:A4;margin:16mm 12mm}.sidebar,.mobile-bar,.skip,.reading-links,.permalink{display:none!important}.page{margin:0;padding:0}.document{max-width:none;padding:0;box-shadow:none}.document>h1{font-size:28px}body{background:white;font-size:10pt;line-height:1.7}.document>p{font-size:10pt}h2{break-before:page;font-size:20px;margin:0 0 16px;padding-top:0;border:0}h3{font-size:15px}h4{font-size:12px}h2,h3,h4{break-after:avoid}table{font-size:8pt}.table-wrap{overflow:visible;border-radius:0;break-inside:auto}th,td{min-width:0;padding:6px;overflow-wrap:anywhere}thead{display:table-header-group}tr{break-inside:avoid}pre{max-height:none;white-space:pre-wrap;overflow:visible;font-size:8pt}pre code{white-space:pre-wrap;overflow-wrap:anywhere}.flow-diagram{break-inside:avoid}a{color:inherit;text-decoration:none}}
+</style></head><body><a class="skip" href="#document">跳到正文</a><div class="mobile-bar"><strong>科研数据平台 · 4.2</strong><button id="menu-toggle" aria-controls="navigation" aria-expanded="false">目录与检索</button></div><aside class="sidebar" id="navigation"><a class="brand" href="#document">科研数据平台</a><p class="edition">合并方案 4.2 · 2026.11.02</p><label class="search-label" for="search">查找操作、模块或维护要求</label><input class="search-box" id="search" type="search" placeholder="例如：操作 / 版本 / 审查"><p class="search-status" id="search-status" aria-live="polite">搜索全文；内容始终完整保留。</p><div id="results" class="search-results"></div><nav class="toc" aria-label="文档目录"><a href="#section-1">1. 怎么使用这份路线</a><a href="#section-2">2. 每种实验具体研究什么、做出什么</a><a href="#section-3">3. 每次调研结束才能确定的开发清单</a></nav><button class="print-button" id="print">打印 / 保存 PDF</button><p class="side-note">方案与实施状态分别标注。当前阶段与限制以任务卡和交接入口为准。</p></aside><main class="page"><article class="document" id="document" tabindex="-1"><h1>后续实验：先调研，再开发的具体路线</h1>
+<p id="block-1">2026-11-02 · B-014研究路线；2026-11-03仅更新阶段说明，未激活新实验</p>
+<h2 id="section-1" tabindex="-1">1. 怎么使用这份路线<a class="permalink" href="#section-1" aria-label="链接到此节">§</a></h2>
+<p id="block-2">P008批处理及P009可视编排已完成工程集成，真实用户与科学验收仍独立。下面是新增实验能力的建议顺序，不是已激活任务，也不是要求所有内容同时开发。第一项先完成<a href="../research/2026-11-02-wb-workflow-audit.html">WB实际流程对照</a>，补齐模板和实验数据汇总。</p>
+<p id="block-3">推荐顺序是：<strong>WB闭环 → 免疫荧光计数/强度 → CCK-8等孔板结果 → qPCR → 划痕 → 克隆形成/Transwell → IHC → 流式。</strong> 这按现有能力的复用程度和数据复杂度排序，不是市场需求排名；如果某类实验已有完整真实数据和明确用户，可以调整先后。</p>
+<p id="block-4">目前只对下列软件功能做了公开资料初筛，没有把每个场景都做成完整调研。真正启动某一项时，先按<a href="workflow-development.html">操作调研表</a>补齐软件版本、具体操作、参数和对照结果，再创建实现任务。</p>
+<h2 id="section-2" tabindex="-1">2. 每种实验具体研究什么、做出什么<a class="permalink" href="#section-2" aria-label="链接到此节">§</a></h2>
+<h3 id="heading-1" tabindex="-1">第一项：免疫荧光细胞计数、阳性率和强度<a class="permalink" href="#heading-1" aria-label="链接到此节">§</a></h3>
+<p id="block-5"><strong>要解决的问题：</strong> 每张图有多少细胞，多少阳性，每个细胞或选区的荧光有多强。</p>
+<p id="block-6">先调研一套二维、明确通道的实验。可对照CellProfiler的<code>IdentifyPrimaryObjects</code>识别细胞核、必要时<code>IdentifySecondaryObjects</code>识别细胞，再用<code>MeasureObjectIntensity</code>测目标通道。ImageJ的阈值和<code>Analyze Particles</code>可作为另一个实验室操作来源，不强制统一为同一种算法。<a href="https://cellprofiler-manual.s3.amazonaws.com/CellProfiler-4.2.8/modules/objectprocessing.html">CellProfiler对象识别</a>、<a href="https://cellprofiler-manual.s3.amazonaws.com/CellProfiler-4.2.8/modules/measurement.html">强度测量</a></p>
+<ul>
+<li id="block-7"><strong>先拿材料：</strong> 原始多通道图、通道含义、像素尺寸、阴性对照、人工核/细胞标注、软件测量表。</li>
+<li id="block-8"><strong>重点问清：</strong> 测细胞核、全细胞还是固定ROI？怎样处理粘连和边缘细胞？阳性阈值从哪里来？是否做背景/照明校正？</li>
+<li id="block-9"><strong>候选模块：</strong> 通道读取 → 核/细胞分割 → 对象筛选 → 强度测量 → 阳性判定 → 按样本汇总。</li>
+<li id="block-10"><strong>第一版交付：</strong> 细胞标号叠加图、逐细胞表、每样本计数/阳性率/强度表，并能用模板跑第二批。</li>
+<li id="block-11"><strong>验收重点：</strong> 人工标注的漏检和合并错误；计数和强度分别核对。多视野先归属同一样本，不能把每个细胞直接当独立实验重复。</li>
+</ul>
+<p id="block-12">这能复用图像输入、ROI、显示与表格交付，但需要新的二维分割和对象测量能力；不能直接用WB的泳道积分替代。</p>
+<h3 id="heading-2" tabindex="-1">第二项：CCK-8/MTT结果与ELISA标准曲线<a class="permalink" href="#heading-2" aria-label="链接到此节">§</a></h3>
+<p id="block-13">先做一套CCK-8板读数，再扩展ELISA。CCK-8先核对试剂说明和仪器导出；它反映代谢相关读数，不能未经验证就等同于直接细胞计数。ELISA可对照Prism的<code>Interpolate a standard curve</code>，但要按具体试剂和数据确定曲线模型及权重。<a href="https://www.dojindo.com/ASIA/products/CK04/">Dojindo CCK-8</a>、<a href="https://www.graphpad.com/guides/prism/latest/curve-fitting/reg_interpolating_with_linear_or_n.htm">Prism标准曲线</a></p>
+<ul>
+<li id="block-14"><strong>先拿材料：</strong> 仪器原始CSV/XLSX、孔位布局、空白/对照、标准品浓度、稀释倍数、重复孔和原结果表。</li>
+<li id="block-15"><strong>重点问清：</strong> 空白怎样扣？有没有参考波长？复孔怎样合并？标准曲线用什么模型、加权和范围？</li>
+<li id="block-16"><strong>候选模块：</strong> 板表读取 → 孔位绑定 → 空白校正 → 复孔汇总；CCK-8接相对对照，ELISA接拟合→反算浓度→稀释换算。</li>
+<li id="block-17"><strong>第一版交付：</strong> 可追溯到孔位的结果表、板图和所需曲线。CCK-8相对值和ELISA浓度采用不同模板。</li>
+<li id="block-18"><strong>验收重点：</strong> 手算样例、标准品回算和超范围样本。不能把缺孔填0，不能不说明地外推浓度。</li>
+</ul>
+<p id="block-19">可复用文件导入和通用表格/出图机制；孔板模型、拟合和实验公式需要新增。Excel元信息读取功能本身不等于已有孔板分析。</p>
+<h3 id="heading-3" tabindex="-1">第三项：qPCR相对表达量<a class="permalink" href="#heading-3" aria-label="链接到此节">§</a></h3>
+<p id="block-20">以一个具体仪器的导出格式起步。QuantStudio相对定量模块提供参照样本/内参设置、基线和阈值检查等操作；这些参数必须随结果记录。<a href="https://documents.thermofisher.com/TFS-Assets/LSG/manuals/MAN0018747_RelativeQuantificatAnalysisModule_QSDASWv2_UG.pdf">QuantStudio Design and Analysis v2相对定量指南，Rev F.0</a></p>
+<ul>
+<li id="block-21"><strong>先拿材料：</strong> 原实验文件或导出曲线、Cq/Ct表、孔位、靶标、内参、对照、复孔、熔解曲线及效率证据。</li>
+<li id="block-22"><strong>重点问清：</strong> 哪些孔未扩增？阈值是否一致？复孔异常怎样处理？采用ΔΔCt还是效率校正方法？前提是否满足？</li>
+<li id="block-23"><strong>候选模块：</strong> 仪器结果读取 → 孔/基因/样本绑定 → 质量检查 → 复孔处理 → 内参与对照计算 → 表图。</li>
+<li id="block-24"><strong>第一版交付：</strong> 从仪器已计算的Cq/Ct开始做可复现相对定量；重新从扩增曲线估计Cq另立方法任务。</li>
+<li id="block-25"><strong>验收重点：</strong> 未检出不填0或任意最大循环数；与仪器/实验室参考表逐孔核对；保留生物重复身份。</li>
+</ul>
+<p id="block-26">先复用孔表与样本身份，不复用WB比值公式来冒充qPCR计算。</p>
+<h3 id="heading-4" tabindex="-1">第四项：划痕愈合<a class="permalink" href="#heading-4" aria-label="链接到此节">§</a></h3>
+<p id="block-27">研究ImageJ/Fiji的Wound Healing Size Tool及实验室已有操作。其方法文章描述了划痕区域、覆盖率、平均宽度等输出，首版只选择实验室真正使用的一个端点。<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7386569/">原始方法论文</a></p>
+<ul>
+<li id="block-28"><strong>先拿材料：</strong> 同一视野的0时刻及后续图、时间信息、标尺、人工划痕区域和原结果。</li>
+<li id="block-29"><strong>重点问清：</strong> 是否同视野配对？如何排除漂浮细胞、划痕岛屿和边缘？需要面积闭合率还是宽度变化？</li>
+<li id="block-30"><strong>候选模块：</strong> 时间/视野配对 → 必要的配准 → 无细胞区域分割 → 面积测量 → 相对0时刻计算。</li>
+<li id="block-31"><strong>第一版交付：</strong> 各时间点区域叠加图和同视野变化曲线。</li>
+<li id="block-32"><strong>验收重点：</strong> 面积与人工mask对照，错误时间配对被识别；图像中的闭合不能自动解释成纯迁移效应。</li>
+</ul>
+<p id="block-33">此处首次真正需要时间序列配对，确认实际需求后再扩展公共数据结构。</p>
+<h3 id="heading-5" tabindex="-1">第五项：克隆形成与Transwell<a class="permalink" href="#heading-5" aria-label="链接到此节">§</a></h3>
+<p id="block-34">两者都可能涉及分割/计数，但必须分开模板。ColonyArea测的是孔内覆盖面积并考虑强度，<strong>不是克隆个数</strong>；不能把它直接贴上“克隆计数”标签。<a href="https://imagej.net/plugins/colonyarea">ColonyArea官方说明</a></p>
+<ul>
+<li id="block-35"><strong>克隆形成材料和问题：</strong> 完整培养孔图、孔边界、原计数/覆盖率；确认端点是数量、面积还是强度，粘连克隆怎样处理。</li>
+<li id="block-36"><strong>克隆候选模块：</strong> 孔检测/裁剪 → 背景与阈值 → 克隆分割/计数，或覆盖面积测量 → 按孔汇总。</li>
+<li id="block-37"><strong>Transwell材料和问题：</strong> 染色视野、孔/膜/样本对应、人工计数；明确膜孔、碎屑、重叠细胞和取景规则。</li>
+<li id="block-38"><strong>Transwell候选模块：</strong> 有效视野 → 细胞识别/筛选 → 每视野计数 → 每膜/样本汇总。</li>
+<li id="block-39"><strong>第一版交付：</strong> 目标轮廓/标号与结果表，数量和面积字段分开。</li>
+<li id="block-40"><strong>验收重点：</strong> 对照人工标注；同一孔/膜的多个视野不能凭数量充作多个独立重复。Transwell具体软件方法尚待单独实测。</li>
+</ul>
+<p id="block-41">先从前面的二维对象测量提炼复用，不预先假定一种分割算法适合所有染色图。</p>
+<h3 id="heading-6" tabindex="-1">第六项：IHC阳性率/面积<a class="permalink" href="#heading-6" aria-label="链接到此节">§</a></h3>
+<p id="block-42">可对照QuPath：标注组织区域 → <code>Analyze &gt; Cell detection &gt; Positive cell detection</code> → 设置检测参数、测量部位和阳性阈值 → 查看测量结果。核标志物与膜/胞质标志物的测量部位不能混用。<a href="https://qupath.readthedocs.io/en/stable/docs/tutorials/cell_detection.html">QuPath细胞检测教程</a></p>
+<ul>
+<li id="block-43"><strong>先拿材料：</strong> 原始切片/扫描文件、染色信息、像素尺度、组织/细胞参考标注、原软件工程和结果。</li>
+<li id="block-44"><strong>重点问清：</strong> 阳性面积、阳性细胞比例还是H-score？哪些组织纳入？染色分离、弱/中/强阈值如何确定？</li>
+<li id="block-45"><strong>候选模块：</strong> 切片读取 → 组织ROI → 染色分离 → 细胞或像素分析 → 评分/汇总。</li>
+<li id="block-46"><strong>第一版交付：</strong> 一种固定染色和端点的ROI结果；整张超大切片分块与病例汇总随后扩展。</li>
+<li id="block-47"><strong>验收重点：</strong> 独立标注/评分、不同染色批次及组织排除。不能把普通图像计数结果当作病理结论。</li>
+</ul>
+<h3 id="heading-7" tabindex="-1">第七项：流式细胞术<a class="permalink" href="#heading-7" aria-label="链接到此节">§</a></h3>
+<p id="block-48">流式处理的是事件表，不能沿用二维图像模型。FlowJo提供Graph Window、轴变换、门和门层级、统计输出，这些是要逐项记录的实际操作。<a href="https://docs.flowjo.com/flowjo/graphs-and-gating/gw-overview/">FlowJo Graph Window</a></p>
+<ul>
+<li id="block-49"><strong>先拿材料：</strong> FCS、通道/标记表、补偿或解混信息及对照、现有门层级、软件workspace和结果表。</li>
+<li id="block-50"><strong>重点问清：</strong> 补偿/解混在哪一步完成？显示变换是什么？每个门依据什么对照？阳性率分母是哪一级父群？</li>
+<li id="block-51"><strong>候选模块：</strong> 事件读取 → 已验证补偿/变换 → 质量/单细胞等门 → 目标群门 → 频率和强度统计。</li>
+<li id="block-52"><strong>第一版交付：</strong> 一套明确panel、固定方法的门树和表格复现，随后再研究跨样本自动调整。</li>
+<li id="block-53"><strong>验收重点：</strong> 与参考软件逐门核对事件身份和分母；不能只比较最终百分比。补偿/解混算法与workspace兼容能力还需专项调研。</li>
+</ul>
+<h2 id="section-3" tabindex="-1">3. 每次调研结束才能确定的开发清单<a class="permalink" href="#section-3" aria-label="链接到此节">§</a></h2>
+<p id="block-54">每个实验至少形成五项简明产物：<strong>一份真实输入和输出对照、逐步操作表、方法/参数来源、现有模块差距表、可验证的第一版模板。</strong> 不要求收集完所有实验室才开发，先覆盖一个明确场景，再用第二批和第二实验室检验复用。</p>
+<p id="block-55">把每个操作归为“已能复用、只需适配、新算法、尚需人工判断”，然后只开发缺少的部分。先保存所选方法和参数；有证据的自动估参再独立加入；没有依据的判断不得交给Agent随意补齐。</p>
+<p id="block-56">公共能力优先跟随真实需求出现：WB先需要样本/膜/重复表与统计出图；IF需要对象mask与测量表；孔板需要孔位；划痕需要时间配对；IHC需要大图组织区域；流式需要事件与门树。它们共享工作流执行和来源记录，不共用一个包办所有实验的数值模型。</p>
+<p id="block-57">每完成一个模板，证明它能保存、重开、替换新数据、自动运行、解释失败和回溯结果，再进入下一实验。具体发布、数据用途与外部服务授权仍按原任务范围，不因本路线自动扩大。</p>
+<footer class="document-footer">4.2整理版 · B-018收尾；不代表算法对照、产品验收或代码重构已经完成。离线可读，本地参考链接依赖对应文件。</footer></article></main><script>
+const menu=document.getElementById('menu-toggle');
+menu.addEventListener('click',()=>{const open=document.body.classList.toggle('nav-open');menu.setAttribute('aria-expanded',String(open));menu.textContent=open?'收起目录':'目录与检索'});
+document.querySelectorAll('.sidebar a').forEach(a=>a.addEventListener('click',()=>{document.body.classList.remove('nav-open');menu.setAttribute('aria-expanded','false');menu.textContent='目录与检索'}));
+document.getElementById('print').addEventListener('click',()=>window.print());
+const index=[...document.querySelectorAll('.document p,.document li,.document pre,.document tr')].map(el=>({el,text:el.textContent.trim()}));
+const search=document.getElementById('search'),results=document.getElementById('results'),status=document.getElementById('search-status');let timer;
+search.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(()=>{const q=search.value.trim().toLocaleLowerCase();results.replaceChildren();if(!q){status.textContent='搜索全文；内容始终完整保留。';return}const hits=index.filter(x=>x.text.toLocaleLowerCase().includes(q));status.textContent=hits.length?'找到 '+hits.length+' 处，显示前 12 处。':'没有找到匹配内容，请换一个关键词。';hits.slice(0,12).forEach(hit=>{const a=document.createElement('a');a.href='#'+hit.el.id;const at=hit.text.toLocaleLowerCase().indexOf(q);a.textContent=(at>24?'…':'')+hit.text.slice(Math.max(0,at-24),at+85)+'…';a.addEventListener('click',()=>{document.body.classList.remove('nav-open');menu.setAttribute('aria-expanded','false');menu.textContent='目录与检索'});results.append(a)});},130)});
+const links=[...document.querySelectorAll('.toc a')];
+const sections=[...document.querySelectorAll('.document h2')];let queued=false;function updateCurrent(){queued=false;let current=sections[0];for(const h of sections){if(h.getBoundingClientRect().top<=150)current=h;else break}links.forEach(a=>{if(a.hash==='#'+current.id)a.setAttribute('aria-current','true');else a.removeAttribute('aria-current')})}addEventListener('scroll',()=>{if(!queued){queued=true;requestAnimationFrame(updateCurrent)}},{passive:true});addEventListener('resize',updateCurrent);updateCurrent();
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.body.classList.remove('nav-open');menu.setAttribute('aria-expanded','false');menu.textContent='目录与检索'}});
+</script></body></html>

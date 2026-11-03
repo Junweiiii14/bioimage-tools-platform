@@ -9,7 +9,7 @@
 
 ## Main Entry Points
 
-当前实际产品执行根为 `C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0`。分支/HEAD及当前任务从snapshot与任务卡核实，不把本文件当状态源。旧规划树、历史worktree、原图/历史成果和在用安装保持；不从历史安装路径判断当前候选已发布。此前T072工作区描述原字节归档于[旧workspace](archive/workspace-before-v4-20261102.md)。
+P009产品验收使用过bioimage-v0；本轮活动检出、分支/HEAD及任务从snapshot与任务卡核实，不把历史执行根当当前入口。旧规划树、历史worktree、原图/历史成果和在用安装保持；不从历史安装路径判断当前候选已发布。此前T072工作区描述原字节归档于[旧workspace](archive/workspace-before-v4-20261102.md)。
 
 在本活动检出中，`Start-BioImage.ps1`固定自身检出；源码命令 `uv run --locked --no-sync python -m bioimage_app`、历史 `--figure-project` / `--platform` 均进入绿色WebWorkbenchWindow，旧原生窗口仅显式 `--legacy-*` 兼容诊断使用。WB公开入口wb_tool.api，说明tools/wb/README.md；宿主公开入口bioimage_app.api。P0探针为p0_probe.py，开发检查为dev.py。使用对应检出的.venv，禁止从历史树启动并当作当前产品；本机Win11候选通过不代表干净Win10/物理DPI/科学验收已完成。
 
@@ -25,7 +25,7 @@
 
 ## Durable Project Context
 
-候选产品 Python/PySide6 桌面单体＋独立 worker；治理已建设，WB 核心已开始。兄弟项目的归档工作流不适用。
+产品采用 Python/PySide6 桌面单体＋独立 worker；WB独立执行及通用工作流已集成，科学/用户/目标环境结论分别看证据。兄弟项目的归档工作流不适用。
 
 ## Project Conventions
 

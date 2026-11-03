@@ -1,5 +1,7 @@
 # P-008 M1有限批量、依赖重算与崩溃对账交付
 
+> 历史设计引用：本卡原始4.0章节见[固定版本](../../docs/plans/research-platform-reference-v4.md)，不按新版主文同号章节解释。完成状态以本卡元数据与准确集成收据为准。
+
 <!-- PROGRAM_TASK_META {"id":"P-008","status":"done","work_package":"W12","depends_on":["P-005","P-007"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"4d6ee6ce364780cad24ef09b808740846937714c","head_commit":"b4847a56b682e71356129e34fac59262c08659e7"} -->
 
 ## 输入与前置

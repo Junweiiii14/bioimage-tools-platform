@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "task": "B-018",
+  "base_commit": "5d6e03be849d678e5f27e220fcf3fc4917e85fd5",
+  "source_head": "2dc9d8ec465f49cd433a685ee1b7ef19719a55fc",
+  "historical_receipts": {
+    "work/evidence/B-016/rules-context.json": "4c7934294d8e678773d6b59d29ea545aee8d0381"
+  }
+}

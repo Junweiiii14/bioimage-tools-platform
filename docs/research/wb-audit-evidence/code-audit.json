@@ -1,0 +1,158 @@
+{
+  "date": "2026-11-02",
+  "root": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-v0",
+  "head": "5d5dd226a7dc6bf16879c16257a0d3754b814ff3",
+  "branch": "codex/p008-workflow-batch",
+  "status": "M apps/desktop/src/bioimage_app/__main__.py\n M apps/desktop/src/bioimage_app/storage.py\n M apps/desktop/src/bioimage_app/wb_workflow_host.py\n M apps/desktop/src/bioimage_app/workflow_input.py\n M apps/desktop/src/bioimage_app/workflow_session.py\n M packages/platform_runtime/src/platform_runtime/api.py\n M packages/platform_runtime/src/platform_runtime/workflow.py\n M packages/tool_contracts/src/tool_contracts/api.py\n M tooling/installed_wheels.py\n?? apps/desktop/src/bioimage_app/wb_workflow_batch_input.py\n?? apps/desktop/src/bioimage_app/workflow_batch_cli.py\n?? apps/desktop/src/bioimage_app/workflow_batch_session.py\n?? apps/desktop/src/bioimage_app/workflow_batch_storage.py\n?? docs/contracts/workflow-batch-v1.md\n?? packages/tool_contracts/src/tool_contracts/workflow_batch.py\n?? tests/test_workflow_batch_cli.py\n?? tests/test_workflow_batch_session.py\n?? work/evidence/B-012/\n?? work/tasks/B-012-adaptive-workflow-plan.md",
+  "files": [
+    {
+      "topic": "输入与位深",
+      "file": "tools/wb/src/wb_tool/adapters/tiff_input.py",
+      "line": 271,
+      "sha256": "277942400684d0a59b17a15c3c5b6a81064278b99aebcc2ca6f1ffb6d470347c",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "原像素均值剖面",
+      "file": "tools/wb/src/wb_tool/domain/lanes.py",
+      "line": 44,
+      "sha256": "11cefe8268550afa1c499c4a7dfc783502ba32363168254572ef38999b6c0c5a",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "基线积分定义",
+      "file": "tools/wb/src/wb_tool/domain/quantify.py",
+      "line": 57,
+      "sha256": "8ad2da99beedd012b7ffe00a69a8f47601dbb9e10bb01e73988db164a46d04cc",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "上下限质量提示",
+      "file": "tools/wb/src/wb_tool/application/analysis.py",
+      "line": 198,
+      "sha256": "fd1dd0d7546d5583c412f359a18a09044402b8832c71a50e14a43618802f9dc7",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "归一化语义",
+      "file": "tools/wb/src/wb_tool/application/project_normalization.py",
+      "line": 25,
+      "sha256": "93d64f4b0975647bbac48294d891ac726c9f730865f747d1a4b93d465cece093",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "归一化计算",
+      "file": "tools/wb/src/wb_tool/domain/normalization.py",
+      "line": 8,
+      "sha256": "538e6a8b0daefe24b69a11cf9bfcf85cb70f34bb0148f059ae6a4d2294fee22f",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "实际注册的三个节点",
+      "file": "tools/wb/src/wb_tool/adapters/workflow_nodes.py",
+      "line": 43,
+      "sha256": "d01207d123d78c5d461a882433fee72b6cd19aeb0ce416da37e136fa51232166",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "导入与分组",
+      "file": "docs/contracts/wb-instrument-intake-v1.md",
+      "line": 1,
+      "sha256": "06fbd7fcc416a04df3f648d3a504b1902e8f0c8012f1f18d4a7170be343758d6",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "样本元信息",
+      "file": "docs/contracts/wb-project-metadata-v1.md",
+      "line": 1,
+      "sha256": "a8bc267cad8b889098b604bc3975fb65a33cb00b06ee6a9a86b30855ec0f7666",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "独立泳道、多峰与整段",
+      "file": "docs/contracts/wb-fig-quant-v1.md",
+      "line": 1,
+      "sha256": "215999dad63590c9a8f300e17df87cd99bc611bed6595e15cfbf822b311d4f53",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "基线/曲线交互",
+      "file": "docs/contracts/wb-standalone-quant-v1.md",
+      "line": 1,
+      "sha256": "a7ab25f25ac0afe26d4c7ca12501451066710763d25f8eb04361930883034fd3",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "原值自动裁图",
+      "file": "docs/contracts/wb-prominent-band-crop-v5.md",
+      "line": 1,
+      "sha256": "906acc79f08655ef6ce238eec409182e8529cf5293346eee2f35bf8cf9615263",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "归一化边界",
+      "file": "docs/contracts/wb-project-normalization-v1.md",
+      "line": 1,
+      "sha256": "00de2f698c2fb64501d69ebdb9931543e6e700a78b05fcee1c8327e106bea681",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "出图与显示隔离",
+      "file": "docs/contracts/wb-direct-figure-image-v1.md",
+      "line": 1,
+      "sha256": "94bd7246cdae7eefa959f5b4e13d0468739eacadacc4b89a913fcb9ccd70d323",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "项目交付",
+      "file": "docs/contracts/wb-intake-delivery-v1.md",
+      "line": 1,
+      "sha256": "f9974af8e9a8c1481f075d266b7b4c8620b5672383f9245bad57a18b94c46ba9",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "原值工作流节点契约",
+      "file": "docs/contracts/wb-original-workflow-v1.md",
+      "line": 1,
+      "sha256": "74eacb7a231a90d546d89aaa63767c08188c838d946ae19197f51ebc1183e2ad",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "独立模块验收",
+      "file": "work/tasks/P-002-wb-headless-module.md",
+      "line": 1,
+      "sha256": "1f06198d4ed62ee476277571395bf14c212a36df1c36c4a1c71ab727258e3dc8",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "几何方法仍待实施",
+      "file": "work/tasks/P-004-analysis-asset-contract.md",
+      "line": 1,
+      "sha256": "ae9b80a83a201c57e76424888829ee1767b40837f56fa666fe275f1f8910f762",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "通用执行验收",
+      "file": "work/tasks/P-005-workflow-execution-slice.md",
+      "line": 1,
+      "sha256": "63bd5e5ae93838ac3e64d8b7899166c789964828cccdc8c3e7edc625e16db1b4",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "积分测试存在，本轮未运行",
+      "file": "tools/wb/tests/test_quantify.py",
+      "line": 22,
+      "sha256": "154dd41889ee7c618388f132260ad90fb6a52f01f83f171d6d959915872b724d",
+      "working_tree_changes": ""
+    },
+    {
+      "topic": "归一化测试存在，本轮未运行",
+      "file": "tools/wb/tests/test_normalization.py",
+      "line": 9,
+      "sha256": "25aa198cd3db6ff251cc43dbc73452beff8c6aad44490a2158f6981c82084481",
+      "working_tree_changes": ""
+    }
+  ],
+  "product_tests_run": false,
+  "developer_messages_sent": false
+}

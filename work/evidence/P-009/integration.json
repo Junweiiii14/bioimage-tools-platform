@@ -1,0 +1,120 @@
+{
+  "candidate": "ba07dbaf229d1f7e9f12d337fbf5ddd1d441dc0f",
+  "base_commit": "275560475d39426434416c74feeb0c2f259d1402",
+  "pr": "https://github.com/Junweiiii14/bioimage-tools-platform/pull/55",
+  "state": "MERGED",
+  "main_merge": "6e0dcd44ae726caffa9215da49bcf569737258cd",
+  "merged_at": "2026-11-02T18:25:12Z",
+  "candidate_and_main_tree": "5d8a8ee43d6f384f3a148a4326072a4b1db9c0e5",
+  "tree_matches": true,
+  "quality_run": 41495774536,
+  "rules_run": 41495774934,
+  "checks": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-02T18:24:39Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41495774536/job/125451052378",
+      "name": "foundation (windows-latest)",
+      "startedAt": "2026-11-02T17:57:52Z",
+      "status": "COMPLETED",
+      "workflowName": "quality"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-02T17:56:19Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41495774934/job/125450201088",
+      "name": "rules-context",
+      "startedAt": "2026-11-02T17:56:05Z",
+      "status": "COMPLETED",
+      "workflowName": "rules-context"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-02T18:16:16Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41495774536/job/125451051907",
+      "name": "foundation (ubuntu-latest)",
+      "startedAt": "2026-11-02T17:57:49Z",
+      "status": "COMPLETED",
+      "workflowName": "quality"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-02T17:58:27Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41495774536/job/125451051699",
+      "name": "desktop-environment",
+      "startedAt": "2026-11-02T17:57:50Z",
+      "status": "COMPLETED",
+      "workflowName": "quality"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-02T17:57:39Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41495774536/job/125451053203",
+      "name": "native-case",
+      "startedAt": "2026-11-02T17:57:39Z",
+      "status": "COMPLETED",
+      "workflowName": "quality"
+    }
+  ],
+  "ci_logs": [
+    {
+      "platform": "windows",
+      "job": 125451052378,
+      "exit": 0,
+      "passed": 1692,
+      "skipped": 0,
+      "warnings": 10,
+      "test_seconds": 1399.58,
+      "raw_bytes": 314073,
+      "raw_sha256": "b2fe50bc7933a1a5e4d55f0b25aa5d0751b395c9b4feaeb21aeb68c91fed08f6",
+      "archive": "work/evidence/P-009/frozen-runs/integration-ba07dba/windows.log.gz",
+      "archive_sha256": "d4336dcf8c7961f399dd09932de21a4211808ccf95fa64e86ed91687c6eea975",
+      "all_isolated_wheels": "passed including actual authoring and no-WB desktop"
+    },
+    {
+      "platform": "linux",
+      "job": 125451051907,
+      "exit": 0,
+      "passed": 1688,
+      "skipped": 4,
+      "warnings": 10,
+      "test_seconds": 945.29,
+      "raw_bytes": 587030,
+      "raw_sha256": "07bb54466f6fd5c9fe2d3d9deb2e1b83254e48e76d6bff5c639e2e775d4d727f",
+      "archive": "work/evidence/P-009/frozen-runs/integration-ba07dba/linux.log.gz",
+      "archive_sha256": "0485caaac886c70869e00247e7f85685cfeacffbfc831df22e8d9c6f61b8a66e",
+      "all_isolated_wheels": "passed including actual authoring and no-WB desktop"
+    }
+  ],
+  "ci_command": "uv run --locked --no-sync python dev.py check --all",
+  "ci_environment": {
+    "QT_QPA_PLATFORM": "offscreen",
+    "QTWEBENGINE_CHROMIUM_FLAGS": "--disable-gpu"
+  },
+  "independent_review": "review-ba07dba-final.md",
+  "visual_source_files_still_match": [
+    "apps/desktop/src/bioimage_app/web_ui/workflow_authoring.js",
+    "apps/desktop/src/bioimage_app/web_ui/workflow_authoring.css",
+    "apps/desktop/src/bioimage_app/web_ui/workflow_graph.js",
+    "apps/desktop/src/bioimage_app/web_ui/workflow_graph.css"
+  ],
+  "visual_capture_hashes_match": 13,
+  "performance_archived_files_hash_match": 28,
+  "prior_failures": {
+    "5e69b2f_quality": 41494573552,
+    "result": "failure before pytest; import boundary",
+    "742c_quality": 41495505039,
+    "result_742c": "cancelled by successor, not pass"
+  },
+  "limits": [
+    "performance reference overruns and high renderer memory retained",
+    "scientific S1 and user/clean-target/physical DPI/GPU acceptance not claimed",
+    "no installer publication/replacement, M3-M6, other experiments or Agent"
+  ],
+  "closeout": "Product integrated via PR55; post-merge task/audit/handoff receipts are local closeout records."
+}

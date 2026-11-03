@@ -1,6 +1,8 @@
 # P-009 M2真实工作流可视编排与模板复用
 
-<!-- PROGRAM_TASK_META {"id":"P-009","status":"in_review","work_package":"W13","depends_on":["P-006","P-008"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"275560475d39426434416c74feeb0c2f259d1402","head_commit":"5e69b2f67eb0aeac7db81afee4033e021b8b1917"} -->
+> 历史设计引用：本卡原始4.0章节见[固定版本](../../docs/plans/research-platform-reference-v4.md)，不按新版主文同号章节解释。完成状态以本卡元数据与准确集成收据为准。
+
+<!-- PROGRAM_TASK_META {"id":"P-009","status":"done","work_package":"W13","depends_on":["P-006","P-008"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"275560475d39426434416c74feeb0c2f259d1402","head_commit":"ba07dbaf229d1f7e9f12d337fbf5ddd1d441dc0f"} -->
 
 ## 输入与前置
 
@@ -22,7 +24,7 @@
 
 ## 当前状态
 
-in_review：完整编排/真实执行、交互覆盖和有界视觉确认已实施；P1修复、受影响正式测量及64c全部wheel已通过相应验证。PR55首轮5e69b2f在双平台导入边界门禁失败，尚未运行pytest；装配边界修复待冻结准确复审及新CI，未合入，不能宣告done。其他实验/Agent/安装器发布不在本卡范围。
+done（工程）：准确ba07dba独审Accepted、四必需CI SUCCESS，PR55已正常merge6e0dcd4，与候选tree同5d8a8ee4。Win1692passed、Linux1688passed4既有skip，双侧全部隔离wheel实际编排通过。逐项验收见work/evidence/P-009/objective-audit.md及integration.json；性能超参考/高内存、科学S1/现场/用户体验限制仍保留，不能把本卡done扩大为这些结论。其他实验/Agent/安装器发布不在本卡范围。
 
 
 ## 2026-11-02激活
@@ -81,3 +83,17 @@ Fresh reviewer首轮bb42有效12图结论fix，唯一问题为窄窗任务密度
 41494573552双平台已terminal failure，import-linter实际拒绝storage→authoring_store→WB/NumPy，未进入pytest/wheel；原日志及具体路径见ci-storage-boundary.md。修复为authoring Session在线程启动前固定装配处理器，通用storage不导入工具，原同一worker/Workspace/bytes命令不变，未改门禁。import-linter9 kept/0 broken；相关10passed38.59s；默认无装配拒绝和同一后台线程实测2passed15.73s，类型/目标Ruff/format通过。待冻结准确复审后更新同PR55，不重跑旧失败或在本机重复全部测试/wheel；新CI会验证当前安装。26f/64c性能及64c本地wheel仍保留原源码归属。
 
 742c5d2装配修复已推同PR55，quality41495505039/rules41495504928启动；独立9导入契约及2真实线程/拒绝测试通过15.32s，产品增量Accepted。独审发现仅新增原CI文本行尾空格使diff检查失败，改无损gzip+原/压缩SHA后全范围检查通过，不修改whitespace门禁。下一纯证据提交将替代742c运行，旧CI取消须如实记录，不称其测试失败或通过。
+
+ba07dbaf229d1f7e9f12d337fbf5ddd1d441dc0f已推同PR55，完整base..ba准确非作者Accepted、gzip字节/SHA验证及diffcheck0；报告.local/p009-review-ba07dba.md，原742产品报告另留。quality41495774536 pending，rules41495774934 success；旧742quality Linux已cancelled，Windows在Post checkout清理、父run仍in_progress。等待这些具体运行真实结束，不盲目重跑。状态更新暂留本地，避免纯交接推送取消当前CI。
+
+最新核对：旧742quality41495505039已completed/cancelled；新ba07quality41495774536双平台已实际进入check --all（Windows125451052378/Linux125451051907），desktop125451051699及rules success。只读观察器exec73784仍活跃，日志.local/p009-ci-ba07dba-watch.log；进行中job日志API404不能判为停止。无本机测试/安装/测量；继续等待同run终态后核查日志和正常集成，不把旧64c wheel冒充当前CI安装成绩。
+
+Linux125451051907已SUCCESS，1688passed4既有Windows专属skip10warnings945.29s；9导入契约、全部隔离wheel及实际编排4000/40/6workers/模板CLI通过，原日志.local/p009-ci-linux-ba07dba.log已下载核对。四必需现3success/Windows1running；不合入/不写done。P002/P008远端MERGED及P002/P007/P008为当前HEAD祖先已实际复核。
+
+## 2026-11-03 PR55正常集成及工程交付完成
+
+准确ba07dbaf229d1f7e9f12d337fbf5ddd1d441dc0f非作者Accepted；quality41495774536的Windows125451052378于18:24:39Z SUCCESS，1692passed10warnings1399.58s；Linux1688passed4既有Windows专属skip10warnings945.29s。两侧9导入契约、全部旧门禁/pytest/隔离wheel及新安装编排4000/40/6worker/保存重开/布局模板CLI均通过，原日志已下载核对并无损压缩。desktop/rules均SUCCESS，native-case预期skip。
+
+四必需通过后未用admin/绕过，PR55于2026-11-02T18:25:12Z正常merge6e0dcd44ae726caffa9215da49bcf569737258cd；候选和origin/main tree同5d8a8ee43d6f384f3a148a4326072a4b1db9c0e5。integration.json记录命令/环境/提交/退出码/原日志SHA；watch73784已真实exit0。旧导入失败、742c自动取消和证据空白失败分别保留。
+
+原P002→M1→M2工程目标逐项核对完成，当前产品源码无额外dirty，P002/P007/P008祖先及原PR已合入事实复核。4个视觉源文件、13份图/索引和28份性能原文件SHA仍吻合，无第三轮视觉或本机重复全量。性能未全面达预算，renderer高内存原因UNKNOWN；科学/用户/干净目标机缺项按原边界保留。合入后本地任务/审计/交接记录更新，不为纯状态再开PR或重跑全量；B012他人文件未动。

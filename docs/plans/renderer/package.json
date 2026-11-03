@@ -7,8 +7,8 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "node build.mjs",
-    "standalone": "node build.mjs --standalone"
+    "build": "node build-v42.cjs",
+    "historical-v4": "node build.mjs --standalone"
   },
   "dependencies": {
     "marked": "17.0.5"

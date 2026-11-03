@@ -1,0 +1,30 @@
+[
+  {
+    "path": "work/tasks/P-009-visual-workflow-authoring.md",
+    "sha256": "6ef92c4e58a2f72363cc3fe18291f785bc32c4e7ebf0f9000e569409782b3847"
+  },
+  {
+    "path": "work/evidence/P-009/integration.json",
+    "sha256": "3a35bb81aee66eeb8e71df3b900127db32cda03cedb1fe7b19144060c8c74a40"
+  },
+  {
+    "path": "work/evidence/P-009/objective-audit.md",
+    "sha256": "db9d00dd06082662015c09f3bfcc9cccde4df41900c1a8d08c4cddd48edbbef4"
+  },
+  {
+    "path": "work/evidence/P-009/review-ba07dba-final.md",
+    "sha256": "d8ca131184cac65d51fcbaac924edee37146c76a5ae5e54bb588437106b9151e"
+  },
+  {
+    "path": "work/evidence/P-009/review-742c5d2-storage-assembly.md",
+    "sha256": "22f8095bdc00389299343bd509cd8044448b745da6da23600669d30d84046371"
+  },
+  {
+    "path": "work/evidence/P-009/frozen-runs/integration-ba07dba/linux.log.gz",
+    "sha256": "0485caaac886c70869e00247e7f85685cfeacffbfc831df22e8d9c6f61b8a66e"
+  },
+  {
+    "path": "work/evidence/P-009/frozen-runs/integration-ba07dba/windows.log.gz",
+    "sha256": "d4336dcf8c7961f399dd09932de21a4211808ccf95fa64e86ed91687c6eea975"
+  }
+]

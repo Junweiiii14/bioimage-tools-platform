@@ -1,5 +1,7 @@
 # P-003 方法和数据验证登记及评估基础
 
+> 历史设计引用：本卡原始3.0章节见[固定版本](../../docs/plans/archive/research-platform-rd-v3-published.md)，不按新版主文同号章节解释。完成状态以本卡元数据与准确集成收据为准。
+
 <!-- PROGRAM_TASK_META {"id":"P-003","status":"done","work_package":"W01","depends_on":["P-001"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"f2dc5ad44fba2e4f951b8987f0babb6b41c1d1a2","head_commit":"c02c2ed65238d553d923a2f7f72e1cc1f7381f7c"} -->
 
 ## 执行状态

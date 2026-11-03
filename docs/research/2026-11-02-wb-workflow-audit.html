@@ -1,0 +1,269 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WB实际分析流程与现有模块对照</title><style>
+:root{--paper:#fefff9;--canvas:#f1f3e9;--ink:#203b2e;--muted:#52634c;--line:#dce3d4;--accent:#24745a;--wash:#e6efcf;--code:#f1f4e9;--focus:#24745a;color-scheme:light}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:30px}body{margin:0;background:var(--canvas);color:var(--ink);font:16px/1.9 'WB Sans','Microsoft YaHei',sans-serif;font-synthesis:none}::selection{background:#c9dfce;color:#152b22}a{color:var(--accent);text-underline-offset:4px}a:hover{text-decoration-thickness:2px}button,input{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--focus);outline-offset:4px}input{caret-color:var(--accent)}
+.skip{position:fixed;left:20px;top:-100px;background:var(--paper);padding:8px;z-index:20}.skip:focus{top:12px}.sidebar{position:fixed;left:0;top:0;bottom:0;width:288px;padding:35px 24px;overflow:auto;background:var(--paper);border-right:1px solid var(--line)}.brand{display:block;font-size:20px;font-weight:700;margin-bottom:6px;text-decoration:none}.edition{font-size:13px;color:var(--muted);margin:0 0 24px}.search-label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}.search-box{width:100%;border:1px solid #879b92;background:var(--paper);border-radius:8px;padding:10px 11px;line-height:1.5;color:var(--ink)}.search-box::placeholder{color:#64756d}.search-status{font-size:12px;color:var(--muted);margin:8px 0;min-height:22px}.search-results{display:grid;gap:0;max-height:40vh;overflow:auto}.search-results a{font-size:12px;padding:8px 0;border-bottom:1px solid var(--line);line-height:1.7}.toc{margin-top:22px;display:grid;gap:3px}.toc>a{display:block;padding:8px 10px;text-decoration:none;font-size:14px;line-height:1.7;border-radius:4px}.toc>a[aria-current=true]{background:var(--wash);font-weight:700}.toc>a:hover{background:#f1f4ef}.side-note{font-size:12px;line-height:1.8;color:var(--muted);margin-top:28px;padding-top:16px;border-top:1px solid var(--line)}.print-button{padding:8px 12px;border:1px solid #8fa498;border-radius:8px;background:transparent;color:var(--accent);margin-top:18px;font-size:13px}.mobile-bar{display:none}
+.page{margin-left:288px;padding:0 48px 60px}.document{max-width:1120px;margin:auto;background:var(--paper);padding:52px 52px 80px;box-shadow:0 8px 32px #173b2210}.document>h1{font-family:'Microsoft YaHei',sans-serif;font-weight:650;font-size:clamp(30px,3vw,43px);line-height:1.45;margin:0 0 12px;letter-spacing:0}.document>h1+p{color:var(--muted);font-size:13px;margin-bottom:28px}.document>p,.document>ul,.document>ol{max-width:74ch}.document>p{margin:16px 0}h2{font-size:27px;line-height:1.55;margin:70px 0 24px;padding-top:26px;border-top:1px solid var(--line);font-weight:700}h3{font-size:21px;line-height:1.6;margin:38px 0 15px}h4{font-size:17px;margin:28px 0 12px;line-height:1.65}h2,h3,h4{scroll-margin-top:26px;text-wrap:balance}h2:target,h3:target,h4:target,[id^=block]:target{background:var(--wash);outline:2px solid #b5ccbc;outline-offset:6px}.permalink{font-weight:400;font-size:.7em;margin-left:10px;color:var(--muted);text-decoration:none;opacity:0}h2:hover .permalink,h3:hover .permalink,h4:hover .permalink,.permalink:focus-visible{opacity:1}p,li,td,th{overflow-wrap:anywhere}li{margin:7px 0}ul,ol{padding-left:1.7em}strong{font-weight:700}code{font-family:Consolas,'Cascadia Code',monospace;font-size:.89em;background:var(--code);border-radius:3px;padding:2px 4px;overflow-wrap:anywhere}pre{overflow:auto;background:#edf2ef;border:1px solid var(--line);border-radius:6px;padding:22px;line-height:1.65;font-size:14px;tab-size:2;max-height:600px}pre code{padding:0;border-radius:0;background:transparent;overflow-wrap:normal;white-space:pre}.table-wrap{max-width:100%;overflow:auto;margin:22px 0 28px;border:1px solid var(--line);border-radius:8px;scrollbar-color:#8da396 #e8eeea}table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.85}th,td{text-align:left;vertical-align:top;padding:13px 15px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-width:135px;font-variant-numeric:tabular-nums}th{background:#edf2ed;font-weight:700;color:#294b3e}td:last-child,th:last-child{border-right:none}tbody tr:last-child td{border-bottom:none}tbody tr:nth-child(even){background:#fafbf7}td code{font-size:12px}.flow-diagram{margin:36px 0 0;padding:22px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}figcaption{font-weight:700;margin-bottom:18px}.flow-row{display:flex;gap:8px;align-items:center}.flow-row>div{flex:1;padding:12px 7px;background:var(--wash);text-align:center;font-size:13px;font-weight:700;line-height:1.6;min-width:0}.flow-row small{display:block;font-size:11px;color:#486153;font-weight:400;margin-top:7px}.flow-row>span{color:var(--accent)}.flow-diagram p{font-size:12px;color:var(--muted);margin:15px 0 0}.document-footer{margin-top:65px;border-top:1px solid var(--line);padding-top:20px;font-size:12px;color:var(--muted)}.reading-links{display:flex;flex-wrap:wrap;gap:10px 22px;padding:16px 0 24px;border-bottom:1px solid var(--line);margin-bottom:28px;font-size:13px}.reading-links a{text-decoration:none}.reading-links a:hover{text-decoration:underline}button:hover{background:var(--wash)}
+@media(min-width:1700px){.document{padding-left:68px;padding-right:68px}}@media(max-width:1200px){.sidebar{width:248px;padding:28px 18px}.page{margin-left:248px;padding:0 22px 40px}.document{padding:36px 28px 60px}.flow-row{flex-wrap:wrap}.flow-row>div{min-width:100px}}@media(max-width:780px){html{scroll-padding-top:85px}.mobile-bar{display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;padding:12px 18px;background:var(--paper);border-bottom:1px solid var(--line);font-size:14px}.mobile-bar button{border:1px solid #8fa498;padding:5px 12px;border-radius:4px;background:transparent;color:var(--accent)}.sidebar{display:none;position:fixed;top:65px;width:100%;bottom:auto;max-height:calc(100vh - 65px);padding:18px 24px;z-index:9;border-bottom:1px solid var(--line)}body.nav-open .sidebar{display:block}.sidebar .brand,.sidebar .edition,.side-note{display:none}.toc{margin-top:12px}.toc>a{padding:6px 8px}.page{margin-left:0;padding:0}.document{padding:26px 20px 48px;box-shadow:none}.document>h1{font-size:31px}.document>p{font-size:15px}.document h2{font-size:23px;margin-top:50px;padding-top:20px;scroll-margin-top:85px}.document h3{font-size:19px;scroll-margin-top:85px}.document h4{scroll-margin-top:85px}.table-wrap{margin-right:0}th,td{min-width:165px;font-size:12px;padding:11px}pre{font-size:12px;padding:15px}.flow-row{display:grid;grid-template-columns:1fr}.flow-row>div{padding:10px}.flow-row small{display:inline;margin-left:8px}.flow-row>span{text-align:center;line-height:1;transform:rotate(90deg)}.search-results{max-height:25vh}.permalink{opacity:1}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}@media print{@page{size:A4;margin:16mm 12mm}.sidebar,.mobile-bar,.skip,.reading-links,.permalink{display:none!important}.page{margin:0;padding:0}.document{max-width:none;padding:0;box-shadow:none}.document>h1{font-size:28px}body{background:white;font-size:10pt;line-height:1.7}.document>p{font-size:10pt}h2{break-before:page;font-size:20px;margin:0 0 16px;padding-top:0;border:0}h3{font-size:15px}h4{font-size:12px}h2,h3,h4{break-after:avoid}table{font-size:8pt}.table-wrap{overflow:visible;border-radius:0;break-inside:auto}th,td{min-width:0;padding:6px;overflow-wrap:anywhere}thead{display:table-header-group}tr{break-inside:avoid}pre{max-height:none;white-space:pre-wrap;overflow:visible;font-size:8pt}pre code{white-space:pre-wrap;overflow-wrap:anywhere}.flow-diagram{break-inside:avoid}a{color:inherit;text-decoration:none}}
+</style></head><body><a class="skip" href="#document">跳到正文</a><div class="mobile-bar"><strong>科研数据平台 · 4.2</strong><button id="menu-toggle" aria-controls="navigation" aria-expanded="false">目录与检索</button></div><aside class="sidebar" id="navigation"><a class="brand" href="#document">科研数据平台</a><p class="edition">合并方案 4.2 · 2026.11.02</p><label class="search-label" for="search">查找操作、模块或维护要求</label><input class="search-box" id="search" type="search" placeholder="例如：操作 / 版本 / 审查"><p class="search-status" id="search-status" aria-live="polite">搜索全文；内容始终完整保留。</p><div id="results" class="search-results"></div><nav class="toc" aria-label="文档目录"><a href="#section-1">1. 先说结论</a><a href="#section-2">2. WB完整的数据处理链是什么</a><a href="#section-3">3. 对照我们现在已有的功能</a><a href="#section-4">4. 为什么必须核对具体测量方法</a><a href="#section-5">5. WB后续具体补什么，先后怎样安排</a><a href="#section-6">6. 原软件能力怎样变成我们的模块</a><a href="#section-7">7. 已有材料能支持什么，还缺什么</a></nav><button class="print-button" id="print">打印 / 保存 PDF</button><p class="side-note">方案与实施状态分别标注。当前阶段与限制以任务卡和交接入口为准。</p></aside><main class="page"><article class="document" id="document" tabindex="-1"><h1>WB实际分析流程与现有模块对照</h1>
+<p id="block-1">2026-11-02 · B-014 · 规划资料，未同步开发窗口</p>
+<h2 id="section-1" tabindex="-1">1. 先说结论<a class="permalink" href="#section-1" aria-label="链接到此节">§</a></h2>
+<p id="block-2">我们已有WB分析的基础，不需要全部重做。接下来主要做三件事：<strong>核对实际实验室的测量方法，把已有功能接入编排，补上目前缺少的实验数据汇总与统计。</strong></p>
+<p id="block-3">本次查阅了ImageJ、Bio-Rad、LI-COR、GraphPad和Adobe的官方资料，并只读核对实际开发树的代码、契约及测试。下面是有来源的典型流程，不是假定所有实验室都使用同一套方法。</p>
+<p id="block-4">本次没有操作原软件重跑实验，也没有实验人员访谈。ImageJ菜单依据其公开文档及1.46r指南；Bio-Rad操作依据2017年Bulletin 6434；Prism在线指南本次显示为11版。真实接入前还要确认实验室安装的版本和设置。开发树HEAD为<code>5d5dd226a7dc6bf16879c16257a0d3754b814ff3</code>，P-008仍在开发；本轮未写该树、未发送开发消息、未运行其测试。</p>
+<h2 id="section-2" tabindex="-1">2. WB完整的数据处理链是什么<a class="permalink" href="#section-2" aria-label="链接到此节">§</a></h2>
+<p id="block-5">从成像结果开始，可以分为：</p>
+<p id="block-6"><strong>登记样本和原图 → 检查采集质量 → 定位泳道/条带 → 扣除背景并测量 → 内参归一化 → 对照组换算 → 汇总独立实验 → 统计和作图 → 排版与归档。</strong></p>
+<p id="block-7">其中测量有几条不同路线。ImageJ的泳道峰面积、矩形区域像素总和、Image Lab的条带体积，不应当混为一个叫“灰度值”的指标。用户可以选用经过验证的一条路线，不需要把下面所有方法串在一起。</p>
+<h3 id="heading-1" tabindex="-1">路线A：ImageJ/Fiji测量，再到表格和Prism<a class="permalink" href="#heading-1" aria-label="链接到此节">§</a></h3>
+<div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的数据表"><table>
+<thead>
+<tr id="block-8">
+<th>步骤</th>
+<th>软件和功能</th>
+<th>实际怎样操作</th>
+<th>要保存什么</th>
+</tr>
+</thead>
+<tbody><tr id="block-9">
+<td>1 登记实验</td>
+<td>仪器软件＋实验记录/Excel</td>
+<td>对上原图、曝光/通道、膜、蛋白、泳道、样本和分组；保留原文件</td>
+<td>原图和采集信息；样本对应表。仅凭文件名不能确认配对</td>
+</tr>
+<tr id="block-10">
+<td>2 检查图像</td>
+<td>ImageJ打开图像、查看信息和直方图；仪器采集记录</td>
+<td>核对位深、通道和信号范围；用采集端信息及稀释系列判断是否适于定量</td>
+<td>曝光选择与质量记录。没有满量程像素不等于一定处于线性范围</td>
+</tr>
+<tr id="block-11">
+<td>3 选择第一泳道</td>
+<td>ImageJ矩形选区、<code>Analyze &gt; Gels &gt; Select First Lane</code></td>
+<td>框完整的第一条待分析泳道</td>
+<td>原图坐标和宽高</td>
+</tr>
+<tr id="block-12">
+<td>4 选择其余泳道</td>
+<td><code>Select Next Lane</code></td>
+<td>移动同尺寸矩形逐条登记</td>
+<td>泳道顺序和对应样本</td>
+</tr>
+<tr id="block-13">
+<td>5 生成曲线</td>
+<td><code>Analyze &gt; Gels &gt; Plot Lanes</code></td>
+<td>为每条泳道生成强度曲线</td>
+<td>曲线及分析选项</td>
+</tr>
+<tr id="block-14">
+<td>6 选择峰并积分</td>
+<td>直线工具、Wand工具</td>
+<td>画基线/分隔线围住目标峰，用Wand选中测面积</td>
+<td>峰边界、基线和测量表；多峰分别保留</td>
+</tr>
+<tr id="block-15">
+<td>7 保存数值</td>
+<td>Results窗口保存；可选<code>Label Peaks</code></td>
+<td>导出结果，明确哪一列是峰面积、哪一列是百分比</td>
+<td><code>Label Peaks</code>百分比不能直接当目标/内参比</td>
+</tr>
+<tr id="block-16">
+<td>8 归一化</td>
+<td>Excel公式，或平台归一化模块</td>
+<td>明确同一样本的目标和参照信号；先算目标/参照，再按选定对照换算</td>
+<td>原始值、比值、对照基准、缺失原因</td>
+</tr>
+<tr id="block-17">
+<td>9 汇总和统计</td>
+<td>Prism <code>Column</code>/<code>Grouped</code>表、<code>Analyze</code></td>
+<td>按实验设计组织数据，再选配对/非配对及比较方法；输出单点图和统计表</td>
+<td>独立重复身份、检验方法、比较集合、效应及不确定性</td>
+</tr>
+<tr id="block-18">
+<td>10 排版和保存</td>
+<td>Illustrator，必要时Photoshop；也可平台直接出图</td>
+<td>置入条带图和统计图，统一文字、间距、图版编号；输出成图和可追溯资料</td>
+<td>完整原图、裁剪坐标、显示设置、最终图、分析表</td>
+</tr>
+</tbody></table></div>
+<p id="block-19">步骤3—7依据<a href="https://imagej.net/ij/docs/menus/analyze.html">ImageJ Gel Analyzer操作说明</a>。步骤2中的位深与显示区别见<a href="https://imagej.net/ij/docs/menus/image.html">ImageJ图像菜单</a>；采集线性范围需单独验证，见<a href="https://www.licorbio.com/support/contents/applications/western-blots/revert-normalization-protocol.html">LI-COR定量归一化说明</a>。步骤8是本平台已有公式的使用方式，不声称所有软件采用相同归一化标尺。</p>
+<p id="block-20">复现ImageJ时还要保存Gel Analyzer Options中的曲线缩放、Invert Peaks、Uncalibrated OD等设置，不能只留下峰面积。<a href="https://imagej.net/ij/docs/guide/146-30.html">ImageJ Gel选项</a></p>
+<p id="block-21">统计时，单一分组变量可用Prism的Column表，两个分组变量可考虑Grouped表；再从Analyze选择分析。显示每个独立数据点能帮助看清分布。<a href="https://www.graphpad.com/guides/prism/latest/user-guide/using_data_table_format.htm">Prism数据表</a>、<a href="https://www.graphpad.com/guides/prism/latest/user-guide/using_choosing_an_analysis.htm">分析入口</a>、<a href="https://www.graphpad.com/guides/prism/latest/user-guide/using_graphing_each_replicate.htm">单点图</a>。具体检验不能只凭“有几组”自动决定。</p>
+<p id="block-22">例如，实验设计和数据确实适用非配对t检验时，在数据表点<code>Analyze</code>进入相应t检验，再设置配对关系、分布假设、方差处理和单双侧，并保存结果。这个例子用来记录操作，不作为所有WB实验的默认统计方案。<a href="https://www.graphpad.com/guides/prism/latest/statistics/stat_howto_ttestunpaired.htm">Prism非配对t检验操作</a></p>
+<h3 id="heading-2" tabindex="-1">路线B：ImageJ矩形区域测量<a class="permalink" href="#heading-2" aria-label="链接到此节">§</a></h3>
+<p id="block-23">在<code>Analyze &gt; Set Measurements</code>选择Area、Mean、Integrated Density，分别框条带和背景，再<code>Analyze &gt; Measure</code>。<code>RawIntDen</code>表示原像素值之和；它不是泳道曲线面积。<a href="https://imagej.net/ij/docs/guide/146-30.html">ImageJ测量定义</a></p>
+<p id="block-24">如果选定“局部背景校正的像素总和”方法，先声明信号极性，再用同一强度定义计算“条带像素总和－条带像素数×背景平均强度”。背景选区的位置、大小和避让邻带的规则必须记录。LI-COR也提供局部均值、中位数及用户指定背景，但这些选项不能仅因名称相似就与ImageJ或本平台互换。<a href="https://www.licorbio.com/support/contents/software/image-studio/analysis/gel-and-blot-background.html">LI-COR背景方法</a></p>
+<p id="block-25">若实验室用<code>Process &gt; Subtract Background</code>，还需记录半径、亮背景等选项，并核对扣背景后的中间图；这是另外一种图像预处理，不默认叠加到前两种方法上。<a href="https://imagej.net/ij/docs/menus/process.html">ImageJ背景扣除</a></p>
+<h3 id="heading-3" tabindex="-1">路线C：Image Lab内完成检测和归一化<a class="permalink" href="#heading-3" aria-label="链接到此节">§</a></h3>
+<p id="block-26">Bio-Rad公开的总蛋白归一化操作示例是：打开化学发光图与stain-free图 → <code>Lane and Bands</code> → 在Normalization Channel中<code>Add channel</code> → 把stain-free图放到Normalization Data → 检测泳道与条带 → 必要时用<code>Adjust Frame / Resize Frame</code>修正 → 选择Normalization Lane → 在<code>Analysis Table</code>查看并导出Excel。修改泳道后，要重新检测该泳道的条带。<a href="https://www.bio-rad.com/webroot/web/pdf/lsr/literature/Bulletin_6434.pdf">Bio-Rad快速指南，1—3页</a></p>
+<p id="block-27">这条路线需要额外的总蛋白图像及对应关系。<strong>“磷酸化蛋白/对应总蛋白”与“目标蛋白/全泳道总蛋白染色”是两件事。</strong> 我们现有代码具备前一种比值语义，没有据此证明后一种分析已完成。</p>
+<h3 id="heading-4" tabindex="-1">排版操作应放在分析之后<a class="permalink" href="#heading-4" aria-label="链接到此节">§</a></h3>
+<p id="block-28">Illustrator可通过<code>File &gt; Place</code>置入多幅图，再完成文字与版面编排；Photoshop的<code>File &gt; Automate &gt; Batch</code>可以批量执行已记录动作。它们适合承接重复出图操作，不能替代实验定量方法。<a href="https://helpx.adobe.com/illustrator/using/place-multiple-files.html">Illustrator置入</a>、<a href="https://helpx.adobe.com/uk/photoshop/desktop/automate-tasks/process-a-batch-of-files/batch-process-files.html">Photoshop批处理</a></p>
+<p id="block-29">输出时保留足够条带上下文，明确标记泳道拼接，说明误差线和重复类型。这些信息应进入我们的出图模板。<a href="https://www.asbmb.org/journals/author-resources/collecting-and-presenting-data">ASBMB图像与数据呈现要求</a></p>
+<h2 id="section-3" tabindex="-1">3. 对照我们现在已有的功能<a class="permalink" href="#section-3" aria-label="链接到此节">§</a></h2>
+<p id="block-30">“已有”指本次找到实现及相关契约/测试，不等于已经通过所有真实实验的科学验收。“未见”指在本次公开入口、注册节点和相关实现范围内未找到，不是对所有历史分支作保证。详细位置与摘要见<a href="wb-audit-evidence/code-audit.md">代码核对记录</a>。</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的数据表"><table>
+<thead>
+<tr id="block-31">
+<th>WB操作</th>
+<th>当前覆盖</th>
+<th>还需要做什么</th>
+</tr>
+</thead>
+<tbody><tr id="block-32">
+<td>原图导入与保护</td>
+<td><strong>已有。</strong> TIFF定量入口、uint8/uint16原值、摘要、来源和显示图隔离</td>
+<td>补实验室仪器导出规范；不能把TIFF容器位深直接当相机有效位深</td>
+</tr>
+<tr id="block-33">
+<td>样本和蛋白登记</td>
+<td><strong>部分已有。</strong> Excel/CSV元信息、Fig/蛋白行/槽位身份、明确配对</td>
+<td>补膜ID、独立实验/生物重复/技术重复、批次与曝光对应的统一样本表</td>
+</tr>
+<tr id="block-34">
+<td>泳道定位与裁图</td>
+<td><strong>旧工作台已有多种能力。</strong> 固定N、独立泳道、多峰、自动裁图建议及修正</td>
+<td>把选定方法适配为可编排操作；不代表当前三节点已包含整套自动找泳道</td>
+</tr>
+<tr id="block-35">
+<td>旋转校正</td>
+<td><strong>显示层已有；正式新分析几何未完成。</strong> P-004仍planned</td>
+<td>按P-004实现并验证统一分析资产；显示拉正不能冒充定量已拉正</td>
+</tr>
+<tr id="block-36">
+<td>极性与曲线</td>
+<td><strong>已有。</strong> 原像素逐行均值、暗/亮极性、曲线展示</td>
+<td>保留方法说明；接入其他软件时核对反相、位深和标尺</td>
+</tr>
+<tr id="block-37">
+<td>基线和峰积分</td>
+<td><strong>已有。</strong> 自动边界策略、人工端点/基线、多峰补充及排除；核心为<code>profile_integral@1</code></td>
+<td>做选定ImageJ流程的对照；不能直接标“ImageJ结果兼容”</td>
+</tr>
+<tr id="block-38">
+<td>矩形总灰度、局部背景、rolling-ball</td>
+<td><strong>未见对应的独立测量/背景模块。</strong> 现有核心不是这些方法</td>
+<td>按实验室真实需要选一种先补，方法版本独立，不替换旧公式</td>
+</tr>
+<tr id="block-39">
+<td>饱和与线性范围检查</td>
+<td><strong>部分已有。</strong> 检出灰度上下限像素并标记待复核</td>
+<td>增加采集范围/曝光信息、稀释系列与线性范围记录；无极值不自动判合格</td>
+</tr>
+<tr id="block-40">
+<td>目标/内参、磷酸化/总蛋白</td>
+<td><strong>旧工作台已有。</strong> 显式泳道配对、有效性检查、比值</td>
+<td>把已有用例接成归一化节点，不能重写一套公式或按蛋白名猜配对</td>
+</tr>
+<tr id="block-41">
+<td>相对对照换算</td>
+<td><strong>已有。</strong> 单对照或选定对照比值均值</td>
+<td>模板保存配对和对照规则，每批绑定实际样本；坏对照不能被自动略过</td>
+</tr>
+<tr id="block-42">
+<td>全泳道总蛋白染色归一化</td>
+<td><strong>未见完整实现。</strong> 与已有phospho_total不同</td>
+<td>新增总蛋白通道/膜配对、泳道信号方法、背景和质量验证</td>
+</tr>
+<tr id="block-43">
+<td>跨膜与独立实验汇总</td>
+<td><strong>未见完整实验层实现。</strong> 现有归一化明确不跨膜汇总</td>
+<td>明确每膜对照、参考样本和批次；技术重复先按方法汇总，不能充作独立n</td>
+</tr>
+<tr id="block-44">
+<td>显著性统计与统计图</td>
+<td><strong>未见实验统计实现。</strong> 不等于现有曲线/结果图导出</td>
+<td>补实验设计、方法选择、效应量/区间、多重比较及单点图；先可导出Prism用表</td>
+</tr>
+<tr id="block-45">
+<td>裁图、标签、表格和成图</td>
+<td><strong>已有。</strong> 原值裁剪、显示拼图、CSV/XLSX、TIFF/PNG、恢复归档</td>
+<td>扩展统计图组合及适用的投稿输出；不需要先做完整Photoshop/Illustrator克隆</td>
+</tr>
+<tr id="block-46">
+<td>通用自动执行</td>
+<td><strong>已有三种固定节点和执行基础。</strong> 校验→分析→发布</td>
+<td>P-008批量继续原任务；把归一化等已有能力逐步接入</td>
+</tr>
+<tr id="block-47">
+<td>自由可视编排、跨软件调用</td>
+<td><strong>未完整具备。</strong> P-009为后续任务；未见ImageJ/Image Lab/Prism连接器</td>
+<td>可视编辑沿现有任务推进；外部软件调用另做小型实测，不靠模拟点击直接宣称兼容</td>
+</tr>
+</tbody></table></div>
+<p id="block-48">现有三个节点的ID是<code>wb-verify-original</code>、<code>wb-analyze-original</code>、<code>wb-publish-original</code>。它们已能传递原图、分析结果、表格和曲线，但当前分析节点仍限制在原整数图、旧方法与已给定分析请求。旧工作台中有功能，不等于它已经成为可独立拖拽的节点。</p>
+<h2 id="section-4" tabindex="-1">4. 为什么必须核对具体测量方法<a class="permalink" href="#section-4" aria-label="链接到此节">§</a></h2>
+<p id="block-49">当前核心先对泳道每行取平均，再对线性基线以上的正差做梯形积分，不乘泳道宽度。代码在<code>domain/lanes.py:44</code>和<code>domain/quantify.py:57</code>。</p>
+<p id="block-50">举一个独立算术例子：宽度4像素，每行强度依次是10、20、30、20、10，背景为10。本平台定义的曲线积分为40；同一区域按“总像素和减背景”则为160。它们描述不同量，不能看到数值不同就判算法错误，也不能修改旧结果强行对齐。这个例子只是公式说明，不是原软件对照实验。</p>
+<p id="block-51">再如现有归一化先算<code>q=目标信号/参照信号</code>，可再算<code>f=q/对照q的均值</code>。这部分已有实现；缺的是完整实验身份和编排接线。每张膜各自归一化为1的对照值，也不能不加说明地当作一组有独立变异的原始观测进行检验。</p>
+<p id="block-52">所以模块必须在名称和输出中说清“测量的是什么”。建议用户看到“泳道曲线积分”“矩形背景校正总信号”“目标/内参比值”，而不是所有节点都输出含义不明的“灰度值”。</p>
+<h2 id="section-5" tabindex="-1">5. WB后续具体补什么，先后怎样安排<a class="permalink" href="#section-5" aria-label="链接到此节">§</a></h2>
+<p id="block-53">以下为调研后的建议工作顺序，不是本轮派发的任务，也不改变P-008/P-009。</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的数据表"><table>
+<thead>
+<tr id="block-54">
+<th>顺序</th>
+<th>要交付的东西</th>
+<th>怎样做</th>
+<th>完成证据</th>
+</tr>
+</thead>
+<tbody><tr id="block-55">
+<td>WB-R1 真实方法对照</td>
+<td>一份本实验室WB操作记录和对照数据</td>
+<td>从现有材料选一条流程；补软件版本、原图、ROI/基线、测量表及配对；按原操作复现</td>
+<td>能解释每个结果来自哪一步；原软件重跑结果可查</td>
+</tr>
+<tr id="block-56">
+<td>WB-R2 最小完整模板</td>
+<td>原图→测量→归一化→表格</td>
+<td>保留已完成节点，适配现有归一化公开用例；先采用已给定/已验证几何，不等待所有自动定位方法</td>
+<td>保存重开并处理第二批；有效0和缺失分开；结果与原用例一致</td>
+</tr>
+<tr id="block-57">
+<td>WB-R3 实验数据汇总</td>
+<td>跨膜/独立重复表和Prism交换表</td>
+<td>增加实验/膜/样本/重复身份，记录对照与配对；汇总规则由真实设计确定</td>
+<td>每个图上数据点能回到独立实验；手算和原表可对照</td>
+</tr>
+<tr id="block-58">
+<td>WB-R4 最需要的缺口方法</td>
+<td>一个有明确用途的新方法</td>
+<td>根据WB-R1选择局部背景测量、全泳道总蛋白或正式几何校正；不要全部同时启动；几何沿P-004</td>
+<td>同一数据/参数的新旧中间结果和差异，冻结方法与适用范围</td>
+</tr>
+<tr id="block-59">
+<td>WB-R5 统计与成图模板</td>
+<td>数据点图、统计表、条带组合图</td>
+<td>先支持一种明确实验设计；复用已有导出，记录检验和显示设置</td>
+<td>与预定统计参考核对；图、表、原图可追溯</td>
+</tr>
+<tr id="block-60">
+<td>WB-R6 扩大适用范围</td>
+<td>第二实验室模板及异常样例</td>
+<td>先区分参数变化、流程变化和新算法；验证后再提炼共用模块</td>
+<td>第二实验室/第二批材料可复用，失败原因可解释</td>
+</tr>
+</tbody></table></div>
+<p id="block-61">自动找泳道、自动校正等可以在各自任务中提高自动化程度，但不必作为上述已知几何数据链的统一前置。标准样本默认自动跑，异常样本才需要可选纠正。</p>
+<h2 id="section-6" tabindex="-1">6. 原软件能力怎样变成我们的模块<a class="permalink" href="#section-6" aria-label="链接到此节">§</a></h2>
+<p id="block-62">优先复用已有Python能力；需要忠实复现ImageJ操作时，先用<code>Plugins &gt; Macros &gt; Record</code>记录操作，提取参数，再按官方批处理方式对另一批文件运行。宏只是实现来源之一，仍需把输入、参数、输出和失败情况接到现有执行器。<a href="https://imagej.net/tutorials/batch-processing-with-ij-macro">ImageJ宏批处理</a></p>
+<p id="block-63">第一版可以把一段完整的已验证宏封装成一个模块，不必每个按钮一个节点。ROI和背景如果原来靠人工选择，就必须变成明确输入或经过验证的定位步骤；录下鼠标坐标并不能解决新图位置不同的问题。</p>
+<p id="block-64">Image Lab、Prism和Adobe软件的安装、许可、脚本能力应在接入时逐项核验。本次确认了其功能与公开操作，没有确认商业软件存在适合我们使用的无界面API。能够导入导出结果，也是一条可先实现的连接方式。</p>
+<h2 id="section-7" tabindex="-1">7. 已有材料能支持什么，还缺什么<a class="permalink" href="#section-7" aria-label="链接到此节">§</a></h2>
+<p id="block-65">只读文件清单发现，本机WB资料已有TIFF原图、Excel表、Illustrator文件，以及既往平台生成的裁图和验证记录。这说明有材料可以开展下一轮流程复现；本次没有读取表格具体结果或解析AI文件，不能由扩展名推断软件版本、测量公式和真实操作顺序。</p>
+<p id="block-66">下一轮只需围绕一份代表性实验补齐：原图和采集信息；样本/膜/蛋白/重复关系；原软件版本；操作录像或逐步记录；ROI与背景；软件导出的数值；最后统计图。优先包括普通条带、多峰/拖尾、较强背景或过曝问题样例。没有对照结果时先做工程验证，不能宣称与实验室流程等价。</p>
+<p id="block-67">本次未进行外联、上传私有原图、安装或启动第三方分析软件。Bio-Rad完整用户手册网页读取超时，因此本文具体操作使用可读取的官方快速指南；没有依据第三方转载补齐缺失操作。</p>
+<p id="block-68">后续实验建议顺序及每项要调研的内容见<a href="../plans/experiment-research-roadmap.html">实验调研与开发路线</a>。当前主方案仍保持简明，这份文档作为WB实例附录。</p>
+<footer class="document-footer">4.2整理版 · B-018收尾；不代表算法对照、产品验收或代码重构已经完成。离线可读，本地参考链接依赖对应文件。</footer></article></main><script>
+const menu=document.getElementById('menu-toggle');
+menu.addEventListener('click',()=>{const open=document.body.classList.toggle('nav-open');menu.setAttribute('aria-expanded',String(open));menu.textContent=open?'收起目录':'目录与检索'});
+document.querySelectorAll('.sidebar a').forEach(a=>a.addEventListener('click',()=>{document.body.classList.remove('nav-open');menu.setAttribute('aria-expanded','false');menu.textContent='目录与检索'}));
+document.getElementById('print').addEventListener('click',()=>window.print());
+const index=[...document.querySelectorAll('.document p,.document li,.document pre,.document tr')].map(el=>({el,text:el.textContent.trim()}));
+const search=document.getElementById('search'),results=document.getElementById('results'),status=document.getElementById('search-status');let timer;
+search.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(()=>{const q=search.value.trim().toLocaleLowerCase();results.replaceChildren();if(!q){status.textContent='搜索全文；内容始终完整保留。';return}const hits=index.filter(x=>x.text.toLocaleLowerCase().includes(q));status.textContent=hits.length?'找到 '+hits.length+' 处，显示前 12 处。':'没有找到匹配内容，请换一个关键词。';hits.slice(0,12).forEach(hit=>{const a=document.createElement('a');a.href='#'+hit.el.id;const at=hit.text.toLocaleLowerCase().indexOf(q);a.textContent=(at>24?'…':'')+hit.text.slice(Math.max(0,at-24),at+85)+'…';a.addEventListener('click',()=>{document.body.classList.remove('nav-open');menu.setAttribute('aria-expanded','false');menu.textContent='目录与检索'});results.append(a)});},130)});
+const links=[...document.querySelectorAll('.toc a')];
+const sections=[...document.querySelectorAll('.document h2')];let queued=false;function updateCurrent(){queued=false;let current=sections[0];for(const h of sections){if(h.getBoundingClientRect().top<=150)current=h;else break}links.forEach(a=>{if(a.hash==='#'+current.id)a.setAttribute('aria-current','true');else a.removeAttribute('aria-current')})}addEventListener('scroll',()=>{if(!queued){queued=true;requestAnimationFrame(updateCurrent)}},{passive:true});addEventListener('resize',updateCurrent);updateCurrent();
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.body.classList.remove('nav-open');menu.setAttribute('aria-expanded','false');menu.textContent='目录与检索'}});
+</script></body></html>

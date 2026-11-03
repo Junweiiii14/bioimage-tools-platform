@@ -1,5 +1,7 @@
 # P-004 自动校正分析资产与版本化数值输入契约
 
+> 历史设计引用：本卡原始3.0章节见[固定版本](../../docs/plans/archive/research-platform-rd-v3-published.md)，不按新版主文同号章节解释。完成状态以本卡元数据与准确集成收据为准。
+
 <!-- PROGRAM_TASK_META {"id":"P-004","status":"planned","work_package":"W03","depends_on":["P-002","P-003","P-007"],"execution_root":"not_activated","owner":null,"base_commit":null,"head_commit":null} -->
 
 ## 执行状态

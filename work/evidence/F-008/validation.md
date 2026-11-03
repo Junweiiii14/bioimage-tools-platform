@@ -21,3 +21,9 @@
 - `git diff --check`：退出0。
 - 作者检查不冒充独审；无产品代码变更。完整双平台、桌面环境及规则检查将由本PR准确提交CI执行，未结束前不写通过。
 - 主仓库交接与清理清单在B018统一维护，避免依赖分支写入过时产品指针。
+
+## 最终远端验证与集成
+
+准确候选c8d969e7ab0fccb1133613c867b899b2d7e8a2f4，质量[run41638536315](https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41638536315)、规则[run41638536362](https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/41638536362)。四必需检查success：Windows1692 passed/10 warnings/1176.76s；Linux1688 passed/4既有平台skip/10 warnings/923.22s；桌面依赖与规则通过。两平台独立wheel构建安装与真实三worker、4000对照、重开及样式复用通过。条件native-case未触发为skipped，不冒充目标机验收。既有GLES诊断未据后继成功销账。
+
+PR56通过普通merge合入main 5d6e03be849d678e5f27e220fcf3fc4917e85fd5。PR4/5/20按已替代关闭、Issue45完成；未删除分支。此合入后记录由B018文档PR补齐，不改已验证依赖或产品代码。

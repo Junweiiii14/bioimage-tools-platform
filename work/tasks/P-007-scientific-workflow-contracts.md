@@ -1,5 +1,7 @@
 # P-007 M1最小科学资产、连接与冻结工作流契约
 
+> 历史设计引用：本卡原始4.0章节见[固定版本](../../docs/plans/research-platform-reference-v4.md)，不按新版主文同号章节解释。完成状态以本卡元数据与准确集成收据为准。
+
 <!-- PROGRAM_TASK_META {"id":"P-007","status":"done","work_package":"W11","depends_on":["P-002","P-003"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0","owner":"chat-01a199d4-dac3-7dd3-af35-cdad7d361934","base_commit":"dc9618e7000eb7793067556e99d50a0d0509423d","head_commit":"c243933569db3ce4e9377283645c6f578ddd4b4e"} -->
 
 ## 输入与前置
