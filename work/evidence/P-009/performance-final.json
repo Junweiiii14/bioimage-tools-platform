@@ -1,0 +1,171 @@
+{
+  "scope": "Raw JSON/receipts/preferences/command logs; synthetic workspace assets remain local, not copied.",
+  "runs": [
+    {
+      "commit": "26f4470bc62b4cf20b7727704739cd223835c7e6",
+      "exit": 0,
+      "case": "both",
+      "action": "all",
+      "warmup": 5,
+      "samples": 30,
+      "output": "frozen-runs/complete-26f4470",
+      "command": "uv run --locked --no-sync python -m tooling.benchmark_workflow_authoring --run --output .local/p009-perf-frozen-26f4470"
+    },
+    {
+      "commit": "64c02d94b0da1596ee9cb372d60e44b24cf23b33",
+      "exit": 0,
+      "case": "standard",
+      "action": "results",
+      "warmup": 5,
+      "samples": 30,
+      "output": "frozen-runs/results-64c02d9",
+      "command": "uv run --locked --no-sync python -m tooling.benchmark_workflow_authoring --run --case standard --action results --output .local/p009-perf-results-64c02d9"
+    }
+  ],
+  "environment": {
+    "QT_QPA_PLATFORM": "windows",
+    "QTWEBENGINE_CHROMIUM_FLAGS": "--disable-gpu"
+  },
+  "files": [
+    {
+      "path": "work/evidence/P-009/frozen-runs/complete-26f4470/results.json",
+      "bytes": 98209,
+      "sha256": "f19de1edca5da61504fca30186f46c22fab1f58d057583f79bc1cd69105b0f98"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/complete-26f4470/command.log",
+      "bytes": 12711,
+      "sha256": "27cd35bac15f4a30ea7932424af0c2d91c4ee04a84204d2045c58ac9c2591976"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/complete-26f4470/nodes-3/controls-raw.json",
+      "bytes": 84032,
+      "sha256": "583902e0f54272e0730a5d7b66a18b4c997d9b51d6caa6be38b01c4df3289a67"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/complete-26f4470/nodes-3/ember-node-raw.json",
+      "bytes": 7055,
+      "sha256": "1b6840c3866abf44d0d3db93fa1af2b3e57f2cf8421cf02835ed9c6d5844a69b"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/complete-26f4470/nodes-3/ember-preview-raw.json",
+      "bytes": 7137,
+      "sha256": "0f69589df69d52f519d1cc303e9d1e7c6c862e13636c4de76a2f0a7f7562281f"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/complete-26f4470/nodes-3/forest-node-raw.json",
+      "bytes": 7132,
+      "sha256": "8169aab808a3659286ee421ff21b0e88dfc2ae04f5078f3dfd4e63de073a40c5"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/complete-26f4470/nodes-3/forest-preview-raw.json",
+      "bytes": 7298,
+      "sha256": "8706df4dc48a339fd190138bea52aa9467b3bbb1d0bad7d465179159be81878d"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/complete-26f4470/nodes-3/iris-node-raw.json",
+      "bytes": 7104,
+      "sha256": "7744e990045dbd50214c43ad8071691254ce6cdc1a91963c37ee76449285916b"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/complete-26f4470/nodes-3/iris-preview-raw.json",
+      "bytes": 7083,
+      "sha256": "0618557a028c029051f8b50ad00f357630d8c1da971910e79b4bea4a549eedb9"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/complete-26f4470/nodes-3/neutral-node-raw.json",
+      "bytes": 7168,
+      "sha256": "fda747396c2f39f4d505bba952025811ae49f1a694a0e5290ebeec9701fc1bf6"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/complete-26f4470/nodes-3/neutral-preview-raw.json",
+      "bytes": 7277,
+      "sha256": "46f268c181d0933a3464d37a06b793e2cf711195b9c4903769592a25baa60abf"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/complete-26f4470/nodes-3/receipts.jsonl",
+      "bytes": 8310,
+      "sha256": "5ab4098171beb3cd4ea5d77baafa5b1243d1fb5fc5e9d1bca7feb58cd137fe7c"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/complete-26f4470/nodes-3/ui.ini",
+      "bytes": 158,
+      "sha256": "9eaab41c384beb0567df84be2dba2332890dd72bc23463a6bd3fc11b3a7e85b4"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/complete-26f4470/nodes-64/ember-node-raw.json",
+      "bytes": 7010,
+      "sha256": "d9ce14fc7936b4acc476b8a617122f3e63a2074941ffce0b7177075532315a32"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/complete-26f4470/nodes-64/forest-node-raw.json",
+      "bytes": 7121,
+      "sha256": "2a3b797025c679de8f914b618c3aa9e9f0b5a2ded093547d64f87816084c7b8b"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/complete-26f4470/nodes-64/iris-node-raw.json",
+      "bytes": 7079,
+      "sha256": "6ce383df7847d656c880e35670db99acaff73170ccdb590af085b5c195c529b8"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/complete-26f4470/nodes-64/neutral-node-raw.json",
+      "bytes": 7202,
+      "sha256": "23b6880f40f8c5fec77523ca4cfe11ed935cef55345d104a6a544459cee958a7"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/complete-26f4470/nodes-64/receipts.jsonl",
+      "bytes": 114,
+      "sha256": "b61ffb8bca2ed8095381a195ae2413f5dcb06d67bf54846871d7faf4a99bdc68"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/complete-26f4470/nodes-64/ui.ini",
+      "bytes": 158,
+      "sha256": "9eaab41c384beb0567df84be2dba2332890dd72bc23463a6bd3fc11b3a7e85b4"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/results-64c02d9/results.json",
+      "bytes": 77253,
+      "sha256": "33088dd10557069be34dc5e8f1dd01856b75db79ed6885d8de4d23f66a6d6393"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/results-64c02d9/command.log",
+      "bytes": 1272,
+      "sha256": "4869b559a5f89494935e04c8a0e39b484039c2db764879d7a526bcd622c536af"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/results-64c02d9/nodes-3/controls-raw.json",
+      "bytes": 83927,
+      "sha256": "d9ba9008b5c024c549e0b9dd4d2076ee3ff15d9625f2e677bf51388d2a667b73"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/results-64c02d9/nodes-3/ember-preview-raw.json",
+      "bytes": 7213,
+      "sha256": "aca9f18f9e596b5f9c2139b923a77791fd3804c7c5d7bda402d187d369be3f6c"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/results-64c02d9/nodes-3/forest-preview-raw.json",
+      "bytes": 7236,
+      "sha256": "4c276bea4b30c06d30876e8f3ff97a31a3782c7714a9e8d927027acc34219a75"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/results-64c02d9/nodes-3/iris-preview-raw.json",
+      "bytes": 7153,
+      "sha256": "a2c053893622cd5b4bbaeca017ceb35191ff353fb0932a6cad58dea5764dbd44"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/results-64c02d9/nodes-3/neutral-preview-raw.json",
+      "bytes": 7269,
+      "sha256": "2e4c6c756ed566e3b4f9fe6f9de3770abf8d7d593c026c8ebc97e3a34c33f9d6"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/results-64c02d9/nodes-3/receipts.jsonl",
+      "bytes": 8310,
+      "sha256": "5ab4098171beb3cd4ea5d77baafa5b1243d1fb5fc5e9d1bca7feb58cd137fe7c"
+    },
+    {
+      "path": "work/evidence/P-009/frozen-runs/results-64c02d9/nodes-3/ui.ini",
+      "bytes": 158,
+      "sha256": "9eaab41c384beb0567df84be2dba2332890dd72bc23463a6bd3fc11b3a7e85b4"
+    }
+  ]
+}

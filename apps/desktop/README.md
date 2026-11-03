@@ -276,4 +276,7 @@ T080 将命名交付接入真实阶段链：配置 CAS → worker 建目录并�
 
 P005开发中RunSession增加可选require_dispatch_ack：真实PID入库后通知started，宿主在账本CAS确认后用匹配run/pid授权请求。默认旧入口保持；等待时取消不发请求，ProcessEvent保留原始模块事件。固定--worker wb_workflow消费公开WB多输入协议；通用GraphSession/后台当前环境准入尚待接入，见 ../../docs/contracts/wb-original-workflow-v1.md。
 
-P005后继已有生产WorkflowSession与CLI（完整M1/M2仍在开发）。可用全新目录运行：`python -m bioimage_app --workflow --workspace <新目录> --validation triangle_u16`；自己的原图/旧AnalysisRequest用`--source <TIFF> --parameters <JSON>`，恢复已有执行用`--resume <execution_id>`。同一控制器自动串行真实三节点、后台入口核验、正式提交/账本确认和节点边界暂停继续；已存在目录不会被覆盖。当前尚未完成完整取消/cache故障矩阵和可视编辑入口，不能把CLI当M2交付。
+P005后继已有生产WorkflowSession与CLI（完整M1/M2仍在开发）。可用全新目录运行：`python -m bioimage_app --workflow --workspace <新目录> --validation triangle_u16`；自己的原图/旧AnalysisRequest用`--source <TIFF> --parameters <JSON>`，恢复已有执行用`--resume <execution_id>`。同一控制器自动串行真实三节点、后台入口核验、正式提交/账本确认和节点边界暂停继续；已存在目录不会被覆盖。单图可靠性切片已PR52集成；完整批量执行和M2画布仍按各任务接续，CLI不代表M2交付。
+
+
+P008批量CLI：`python -m bioimage_app --workflow-batch --workspace <新目录> --validation triangle_u16 --validation triangle_u8`。父控制器复用同一WorkflowSession/存储，支持样本隔离、整批控制、持久身份恢复、真实图模板绑定及依赖缓存。--manifest接显式原图/参数，--resume重开，--rerun在同目录创建新批次。实际验收状态只看P008任务卡，中文操作见 ../../docs/runbooks/workflow-batch.md。

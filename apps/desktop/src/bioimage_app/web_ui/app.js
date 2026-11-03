@@ -1543,6 +1543,7 @@ async function bootstrap() {
             new QWebChannel(qt.webChannelTransport, (channel) => {
                 bridge = channel.objects.workbench;
                 window.moduleComparison?.connect(channel.objects.comparison);
+                window.workflowEditor.connect(channel.objects.workflowAuthoring);
                 boundaryDiagnostics.connect(bridge);
                 window.desktopSession?.connect(bridge);
                 bridge.progressChanged?.connect((raw) => {

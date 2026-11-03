@@ -302,6 +302,9 @@ def test_actual_web_forms_save_reopen_and_export(
         )
         host.view.generation += 1  # Match the host commit/install protocol.
         assert host.view.generation != before_generation
+        host.save()
+        qtbot.waitUntil(lambda: not host.operation_busy, timeout=20000)
+        assert host.current_draft_saved
         window.bridge.publish()
         qtbot.waitUntil(lambda: javascript(window, qtbot, "state.revision") == host.view.generation)
         open_tool("template")

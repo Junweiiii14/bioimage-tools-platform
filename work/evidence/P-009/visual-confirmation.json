@@ -1,0 +1,54 @@
+{
+  "parent_commit": "bb42d6b9116ecf05085bc5a0e076d334d02f3f28",
+  "source_sha256_lf": {
+    "apps\\desktop\\src\\bioimage_app\\web_ui\\workflow_authoring.js": "c3b89a6ee7d0d361abdf1dd7221a8426d549e54433d6f9ff96595f68e3650125",
+    "apps\\desktop\\src\\bioimage_app\\web_ui\\workflow_authoring.css": "6815cdc74d82db37139542021ea751bc80863e87b90eec65f9970c1fa8aa4528",
+    "apps\\desktop\\src\\bioimage_app\\web_ui\\workflow_graph.js": "426b86474bb69a302d422f5d23947282d5705762c673d3f996da56055ee39379",
+    "apps\\desktop\\src\\bioimage_app\\web_ui\\workflow_graph.css": "f6d4ceeb7d8770f873fe2be23a556603fb5ce551eb987f12beb57b19505482a3",
+    "tests\\test_workflow_authoring_web.py": "b0a2eed75ff54ed39d7e577279f183dc53793ae521b57abc09e57b7b159a78f8"
+  },
+  "capture_sha256": {
+    "captures.json": "ae051e400bea094619729766f5759881baaa69338c50b5bff407f3ac83e7ec97",
+    "ember-1440x940-graph.png": "9a494cefdb487c1b9f1e5d06069254a5fa77c74ccf0c209fbcf66bbf2b77c9a1",
+    "ember-960x640-parameters.png": "6ea7a5e18abc8024fe651cc0a486b9e308986704f61d4d917373ccb644570660",
+    "forest-1440x940-graph.png": "7080b1e26dabac74eb3e5e29194e3196e7ed9469bc4efe4e3977d6ed8b066d6f",
+    "forest-1440x940-results.png": "6e29dff977f02b5e0c3d4aac1b5a54bc8230d09d82b702a513f28f2c5df91719",
+    "forest-640x720-graph.png": "bc1a767e89b081ce0c545ff867987d3f4e34c7394fafa15a8fcbd9ed43e6bbe4",
+    "forest-640x720-parameters.png": "ec087758079f1060ffc676646ab5bc766d20137566d7fb12a872769ba3c10a5f",
+    "forest-640x720-results.png": "32668407fb45e8f3dc632d3962d3eb1eb13b72404a8392510434ea344e96480f",
+    "forest-960x640-parameters.png": "4b6245b1e5c243e377fbea92e70b7f314ff6b93da152d54ea295471dc046fdd9",
+    "iris-1440x940-graph.png": "593d56e9c9d101ce2d70c215916657c701feaf521b3c0327312b8a6693c566e8",
+    "iris-960x640-parameters.png": "b0c45a20ef5bf52da5340014167aa13e537c96561322f90b81e6c828e3a1e52c",
+    "neutral-1440x940-graph.png": "9f93da8494935f1517e768a919eae68ffaed5d86a335e3a32c448922fc8f9b02",
+    "neutral-960x640-parameters.png": "4ef2464e27b7327c63df0d034ff506d2ae4aef561b6101a541ee5ab0324e4502"
+  },
+  "log_sha256": {
+    "p009-ui-responsive-flows.log": "1fbec8b13e98daa3f643c3d85c632b0e24838c4f2f82e5964ee89510f865ee0d",
+    "p009-ui-responsive-types.log": "c584b21ee012de391dc2799d5455db619d3fefbb192ab07ea4ba83fb0d704c14",
+    "p009-ui-responsive-web-static.log": "adc41c720a2c62a2141520dfc35701253a6b7185d171e0dcbfdf5fd8126b67d2",
+    "p009-ui-confirm-active-capture.log": "3510a4e4990e36b17c727b880fa3185c6b1acbfe3199ca275dfdd0e7c13a376f"
+  },
+  "independent_reviewer": "/root/impeccable_finish_reviewer",
+  "first_disposition": "fix",
+  "final_disposition": "ship",
+  "verdict_scope": "single material viewport-usability/task-density fix resolved; not whole surface/performance/science/physical IME/target device",
+  "documenter": "/root/impeccable_documenter",
+  "related_tests": {
+    "passed": 6,
+    "seconds": 41.34,
+    "exit_code": 0
+  },
+  "confirmation_capture": {
+    "passed": 1,
+    "seconds": 15.57,
+    "exit_code": 0,
+    "valid_frames": 12
+  },
+  "remaining": [
+    "native performance",
+    "isolated wheels",
+    "final exact code review",
+    "PR required CI",
+    "normal merge"
+  ]
+}

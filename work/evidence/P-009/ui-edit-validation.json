@@ -1,0 +1,56 @@
+{
+  "status": "in_progress",
+  "parent_commit": "f4c8ac1839ab12eda184abd7e8ca0d4b920a1c2c",
+  "source_sha256_lf": {
+    "apps/desktop/src/bioimage_app/web_ui/workflow_authoring.js": "809311bbb1da6480d6ba7e7d15aa9ec400bebd5cf301e048f5dee00d58ccbd3f",
+    "apps/desktop/src/bioimage_app/workflow_authoring_bridge.py": "df20edead1fece8e986d45dee2987271095125a7c5d8f8a1e17562aec9a62d96",
+    "tests/test_workflow_authoring_web.py": "8f39599c6688fc4e61b0cd52cd82346f3a817846176c68e1e46a43ed3df5bb7d",
+    "work/evidence/P-009/ui_surface_probe.py": "162f8a4daad9fd0ab8847453a5fd3fd7887155de632336bddf6e5bf89dd8ea0d",
+    "docs/runbooks/workflow-authoring.md": "4843710878892badda26767452ebd25b810528efe545a822564cdd5e6c9cedcf",
+    "docs/contracts/workflow-authoring-v1.md": "ef3345120fa10feb9a1499f5ab1185d256adc40667032c534f371f09c899748c"
+  },
+  "log_sha256": {
+    "p009-web-edit-connected-flows.log": "c0950c5e56044c7ca977a405bd47f1f2ce0a0bc6a048dbe499adec10455988ad",
+    "p009-web-edit-flows.log": "459c3f9738585dc5e35b2078ae9f1420e720c6237fd6e0ca5ff4775789f37fa7",
+    "p009-ui-edit-final-types.log": "c584b21ee012de391dc2799d5455db619d3fefbb192ab07ea4ba83fb0d704c14",
+    "p009-ui-edit-final-web-static.log": "8777e30623807e91500eea53818df7ba562e21745af22febdbee9ad16ac6bb4f",
+    "p009-ui-detect.json": "0c741218fc194088e8c6723b1c060096443278009ef7fcefea5e4c34fd082385",
+    "p009-ui-windows-active-capture.log": "b57b2b6bba7ee596eac640b876ca7b49417dc471b52216a9a51e65af8ce49979",
+    "p009-ui-windows-static-capture.log": "a7d40b2858040fbbf28402fa3207af3ced111cce8b39fe458b07a3c0bdd04c9a"
+  },
+  "valid_capture_sha256": {
+    "captures.json": "ae051e400bea094619729766f5759881baaa69338c50b5bff407f3ac83e7ec97",
+    "ember-1440x940-graph.png": "a107f176d74d0036146ddc63b53d6c17cc2ac52f137f5ad3b070e562dbb68dc2",
+    "ember-960x640-parameters.png": "873240081679be9f4053e56d7161d1f742cb62052bf34dede606aa7f7b5dde95",
+    "forest-1440x940-graph.png": "e953b62eb1d1e087735d6ebb3e93b5a991536b6a6816660632553467134b30ff",
+    "forest-1440x940-results.png": "46d7b04650bbef122db5d1c789c0512b3a3a0483c0b4a6b3c2804ffaa8d3db68",
+    "forest-640x720-graph.png": "0a279f27d300c4e2389df320357c0bc4b2022b7d5aa5f5e04f4349699dc1f289",
+    "forest-640x720-parameters.png": "e63fe45c839bbfefad234aa90420cf64f59d9534b8e28c9afd55b8e650f6b017",
+    "forest-640x720-results.png": "82178a88fd8fb867d9eb61a7671550c70f1f69bb211e565bc38d017f9ce1210e",
+    "forest-960x640-parameters.png": "e969114a1a858279f427cf8d7762382ab33436637288f7af95f77d59d4f224e3",
+    "iris-1440x940-graph.png": "44821a456e3dcf061d6abd1f4275a11e7dfcf4c1938882368c249009585c358b",
+    "iris-960x640-parameters.png": "8e5e5795702110a4a917991ff2040751159e05cca87875409f99128e0c23fb3f",
+    "neutral-1440x940-graph.png": "534d629023c38430406248a49d8411510e88e74b12ae7e85124955b179391ab4",
+    "neutral-960x640-parameters.png": "730fc5bec18f56730e87eb3c13688b0c29c9dc942763c29db9052d3f58ff2346"
+  },
+  "web_flows": {
+    "passed": 5,
+    "seconds": 39.93,
+    "exit_code": 0
+  },
+  "capture": {
+    "passed": 1,
+    "seconds": 15.42,
+    "exit_code": 0,
+    "QT_QPA_PLATFORM": "windows",
+    "QTWEBENGINE_CHROMIUM_FLAGS": "--disable-gpu",
+    "static_capture_only": "active window, animations disabled, two RAF + 500ms native delivery, nonblank and CSS/pixel color consistency"
+  },
+  "not_yet": [
+    "independent visual verdict",
+    "performance",
+    "isolated wheels",
+    "final exact code review",
+    "PR required CI and merge"
+  ]
+}

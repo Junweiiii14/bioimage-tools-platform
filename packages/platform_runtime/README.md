@@ -32,3 +32,5 @@ T-019：import_draft_snapshot只在尚无文档/run的新工作区保存一个�
 P007增加纯有限图compile_workflow、定义/计划有界JSON读取、可信ModuleRegistration及冻结计划重新编译校验。平台不导入WB，参数验证由可信宿主装配；不从工作区加载代码。当前只预检/冻结，运行账本/调度/复用由P005实现，合同见docs/contracts/scientific-workflow-v1.md（仓库根相对路径）。
 
 P005开发中的workflow-journal-v1.md增加纯账本转移：实际RunRecord引用、分离的宿主/worker序号、边界暂停、控制幂等、恢复和科学计算键复用。纯函数不观察进程/存储或认证文件；宿主仍须实际验证、CAS落盘后再通知。它尚不代表生产图执行器完成。
+
+P009增加validate_workflow_result_selection：对已验证的冻结模型核对计算键、真实提交清单的输出/质量、原execution/node/attempt及实际请求绑定。复用和成果展示共同使用同一纯边界；存储字节仍由宿主读取核验，不改变v1结构、方法或数值。

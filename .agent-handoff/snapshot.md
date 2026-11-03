@@ -1,30 +1,36 @@
 # 当前恢复指针
 
-目标仍active、无预算：在bioimage-v0完成4.0 M1通用执行与M2真实可视编排，不缩成仅CLI或账本。分支codex/p005-workflow-executor，main基线006e9f143c830f5e13be2932e8ac37a9f3a05ed1；核对实际HEAD/dirty后接续。
+目标active、无预算：实际产品树bioimage-v0完成P002及4.0 M1/M2。P001/P002/P003/P005/P006/P007/P008已完成，不重做。当前唯一任务work/tasks/P-009-visual-workflow-authoring.md，in_review；不得提前mark goal complete。
 
-用户最新要求优先：入口一次校验、内部信任不变量，删重复判空/验证，不滥用try/except，不为单次逻辑抽象，不写低概率防御。社区karpathy-guidelines已验证后项目配置，固定2c606141936f1eeef17fa3043a72095b4765b9c2，原文SHA一致、仅MD无hook、非作者独立核验/policy通过；配置提交bab41e0。技能不是自动修复保证。普通已授权操作连续做，独审集中可运行最终候选，不再逐个小提交循环审批。
+## 工作区
 
-## 当前任务
+显式workdir C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-v0；默认app cwd旧规划树不是产品树。分支codex/p009-visual-workflow，base main275560475d39426434416c74feeb0c2f259d1402。保留另一聊天untracked B012任务/证据，不stage、不修改。scope .回执绑定2755604，707行已完整加载；规则/范围/main变化才重新加载。
 
-权威卡work/tasks/P-005-workflow-execution-slice.md保持in_progress，当前scope . 的新规则回执已实际加载，AGENTS/coding-standards为新简洁规则。P002/P003/P006/P007已分别通过既有PR集成done，不重做；P004仍单独planned，P008/P009待依赖。
+## 已完成与实际边界
 
-- 账本/存储组件准确3215..418已独审/隔离wheels通过；证据journal-review-r1/r2/r3与journal-wheels，旧失败保留。
-- 三固定WB节点及请求确认：823d首审发现NaN/负数可误发布valid；b80b900已复用旧ResultFrame完整校验并获89ba603..b80b900 Accepted，独立13pass22.86s，worker-review-r1保留Request changes。不要把该接受扩大到后继调度代码。
-- 新WorkflowSession已实际自动派发verify/analyze/publish，后台可信注册/当前环境核验，PID账本确认后再发送请求，正式提交后更新账本。原来测试父循环已由生产控制器取代。单图与节点边界暂停/继续测试2pass；相关RunSession/模块共23pass36.34s。新增核验调用次数/线程断言后2pass10.86s：开始仅核验一次，明确resume重新核验一次，全部在后台。
-- 新--workflow CLI实际执行triangle_u16三真实run、journal revision21/succeeded、表4000.0/text:valid，退出0；关闭后重开比对当前runtime源码指纹相同。work/evidence/P-005/auto-session.json记录实际源码SHA、日志、run IDs。Ruff/Pyright/policy/九import边界通过。新代码尚未最终独审/完整门禁/新wheels/CI，不是整卡或M1完成。
+- P008 PR53正常merge2755604；准确b4847a5非作者Accepted，四必需CI成功，main/候选同tree98754bdd。Windows1675passed、Linux1671passed4既有skip，双侧全部wheel真实4000/40/6runs。证据P008/integration.json，不重跑。
+- P009完整编辑器连接同一执行器：节点CRUD/连线/schema表单、CAS保存重开、模板v1新旧兼容、GUI/CLI复用、新TIFF真实运行、缓存依赖失效、暂停/继续/取消排空、运行中新草稿/焦点、坏TIFF隔离均有定向证据。不是预设动画；未新增依赖/科学算法。
+- 视觉首轮12图仅发现窄窗密度，一批fb3e11f修正、同12图确认，独审scored fix ship。一次detect0主要/1backdrop advisory。预算耗尽，不再截图循环或第二detector。design-conformance.md/visual-review.md保留范围；不声称科学/物理IME/设备通过。
+- 26f4470全环境隔离wheel第二轮exit0，新独立GUI探针真实安装资产/保存重开/4000→40/6workers/模板CLI；第一轮app.quit轮询损坏WebEngine并人工核实自建PID后停止，exit1原证据保留。之后P1产品修改尚未重验wheel。
+- 26f4470完整正式性能5+30 exit0，.local/p009-perf-frozen-26f4470/results.json。12UI组及35真实控制独审重算一致。iris/neutral node137–149ms、preview332–345ms超100ms参考；normal renderer WS约3.93GB/peak4.13GB，原因UNKNOWN。不能写性能全面通过；不是worker树总峰值。历史诊断和失败正式轮不覆盖。
 
-## 下一步：直接推进MVP
+## 当前修复与下一步
 
-1. 控制器取消/关闭重开/存储故障/缓存矩阵19项已通过；桌面入口--workflow-ui复用同一执行器，后台输入准备、开始/暂停/继续/取消/重开/应用参数或样式新修订均已接通，5项真实界面测试通过。输入准备失败的重入关闭竞态已实际复现并修为只退休一次；旧失败证据保留。runtime-gui-recovery.json记录原生截图/真实4000三run与准确源码。
-2. 当前冻结可运行候选，集中独审和完整dev.py check --all、四wheel最终重验与正常PR/四必需CI。此前四wheel/23联合/5界面通过不覆盖随后最后样式修补，不提前认整卡完成。主线base仍006e9f1，规则scope .有效。
-3. P008复用同一账本/cache/recovery扩有限批量完整M1，随后P009真实增删/连接/替换/参数/保存重开/模板第二批M2；不重建第二执行器，不以静态图或JSON预检收尾。
+独审/root/p002_independent_review准确2755604..26f4470 Request changes P1：合法子账本改outputs可错绑已有9999 CSV，真实run/manifest未变。持久副本.local/p009-independent-26f-selection，报告.local/p009-review-26f4470.md。损坏manifest假设已撤回（Workspace.get_run本就拒绝）。
 
-## 当前代码与运行入口
+修复已冻结64c02d94b0da1596ee9cb372d60e44b24cf23b33，共享纯validate_workflow_result_selection，reuse/display两真实消费者；缓存保留原身份。无公式/schema/门禁变化。作者21passed38.06s、最终store+加强GUI4passed18.95s、type/Ruff/format通过。非作者准确2755604..64c Accepted，原持久反例results/open拒绝，缓存/真实GUI独立2passed17.73s。报告work/evidence/P-009/review-final.md，原拒绝报告保留。
 
-apps/desktop/src/bioimage_app/workflow_session.py、workflow_preparation.py、wb_workflow_host.py、workflow_cli.py与RunSession是下一修改范围；tests/test_workflow_session.py实际控制器测试。CLI：uv run --locked --no-sync python -m bioimage_app --workflow --workspace <全新目录> --validation triangle_u16；原图/参数用--source和--parameters，恢复用--resume <execution_id>。不要覆盖已存在示例工作区。
+64c受影响preview/control5+30采样exit0，独立复算一致；preview329–342ms，pause/cancel后台确认38/38ms、UI反馈204/212ms，renderer WS3.57GB，超参考/高值如实保留，不推断根因。28份两提交原始文件及SHA已归档，performance-final.md/json。64c当前全部隔离wheelexit0，handle64363终态确认，实际安装编排/保存重开/4000→40/6workers/模板CLI通过；日志.local/p009-installed-wheels-64c02d9.log。当前没有本机运行中的测量/测试/安装进程。
 
-本轮实际案例.local/p005-auto-mvp-20261102-verified-r2与日志.local/p005-auto-mvp-cli-r2.log保留，都是自有合成数据。旧snapshot完整归档archive/2026-11-02-before-auto-session-snapshot.md。PR52生产候选384e5ba已准确非作者Accepted（原P2入口修复）；37定向109.40秒、完整本机1659pass928.26秒/四wheels0，LinuxCI1655pass4既有skip738.87秒/四wheels0。Windows run41413166304/job125170776585明确20分钟作业超时取消，82%无FAILED但不认通过；现仅将Windows foundation总时限20→25、Linux20保留，检查集合/单测超时/预期和必需门禁不变，单独记录runtime-review.md及ci-timeout-r1.json。资源增量独审/新CI待做，P005仍in_progress；新CI实际handle从.local/p005-live-dispatch.json核验。旧local check session19645因修正主动中止exit1（约13%有F与GPU日志，原因未定位）；PID29552已查不存在。原日志保留，不能写通过；新全量使用CI同款--disable-gpu。实际HEAD/dirty必须核对。
+1. PR55：https://github.com/Junweiiii14/bioimage-tools-platform/pull/55。5e69b2f曾准确独审Accepted延伸，但quality41494573552两foundation已failure：import-linter发现storage→authoring_store→WB/NumPy，未运行pytest/wheel；desktop/rules成功保留，native-case预期skip。不是观察超时，旧run终态已确认，不盲目重跑。
+2. 当前装配修复：AsyncStorage构造时固定typed authoring处理器，Session显式装配；通用storage无WB导入，原同一worker/Workspace执行，命令仍只有固定操作/bytes。默认未装配端口明确拒绝。9 import contracts全过、相关10passed38.59s、默认拒绝/真实处理线程2passed15.73s，type0/Ruff/format。冻结准确提交后集中增量独审、推同PR55及新必需CI；不改门禁/容差/阈值。原性能和64c本地wheel不改署新源码。
+2. 本地不再重复全pytest/已通过wheel/原生测量；最终CI执行全量Windows/Linux已有门禁和wheel。失败按真实原因处理，不自动重跑凑绿。
+3. 集成后按objective-audit.md及原P002/M1/M2需求逐项核验，记录当前PR/check/tree，不能靠状态文字宣布完成。保持科学/设备/用户体验及性能限制。
 
-## 保留边界
+存储装配已提交并推742c5d26403b1509537ebe1cfd4cf6ba4b4e18ef；quality41495505039/rules41495504928启动。独立产品增量Accepted、9导入契约过、2真实线程/默认拒绝测试15.32s。仅原CI文本行尾空格导致742c diffcheck失败，当前改无损gzip+原/压缩SHA，解压字节一致，未扩大whitespace忽略。纯证据修正需冻结并推同PR，准确报告待reviewer延伸；新推可能取消742c CI，按真实终态记录。旧41494573552 failure不重跑。B012仍保留，review-final.md仍明确64c旧范围，新报告不改署历史。
 
-科学留出/负责人容差/S1、用户体验与干净Windows/物理DPI/GPU/T002-P0及旧native UNKNOWN仍见risks/backlog；这些不冻结无依赖工程。原图/历史/旧dirty树/在用安装不覆盖；不扩到新校正、其他实验全套、Agent、正式安装器发布/替换、外联、花费或数据上传。
+旧快照已逐字节归档archive/P009-before-manifest-fix-snapshot.md；详细失败、命令和阶段证据在任务及work/evidence/P-009，不在snapshot复制长日志。
+
+## 边界
+
+P004几何方法独立planned，不阻塞原整数图工程M1/M2。科学留出/S1、用户体验、干净Windows/物理DPI/GPU/T002-P0及历史native UNKNOWN见risks/backlog，不能由本机通过代签。原图/历史结果/旧dirty树/在用安装不覆盖；不扩M3/其他实验/Agent、安装器正式发布或替换、外联、花费、数据上传。

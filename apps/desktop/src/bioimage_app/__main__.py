@@ -13,6 +13,10 @@ for variable in (
 
 
 def main() -> int:
+    if sys.argv[1:2] == ["--workflow-batch"]:
+        from bioimage_app.workflow_batch_cli import run_workflow_batch_cli
+
+        return run_workflow_batch_cli(sys.argv[2:])
     if sys.argv[1:2] == ["--workflow"]:
         from bioimage_app.workflow_cli import run_workflow_cli
 

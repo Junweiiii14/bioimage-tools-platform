@@ -136,6 +136,7 @@ def test_fifo_save_load_errors_and_shutdown(qtbot: QtBot, tmp_path: Path) -> Non
         )
     )
     load = port.submit(StorageCommand("load", document_id="D"))
+    unsupported = port.submit(StorageCommand("workflow_authoring", data=b"{}"))
     port.shutdown()
     qtbot.waitUntil(lambda: bool(closed), timeout=10000)
     assert [reply.request_id for reply in replies[:4]] == [create, save, invalid, load]
@@ -143,6 +144,9 @@ def test_fifo_save_load_errors_and_shutdown(qtbot: QtBot, tmp_path: Path) -> Non
     assert replies[2].error_code == "StateConflict"
     assert replies[3].data == b'{"v":1}'
     assert replies[3].error_code is None
+    assert replies[4].request_id == unsupported
+    assert replies[4].error_code == "ValueError"
+    assert "not configured" in replies[4].message
     assert all(thread == port.thread() for thread in callback_threads)
     with Workspace.open(tmp_path / "workspace") as store:
         assert store.load_draft("D").revision == 0

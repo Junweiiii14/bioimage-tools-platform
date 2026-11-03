@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
@@ -22,10 +23,13 @@ from tool_contracts.api import (
     ProcessExitReceipt,
     RecoveryReport,
     RunRecord,
+    WorkflowBatch,
     WorkflowLedger,
 )
 
 from bioimage_app.module_results import commit_module_result
+from bioimage_app.workflow_authoring_models import AuthoringProjection
+from bioimage_app.workflow_batch_storage import WorkflowBatchStoreCommand, execute_batch_store
 from bioimage_app.workflow_storage import WorkflowStoreCommand, execute_workflow_store
 
 _LOGGER = logging.getLogger(__name__)
@@ -65,6 +69,8 @@ Operation = Literal[
     "backup",
     "close",
     "workflow",
+    "workflow_batch",
+    "workflow_authoring",
 ]
 Value = (
     AssetRef
@@ -72,6 +78,8 @@ Value = (
     | RunRecord
     | RecoveryReport
     | WorkflowLedger
+    | WorkflowBatch
+    | AuthoringProjection
     | tuple[DraftSnapshot, ...]
     | tuple[RunRecord, ...]
     | str
@@ -100,6 +108,7 @@ class StorageCommand:
     cancellation: Event | None = None
     module_request: ExecutionRequest | None = None
     workflow: WorkflowStoreCommand | None = None
+    workflow_batch: WorkflowBatchStoreCommand | None = None
 
 
 @dataclass(frozen=True)
@@ -114,10 +123,11 @@ class StorageReply:
 class _StorageWorker(QObject):
     replied = Signal(object)
 
-    def __init__(self) -> None:
+    def __init__(self, authoring: Callable[[Workspace, bytes], AuthoringProjection] | None) -> None:
         super().__init__()
         self._owner_thread = self.thread()
         self._workspace: Workspace | None = None
+        self._authoring = authoring
 
     @Slot()
     def retire(self) -> None:
@@ -154,6 +164,18 @@ class _StorageWorker(QObject):
         store = self._workspace
         if store is None:
             raise ValueError("No workspace is open")
+        if op == "workflow_authoring":
+            if self._authoring is None:
+                raise ValueError("Workflow authoring is not configured on this storage port")
+            projection = self._authoring(store, command.data)
+            data = projection.model_dump_json(
+                exclude={"plan": True, "batch": True, "project": {"seed": True}}
+            ).encode("utf-8")
+            return projection, data
+        if op == "workflow_batch":
+            if command.workflow_batch is None:
+                raise ValueError("Batch operation requires an explicit index command")
+            return execute_batch_store(store, command.workflow_batch), b""
         if op == "workflow":
             if command.workflow is None:
                 raise ValueError("Workflow operation requires an explicit journal command")
@@ -253,7 +275,13 @@ class AsyncStorage(QObject):
     _requested = Signal(str, object)
     _retire_requested = Signal()
 
-    def __init__(self, parent: QObject | None = None, *, max_pending: int = 64) -> None:
+    def __init__(
+        self,
+        parent: QObject | None = None,
+        *,
+        max_pending: int = 64,
+        authoring: Callable[[Workspace, bytes], AuthoringProjection] | None = None,
+    ) -> None:
         super().__init__(parent)
         if type(max_pending) is not int or max_pending < 1:
             raise ValueError("max_pending must be a positive integer")
@@ -261,7 +289,8 @@ class AsyncStorage(QObject):
         self._pending: set[str] = set()
         self._closing_id: str | None = None
         self._thread = QThread(self)
-        self._worker = _StorageWorker()
+        # Trusted host assembly is fixed before thread start; commands carry only data.
+        self._worker = _StorageWorker(authoring)
         self._worker.moveToThread(self._thread)
         self._requested.connect(self._worker.execute, Qt.ConnectionType.QueuedConnection)
         self._worker.replied.connect(self._deliver, Qt.ConnectionType.QueuedConnection)

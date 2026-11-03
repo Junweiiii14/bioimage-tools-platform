@@ -1,0 +1,317 @@
+[
+  {
+    "warmup": true,
+    "kind": "preview",
+    "feedback_ms": 246.4000000357628,
+    "settled_ms": 375.19999998807907,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": true,
+    "kind": "preview",
+    "feedback_ms": 343.10000002384186,
+    "settled_ms": 365.69999998807907,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": true,
+    "kind": "preview",
+    "feedback_ms": 245.89999997615814,
+    "settled_ms": 350.5,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": true,
+    "kind": "preview",
+    "feedback_ms": 221.19999998807907,
+    "settled_ms": 336.80000001192093,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": true,
+    "kind": "preview",
+    "feedback_ms": 218.19999998807907,
+    "settled_ms": 326.19999998807907,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 246.19999998807907,
+    "settled_ms": 360.19999998807907,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 243.70000004768372,
+    "settled_ms": 349,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 243.30000001192093,
+    "settled_ms": 348.2000000476837,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 261.7999999523163,
+    "settled_ms": 376.2999999523163,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 251.4000000357628,
+    "settled_ms": 367.60000002384186,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 345.10000002384186,
+    "settled_ms": 368.39999997615814,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 236.60000002384186,
+    "settled_ms": 351.80000001192093,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 215.29999995231628,
+    "settled_ms": 323,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 249.5,
+    "settled_ms": 364,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 249.60000002384186,
+    "settled_ms": 367.4000000357628,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 248.0999999642372,
+    "settled_ms": 364.89999997615814,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 222.4000000357628,
+    "settled_ms": 338.5,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 249.9000000357628,
+    "settled_ms": 366.5,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 262.5,
+    "settled_ms": 382.10000002384186,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 327.69999998807907,
+    "settled_ms": 349.5,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 249.19999998807907,
+    "settled_ms": 364,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 316.7000000476837,
+    "settled_ms": 339.10000002384186,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 242.69999998807907,
+    "settled_ms": 350.89999997615814,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 242.4000000357628,
+    "settled_ms": 361.19999998807907,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 310.5,
+    "settled_ms": 339.69999998807907,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 236.4000000357628,
+    "settled_ms": 346,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 263.39999997615814,
+    "settled_ms": 376.39999997615814,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 245.9000000357628,
+    "settled_ms": 365.5,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 243.5,
+    "settled_ms": 349.2999999523163,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 252.0999999642372,
+    "settled_ms": 367.80000001192093,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 244.69999998807907,
+    "settled_ms": 348.7999999523163,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 347.7000000476837,
+    "settled_ms": 369.10000002384186,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 314.4000000357628,
+    "settled_ms": 340.4000000357628,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 253.60000002384186,
+    "settled_ms": 368.69999998807907,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  },
+  {
+    "warmup": false,
+    "kind": "preview",
+    "feedback_ms": 250.60000002384186,
+    "settled_ms": 359.69999998807907,
+    "trusted": true,
+    "theme": "neutral",
+    "native_foreground": true
+  }
+]
