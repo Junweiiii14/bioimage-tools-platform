@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "program_id": "scientific-agent-platform",
-  "plan_version": "4.2",
+  "plan_version": "5.0",
   "plan_path": "docs/plans/research-platform-rd.md",
-  "purpose": "P002/M1/M2 engineering delivered; close out prior work before next plan. Task cards remain the sole status source; archived design chapters retain their original versions.",
+  "purpose": "Complete experiment workflows for ordinary lab users first; reuse validated algorithms and delivered runtime/editor; professional modules and controlled Agent follow evidence. Task cards are the sole status source.",
   "dependency_semantics": "Work package edges name required prior capabilities; D1 design readiness and S1 method admission are distinct gates in the plan. Task dependencies require done. If narrower handoff is needed, split and register a separate task instead of overriding the dependency check.",
   "tasks": [
     {
@@ -41,6 +41,10 @@
     {
       "id": "P-009",
       "path": "work/tasks/P-009-visual-workflow-authoring.md"
+    },
+    {
+      "id": "P-010",
+      "path": "work/tasks/P-010-experiment-discovery.md"
     }
   ],
   "work_packages": [
@@ -107,12 +111,15 @@
     },
     {
       "id": "W06",
-      "title": "自动WB可交付版",
+      "title": "完整WB学生自动流程",
       "depends_on": [
         "W01",
-        "W03",
+        "W02",
         "W04",
-        "W05"
+        "W05",
+        "W12",
+        "W13",
+        "W14"
       ],
       "task_ids": []
     },
@@ -120,7 +127,8 @@
       "id": "W07",
       "title": "第二实验闭环",
       "depends_on": [
-        "W06"
+        "W06",
+        "W14"
       ],
       "task_ids": []
     },
@@ -183,12 +191,24 @@
       "task_ids": [
         "P-009"
       ]
+    },
+    {
+      "id": "W14",
+      "title": "普通实验任务与需求验证",
+      "depends_on": [
+        "W01",
+        "W02",
+        "W13"
+      ],
+      "task_ids": [
+        "P-010"
+      ]
     }
   ],
   "task_execution_root": ".",
   "method_gates": {
     "D1": "P-003 establishes design and evaluation contract readiness only",
-    "S1": "Each method needs a separate scientific admission task and evidence before W06 formal delivery"
+    "S1": "Each method needs separate scientific admission evidence. W06 does not require new geometry unconditionally; if the selected workflow needs it, P004 and subsequent method validation must be explicit prerequisites."
   },
   "governance_plan_path": "docs/plans/scientific-agent-platform.md"
 }

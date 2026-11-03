@@ -1,10 +1,9 @@
 # 当前恢复入口
 
-2026-11-03。当前任务：[B018旧事项收尾](../work/tasks/B-018-repository-closeout.md)。用户要求先收尾再重写方案；新实验/Agent实现未启动。
+2026-11-03。当前任务：[B019研发方案重写](../work/tasks/B-019-student-experiment-plan.md)；活动树bioimage-plan-sync，分支codex/b019-student-experiment-plan，基线main f2a7a7801930a3ea5a14565c11eda84636bec933。
 
-- 本轮工作树bioimage-plan-sync，分支codex/b016-plan-v42-sync；已合main 5d6e03b，产品源码无增量。不要在旧主目录或bioimage-v0既存dirty上直接改写。
-- P002/M1/M2工程已由PR48/53/55正常集成，P009合入后收尾记录正在本PR补齐；读P009任务与integration.json，不重做或等待已结束的CI。不从旧文本推断其他聊天goal状态。
-- F008/PR56已通过四项检查并集成；PR4/5/20关闭为已替代，Issue45完成。依赖验证见F008。
-- 本PR54修复历史代码块格式、版本/任务/渲染导航。检查通过并正常集成后，再开始用户已授权的新研发方案重写；不要把旧4.2当成新方向已交付。
-- 科学S1/独立留出、真实用户体验、干净目标Windows/物理DPI/GPU、P009高内存和交互超参考仍未解决，见risks与backlog；不因文档收尾销账。
-- 历史snapshot已归档archive/B018-before-closeout-snapshot.md；详细盘点见work/evidence/B-018/closeout.md。
+- 用户要求先收尾后重写，B018/PR54及F008/PR56已通过四必需检查正常集成；旧依赖PR4/5/20已替代关闭，旧Issue6归档，44/45及V0里程碑关闭。未验限制公开入口Issue57。
+- 5.0主方案/开发流程/实验路线改为普通实验人员完整自动流程优先，复用现有算法及执行/编辑基础；专业组合和Agent逐步推进。原4.2三个文档按字节保留，见history及B019 archive-manifest。
+- 当前只编制方案、导航和下一任务；P010需求调研planned，尚未访谈/获取新数据/验证科学或商业结论，也未启动新产品开发。W06不再无条件等待新几何，真正使用新几何时仍必须登记P004与科学验证。
+- 完成文档/链接/HTML/依赖/规则验证后提交PR，经既有检查正常集成。产品代码、测试与门禁不变；不得把方案完成写为产品验收。
+- 旧主目录已转本树短路由，其源码/规划dirty与bioimage-v0既存dirty保留。科学S1/独立留出、用户体验、干净目标机/物理交互及P009性能缺项仍在risks/backlog。

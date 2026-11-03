@@ -1,188 +1,102 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>从实验操作到自动化模块：开发流程</title><style>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>从实验需求到完整自动流程：开发流程</title><style>
 :root{--paper:#fefff9;--canvas:#f1f3e9;--ink:#203b2e;--muted:#52634c;--line:#dce3d4;--accent:#24745a;--wash:#e6efcf;--code:#f1f4e9;--focus:#24745a;color-scheme:light}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:30px}body{margin:0;background:var(--canvas);color:var(--ink);font:16px/1.9 'WB Sans','Microsoft YaHei',sans-serif;font-synthesis:none}::selection{background:#c9dfce;color:#152b22}a{color:var(--accent);text-underline-offset:4px}a:hover{text-decoration-thickness:2px}button,input{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--focus);outline-offset:4px}input{caret-color:var(--accent)}
 .skip{position:fixed;left:20px;top:-100px;background:var(--paper);padding:8px;z-index:20}.skip:focus{top:12px}.sidebar{position:fixed;left:0;top:0;bottom:0;width:288px;padding:35px 24px;overflow:auto;background:var(--paper);border-right:1px solid var(--line)}.brand{display:block;font-size:20px;font-weight:700;margin-bottom:6px;text-decoration:none}.edition{font-size:13px;color:var(--muted);margin:0 0 24px}.search-label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}.search-box{width:100%;border:1px solid #879b92;background:var(--paper);border-radius:8px;padding:10px 11px;line-height:1.5;color:var(--ink)}.search-box::placeholder{color:#64756d}.search-status{font-size:12px;color:var(--muted);margin:8px 0;min-height:22px}.search-results{display:grid;gap:0;max-height:40vh;overflow:auto}.search-results a{font-size:12px;padding:8px 0;border-bottom:1px solid var(--line);line-height:1.7}.toc{margin-top:22px;display:grid;gap:3px}.toc>a{display:block;padding:8px 10px;text-decoration:none;font-size:14px;line-height:1.7;border-radius:4px}.toc>a[aria-current=true]{background:var(--wash);font-weight:700}.toc>a:hover{background:#f1f4ef}.side-note{font-size:12px;line-height:1.8;color:var(--muted);margin-top:28px;padding-top:16px;border-top:1px solid var(--line)}.print-button{padding:8px 12px;border:1px solid #8fa498;border-radius:8px;background:transparent;color:var(--accent);margin-top:18px;font-size:13px}.mobile-bar{display:none}
 .page{margin-left:288px;padding:0 48px 60px}.document{max-width:1120px;margin:auto;background:var(--paper);padding:52px 52px 80px;box-shadow:0 8px 32px #173b2210}.document>h1{font-family:'Microsoft YaHei',sans-serif;font-weight:650;font-size:clamp(30px,3vw,43px);line-height:1.45;margin:0 0 12px;letter-spacing:0}.document>h1+p{color:var(--muted);font-size:13px;margin-bottom:28px}.document>p,.document>ul,.document>ol{max-width:74ch}.document>p{margin:16px 0}h2{font-size:27px;line-height:1.55;margin:70px 0 24px;padding-top:26px;border-top:1px solid var(--line);font-weight:700}h3{font-size:21px;line-height:1.6;margin:38px 0 15px}h4{font-size:17px;margin:28px 0 12px;line-height:1.65}h2,h3,h4{scroll-margin-top:26px;text-wrap:balance}h2:target,h3:target,h4:target,[id^=block]:target{background:var(--wash);outline:2px solid #b5ccbc;outline-offset:6px}.permalink{font-weight:400;font-size:.7em;margin-left:10px;color:var(--muted);text-decoration:none;opacity:0}h2:hover .permalink,h3:hover .permalink,h4:hover .permalink,.permalink:focus-visible{opacity:1}p,li,td,th{overflow-wrap:anywhere}li{margin:7px 0}ul,ol{padding-left:1.7em}strong{font-weight:700}code{font-family:Consolas,'Cascadia Code',monospace;font-size:.89em;background:var(--code);border-radius:3px;padding:2px 4px;overflow-wrap:anywhere}pre{overflow:auto;background:#edf2ef;border:1px solid var(--line);border-radius:6px;padding:22px;line-height:1.65;font-size:14px;tab-size:2;max-height:600px}pre code{padding:0;border-radius:0;background:transparent;overflow-wrap:normal;white-space:pre}.table-wrap{max-width:100%;overflow:auto;margin:22px 0 28px;border:1px solid var(--line);border-radius:8px;scrollbar-color:#8da396 #e8eeea}table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.85}th,td{text-align:left;vertical-align:top;padding:13px 15px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-width:135px;font-variant-numeric:tabular-nums}th{background:#edf2ed;font-weight:700;color:#294b3e}td:last-child,th:last-child{border-right:none}tbody tr:last-child td{border-bottom:none}tbody tr:nth-child(even){background:#fafbf7}td code{font-size:12px}.flow-diagram{margin:36px 0 0;padding:22px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}figcaption{font-weight:700;margin-bottom:18px}.flow-row{display:flex;gap:8px;align-items:center}.flow-row>div{flex:1;padding:12px 7px;background:var(--wash);text-align:center;font-size:13px;font-weight:700;line-height:1.6;min-width:0}.flow-row small{display:block;font-size:11px;color:#486153;font-weight:400;margin-top:7px}.flow-row>span{color:var(--accent)}.flow-diagram p{font-size:12px;color:var(--muted);margin:15px 0 0}.document-footer{margin-top:65px;border-top:1px solid var(--line);padding-top:20px;font-size:12px;color:var(--muted)}.reading-links{display:flex;flex-wrap:wrap;gap:10px 22px;padding:16px 0 24px;border-bottom:1px solid var(--line);margin-bottom:28px;font-size:13px}.reading-links a{text-decoration:none}.reading-links a:hover{text-decoration:underline}button:hover{background:var(--wash)}
 @media(min-width:1700px){.document{padding-left:68px;padding-right:68px}}@media(max-width:1200px){.sidebar{width:248px;padding:28px 18px}.page{margin-left:248px;padding:0 22px 40px}.document{padding:36px 28px 60px}.flow-row{flex-wrap:wrap}.flow-row>div{min-width:100px}}@media(max-width:780px){html{scroll-padding-top:85px}.mobile-bar{display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;padding:12px 18px;background:var(--paper);border-bottom:1px solid var(--line);font-size:14px}.mobile-bar button{border:1px solid #8fa498;padding:5px 12px;border-radius:4px;background:transparent;color:var(--accent)}.sidebar{display:none;position:fixed;top:65px;width:100%;bottom:auto;max-height:calc(100vh - 65px);padding:18px 24px;z-index:9;border-bottom:1px solid var(--line)}body.nav-open .sidebar{display:block}.sidebar .brand,.sidebar .edition,.side-note{display:none}.toc{margin-top:12px}.toc>a{padding:6px 8px}.page{margin-left:0;padding:0}.document{padding:26px 20px 48px;box-shadow:none}.document>h1{font-size:31px}.document>p{font-size:15px}.document h2{font-size:23px;margin-top:50px;padding-top:20px;scroll-margin-top:85px}.document h3{font-size:19px;scroll-margin-top:85px}.document h4{scroll-margin-top:85px}.table-wrap{margin-right:0}th,td{min-width:165px;font-size:12px;padding:11px}pre{font-size:12px;padding:15px}.flow-row{display:grid;grid-template-columns:1fr}.flow-row>div{padding:10px}.flow-row small{display:inline;margin-left:8px}.flow-row>span{text-align:center;line-height:1;transform:rotate(90deg)}.search-results{max-height:25vh}.permalink{opacity:1}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}@media print{@page{size:A4;margin:16mm 12mm}.sidebar,.mobile-bar,.skip,.reading-links,.permalink{display:none!important}.page{margin:0;padding:0}.document{max-width:none;padding:0;box-shadow:none}.document>h1{font-size:28px}body{background:white;font-size:10pt;line-height:1.7}.document>p{font-size:10pt}h2{break-before:page;font-size:20px;margin:0 0 16px;padding-top:0;border:0}h3{font-size:15px}h4{font-size:12px}h2,h3,h4{break-after:avoid}table{font-size:8pt}.table-wrap{overflow:visible;border-radius:0;break-inside:auto}th,td{min-width:0;padding:6px;overflow-wrap:anywhere}thead{display:table-header-group}tr{break-inside:avoid}pre{max-height:none;white-space:pre-wrap;overflow:visible;font-size:8pt}pre code{white-space:pre-wrap;overflow-wrap:anywhere}.flow-diagram{break-inside:avoid}a{color:inherit;text-decoration:none}}
-</style></head><body><a class="skip" href="#document">跳到正文</a><div class="mobile-bar"><strong>科研数据平台 · 4.2</strong><button id="menu-toggle" aria-controls="navigation" aria-expanded="false">目录与检索</button></div><aside class="sidebar" id="navigation"><a class="brand" href="#document">科研数据平台</a><p class="edition">合并方案 4.2 · 2026.11.02</p><label class="search-label" for="search">查找操作、模块或维护要求</label><input class="search-box" id="search" type="search" placeholder="例如：操作 / 版本 / 审查"><p class="search-status" id="search-status" aria-live="polite">搜索全文；内容始终完整保留。</p><div id="results" class="search-results"></div><nav class="toc" aria-label="文档目录"><a href="#section-1">一次交付一条真实流程</a><a href="#section-2">先把人员动作分清楚</a><a href="#section-3">可直接填写的操作表</a><a href="#section-4">方法复现的具体步骤</a><a href="#section-5">一张表连接操作、方法和代码</a><a href="#section-6">把操作表转为代码任务</a><a href="#section-7">调整如何变成可执行逻辑</a><a href="#section-8">验收与接续</a></nav><button class="print-button" id="print">打印 / 保存 PDF</button><p class="side-note">方案与实施状态分别标注。当前阶段与限制以任务卡和交接入口为准。</p></aside><main class="page"><article class="document" id="document" tabindex="-1"><h1>从实验操作到自动化模块：开发流程</h1>
-<p id="block-1">配合4.2合并主方案使用。这里规定如何把真实操作变成模块；代码分区、审查和维护统一见<a href="../maintenance-plan.html">维护计划</a>。本页定义开发方法，不表示每个实验已经完成调研或验证。</p>
-<h2 id="section-1" tabindex="-1">一次交付一条真实流程<a class="permalink" href="#section-1" aria-label="链接到此节">§</a></h2>
-<p id="block-2">每个场景建立任务卡，写明用户、输入、目标输出和不覆盖情况。以下材料可以合在一份短文档，不必逐步建立审批或新系统。</p>
+</style></head><body><a class="skip" href="#document">跳到正文</a><div class="mobile-bar"><strong>科研数据平台 · 研发文档</strong><button id="menu-toggle" aria-controls="navigation" aria-expanded="false">目录与检索</button></div><aside class="sidebar" id="navigation"><a class="brand" href="#document">科研数据平台</a><p class="edition">版本与日期以正文为准</p><label class="search-label" for="search">查找操作、模块或维护要求</label><input class="search-box" id="search" type="search" placeholder="例如：操作 / 版本 / 审查"><p class="search-status" id="search-status" aria-live="polite">搜索全文；内容始终完整保留。</p><div id="results" class="search-results"></div><nav class="toc" aria-label="文档目录"><a href="#section-1">1. 先写一张实验场景卡</a><a href="#section-2">2. 观察一条完整操作链</a><a href="#section-3">3. 做算法复用核验和最小对照</a><a href="#section-4">4. 先完成实验，再暴露专业模块</a><a href="#section-5">5. 自动化、异常和修正保持可复现</a><a href="#section-6">6. 两组验收，外加工程底线</a><a href="#section-7">7. 一次任务如何结束</a></nav><button class="print-button" id="print">打印 / 保存 PDF</button><p class="side-note">方案与实施状态分别标注。当前阶段与限制以任务卡和交接入口为准。</p></aside><main class="page"><article class="document" id="document" tabindex="-1"><h1>从实验需求到完整自动流程：开发流程</h1>
+<p id="block-1">配合<a href="research-platform-rd.html">主方案5.0</a>。每轮先完成普通实验人员的一项真实任务，再把已验证步骤开放给专业组合。以下是开发要求，不是已完成实验调研的报告。</p>
+<h2 id="section-1" tabindex="-1">1. 先写一张实验场景卡<a class="permalink" href="#section-1" aria-label="链接到此节">§</a></h2>
+<p id="block-2">在当前任务的证据目录维护一份场景卡，至少写明：使用者及经验、发生场景、任务频率、当前工具/耗时/失败、原始输入、样本/重复/分组、最终表图和用途、适用范围与不支持情况、资料来源和未决问题。</p>
+<p id="block-3">把事实分为实际观察、用户转述、公开来源和待验证假设。用户觉得“更简单”不能直接变成已证实的付费需求；公开教程不能冒充实验室实操。</p>
+<p id="block-4">结果定义先于界面和算法清单。例如计数任务需明确计数对象、重叠处理、面积/视野、单位和汇总层级；归一化需明确对照、分母失效和重复身份。科学语义不明确时列为待决，不由文件名、UI默认值或Agent补齐。</p>
+<h2 id="section-2" tabindex="-1">2. 观察一条完整操作链<a class="permalink" href="#section-2" aria-label="链接到此节">§</a></h2>
+<p id="block-5">从导入到最终交付，记录每次有意义的处理、参数默认值、变化理由、输入输出及失败纠正。再拿另一批数据核对哪些步骤固定、哪些变化。只有获准使用的数据进入实验；私有原图不提交仓库。</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的数据表"><table>
 <thead>
-<tr id="block-3">
-<th>阶段</th>
-<th>工作</th>
-<th>可检查产物</th>
+<tr id="block-6">
+<th>动作类别</th>
+<th>自动化方式</th>
+<th>必须显式保留</th>
 </tr>
 </thead>
-<tbody><tr id="block-4">
-<td>观察真实动作</td>
-<td>读取SOP，记录授权的完整操作；再看第二份数据上的调整</td>
-<td>操作表、数据来源与判断依据</td>
-</tr>
-<tr id="block-5">
-<td>还原方法</td>
-<td>查对应版本文档/源码/宏，确认公式、默认值、数据转换</td>
-<td>方法说明、已知和未知细节</td>
-</tr>
-<tr id="block-6">
-<td>原流程复现</td>
-<td>固定数据重跑原软件，保存关键中间结果</td>
-<td>原软件基准、参数、输出与环境</td>
-</tr>
-<tr id="block-7">
-<td>自动调用或复刻</td>
-<td>优先库/API/CLI/宏；自行实现时明确方法及边界</td>
-<td>可重复的调用或实现，以及逐步对照</td>
+<tbody><tr id="block-7">
+<td>固定计算</td>
+<td>直接调用已验证算法</td>
+<td>方法、版本、输入输出与单位</td>
 </tr>
 <tr id="block-8">
-<td>封装</td>
-<td>复用已有模块，补适配和缺少步骤</td>
-<td>公开入口、参数、输入输出及版本</td>
+<td>每批信息</td>
+<td>导入清单或最少必要填写</td>
+<td>样本身份、分组、对照与重复</td>
 </tr>
 <tr id="block-9">
-<td>连接</td>
-<td>使用现有执行器，保存并重新打开模板</td>
-<td>单样本及第二批数据运行记录</td>
+<td>数据驱动选择</td>
+<td>经验证的估参/判断规则</td>
+<td>本次计算值、依据、适用范围与失败</td>
 </tr>
 <tr id="block-10">
-<td>核对</td>
-<td>比较原软件结果和独立参考，验证失败处理</td>
-<td>指标、容差依据、结果与适用范围</td>
+<td>科学判断未定</td>
+<td>暂停相应结论，提供复核入口</td>
+<td>不能可靠自动判断的原因</td>
+</tr>
+<tr id="block-11">
+<td>展示和排版</td>
+<td>独立显示处理与导出</td>
+<td>不修改定量来源或伪造实验身份</td>
 </tr>
 </tbody></table></div>
-<p id="block-11">只研究当前影响实现的问题，不提前调研整个软件市场。模拟数据可以验证调度，但不能替代真实流程的方法验收。研究阶段可以先做可丢弃小实验；没有完成方法核对时不把候选原型设为正式默认。</p>
-<h2 id="section-2" tabindex="-1">先把人员动作分清楚<a class="permalink" href="#section-2" aria-label="链接到此节">§</a></h2>
-<p id="block-12">观察时记录动作前看到的数据、执行的功能、参数、动作后的结果，以及人员接受或修改结果的理由。保留“起初这样做，发现问题后改成另一种做法”的过程，而不只记录最后成功的一遍。</p>
+<p id="block-12">不把每一次点击都变成节点。保留一条能被解释的处理链即可；正常样本不逐步骤请求确认。</p>
+<h2 id="section-3" tabindex="-1">3. 做算法复用核验和最小对照<a class="permalink" href="#section-3" aria-label="链接到此节">§</a></h2>
+<p id="block-13">优先顺序：本项目现成实现 → 可用的库/API/CLI/宏 → 明确定义的方法复现 → 有证据支持的自研/替代。每个候选记录来源、具体版本/提交、许可证和分发条件、依赖、输入转换、默认参数、CPU/GPU/离线要求、维护风险及淘汰理由。</p>
+<p id="block-14">先在小型冻结样例上真实调用候选，检查中间资产和最终结果，再决定集成。需要第三方软件或模型时记录安装条件、模型权重/资源来源和错误返回；不在文档中把未运行候选标成可用。复用CellProfiler也必须验证具体pipeline及调用边界，不以“同算法”跳过验收。</p>
+<p id="block-15">对照应分开验证读取/转换、预处理、分割或定位、测量、归一化、汇总和导出。比较指标、参考来源和容差在看结果前固定；参考不能由新实现自己产生。保持失败样例，不通过删样本、改预期或扩大容差制造通过。</p>
+<h2 id="section-4" tabindex="-1">4. 先完成实验，再暴露专业模块<a class="permalink" href="#section-4" aria-label="链接到此节">§</a></h2>
+<p id="block-16">使用现有公开API、可信注册、冻结计划、worker及Workspace。先用已有完整步骤封装成实验模板，补上导入、必要信息、质量反馈、结果导出和重开。模板跑通后才按真实替换/复用需求细分模块，不另造执行器。</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的数据表"><table>
 <thead>
-<tr id="block-13">
-<th>动作类别</th>
-<th>例子</th>
-<th>自动化落点</th>
+<tr id="block-17">
+<th>层次</th>
+<th>交付内容</th>
 </tr>
 </thead>
-<tbody><tr id="block-14">
-<td>固定计算</td>
-<td>按明确公式计算目标/内参比值</td>
-<td>纯算法，输入输出可直接测试</td>
-</tr>
-<tr id="block-15">
-<td>每批参数</td>
-<td>样本分组、对照选择</td>
-<td>模板参数或本次输入，不从名字猜</td>
-</tr>
-<tr id="block-16">
-<td>数据驱动调整</td>
-<td>按已验证规则选择范围/参数</td>
-<td>估参或条件步骤，记录依据和本次决定</td>
-</tr>
-<tr id="block-17">
-<td>无明确规则的判断</td>
-<td>“这个条带可能不可信”</td>
-<td>记录判据缺口；异常提示/可选纠正，不伪装自动判断</td>
-</tr>
-<tr id="block-18">
-<td>软件交接</td>
-<td>复制结果到Excel再重排</td>
-<td>表格转换/身份绑定，保留精度和空值</td>
+<tbody><tr id="block-18">
+<td>方法</td>
+<td>公式或原实现适配、参数、适用范围、版本与参考</td>
 </tr>
 <tr id="block-19">
-<td>版面操作</td>
-<td>对齐、标注、调显示范围</td>
-<td>报告/显示模块，不回流定量</td>
+<td>模块</td>
+<td>输入/输出/单位/身份、失败状态、资源边界与测试</td>
+</tr>
+<tr id="block-20">
+<td>实验模板</td>
+<td>默认步骤、必要信息、自动估参依据、质量门槛、成果规则</td>
+</tr>
+<tr id="block-21">
+<td>实验向导</td>
+<td>以结果为中心的短路径、进度、异常与可选纠正</td>
+</tr>
+<tr id="block-22">
+<td>专业工作流</td>
+<td>同一模块和模板的查看/替换/组合，不产生第二套计算</td>
 </tr>
 </tbody></table></div>
-<p id="block-20">一项有意义的动作可以包含多次点击；也可能依赖多步计算。记录动作不等于直接录制鼠标坐标。新图尺寸和位置变化时，必须明确使用的是原图坐标、相对几何、样本身份还是定位算法。</p>
-<h2 id="section-3" tabindex="-1">可直接填写的操作表<a class="permalink" href="#section-3" aria-label="链接到此节">§</a></h2>
-<p id="block-21">流程名称 / 实验室或来源 / 数据授权 / 日期：</p>
-<p id="block-22">软件、版本、插件及官方来源链接：</p>
-<p id="block-23">原始数据位置与摘要 / 对照结果位置 / 目标输出：</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的数据表"><table>
-<thead>
-<tr id="block-24">
-<th>顺序</th>
-<th>目的</th>
-<th>软件功能和菜单路径/命令</th>
-<th>输入→输出</th>
-<th>参数、单位及依据</th>
-<th>人工调整条件</th>
-<th>自动调用方式及验证状态</th>
-<th>对照结果</th>
-</tr>
-</thead>
-<tbody><tr id="block-25">
-<td>1</td>
-<td>待填</td>
-<td>待填，不凭记忆猜菜单</td>
-<td>待填</td>
-<td>待填</td>
-<td>无/待填</td>
-<td>待验证</td>
-<td>待填</td>
-</tr>
-</tbody></table></div>
-<p id="block-26">每个有意义的操作给一个文档内稳定编号，例如<code>OP-01</code>。附录记录未改动的默认值、隐式转换、选择/排除理由、手动修正范围和关键中间文件。编号用于找回依据，不要求为每次点击建数据库或运行节点。</p>
-<p id="block-27">流程差异：哪些只是参数变化，哪些改变方法或步骤？</p>
-<p id="block-28">未知项：缺什么证据、影响哪一步、哪些工作仍可继续？</p>
-<p id="block-29">软件能力需查官方资料并做最小实验，按<a href="../research-protocol.md">调研规范</a>记录。占位内容不是验证结论。</p>
-<h2 id="section-4" tabindex="-1">方法复现的具体步骤<a class="permalink" href="#section-4" aria-label="链接到此节">§</a></h2>
-<ol>
-<li id="block-30"><strong>锁定参考：</strong> 软件/插件版本、方法来源、原始输入、参数和原软件输出；原始输入不覆盖。</li>
-<li id="block-31"><strong>写清数学和数据语义：</strong> 极性、位深、单位、轴/坐标、ROI边界、背景、归一化、缺失处理、舍入和可选随机性。无法确认的细节记未知。</li>
-<li id="block-32"><strong>选择实现路径：</strong> 调用原实现、已知方法重实现或替代方法。闭源内部细节未知时不能声称完整复刻；能调用原功能时先做薄适配。</li>
-<li id="block-33"><strong>固定比较规则：</strong> 在看新实现结果前确定指标与容差、参考样例和不适用范围；已有同实现等价检查可以要求精确一致，但不能推广成所有方法都必须零误差。</li>
-<li id="block-34"><strong>逐步比较：</strong> 先对导入值/坐标，再对预处理、选区、背景、测量及最终表。出现差异，定位原因，不用末端缩放“修到一样”。</li>
-<li id="block-35"><strong>区分验证：</strong> 原软件对照检验复现；解析样例或独立标注检验正确性；第二批/留出数据检验适用范围。调参数据与独立评估数据按真实来源分组。</li>
-<li id="block-36"><strong>记录结论：</strong> 写“在哪些输入、设置和指标上通过，哪些尚未验证”，而不是无条件写“完全兼容”。新方法保留失败样例和适用域。</li>
-</ol>
-<p id="block-37">对比结果仍属于方法证据；正式准入沿用已有方法登记/评估机制，不新建另一套批准数据库。缺材料只阻止依赖该证据的方法结论，其他工程继续。</p>
-<h2 id="section-5" tabindex="-1">一张表连接操作、方法和代码<a class="permalink" href="#section-5" aria-label="链接到此节">§</a></h2>
-<p id="block-38">在同一份研究记录中维护下表；模块README只链接该表，不复制长篇科学说明。一个方法可支撑多个动作，一个动作也可调用多个方法。</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的数据表"><table>
-<thead>
-<tr id="block-39">
-<th>操作编号及目的</th>
-<th>方法/版本与来源</th>
-<th>实现路径</th>
-<th>公开入口→关键实现</th>
-<th>参考及测试</th>
-<th>模板节点/参数</th>
-<th>验证范围</th>
-</tr>
-</thead>
-<tbody><tr id="block-40">
-<td>待填</td>
-<td>待填</td>
-<td>原实现/重实现/替代</td>
-<td>待填实际符号</td>
-<td>待填参考和测试位置</td>
-<td>已接入/尚未接入</td>
-<td>待验证</td>
-</tr>
-</tbody></table></div>
-<p id="block-41">WB示例：用户“选定条带并围出曲线面积”的需求，可对照现有<code>profile_integral@1</code>，从<code>wb_tool.api</code>进入分析用例，再到<code>domain/lanes.py::compute_lane_profiles</code>和<code>domain/quantify.py::integrate_profile</code>；相关测试为<code>test_quantify.py</code>。这只演示代码追溯方法，<strong>不表示已经观察实验室动作或验证与ImageJ相同</strong>。公开资料与现有差距见<a href="../research/2026-11-02-wb-workflow-audit.html">WB调研</a>。</p>
-<h2 id="section-6" tabindex="-1">把操作表转为代码任务<a class="permalink" href="#section-6" aria-label="链接到此节">§</a></h2>
-<p id="block-42">每项操作标为“直接复用”“增加参数预设”“新增薄适配”“新增算法”或“暂不能自动化”。不必每行对应一个模块；一起输入输出、没有独立复用价值的操作可先整体封装。</p>
-<p id="block-43">任务写清对应操作行、实现及版本、格式/单位/坐标、参数默认值来源、成功与失败输出、对照方法、改动范围。沿用现有契约，确有缺口才增量修改。公共抽象需要真实复用证据。</p>
-<p id="block-44">实际执行链：模板读取输入 → 适配器转换 → 调用功能 → 登记输出和实际参数 → 下一步读取。结果完整提交后才算成功。原图和历史结果不覆盖，显示数据不能混入定量。</p>
-<p id="block-45">批处理、取消、恢复与保存使用平台已有能力，模块不另建引擎。界面自动化必须能识别失败，不能凭点击结束认定成功。依赖版本、许可或本机环境要求写进模块说明。</p>
-<h2 id="section-7" tabindex="-1">调整如何变成可执行逻辑<a class="permalink" href="#section-7" aria-label="链接到此节">§</a></h2>
-<ul>
-<li id="block-46">固定参数放模板，每批样本信息作为运行输入。</li>
-<li id="block-47">有公式或算法依据的参数增加计算步骤，记录方法和本次计算值。</li>
-<li id="block-48">有明确依据的处理选择保存条件和分支。</li>
-<li id="block-49">无可靠自动判断时标记样本问题，提供可选纠正；正常样本按策略继续。</li>
-<li id="block-50">修改后新建运行修订，只重算受影响下游，保留旧结果。用户明确保存才更新模板。</li>
-</ul>
-<p id="block-51">按真实流程需要添加这些能力，不把通用规则引擎、自主Agent或无限重试作为首个模块的前置条件。</p>
-<h2 id="section-8" tabindex="-1">验收与接续<a class="permalink" href="#section-8" aria-label="链接到此节">§</a></h2>
-<p id="block-52">证明固定数据可重跑；关键结果与预先确定的参考一致或差异已解释；模板重开可运行；第二批无需重新连接；失败不变成有效零值或成功。测试覆盖方法正确性、数据传递和本次改变的运行行为，保留既有必需检查与独立审查。</p>
-<p id="block-53">P008/P009已完成工程集成，见对应任务和PR53/55收据。未来接入本方案时先读当时最新任务与接口，再拆新增实验任务；不凭本快照重做已完成工作。缺少科学材料只限制相应模块验收，不阻止独立工程。</p>
-<p id="block-54">一次交付的最小文档组合是：已有任务卡＋一份流程/方法记录＋需要更新的模块README/契约。只在入口、方法或契约变化时改对应文档，不为普通函数调整生成多份重复报告。</p>
-<footer class="document-footer">4.2整理版 · B-018收尾；不代表算法对照、产品验收或代码重构已经完成。离线可读，本地参考链接依赖对应文件。</footer></article></main><script>
+<p id="block-23">领域算法不读文件、不调用Qt/数据库/子进程；I/O放适配层，实验用例组合本工具方法，宿主负责进程和正式提交。图像位深、坐标、通道与尺度不丢失；跨工具只走公开API。</p>
+<h2 id="section-5" tabindex="-1">5. 自动化、异常和修正保持可复现<a class="permalink" href="#section-5" aria-label="链接到此节">§</a></h2>
+<p id="block-24">首次确定必要样本信息和方法配置后，正常路径自动运行。无法可靠判断的情况返回明确状态，不伪装成有效零或成功。按预设策略暂停当前样本或继续其余样本，运行结束列出成功、失败、待复核与排除情况。</p>
+<p id="block-25">纠正保存为新修订，重算受影响的步骤及下游；不会覆盖原始输入或历史成果。运行记录实际参数、原始/分析资产摘要、模块/方法/实现/环境版本和正式输出；模板只有明确保存才更新。</p>
+<p id="block-26">正式几何校正由版本化方法生成保精度分析资产，预览、ROI和定量绑定同一来源；旧显示旋转保持原有历史语义。方法变化与纯重构分开交付。</p>
+<h2 id="section-6" tabindex="-1">6. 两组验收，外加工程底线<a class="permalink" href="#section-6" aria-label="链接到此节">§</a></h2>
+<p id="block-27">方法验收：冻结开发/调参数据与独立验证数据，按来源/生物样本划分，避免同图裁片泄漏；保持独立参考、原始失败和适用范围。与原软件一致只证明指定配置下的复现，不能单独授予科学准入。</p>
+<p id="block-28">用户验收：让目标用户在明确任务和允许帮助条件下独立使用，记录完成数/总数、耗时、求助位置、误操作、错误发现及恢复。与现有处理基线比较，记录学习成本；首次小样本只作探索，不推导全体用户成功率。</p>
+<p id="block-29">工程底线：真实输入、取消、异常、重开、提交/导出一致，旧结果和原图受保护，目标负载及环境有证据。部分科学/目标环境缺项可以保留候选，不得把未验写成正式交付。</p>
+<p id="block-30">三者分别记入同一任务验收表。预先约定严重失败的处理规则；存在可能静默改变结论的错误时，先修复再让流程进入正式使用。</p>
+<h2 id="section-7" tabindex="-1">7. 一次任务如何结束<a class="permalink" href="#section-7" aria-label="链接到此节">§</a></h2>
+<p id="block-31">任务卡保留范围、状态、准确提交与验收结论；证据目录保留场景卡、方法来源、对照和使用记录。README只给“用户动作→公开API→用例/方法→输出→测试”的短导航，公式和方法只维护一个权威位置。</p>
+<p id="block-32">产品改动绑定准确提交独审，经现有PR与必需检查集成；旧数据兼容和未验项写清。未完成项说明影响、责任角色、解除条件与下一动作，而不是不断在当前方案尾部追加相互矛盾的说明。</p>
+<p id="block-33">同一实验出现参数差异先用预设；有真实方法差异再加模块。新实验连续需要平台特判、公式被复制或调用链难以追踪时，依据具体问题重构。维护细则见<a href="../maintenance-plan.html">维护计划</a>。</p>
+<footer class="document-footer">研发文档；规划、工程、方法与用户验收分别记录。离线可读，本地参考链接依赖对应文件。</footer></article></main><script>
 const menu=document.getElementById('menu-toggle');
 menu.addEventListener('click',()=>{const open=document.body.classList.toggle('nav-open');menu.setAttribute('aria-expanded',String(open));menu.textContent=open?'收起目录':'目录与检索'});
 document.querySelectorAll('.sidebar a').forEach(a=>a.addEventListener('click',()=>{document.body.classList.remove('nav-open');menu.setAttribute('aria-expanded','false');menu.textContent='目录与检索'}));

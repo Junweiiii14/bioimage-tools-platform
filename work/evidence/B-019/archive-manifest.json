@@ -1,0 +1,21 @@
+{
+  "base": "f2a7a7801930a3ea5a14565c11eda84636bec933",
+  "files": [
+    {
+      "source": "docs/plans/research-platform-rd.md",
+      "snapshot": "docs/plans/research-platform-reference-v4.2.md",
+      "sha256": "f2ab2a640a359ff0b1fa09d1c833e6c7dd347eac78a6f9e02b01720fe646327e"
+    },
+    {
+      "source": "docs/plans/workflow-development.md",
+      "snapshot": "docs/plans/workflow-development-reference-v4.2.md",
+      "sha256": "fa2661e8bca58e1f28c04a2a47c2b910d12f667bf0d63926b6ee1f15480cd261"
+    },
+    {
+      "source": "docs/plans/experiment-research-roadmap.md",
+      "snapshot": "docs/plans/experiment-research-roadmap-reference-v4.2.md",
+      "sha256": "ee0b8154b581182de175a6fe8c6d09f815ef87b7223daeda066120db19cc3ab8"
+    }
+  ],
+  "hash_basis": "Exact Git blob bytes at base; no content changes."
+}

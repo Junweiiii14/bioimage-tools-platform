@@ -5,217 +5,237 @@
 .page{margin-left:288px;padding:0 48px 60px}.document{max-width:1120px;margin:auto;background:var(--paper);padding:52px 52px 80px;box-shadow:0 8px 32px #173b2210}.document>h1{font-family:'Microsoft YaHei',sans-serif;font-weight:650;font-size:clamp(30px,3vw,43px);line-height:1.45;margin:0 0 12px;letter-spacing:0}.document>h1+p{color:var(--muted);font-size:13px;margin-bottom:28px}.document>p,.document>ul,.document>ol{max-width:74ch}.document>p{margin:16px 0}h2{font-size:27px;line-height:1.55;margin:70px 0 24px;padding-top:26px;border-top:1px solid var(--line);font-weight:700}h3{font-size:21px;line-height:1.6;margin:38px 0 15px}h4{font-size:17px;margin:28px 0 12px;line-height:1.65}h2,h3,h4{scroll-margin-top:26px;text-wrap:balance}h2:target,h3:target,h4:target,[id^=block]:target{background:var(--wash);outline:2px solid #b5ccbc;outline-offset:6px}.permalink{font-weight:400;font-size:.7em;margin-left:10px;color:var(--muted);text-decoration:none;opacity:0}h2:hover .permalink,h3:hover .permalink,h4:hover .permalink,.permalink:focus-visible{opacity:1}p,li,td,th{overflow-wrap:anywhere}li{margin:7px 0}ul,ol{padding-left:1.7em}strong{font-weight:700}code{font-family:Consolas,'Cascadia Code',monospace;font-size:.89em;background:var(--code);border-radius:3px;padding:2px 4px;overflow-wrap:anywhere}pre{overflow:auto;background:#edf2ef;border:1px solid var(--line);border-radius:6px;padding:22px;line-height:1.65;font-size:14px;tab-size:2;max-height:600px}pre code{padding:0;border-radius:0;background:transparent;overflow-wrap:normal;white-space:pre}.table-wrap{max-width:100%;overflow:auto;margin:22px 0 28px;border:1px solid var(--line);border-radius:8px;scrollbar-color:#8da396 #e8eeea}table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.85}th,td{text-align:left;vertical-align:top;padding:13px 15px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-width:135px;font-variant-numeric:tabular-nums}th{background:#edf2ed;font-weight:700;color:#294b3e}td:last-child,th:last-child{border-right:none}tbody tr:last-child td{border-bottom:none}tbody tr:nth-child(even){background:#fafbf7}td code{font-size:12px}.flow-diagram{margin:36px 0 0;padding:22px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}figcaption{font-weight:700;margin-bottom:18px}.flow-row{display:flex;gap:8px;align-items:center}.flow-row>div{flex:1;padding:12px 7px;background:var(--wash);text-align:center;font-size:13px;font-weight:700;line-height:1.6;min-width:0}.flow-row small{display:block;font-size:11px;color:#486153;font-weight:400;margin-top:7px}.flow-row>span{color:var(--accent)}.flow-diagram p{font-size:12px;color:var(--muted);margin:15px 0 0}.document-footer{margin-top:65px;border-top:1px solid var(--line);padding-top:20px;font-size:12px;color:var(--muted)}.reading-links{display:flex;flex-wrap:wrap;gap:10px 22px;padding:16px 0 24px;border-bottom:1px solid var(--line);margin-bottom:28px;font-size:13px}.reading-links a{text-decoration:none}.reading-links a:hover{text-decoration:underline}button:hover{background:var(--wash)}
 @media(min-width:1700px){.document{padding-left:68px;padding-right:68px}}@media(max-width:1200px){.sidebar{width:248px;padding:28px 18px}.page{margin-left:248px;padding:0 22px 40px}.document{padding:36px 28px 60px}.flow-row{flex-wrap:wrap}.flow-row>div{min-width:100px}}@media(max-width:780px){html{scroll-padding-top:85px}.mobile-bar{display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;padding:12px 18px;background:var(--paper);border-bottom:1px solid var(--line);font-size:14px}.mobile-bar button{border:1px solid #8fa498;padding:5px 12px;border-radius:4px;background:transparent;color:var(--accent)}.sidebar{display:none;position:fixed;top:65px;width:100%;bottom:auto;max-height:calc(100vh - 65px);padding:18px 24px;z-index:9;border-bottom:1px solid var(--line)}body.nav-open .sidebar{display:block}.sidebar .brand,.sidebar .edition,.side-note{display:none}.toc{margin-top:12px}.toc>a{padding:6px 8px}.page{margin-left:0;padding:0}.document{padding:26px 20px 48px;box-shadow:none}.document>h1{font-size:31px}.document>p{font-size:15px}.document h2{font-size:23px;margin-top:50px;padding-top:20px;scroll-margin-top:85px}.document h3{font-size:19px;scroll-margin-top:85px}.document h4{scroll-margin-top:85px}.table-wrap{margin-right:0}th,td{min-width:165px;font-size:12px;padding:11px}pre{font-size:12px;padding:15px}.flow-row{display:grid;grid-template-columns:1fr}.flow-row>div{padding:10px}.flow-row small{display:inline;margin-left:8px}.flow-row>span{text-align:center;line-height:1;transform:rotate(90deg)}.search-results{max-height:25vh}.permalink{opacity:1}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}@media print{@page{size:A4;margin:16mm 12mm}.sidebar,.mobile-bar,.skip,.reading-links,.permalink{display:none!important}.page{margin:0;padding:0}.document{max-width:none;padding:0;box-shadow:none}.document>h1{font-size:28px}body{background:white;font-size:10pt;line-height:1.7}.document>p{font-size:10pt}h2{break-before:page;font-size:20px;margin:0 0 16px;padding-top:0;border:0}h3{font-size:15px}h4{font-size:12px}h2,h3,h4{break-after:avoid}table{font-size:8pt}.table-wrap{overflow:visible;border-radius:0;break-inside:auto}th,td{min-width:0;padding:6px;overflow-wrap:anywhere}thead{display:table-header-group}tr{break-inside:avoid}pre{max-height:none;white-space:pre-wrap;overflow:visible;font-size:8pt}pre code{white-space:pre-wrap;overflow-wrap:anywhere}.flow-diagram{break-inside:avoid}a{color:inherit;text-decoration:none}}
-</style></head><body><a class="skip" href="#document">跳到正文</a><div class="mobile-bar"><strong>科研数据平台 · 4.2</strong><button id="menu-toggle" aria-controls="navigation" aria-expanded="false">目录与检索</button></div><aside class="sidebar" id="navigation"><a class="brand" href="#document">科研数据平台</a><p class="edition">合并方案 4.2 · 2026.11.02</p><label class="search-label" for="search">查找操作、模块或维护要求</label><input class="search-box" id="search" type="search" placeholder="例如：操作 / 版本 / 审查"><p class="search-status" id="search-status" aria-live="polite">搜索全文；内容始终完整保留。</p><div id="results" class="search-results"></div><nav class="toc" aria-label="文档目录"><a href="#section-1">1. 软件形态：实验室可编排的分析操作平台</a><a href="#section-2">2. 调研起点：观察真实操作，而不只收集软件名称</a><a href="#section-3">3. 复现方法：把动作还原成可验证的计算</a><a href="#section-4">4. 模块与自动化：复用的是方法，不是鼠标坐标</a><a href="#section-5">5. 工程分区：每类代码有明确职责</a><a href="#section-6">6. 长期维护：随功能交付，持续控制复杂度</a><a href="#section-7">7. 实施路线：已有工作继续，新增能力由真实流程驱动</a><a href="#section-8">8. 验收：既看结果，也看代码能否继续维护</a><a href="#section-9">9. 合并关系与文档分工</a></nav><button class="print-button" id="print">打印 / 保存 PDF</button><p class="side-note">方案与实施状态分别标注。当前阶段与限制以任务卡和交接入口为准。</p></aside><main class="page"><article class="document" id="document" tabindex="-1"><h1>科研数据平台研发总方案</h1>
-<p id="block-1">4.2 · 真实操作复现、可编排自动化与长期维护合并版 · 2026-11-02</p>
+</style></head><body><a class="skip" href="#document">跳到正文</a><div class="mobile-bar"><strong>科研数据平台 · 研发文档</strong><button id="menu-toggle" aria-controls="navigation" aria-expanded="false">目录与检索</button></div><aside class="sidebar" id="navigation"><a class="brand" href="#document">科研数据平台</a><p class="edition">版本与日期以正文为准</p><label class="search-label" for="search">查找操作、模块或维护要求</label><input class="search-box" id="search" type="search" placeholder="例如：操作 / 版本 / 审查"><p class="search-status" id="search-status" aria-live="polite">搜索全文；内容始终完整保留。</p><div id="results" class="search-results"></div><nav class="toc" aria-label="文档目录"><a href="#section-1">1. 产品定位与成功标准</a><a href="#section-2">2. 两种使用方式，共用同一套计算</a><a href="#section-3">3. 开发顺序：先完整实验，再扩大覆盖</a><a href="#section-4">4. 每个实验先研究哪些事实</a><a href="#section-5">5. 算法策略：有效现成方法优先，缺失才自研</a><a href="#section-6">6. 平台、模块、模板与Agent的边界</a><a href="#section-7">7. 科学正确与使用简单，分别验收</a><a href="#section-8">8. 分阶段推进与退出条件</a><a href="#section-9">9. 成本与经营验证不脱离产品</a><a href="#section-10">10. 维护、版本和阅读入口</a></nav><button class="print-button" id="print">打印 / 保存 PDF</button><p class="side-note">方案与实施状态分别标注。当前阶段与限制以任务卡和交接入口为准。</p></aside><main class="page"><article class="document" id="document" tabindex="-1"><h1>科研数据平台研发总方案</h1>
+<p id="block-1">5.0 · 普通实验人员的完整自动分析流程 · 2026-11-03</p>
 <blockquote>
-<p id="block-2">本版合并此前的产品形态、流程调研、WB实例、后续实验路线和工程维护要求。方案编制不代表所有功能已实现。旧<a href="research-platform-reference-v4.md">4.0详细方案</a>、<a href="research-platform-reference-v4.1.md">4.1原文</a>保留；文末说明各部分的唯一维护位置。</p>
+<p id="block-2">产品方向：多实验工具＋统一平台＋Agent。以普通生物本科生、研究生和实验人员的实际任务为入口，先交付低门槛、可验证的完整实验分析，再扩展专业方法和可组合工作流。本文是开发方案，不能作为新功能、科学效果或商业收入已经实现的证明。</p>
 </blockquote>
-<blockquote>
-<p id="block-3">2026-11-03收尾：本次保留4.2原有产品方向，仅修正集成状态和入口。P008/P009已正常集成；本方案并非用户新提出的“普通学生完整实验优先”新版方案。先完成<a href="../../work/evidence/B-018/closeout.md">B018旧项清理</a>，再重写。旧接入评估保留为当时快照。</p>
-</blockquote>
-<h2 id="section-1" tabindex="-1">1. 软件形态：实验室可编排的分析操作平台<a class="permalink" href="#section-1" aria-label="链接到此节">§</a></h2>
-<p id="block-4">产品像一套可视化宏：把实验人员在不同软件中反复进行的分析操作，封装成模块，连接成流程。用户可直接使用现成实验模板，也可换步骤、改参数，保存为本实验室模板。以后导入同类新数据，就能自动得到分析表和图片。</p>
-<p id="block-5">界面包含模块列表、流程画布、参数设置、运行状态和结果预览。模块既可以是已有算法，也可以是某软件的宏、脚本或受控调用。平台负责连接和执行，实验模块负责方法；不要求一开始重写ImageJ、Photoshop或Prism的全部功能。</p>
-<p id="block-6"><strong>核心开发顺序是：看人怎样做 → 记录每个有意义的动作 → 查清实际算法 → 调用或复现算法 → 对照验证 → 封装模块 → 编排自动运行 → 用新数据持续验证。</strong> 不能跳过真实工作，先凭想象堆算法节点。</p>
-<h2 id="section-2" tabindex="-1">2. 调研起点：观察真实操作，而不只收集软件名称<a class="permalink" href="#section-2" aria-label="链接到此节">§</a></h2>
-<p id="block-7">每次选一个具体场景，如“某实验室某类WB的相对蛋白表达分析”。先用已有授权材料，观察熟练人员从原始数据到最终结果的一次完整处理；拿到另一份数据，观察哪些动作发生变化。记录实际做法，也追问每次调整的理由。</p>
+<h2 id="section-1" tabindex="-1">1. 产品定位与成功标准<a class="permalink" href="#section-1" aria-label="链接到此节">§</a></h2>
+<p id="block-3">用户要完成的是“把这批实验数据处理成可信的表和图”，通常不是学习算法名或搭建节点图。默认入口应按实验和目标结果组织，让用户知道要提供什么、会得到什么、哪里需要复核。</p>
+<p id="block-4">保留专业计算能力，通过明确的实验预设、必要信息收集、自动处理、质量提示和结果追溯降低操作门槛。简化界面不能省略会改变科学含义的输入，也不能把默认参数伪装成适用于所有数据。</p>
+<p id="block-5">本次方向依据是用户转述的身边实验室粗略调查：部分人员觉得CellProfiler操作困难，希望更简单。它是值得验证的需求线索，尚不是代表性用户研究、付费意愿或市场规模证据。我们不预设所有用户都会迁移，也不承诺与CellProfiler所有功能、版本及输入完全等效。</p>
+<p id="block-6">核心成功标准是：目标用户能独立完成一个明确的实验任务，结果在声明范围内经独立参考验证，出错时能理解原因并恢复。先验证这一点，再扩大实验覆盖。</p>
+<h2 id="section-2" tabindex="-1">2. 两种使用方式，共用同一套计算<a class="permalink" href="#section-2" aria-label="链接到此节">§</a></h2>
 <div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的数据表"><table>
 <thead>
-<tr id="block-8">
-<th>观察内容</th>
-<th>必须记录的事实</th>
+<tr id="block-7">
+<th>使用方式</th>
+<th>用户看到什么</th>
+<th>开发要求</th>
 </tr>
 </thead>
-<tbody><tr id="block-9">
-<td>数据进入软件</td>
-<td>仪器/文件、版本、通道、位深、样本和分组；导入时有无转换</td>
+<tbody><tr id="block-8">
+<td>实验向导，默认入口</td>
+<td>选择实验与结果 → 导入数据 → 补齐必要样本信息 → 自动运行 → 查看质量与结果 → 导出/重开</td>
+<td>隐藏不必要的算法术语；模板内正常步骤无需逐节点确认</td>
 </tr>
-<tr id="block-10">
-<td>点击和处理</td>
-<td>软件功能、菜单/命令、先后顺序、输入输出、中间文件</td>
-</tr>
-<tr id="block-11">
-<td>设置与微调</td>
-<td>显式参数及未改动的默认值、单位、选区、背景、阈值、排除对象</td>
-</tr>
-<tr id="block-12">
-<td>人员判断</td>
-<td>看到什么才调整，按什么依据调整，什么时候认定失败</td>
-</tr>
-<tr id="block-13">
-<td>软件之间交接</td>
-<td>导出列、格式、单位、精度、样本顺序，以及复制粘贴时做的计算</td>
-</tr>
-<tr id="block-14">
-<td>最终交付</td>
-<td>结果表、图、统计设计、独立重复身份、保存和重开方式</td>
+<tr id="block-9">
+<td>专业工作流，按需进入</td>
+<td>查看实际处理步骤、调整参数、替换已验证模块、保存自己的模板</td>
+<td>复用已交付的图编辑/执行基础；不能建立第二套公式、存储或运行语义</td>
 </tr>
 </tbody></table></div>
-<p id="block-15">把动作分为固定计算、参数选择、数据驱动规则、科学判断和排版操作。固定计算直接自动化；参数变成模板配置；有依据的判断变成明确规则；无法可靠表达的判断保留异常提示和可选纠正。显示处理与定量分开。</p>
-<p id="block-16">公开教程用于补充和核验，不能替代实验室操作记录。没有真实记录时可以先做候选原型，但必须标明尚未完成流程复现。调研不意味着未经授权联系他人或上传私有数据。</p>
-<h2 id="section-3" tabindex="-1">3. 复现方法：把动作还原成可验证的计算<a class="permalink" href="#section-3" aria-label="链接到此节">§</a></h2>
-<p id="block-17">对每一步查阅对应版本的官方文档、宏记录、可用源码或原始方法说明，弄清公式、处理顺序、参数默认值、坐标和边界规则。按钮同名不等于算法相同；结果相近也不能单独证明方法相同。</p>
-<p id="block-18">有三种实现路径，必须写清采用哪一种：</p>
+<p id="block-10">首版向导只暴露对结果有实际影响且不能可靠推断的信息。例如样本分组、对照与重复身份必须明确；文件名或Agent猜测只能成为待确认建议。系统应说明缺什么及其用途。</p>
+<p id="block-11">正常数据默认全自动完成。遇到超出适用范围、低质量或缺信息，标记对应样本与步骤，提供原因和最小纠正入口；其他样本按已选策略继续。人工纠正生成新修订，只重算受影响下游，历史成果保持。</p>
+<p id="block-12">结果页给出结果表、可追溯图像、样本/单位/质量状态、采用的方法与参数、导出和重开入口。预览和正式定量使用可追溯的一致分析来源；缩略图、RGB8、LUT等显示副本不能进入定量。</p>
+<h2 id="section-3" tabindex="-1">3. 开发顺序：先完整实验，再扩大覆盖<a class="permalink" href="#section-3" aria-label="链接到此节">§</a></h2>
+<p id="block-13"><strong>调研任务与结果 → 固定输入输出和适用范围 → 选择并验证算法 → 做完整自动流程 → 普通用户独立使用 → 修正失败 → 扩展下一实验。</strong></p>
+<p id="block-14">一条完整流程包括导入、样本身份、必要预处理、分析、质量控制、统计/汇总、表图输出、保存重开及异常恢复。具体实验不需要的步骤不强加；不以算法跑通或一张漂亮截图作为闭环完成。</p>
+<p id="block-15">每轮只推进一条可交付主线。已有的WB、通用执行、批次恢复和可视编排继续复用，不推倒重写。第二实验的需求调研可以在不依赖未完成科学材料的范围内推进，但其产品实施应在首条学生流程的体验和验收边界清楚后拆卡。</p>
+<p id="block-16">“尽可能覆盖普通学生需求”是逐步积累模板的长期方向，不是首版同时开发全部实验。专业小众能力只有在真实场景需要、输入输出和验收明确时才成为新模块。</p>
+<h2 id="section-4" tabindex="-1">4. 每个实验先研究哪些事实<a class="permalink" href="#section-4" aria-label="链接到此节">§</a></h2>
+<p id="block-17">先确定一类具体用户、一个实验类型和一种目标结果。读取获准使用的SOP、原始记录及公开方法；有授权材料时观察熟练人员处理一批数据，再用另一批检验变化。暂时没有材料时只做候选设计，不虚构访谈或真实性验证。</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的数据表"><table>
 <thead>
-<tr id="block-19">
-<th>路径</th>
-<th>什么时候用</th>
-<th>可以宣称什么</th>
+<tr id="block-18">
+<th>要查清的问题</th>
+<th>最小交付物</th>
 </tr>
 </thead>
-<tbody><tr id="block-20">
-<td>直接调用原实现</td>
-<td>有可用库、接口、命令行或宏</td>
-<td>使用指定版本的原功能；仍需核验输入转换和调用设置</td>
+<tbody><tr id="block-19">
+<td>谁在什么情况下做、频率如何、哪里耗时或易错</td>
+<td>用户与任务说明；实际观察和主观偏好分开</td>
+</tr>
+<tr id="block-20">
+<td>输入是什么，如何确认样本、通道、位深、尺度和分组</td>
+<td>输入清单与数据契约；不能按扩展名猜实验身份</td>
 </tr>
 <tr id="block-21">
-<td>根据已知方法重新实现</td>
-<td>原方法足够明确，适合本地实现</td>
-<td>经指定数据和容差验证的方法复现，不承诺所有输入完全等价</td>
+<td>最终需要哪些数值、表、图及单位</td>
+<td>一份具体结果样例和列定义；标明生物/技术重复</td>
 </tr>
 <tr id="block-22">
-<td>新增替代方法</td>
-<td>原实现不可用或细节未知，需要其他算法</td>
-<td>明确命名的新方法，不标成“原软件同算法”</td>
+<td>当前如何处理，为什么改参数或排除样本</td>
+<td>操作与判断记录；保留失败和修正过程</td>
+</tr>
+<tr id="block-23">
+<td>原软件实际做了什么计算</td>
+<td>对应版本、公式/源码/参数默认值、转换与边界</td>
+</tr>
+<tr id="block-24">
+<td>如何知道结果正确、普通用户能否独立完成</td>
+<td>科学比较方案和使用任务，预先固定判据</td>
 </tr>
 </tbody></table></div>
-<p id="block-23">优先复用已有能力或直接调用。不得凭空猜闭源功能的内部公式。只有确实缺少稳定调用方式时才评估界面自动化；也要检查真实输出，不能以“按钮点击完成”认定分析成功。</p>
-<p id="block-24">开发前固定一组原图、操作参数、关键中间结果和参考输出，预先确定比较指标与容差。先逐步对照，再对比最终结果：格式转换、选区、背景、测量、归一化分别查，不能只看最后的图像是否相似。参考值不得由新实现自己生成。</p>
-<p id="block-25">还要检查原方法是否适合当前实验。与原软件一致是复现证据，独立已知样例、标注或方法依据是科学适用性证据；两者分开。新数据验证失败时，定位失败步骤，修正后保留旧版本和失败样例。</p>
-<p id="block-26">详细记录与实施方式统一放在<a href="workflow-development.html">真实操作到模块的开发流程</a>。</p>
-<h2 id="section-4" tabindex="-1">4. 模块与自动化：复用的是方法，不是鼠标坐标<a class="permalink" href="#section-4" aria-label="链接到此节">§</a></h2>
-<p id="block-27">一个模块对应一项有意义的处理，如背景扣除、区域测量、归一化或导出。一个动作可以对应多个计算步骤，一段连续宏也可以先整体封装；不要强制“一个点击一个节点”。</p>
-<p id="block-28">模块先声明输入、参数、输出、方法版本和失败结果。图像保留位深、通道与坐标，表格保留单位及样本身份。用薄适配连接原功能与现有执行器，不另建一套任务、缓存、恢复或保存系统。执行模块采用固定审核登记，不允许工作区任意代码直接加载。</p>
-<p id="block-29">实验室之间的差异按最小变化处理：参数不同用预设；方法不同换模块；顺序不同改连接；格式不同补读取适配；特殊流程可保留专用模块。只有两个真实消费者已证明稳定共性时，才提炼公共能力。</p>
-<p id="block-30">固定参数保存在模板；每批样本信息作为运行输入；有算法依据的参数由计算步骤产生，并保存本次计算值；有明确依据的选择保存条件和分支。规则按具体流程需要增加，不预建万能判断引擎，也不让Agent自由猜阈值。</p>
-<p id="block-31">首次配置时可检查和修正模板；日常正常样本默认全自动，不逐节点确认。异常样本保留原因，按已选策略暂停该样本或继续其他样本。纠正生成新修订，只重算受影响的下游，旧结果保留；只有明确保存才更新模板版本。</p>
-<p id="block-32">模板记录模块版本、连接、参数和输出规则；运行记录实际数据、实际参数、方法/实现/环境和正式成果。界面与命令行共用执行语义。Agent以后可以辅助配置和解释，不是此能力的前置条件。</p>
-<h2 id="section-5" tabindex="-1">5. 工程分区：每类代码有明确职责<a class="permalink" href="#section-5" aria-label="链接到此节">§</a></h2>
-<p id="block-33">沿用当前模块化单体、公开API、后台worker和现有工作区，不为规划提前新建空包。以下是职责分区，不是要求立刻搬移旧代码：</p>
+<p id="block-25">同一份短实验说明承载这些内容，不为每个步骤建立新文档体系。详细实施规范见<a href="workflow-development.html">开发流程</a>。</p>
+<h2 id="section-5" tabindex="-1">5. 算法策略：有效现成方法优先，缺失才自研<a class="permalink" href="#section-5" aria-label="链接到此节">§</a></h2>
+<p id="block-26">先复用本项目已验证的实现；再评估公开库、现成软件的受支持接口、命令行或宏。CellProfiler及其他工具均是候选方法来源，采用前核对具体版本、功能、许可证/依赖/模型权利、再分发和本地部署条件。公开可查看并不自动等于可按任意方式集成或商业分发。</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的数据表"><table>
 <thead>
-<tr id="block-34">
-<th>分区</th>
-<th>现有位置</th>
-<th>负责什么</th>
-<th>不应放什么</th>
+<tr id="block-27">
+<th>路径</th>
+<th>决策依据</th>
+<th>必须保留的证据</th>
 </tr>
 </thead>
-<tbody><tr id="block-35">
-<td>通用契约</td>
-<td><code>packages/tool_contracts/</code></td>
-<td>文件/结果身份、节点输入输出、执行消息</td>
-<td>WB公式、界面、数据库操作</td>
+<tbody><tr id="block-28">
+<td>调用现成实现</td>
+<td>方法适用、调用稳定、依赖与分发可接受</td>
+<td>固定版本/来源、实际参数、输入转换、真实调用与输出对照</td>
 </tr>
-<tr id="block-36">
-<td>平台运行与存储</td>
-<td><code>packages/platform_runtime/</code></td>
-<td>通用图规则、执行账本、工作区事务与恢复</td>
-<td>某实验特判、控件、工具内部调用</td>
+<tr id="block-29">
+<td>复现公开方法</td>
+<td>方法定义完整，现有实现不可用或成本不合适</td>
+<td>原始定义、独立参考、逐步骤差异与容差；不夸大为全输入等价</td>
 </tr>
-<tr id="block-37">
-<td>实验算法</td>
-<td><code>tools/wb/.../domain/</code>；未来其他工具同样分层</td>
-<td>纯数据和数值计算、方法定义</td>
-<td>文件读写、Qt、进程和数据库</td>
+<tr id="block-30">
+<td>自研或采用替代方法</td>
+<td>现有方法经最小实验不能满足需求</td>
+<td>不满足之处、替代方法版本、独立验证、适用范围及失败样例</td>
 </tr>
+</tbody></table></div>
+<p id="block-31">不要为“创新”重复写成熟算法，也不要为“复用”引入无法维护的整套环境。需要外部软件时先验证安装、无界面运行、错误传播、离线条件和升级影响；有依赖冲突才考虑独立worker环境。界面点击自动化只在没有稳定接口且成本可接受时评估。</p>
+<p id="block-32">专业度来自方法适用性、计算正确、质量控制和可复现证据。使用相同算法本身不能保证相同结果：位深、预处理、默认参数、坐标、阈值、单位和统计设计都可能改变答案。</p>
+<h2 id="section-6" tabindex="-1">6. 平台、模块、模板与Agent的边界<a class="permalink" href="#section-6" aria-label="链接到此节">§</a></h2>
+<p id="block-33">实验模板是经过验证的一条完整操作流程；算法模块是其中有明确输入、参数、输出和失败语义的可替换步骤。模块粒度按计算职责划分，不按每次鼠标点击划分。</p>
+<p id="block-34">平台只管理通用资产、图规则、运行/取消/恢复、结果提交及版本。实验模块负责本实验方法和必要交互；外部只走公开API。不同用户的参数差异用预设，方法差异用版本化模块，流程差异用模板，格式差异用适配器。只有真实复用证据出现后才提炼新公共包。</p>
+<p id="block-35">Agent按成熟度逐步接入：先解释结果和错误、帮助找到合适的已验证模板；再把用户意图转换为可检查的参数/工作流草稿；最后才评估受控调用。所有执行仍走同一确定性入口、真实输入验证、冻结计划和结果提交。</p>
+<p id="block-36">Agent不能自行认定生物学分组、科学真值或统计设计，不能静默猜关键参数，不得任意加载工作区代码。自动调参只能调用已验证的规则并保存本次值及依据。缺少Agent、网络或模型服务时，已交付的实验模板仍应能本地运行。</p>
+<p id="block-37">算法研发Agent属于后期辅助研究：提出候选、生成可审查实现和测试，不能自行把候选算法提升为正式默认。</p>
+<h2 id="section-7" tabindex="-1">7. 科学正确与使用简单，分别验收<a class="permalink" href="#section-7" aria-label="链接到此节">§</a></h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的数据表"><table>
+<thead>
 <tr id="block-38">
-<td>实验用例</td>
-<td><code>tools/wb/.../application/</code></td>
-<td>组合本工具算法，完成测量/归一化等动作</td>
-<td>界面细节、跨工具内部引用</td>
+<th>验收维度</th>
+<th>证据</th>
+<th>不能替代它的东西</th>
 </tr>
-<tr id="block-39">
-<td>输入输出适配</td>
-<td><code>tools/wb/.../adapters/</code></td>
-<td>TIFF/CSV、外部软件/worker、成果导出</td>
-<td>第二套科学公式、第二套运行引擎</td>
+</thead>
+<tbody><tr id="block-39">
+<td>工程可靠</td>
+<td>真实输入、worker、取消/恢复、正式成果、重开和安装验证</td>
+<td>模拟按钮或只跑纯函数</td>
 </tr>
 <tr id="block-40">
-<td>宿主与界面</td>
-<td><code>apps/desktop/</code>、工具的<code>ui/</code></td>
-<td>注册、后台任务接线、交互和展示</td>
-<td>浏览器中偷偷算定量、UI线程重计算</td>
+<td>方法正确/适用</td>
+<td>独立参考、冻结参数、预先定义指标与容差、未用于调参的数据</td>
+<td>新实现和自己对比、与原软件一致就宣布科学正确</td>
 </tr>
 <tr id="block-41">
-<td>测试和工程工具</td>
-<td>包内<code>tests/</code>、根<code>tests/</code>、<code>tooling/</code></td>
-<td>独立参考、集成验证、构建与检查</td>
-<td>生产代码依赖测试工具或探针</td>
+<td>普通用户可用</td>
+<td>目标用户独立完成任务，记录成功数/总数、耗时、求助、误操作及纠正</td>
+<td>开发者熟练演示、好看的界面、未经核实的满意度</td>
+</tr>
+<tr id="block-42">
+<td>可维护</td>
+<td>方法来源、公开入口、调用路线、相关测试和版本迁移可定位</td>
+<td>文档页数、节点数或抽象层数量</td>
 </tr>
 </tbody></table></div>
-<p id="block-42">跨包只走<code>package.api</code>。平台不认识“内参”“阳性细胞”等实验概念。现有桌面宿主负责进程/线程接线，不将其职责误塞进纯算法或平台图规则中。未来若需要共享图像包，应先证明实际复用，再按既有依赖边界接入。</p>
-<p id="block-43">人工审查从模块地图进入：<strong>用户动作 → 公开入口 → 用例 → 算法/适配 → 结果提交 → 相关测试。</strong> 每个模块README维护这条短路线；关键算法注明方法版本、数据含义和参考测试。注释解释“为什么”，不复述代码。</p>
-<p id="block-44">详见<a href="../maintenance-plan.html">长期维护与人工审查导航</a>及其中的实际WB入口示例。</p>
-<h2 id="section-6" tabindex="-1">6. 长期维护：随功能交付，持续控制复杂度<a class="permalink" href="#section-6" aria-label="链接到此节">§</a></h2>
-<p id="block-45">代码能否长期推进，不能靠一次整理保证。维护要随每个功能切片执行：方法有依据、职责清楚、变化可验证、历史可恢复、下一位维护者找得到入口。</p>
-<ul>
-<li id="block-46"><strong>一次改一个完整行为。</strong> 调研、方法变更、功能接线、无关重构和依赖升级不要混成一大包；相互依赖的最小改动可以一起交付。</li>
-<li id="block-47"><strong>简单实现优先。</strong> 入口验证后内部信任类型；只处理已知异常；不用静默兜底掩盖失败；不为假想扩展堆配置、接口和继承层。</li>
-<li id="block-48"><strong>重构有触发条件。</strong> 同一公式被复制、一个文件混合不相干职责、增加实验总要改平台特判、旧事件反复覆盖新状态，才按具体原因拆分。长文件是检查信号，不是机械拆碎的理由。</li>
-<li id="block-49"><strong>审查能顺着代码读。</strong> PR说明行为变化、入口与关键函数、验证及兼容；独审绑定准确提交，后续相关更改重新审查。不要求每个小提交重新审批。</li>
-<li id="block-50"><strong>升级不改变旧答案。</strong> 公式/默认值/预处理影响结果时版本化；旧模板不静默换方法。格式迁移先备份，在副本验证，保留恢复路线。</li>
-<li id="block-51"><strong>维护有节奏。</strong> 每任务检查相关行为；每里程碑看高频故障和复杂模块，做接手与恢复检查；依赖定期人工复核，固定版本升级。没有自动创建后台调度。</li>
-</ul>
-<p id="block-52">测试按风险选择：公式看独立数值参考，接口看实际数据交换，执行看失败/取消/提交，界面看真实交互，安装看独立环境。先定向，最终候选完成既有必需检查；不为文档改动重复全套产品测试，不为过门禁削弱断言。</p>
-<p id="block-53">技术债记在对应任务，交接只保留入口。记录问题造成的具体影响、处理触发条件、责任角色和完成证据；关键正确性/数据风险当次处理，普通整理按计划推进，不借“维护”无限扩大范围。</p>
-<h2 id="section-7" tabindex="-1">7. 实施路线：已有工作继续，新增能力由真实流程驱动<a class="permalink" href="#section-7" aria-label="链接到此节">§</a></h2>
-<p id="block-54">2026-11-03核对：P008批处理和P009可视编排已分别由PR53/55正常合入主线，见<a href="../../work/evidence/P-009/objective-audit.md">P009交付审计</a>。复用已有执行、恢复和编辑基础，不重做。科学适用性、用户体验、目标机及性能限制仍保留；后续新增能力须按任务验收。</p>
-<p id="block-55">WB实例已明确：旧工作台具备裁图、多峰、基线、归一化和导出；新工作流先有原图校验、分析、发布三个节点。下一步依次做真实方法对照、接入现有归一化、补样本/重复汇总，再按真实需要补背景/总蛋白/统计等能力。正式新几何沿P-004，不由显示旋转冒充。</p>
-<p id="block-56">后续建议为：<strong>WB闭环 → IF计数/强度 → 孔板结果 → qPCR → 划痕 → 克隆/Transwell → IHC → 流式。</strong> 具体顺序随真实材料和用户需求调整；每次只交付一个可验证场景，再用第二批数据检验复用。</p>
-<p id="block-57">软件功能与现有缺口见<a href="../research/2026-11-02-wb-workflow-audit.html">WB调研</a>，各实验的材料、模块和验收见<a href="experiment-research-roadmap.html">后续路线</a>。这两份附录保持各自研究范围，不冒充已做实验室访谈或原软件实跑。</p>
-<h2 id="section-8" tabindex="-1">8. 验收：既看结果，也看代码能否继续维护<a class="permalink" href="#section-8" aria-label="链接到此节">§</a></h2>
-<p id="block-58">一条流程交付时，应能回答六个问题：对应人员的哪些动作？采用什么方法和版本？结果与什么参考比较？新数据能否按模板运行？失败和纠正怎样处理？维护者从哪里进入代码并验证修改？</p>
-<p id="block-59">验收分三条记录：<strong>工程能运行、方法有证据、人员能使用。</strong> 不以测试数量替代科学验证，也不把缺少一类科学材料变成无关工程的停工条件。输出应可追溯到原始输入，失败和缺失不能伪装成0或成功。</p>
-<p id="block-60">可维护性的完成证据包括：入口与调用链可定位，算法没有重复权威实现，边界检查通过，相关测试可执行，README/契约与代码同次更新，旧数据兼容范围清楚。文档完整不代表这些检查已经完成。</p>
-<h2 id="section-9" tabindex="-1">9. 合并关系与文档分工<a class="permalink" href="#section-9" aria-label="链接到此节">§</a></h2>
+<p id="block-43">首次试用前明确任务难度、样本数量、允许帮助、成功定义及目标值；目标值基于实际基线或负责人依据，不事后降低以宣布通过。记录严重误用，即使任务最终完成也不能当作无风险成功。小样本探索不宣称总体成功率。</p>
+<p id="block-44">科学真值或目标环境缺失时，可以完成明确标记的工程候选，但不能宣称相应验收已通过。D1评估设计就绪不等于S1科学准入。当前<a href="https://github.com/Junweiiii14/bioimage-tools-platform/issues/57">验收缺口</a>必须继承。</p>
+<h2 id="section-8" tabindex="-1">8. 分阶段推进与退出条件<a class="permalink" href="#section-8" aria-label="链接到此节">§</a></h2>
 <div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的数据表"><table>
 <thead>
-<tr id="block-61">
-<th>内容</th>
-<th>唯一维护位置</th>
-<th>本次合并方式</th>
+<tr id="block-45">
+<th>阶段</th>
+<th>主要交付</th>
+<th>进入下一阶段前需要什么</th>
 </tr>
 </thead>
-<tbody><tr id="block-62">
-<td>产品形态、优先级和总原则</td>
-<td>本方案</td>
-<td>合并4.0/4.1的模块、编排、扩展、自动执行，补真实操作复现与工程分区</td>
+<tbody><tr id="block-46">
+<td>0，旧事项收尾</td>
+<td>依赖/旧PR、任务证据、阅读入口已整理；PR54/56已集成</td>
+<td>已完成；真实未验项继续跟踪，不重启P002/M1/M2</td>
 </tr>
-<tr id="block-63">
-<td>逐步调研、方法还原与模块交付</td>
-<td><a href="workflow-development.html">开发流程</a></td>
-<td>补动作分类、方法一致性、追溯表及复现步骤</td>
+<tr id="block-47">
+<td>1，实验需求与首条流程冻结</td>
+<td>普通用户任务、结果样例、现有能力差距、算法复用核验、验收方案</td>
+<td>明确一个可实施场景；缺材料及替代候选有据可查</td>
 </tr>
-<tr id="block-64">
-<td>WB实际软件操作与源码差距</td>
-<td><a href="../research/2026-11-02-wb-workflow-audit.html">WB实例</a></td>
-<td>保留有来源的研究结果，通过主方案接入，不重复复制</td>
+<tr id="block-48">
+<td>2，首条学生自动流程</td>
+<td>复用现有WB基础完成实验向导与完整输出；若资料不支持则先记录阻塞并论证调整</td>
+<td>工程、方法、用户三类证据分别明确；严重错误/误用有处理结论</td>
 </tr>
-<tr id="block-65">
-<td>后续实验清单</td>
-<td><a href="experiment-research-roadmap.html">实验路线</a></td>
-<td>保留逐项材料与验收，按本方案统一开发方法</td>
+<tr id="block-49">
+<td>3，第二实验闭环</td>
+<td>经需求比较选定的一个实验，验证模板和接口的真实复用</td>
+<td>独立完整流程通过其验收，扩展没有污染平台实验边界</td>
 </tr>
-<tr id="block-66">
-<td>长期维护、审查路线、维护节奏</td>
-<td><a href="../maintenance-plan.html">维护计划</a></td>
-<td>合并既有维护要求，增加可读性、技术债和接手机制</td>
+<tr id="block-50">
+<td>4，扩大普通实验覆盖</td>
+<td>按需求与材料优先级逐个增加模板</td>
+<td>每次有真实使用与维护反馈，再决定下一项</td>
 </tr>
-<tr id="block-67">
-<td>依赖规则与代码规则</td>
-<td><a href="../architecture.md">架构</a>、<a href="../coding-standards.md">编码规范</a></td>
-<td>保留公开API、数值/存储/并发不变量，新增简明导航和标注要求</td>
+<tr id="block-51">
+<td>5，专业方法与组合</td>
+<td>小范围明确需求的模块、参数和工作流组合</td>
+<td>输入输出/版本/质量与缓存语义能兼容；不降低默认向导易用性</td>
 </tr>
-<tr id="block-68">
-<td>当前任务与完成状态</td>
-<td>实际开发树任务卡</td>
-<td>不复制状态、不重新编号、不在本轮激活新任务</td>
+<tr id="block-52">
+<td>6，受控Agent与机构交付</td>
+<td>先辅助，再草稿，再可核验执行；按需求补部署和支持</td>
+<td>确定性模板稳定，质量/隐私/成本边界可证明</td>
 </tr>
 </tbody></table></div>
-<p id="block-69">架构取舍改变时写短ADR；普通函数调整不新增一套设计文档。历史方案和报告保留参考，不自动扩大实施范围。未来接入本版时，先核对实际开发树最新任务、代码和依赖，再增量采用。</p>
-<footer class="document-footer">4.2整理版 · B-018收尾；不代表算法对照、产品验收或代码重构已经完成。离线可读，本地参考链接依赖对应文件。</footer></article></main><script>
+<p id="block-53">这些是产品推进顺序，不是强制串行等待所有外部资料。需求调研、方法小实验和无关工程可并行开展；缺项只阻止依赖它的结论。当前仅登记下一项<a href="../../work/tasks/P-010-experiment-discovery.md">P010需求与流程调研</a>，后续按实测结果拆小任务，不预建几十张空任务卡。</p>
+<p id="block-54">首个验证入口建议沿已有学校实验室关系，从WB完整学生任务开始，理由是已有工程基础、切换成本较小；这仍需真实需求与材料确认。IF计数/强度等属于第二实验候选，不在没有比较证据时固定市场结论。候选和选择规则见<a href="experiment-research-roadmap.html">实验路线</a>。</p>
+<h2 id="section-9" tabindex="-1">9. 成本与经营验证不脱离产品<a class="permalink" href="#section-9" aria-label="链接到此节">§</a></h2>
+<p id="block-55">用户资金紧张，希望尽快有人付费、覆盖开发成本，并以一年净利润超过十万元为目标。该目标保留为商业假设，不是本方案能保证的结果。</p>
+<p id="block-56">先用已有老师和企业联系人作为用户自行协调的调研入口，验证谁使用、谁付钱、谁验收，以及部署/维护成本。可优先测试有限范围的付费部署、适度定制或技术服务；是否订阅、软件收费、免费试用及是否成立公司，待真实交付与采购条件核实后另作经营方案，不先构建收费系统。</p>
+<p id="block-57">每项试点都应有明确数据范围、成果、验收、支持边界与维护成本记录。不同实验室的共性再沉淀成产品模板；一次性定制不直接污染通用平台。没有付费证据时不声称找到可盈利模式，不自动对外联系、花费或上传实验数据。</p>
+<h2 id="section-10" tabindex="-1">10. 维护、版本和阅读入口<a class="permalink" href="#section-10" aria-label="链接到此节">§</a></h2>
+<p id="block-58">原始输入、已完成结果和初始PDF不可覆盖。改变公式、预处理、默认参数或schema时版本化并说明旧数据兼容；新几何方法沿<a href="../../work/tasks/P-004-analysis-asset-contract.md">P004</a>独立验证，不能用旧显示角改变历史数值。未检测、无效、排除、失败与真实零值保持区分。</p>
+<p id="block-59">每次交付同步维护“用户动作 → 公开入口 → 方法/适配 → 输出 → 相关测试”的短导航。复杂度来自真实问题时才重构，不为假想扩展创建框架。实现、验证和长期维护要求见<a href="../maintenance-plan.html">维护计划</a>。</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的数据表"><table>
+<thead>
+<tr id="block-60">
+<th>内容</th>
+<th>唯一维护位置</th>
+</tr>
+</thead>
+<tbody><tr id="block-61">
+<td>产品定位与阶段优先级</td>
+<td>本文；旧版只读见<a href="history.md">版本索引</a></td>
+</tr>
+<tr id="block-62">
+<td>实验调研、算法选择及交付步骤</td>
+<td><a href="workflow-development.html">开发流程</a></td>
+</tr>
+<tr id="block-63">
+<td>候选实验与排序依据</td>
+<td><a href="experiment-research-roadmap.html">实验路线</a></td>
+</tr>
+<tr id="block-64">
+<td>已有WB研究证据</td>
+<td><a href="../research/2026-11-02-wb-workflow-audit.html">2026-11-02 WB审计</a>，是当日快照</td>
+</tr>
+<tr id="block-65">
+<td>模块和代码约束</td>
+<td><a href="../module-map.md">模块地图</a>、<a href="../architecture.md">架构</a>、<a href="../coding-standards.md">编码规范</a></td>
+</tr>
+<tr id="block-66">
+<td>当前任务与状态</td>
+<td><a href="../../AGENT_HANDOFF.md">交接入口</a> → 任务卡；<a href="../../work/programs/scientific-agent-platform/registry.json">登记表</a>仅存依赖</td>
+</tr>
+<tr id="block-67">
+<td>未验限制</td>
+<td><a href="../../.agent-handoff/risks.md">风险入口</a>及Issue57</td>
+</tr>
+</tbody></table></div>
+<p id="block-68">主方案和HTML同步生成。旧计划快照保留来源，不同时维护多份“当前方案”。本次只交付方案及任务组织，不将新实验、Agent或商业试点写成已实施。</p>
+<footer class="document-footer">研发文档；规划、工程、方法与用户验收分别记录。离线可读，本地参考链接依赖对应文件。</footer></article></main><script>
 const menu=document.getElementById('menu-toggle');
 menu.addEventListener('click',()=>{const open=document.body.classList.toggle('nav-open');menu.setAttribute('aria-expanded',String(open));menu.textContent=open?'收起目录':'目录与检索'});
 document.querySelectorAll('.sidebar a').forEach(a=>a.addEventListener('click',()=>{document.body.classList.remove('nav-open');menu.setAttribute('aria-expanded','false');menu.textContent='目录与检索'}));

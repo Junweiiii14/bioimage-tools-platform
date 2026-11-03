@@ -1,6 +1,6 @@
 # 待办入口
 
-当前收尾入口为[B018](../work/tasks/B-018-repository-closeout.md)。P002/M1/M2已集成，任务状态在对应P卡；旧风险不因完成工程而关闭。后续方案在清理后重写，不从历史待办自动启动新实验。
+当前入口为[B019方案重写](../work/tasks/B-019-student-experiment-plan.md)。B018旧事项已收尾，5.0后续P010仅登记未执行；P002/M1/M2工程已集成，旧风险不会由方案或工程完成关闭。公开缺口见[Issue57](https://github.com/Junweiiii14/bioimage-tools-platform/issues/57)。
 
 - 本轮代码、完整门禁、准确提交独审、构建/安装验收、条件项和交接：从 T082 的 R00–R12 台账读取，证据位于 `work/evidence/T-082/`。不要在此复制勾选状态。
 - 外部依赖：R10 独立留出与负责人判定标准由用户确认暂无材料；目标 Windows/物理交互等未验只阻塞各自结论。解除条件和工程/科学/安装态区分见 [risks](risks.md) 及任务，不因缺材料冻结无依赖工作。

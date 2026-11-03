@@ -150,3 +150,6 @@ T050初次归档复制因archive目录尚不存在失败，随后从未修改的
 - [work-log-20261102T165307473616Z.md](archive/work-log-20261102T165307473616Z.md): work log exceeded 64 KiB or 30 dated sections
 - [work-log-20261103T125139799631Z.md](archive/work-log-20261103T125139799631Z.md): work log exceeded 64 KiB or 30 dated sections
 - [work-log-20261103T131043399538Z.md](archive/work-log-20261103T131043399538Z.md): work log exceeded 64 KiB or 30 dated sections
+
+- B019换版前snapshot原字节：[原位置语义快照](archive/B019-before-plan-snapshot.txt)。文本内相对路径按当时.agent-handoff/snapshot.md解释，恢复只走当前snapshot。
+- [work-log-20261103T134343120683Z.md](archive/work-log-20261103T134343120683Z.md): work log exceeded 64 KiB or 30 dated sections

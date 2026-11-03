@@ -1,6 +1,6 @@
 # 研发文档HTML构建
 
-当前构建器为build-v42.cjs，固定使用package-lock.json中的marked 17.0.5，不增加产品依赖。
+当前构建器为build-current.cjs，固定使用package-lock.json中的marked 17.0.5，不增加产品依赖。
 
 ```powershell
 npm ci --prefix docs/plans/renderer

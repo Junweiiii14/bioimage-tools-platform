@@ -7,7 +7,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "node build-v42.cjs",
+    "build": "node build-current.cjs",
     "historical-v4": "node build.mjs --standalone"
   },
   "dependencies": {
