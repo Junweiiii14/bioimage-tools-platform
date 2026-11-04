@@ -1,12 +1,12 @@
 # P-010 普通实验人员需求与首条自动流程调研
 
-<!-- PROGRAM_TASK_META {"id":"P-010","status":"planned","work_package":"W14","depends_on":["P-002","P-003","P-009"],"execution_root":"not_activated","owner":null,"base_commit":null,"head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-010","status":"in_progress","work_package":"W14","depends_on":["P-002","P-003","P-009"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex P010 research handoff","base_commit":"c8f1bcbacbfcc02a1bbfbb190ae8a967012e120b","head_commit":null} -->
 
 ## 目的与范围
 
 按[主方案5.0](../../docs/plans/research-platform-rd.md)和[开发流程](../../docs/plans/workflow-development.md)，冻结一个普通实验人员能独立完成的完整任务。优先核验WB现有基础与真实场景，比较一个可行备选；不默认重做执行器、增加全部实验或启动Agent。
 
-本卡planned仅表示接续任务已登记，未进行新访谈、未取得新实验材料、未验证支付意愿。公开调研可按授权开展；私人材料和对外联系沿用户实际授权处理，不能伪造。
+2026-11-04用户授权开始WB需求调研并交新窗口目标模式持续推进。当前in_progress；尚未进行新访谈、取得新实验材料或验证支付意愿。公开调研可按授权开展；私人材料和对外联系沿用户实际授权处理，不能伪造。
 
 ## 输入与步骤
 
@@ -25,4 +25,4 @@
 
 ## 执行与验收记录
 
-尚未执行。激活时记录实际执行根、owner、base/head并加载规则；之后记录真实命令、来源、日期、环境、失败与未运行项。方案编写不构成产品实现或发布。
+已开始公开资料与当前源码核对，初步底稿见work/evidence/P-010/wb-discovery.md；后续由新窗口接续，记录真实来源、最小实验和未运行项。方案编写不构成产品实现或发布。
