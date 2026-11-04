@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "diagnostic": "automatic_flow_installed@1",
+  "phase": "passed",
+  "failed_phase": "",
+  "shutdown_stage": "shutdown",
+  "checks": [
+    "top-fields-one-start",
+    "no-human-crop-confirmations",
+    "real-workers",
+    "original-pixel-crops",
+    "display-correction",
+    "signal-direction-independent-of-guide",
+    "missing-is-not-zero",
+    "committed-output",
+    "original-preview-replaces-thumbnail",
+    "visible-gray-image",
+    "visible-results-table",
+    "automatic-navigation",
+    "stage-barriers",
+    "safe-reopen",
+    "originals-unchanged",
+    "owned-resources-closed",
+    "owned-window-deleted"
+  ],
+  "errors": [],
+  "elapsed": 8.296999999962281,
+  "runtime_executable": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.venv\\Scripts\\python.exe",
+  "package_file": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\apps\\desktop\\src\\bioimage_app\\installation_check_sequence.py",
+  "isolated_imports": false,
+  "release_channel": "",
+  "worker_pids": [
+    50952,
+    30896
+  ],
+  "page_modes": [
+    "intake",
+    "intake",
+    "review",
+    "layout",
+    "quant",
+    "results"
+  ],
+  "stage_events": [
+    {
+      "stage": "crop",
+      "target": "group-7a1472c9012d40254b6d736f8b2362c8",
+      "attempt": 1,
+      "revision": 4
+    },
+    {
+      "stage": "crop",
+      "target": "group-7a1472c9012d40254b6d736f8b2362c8",
+      "attempt": 2,
+      "revision": 6
+    },
+    {
+      "stage": "crop",
+      "target": "group-9c03e458879f84b166ac3a9a602dff38",
+      "attempt": 1,
+      "revision": 8
+    },
+    {
+      "stage": "crop",
+      "target": "group-9c03e458879f84b166ac3a9a602dff38",
+      "attempt": 2,
+      "revision": 10
+    },
+    {
+      "stage": "compose",
+      "target": "279c79d4-ddbe-481e-94b4-3e40a6faf009",
+      "attempt": 1,
+      "revision": 12
+    },
+    {
+      "stage": "compose",
+      "target": "89f45226-7789-4974-ad07-33b36db425ef",
+      "attempt": 1,
+      "revision": 14
+    },
+    {
+      "stage": "measure",
+      "target": "279c79d4-ddbe-481e-94b4-3e40a6faf009",
+      "attempt": 1,
+      "revision": 16
+    },
+    {
+      "stage": "measure",
+      "target": "89f45226-7789-4974-ad07-33b36db425ef",
+      "attempt": 1,
+      "revision": 18
+    },
+    {
+      "stage": "export",
+      "target": "db52dacc17644e2dabf0e7b30b0cd404",
+      "attempt": 1,
+      "revision": 20
+    }
+  ],
+  "stage_event_source": "committed-save-callback",
+  "last_status": "缩略图加载结束；0 张失败。",
+  "corrected_rows": [],
+  "limitations": "Synthetic uint16 paired-guide images, automatic crop, N=4/5. Engineering page/worker/output checks; not scientific accuracy, physical input/DPI or clean Windows acceptance."
+}

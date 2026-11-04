@@ -46,7 +46,7 @@
 
 ## Current Pointer
 
-- 当前任务：[P010 WB需求调研](work/tasks/P-010-experiment-discovery.md)，用户已授权从WB开始并交新窗口目标模式持续推进；首轮底稿见work/evidence/P-010/wb-discovery.md。5.0已合入，P002/M1/M2不重做。
+- 当前任务：[P011 WB学生结果闭环](work/tasks/P-011-wb-student-results.md)，依据[P010调研](work/evidence/P-010/wb-discovery.md)持续推进；本聊天已创建无预算active goal。5.0已合入，P002/M1/M2不重做。
 - T082历史工程证据及科学/目标环境待办完整保留于其[任务](work/tasks/T-082-reliability-remediation.md)，不由V0自动关闭。
 - 本轮本地工程交接：[T082 final-handoff](work/evidence/T-082/final-handoff.md)，区分冻结源码、隔离验收工件与后续交接HEAD；科学待办不由工程通过代替。
 - 最近交付：[T081 R2](work/evidence/T-081/final-delivery.md)。当前源码/构建源码/主线集成/安装包区分见 [T082 baseline](work/evidence/T-082/baseline.md)。

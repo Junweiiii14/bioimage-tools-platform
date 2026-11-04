@@ -2,8 +2,10 @@
 
 2026-11-04：用户授权P010，从WB研究普通学生的完整流程、结果和现有缺口，并交新窗口使用真实目标模式持续推进。活动树bioimage-plan-sync，分支codex/p010-wb-discovery；继承200720f的B019本地收尾，main基线c8f1bcb。原主目录旧dirty不碰。
 
-- 当前任务work/tasks/P-010-experiment-discovery.md为in_progress；首轮底稿work/evidence/P-010/wb-discovery.md。已核对公开来源与当前源码，未开展新访谈、原软件实跑或科学验收。
+- 当前任务转work/tasks/P-011-wb-student-results.md；P010调研记录见work/evidence/P-010/wb-discovery.md。明确缺口：自动裁图reviewed=false与旧归一化人工标记不兼容、重复身份未结构化；归一化UI本已接入，不重写。
 - 当前优先：复用已有WB测量、配对/归一化、成图导出，研究学生完整路径；样本/重复与统计交换表是候选缺口。P009已完成，不照旧审计重建执行器。
-- 新窗口应实际调用create_goal启用目标模式，不设用户未要求的预算；继续P010，结论明确后按授权和依赖推进首个WB最小完整切片，不全面扩展其他实验或Agent。
+- 本聊天已成功create_goal，active、无token预算。继续P011最小完整切片，不全面扩展其他实验或Agent；待重载P011 context后修改产品。
+- 用户确认不知道配对/分组重复/软件背景方法，并要求少问、自主调研。这些科学语义保留UNKNOWN，明确合成身份支持工程对照，真实科学/学生验收不宣称通过。
+- 基线bf52b61归一化15测试、网页worker/CAS2测试、自动完整入口17checks通过；offscreen GPU日志及原生computer-use窗口绑定失败保留。接续树原缺依赖，已uv sync --locked --all-groups；不改锁。原生验收进程45312由本聊天启动，尚需正常关闭，不操作其他窗口。
 - 用户要求不要过度设计/过度防御：小文案与收尾记录随正常任务处理，不追加完整检查轮次；数据保护、科学口径和既有必需检查保留。
 - 真实未验边界仍见risks及Issue57；资料目录可只读核对，原图、旧结果和未提交内容不覆盖、不上传。

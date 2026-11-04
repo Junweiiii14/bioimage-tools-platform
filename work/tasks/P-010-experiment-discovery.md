@@ -1,12 +1,12 @@
 # P-010 普通实验人员需求与首条自动流程调研
 
-<!-- PROGRAM_TASK_META {"id":"P-010","status":"in_progress","work_package":"W14","depends_on":["P-002","P-003","P-009"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex P010 research handoff","base_commit":"c8f1bcbacbfcc02a1bbfbb190ae8a967012e120b","head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-010","status":"done","work_package":"W14","depends_on":["P-002","P-003","P-009"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex WB discovery","base_commit":"c8f1bcbacbfcc02a1bbfbb190ae8a967012e120b","head_commit":null} -->
 
 ## 目的与范围
 
 按[主方案5.0](../../docs/plans/research-platform-rd.md)和[开发流程](../../docs/plans/workflow-development.md)，冻结一个普通实验人员能独立完成的完整任务。优先核验WB现有基础与真实场景，比较一个可行备选；不默认重做执行器、增加全部实验或启动Agent。
 
-2026-11-04用户授权开始WB需求调研并交新窗口目标模式持续推进。当前in_progress；尚未进行新访谈、取得新实验材料或验证支付意愿。公开调研可按授权开展；私人材料和对外联系沿用户实际授权处理，不能伪造。
+2026-11-04用户授权开始WB需求调研并交新窗口目标模式持续推进，目标工具已成功创建。调研产物完成；未进行新访谈、取得新实验材料或验证支付意愿。用户确认不知道配对、分组/重复及原软件口径，要求自主调研、减少询问；这些未知不代填。
 
 ## 输入与步骤
 
@@ -25,4 +25,4 @@
 
 ## 执行与验收记录
 
-已开始公开资料与当前源码核对，初步底稿见work/evidence/P-010/wb-discovery.md；后续由新窗口接续，记录真实来源、最小实验和未运行项。方案编写不构成产品实现或发布。
+完整场景、材料观察、能力差距、方法备选、对照与验收设计见[调研记录](../evidence/P-010/wb-discovery.md)。基线bf52b61：归一化15项、网页实际worker/CAS回归2项通过；现有完整自动入口诊断17检查通过，但offscreen GPU日志和原生窗口绑定失败如实保留。调研未修改产品公式，未验证真实科学适用性或学生独立使用。下一张[P011](P-011-wb-student-results.md)按已授权WB范围推进。
