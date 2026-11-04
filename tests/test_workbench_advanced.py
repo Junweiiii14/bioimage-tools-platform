@@ -389,6 +389,34 @@ def test_actual_web_forms_save_reopen_and_export(
         js("document.querySelector('[data-adv-path=\"plans.0.confirmed\"]').click()")
         click("normalization_apply")
         completed()
+        # A failed reread after discard must not retain edits in the saved snapshot.
+        field("plans.0.pairs.0.identity.group", "discarded-group")
+        manager = window.bridge.advanced_commands
+
+        def fail_read(request: dict[str, object]) -> None:
+            assert request["operation"] == "open"
+            manager.emit(str(request["requestId"]), "failed", "Read unavailable")
+
+        with monkeypatch.context() as patch:
+            patch.setattr(manager, "command", fail_read)
+            click("discard")
+            qtbot.waitUntil(
+                lambda: (
+                    javascript(
+                        window, qtbot, "document.querySelector('#advanced-status').textContent"
+                    )
+                    == "Read unavailable"
+                )
+            )
+        field("plans.0.pairs.0.sample", "renamed-sample")
+        js("document.querySelector('[data-adv-path=\"plans.0.confirmed\"]').click()")
+        click("normalization_apply")
+        completed()
+        after_discard = host.view.project()
+        assert isinstance(after_discard, WBNormalizedProject)
+        pair = after_discard.normalizations[0].pairs[0]
+        assert pair.sample == "renamed-sample"
+        assert pair.identity and pair.identity.group == "control"
         norm_path = tmp_path / "web-normalization.csv"
         monkeypatch.setattr(
             "bioimage_app.web_advanced.QFileDialog.getSaveFileName",

@@ -127,13 +127,15 @@ window.advancedWorkspace = (() => {
                 ...copy(plan),
                 pairs: plan.pairs.map((pair) => ({
                     ...copy(pair),
-                    identity: pair.identity || {
-                        schema_version: 1,
-                        experiment_id: '',
-                        group: '',
-                        biological_replicate: '',
-                        technical_replicate: '',
-                    },
+                    identity: copy(
+                        pair.identity || {
+                            schema_version: 1,
+                            experiment_id: '',
+                            group: '',
+                            biological_replicate: '',
+                            technical_replicate: '',
+                        },
+                    ),
                 })),
             })),
             ocrLabels: false,
