@@ -18,9 +18,9 @@ from tooling.qt_test_lifecycle import close_and_dispose_window
 from tools.wb.tests.test_source_geometry import membrane
 
 
-@pytest.mark.parametrize("supported", [True, False])
+@pytest.mark.parametrize("supported, guided", [(True, False), (True, True), (False, False)])
 def test_automatic_batch_to_explicit_sample_results(
-    qtbot: QtBot, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, supported: bool
+    qtbot: QtBot, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, supported: bool, guided: bool
 ) -> None:
     sources = tmp_path / "inputs"
     sources.mkdir()
@@ -33,7 +33,7 @@ def test_automatic_batch_to_explicit_sample_results(
             for center in (254, 302, 350, 398, 446):
                 pixels[150, center] = 0
         arrays = [pixels]
-        if supported:
+        if guided:
             guide = membrane(marker=False)
             guide[guide > 15] = 50000
             signal = pixels.copy()
@@ -65,7 +65,7 @@ def test_automatic_batch_to_explicit_sample_results(
             p = host.view.project()
             return (
                 isinstance(p, WBIntakeProject)
-                and len(p.intake.sources) == (6 if supported else 2)
+                and len(p.intake.sources) == (6 if guided else 2)
                 and not host.operation_busy
             )
 
@@ -237,7 +237,15 @@ def test_automatic_batch_to_explicit_sample_results(
         with exported.open(encoding="utf-8-sig", newline="") as stream:
             records = list(csv.DictReader(stream))
         assert len(records) == 5 and records[4]["生物重复 ID"] == "text:animal-4"
+        # Like capture_workbench, settle compositor animations for static evidence.
+        # All functional actions and assertions above ran with normal animations.
+        javascript(window, qtbot, "document.getAnimations().forEach(a=>a.finish());true")
         qtbot.wait(350)
+        assert javascript(
+            window,
+            qtbot,
+            "getComputedStyle(document.querySelector('#drawer')).opacity==='1'",
+        )
         assert window.grab().save(str(tmp_path / "student-results.png"))
         saved = host.view.project()
         assert isinstance(saved, WBNormalizedProject)

@@ -22,9 +22,9 @@
 
 ## 当前进度
 
-已重载P011全仓范围与integration回执。当前HEAD为3caf797，产品改动尚未提交：自动证据就绪口径、SampleIdentity v1、逐样本导出字段、结果页直达及隐藏Qt面板身份保留。已有定向回归及当前入口完整连续回归通过；全门禁正在运行，独审与集成未完成。
+已重载P011全仓范围与integration回执。当前产品候选已提交为918af166b2bdc3bcd94f08c40a44b6d488db2f05：自动证据就绪口径、SampleIdentity v1、逐样本导出字段、结果页直达及隐藏Qt面板身份保留。已有定向回归及当前入口完整连续回归通过；全门禁正在运行，独审与集成未完成。
 
-2026-11-04补充诊断：当前批次入口采用common/prominent几何，sampling_rectangles按所选support加3像素边距，且common_sampling_crop_limits@1将sampling_limits设为该范围。矩形合成条带被裁为Y141:160，无法满足anchored_background@1的持续背景要求；Gaussian候选也失败；加入三联图未改变此结果。旧prepared测试使用历史路线，不能替代当前入口。tests/test_wb_student_results.py现保留两参数：负例完整导出/重开/原图历史SHA保护通过，预期有效正例仍失败（最新1 failed/1 passed，18.23秒），不得修改质量阈值或把无效比值当0。
+2026-11-04补充诊断：当前批次入口采用common/prominent几何，sampling_rectangles按所选support加3像素边距，且common_sampling_crop_limits@1将sampling_limits设为该范围。矩形合成条带被裁为Y141:160，无法满足anchored_background@1的持续背景要求；Gaussian候选也失败；加入三联图未改变此结果。旧prepared测试使用历史路线，不能替代当前入口。当时tests/test_wb_student_results.py保留两参数：负例完整导出/重开/原图历史SHA保护通过，预期有效正例失败（当次1 failed/1 passed，18.23秒），不得修改质量阈值或把无效比值当0。
 
 上述首次失败已通过版本化bounded_background_context@1修复，历史失败记录保留。当前入口真实worker正例比值/相对值1与含dtype_min的无效反例均导出/重开通过：2 passed，19.31秒。原背景不足负例保留在纯数值旧limits回归；没有修改质量阈值。5个新上下文/邻带/孔洞/裁图边界/旧wire测试通过，另42个现有几何与自动裁图测试通过。
 
@@ -33,3 +33,5 @@
 ## 已发现的必要范围修正
 
 当前入口将允许背景搜索的范围等同于窄条带目标，导致已有anchored_background@1无法工作。已增加版本化bounded_background_context@1：目标槽位和显示框不变，仅在原图、现有裁图、有效膜区内且不跨其他检测标签的位置允许最多25%上下文，实际是否采用仍由现有背景检查决定。旧记录缺新标记保持原范围与原值，不重算历史；不修改积分、阈值、对照或质量判据。新增正例/邻条带/膜孔洞/历史序列化回归；科学适用性仍未验。
+
+2026-11-04候选918af16：提交钩子ruff/policy/web通过。全门禁session91098仍活跃，pytest已到16%且出现3个失败，等待完整摘要；不得称通过。新增未提交测试补丁增加单图正例，以及沿现有capture_workbench方法收尾动画后检查opacity再截图，尚未运行。只读独立子代理审查权限已异步询问（当前明确禁止未授权启动子代理），未获答复，不擅自启动；不影响测试和修复。
