@@ -35,3 +35,9 @@
 当前入口将允许背景搜索的范围等同于窄条带目标，导致已有anchored_background@1无法工作。已增加版本化bounded_background_context@1：目标槽位和显示框不变，仅在原图、现有裁图、有效膜区内且不跨其他检测标签的位置允许最多25%上下文，实际是否采用仍由现有背景检查决定。旧记录缺新标记保持原范围与原值，不重算历史；不修改积分、阈值、对照或质量判据。新增正例/邻条带/膜孔洞/历史序列化回归；科学适用性仍未验。
 
 2026-11-04候选918af16：提交钩子ruff/policy/web通过。全门禁session91098仍活跃，pytest已到16%且出现3个失败，等待完整摘要；不得称通过。新增未提交测试补丁增加单图正例，以及沿现有capture_workbench方法收尾动画后检查opacity再截图，尚未运行。只读独立子代理审查权限已异步询问（当前明确禁止未授权启动子代理），未获答复，不擅自启动；不影响测试和修复。
+
+草稿PR已创建：https://github.com/Junweiiii14/bioimage-tools-platform/pull/60 ，HEAD35cfe0bacdbf22fb075d59c9670619ac028eacbd，未合并。35cfe仅新增单图正例和静态截图收尾检查及交接；本机仍运行的全门禁在其测试改动前已完成collection，不能宣称覆盖该新增用例。CI正常必需检查已触发，等待实际状态。当前本机门禁未显式设置QTWEBENGINE_CHROMIUM_FLAGS，已有GPU context-lost日志及至少3fail；此差异与CI固定--disable-gpu须在结果中分开记录，不自动归因为环境。
+
+PR60规则失败已定位阶段清单冲突，按runbook拆出文档前置PR61：https://github.com/Junweiiii14/bioimage-tools-platform/pull/61。准确c8f1bcb..3caf797本地规则验证exit0；服务器规则与桌面环境通过，foundation双平台仍运行。待前置正常集成后重载P011基线，不删历史回执或改门禁。本机全门禁当前38%、至少4fail，尚待终态摘要。
+
+本机全门禁终态1696passed/5failed（exit1），详见progress最新节；后续定向发现并修正测试入口/token与preview busy同步问题，3例最终通过，未改产品取消保护或门槛。新增3条当前端到端全部通过，完整视觉证据仍待CDP捕获。当前旧PR60 Ubuntu foundation通过、Windows仍运行；测试修正待提交。

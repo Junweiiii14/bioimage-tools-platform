@@ -2181,6 +2181,9 @@ def test_v5_attempts_remaining_crop_then_pauses_before_any_fig_or_output(
     request(window, "intake_export", workflowDigest=intake_workflow_digest(paused))
     assert "全部裁剪" in str(window.bridge.snapshot()["status"])
     assert current(window) == paused
+    # Building the snapshot can enqueue preview asset reads. Continue only when
+    # the real host accepts commands; do not bypass its busy guard.
+    wait_saved(window, qtbot)
     request(
         window,
         "intake_sequence_continue",

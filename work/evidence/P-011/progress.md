@@ -17,3 +17,19 @@
 新5例通过：解析面积13×30000、其他条带、膜孔洞、裁图界限、旧wire/未知版本。首次新测试有两个测试代码错误（遗漏polarity与strict Python tuple输入），修正为显式dark及真正JSON wire；未修改产品以迁就测试。现有几何/自动裁图42例通过。
 
 全门禁首次被新测试长行ruff拒绝（exit1），仅断行后再次执行；当前session91098仍运行。静态/类型/边界/web通过，pytest尚未完成。日志父目录p011-check-all.log，勿提交长日志。原生grab仍没有可靠显示抽屉，视觉验收未通过。待最终独审与集成。
+
+## 集成阶段修正（35cfe0b）
+
+PR60 rules-context失败：Integration needs exactly one changed integration context。原因是P010/P011均含集成清单；不删除/重命名历史回执、不修改门禁。按既有runbook拆文档前置PR61（head3caf797，basec8f1bcb），本地准确base/head规则检查exit0；PR61服务器rules-context与desktop-environment已SUCCESS，foundation双平台仍运行。待PR61按必需检查集成后，再更新P011准确基线及回执。PR60保持草稿。
+
+本机check--all session91098仍live（pytest已到38%，至少4fail，未出最终摘要）。此轮未重启测试。原自行启动验收窗口45312的真实子进程53468已CloseMainWindow正常退出，父/子均确认不存在；未强杀或操作其他应用。
+
+## 全门禁结果与测试入口修正
+
+本机check--all（session91098）已终态exit1：1696 passed / 5 failed / 11 warnings，1427.22秒。失败：v5恢复批次、两个旋转canvas、失败route诊断、workflow cancel退出。原日志父目录p011-check-all.log保留；含GPU context-lost及一个子进程UTF8解码warning。后续未把失败抹为通过。
+
+使用CI相同offscreen/--disable-gpu定向5旧失败+3新端到端：7 passed/1 failed，65.02秒；旧cancel仍超时，新单图、三联图、dtype_min反例均通过。静态Qtgrab能显示抽屉，但显示内容帧仍陈旧，不能称完整视觉验收；下一步用已有CDP捕获路径验证真实当前DOM。
+
+隔离cancel诊断1 passed；原顺序组合诊断2 failed/3 passed。失败时捕获stage=confirm_draft、authoring.dirty=True、batch=cancelled/closed：测试直接native freeze没有网页pending token，网页正确保护未知回执后的草稿。修正测试为连接就绪后点击真实wf-run按钮；不自动丢弃草稿。v5测试的snapshot会发起预览asset读取，因此在继续请求前等既有wait_saved（不延长超时、不绕过busy）。这三例最终3 passed/12.43秒，exit0。临时print诊断已移除。产品取消/保存代码没有修改。
+
+PR60 Ubuntu foundation已SUCCESS，Windows仍运行；PR61的规则和desktop已SUCCESS，foundation仍运行。待准确最终HEAD所有必需CI与独审，不凭定向通过宣称全门禁完成。

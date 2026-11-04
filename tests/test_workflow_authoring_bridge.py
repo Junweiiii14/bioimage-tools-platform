@@ -11,7 +11,7 @@ from PySide6.QtCore import QSettings
 from PySide6.QtWidgets import QFileDialog
 from pytestqt.qtbot import QtBot
 
-from tests.test_workflow_authoring_store import payload
+from tests.test_intake_web_ui import javascript
 from tooling.qt_test_lifecycle import close_and_dispose_window
 
 
@@ -35,21 +35,31 @@ def test_native_workbench_exits_after_actual_workflow_cancel(
     monkeypatch.setattr(QFileDialog, "getExistingDirectory", parent)
     workspace = ""
     try:
+        qtbot.waitUntil(
+            lambda: (
+                javascript(window, qtbot, "!!window.workflowEditor?.snapshot().connected") is True
+            ),
+            timeout=10000,
+        )
         window.authoring.choose("new", "new_example", '{"validation":"triangle_u16"}')
         qtbot.waitUntil(lambda: window.authoring.projection is not None, timeout=15000)
         assert window.authoring.projection is not None
-        project = window.authoring.projection.project
         assert window.host.workspace_path == ""
-        window.authoring.command(
-            "run",
-            payload(
-                "freeze",
-                project.document_id,
-                previous_revision=project.revision,
-                graph=project.graph,
-                layout=project.layout,
-            ).decode("utf-8"),
+        qtbot.waitUntil(
+            lambda: (
+                javascript(
+                    window,
+                    qtbot,
+                    "!!window.workflowEditor?.snapshot().graph && "
+                    "!document.querySelector('#wf-run').disabled",
+                )
+                is True
+            ),
+            timeout=15000,
         )
+        # Preserve the real request token: unsolicited native freeze receipts
+        # correctly retain a browser draft instead of authorizing its discard.
+        javascript(window, qtbot, "document.querySelector('#wf-run').click();true")
         adapter = TypeAdapter(WorkflowBatchStatus)
         qtbot.waitUntil(
             lambda: any(
