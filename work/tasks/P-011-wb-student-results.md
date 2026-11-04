@@ -1,6 +1,6 @@
 # P-011 WB学生结果闭环
 
-<!-- PROGRAM_TASK_META {"id":"P-011","status":"in_progress","work_package":"W06","depends_on":["P-010","P-002","P-003","P-009"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex WB implementation","base_commit":"c8f1bcbacbfcc02a1bbfbb190ae8a967012e120b","head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-011","status":"in_progress","work_package":"W06","depends_on":["P-010","P-002","P-003","P-009"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex WB implementation","base_commit":"87dba64196f8591405dd222f05a69dca07434291","head_commit":null} -->
 
 ## 范围
 
@@ -22,24 +22,14 @@
 
 ## 当前进度
 
-已重载P011全仓范围与integration回执。当前产品候选已提交为918af166b2bdc3bcd94f08c40a44b6d488db2f05：自动证据就绪口径、SampleIdentity v1、逐样本导出字段、结果页直达及隐藏Qt面板身份保留。已有定向回归及当前入口完整连续回归通过；全门禁正在运行，独审与集成未完成。
+产品候选918af16；测试入口修正e349b2e；静态视觉证据1970937。前置调研PR61已按必需检查正常合入main87dba64，产品分支已合入该主线，P011规则及唯一集成清单已重载到准确基线。历史回执全部保留，未修改门禁。产品PR60仍为草稿，尚未独审或合并。
 
-2026-11-04补充诊断：当前批次入口采用common/prominent几何，sampling_rectangles按所选support加3像素边距，且common_sampling_crop_limits@1将sampling_limits设为该范围。矩形合成条带被裁为Y141:160，无法满足anchored_background@1的持续背景要求；Gaussian候选也失败；加入三联图未改变此结果。旧prepared测试使用历史路线，不能替代当前入口。当时tests/test_wb_student_results.py保留两参数：负例完整导出/重开/原图历史SHA保护通过，预期有效正例失败（当次1 failed/1 passed，18.23秒），不得修改质量阈值或把无效比值当0。
+当前入口单图/三联图正例、dtype_min负例均经真实worker/归一化/导出/重开通过；原图、既存归档及run ID保持。新解析面积与邻带/孔洞/裁图边界/旧wire5例通过，相关现有42例通过。visual/三张CDP原始截图已查看：配对、重复身份和五行结果显示完整。
 
-上述首次失败已通过版本化bounded_background_context@1修复，历史失败记录保留。当前入口真实worker正例比值/相对值1与含dtype_min的无效反例均导出/重开通过：2 passed，19.31秒。原背景不足负例保留在纯数值旧limits回归；没有修改质量阈值。5个新上下文/邻带/孔洞/裁图边界/旧wire测试通过，另42个现有几何与自动裁图测试通过。
+旧PR60 head35cfe的双平台全门禁通过：Windows1702passed，Linux1698passed/4既有平台skip；隔离wheel及desktop-environment通过。本机初次全门禁1696pass/5fail完整保留，后续定位并修正测试绕过网页token、预览读取busy同步两项；定向3例通过。未改产品取消保护、超时或科学质量判据。测试修正后的最终HEAD仍需重跑服务器必需检查。详细失败/修正过程见[progress](../evidence/P-011/progress.md)。
 
-下一步：轮询全门禁session91098（日志位于工作区父目录p011-check-all.log），不要因无增量输出重启。格式/类型/导入边界/网页已过，pytest仍活跃。完成后处理失败、复核面板可见性、提交并独审/PR集成。当前未独审、未PR、未合并。
+只读独立子代理审查权限已异步询问，尚未答复，不重复询问或擅自启动。作者自验不代替独审。下一步提交新基线回执并检查准确base/head、推送PR60、处理最终CI；独审完成后才按正常PR集成。科学适用性、独立学生试用、干净Windows/GPU/DPI未验；CDP工具曾打印0xc0000139但exit0，保留环境限制。
 
-## 已发现的必要范围修正
+## 必要的背景范围修正
 
-当前入口将允许背景搜索的范围等同于窄条带目标，导致已有anchored_background@1无法工作。已增加版本化bounded_background_context@1：目标槽位和显示框不变，仅在原图、现有裁图、有效膜区内且不跨其他检测标签的位置允许最多25%上下文，实际是否采用仍由现有背景检查决定。旧记录缺新标记保持原范围与原值，不重算历史；不修改积分、阈值、对照或质量判据。新增正例/邻条带/膜孔洞/历史序列化回归；科学适用性仍未验。
-
-2026-11-04候选918af16：提交钩子ruff/policy/web通过。全门禁session91098仍活跃，pytest已到16%且出现3个失败，等待完整摘要；不得称通过。新增未提交测试补丁增加单图正例，以及沿现有capture_workbench方法收尾动画后检查opacity再截图，尚未运行。只读独立子代理审查权限已异步询问（当前明确禁止未授权启动子代理），未获答复，不擅自启动；不影响测试和修复。
-
-草稿PR已创建：https://github.com/Junweiiii14/bioimage-tools-platform/pull/60 ，HEAD35cfe0bacdbf22fb075d59c9670619ac028eacbd，未合并。35cfe仅新增单图正例和静态截图收尾检查及交接；本机仍运行的全门禁在其测试改动前已完成collection，不能宣称覆盖该新增用例。CI正常必需检查已触发，等待实际状态。当前本机门禁未显式设置QTWEBENGINE_CHROMIUM_FLAGS，已有GPU context-lost日志及至少3fail；此差异与CI固定--disable-gpu须在结果中分开记录，不自动归因为环境。
-
-PR60规则失败已定位阶段清单冲突，按runbook拆出文档前置PR61：https://github.com/Junweiiii14/bioimage-tools-platform/pull/61。准确c8f1bcb..3caf797本地规则验证exit0；服务器规则与桌面环境通过，foundation双平台仍运行。待前置正常集成后重载P011基线，不删历史回执或改门禁。本机全门禁当前38%、至少4fail，尚待终态摘要。
-
-本机全门禁终态1696passed/5failed（exit1），详见progress最新节；后续定向发现并修正测试入口/token与preview busy同步问题，3例最终通过，未改产品取消保护或门槛。新增3条当前端到端全部通过，完整视觉证据仍待CDP捕获。当前旧PR60 Ubuntu foundation通过、Windows仍运行；测试修正待提交。
-
-当前修正提交e349b2e；PR60旧head35cfe已获双平台全门禁成功（Win1702pass/Linux1698pass+4既有平台skip），规则待分阶段前置。实际CDP视觉三张已检查，见visual/capture.json，捕获工具异常与真实用户/目标机边界保留。最终HEAD与独审/集成仍待。
+当前入口把允许背景搜索范围等同于窄条带目标，导致已有anchored_background@1无法工作。新增版本化bounded_background_context@1：目标槽位和显示框不变，仅在原图裁图、有效膜区内且不跨其他检测标签的位置允许最多25%上下文，实际是否采用仍由现有背景检查决定。旧记录缺新标记保持原范围与原值，不重算历史；不修改积分、阈值、对照或质量判据。契约见[有界背景](../../docs/contracts/wb-bounded-background-context-v1.md)。
