@@ -33,3 +33,9 @@ PR60 rules-context失败：Integration needs exactly one changed integration con
 隔离cancel诊断1 passed；原顺序组合诊断2 failed/3 passed。失败时捕获stage=confirm_draft、authoring.dirty=True、batch=cancelled/closed：测试直接native freeze没有网页pending token，网页正确保护未知回执后的草稿。修正测试为连接就绪后点击真实wf-run按钮；不自动丢弃草稿。v5测试的snapshot会发起预览asset读取，因此在继续请求前等既有wait_saved（不延长超时、不绕过busy）。这三例最终3 passed/12.43秒，exit0。临时print诊断已移除。产品取消/保存代码没有修改。
 
 PR60 Ubuntu foundation已SUCCESS，Windows仍运行；PR61的规则和desktop已SUCCESS，foundation仍运行。待准确最终HEAD所有必需CI与独审，不凭定向通过宣称全门禁完成。
+
+## 双平台CI与实际页面画面
+
+PR60 head35cfe0b，Actions41834236478：Windows foundation成功（1702 passed/10 warnings，1488.73秒），Ubuntu foundation成功（1698 passed/4既有平台skip/10 warnings，989.54秒）；随后各自隔离wheel与其余check--all均成功，desktop-environment成功。规则检查仍因阶段清单冲突失败，按PR61前置处理。e349b2e仅修正测试入口与等待，待后续最终HEAD重新CI；不把35cfe检查写成覆盖未推送提交。
+
+CDP捕获当前实际WebEngine画面，而非Qt grab缓存：e349b2e的当前入口三例在临时本地捕获探针下3 passed/30.62秒；单图补拍滚动位置1 passed/12.48秒，exit0。visual/capture.json记录来源与SHA，3张原始PNG未经图像修改。已查看：配对、实验/处理组/生物/技术身份、5行比值/相对值1与导出入口均显示完整。QtWebSocket初始化打印原生异常0xc0000139但进程完成exit0，原因未定位；这属于捕获工具环境限制，不声明干净原生环境已通过。真实学生试用仍未验。

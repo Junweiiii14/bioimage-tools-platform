@@ -41,3 +41,5 @@
 PR60规则失败已定位阶段清单冲突，按runbook拆出文档前置PR61：https://github.com/Junweiiii14/bioimage-tools-platform/pull/61。准确c8f1bcb..3caf797本地规则验证exit0；服务器规则与桌面环境通过，foundation双平台仍运行。待前置正常集成后重载P011基线，不删历史回执或改门禁。本机全门禁当前38%、至少4fail，尚待终态摘要。
 
 本机全门禁终态1696passed/5failed（exit1），详见progress最新节；后续定向发现并修正测试入口/token与preview busy同步问题，3例最终通过，未改产品取消保护或门槛。新增3条当前端到端全部通过，完整视觉证据仍待CDP捕获。当前旧PR60 Ubuntu foundation通过、Windows仍运行；测试修正待提交。
+
+当前修正提交e349b2e；PR60旧head35cfe已获双平台全门禁成功（Win1702pass/Linux1698pass+4既有平台skip），规则待分阶段前置。实际CDP视觉三张已检查，见visual/capture.json，捕获工具异常与真实用户/目标机边界保留。最终HEAD与独审/集成仍待。
