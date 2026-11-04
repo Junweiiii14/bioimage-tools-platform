@@ -45,6 +45,10 @@
     {
       "id": "P-010",
       "path": "work/tasks/P-010-experiment-discovery.md"
+    },
+    {
+      "id": "P-011",
+      "path": "work/tasks/P-011-wb-student-results.md"
     }
   ],
   "work_packages": [
@@ -121,7 +125,9 @@
         "W13",
         "W14"
       ],
-      "task_ids": []
+      "task_ids": [
+        "P-011"
+      ]
     },
     {
       "id": "W07",

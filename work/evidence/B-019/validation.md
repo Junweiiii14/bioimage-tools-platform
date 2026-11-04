@@ -10,3 +10,7 @@
 - 无新增实验实测、独立用户试用、付费验证或目标机验收，不以规划和文档检查宣称这些已完成。PR既有完整检查仍需核验准确提交。
 
 - 修正归档展示方式后，250个本地Markdown链接无缺失；三份快照与基线Git blob SHA一致。主方案390宽截图人工查看无裁切；五文档脚本检查结果见html-validation.json。policy退出0，git diff --check退出0。
+
+## 最终集成
+
+PR58候选7ea0a5dada08e489550e2251282907421105176d，质量run41647025790/规则run41647025492四必需检查success；Windows1692 passed/10 warnings/1492.07s；Linux1688 passed/4既有skip/10 warnings/951.18s；两平台安装后真实工作流通过。正常merge至c8f1bcbacbfcc02a1bbfbb190ae8a967012e120b。GitHub简介已更新，Issue59承载下一项planned调研，Issue57保留未验限制。后续仅本地补合入收据与交接，不为小记录再运行整套产品验证。
