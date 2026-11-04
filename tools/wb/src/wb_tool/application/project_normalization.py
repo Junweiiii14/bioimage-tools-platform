@@ -39,12 +39,23 @@ class NormalizationSource(DocumentIO):
         return self
 
 
+class SampleIdentity(DocumentIO):
+    """Explicit experimental identity; never infer independent n or aggregate measurements."""
+
+    schema_version: Literal[1] = 1
+    experiment_id: str = Field(default="", max_length=128)
+    group: str = Field(default="", max_length=128)
+    biological_replicate: str = Field(default="", max_length=128)
+    technical_replicate: str = Field(default="", max_length=128)
+
+
 class SamplePair(DocumentIO):
     target_lane: int = Field(ge=1, le=96)
     sample: str = Field(default="", max_length=128)
     reference_lane: int | None = Field(default=None, ge=1, le=96)
     included: bool = True
     control: bool = False
+    identity: SampleIdentity | None = Field(default=None, exclude_if=lambda value: value is None)
 
 
 class NormalizationPlan(DocumentIO):
@@ -108,9 +119,11 @@ def project_with_normalizations(
     )
 
 
-def normalization_source(row: FigureRow) -> NormalizationSource:
-    if not row.source or not row.roi or not row.reviewed:
-        raise ValueError("请先审核目标和参照原图的裁剪行")
+def normalization_source(project: WBFigureProject, row: FigureRow) -> NormalizationSource:
+    from wb_tool.application.automatic import row_is_ready
+
+    if not row.source or not row.roi or not row_is_ready(project, row):
+        raise ValueError("目标和参照需要当前有效的原图裁剪，请完成自动定位或修正范围")
     return NormalizationSource(
         row_id=row.row_id, source_sha256=row.source.sha256, crop=row.roi, lane_count=row.lane_count
     )
@@ -124,8 +137,8 @@ def make_normalization_plan(
         raise ValueError("请选择已有目标和参照行")
     target, reference = rows[target_id], rows[reference_id]
     return NormalizationPlan(
-        target=normalization_source(target),
-        reference=normalization_source(reference),
+        target=normalization_source(project, target),
+        reference=normalization_source(project, reference),
         kind=kind,
         pairs=tuple(
             SamplePair(target_lane=i, included=i not in target.empty_lanes)
@@ -135,12 +148,14 @@ def make_normalization_plan(
 
 
 def normalization_is_current(project: WBFigureProject, plan: NormalizationPlan) -> bool:
+    from wb_tool.application.automatic import row_is_ready
+
     rows = {r.row_id: r for r in project.rows}
     for source in (plan.target, plan.reference):
         row = rows.get(source.row_id)
-        if row is None or not row.reviewed or row.source is None or row.roi is None:
+        if row is None or not row_is_ready(project, row) or row.source is None or row.roi is None:
             return False
-        if normalization_source(row) != source:
+        if normalization_source(project, row) != source:
             return False
     return True
 
@@ -169,6 +184,11 @@ class NormalizedCell:
     control_samples: tuple[str, ...] = ()
     ocr_row_id: str = ""
     algorithm_id: str = NORMALIZATION_ALGORITHM
+    experiment_id: str = ""
+    group: str = ""
+    biological_replicate: str = ""
+    technical_replicate: str = ""
+    identity_status: str = "incomplete"
 
 
 @dataclass(frozen=True)
@@ -282,7 +302,22 @@ def fill_project_normalization(
                 measured.get((plan.reference.row_id, pair.reference_lane))
                 if pair.reference_lane
                 else None,
+                experiment_id=pair.identity.experiment_id if pair.identity else "",
+                group=pair.identity.group if pair.identity else "",
+                biological_replicate=pair.identity.biological_replicate if pair.identity else "",
+                technical_replicate=pair.identity.technical_replicate if pair.identity else "",
             )
+            if all(
+                value.strip()
+                for value in (
+                    cell.sample,
+                    cell.experiment_id,
+                    cell.group,
+                    cell.biological_replicate,
+                    cell.technical_replicate,
+                )
+            ):
+                cell = replace(cell, identity_status="specified")
             cells.append(_ratio(cell, plan, pair, current))
         values.extend(_controls(tuple(cells), plan.control_mode))
     ocr_cells: list[NormalizedCell] = []

@@ -19,6 +19,8 @@ See `../../docs/contracts/wb-intake-crop-v1.md` and `../../work/tasks/T-056-fixe
 
 # WB 数值核心
 
+P011：当前结果页的样本对应入口调用 `make_normalization_plan` / `project_with_normalizations`，来源就绪复用已有机器裁图证据；`SampleIdentity` 保存显式实验/处理组/生物与技术重复，`export_project_normalization` 保留逐配对身份和失败状态，`read_figure_project` 重开。见[身份扩展契约](../../docs/contracts/wb-sample-identity-v1.md)，验收状态见P011；不自动统计或推断独立样本。
+
 T082：公共TIFF读取及原值裁剪重读使用`tiff_resource_admission@1`的解码前资源准入，默认3200万像素/2GiB估算缓冲预算，可通过进程环境配置；定量公式、原图位深及历史schema保持。依据、配置及兼容边界见[TIFF资源准入v1](../../docs/contracts/wb-tiff-resource-admission-v1.md)。
 
 T072 adds versioned `intake_crop@2` geometry acceptance for explicitly started whole

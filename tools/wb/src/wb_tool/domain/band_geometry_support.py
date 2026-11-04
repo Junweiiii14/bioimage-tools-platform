@@ -3,7 +3,7 @@
 These helpers do not choose a detection policy or read/write image files.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from math import ceil, cos, floor, sin, tan
 
 import numpy as np
@@ -255,4 +255,42 @@ def sampling_rectangles(
         if not np.all(inside):
             raise ValueError("common_sampling_outside_membrane")
         result.append(LaneROI(lane.lane_id, x0, y0, x1, y1))
+    return tuple(result)
+
+
+def bounded_background_limits(
+    lanes: tuple[LaneROI, ...],
+    crop: LaneROI,
+    plane: DetectionPlane,
+    excluded: NDArray[np.bool_],
+) -> tuple[LaneROI, ...]:
+    """bounded_background_context@1: contiguous, source-coordinate context.
+
+    Keep the selected target unchanged. Only permit the existing anchored
+    method's maximum 25% Y expansion within the crop and valid detection field,
+    stopping before any other labelled signal. Detection arrays never enter
+    integration; they constrain where original pixels may be sampled.
+    """
+    c, s = cos(plane.angle), sin(plane.angle)
+    valid = plane.valid.astype(np.float64)
+    excluded_values = excluded.astype(np.float64)
+    result: list[LaneROI] = []
+    for lane in lanes:
+        pad = max(1, ((lane.y1 - lane.y0) * 25 + 50) // 100)
+        top, bottom = max(crop.y0, lane.y0 - pad), min(crop.y1, lane.y1 + pad)
+        yy, xx = np.mgrid[top:bottom, lane.x0 : lane.x1]
+        px = (xx - plane.origin_x) * c + (yy - plane.origin_y) * s
+        py = -(xx - plane.origin_x) * s + (yy - plane.origin_y) * c
+        inside = ndi.map_coordinates(valid, [py, px], order=0, mode="constant") > 0
+        other = ndi.map_coordinates(excluded_values, [py, px], order=0, mode="constant") > 0
+        unsafe = (~inside | other).any(axis=1)
+        above = np.flatnonzero(unsafe[: lane.y0 - top])
+        below = np.flatnonzero(unsafe[lane.y1 - top :])
+        result.append(
+            replace(
+                lane,
+                y0=top + int(above[-1]) + 1 if len(above) else top,
+                y1=lane.y1 + int(below[0]) if len(below) else bottom,
+            )
+        )
     return tuple(result)

@@ -382,6 +382,10 @@ def test_actual_web_forms_save_reopen_and_export(
         for i in range(3):
             field(f"plans.0.pairs.{i}.sample", f"sample-{i + 1}")
             field(f"plans.0.pairs.{i}.reference_lane", i + 1)
+            field(f"plans.0.pairs.{i}.identity.experiment_id", "experiment-1")
+            field(f"plans.0.pairs.{i}.identity.group", "control" if i == 0 else "treated")
+            field(f"plans.0.pairs.{i}.identity.biological_replicate", f"animal-{i + 1}")
+            field(f"plans.0.pairs.{i}.identity.technical_replicate", "measurement-1")
         js("document.querySelector('[data-adv-path=\"plans.0.confirmed\"]').click()")
         click("normalization_apply")
         completed()
@@ -396,6 +400,17 @@ def test_actual_web_forms_save_reopen_and_export(
         saved = host.view.project()
         assert isinstance(saved, WBNormalizedProject)
         assert saved.normalizations[0].confirmed and host.current_draft_saved
+        identity = saved.normalizations[0].pairs[0].identity
+        assert identity and identity.experiment_id == "experiment-1"
+        assert identity.biological_replicate == "animal-1"
+        assert "text:animal-1" in norm_path.read_text(encoding="utf-8-sig")
+        click("tables_refresh")
+        completed()
+        assert "已填写" in str(
+            javascript(window, qtbot, "document.querySelector('[data-derived-table]').textContent")
+        )
+        qtbot.wait(150)  # Let the native compositor present the new form before capture.
+        assert window.grab().save(str(tmp_path / "sample-identity.png"))
         js("closeDrawer()")
         host.load_document(saved.project_id)
         qtbot.waitUntil(lambda: not host.operation_busy, timeout=20000)

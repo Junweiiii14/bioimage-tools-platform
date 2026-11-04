@@ -310,6 +310,7 @@ class NormalizationPanel(QWidget):
                     reference_lane=int(raw) if raw else None,
                     included=included.checkState() == Qt.CheckState.Checked,
                     control=control.checkState() == Qt.CheckState.Checked,
+                    identity=original.identity,
                 )
             )
         kind, mode = self.relationship_kind.currentData(), self.mode.currentData()
