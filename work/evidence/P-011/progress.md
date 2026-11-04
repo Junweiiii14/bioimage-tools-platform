@@ -39,3 +39,11 @@ PR60 Ubuntu foundation已SUCCESS，Windows仍运行；PR61的规则和desktop已
 PR60 head35cfe0b，Actions41834236478：Windows foundation成功（1702 passed/10 warnings，1488.73秒），Ubuntu foundation成功（1698 passed/4既有平台skip/10 warnings，989.54秒）；随后各自隔离wheel与其余check--all均成功，desktop-environment成功。规则检查仍因阶段清单冲突失败，按PR61前置处理。e349b2e仅修正测试入口与等待，待后续最终HEAD重新CI；不把35cfe检查写成覆盖未推送提交。
 
 CDP捕获当前实际WebEngine画面，而非Qt grab缓存：e349b2e的当前入口三例在临时本地捕获探针下3 passed/30.62秒；单图补拍滚动位置1 passed/12.48秒，exit0。visual/capture.json记录来源与SHA，3张原始PNG未经图像修改。已查看：配对、实验/处理组/生物/技术身份、5行比值/相对值1与导出入口均显示完整。QtWebSocket初始化打印原生异常0xc0000139但进程完成exit0，原因未定位；这属于捕获工具环境限制，不声明干净原生环境已通过。真实学生试用仍未验。
+
+## 独立审查发现与修复（4dcd41e）
+
+用户明确允许只读子代理后，p011_independent_review审查87dba64..7e875d1，发现P2：seed()中的pair.identity共享已保存快照对象，保存后再次编辑、撤销重读失败时，可意外持久化已撤销组别。Node直接提取真实seed复现cachedServer与discardDraft均变为UNSAVED。已在4dcd41e深拷贝身份，未改变保存协议或科学公式。
+
+真实网页回归先在旧代码确认失败（group为discarded-group而非control，exit1），修复后保留control；重命名sample会按既有规则取消confirmed，测试补真实确认点击，不放宽保护。最终tests/test_workbench_advanced.py两例通过9.52秒exit0（Windows/锁环境，offscreen、--disable-gpu、PYTHONUTF8=1）；pyright、npm check:web、Ruff及提交钩子通过。首轮提交被ruff格式拒绝，格式化后通过；没有改测试期望、超时或门禁。
+
+7e875d1的rules-context与desktop成功，双平台41839649342仍运行；新产品修复需最终HEAD重新CI，不继承旧检查。绑定4dcd41e的独立复审通过：Node反例关闭，真实网页1 passed/8.42s；完整记录见independent-review.md。
