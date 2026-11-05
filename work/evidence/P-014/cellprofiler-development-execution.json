@@ -1,0 +1,19 @@
+{
+  "command": [
+    "C:/Program Files/CellProfiler/CellProfiler.exe",
+    "-c",
+    "-r",
+    "-p",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p014-research\\nuclei-development.cppipe",
+    "-i",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p014-research\\dataset\\rawimages",
+    "-o",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p014-research\\cp-development-01",
+    "-d",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p014-research\\cp-development-01\\done.txt",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p014-research\\cp-development-01\\measurements.h5"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 5.429979600012302,
+  "memory_measured": false
+}

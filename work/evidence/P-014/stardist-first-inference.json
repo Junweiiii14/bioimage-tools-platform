@@ -1,0 +1,16 @@
+{
+  "tensorflow": "2.21.0",
+  "model": "2D_versatile_fluo",
+  "count": 409,
+  "prediction_seconds": 1.203312600031495,
+  "shape": [
+    914,
+    1225
+  ],
+  "dtype": "int32",
+  "normalization": "csbdeep.utils.normalize defaults",
+  "n_tiles": [
+    2,
+    2
+  ]
+}

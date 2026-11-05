@@ -18,3 +18,5 @@
 ## 当前状态
 
 查重无P014。干净树从6868b06建立codex/p014-mature-nuclei-methods，合入最新main cddf759；squash产生6份旧交接冲突，核验main与887fd53树相同、差异仅P013较新收尾后保留本地，合并00bce42。469152c/6868b06收据保留，产品不变。P014 context及登记已完成。已真实运行官方CellProfiler 4.2.8 Human示例（原pipeline不改），退出0、Done Complete、289个核、总9.44秒；这是执行烟测，无准确率/内存结论。见official-smoke.json。已核Kromp数据CC0、完整groundtruth与抽样singlecell区别，按元数据冻结3开发/10评估图，尚未下载这些图或模型权重。下一步隔离StarDist环境、开发组配置与正式冻结。
+
+2026-11-06推进：730dd50在任何选中图下载前冻结分组。仓库外3幅开发图/完整实例GT及5.3MB权重已下载并核SHA；评估图未下载。隔离Python3.12.14、StarDist0.9.2/CSBDeep0.8.2/TensorFlowCPU2.21.0安装完成，首次真实CPU推理成功（组织开发图409核，预测1.20秒；不含启动，不作准确率结论）。CP开发配置真实运行3图成功，CSV计数与原始npy连续标签数逐一一致423/328/868；官方Experiment.csv保存了加载后DateRevision428的完整pipeline，已提取入证据。开发配置尚未最终冻结；下一步三开发图对照、参数冻结、独立进程内存监测及10评估图。无活动安装/下载/推理进程遗留。
