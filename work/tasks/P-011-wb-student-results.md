@@ -1,6 +1,6 @@
 # P-011 WB学生结果闭环
 
-<!-- PROGRAM_TASK_META {"id":"P-011","status":"in_progress","work_package":"W06","depends_on":["P-010","P-002","P-003","P-009"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex WB implementation","base_commit":"87dba64196f8591405dd222f05a69dca07434291","head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-011","status":"done","work_package":"W06","depends_on":["P-010","P-002","P-003","P-009"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex WB implementation","base_commit":"87dba64196f8591405dd222f05a69dca07434291","head_commit":"f3a7d8653151923f1432b51cd622f5933f9f73c3"} -->
 
 ## 范围
 
@@ -20,15 +20,17 @@
 - 真实当前入口保存、导出、重开一致；旧格式可读、原值/历史不覆盖。
 - 适当检查、独审及PR集成收据齐全，未验证范围如实列出。
 
-## 当前进度
+## 完成收据（2026-11-05）
 
-产品候选918af16；测试入口修正e349b2e；静态视觉证据1970937。前置调研PR61已按必需检查正常合入main87dba64，产品分支已合入该主线，P011规则及唯一集成清单已重载到准确基线。历史回执全部保留，未修改门禁。产品PR60仍为草稿，独立审查已完成，尚未合并。
+工程范围完成，PR60以准确候选f3a7d8653151923f1432b51cd622f5933f9f73c3正常merge至main8299f71a02e144bf95e9a987b4718f7fee052159。已fetch核验main与候选文件树无差异。前置调研PR61已集成；独审绑定产品4dcd41e，后续仅审查/交接文档，无产品变化。
 
-当前入口单图/三联图正例、dtype_min负例均经真实worker/归一化/导出/重开通过；原图、既存归档及run ID保持。新解析面积与邻带/孔洞/裁图边界/旧wire5例通过，相关现有42例通过。visual/三张CDP原始截图已查看：配对、重复身份和五行结果显示完整。
+四项必需检查全部成功：规则41841250191；quality41841250194的Linux1698passed/4既有平台skip/10warnings，Windows第二attempt1702passed/10warnings/1178.73秒，双平台后续隔离wheel/check--all及desktop通过。native-case是既有可选诊断分支skip，不是必需门禁。首次本机5fail、Windows首attempt旧OCR关闭挂起及30分钟取消均保留，重试成功不证明其根因已解；详见[progress](../evidence/P-011/progress.md)。未改超时、质量阈值或门禁。
 
-旧PR60 head35cfe的双平台全门禁通过：Windows1702passed，Linux1698passed/4既有平台skip；隔离wheel及desktop-environment通过。本机初次全门禁1696pass/5fail完整保留，后续定位并修正测试绕过网页token、预览读取busy同步两项；定向3例通过。未改产品取消保护、超时或科学质量判据。测试修正后的最终HEAD仍需重跑服务器必需检查。详细失败/修正过程见[progress](../evidence/P-011/progress.md)。
+当前入口单图/三联图正例、dtype_min负例经真实worker/归一化/导出/重开通过；原图、既存归档及run ID保持。独审发现身份草稿共享P2，4dcd41e修复，真实旧代码先复现误存、独立复验通过；详见[independent-review](../evidence/P-011/independent-review.md)。可操作页面CDP截图为开发者静态核对，非学生试用。
 
-用户授权的只读独立审查发现身份草稿共享P2，已在4dcd41e修复并通过独立Node及真实网页复审。审查绑定base87dba64及产品HEAD4dcd41e，详见[independent-review](../evidence/P-011/independent-review.md)。旧head7e875d1规则/desktop已通过；修复后的最终HEAD仍需完整服务器必需检查及正常PR集成。科学适用性、独立学生试用、干净Windows/GPU/DPI未验；CDP工具曾打印0xc0000139但exit0，保留环境限制。
+科学适用性、独立学生试用、干净Windows/GPU/DPI尚未验证；真实样本配对/分组/重复及原软件背景口径UNKNOWN。不把合成正确或工程done写成真实科学/用户通过。完整目标逐项证据见[objective-audit](../evidence/P-011/objective-audit.md)。
+
+本段是合入后本地收据，随后续正常任务带入，不另开小文档PR或触发新一轮全量。没有安装器发布、替换在用安装、私有数据上传或其他实验实施。
 
 ## 必要的背景范围修正
 
