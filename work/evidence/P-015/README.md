@@ -15,3 +15,9 @@
 `uv.lock`只新增本地nuclei-tool成员和desktop可选nuclei额外项，现有第三方版本未变；默认没有TensorFlow/StarDist。研究依赖单独`requirements-research.txt`固定P014全版本及共享契约的Pydantic依赖，worker逐项核验、请求记录整份版本摘要。新增包进入Pyright/pytest、AST边界、Import Linter、独立wheel安装；只增加检查，无测试容差/skip/xfail/忽略放宽。窄外部stub用于类型检查，不伪造实现。
 
 临时模型快照放入现有WorkflowPreparation拥有的目录；退出确认、取消仲裁、候选资产校验和事务提交沿用现有WorkflowSession/RunSession/AsyncStorage/Workspace。平台与WB源码不加入核分割语义；仅桌面明确注册和独立CLI。
+
+## 首轮全仓失败与定向核查
+
+首轮dev.py check --all退出1：1717 passed/4 failed/10已有deprecated warnings，1274.55秒。三项旧旋转canvas用例在5秒waitUntil取像素超时，伴随SKIA/GPU上下文丢失；采用现有CI同样QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu和offscreen，原三项原断言未修改，定向3 passed/5.81s/exit0。未证明物理GPU根因解决，初次失败保留。首轮执行期间有独审修复，不作为最终候选完整证明。
+
+第四项是Import Linter正例写死9条规则，本次实际增加两条规则应为11；修正预期为完整“11 kept, 0 broken”，同时为模拟图显式建立nuclei包，并新增4个跨层/跨工具/运行时的传递导入负例。原9个负例未删除，规则没有减弱；不是把失败输出改成成功。最终全量和CI将重新执行。

@@ -23,6 +23,10 @@ ROOT = Path(__file__).resolve().parents[1]
         "contracts-runtime",
         "host-tool",
         "lower-host",
+        "nuclei-storage",
+        "nuclei-adapter",
+        "runtime-nuclei",
+        "cross-tool",
     ],
 )
 def test_import_linter_rejects_transitive_dependencies(tmp_path: Path, violation: str) -> None:
@@ -38,11 +42,16 @@ def test_import_linter_rejects_transitive_dependencies(tmp_path: Path, violation
     (adapters / "__init__.py").write_text("", encoding="utf-8")
     (adapters / "tiff_input.py").write_text("VALUE = 1\n", encoding="utf-8")
     (package / "__init__.py").write_text("", encoding="utf-8")
-    for owner in ("tool_contracts", "platform_runtime", "bioimage_app"):
+    for owner in ("tool_contracts", "platform_runtime", "bioimage_app", "nuclei_tool"):
         folder = tmp_path / owner
         folder.mkdir()
         (folder / "__init__.py").write_text("", encoding="utf-8")
         (folder / "api.py").write_text("VALUE = 1\n", encoding="utf-8")
+    for layer in ("domain", "application", "adapters"):
+        folder = tmp_path / "nuclei_tool" / layer
+        folder.mkdir()
+        (folder / "__init__.py").write_text("", encoding="utf-8")
+        (folder / "entry.py").write_text("VALUE = 1\n", encoding="utf-8")
     (tmp_path / "bioimage_app" / "storage.py").write_text("VALUE = 1\n", encoding="utf-8")
     (domain / "__init__.py").write_text("", encoding="utf-8")
     (package / "api.py").write_text("from wb_tool.domain import quantify\n", encoding="utf-8")
@@ -58,8 +67,29 @@ def test_import_linter_rejects_transitive_dependencies(tmp_path: Path, violation
         "contracts-runtime": "VALUE = 1\n",
         "host-tool": "VALUE = 1\n",
         "lower-host": "VALUE = 1\n",
+        "nuclei-storage": "VALUE = 1\n",
+        "nuclei-adapter": "VALUE = 1\n",
+        "runtime-nuclei": "VALUE = 1\n",
+        "cross-tool": "VALUE = 1\n",
     }[violation]
     (domain / "bridge.py").write_text(bridge, encoding="utf-8")
+    if violation in ("nuclei-storage", "nuclei-adapter"):
+        layer = "domain" if violation == "nuclei-storage" else "application"
+        (tmp_path / "nuclei_tool" / layer / "entry.py").write_text(
+            "from nuclei_tool import bridge\n", encoding="utf-8"
+        )
+        (tmp_path / "nuclei_tool" / "bridge.py").write_text(
+            "import sqlite3\n"
+            if violation == "nuclei-storage"
+            else "from nuclei_tool.adapters import entry\n",
+            encoding="utf-8",
+        )
+    if violation in ("runtime-nuclei", "cross-tool"):
+        owner = "platform_runtime" if violation == "runtime-nuclei" else "wb_tool"
+        (tmp_path / owner / "api.py").write_text(f"from {owner} import bridge\n", encoding="utf-8")
+        (tmp_path / owner / "bridge.py").write_text(
+            "from nuclei_tool import api\n", encoding="utf-8"
+        )
     if violation == "host-tool":
         (tmp_path / "bioimage_app" / "storage.py").write_text(
             "from bioimage_app import bridge\n", encoding="utf-8"
@@ -116,4 +146,4 @@ def test_import_linter_rejects_transitive_dependencies(tmp_path: Path, violation
         check=False,
     )
     assert result.returncode == (0 if violation == "none" else 1), result.stdout + result.stderr
-    assert ("BROKEN" if violation != "none" else "Contracts: 9 kept") in result.stdout
+    assert ("BROKEN" if violation != "none" else "Contracts: 11 kept, 0 broken") in result.stdout
