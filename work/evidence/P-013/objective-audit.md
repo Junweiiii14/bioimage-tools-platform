@@ -16,4 +16,4 @@
 | 历史/授权保护 | P012最终收据完整携带；原dirty树、原图、旧安装与GUI未动；下载仅公开CC0图，不含私有上传/外联/花费/产品发布 |
 | 最终交接回传 | 阶段进度及本地/远端提交已成功回传；任务/handoff已更新并归档旧快照，最终交付与下一成熟实现方案见final-delivery；最后发送结果以任务卡回执为准 |
 
-当前结论：研究与准则同步均有准确提交、独审/检查及main树验证证据。PR64 quality42058419612 Windows1703passed、Linux1699passed/4既有skip及后续wheel/check--all全通过，rules/desktop成功，未重试或改门禁。仅最终交接发送回执须在关闭goal前确认。研究完成不关闭科学、学生试用或目标机未验边界。
+当前结论：研究与准则同步均有准确提交、独审/检查及main树验证证据。PR64 quality42058419612 Windows1703passed、Linux1699passed/4既有skip及后续wheel/check--all全通过，rules/desktop成功，未重试或改门禁。最终验收及下一项方案已成功发送上游，返回目标threadId、isError=false，任务与snapshot已写回回执，全部本轮要求已完成。研究完成不关闭科学、学生试用或目标机未验边界。

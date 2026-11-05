@@ -18,7 +18,7 @@
 
 研究及用户追加的库内准则同步已完成。活动树bioimage-plan-sync、分支codex/p013-algorithm-reuse-plan。PR63候选4ebb14d合入d85c3e5，PR64候选887fd53合入main cddf759d20368f10e3ea1d447503dcc3cf3740ea；两次fetch均核验候选与合入文件树一致。两PR的Windows1703passed、Linux1699passed/4既有skip，以及双平台wheel/check--all、rules/desktop全部通过，无重试/门禁变化。探针独审476b47e通过。完整命令、环境、结果、未验边界及下一项见[最终交付](../evidence/P-013/final-delivery.md)和[完成审计](../evidence/P-013/objective-audit.md)。
 
-主方案第5节、开发流程第3节及同名HTML已经在远端main，不是仅本地修改。仅研究/文档，无产品或正式依赖变更；真实学生/科学准入/目标机未验。后续优先直接调用成熟实现及核对训练泄漏，不堆简易基线补丁。最终上游回传待本轮交接发送后记回执；不阻塞已完成的工程/研究事实。收尾记录随下一正常任务带入。
+主方案第5节、开发流程第3节及同名HTML已经在远端main，不是仅本地修改。仅研究/文档，无产品或正式依赖变更；真实学生/科学准入/目标机未验。后续优先直接调用成熟实现及核对训练泄漏，不堆简易基线补丁。最终验收及下一成熟实现方案已通过send_message_to_thread成功送达上游01a19bfd-f3ab-7502-86da-9f61953d1c8a（返回该threadId，isError=false）；由上游连续接续，不等用户催促。收尾记录随下一正常任务带入。
 
 ## 用户纠偏与后续接续
 

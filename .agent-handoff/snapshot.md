@@ -6,6 +6,6 @@ PR63研究合入d85c3e5，PR64正式MD/HTML准则合入main cddf759，两次候�
 
 研究只运行scikit-image基线，未运行CellProfiler/StarDist/Cellpose。test最差计数误差71.01%，没有科学准入或IF强度/全细胞验证。主方案第5节、开发流程第3节及同名HTML已明确成熟实现优先、先检索/实测再自研，适用所有实验模块/算法研发Agent。
 
-下一步：最终回传上游01a19bfd-f3ab-7502-86da-9f61953d1c8a（local），由上游在授权范围连续派发，不等用户催促。优先真实调用CellProfiler官方pipeline，再按固定版本/代码与权重许可/CPU成本选少量成熟候选；先排查BBBC038/039/DSB2018及预训练数据重叠，再定未见留出。来源入口见P013/plan-amendment。已见12test只作诊断。
+最终验收和下一步方案已成功送达上游01a19bfd-f3ab-7502-86da-9f61953d1c8a（local），工具返回该threadId。下一步由上游在授权范围连续派发，不等用户催促。优先真实调用CellProfiler官方pipeline，再按固定版本/代码与权重许可/CPU成本选少量成熟候选；先排查BBBC038/039/DSB2018及预训练数据重叠，再定未见留出。来源入口见P013/plan-amendment。已见12test只作诊断。
 
 P012/历史科学、真人学生、干净Windows/GPU未验仍保留，见risks/backlog及各任务final-delivery。旧快照完整保留在archive/P013-before-closeout-snapshot.md；P012收据已随PR63入main。

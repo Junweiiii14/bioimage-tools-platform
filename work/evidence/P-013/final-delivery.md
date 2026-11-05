@@ -23,3 +23,5 @@
 准则正式位置：主方案第5节 `docs/plans/research-platform-rd.md/.html`、开发流程第3节 `docs/plans/workflow-development.md/.html`。适用于后续所有实验模块及算法研发Agent；不增加审批表或逐节点用户确认。保留科学/学生/目标机旧缺项，不因本研究关闭。
 
 上游目标：01a19bfd-f3ab-7502-86da-9f61953d1c8a（local）。本文件为最终回传依据，交接发送结果在任务卡记录。合入后状态收据本地提交随下一正常任务带入，不为更新“已合入”再重复开PR。
+
+最终送达确认：send_message_to_thread返回目标threadId且isError=false，正式验收、main提交、验证证据、未验边界和下一成熟实现任务范围均已送达。任务与snapshot已记录，不再停在“待回传”。
