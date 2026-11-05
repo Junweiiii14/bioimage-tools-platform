@@ -61,6 +61,10 @@
     {
       "id": "P-014",
       "path": "work/tasks/P-014-mature-nuclei-methods.md"
+    },
+    {
+      "id": "P-015",
+      "path": "work/tasks/P-015-nuclei-research-adapter.md"
     }
   ],
   "work_packages": [
@@ -149,7 +153,11 @@
         "W06",
         "W14"
       ],
-      "task_ids": ["P-013", "P-014"]
+      "task_ids": [
+        "P-013",
+        "P-014",
+        "P-015"
+      ]
     },
     {
       "id": "W08",

@@ -186,3 +186,7 @@ ed830e1准确完整门禁1503 passed/756.15s+全部isolated wheels/exit0，HEAD/
 ## 2026-11-06 P013验收
 
 PR63 quality42053261398：Windows1703pass/1378.01s、Linux1699pass/4旧skip/975.19s；PR64 quality42058419612：Windows1703pass/1480.53s、Linux1699pass/4旧skip/939.54s，均10warnings；双平台后续wheel/check--all及rules/desktop成功。探针15图、重复CSV一致、独立30行评价、Ruff/policy/context、HTML构建/链接/22本地链接与容量检查通过。首次探针失败/警告及科学未验边界见P013/README、final-delivery。
+
+## 2026-11-06 P014最终验收
+
+候选c86e3db，quality42071385491 success：Windows1703passed/10warnings/1402.35s，Linux1699passed/4既有skip/10warnings/998.77s；两平台check --all及wheel、desktop通过。rules42071385465 success，精确HEAD一致。PR65 main07838c2与候选diff退出0。实验20行实例指标独审9ffa327复算一致，fd88b76增量复审通过；研究输入/模型SHA脚本exit0。真实失败/取消及未验边界见P014/final-delivery。

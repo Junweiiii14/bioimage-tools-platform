@@ -1,6 +1,6 @@
 # P-014 成熟2D荧光核计数实现直接调用与对照
 
-<!-- PROGRAM_TASK_META {"id":"P-014","status":"in_progress","work_package":"W07","depends_on":["P-013"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex mature-method research","base_commit":"cddf759d20368f10e3ea1d447503dcc3cf3740ea","head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-014","status":"done","work_package":"W07","depends_on":["P-013"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex mature-method research","base_commit":"cddf759d20368f10e3ea1d447503dcc3cf3740ea","head_commit":"c86e3db4832891d56f33b87178ccdec33bf8c0aa"} -->
 
 ## 授权与范围
 
@@ -26,3 +26,15 @@
 PR65已建立。首轮rules-context 42070466193失败“Integration needs exactly one changed integration context”：b882重载P013时也改了其旧集成清单，导致两份当前清单差异。修复为恢复P013已在main验收的canonical integration-context原文，将本次重载清单完整复制保留于P014/p013-reload-integration-context.json；P013真实重载rules-context及P014历史来源校验保持，不删除回执、不改门禁。此修复独立说明并纳入增量独审。
 
 独审收尾：9ffa327独立逐实例IoU核对20行一致；两项P3文档修正后fd88b76增量复审通过，含历史清单逐字节保留与规则校验。记录见independent-review.md。后续提交仅记录审查/目标审计，不改变被审实验代码/参数/数值。PR65最终远端CI仍待通过，未集成。
+
+最终候选c86e3db已推PR65，规则CI42071385465成功；quality42071385491 pending，精确HEAD一致。旧候选质量运行42070466221仅请求取消（被新候选替代），不计为通过。目标仍in_progress，待最终必需CI、main集成与上游回传。
+
+CI跟踪：42071385491的desktop-environment已成功，Windows/Linux当前执行check --all，监测session41138活跃；旧42070466221已确认cancelled终态。仍未合并，不把在跑检查写成通过。
+
+等待CI期间已向既定上游发送阶段结果、PR65和下一最小范围，工具返回目标threadId且isError=false；消息明确尚未最终验收，只供上游预备接续。正式合并后验收回传仍未完成。最新核验最终quality42071385491双平台仍in_progress，无新失败；保持同一监测session41138。
+
+## 最终验收
+
+PR65已合入main07838c293390b0ce209b9c1500d49d734bc393a6（2026-11-05T17:35:40Z），与c86e3db树一致；最终quality42071385491/rules42071385465全部必需检查通过，详见final-delivery。工作树实际合入main为58ad6c7后再加载收尾回执，避免squash祖先问题；旧回执保留Git，不把收尾记录当新产品验收。
+
+已正式回传指定上游01a19bfd-f3ab-7502-86da-9f61953d1c8a（local），发送工具返回该threadId且isError=false，包含main/PR/CI/独审、结果边界与下一最小范围，并要求按用户授权自动接续派发。实验、独审、正常集成、记录和回传条件均达成；后续任务按上游派发恢复。

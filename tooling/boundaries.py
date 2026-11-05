@@ -11,7 +11,7 @@ from pathlib import Path
 MODULES: dict[str, tuple[str, frozenset[str]]] = {
     "bioimage_app": (
         "apps/desktop/src",
-        frozenset({"tool_contracts", "platform_runtime", "desktop_sdk", "wb_tool"}),
+        frozenset({"tool_contracts", "platform_runtime", "desktop_sdk", "wb_tool", "nuclei_tool"}),
     ),
     "tool_contracts": ("packages/tool_contracts/src", frozenset()),
     "platform_runtime": ("packages/platform_runtime/src", frozenset({"tool_contracts"})),
@@ -21,6 +21,7 @@ MODULES: dict[str, tuple[str, frozenset[str]]] = {
         "packages/imaging_ui/src",
         frozenset({"imaging_core", "desktop_sdk", "tool_contracts"}),
     ),
+    "nuclei_tool": ("tools/nuclei/src", frozenset({"tool_contracts"})),
     "wb_tool": (
         "tools/wb/src",
         frozenset({"tool_contracts", "imaging_core", "desktop_sdk", "imaging_ui"}),
