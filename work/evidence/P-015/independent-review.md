@@ -28,3 +28,7 @@
 ### 最终产品增量结论：a490d2ed293953d6e0560b9e7a426d113e711d56
 
 独立复审通过，无新增问题。独立运行tests/test_nuclei_host.py：3 passed/1.93s/exit0。解释器absolute入口保留venv及is_file验证，sys.prefix实际子进程和研究依赖错误断言有效。未修改文件或重跑模型；先前方法/数值审查继续适用，Linux实际符号链接路径留待最终CI。本结论之后的收据提交仅文档/交接，不改被审产品、测试或门禁。
+
+## 门禁测试增量：95ecb029c467159cceead47c3ec1bbdbcad5bbae
+
+独立审查通过，无新增问题。11 kept/0 broken与实际11条契约一致，正例继续要求exit0；四个新负例均经中间bridge构成传递依赖，使用真实.importlinter/独立临时包/--no-cache，原9个负例全部保留。独立运行tests/test_import_contracts.py：14 passed/3.71s/exit0。产品和规则未变；证据保留首次全仓失败且未把GPU设置定向复验当根因修复。没有重跑GUI、模型或全仓。

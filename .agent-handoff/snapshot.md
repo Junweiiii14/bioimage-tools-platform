@@ -1,6 +1,6 @@
 # 当前恢复入口
 
-当前任务[P015核分割研究适配器](../work/tasks/P-015-nuclei-research-adapter.md)，活动树bioimage-plan-sync，分支codex/p015-nuclei-research-adapter。已实现独立工具/显式CLI及既有WorkflowSession接线；21新增用例与14真实模型进程场景已通过，证据见P015/real-regression.json。全仓检查正在执行；最终产品独审a490d2e已通过；下一步最终CI和正常PR66集成，再验收回传上游自动派发。原dirty树/GUI/安装不碰；科学边界不关闭。
+当前任务[P015核分割研究适配器](../work/tasks/P-015-nuclei-research-adapter.md)，活动树bioimage-plan-sync，分支codex/p015-nuclei-research-adapter。已实现独立工具/显式CLI及既有WorkflowSession接线；21新增用例与14真实模型进程场景已通过，证据见P015/real-regression.json。首次全量4项失败已分别修正/定向核验，门禁测试增量95ecb02独审通过；最终全仓正在同CI渲染设置执行；最终产品独审a490d2e已通过；下一步最终CI和正常PR66集成，再验收回传上游自动派发。原dirty树/GUI/安装不碰；科学边界不关闭。
 
 [P014成熟核计数直接调用研究](../work/tasks/P-014-mature-nuclei-methods.md)已完成实验、独审与正常集成，最终证据见[final-delivery](../work/evidence/P-014/final-delivery.md)。PR65 main07838c293390b0ce209b9c1500d49d734bc393a6与候选c86e3db树一致；活动树bioimage-plan-sync已合入main为58ad6c7，原dirty树/GUI/安装不碰。
 
