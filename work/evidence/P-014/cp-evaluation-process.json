@@ -1,0 +1,27 @@
+{
+  "command": [
+    "C:/Program Files/CellProfiler/CellProfiler.exe",
+    "-c",
+    "-r",
+    "-p",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\work\\evidence\\P-014\\cellprofiler-frozen.cppipe",
+    "-i",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p014-research\\evaluation-input",
+    "-o",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p014-research\\cp-evaluation",
+    "-d",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p014-research\\cp-evaluation\\done.txt"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 9.580422300030477,
+  "sampled_tree_peak_rss_bytes": 421621760,
+  "sample_interval_seconds": 0.05,
+  "samples": 148,
+  "observed_pids": [
+    21804,
+    35172,
+    49684,
+    55552
+  ],
+  "memory_definition": "Maximum sampled sum of live process-tree RSS; may miss brief peaks; shared pages may be counted more than once. Observer excluded."
+}

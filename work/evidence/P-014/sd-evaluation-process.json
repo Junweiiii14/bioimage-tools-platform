@@ -1,0 +1,23 @@
+{
+  "command": [
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p014-research\\stardist-venv\\Scripts\\python.exe",
+    "work\\evidence\\P-014\\run_stardist.py",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p014-research",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p014-research\\sd-evaluation",
+    "--group",
+    "evaluation",
+    "--scale",
+    "0.5"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 12.71879600000102,
+  "sampled_tree_peak_rss_bytes": 535674880,
+  "sample_interval_seconds": 0.05,
+  "samples": 195,
+  "observed_pids": [
+    3196,
+    20784,
+    30920
+  ],
+  "memory_definition": "Maximum sampled sum of live process-tree RSS; may miss brief peaks; shared pages may be counted more than once. Observer excluded."
+}

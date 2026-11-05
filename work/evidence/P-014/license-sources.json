@@ -1,0 +1,20 @@
+[
+  {
+    "component": "cellprofiler",
+    "source": "https://raw.githubusercontent.com/CellProfiler/CellProfiler/v4.2.8/LICENSE",
+    "sha256": "40b59a052ee4022a18c7b3e624d5c0309698f0d38370501a83ad189545aecb3d",
+    "license": "BSD-3-Clause"
+  },
+  {
+    "component": "stardist",
+    "source": "https://raw.githubusercontent.com/stardist/stardist/0.9.2/LICENSE.txt",
+    "sha256": "c279e190706f46dd920854b64d0d823a33be1981c187f581eb432b273f797492",
+    "license": "BSD-3-Clause"
+  },
+  {
+    "component": "stardist-models",
+    "source": "https://raw.githubusercontent.com/stardist/stardist-models/ff53277eb2adbd4b8b25cc37c4c4c68496ca216b/LICENSE.txt",
+    "sha256": "d413591c8a0507f0f190c5e83addd7e147b25e064ce439d2d18bc80d865cb50f",
+    "license": "BSD-3-Clause"
+  }
+]

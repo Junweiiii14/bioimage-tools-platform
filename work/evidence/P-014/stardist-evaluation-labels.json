@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Ganglioneuroblastoma_10_labels.npy",
+    "sha256": "628e50bf8273f78f15cc104a6650ed18fe41223315d90e57cc6be5dbb5c0eaed"
+  },
+  {
+    "name": "Ganglioneuroblastoma_4_labels.npy",
+    "sha256": "5f45cd69fe1eca098b8bdb79ac82381dfcb0fee03259762656cafa0b72a74d15"
+  },
+  {
+    "name": "Neuroblastoma_13_labels.npy",
+    "sha256": "393afbc341cc7adbe2ba8c33c7e93456f43fd1adfb6cd03ce85843a95acc5086"
+  },
+  {
+    "name": "Neuroblastoma_15_labels.npy",
+    "sha256": "419dfaad510f15b4992d5f25e0ab08b65c2ad7cd814b302301e29809ee6b6b42"
+  },
+  {
+    "name": "normal_26_labels.npy",
+    "sha256": "b0b6ce92877596fce8015ddfe9ed0e6e343afbc6bfe0aca20728edd0ca4ad5e1"
+  },
+  {
+    "name": "normal_28_labels.npy",
+    "sha256": "d30e90b3344d6e4177e46ac46e0ae6c006cbb9bb880a5403fb7b6490fd9d41f6"
+  },
+  {
+    "name": "normal_34_labels.npy",
+    "sha256": "c957772f03886c93534796713fe8b0f0596178532888cb4f9416e3816fd5839a"
+  },
+  {
+    "name": "otherspecimen_0_labels.npy",
+    "sha256": "21e99128b680087a09a5f3316f38d9a4d44456ffb5c9d20b6cde618f86832d7c"
+  },
+  {
+    "name": "otherspecimen_2_labels.npy",
+    "sha256": "f1d8116f27fe137bbaba5c984a6eb9c5984dbaeb46022beb84a80183bdd53172"
+  },
+  {
+    "name": "otherspecimen_5_labels.npy",
+    "sha256": "dba93813a090d58508a11eb811532e6e7c325637603099aa0ab8ff78ca4ad975"
+  }
+]

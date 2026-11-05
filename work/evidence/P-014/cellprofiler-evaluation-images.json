@@ -1,0 +1,122 @@
+[
+  {
+    "image": "Ganglioneuroblastoma_10",
+    "image_number": 1,
+    "count": 73,
+    "labels_sha256": "1c0553f661188668d6108df13b303e0b62a36fff25819c0537acf3a3d6037e90",
+    "shape": [
+      1024,
+      1360
+    ],
+    "dtype": "int32",
+    "sum_module_wall_seconds": 0.7000000000000001
+  },
+  {
+    "image": "Ganglioneuroblastoma_4",
+    "image_number": 2,
+    "count": 392,
+    "labels_sha256": "ca03e57e99a3f51051067c9c08474dbf66b41e7f6a3db6c7738510b812b32a0b",
+    "shape": [
+      914,
+      1225
+    ],
+    "dtype": "int32",
+    "sum_module_wall_seconds": 0.67
+  },
+  {
+    "image": "Neuroblastoma_13",
+    "image_number": 3,
+    "count": 212,
+    "labels_sha256": "2011a5d2e193c6cf6a2b1270d4a878ceb53eed78a46fcb3e33364f9defe2be96",
+    "shape": [
+      1024,
+      1280
+    ],
+    "dtype": "int32",
+    "sum_module_wall_seconds": 0.5800000000000001
+  },
+  {
+    "image": "Neuroblastoma_15",
+    "image_number": 4,
+    "count": 806,
+    "labels_sha256": "cb0aebab3b38cb0f0453dbf51aeebc9b293fc137c88e028697480bb7a9c61585",
+    "shape": [
+      1024,
+      1280
+    ],
+    "dtype": "int32",
+    "sum_module_wall_seconds": 0.74
+  },
+  {
+    "image": "normal_26",
+    "image_number": 5,
+    "count": 960,
+    "labels_sha256": "75103e99b8375eb5d11d94beb7a46126f0b2cc69dcbfc85ad0c37f15e6f28f68",
+    "shape": [
+      1024,
+      1280
+    ],
+    "dtype": "int32",
+    "sum_module_wall_seconds": 0.66
+  },
+  {
+    "image": "normal_28",
+    "image_number": 6,
+    "count": 511,
+    "labels_sha256": "c4fbe14f2881251174127aca10402cc950a7ac739c62f82a64a8290bbe19309d",
+    "shape": [
+      1024,
+      1280
+    ],
+    "dtype": "int32",
+    "sum_module_wall_seconds": 0.6000000000000001
+  },
+  {
+    "image": "normal_34",
+    "image_number": 7,
+    "count": 827,
+    "labels_sha256": "213eda50f7c3396351476e96ef850f8616a23ec0e382e8fb62c7de5fc364e5e3",
+    "shape": [
+      1024,
+      1360
+    ],
+    "dtype": "int32",
+    "sum_module_wall_seconds": 0.6000000000000001
+  },
+  {
+    "image": "otherspecimen_0",
+    "image_number": 8,
+    "count": 390,
+    "labels_sha256": "a530385f5cdc734ee22639bffedc744840ab1b6611505242b24aaf744d358192",
+    "shape": [
+      1024,
+      1280
+    ],
+    "dtype": "int32",
+    "sum_module_wall_seconds": 0.5700000000000001
+  },
+  {
+    "image": "otherspecimen_2",
+    "image_number": 9,
+    "count": 639,
+    "labels_sha256": "4bb8448dc163df026d7b8e6ac6f6470fc55c3681ee77374e93fbd5b596fcd6ca",
+    "shape": [
+      1024,
+      1280
+    ],
+    "dtype": "int32",
+    "sum_module_wall_seconds": 0.7500000000000001
+  },
+  {
+    "image": "otherspecimen_5",
+    "image_number": 10,
+    "count": 738,
+    "labels_sha256": "b00a39c9a85d6758dc5422cfc60734a70ee3cca046c18f9375fce33a12a27e74",
+    "shape": [
+      1024,
+      1024
+    ],
+    "dtype": "int32",
+    "sum_module_wall_seconds": 0.49
+  }
+]

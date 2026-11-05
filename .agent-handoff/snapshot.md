@@ -1,6 +1,6 @@
 # 当前恢复入口
 
-当前任务[P014成熟核计数方法直接调用](../work/tasks/P-014-mature-nuclei-methods.md)，已接上游明确派发并创建新goal，分支codex/p014-mature-nuclei-methods。main cddf759已合入00bce42；P013历史回执祖先问题已真实重载并单独提交b882b8e，P014 context成功。CellProfiler 4.2.8官方Human示例已真实成功执行，289核、9.44秒，仅执行烟测。Kromp元数据已核并冻结3开发/10评估图（dataset-plan.json），730dd50冻结后已下载3开发图和权重，10评估图未下载。CP开发3图与StarDist首图CPU均真实运行成功，官方加载后pipeline已从Experiment.csv提取。下一步完整开发对照、参数冻结与评估内存监测；安装/下载/首次推理均终态。不自研分割，不碰产品依赖与旧dirty树。
+当前任务[P014成熟核计数方法直接调用](../work/tasks/P-014-mature-nuclei-methods.md)，已接上游明确派发并创建新goal，分支codex/p014-mature-nuclei-methods。main cddf759已合入00bce42；P013历史回执祖先问题已真实重载并单独提交b882b8e，P014 context成功。CellProfiler 4.2.8官方Human示例已真实成功执行，289核、9.44秒，仅执行烟测。Kromp元数据已核并冻结3开发/10评估图（dataset-plan.json），730dd50冻结后已下载3开发图和权重，10评估图未下载。CP开发3图与StarDist首图CPU均真实运行成功，官方加载后pipeline已从Experiment.csv提取。1866b47/687e34a冻结配置后10评估图两方法均成功；20行指标/内存时间已归档。SD平均F1 0.8600，仍有最差计数误差38.46%。下一步候选独审、CI/PR和回传。全部实验进程终态，不重复调参或运行。不自研分割，不碰产品依赖与旧dirty树。
 
 [P013第二实验研究与成熟算法准则](../work/tasks/P-013-second-experiment-discovery.md)已完成研究和集成，证据见[final-delivery](../work/evidence/P-013/final-delivery.md)。活动树bioimage-plan-sync，分支codex/p013-algorithm-reuse-plan；原bioimage-tools-platform dirty树/旧GUI与安装不碰。
 

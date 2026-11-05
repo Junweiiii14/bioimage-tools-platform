@@ -1,0 +1,122 @@
+[
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/groundtruth/Ganglioneuroblastoma_10.tif",
+    "path": "dataset/groundtruth/Ganglioneuroblastoma_10.tif",
+    "bytes": 2785648,
+    "sha256": "ea13b60e5ef590785923e8a3288ee679b4b182ebad9ef6cfcac45e65b19bab42"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/groundtruth/Ganglioneuroblastoma_4.tif",
+    "path": "dataset/groundtruth/Ganglioneuroblastoma_4.tif",
+    "bytes": 2239668,
+    "sha256": "2d18d11e2319765cb7b5b25fe178c291f03b77b6c8f7cfc9066bf11bbb79124a"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/groundtruth/Neuroblastoma_13.tif",
+    "path": "dataset/groundtruth/Neuroblastoma_13.tif",
+    "bytes": 2621808,
+    "sha256": "6a4a25b810eb5453af7ead099296238b3587e5eabbc9484ee9de937a660b5e66"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/groundtruth/Neuroblastoma_15.tif",
+    "path": "dataset/groundtruth/Neuroblastoma_15.tif",
+    "bytes": 2621808,
+    "sha256": "2d22f93d6b3fcc7801a542356cb1cade24e9e2870d28fc6e65f075a9137082cd"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/groundtruth/normal_26.tif",
+    "path": "dataset/groundtruth/normal_26.tif",
+    "bytes": 2621808,
+    "sha256": "ffec376e0824d192c01755ee639c3749aa49b121e9cb07c06b718585ff2d700f"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/groundtruth/normal_28.tif",
+    "path": "dataset/groundtruth/normal_28.tif",
+    "bytes": 2621808,
+    "sha256": "978cfdf4312ffb024aa2aa17c4f2d9bbed1e8e4e7acdc4339acf671d0356485c"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/groundtruth/normal_34.tif",
+    "path": "dataset/groundtruth/normal_34.tif",
+    "bytes": 2785648,
+    "sha256": "4e6fbe4141810edb4f3063a5902c7ed240a0e9f5150204fc26397fef0a276475"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/groundtruth/otherspecimen_0.tif",
+    "path": "dataset/groundtruth/otherspecimen_0.tif",
+    "bytes": 2621808,
+    "sha256": "315724f7f8a591e4dac9a2f03e3d38e0b9d1eb62f0f7f8d7f5c2ca00e712466b"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/groundtruth/otherspecimen_2.tif",
+    "path": "dataset/groundtruth/otherspecimen_2.tif",
+    "bytes": 2621808,
+    "sha256": "17d54fd48b42a924f73cac9acccc031a928e06e47d5b78c5b085656483e1f247"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/groundtruth/otherspecimen_5.tif",
+    "path": "dataset/groundtruth/otherspecimen_5.tif",
+    "bytes": 2097520,
+    "sha256": "d7a04eb8233c41cea6bb5abca605cd540bfb899b6374d814f402a5790f713b73"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/rawimages/Ganglioneuroblastoma_10.tif",
+    "path": "dataset/rawimages/Ganglioneuroblastoma_10.tif",
+    "bytes": 1393214,
+    "sha256": "77f7b965733145a6edae173090ba1b9081266c708a3f141a12f8b281af640074"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/rawimages/Ganglioneuroblastoma_4.tif",
+    "path": "dataset/rawimages/Ganglioneuroblastoma_4.tif",
+    "bytes": 504152,
+    "sha256": "8a047cd3c65f66515b15e76c562d4dbf428d000e30f22272824ec1bd22b5e09d"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/rawimages/Neuroblastoma_13.tif",
+    "path": "dataset/rawimages/Neuroblastoma_13.tif",
+    "bytes": 1311278,
+    "sha256": "a0a1e82c1fc1c84f358c9764df12634a8cc74b18b710e0f06c81f912e6d611b7"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/rawimages/Neuroblastoma_15.tif",
+    "path": "dataset/rawimages/Neuroblastoma_15.tif",
+    "bytes": 1311278,
+    "sha256": "6d99d58d176b7c4134fa4548c4b240fda0e52b856391545e7d911d2c8d0db14a"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/rawimages/normal_26.tif",
+    "path": "dataset/rawimages/normal_26.tif",
+    "bytes": 1311278,
+    "sha256": "4a868853577d5ace7f772333c3e69c3ec9785fd7fcc08767c312fd091818d104"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/rawimages/normal_28.tif",
+    "path": "dataset/rawimages/normal_28.tif",
+    "bytes": 1311278,
+    "sha256": "73ae1a202a163abcf3ec67d9cdc442a91817d50b7b535f0a4c42fc34e27fb312"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/rawimages/normal_34.tif",
+    "path": "dataset/rawimages/normal_34.tif",
+    "bytes": 1393214,
+    "sha256": "91a22a4df04f9661c44baf9d95deba75b8224b2f20c6b9c66c982e35e18e0ef0"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/rawimages/otherspecimen_0.tif",
+    "path": "dataset/rawimages/otherspecimen_0.tif",
+    "bytes": 1311278,
+    "sha256": "c3860c244d3e2ab0436299dd0aed88bb7150234dca6b30c484ebb5b6e92b4114"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/rawimages/otherspecimen_2.tif",
+    "path": "dataset/rawimages/otherspecimen_2.tif",
+    "bytes": 1311278,
+    "sha256": "07f8cdbe82c0ac71cda4841a78111949c79d72e9a6bf3ff0cea8875f5b345cf9"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/rawimages/otherspecimen_5.tif",
+    "path": "dataset/rawimages/otherspecimen_5.tif",
+    "bytes": 1074376,
+    "sha256": "6d82e0f5fd1a09dda5d89cba4d7470b214de4419c5d064d267348e3e4acd5060"
+  }
+]

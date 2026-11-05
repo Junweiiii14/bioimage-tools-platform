@@ -1,0 +1,19 @@
+{
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.14",
+  "logical_cpus": 20,
+  "physical_cpus": 20,
+  "physical_memory_bytes": 16496738304,
+  "disk": {
+    "stardist_environment": {
+      "files": 25224,
+      "logical_file_bytes": 2019358528,
+      "note": "File lengths, not allocated disk space; installation includes runtime and auxiliary modules."
+    },
+    "cellprofiler_installation": {
+      "files": 4246,
+      "logical_file_bytes": 826929641,
+      "note": "File lengths, not allocated disk space; installation includes runtime and auxiliary modules."
+    }
+  }
+}
