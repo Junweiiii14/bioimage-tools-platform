@@ -1,5 +1,7 @@
 # 当前恢复入口
 
+当前任务：[P013 第二实验比较与最小方法验证](../work/tasks/P-013-second-experiment-discovery.md)。活动树 bioimage-plan-sync，分支 codex/p013-second-experiment，保留 P012 收据并合入 main f30ea5d。规则 context 已成功。下一步按预先声明的小实验核验公开人工核标注与 CPU 分割，比较孔板及划痕候选；不新增产品。用户连续自动接续要求已再次成功发给上游 01a19bfd-f3ab-7502-86da-9f61953d1c8a，验收后回传。
+
 2026-11-05 [P012首次使用走查](../work/tasks/P-012-wb-first-use.md)工程完成，活动树bioimage-plan-sync，分支codex/p012-wb-first-use。PR62合入main f30ea5d，最终候选dd99855与main树相同；产品76bd5b7独审通过。Windows1703passed、Linux1699passed/4既有skip，双平台wheel及全部必需门禁通过。准确证据见[P012 final-delivery](../work/evidence/P-012/final-delivery.md)。本机首轮2个既有canvas失败/GPU日志保留，CI环境定向6例和wheel通过，原故障根因UNKNOWN。
 
 用户明确连续自动推进；已向上游01a19bfd-f3ab-7502-86da-9f61953d1c8a转达且获接受。最终验收回传已成功送达上游（send_message_to_thread返回该threadId）；由上游核对依赖派发下一项，不等用户催促。科学/真人学生/干净Windows未验，旧安装未替换，原dirty树不碰。本机测试7883/98418/95554、原GUI31291及CI监测57164均终态；另开的GUI66364可能仍被用户最小化，先核实再操作。合入后收据随下一正常任务带入，不重开文档PR。

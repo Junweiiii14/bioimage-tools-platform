@@ -1,0 +1,274 @@
+{
+  "method_version": "p013-nuclei-v1",
+  "python": "3.12.14",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "dependencies": {
+    "ImageIO": "2.38.1",
+    "lazy-loader": "0.6",
+    "networkx": "3.7",
+    "numpy": "2.5.4",
+    "packaging": "26.3",
+    "pillow": "12.3.0",
+    "scikit-image": "0.26.0",
+    "scipy": "1.18.1",
+    "tifffile": "2026.9.20"
+  },
+  "archives": {
+    "images": "6f30a5d4fe38c928ded972704f085975f8dc0d65d9aa366df00e5a9d449fddd7",
+    "masks": "f9e6043d8ca56344a4886f96a700d804d6ee982f31e2b2cd3194af2a053c2710",
+    "metadata": "a2c1f900bed9ba92a99553efd4c2ae98598433691c7401d818653ab61110deb2"
+  },
+  "selected": [
+    {
+      "split": "validation",
+      "image": "IXMtest_A02_s1_w1051DAA7C-7042-435F-99F0-1E847D9B42CB.png",
+      "image_sha256": "9eacee0e5a4c29af70307af4d310320632e31ed84b4d8b5fd4fce42930f780ec",
+      "mask_sha256": "c56c246edcd456f81fb0d61d318c2b7a378afba207bd0b409834db16d30cfb72",
+      "red_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "saturated_pixels": 0,
+      "segmentation_seconds": 0.05050059990026057
+    },
+    {
+      "split": "validation",
+      "image": "IXMtest_B04_s4_w1F6AEFA0F-AF87-4B3B-A334-698647CFE043.png",
+      "image_sha256": "050eb9075826c493e83496821a9d6fdcb552661fb97ca1881342c635fcbf370e",
+      "mask_sha256": "224af73534b6512a6ac3bfe9db31161b7842c394ef7a255dc22aba5c2649a1f3",
+      "red_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "saturated_pixels": 0,
+      "segmentation_seconds": 0.05020419997163117
+    },
+    {
+      "split": "validation",
+      "image": "IXMtest_B12_s2_w19F7E0279-D087-4B5E-9899-61971C29CB78.png",
+      "image_sha256": "d7888558da0167835ee5fd0455f16316f131ec2056a37927ce240ba71ce91d59",
+      "mask_sha256": "2a3e4c546941f6b6bb124d01447618ae139f401e9ae729d51bc0c8a191203481",
+      "red_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "saturated_pixels": 0,
+      "segmentation_seconds": 0.05073220003396273
+    },
+    {
+      "split": "test",
+      "image": "IXMtest_A09_s1_w1CE70AD49-290D-4312-82E6-CDC717F32637.png",
+      "image_sha256": "51787b533f38efc0d934a9cc0f760e704ef5fca97d561aa868f2099f2e6bb1ce",
+      "mask_sha256": "bf9897059aa3c4de8ce94b583eee7285dc9f9f90fc7848cf9a4b5f74ba4e2471",
+      "red_values": [
+        0,
+        1,
+        2
+      ],
+      "saturated_pixels": 0,
+      "segmentation_seconds": 0.05477529997006059
+    },
+    {
+      "split": "test",
+      "image": "IXMtest_A12_s7_w1EAEEA614-51ED-43B3-A4FF-088730911E4C.png",
+      "image_sha256": "d49d90f12cde7176191b0acbf2ed783c39fe8bdf0caf968ca5f8a1627429b8f1",
+      "mask_sha256": "471aa3c33f45be0ca829d7de49acebcc0fa4bcbf2d4dbadc2d6de0665d45c9c9",
+      "red_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "saturated_pixels": 0,
+      "segmentation_seconds": 0.04277639999054372
+    },
+    {
+      "split": "test",
+      "image": "IXMtest_A16_s2_w15AF20A10-82AE-48FA-AC50-7AE8AC3AA544.png",
+      "image_sha256": "69329412d32aff2e6ce272576062f54d43453d4126313bae405389091c79843a",
+      "mask_sha256": "d5075a936788df5ebc48880685681949e74c33a26c3bdf6023e682a102830ad3",
+      "red_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "saturated_pixels": 0,
+      "segmentation_seconds": 0.04771060007624328
+    },
+    {
+      "split": "test",
+      "image": "IXMtest_A22_s8_w1E2AFE190-831D-4D9C-961E-3AA2ECB3599D.png",
+      "image_sha256": "fbc992000fe626926d56ece5f1731af9284add61d1b8096b3d99e943a47435e5",
+      "mask_sha256": "a4ae99ca8c53fbe14bcd8ed769a5216317f69cbf8eff570062b9022cf3ce08e0",
+      "red_values": [
+        0,
+        1,
+        2
+      ],
+      "saturated_pixels": 0,
+      "segmentation_seconds": 0.0492452000034973
+    },
+    {
+      "split": "test",
+      "image": "IXMtest_B02_s9_w124B5080D-EBE1-47D2-B147-C0F342039EDF.png",
+      "image_sha256": "f6c668b78aa2f19af2ed936b758e024d00ffc1a2db091ee04d8f6c6ced342003",
+      "mask_sha256": "371e8efd02fa55ebee8d0fe34433bd36a402d52c496f5f230aebc39445b86db5",
+      "red_values": [
+        0,
+        1,
+        2
+      ],
+      "saturated_pixels": 0,
+      "segmentation_seconds": 0.045609000022523105
+    },
+    {
+      "split": "test",
+      "image": "IXMtest_B04_s2_w17C6C7F8D-98F7-422B-92CD-EA61EE813325.png",
+      "image_sha256": "a28f5fe95e775e88271527f6fe1c5562f9e94db2da93ac4cf0dc7a09c086fbd2",
+      "mask_sha256": "1babc76856de7ae38481982c4ba1b85c98ac4f91c5ed06152b0fe6d5a233f6a2",
+      "red_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "saturated_pixels": 0,
+      "segmentation_seconds": 0.05084829998668283
+    },
+    {
+      "split": "test",
+      "image": "IXMtest_B05_s5_w10296BEF4-0F48-4EC8-BC24-6C604871398B.png",
+      "image_sha256": "9789dd00d103bbfc9356d1f6503a9c1210b12abaefa6d6050fb3fd74f6338cd6",
+      "mask_sha256": "eb777726e6b482b72e5b55d3d39d7ab3495bd1e3e23b4ca577ebccc2ef90eb5e",
+      "red_values": [
+        0,
+        1,
+        2
+      ],
+      "saturated_pixels": 0,
+      "segmentation_seconds": 0.051262900000438094
+    },
+    {
+      "split": "test",
+      "image": "IXMtest_C07_s5_w12C9F2926-A017-4962-8660-72C9C20C86E4.png",
+      "image_sha256": "3ebabf72d4a0d737cdf345f291cb67c5ce8fcdb7ccaaa52c874d8abdc1413143",
+      "mask_sha256": "572ce9c3a7a1b2102cc808e3f03aae2598448be94adef34bb34d85315900f2e3",
+      "red_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "saturated_pixels": 0,
+      "segmentation_seconds": 0.05371349991764873
+    },
+    {
+      "split": "test",
+      "image": "IXMtest_C14_s8_w1612E3D43-FA7E-4FFB-BE53-F34A3A0CAFCD.png",
+      "image_sha256": "09363558d0fd0aa848e28f79dfc2b130f2bcc67208acab9741193afe76811b83",
+      "mask_sha256": "db86dea80951f5d9c2c014408dfcb8fd98e3bebdf5420d258aa013ebe3568e6e",
+      "red_values": [
+        0,
+        1,
+        2
+      ],
+      "saturated_pixels": 0,
+      "segmentation_seconds": 0.05293330003041774
+    },
+    {
+      "split": "test",
+      "image": "IXMtest_C23_s2_w10533E965-3DC3-4556-9C26-EA8DD4F8DE61.png",
+      "image_sha256": "033b59cb26728242bfec49319c15a3784a825b4d5c5d5b5ecf60b760ecad9924",
+      "mask_sha256": "a7b0aa3d0aa53f2e7b2e7b8613a50024392479b9f838b1e3ddf3bbd6ca966839",
+      "red_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "saturated_pixels": 0,
+      "segmentation_seconds": 0.04863090009894222
+    },
+    {
+      "split": "test",
+      "image": "IXMtest_D01_s1_w181AE787C-B5EE-4150-A90E-2FE43165C32E.png",
+      "image_sha256": "62f8532495bcae6829667866b376d9fc484039278427b67781ce9e441073a5d5",
+      "mask_sha256": "524944ee40fe3ac8ecb280b2fc11b5651f340548c48ff45c798091dcb7d86bce",
+      "red_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "saturated_pixels": 0,
+      "segmentation_seconds": 0.04854300001170486
+    },
+    {
+      "split": "test",
+      "image": "IXMtest_D06_s8_w1BE84C8EF-4CD0-4B56-8267-4E662F57AC25.png",
+      "image_sha256": "02a0f641f54f4dec9d0cac45a16f531721a2916ed74cdba7f2678e968e88f3d8",
+      "mask_sha256": "a55519794dfda6a4202da48523386467930a8a375100cf5086a19caab7dc1c29",
+      "red_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "saturated_pixels": 0,
+      "segmentation_seconds": 0.054534200113266706
+    }
+  ],
+  "summary": [
+    {
+      "split": "validation",
+      "method": "connected",
+      "images": 3,
+      "tp": 241,
+      "fp": 30,
+      "fn": 93,
+      "micro_f1": 0.7966942148760331,
+      "mean_absolute_count_error": 21.0,
+      "mean_relative_count_error": 0.18892773892773893
+    },
+    {
+      "split": "validation",
+      "method": "watershed",
+      "images": 3,
+      "tp": 283,
+      "fp": 37,
+      "fn": 51,
+      "micro_f1": 0.8654434250764526,
+      "mean_absolute_count_error": 4.666666666666667,
+      "mean_relative_count_error": 0.042715617715617715
+    },
+    {
+      "split": "test",
+      "method": "connected",
+      "images": 12,
+      "tp": 1025,
+      "fp": 92,
+      "fn": 370,
+      "micro_f1": 0.8160828025477707,
+      "mean_absolute_count_error": 23.166666666666668,
+      "mean_relative_count_error": 0.20929794138038615
+    },
+    {
+      "split": "test",
+      "method": "watershed",
+      "images": 12,
+      "tp": 1167,
+      "fp": 114,
+      "fn": 228,
+      "micro_f1": 0.8721973094170403,
+      "mean_absolute_count_error": 9.5,
+      "mean_relative_count_error": 0.10446036656805942
+    }
+  ]
+}

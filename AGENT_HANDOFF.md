@@ -46,6 +46,8 @@
 
 ## Current Pointer
 
+- 当前：[P013 第二实验比较与最小方法验证](work/tasks/P-013-second-experiment-discovery.md)，活动树 bioimage-plan-sync，分支 codex/p013-second-experiment；仅研究，不新增产品。完成验收后回传上游连续接续，已再次发送用户要求。
+
 - 最近完成：[P012 WB首次使用走查与试用准备](work/tasks/P-012-wb-first-use.md)，PR62集成，工程验收证据见final-delivery；科学/学生/目标机未验保留。用户要求由上游在回传后连续派发推进下一项。
 
 - 最近完成：[P011 WB学生结果闭环](work/tasks/P-011-wb-student-results.md)，依据[P010调研](work/evidence/P-010/wb-discovery.md)完成工程范围并经PR60集成；科学/用户未验边界保留。5.0已合入，P002/M1/M2不重做。
