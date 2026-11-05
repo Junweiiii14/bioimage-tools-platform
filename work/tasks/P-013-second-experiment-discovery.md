@@ -21,3 +21,15 @@
 三候选比较与预声明 CPU 探针已完成，见[主研究](../../docs/research/2026-11-05-second-experiment.md)及[实验收据](../evidence/P-013/README.md)。12张留出核计数watershed F1=0.8722、平均相对计数误差10.45%，最差图71.01%；原始强度无独立参考。研究主选核计数、备选具体assay孔板；下一步优先失败分层，不把平均指标当正式准入。固定依赖隔离安装，原数据在仓库外，产品依赖和源码未改。
 
 Ruff检查/格式、policy、解析指标边界、两次成功运行数值CSV一致及handoff容量检查均退出0；首次下载元数据解码失败、RGB断言失败和一次评价警告完整保留解释。下一步独立复核研究材料、正常PR及必需CI，集成后回传上游接续；任务仍in_progress。
+
+进度：独审绑定476b47e，无阻断发现，另用SciPy逐对象评价核对30行完全一致；收据见 independent-review.md。后续4ebb14d仅补研究文档/独审收据，不改探针或指标。[PR63](https://github.com/Junweiiii14/bioimage-tools-platform/pull/63)已创建，最终候选4ebb14d17262f704cc7464a70e015e334a955aff；quality运行42053261398（Windows/Linux/desktop）已确认in_progress，rules-context运行42053261484已成功。未集成/未完成，不重启这些运行；等待终态并核对准确HEAD后再收尾回传。
+
+## 用户纠偏与后续接续
+
+追加明确授权：用户要求将成熟优质算法优先准则实际写入库内主方案第5节、开发流程第3节及同名HTML，并提交Git、经后续正常PR同步main。属于本研究选型规则的文档补充；先本地完成回传准确commit，再跟进正常集成。不得重启PR63当前CI；不触碰产品或改变门禁。编辑前重新运行P013 context --scope . --record --integration并读取，保留原提交的历史回执。
+
+上游转达用户要求优先搜索、直接复用成熟开源实现，不能围绕简易基线闭门堆补丁。当前已运行仅scikit-image0.26.0组合基线，**未运行CellProfiler、StarDist、Cellpose**。保留本轮结果/失败，正常完成PR63，不重启CI。
+
+下一任务按成熟实现优先：先核验CellProfiler官方examples/pipeline及IdentifyPrimaryObjects；再核验StarDist的2D_versatile_fluo、Cellpose具体版本/模型。分别查代码/权重许可、稳定调用接口与CPU成本，再选少量候选实际运行；不是复写同名算法后声称调用原工具。后续任务单独建卡/加载规则，不借本项扩大产品/大模型范围。
+
+BBBC039已见15图用于诊断；已见12test不能再叫未见留出。BBBC039与BBBC038部分重叠，StarDist常用荧光预训练模型训练含DSB2018子集，因此先查预训练来源和公开标注集重叠，未知则明确限制，不能直接声称独立泛化。核计数标注不证明全细胞或IF强度。最终回传应将此具体复用方案交上游连续派发。

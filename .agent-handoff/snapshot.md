@@ -1,6 +1,8 @@
 # 当前恢复入口
 
-当前任务：[P013 第二实验比较与最小方法验证](../work/tasks/P-013-second-experiment-discovery.md)。活动树 bioimage-plan-sync，分支 codex/p013-second-experiment，保留 P012 收据并合入 main f30ea5d。规则 context 已成功。下一步按预先声明的小实验核验公开人工核标注与 CPU 分割，比较孔板及划痕候选；不新增产品。用户连续自动接续要求已再次成功发给上游 01a19bfd-f3ab-7502-86da-9f61953d1c8a，验收后回传。
+最新纠偏已落入P013任务卡：下一项优先真实调用成熟CellProfiler示例pipeline，核验StarDist/Cellpose固定模型许可、CPU成本及训练集重叠后再选候选；不继续自行优化简易基线。当前只运行过scikit-image，未运行上述三工具。保留P013结果并等当前CI，不重启；后续独立建卡。
+
+当前任务：[P013 第二实验比较与最小方法验证](../work/tasks/P-013-second-experiment-discovery.md)。活动树 bioimage-plan-sync，分支 codex/p013-second-experiment。三候选研究、CPU探针及独审已完成；PR63候选4ebb14d，rules-context成功，quality运行42053261398已确认进行中。下一步等必需Windows/Linux/desktop终态，核对准确HEAD，正常合并并做最终验收回传；仓库不支持auto-merge，未改设置，不绕过检查。不得重跑已完成研究或重启在跑CI。用户连续自动接续要求已成功发给上游01a19bfd-f3ab-7502-86da-9f61953d1c8a。当前本地未提交任务/快照是进度记录，保留P012收据，不新增产品。
 
 2026-11-05 [P012首次使用走查](../work/tasks/P-012-wb-first-use.md)工程完成，活动树bioimage-plan-sync，分支codex/p012-wb-first-use。PR62合入main f30ea5d，最终候选dd99855与main树相同；产品76bd5b7独审通过。Windows1703passed、Linux1699passed/4既有skip，双平台wheel及全部必需门禁通过。准确证据见[P012 final-delivery](../work/evidence/P-012/final-delivery.md)。本机首轮2个既有canvas失败/GPU日志保留，CI环境定向6例和wheel通过，原故障根因UNKNOWN。
 
