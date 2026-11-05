@@ -13,3 +13,5 @@ PR63研究合入d85c3e5，PR64正式MD/HTML准则合入main cddf759，两次候�
 P012/历史科学、真人学生、干净Windows/GPU未验仍保留，见risks/backlog及各任务final-delivery。旧快照完整保留在archive/P013-before-closeout-snapshot.md；P012收据已随PR63入main。
 
 用户再次明确要求每次验收后回传上游，由上游自动派发下一步；本轮已立即发消息至既定上游，工具返回threadId且isError=false。普通交接不等待用户再次继续，授权边界与审查门禁不变。
+
+P014独审绑定fd88b76已通过（20行指标独立核验），PR65规则清单冲突已修且本地精确校验通过。下一步推送最终收据候选，等待必需双平台CI终态，正常合并后回传。

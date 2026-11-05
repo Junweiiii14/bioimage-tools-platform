@@ -24,3 +24,5 @@
 冻结评估已完成：1866b47冻结后下载评估图、687e34a补精确记录后10图两方法运行成功，20行匹配结果归档；StarDist平均F1 0.8600/平均计数相对误差11.59%，最差计数误差38.46%；CP所测有限配置过分割明显。实测内存与运行/环境体积齐全。下一步绑定候选独审、CI/PR集成，上游回传尚未完成。
 
 PR65已建立。首轮rules-context 42070466193失败“Integration needs exactly one changed integration context”：b882重载P013时也改了其旧集成清单，导致两份当前清单差异。修复为恢复P013已在main验收的canonical integration-context原文，将本次重载清单完整复制保留于P014/p013-reload-integration-context.json；P013真实重载rules-context及P014历史来源校验保持，不删除回执、不改门禁。此修复独立说明并纳入增量独审。
+
+独审收尾：9ffa327独立逐实例IoU核对20行一致；两项P3文档修正后fd88b76增量复审通过，含历史清单逐字节保留与规则校验。记录见independent-review.md。后续提交仅记录审查/目标审计，不改变被审实验代码/参数/数值。PR65最终远端CI仍待通过，未集成。
