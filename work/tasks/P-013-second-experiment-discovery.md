@@ -16,13 +16,13 @@
 
 ## 当前状态
 
-活动分支codex/p013-second-experiment，从9606676保留P012收据并合入main f30ea5d；squash造成交接文件冲突，核对仅为旧状态与新收据后保留新收据，产品树不变。context --scope . --record --integration 退出0，已读取。
+当前活动分支codex/p013-algorithm-reuse-plan，活动树bioimage-plan-sync。研究PR63已合入main d85c3e5a9f48ba7d3b66200cc656ce0ba1baca25，核验与候选4ebb14d文件树一致。新分支保留本地准则补充并合入main；squash导致3份交接/回执文件冲突，核对只差较新的补充后保留本地版本，产品树不变。main更新后重新加载context。
 
 三候选比较与预声明 CPU 探针已完成，见[主研究](../../docs/research/2026-11-05-second-experiment.md)及[实验收据](../evidence/P-013/README.md)。12张留出核计数watershed F1=0.8722、平均相对计数误差10.45%，最差图71.01%；原始强度无独立参考。研究主选核计数、备选具体assay孔板；下一步优先失败分层，不把平均指标当正式准入。固定依赖隔离安装，原数据在仓库外，产品依赖和源码未改。
 
 Ruff检查/格式、policy、解析指标边界、两次成功运行数值CSV一致及handoff容量检查均退出0；首次下载元数据解码失败、RGB断言失败和一次评价警告完整保留解释。下一步独立复核研究材料、正常PR及必需CI，集成后回传上游接续；任务仍in_progress。
 
-进度：独审绑定476b47e，无阻断发现，另用SciPy逐对象评价核对30行完全一致；收据见 independent-review.md。后续4ebb14d仅补研究文档/独审收据，不改探针或指标。[PR63](https://github.com/Junweiiii14/bioimage-tools-platform/pull/63)已创建，最终候选4ebb14d17262f704cc7464a70e015e334a955aff；quality运行42053261398（Windows/Linux/desktop）已确认in_progress，rules-context运行42053261484已成功。未集成/未完成，不重启这些运行；等待终态并核对准确HEAD后再收尾回传。
+研究验收：独审绑定476b47e，无阻断发现，另用SciPy逐对象评价核对30行完全一致；收据见 independent-review.md。后续4ebb14d仅补文档。[PR63](https://github.com/Junweiiii14/bioimage-tools-platform/pull/63)于2026-11-05T15:44:13Z正常合入。quality42053261398全部必需项成功：Windows1703passed/10warnings/1378.01s，Linux1699passed/4既有skip/10warnings/975.19s，后续双平台wheel/check--all通过；rules42053261484成功。未重试、未改门禁。用户追加准则c442d61及来源补充8eade38/b0cc762已本地提交并成功回传，下一步通过后续正常PR同步main；P013整体仍in_progress直到本项同步及最终回传完成。
 
 ## 用户纠偏与后续接续
 

@@ -6,7 +6,7 @@
 
 检查：`npm run build --prefix docs/plans/renderer` 退出0；五份固定输出中仅两份正文变化，其余Git内容不变。HTML解析检查关键要求文本及相对链接通过；`git diff --check`、`dev.py policy`退出0。未改样式/构建器、产品代码/依赖/测试，不为此启动本机全量。
 
-PR63的4ebb14d仍运行原必需CI，不推送其活动分支新HEAD。此补充先本地提交并立即回传上游，明确尚未main；PR63集成后另走正常PR与必需检查，不能只留下本地补丁。P013最终完成还包括本项main同步与回传。
+此补充在PR63的4ebb14d原CI运行期间先本地提交c442d61并立即回传上游，未推送活动PR的新HEAD或重启CI。现PR63已经全部必需检查成功并合入d85c3e5；补充在codex/p013-algorithm-reuse-plan分支另走正常PR与必需检查，不能只留下本地补丁。P013最终完成还包括本项main同步与回传。
 
 ## 后续真实调用入口预检（未安装、未运行）
 
