@@ -1,6 +1,6 @@
 # P-015 StarDist独立核分割研究适配器
 
-<!-- PROGRAM_TASK_META {"id":"P-015","status":"in_progress","work_package":"W07","depends_on":["P-014"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex nuclei adapter","base_commit":"07838c293390b0ce209b9c1500d49d734bc393a6","head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-015","status":"in_progress","work_package":"W07","depends_on":["P-014"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex nuclei adapter","base_commit":"07838c293390b0ce209b9c1500d49d734bc393a6","head_commit":"9c9f81ed09466afdb86a8753192648a94d7111a9"} -->
 
 ## 授权与边界
 
@@ -35,3 +35,5 @@
 全仓dev.py check --all正在执行（.local/p015-check-all.log）；尚待准确候选独审、必需CI/正常PR合入、收尾回传。用户再次明确自动推进意图已成功发送上游（isError=false），验收后由上游自动接续派发，不重复求批。科学、学生、16bit、训练来源未知继续保留。
 
 首轮独审b1e348a发现两项实证问题（signed TIFF及超长失败原因），已修复并补真实反例，见independent-review.md；复审绑定新候选后才可验收。草稿PR66，rules-context首次成功；旧候选quality与本机全量仍在执行，不当新候选通过。
+
+9c9f81e增量只读复审已通过，两项问题关闭；独立4项反例/正常路径回归通过及第三轮9份实际标签/摘要一致。当前只待全仓/最终CI与正常集成，非科学验收。
