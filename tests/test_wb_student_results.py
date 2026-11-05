@@ -258,6 +258,25 @@ def test_automatic_batch_to_explicit_sample_results(
         assert all(
             sha256(path.read_bytes()).hexdigest() == digest for path, digest in originals.items()
         )
+        workspace = host.workspace_path
+        javascript(window, qtbot, "switchMode('results');true")
+        qtbot.waitUntil(lambda: window.navigation.read(workspace).get("mode") == "results")
+        window.bridge.session("home", "{}")
+        qtbot.waitUntil(lambda: window.host is not host, timeout=20000)
+        host = window.host
+        qtbot.waitUntil(lambda: window.shutdown_stage == "idle", timeout=20000)
+        window.open_project(workspace)
+        qtbot.waitUntil(
+            lambda: (
+                window.host.view.project().project_id == saved.project_id
+                and not window.host.operation_busy
+                and window.shutdown_stage == "idle"
+            ),
+            timeout=25000,
+        )
+        qtbot.waitUntil(lambda: javascript(window, qtbot, "mode") == "results", timeout=10000)
+        assert window.host.view.project() == saved
+        assert window.navigation.read(workspace)["mode"] == "results"
     finally:
         close_and_dispose_window(
             window, qtbot, resources_closed=lambda: host.resources_closed, timeout=20000

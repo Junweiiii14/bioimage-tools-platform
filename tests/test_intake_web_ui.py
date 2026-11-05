@@ -92,6 +92,68 @@ def test_executed_group_revision_returns_to_grid_with_explicit_editing_guard(
     )
 
 
+def test_sequence_field_blur_preserves_next_real_click(
+    intake_page: WebWorkbenchWindow, qtbot: QtBot
+) -> None:
+    window = intake_page
+    window.resize(1440, 940)
+    javascript(
+        window,
+        qtbot,
+        """
+        setState({intake:{...state.intake,figures:[],proteins:[],grouped_draft:{schema_version:2,
+        figures:[],sequence:[],excluded_group_ids:[],groups:['a','b'].map(s=>({group_id:'g-'+s,
+        source_ids:['source-'+s],figure_id:null,protein_label:'',selected_source_id:null,
+        region_index:null,reuse_confirmed:false}))}}});
+        document.querySelector('#intake-new-figure').click();true
+        """,
+    )
+    focus = window.web.focusProxy()
+    assert focus is not None
+
+    def click(selector: str) -> None:
+        raw = javascript(
+            window,
+            qtbot,
+            "(()=>{const e=document.querySelector(" + json.dumps(selector) + ");"
+            "e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect();"
+            "return JSON.stringify([r.x+r.width/2,r.y+r.height/2]);})()",
+        )
+        assert isinstance(raw, str)
+        x, y = TypeAdapter(tuple[float, float]).validate_json(raw)
+        QTest.mouseClick(focus, Qt.MouseButton.LeftButton, pos=QPoint(round(x), round(y)))
+
+    click("[data-group-field=lanes]")
+    QTest.keyClick(focus, Qt.Key.Key_A, Qt.KeyboardModifier.ControlModifier)
+    QTest.keyClicks(focus, "5")
+    click("[data-group-field=proteins]")
+    qtbot.waitUntil(
+        lambda: (
+            javascript(
+                window, qtbot, "document.activeElement.matches('[data-group-field=proteins]')"
+            )
+            is True
+        )
+    )
+    QTest.keyClicks(focus, "Target")
+    QTest.keyClick(focus, Qt.Key.Key_Return)
+    QTest.keyClicks(focus, "Reference")
+    click("[data-group-source]")
+    qtbot.waitUntil(
+        lambda: (
+            javascript(window, qtbot, "document.querySelector('[data-group-source]').checked")
+            is True
+        )
+    )
+    assert (
+        javascript(window, qtbot, "document.querySelector('[data-group-field=lanes]').value") == "5"
+    )
+    assert (
+        javascript(window, qtbot, "document.querySelector('[data-group-field=proteins]').value")
+        == "Target\nReference"
+    )
+
+
 def test_sequence_top_fields_assign_across_figs_and_start_once(
     intake_page: WebWorkbenchWindow, qtbot: QtBot
 ) -> None:

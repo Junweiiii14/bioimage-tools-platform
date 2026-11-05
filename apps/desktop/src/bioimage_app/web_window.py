@@ -659,11 +659,16 @@ class WebWorkbenchWindow(QMainWindow):
             self._starting = False
             if has_content and not self.host.operation_failed:
                 self._ready_project = project.project_id
-                if isinstance(project, WBIntakeProject):
-                    self._target_mode = "intake"
                 restore = (
                     self._restore if self._restore.get("projectId") == project.project_id else {}
                 )
+                if isinstance(project, WBIntakeProject):
+                    restored_mode = restore.get("mode")
+                    self._target_mode = (
+                        restored_mode
+                        if isinstance(restored_mode, str) and restored_mode in MODES
+                        else "intake"
+                    )
                 selected = next((r for r in project.rows if r.row_id == restore.get("rowId")), None)
                 if selected is None:
                     selected = next(

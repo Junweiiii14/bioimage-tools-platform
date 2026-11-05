@@ -1,5 +1,9 @@
 # 当前恢复入口
 
+2026-11-05当前[P012首次使用走查](../work/tasks/P-012-wb-first-use.md)，活动树 bioimage-plan-sync，分支 codex/p012-wb-first-use，基线 ec7588d。实际 GUI 完整导入/自动处理/归一化/导出/重开已完成，证据见任务。正在修复字段失焦吞点击及重开丢页面两项，定向4例通过；完整门禁运行中，未提交/独审/PR。练习素材生成器与学生短任务已准备。下一步验证终态、准确提交独审和正常PR集成，最终回传上游。走查窗口先核实再操作。
+
+以下为已完成P011证据，不从旧阶段重做。
+
 2026-11-05，P010调研与[P011 WB学生结果闭环](../work/tasks/P-011-wb-student-results.md)工程范围完成。活动树C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync，分支codex/p010-wb-discovery；原bioimage-tools-platform旧dirty树不碰。
 
 - P010 PR61合入87dba64；P011 PR60已正常合入main8299f71a02e144bf95e9a987b4718f7fee052159。准确候选f3a7d86，已fetch核验main文件树相同。产品独审4dcd41e，后续仅文档。

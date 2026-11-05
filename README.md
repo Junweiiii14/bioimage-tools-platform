@@ -1,6 +1,6 @@
 # 生物图像工具平台
 
-[研发方案与历史](docs/plans/README.md) · [当前任务](AGENT_HANDOFF.md) · [代码入口](docs/module-map.md) · [工作流操作说明](docs/runbooks/workflow-authoring.md)。
+[研发方案与历史](docs/plans/README.md) · [当前任务](AGENT_HANDOFF.md) · [代码入口](docs/module-map.md) · [工作流操作说明](docs/runbooks/workflow-authoring.md) · [WB 首次使用练习](examples/wb-first-use/README.md)。
 
 当前主线已包含WB独立执行、通用工作流和可视编排，集成与验收证据见[P009交付审计](work/evidence/P-009/objective-audit.md)。旧事项已由PR54/56收尾，见[B018清单](work/evidence/B-018/closeout.md)。新[5.0方案](docs/plans/research-platform-rd.md)以普通实验人员的完整自动分析为默认入口，专业模块和Agent按需求逐步扩展；下一项[P010调研](work/tasks/P-010-experiment-discovery.md)尚未执行。规划、工程集成、科学验证、用户验收和安装器发布是不同状态。
 
