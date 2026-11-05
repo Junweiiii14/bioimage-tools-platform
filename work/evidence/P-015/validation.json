@@ -1,0 +1,92 @@
+{
+  "candidate": "8f00757a966d5ff7c9f9237dbfe39471d3c9719b",
+  "main": "a7612843e5216f0471b51be93bd3687f0b8dbc82",
+  "tree_diff_exit": 0,
+  "product_review": "a490d2ed293953d6e0560b9e7a426d113e711d56",
+  "gate_review": "95ecb029c467159cceead47c3ec1bbdbcad5bbae",
+  "ci": {
+    "run": 42086151498,
+    "head": "8f00757a966d5ff7c9f9237dbfe39471d3c9719b",
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "databaseId": 127452480405,
+        "name": "foundation (windows-latest)",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/42086151498/job/127452480405"
+      },
+      {
+        "databaseId": 127452480908,
+        "name": "desktop-environment",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/42086151498/job/127452480908"
+      },
+      {
+        "databaseId": 127452481324,
+        "name": "foundation (ubuntu-latest)",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/42086151498/job/127452481324"
+      },
+      {
+        "databaseId": 127452482823,
+        "name": "native-case",
+        "status": "completed",
+        "conclusion": "skipped",
+        "url": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/42086151498/job/127452482823"
+      }
+    ]
+  },
+  "local_final": {
+    "command": "QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu uv run --locked --no-sync python dev.py check --all",
+    "exit_code": 0,
+    "pytest_passed": 1728,
+    "pytest_warnings": 10,
+    "pytest_seconds": 1208.32,
+    "wheel_all": "passed",
+    "environment": "Windows/Python3.12.14/locked dependencies; dev.py sets offscreen",
+    "run_start_commit": "95ecb029c467159cceead47c3ec1bbdbcad5bbae",
+    "head_difference": "3 evidence/task/handoff documents only; no code/test/gate changes"
+  },
+  "initial_local_failure": {
+    "exit_code": 1,
+    "passed": 1717,
+    "failed": 4,
+    "seconds": 1274.55,
+    "reasons": [
+      "old positive import contract count expected 9 instead of new 11",
+      "three existing rotation canvas pixel waits timed out with GPU context diagnostics"
+    ],
+    "same_assertion_rotation_recheck": {
+      "environment": "existing CI offscreen/--disable-gpu",
+      "passed": 3,
+      "seconds": 5.81,
+      "exit_code": 0
+    }
+  },
+  "log_hashes": {
+    "p015-check-all.log": {
+      "sha256": "3c27d22a3d9e36747eefe98b52075ca37f61949c10555f370e1bd3c91738a0f8",
+      "size_bytes": 200195
+    },
+    "p015-check-final.log": {
+      "sha256": "afb8a550ea69691e5c4ddd5cddf49529978f043513153b59502a245a0d1079b7",
+      "size_bytes": 19877
+    },
+    "p015-linux-final.log": {
+      "sha256": "438ee6244c80a85f9a766f724717545f13300e721560b51ed75dd1ce50c2ef9f",
+      "size_bytes": 593014
+    },
+    "p015-windows-final.log": {
+      "sha256": "47f519ac33ea7604bfc9bad920e2055229358f5e4e14e78a472f8e35feb009b5",
+      "size_bytes": 323491
+    },
+    "p015-rotation-ci-env.log": {
+      "sha256": "7796a941b4a9e2605d85c1c5279c3a758bb82bacfe4bac5f767df8ec044ed6c4",
+      "size_bytes": 100
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # P-015 StarDist独立核分割研究适配器
 
-<!-- PROGRAM_TASK_META {"id":"P-015","status":"in_progress","work_package":"W07","depends_on":["P-014"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex nuclei adapter","base_commit":"07838c293390b0ce209b9c1500d49d734bc393a6","head_commit":"a490d2ed293953d6e0560b9e7a426d113e711d56"} -->
+<!-- PROGRAM_TASK_META {"id":"P-015","status":"done","work_package":"W07","depends_on":["P-014"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex nuclei adapter","base_commit":"07838c293390b0ce209b9c1500d49d734bc393a6","head_commit":"8f00757a966d5ff7c9f9237dbfe39471d3c9719b"} -->
 
 ## 授权与边界
 
@@ -26,18 +26,10 @@
 
 ## 当前状态
 
-独立nuclei_tool和显式nuclei_cli已接既有WorkflowSession，无平台/WB算法修改。固定隔离环境和模型快照、2D uint8 TIFF准入、原坐标uint32标签/核数/出处、失败原因/取消与提交结果已实现。workspace、边界、Import Linter、独立wheel检查入口和21项新增测试已补。
+P015已完成授权工程验收、独审、正常PR集成和正式上游回传。PR66 main a7612843e5216f0471b51be93bd3687f0b8dbc82，最终候选8f00757a966d5ff7c9f9237dbfe39471d3c9719b与main文件树一致；活动树合入实际main为528c821。后续收尾仅文档/交接，随下一正常任务带入。
 
-本机21项新增用例通过，严格类型0 errors/3个隔离研究源码缺失warnings（未忽略），11项导入契约通过。真实14场景第三轮（独审修复后）全部通过，9张原灰度图逐像素/实例ID匹配P014冻结结果；零核成功、缺模型/坏摘要失败、期限取消、16bit准入拒绝，原图SHA不变且观察到的子进程均退出。见work/evidence/P-015/real-regression.json；实际目录p015-research/regression-03不提交原图/模型。
+完整交付与逐项核对见work/evidence/P-015/final-delivery.md、objective-audit.md。14真实Windows场景通过，9张已见公开灰度图逐像素/实例ID匹配P014，零核/缺模型/坏摘要/取消/16bit拒绝符合预期；原图SHA不变、观察后代进程均退出。默认桌面不含TF，隔离环境/模型显式准备；复用既有执行/提交，无新引擎和WB算法变更。
 
-初版Windows控制管道阻塞与NumPy native加载死锁，最小探针复现后改为非阻塞pipe；实际首次超时取消无发布，失败证据未当通过。新增开管道导入回归。私有模型快照归宿主临时目录，强退后沿既有清理；期限从输入准入后开始，预算不是性能保证。
+产品a490d2e、门禁测试95ecb02准确提交独审通过；signed TIFF、超长失败原因、venv入口解析三项已修复。新工具/宿主21项通过，4个新增传递负例；相关48项定向通过。首轮全量1717passed/4failed/exit1保留（旧契约正例数量与3项GPU画布超时）；原画布断言同CI设置定向3passed，不宣称物理GPU根因解决。最终本机完整check --all exit0、1728passed/全部wheel；最终quality42086151498 Windows1728passed、Linux1724passed+4既有skip，双平台完整check/wheel及desktop均成功；rules42086151033成功。optional native-case未运行。严格类型0errors/3研究源码缺失warnings，未降低检查。
 
-全仓dev.py check --all正在执行（.local/p015-check-all.log）；尚待准确候选独审、必需CI/正常PR合入、收尾回传。用户再次明确自动推进意图已成功发送上游（isError=false），验收后由上游自动接续派发，不重复求批。科学、学生、16bit、训练来源未知继续保留。
-
-首轮独审b1e348a发现两项实证问题（signed TIFF及超长失败原因），已修复并补真实反例，见independent-review.md；复审绑定新候选后才可验收。草稿PR66，rules-context首次成功；旧候选quality与本机全量仍在执行，不当新候选通过。
-
-9c9f81e增量只读复审已通过，两项问题关闭；独立4项反例/正常路径回归通过及第三轮9份实际标签/摘要一致。当前只待全仓/最终CI与正常集成，非科学验收。
-
-补审确认Linux venv入口resolve会绕开环境，a490d2e已最小修复并增实际sys.prefix回归/失败原因约束；最终产品增量独审通过，本机3项host测试独立通过。方法和数值未变，14场景第三轮继续有效；最终CI尚待完成。
-
-首轮全量1717passed/4failed（其中1项旧import契约数正例、3项旧GPU画布超时），exit1保留。95ecb02仅修正契约正例9→11并新增4个传递负例，独审14项通过；原3项画布在现有CI渲染设置下定向通过，未改断言、不宣称物理GPU根因解决。相关48项通过，最终全量已在同CI设置重新启动，最终PR66 CI待新收据提交完成后运行。
+正式验收已实际发送上游01a19bfd-f3ab-7502-86da-9f61953d1c8a（local），工具返回目标threadId且isError=false。用户要求由上游核对依赖后自动接续，不等待再次催促；下一任务编号/范围以正式派发为准。建议现有界面单图研究结果走查，仍不扩科学准入、整套GUI或发布。科学/训练重叠/患者/实验室/学生/16bit/Linux真实模型及旧目标环境缺项全部保留。
