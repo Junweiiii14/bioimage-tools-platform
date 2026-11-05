@@ -1,6 +1,6 @@
 # 当前恢复入口
 
-2026-11-05当前[P012首次使用走查](../work/tasks/P-012-wb-first-use.md)，活动树 bioimage-plan-sync，分支 codex/p012-wb-first-use，基线 ec7588d。实际 GUI 完整导入/自动处理/归一化/导出/重开已完成，证据见任务。正在修复字段失焦吞点击及重开丢页面两项，定向4例通过；完整门禁运行中，未提交/独审/PR。练习素材生成器与学生短任务已准备。下一步验证终态、准确提交独审和正常PR集成，最终回传上游。走查窗口先核实再操作。
+2026-11-05当前[P012首次使用走查](../work/tasks/P-012-wb-first-use.md)，活动树 bioimage-plan-sync，分支 codex/p012-wb-first-use，HEAD8077336。完整GUI走查与练习材料完成；产品76bd5b7已绑定独审。PR62待最终quality run42041925936（Windows/Linux），规则与依赖门禁已过。本机全量7883已终态1701passed/2既有旋转canvas失败/GPU日志，CI相同--disable-gpu定向6例通过exit0，wheel95554通过exit0；这两会话均已终态。先核实终态，不重启live检查。下一步处理验证结论、正常PR集成、最终handoff与回传；科学/学生/目标机未验继续保留。
 
 以下为已完成P011证据，不从旧阶段重做。
 

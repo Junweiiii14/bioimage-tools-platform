@@ -18,8 +18,10 @@
 
 分支 codex/p012-wb-first-use，基线 ec7588d。真实 GUI 完整流程已完成；两处已确认操作障碍已作最小修复，尚待绑定提交独审及正常 PR 集成。详见 [走查证据](../evidence/P-012/walkthrough.md)。
 
-新增真实 Qt 鼠标回归覆盖 N 输入后单击蛋白框、输入多行蛋白后单击来源；既有三组自动处理用例追加真实关闭项目、重新打开和结果页恢复。定向命令 4 passed / 30.44s，exit 0。完整 dev.py check --all 正在执行，尚无通过结论。
+新增真实 Qt 鼠标回归覆盖 N 输入后单击蛋白框、输入多行蛋白后单击来源；既有三组自动处理用例追加真实关闭项目、重新打开和结果页恢复。定向命令 4 passed / 30.44s，exit 0。完整 dev.py check --all 已结束 exit 1：1701 passed / 2 failed / 10 warnings，1264.29s。仅两个既有旋转 canvas 刷新用例超时，伴随 GPU context-lost；新增回归通过。按 CI 的 --disable-gpu 环境定向复核两项及新增用例：6 passed / 28.64s，exit 0，未改测试预期/超时。原失败及 GPU 日志保留，根因 UNKNOWN。独立 wheel 安装检查单独补完 exit 0（含原始输入、OCR、真实 worker、保存重开及工作流）；原 check --all 的 exit 1 不改写。
 
 提供 [练习生成器及学生短任务](../../examples/wb-first-use/README.md)，不含私有素材。生成器像素与走查输入相同、uint16、既存目标拒绝且无改写、PNG 尺寸核验均通过；导出表 XML 读取确认数值和身份。
 
 已向上游回传完整流程及正在修复/验证的阶段进度。科学适用性、真人学生独立试用、干净目标 Windows 未验。未最终回传或宣告完成。
+
+候选产品 76bd5b7，证据候选 8077336；绑定独审无新增发现，见 independent-review.md。PR62 OPEN；最终 quality run42041925936 Windows/Linux 未终态，rules-context 与 desktop-environment 已过。原本机全量会话7883已终态，不重启同一运行。
