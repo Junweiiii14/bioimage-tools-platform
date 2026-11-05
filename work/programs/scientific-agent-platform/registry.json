@@ -57,6 +57,10 @@
     {
       "id": "P-013",
       "path": "work/tasks/P-013-second-experiment-discovery.md"
+    },
+    {
+      "id": "P-014",
+      "path": "work/tasks/P-014-mature-nuclei-methods.md"
     }
   ],
   "work_packages": [
@@ -145,7 +149,7 @@
         "W06",
         "W14"
       ],
-      "task_ids": ["P-013"]
+      "task_ids": ["P-013", "P-014"]
     },
     {
       "id": "W08",

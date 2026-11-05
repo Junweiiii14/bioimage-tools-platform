@@ -1,0 +1,20 @@
+# P-014 成熟2D荧光核计数实现直接调用与对照
+
+<!-- PROGRAM_TASK_META {"id":"P-014","status":"in_progress","work_package":"W07","depends_on":["P-013"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex mature-method research","base_commit":"cddf759d20368f10e3ea1d447503dcc3cf3740ea","head_commit":null} -->
+
+## 授权与范围
+
+2026-11-06上游依据用户持续推进/成熟算法优先要求明确派发，旧goal已完成，新goal已实际创建且无token预算。研究与最小接入建议，不做产品接入/正式依赖/IF强度/全细胞/Agent，不训练或自行研发分割算法。允许合理大小公开模型存仓库外隔离缓存，不下载超大基础模型、不花费、不上传私有数据。原dirty树/GUI/原图/旧安装不碰。
+
+## 完成条件
+
+1. 核验当前稳定发布及接口/代码许可，真实运行CellProfiler官方程序与适用pipeline/IdentifyPrimaryObjects；旧cp3 pipeline仅在官方加载/迁移有效时采用并保存转换版本/参数。不能自行重写冒充官方链。环境隔离；遇安装困难查官方支持路线，不因小问题放弃或无限试错。
+2. StarDist荧光核预训练模型或Cellpose具体适用模型至少一个合理对照真实运行；先核版本、代码/权重许可、大小、CPU内存/部署成本，客观无法运行须有证据。
+3. 评测前查训练来源和BBBC038/039/DSB2018重复，选择人工实例标注公开数据、冻结开发/评估组；已见12test仅诊断，未知重叠不称独立泛化。优先少量代表性明暗/密集/粘连场景，不在测试组调参。
+4. 可按官方设置在开发组配置，再冻结参数；保留完整实际前处理和输入缩放差异。复用P013已审计评价，逐图计数/匹配/失败、运行时间和内存/部署负担，不只报平均分。不改变自有watershed基线追赶。
+5. 一份精简选型、固定版本运行脚本/官方pipeline出处配置、非私有复现实测，明确直接复用谁及限制、下一最小产品接入任务范围；无方案适用则如实给证据和下一最小调查，不强行自研。公开基准不代替学生/实验室验收。
+6. 绑定候选只读独审、适当本地检查、正常PR必需CI集成、更新handoff并回传上游01a19bfd-f3ab-7502-86da-9f61953d1c8a（local）接续。
+
+## 当前状态
+
+查重无P014。干净树从6868b06建立codex/p014-mature-nuclei-methods，合入最新main cddf759；squash产生6份旧交接冲突，核验main与887fd53树相同、差异仅P013较新收尾后保留本地，合并00bce42。469152c/6868b06收据保留，产品不变。P014 context及登记已完成。已真实运行官方CellProfiler 4.2.8 Human示例（原pipeline不改），退出0、Done Complete、289个核、总9.44秒；这是执行烟测，无准确率/内存结论。见official-smoke.json。已核Kromp数据CC0、完整groundtruth与抽样singlecell区别，按元数据冻结3开发/10评估图，尚未下载这些图或模型权重。下一步隔离StarDist环境、开发组配置与正式冻结。
