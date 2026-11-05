@@ -31,6 +31,7 @@ P013 · 2026-11-05 · **最小实验完成，集成验收待完成**。问题是
 - [scikit-image 0.26.0 PyPI](https://pypi.org/project/scikit-image/0.26.0/)、[版本许可](https://raw.githubusercontent.com/scikit-image/scikit-image/v0.26.0/LICENSE.txt)、[watershed 官方例](https://scikit-image.org/docs/stable/auto_examples/segmentation/plot_watershed.html)：固定 0.26.0/Python>=3.11；总许可 BSD-3，thresholding 标明 BSD-2；无需模型权重。依赖版本见探针 requirements，不改产品锁。
 - [CellProfiler 4.2.1 对象模块文档](https://cellprofiler-manual.s3.amazonaws.com/CellProfiler-4.2.1/modules/objectprocessing.html)：仅用于确认对象识别任务边界，不宣称核验了最新版整套软件或已安装。
 - [plater 官方接口](https://docs.ropensci.org/plater/)、[2024-10-25 官方示例](https://cran.r-project.org/web/packages/plater/vignettes/plater-basics.html)：GPL-3；示例用于布局到逐孔行的转换，不提供通用 assay 公式。本轮未运行 R 包，不以网站版本猜测本机执行结果。
+- 补充核验 [plater 固定源码 DESCRIPTION](https://github.com/ropensci/plater/blob/c11002c79884ba4b455c2b10da8949f9654d2536/DESCRIPTION)：1.0.5，R>=3.1.0，imports 为 utils/dplyr>0.4.3/rlang，GPL-3。用官方 GitHub API读取（公开匿名API限流后使用已登录gh读取），不是已执行的依赖环境。`read_plate(file, well_ids_column="Wells", sep=",")` 接口见[官方参考](https://docs.ropensci.org/plater/reference/read_plate.html)。
 - [Suarez-Arnedo 等 2020 原始论文](https://doi.org/10.1371/journal.pone.0232565) Methods/Supporting information、[作者仓库](https://github.com/AlejandraArnedo/Wound-healing-size-tool)：参数依赖与输出定义可核验；公开可见不是可直接商业打包的许可证。
 
 ## 仓库实际复用范围
@@ -52,5 +53,11 @@ WB 的 TIFF 适配、背景、归一化及 UI 位于工具内部，不能跨工�
 下一实现任务只在结论形成后拆卡：建议首先限于单通道二维核计数的完整练习闭环，明确标注研究/未准入，不自动扩为 IF 相对表达；输入不猜组别，逐图错误不能填零，原始像素不进显示变换，导出重开一致。方法若不能满足预先认可的参考要求，则下一项应是失败分层与方法比较，而非立即上学生产品。
 
 最小缺项是一个明确使用者的代表输入/目标输出和核对象判定、独立参考及可接受误差；由已有渠道后续取得，不为本研究擅自外联。若孔板先取得真实目标 assay、布局和独立参考，且重复任务价值明确，则可取代核计数主选。取得新实验/新位深、升级算法依赖、改变阈值或引入强度校正时必须重新验证。
+
+下一项建议拆为“核计数失败分层与第二方法验证”，不直接实施完整产品：将本轮15图标为已见，仅用官方 training/validation 开发；从尚未读取的 test 图先写入冻结选图摘要后再评价。最多比较两个有明确版本/许可的现成 CPU 方法，列出小对象/密集场景误差、最差图、时间及内存，不只报总平均。验收是独立标注逐图匹配可重现、开发/留出清单无交叉、参数冻结在结果前独立提交、失败不丢弃，结论能说明是否足以拆实现任务；科学合格阈值仍须有目标任务依据，不能凭本轮均值自定。
+
+后续若进入实现，最小切片限定2D单通道原生TIFF→显式样本/视野→核计数及边界证据→CSV/图→保存重开；不含全细胞、抗体相对表达或统计显著性。验收要覆盖独立参考比较、空/饱和/越界错误状态、原位深和单位、取消/旧结果隔离、导出重开数值一致、真实学生独立操作；与现有公开API接线并通过双平台门禁及提交独审。尚缺的真实用户验收不能由研究探针代替。
+
+独立只读复核绑定476b47e，使用不同的逐对象交并比实现核对30行指标一致，未发现阻断问题；[审查收据](../../work/evidence/P-013/independent-review.md)。预声明与结果同一Git提交，不能仅靠Git证明先后时间，不称为独立预注册。
 
 研究步骤采用 scientific-critical-thinking 技能区分方法、科学和市场证据；其程序化指引不是方法准确性证据。技能要求的出处：[Kassis 等，Scientific Agent Skills，arXiv:2609.00065](https://doi.org/10.48550/arXiv.2609.00065)，核验 v2（2026-09-02）。
