@@ -46,7 +46,7 @@
 
 ## Current Pointer
 
-- 当前：[P014 成熟荧光核计数方法直接调用](work/tasks/P-014-mature-nuclei-methods.md)，分支codex/p014-mature-nuclei-methods；先CellProfiler官方流程，再合理预训练对照，纯研究。
+- 最近完成：[P014 成熟荧光核计数方法直接调用](work/tasks/P-014-mature-nuclei-methods.md)，PR65合入main07838c2，实验/独审/双平台CI及回传完成；详见[P014交付](work/evidence/P-014/final-delivery.md)。下一任务由已收到验收回传的上游自动接续派发，不猜编号；科学缺项保留。
 
 - 最近完成：[P013 第二实验比较与最小方法验证](work/tasks/P-013-second-experiment-discovery.md)，PR63研究/PR64正式准则及HTML已同步main cddf759，证据见[P013交付](work/evidence/P-013/final-delivery.md)。下一项由上游连续派发，优先成熟实现真实调用及训练数据重叠核验；未授予核计数科学准入。
 
