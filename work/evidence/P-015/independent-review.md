@@ -24,3 +24,7 @@
 ## 显式虚拟环境入口补审
 
 主代理发现并请求独立检查Linux venv入口提前resolve的疑点。审查者确认P2：Linux解释器符号链接被解析成基础Python会绕开用户指定虚拟环境；依据Python3.12官方venv文档，当前Windows不冒充Linux实测。最小修复保留absolute入口、is_file校验；新增实际子进程sys.prefix回归，并加强实际宿主失败测试要求研究依赖错误，不能用找不到nuclei模块冒充预期失败。21项新增测试本机通过；Linux实际路径回归等待最终CI。数值/模型/输入/输出方法代码未变，第三轮Windows14场景证据继续适用。
+
+### 最终产品增量结论：a490d2ed293953d6e0560b9e7a426d113e711d56
+
+独立复审通过，无新增问题。独立运行tests/test_nuclei_host.py：3 passed/1.93s/exit0。解释器absolute入口保留venv及is_file验证，sys.prefix实际子进程和研究依赖错误断言有效。未修改文件或重跑模型；先前方法/数值审查继续适用，Linux实际符号链接路径留待最终CI。本结论之后的收据提交仅文档/交接，不改被审产品、测试或门禁。
