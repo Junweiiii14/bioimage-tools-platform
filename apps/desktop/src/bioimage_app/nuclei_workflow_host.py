@@ -50,7 +50,8 @@ class NucleiHost:
     """Trusted launch paths are explicit host configuration, never workspace code."""
 
     def __init__(self, worker_python: str, model_directory: str) -> None:
-        self.worker_python = str(Path(worker_python).resolve(strict=True))
+        # Resolving a venv's Python symlink would silently launch its base interpreter.
+        self.worker_python = str(Path(worker_python).absolute())
         self.model_directory = str(Path(model_directory).absolute())
         if not Path(self.worker_python).is_file():
             raise ValueError("Worker Python must be an explicitly prepared executable")

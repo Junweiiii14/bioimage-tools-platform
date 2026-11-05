@@ -67,5 +67,21 @@ def test_real_host_failure_does_not_publish_empty_success(tmp_path: Path) -> Non
     finished = messages[-1]
     assert finished["phase"] == "finished"
     assert finished["state"] == "failed"
+    assert (
+        "PackageNotFoundError" in finished["failure_reason"]
+        or "environment_mismatch" in finished["failure_reason"]
+    )
     assert finished["outputs"] == {}
     assert source.read_bytes() == original
+
+
+def test_explicit_worker_python_keeps_virtual_environment(tmp_path: Path) -> None:
+    host = NucleiHost(sys.executable, str(tmp_path / "model"))
+    result = subprocess.run(
+        [host.worker_python, "-I", "-c", "import sys; print(sys.prefix)"],
+        capture_output=True,
+        text=True,
+        timeout=15,
+        check=True,
+    )
+    assert Path(result.stdout.strip()).resolve() == Path(sys.prefix).resolve()
