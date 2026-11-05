@@ -1,6 +1,6 @@
 # P013 探针与验收收据
 
-状态：研究探针完成，PR/必需 CI/最终回传待完成。当前源码基线 cddf5ae；正式候选提交在任务卡收尾记录。Windows 11、Python3.12.14，CPU 单进程；未运行 GPU 或模型。
+状态：研究探针及PR63必需CI已完成，候选4ebb14d与main d85c3e5文件树一致。Windows1703passed、Linux1699passed/4既有skip及后续双平台wheel/check--all通过。用户追加方案准则另走正常PR同步main，最终回传待完成。探针源码基线 cddf5ae；实际审查及提交见任务卡。Windows 11、Python3.12.14，CPU 单进程；未运行 GPU 或模型。
 
 ## 复现
 
