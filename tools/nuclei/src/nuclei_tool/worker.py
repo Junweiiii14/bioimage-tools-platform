@@ -101,7 +101,7 @@ def main() -> int:
         response = ExecutionEvent(kind="cancelled", sequence=2, identity=start.identity)
     except Exception as error:
         # Boundary converts any model/runtime error to failure, never a zero count.
-        reason = f"{type(error).__name__}: {error}"[:1500]
+        reason = f"{type(error).__name__}: {error}"[:1024]
         print(reason, file=sys.stderr)
         response = ExecutionEvent(
             kind="failure", sequence=2, identity=start.identity, reason=reason

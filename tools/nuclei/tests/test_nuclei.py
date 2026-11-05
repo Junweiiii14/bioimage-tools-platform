@@ -8,6 +8,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+import tifffile
 from nuclei_tool.adapters import execute as execution
 from nuclei_tool.adapters.inference import NucleiCancelled
 from nuclei_tool.adapters.input import read_nuclei_input
@@ -110,6 +111,15 @@ def test_pixels_original_and_readonly(start: NucleiStart) -> None:
     supplied = read_nuclei_input(start.source_path)
     np.testing.assert_array_equal(supplied.pixels, np.arange(48).reshape(6, 8))
     assert not supplied.pixels.flags.writeable
+
+
+def test_signed_tiff_is_rejected_before_reinterpreting_negative_pixels(tmp_path: Path) -> None:
+    path = tmp_path / "signed.tif"
+    tifffile.imwrite(path, np.array([[-1, 0, 1], [127, -128, 3]], dtype=np.int8))
+    original = path.read_bytes()
+    with pytest.raises(ValueError, match="unsupported_input"):
+        read_nuclei_input(str(path))
+    assert path.read_bytes() == original
 
 
 def test_invalid_labels_not_zero() -> None:
@@ -252,3 +262,27 @@ print('native_import_complete')
         output, errors = process.communicate(timeout=5)
     assert process.returncode == 0, errors.decode(errors="replace")
     assert b"native_import_complete" in output
+
+
+def test_long_model_error_still_emits_terminal_failure(start: NucleiStart) -> None:
+    code = """
+import nuclei_tool.adapters.execute as execution
+from nuclei_tool.worker import main
+def fail(*args):
+    raise RuntimeError('x' * 1200)
+execution.execute = fail
+raise SystemExit(main())
+"""
+    result = subprocess.run(
+        [sys.executable, "-I", "-c", code],
+        input=encode_frame(start),
+        capture_output=True,
+        timeout=20,
+        check=False,
+    )
+    events = [ExecutionEvent.model_validate_json(line) for line in result.stdout.splitlines()]
+    assert result.returncode == 2
+    assert [event.kind for event in events] == ["hello", "accepted", "failure"]
+    assert len(events[-1].reason) == 1024
+    assert events[-1].reason.startswith("RuntimeError: ")
+    assert not Path(start.output_directory).exists()

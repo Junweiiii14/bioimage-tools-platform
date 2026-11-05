@@ -35,6 +35,7 @@ def read_nuclei_input(path: str) -> NucleiInput:
             raise ValueError("unsupported_input: expected one uint8 grayscale TIFF page")
         if (
             image.tag_v2.get(258) != (8,)
+            or image.tag_v2.get(339, (1,)) != (1,)
             or image.tag_v2.get(277, 1) != 1
             or image.tag_v2.get(274, 1) != 1
             or image.tag_v2.get(262) != 1

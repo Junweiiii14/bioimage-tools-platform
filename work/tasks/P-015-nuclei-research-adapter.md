@@ -26,10 +26,12 @@
 
 ## 当前状态
 
-独立nuclei_tool和显式nuclei_cli已接既有WorkflowSession，无平台/WB算法修改。固定隔离环境和模型快照、2D uint8 TIFF准入、原坐标uint32标签/核数/出处、失败原因/取消与提交结果已实现。workspace、边界、Import Linter、独立wheel检查入口和18项新增测试已补。
+独立nuclei_tool和显式nuclei_cli已接既有WorkflowSession，无平台/WB算法修改。固定隔离环境和模型快照、2D uint8 TIFF准入、原坐标uint32标签/核数/出处、失败原因/取消与提交结果已实现。workspace、边界、Import Linter、独立wheel检查入口和20项新增测试已补。
 
-本机18项新增用例通过，严格类型0 errors/3个隔离研究源码缺失warnings（未忽略），11项导入契约通过。真实14场景第二轮全部通过，9张原灰度图逐像素/实例ID匹配P014冻结结果；零核成功、缺模型/坏摘要失败、期限取消、16bit准入拒绝，原图SHA不变且观察到的子进程均退出。见work/evidence/P-015/real-regression.json；实际目录p015-research/regression-02不提交原图/模型。
+本机20项新增用例通过，严格类型0 errors/3个隔离研究源码缺失warnings（未忽略），11项导入契约通过。真实14场景第三轮（独审修复后）全部通过，9张原灰度图逐像素/实例ID匹配P014冻结结果；零核成功、缺模型/坏摘要失败、期限取消、16bit准入拒绝，原图SHA不变且观察到的子进程均退出。见work/evidence/P-015/real-regression.json；实际目录p015-research/regression-03不提交原图/模型。
 
 初版Windows控制管道阻塞与NumPy native加载死锁，最小探针复现后改为非阻塞pipe；实际首次超时取消无发布，失败证据未当通过。新增开管道导入回归。私有模型快照归宿主临时目录，强退后沿既有清理；期限从输入准入后开始，预算不是性能保证。
 
 全仓dev.py check --all正在执行（.local/p015-check-all.log）；尚待准确候选独审、必需CI/正常PR合入、收尾回传。用户再次明确自动推进意图已成功发送上游（isError=false），验收后由上游自动接续派发，不重复求批。科学、学生、16bit、训练来源未知继续保留。
+
+首轮独审b1e348a发现两项实证问题（signed TIFF及超长失败原因），已修复并补真实反例，见independent-review.md；复审绑定新候选后才可验收。草稿PR66，rules-context首次成功；旧候选quality与本机全量仍在执行，不当新候选通过。
