@@ -46,7 +46,7 @@
 
 ## Current Pointer
 
-- 当前任务：[P012 WB首次使用走查与试用准备](work/tasks/P-012-wb-first-use.md)，新goal active；从空项目走真实GUI，仅修实际障碍，保留P011成果。
+- 最近完成：[P012 WB首次使用走查与试用准备](work/tasks/P-012-wb-first-use.md)，PR62集成，工程验收证据见final-delivery；科学/学生/目标机未验保留。用户要求由上游在回传后连续派发推进下一项。
 
 - 最近完成：[P011 WB学生结果闭环](work/tasks/P-011-wb-student-results.md)，依据[P010调研](work/evidence/P-010/wb-discovery.md)完成工程范围并经PR60集成；科学/用户未验边界保留。5.0已合入，P002/M1/M2不重做。
 - T082历史工程证据及科学/目标环境待办完整保留于其[任务](work/tasks/T-082-reliability-remediation.md)，不由V0自动关闭。

@@ -1,6 +1,6 @@
 # P-012 WB首次使用走查与试用准备
 
-<!-- PROGRAM_TASK_META {"id":"P-012","status":"in_progress","work_package":"W06","depends_on":["P-011"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex WB first-use walkthrough","base_commit":"8299f71a02e144bf95e9a987b4718f7fee052159","head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-012","status":"done","work_package":"W06","depends_on":["P-011"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex WB first-use walkthrough","base_commit":"8299f71a02e144bf95e9a987b4718f7fee052159","head_commit":"dd99855b57a8b18c57e33c0f2917987988b6cab3"} -->
 
 ## 范围与授权
 
@@ -16,12 +16,10 @@
 
 ## 当前状态
 
-分支 codex/p012-wb-first-use，基线 ec7588d。真实 GUI 完整流程已完成；两处已确认操作障碍已作最小修复，尚待绑定提交独审及正常 PR 集成。详见 [走查证据](../evidence/P-012/walkthrough.md)。
+工程范围完成。PR62 正常合入 main f30ea5d515a8fedaece994edc6cb583db752d536；最终候选 dd99855，产品独审绑定76bd5b7。候选与 main 文件树相同。完整依据与未验边界见 [最终验收交接](../evidence/P-012/final-delivery.md)。
 
-新增真实 Qt 鼠标回归覆盖 N 输入后单击蛋白框、输入多行蛋白后单击来源；既有三组自动处理用例追加真实关闭项目、重新打开和结果页恢复。定向命令 4 passed / 30.44s，exit 0。完整 dev.py check --all 已结束 exit 1：1701 passed / 2 failed / 10 warnings，1264.29s。仅两个既有旋转 canvas 刷新用例超时，伴随 GPU context-lost；新增回归通过。按 CI 的 --disable-gpu 环境定向复核两项及新增用例：6 passed / 28.64s，exit 0，未改测试预期/超时。原失败及 GPU 日志保留，根因 UNKNOWN。独立 wheel 安装检查单独补完 exit 0（含原始输入、OCR、真实 worker、保存重开及工作流）；原 check --all 的 exit 1 不改写。
+真实 GUI 从空项目完成导入、自动分析、样本/目标参照/重复身份、比值及单对照相对值、表图导出与保存重开。两项确认障碍完成修复、实际鼠标及关闭重开回归、准确提交独审。非私有生成器、版本准备及学生短任务已交付。
 
-提供 [练习生成器及学生短任务](../../examples/wb-first-use/README.md)，不含私有素材。生成器像素与走查输入相同、uint16、既存目标拒绝且无改写、PNG 尺寸核验均通过；导出表 XML 读取确认数值和身份。
+最终 CI：Windows1703passed、Linux1699passed/4既有skip，双平台后续wheel/check--all通过，rules-context及desktop-environment成功。本机首轮1701passed/2既有canvas失败保留；CI相同环境定向6例通过、独立wheel通过，不宣称GPU根因已解。科学/真实学生/干净目标环境未验保留。
 
-已向上游回传完整流程及正在修复/验证的阶段进度。科学适用性、真人学生独立试用、干净目标 Windows 未验。未最终回传或宣告完成。
-
-候选产品 76bd5b7，证据候选 8077336；绑定独审无新增发现，见 independent-review.md。PR62 OPEN；最终 quality run42041925936 Windows/Linux 未终态，rules-context 与 desktop-environment 已过。原本机全量会话7883已终态，不重启同一运行。
+用户要求后续连续自动推进；已立即转达上游并获明确接受。最终回传完成后，由上游核对依赖并派发下一项，不等用户反复催促，不扩展未授权发布/外联/花费/数据用途。
