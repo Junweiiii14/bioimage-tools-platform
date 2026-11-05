@@ -3,7 +3,7 @@ name = "bioimage-tools-platform"
 version = "0.0.0"
 description = "Bioimage desktop platform and WB quantification tools in development"
 requires-python = ">=3.12,<3.13"
-dependencies = ["wb-tool", "platform-runtime", "bioimage-app[wb]"]
+dependencies = ["wb-tool", "platform-runtime", "bioimage-app[wb,nuclei]", "nuclei-tool"]
 
 [dependency-groups]
 dev = [
@@ -33,9 +33,10 @@ package = false
 required-version = "==0.13.0"
 
 [tool.uv.workspace]
-members = ["tools/wb", "packages/tool_contracts", "packages/platform_runtime", "apps/desktop"]
+members = ["tools/nuclei", "tools/wb", "packages/tool_contracts", "packages/platform_runtime", "apps/desktop"]
 
 [tool.uv.sources]
+nuclei-tool = { workspace = true }
 wb-tool = { workspace = true }
 platform-runtime = { workspace = true }
 bioimage-app = { workspace = true }
@@ -50,7 +51,7 @@ extend-exclude = [".agents", ".local", "tools/wb/src/wb_tool/domain/wbquant143"]
 select = ["E", "F", "I", "UP", "B", "SIM"]
 
 [tool.pyright]
-include = ["dev.py", "p0_probe.py", "tooling", "tests", "tools/wb", "packages", "apps"]
+include = ["dev.py", "p0_probe.py", "tooling", "tests", "tools/wb", "tools/nuclei", "packages", "apps"]
 exclude = [".agents", ".venv", ".local", "tools/wb/src/wb_tool/domain/wbquant143"]
 ignore = ["tools/wb/src/wb_tool/domain/wbquant143"]
 pythonVersion = "3.12"
@@ -59,7 +60,7 @@ venvPath = "."
 venv = ".venv"
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "tools/wb/tests"]
+testpaths = ["tests", "tools/wb/tests", "tools/nuclei/tests"]
 addopts = ["--import-mode=importlib", "--strict-markers", "--strict-config", "-ra"]
 pythonpath = ["."]
 markers = ["environment: optional desktop dependency smoke check, no product behavior"]

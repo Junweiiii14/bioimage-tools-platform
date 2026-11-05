@@ -1,0 +1,316 @@
+{
+  "scope": "already-seen P014 engineering regression, not scientific admission",
+  "sample_interval_seconds": 0.05,
+  "rows": [
+    {
+      "case": "Ganglioneuroblastoma_10",
+      "returncode": 0,
+      "seconds": 7.56393239996396,
+      "sampled_descendant_peak_rss": 608239616,
+      "observed_descendants": 4,
+      "live_descendants_after_exit": [],
+      "original_sha256_unchanged": "77f7b965733145a6edae173090ba1b9081266c708a3f141a12f8b281af640074",
+      "all_original_coordinate_labels_equal": true,
+      "shape": [
+        1024,
+        1360
+      ],
+      "count": 46,
+      "dtype": "uint32",
+      "reference_sha256": "628e50bf8273f78f15cc104a6650ed18fe41223315d90e57cc6be5dbb5c0eaed",
+      "state": "succeeded",
+      "execution_id": "f69b85ee7d6f4a7a92cddee50e456db7",
+      "run_id": "ea5ef4b71d58489e9a17f7999e41b16c",
+      "failure_reason": "",
+      "stop_reason": "",
+      "committed_output_sha256": {
+        "labels": "fc707624198066c884fd4c328802c71cf0a89376a99ac913c0df0194cc84299f",
+        "provenance": "1940c8b794d72c1ff734a8b2f6fe9555f6aaac71ee7273eadd75f2000655345d"
+      }
+    },
+    {
+      "case": "Neuroblastoma_13",
+      "returncode": 0,
+      "seconds": 6.539238400058821,
+      "sampled_descendant_peak_rss": 595894272,
+      "observed_descendants": 4,
+      "live_descendants_after_exit": [],
+      "original_sha256_unchanged": "a0a1e82c1fc1c84f358c9764df12634a8cc74b18b710e0f06c81f912e6d611b7",
+      "all_original_coordinate_labels_equal": true,
+      "shape": [
+        1024,
+        1280
+      ],
+      "count": 18,
+      "dtype": "uint32",
+      "reference_sha256": "393afbc341cc7adbe2ba8c33c7e93456f43fd1adfb6cd03ce85843a95acc5086",
+      "state": "succeeded",
+      "execution_id": "0c77963146334e3d8ec0b1970eecce12",
+      "run_id": "0c1bea1f38de41ada44169318a98ed6c",
+      "failure_reason": "",
+      "stop_reason": "",
+      "committed_output_sha256": {
+        "labels": "d85cf46376cc50f314e16ff0ecc8bc249ed10dc772272d10017653acc6d29d4a",
+        "provenance": "32ec40a821037d012fee953cb5f12da1f752be9f56bb5ebbc36327e051291dad"
+      }
+    },
+    {
+      "case": "Neuroblastoma_15",
+      "returncode": 0,
+      "seconds": 6.516706299968064,
+      "sampled_descendant_peak_rss": 600346624,
+      "observed_descendants": 4,
+      "live_descendants_after_exit": [],
+      "original_sha256_unchanged": "6d99d58d176b7c4134fa4548c4b240fda0e52b856391545e7d911d2c8d0db14a",
+      "all_original_coordinate_labels_equal": true,
+      "shape": [
+        1024,
+        1280
+      ],
+      "count": 139,
+      "dtype": "uint32",
+      "reference_sha256": "419dfaad510f15b4992d5f25e0ab08b65c2ad7cd814b302301e29809ee6b6b42",
+      "state": "succeeded",
+      "execution_id": "b1368abb47f94339b4783538ac54c103",
+      "run_id": "242d70bb5ec7479190d3939f0a1e80d2",
+      "failure_reason": "",
+      "stop_reason": "",
+      "committed_output_sha256": {
+        "labels": "c53b67cae9cc29080a20cc9b4ffa7556f8c3f9f364ced8c649c5f4b109372aa9",
+        "provenance": "2e58110d8983293dd49ed53e84f29237e71aec906e1184563c9660b75589825e"
+      }
+    },
+    {
+      "case": "normal_26",
+      "returncode": 0,
+      "seconds": 7.3874075000640005,
+      "sampled_descendant_peak_rss": 599482368,
+      "observed_descendants": 4,
+      "live_descendants_after_exit": [],
+      "original_sha256_unchanged": "4a868853577d5ace7f772333c3e69c3ec9785fd7fcc08767c312fd091818d104",
+      "all_original_coordinate_labels_equal": true,
+      "shape": [
+        1024,
+        1280
+      ],
+      "count": 29,
+      "dtype": "uint32",
+      "reference_sha256": "b0b6ce92877596fce8015ddfe9ed0e6e343afbc6bfe0aca20728edd0ca4ad5e1",
+      "state": "succeeded",
+      "execution_id": "3f6fbfd768ff429597650435fe86144b",
+      "run_id": "48017e60fb90410d826f8a5fd8f6a300",
+      "failure_reason": "",
+      "stop_reason": "",
+      "committed_output_sha256": {
+        "labels": "7421751c747c7e4c4a085256ad86780ebb40b1e5bccf61cd26f92e34f1972ccb",
+        "provenance": "76f03e0e6cb0168672a45bf8d2b57f6f6aaffd654a20e1626f7e04c7c44f8044"
+      }
+    },
+    {
+      "case": "normal_28",
+      "returncode": 0,
+      "seconds": 7.719640100025572,
+      "sampled_descendant_peak_rss": 597123072,
+      "observed_descendants": 4,
+      "live_descendants_after_exit": [],
+      "original_sha256_unchanged": "73ae1a202a163abcf3ec67d9cdc442a91817d50b7b535f0a4c42fc34e27fb312",
+      "all_original_coordinate_labels_equal": true,
+      "shape": [
+        1024,
+        1280
+      ],
+      "count": 19,
+      "dtype": "uint32",
+      "reference_sha256": "d30e90b3344d6e4177e46ac46e0ae6c006cbb9bb880a5403fb7b6490fd9d41f6",
+      "state": "succeeded",
+      "execution_id": "fae75721217b43c384d375d92a83cf09",
+      "run_id": "ee1c368a8cc549a59a757ce8a3378dd4",
+      "failure_reason": "",
+      "stop_reason": "",
+      "committed_output_sha256": {
+        "labels": "61821f8983d81834fb97a9386e0b78ddd79da17483d2c3409abd747d4070d6c7",
+        "provenance": "bd6b5acfef3598b6d734f9879504322cf92c71c8200bea5877a622460b049333"
+      }
+    },
+    {
+      "case": "normal_34",
+      "returncode": 0,
+      "seconds": 7.345358299906366,
+      "sampled_descendant_peak_rss": 600522752,
+      "observed_descendants": 4,
+      "live_descendants_after_exit": [],
+      "original_sha256_unchanged": "91a22a4df04f9661c44baf9d95deba75b8224b2f20c6b9c66c982e35e18e0ef0",
+      "all_original_coordinate_labels_equal": true,
+      "shape": [
+        1024,
+        1360
+      ],
+      "count": 797,
+      "dtype": "uint32",
+      "reference_sha256": "c957772f03886c93534796713fe8b0f0596178532888cb4f9416e3816fd5839a",
+      "state": "succeeded",
+      "execution_id": "41bf97dd582a4f55822ba2c9bce40154",
+      "run_id": "b020b1f1e775401bbce7a749842c6c01",
+      "failure_reason": "",
+      "stop_reason": "",
+      "committed_output_sha256": {
+        "labels": "5469e602389e5ff6b20df7db9b753290edc748b478cf190f1d66dc3f6b29a9cd",
+        "provenance": "7ebc9aca63bb0d9ac076862c478bd9fae07c5a8cf1086952ffe9933394c5c1d2"
+      }
+    },
+    {
+      "case": "otherspecimen_0",
+      "returncode": 0,
+      "seconds": 6.15284450002946,
+      "sampled_descendant_peak_rss": 595804160,
+      "observed_descendants": 4,
+      "live_descendants_after_exit": [],
+      "original_sha256_unchanged": "c3860c244d3e2ab0436299dd0aed88bb7150234dca6b30c484ebb5b6e92b4114",
+      "all_original_coordinate_labels_equal": true,
+      "shape": [
+        1024,
+        1280
+      ],
+      "count": 25,
+      "dtype": "uint32",
+      "reference_sha256": "21e99128b680087a09a5f3316f38d9a4d44456ffb5c9d20b6cde618f86832d7c",
+      "state": "succeeded",
+      "execution_id": "eb4cf587be194f578c6179399e0401cd",
+      "run_id": "188171c1c21e450f8546aebf1d6d7edd",
+      "failure_reason": "",
+      "stop_reason": "",
+      "committed_output_sha256": {
+        "labels": "5e2cb1822b3552511ed4cf761c6bf53bdc3325e03d10d2996375ce803e4a3425",
+        "provenance": "c5f317ea44c7ace2360d24e7e3c706f6a91a4274dfe9d049bf3e8a643378b1cc"
+      }
+    },
+    {
+      "case": "otherspecimen_2",
+      "returncode": 0,
+      "seconds": 6.482067700009793,
+      "sampled_descendant_peak_rss": 599969792,
+      "observed_descendants": 4,
+      "live_descendants_after_exit": [],
+      "original_sha256_unchanged": "07f8cdbe82c0ac71cda4841a78111949c79d72e9a6bf3ff0cea8875f5b345cf9",
+      "all_original_coordinate_labels_equal": true,
+      "shape": [
+        1024,
+        1280
+      ],
+      "count": 183,
+      "dtype": "uint32",
+      "reference_sha256": "f1d8116f27fe137bbaba5c984a6eb9c5984dbaeb46022beb84a80183bdd53172",
+      "state": "succeeded",
+      "execution_id": "c2472d9bf2414ed4a1e13be5f2a48750",
+      "run_id": "cc5700c493144968995231fe96d07bd5",
+      "failure_reason": "",
+      "stop_reason": "",
+      "committed_output_sha256": {
+        "labels": "521f99b60a5dcd6c97bdda1e7344c14776f6bebd75cc54a6e37f606323f28240",
+        "provenance": "d30cefec6d0ee3015f868aed8030653caac75c73d97560a44b5957318f566c97"
+      }
+    },
+    {
+      "case": "otherspecimen_5",
+      "returncode": 0,
+      "seconds": 7.190960199921392,
+      "sampled_descendant_peak_rss": 585617408,
+      "observed_descendants": 4,
+      "live_descendants_after_exit": [],
+      "original_sha256_unchanged": "6d82e0f5fd1a09dda5d89cba4d7470b214de4419c5d064d267348e3e4acd5060",
+      "all_original_coordinate_labels_equal": true,
+      "shape": [
+        1024,
+        1024
+      ],
+      "count": 20,
+      "dtype": "uint32",
+      "reference_sha256": "dba93813a090d58508a11eb811532e6e7c325637603099aa0ab8ff78ca4ad975",
+      "state": "succeeded",
+      "execution_id": "1d3f744814b34c55a61098fe37f482b9",
+      "run_id": "79bf4abd16974608a8e0887fe9564332",
+      "failure_reason": "",
+      "stop_reason": "",
+      "committed_output_sha256": {
+        "labels": "dc3156715e4dc81f12f13c0b82a43e072871e725a0ec0a409a208863904eed06",
+        "provenance": "2e71aafd50b5cf05b0233f6319962294b64ee5f33685d80709455a42b972932f"
+      }
+    },
+    {
+      "case": "valid-empty",
+      "returncode": 0,
+      "seconds": 6.946755600045435,
+      "sampled_descendant_peak_rss": 543240192,
+      "observed_descendants": 4,
+      "live_descendants_after_exit": [],
+      "original_sha256_unchanged": "96d9664cca1f7c0fbc28323d348feafd0e2b4afddac2f0cd17269f7dda31756b",
+      "state": "succeeded",
+      "execution_id": "178bdcb98f084778bb15aa7f30c65065",
+      "run_id": "1d96715d7ca448e3bf358d8e34e306c5",
+      "failure_reason": "",
+      "stop_reason": "",
+      "committed_output_sha256": {
+        "labels": "f8caa1888752b4e4e2a345c48dbcbb8396398653adb8f6ea4b55716966b87dac",
+        "provenance": "a2aaecaefc121f9b4311de979f564c7f06f28a9d906708d04da79611a6d5e492"
+      }
+    },
+    {
+      "case": "missing-model",
+      "returncode": 2,
+      "seconds": 1.4285340999485925,
+      "sampled_descendant_peak_rss": 137613312,
+      "observed_descendants": 4,
+      "live_descendants_after_exit": [],
+      "original_sha256_unchanged": "96d9664cca1f7c0fbc28323d348feafd0e2b4afddac2f0cd17269f7dda31756b",
+      "state": "failed",
+      "execution_id": "dbf82087a3074b2986a75528af0f4990",
+      "run_id": "b97c1d0c7149401e8e9e8a0f4adc880c",
+      "failure_reason": "ValueError: model_missing: prepare the fixed P014 model directory explicitly",
+      "stop_reason": "",
+      "committed_output_sha256": {}
+    },
+    {
+      "case": "bad-model-digest",
+      "returncode": 2,
+      "seconds": 1.3296456000534818,
+      "sampled_descendant_peak_rss": 134512640,
+      "observed_descendants": 4,
+      "live_descendants_after_exit": [],
+      "original_sha256_unchanged": "96d9664cca1f7c0fbc28323d348feafd0e2b4afddac2f0cd17269f7dda31756b",
+      "state": "failed",
+      "execution_id": "f366bf0a096845738cbb35d5f9c58045",
+      "run_id": "c01a1ec8e7114734a2f410159c3fb1a2",
+      "failure_reason": "ValueError: model_digest_mismatch: config.json",
+      "stop_reason": "",
+      "committed_output_sha256": {}
+    },
+    {
+      "case": "cancel-during-load",
+      "returncode": 2,
+      "seconds": 5.611324300058186,
+      "sampled_descendant_peak_rss": 445210624,
+      "observed_descendants": 4,
+      "live_descendants_after_exit": [],
+      "original_sha256_unchanged": "96d9664cca1f7c0fbc28323d348feafd0e2b4afddac2f0cd17269f7dda31756b",
+      "state": "cancelled",
+      "execution_id": "ce1cd6200d4c48fd957ffeb16c926c93",
+      "run_id": "3421dbeaf5e44c048c0560c79884149c",
+      "failure_reason": "Node process cancelled",
+      "stop_reason": "deadline",
+      "committed_output_sha256": {}
+    },
+    {
+      "case": "reject-uint16",
+      "returncode": 2,
+      "seconds": 0.5430097000207752,
+      "sampled_descendant_peak_rss": 61095936,
+      "observed_descendants": 1,
+      "live_descendants_after_exit": [],
+      "original_sha256_unchanged": "74c5926aa18c78f3175d788499466f899497b459942f4402fc80b6a7f112993b",
+      "state": "input_failed"
+    }
+  ],
+  "implementation_digest": "802af0ec4eb48074cbe64a19078b406986e8ae5962eafcde8eb5526c88957f30",
+  "research_python": "3.12.14; Windows x64; explicit isolated wheel installation",
+  "source_artifacts": "p015-research/regression-02 (outside repository); P014 frozen direct outputs unmodified"
+}

@@ -1,6 +1,7 @@
 [importlinter]
 root_packages =
     wb_tool
+    nuclei_tool
     tool_contracts
     platform_runtime
     bioimage_app
@@ -49,6 +50,7 @@ source_modules = tool_contracts
 forbidden_modules =
     platform_runtime
     wb_tool
+    nuclei_tool
     PySide6
     numpy
     sqlite3
@@ -59,6 +61,7 @@ type = forbidden
 source_modules = platform_runtime
 forbidden_modules =
     wb_tool
+    nuclei_tool
     PySide6
     numpy
 
@@ -67,6 +70,7 @@ name = WB tool and host persistence remain independent
 type = independence
 modules =
     wb_tool
+    nuclei_tool
     platform_runtime
 
 [importlinter:contract:host-storage-purity]
@@ -75,6 +79,7 @@ type = forbidden
 source_modules = bioimage_app.storage
 forbidden_modules =
     wb_tool
+    nuclei_tool
     numpy
 
 [importlinter:contract:lower-host-independence]
@@ -84,5 +89,29 @@ source_modules =
     tool_contracts
     platform_runtime
     wb_tool
+    nuclei_tool
 forbidden_modules = bioimage_app
 
+
+[importlinter:contract:nuclei-domain]
+name = Nuclei domain stays pure
+type = forbidden
+source_modules = nuclei_tool.domain
+forbidden_modules =
+    nuclei_tool.adapters
+    nuclei_tool.application
+    PySide6
+    sqlite3
+    subprocess
+    multiprocessing
+    pathlib
+
+[importlinter:contract:nuclei-application]
+name = Nuclei application never imports adapters
+type = forbidden
+source_modules = nuclei_tool.application
+forbidden_modules =
+    nuclei_tool.adapters
+    PySide6
+    sqlite3
+    subprocess

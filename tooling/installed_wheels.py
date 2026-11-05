@@ -69,6 +69,33 @@ def installed_check(
     return 0
 
 
+NUCLEI_SCRIPT = """
+import importlib.util
+import subprocess
+import sys
+from pathlib import Path
+import numpy as np
+from PIL import Image
+import nuclei_tool.api
+from nuclei_tool.api import read_nuclei_input, nuclei_module_spec
+assert Path(nuclei_tool.api.__file__).is_relative_to(Path(sys.prefix))
+for name in ('tensorflow', 'stardist', 'PySide6', 'platform_runtime', 'wb_tool'):
+    assert importlib.util.find_spec(name) is None
+    assert name not in sys.modules
+source = Path('nuclei-original.tif')
+Image.fromarray(np.arange(48, dtype=np.uint8).reshape(6, 8)).save(source)
+original = source.read_bytes()
+loaded = read_nuclei_input(str(source))
+np.testing.assert_array_equal(loaded.pixels, np.arange(48).reshape(6, 8))
+assert source.read_bytes() == original
+assert nuclei_module_spec().module_id == 'nuclei-stardist-research'
+process = subprocess.run([sys.executable, '-I', '-m', 'nuclei_tool.worker'],
+                         input=b'', capture_output=True, timeout=15, check=False)
+assert process.returncode == 2
+assert b'"kind":"hello"' in process.stdout
+print('Isolated nuclei wheel: original input and worker hello; no model/GUI/storage dependencies')
+"""
+
 WB_SCRIPT = """
 import sys
 from pathlib import Path
@@ -829,7 +856,7 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="bioimage-wheel-") as temporary:
         folder = Path(temporary)
         wheel_dir = folder / "wheels"
-        packages = ("wb-tool", "tool-contracts", "platform-runtime", "bioimage-app")
+        packages = ("wb-tool", "nuclei-tool", "tool-contracts", "platform-runtime", "bioimage-app")
         built: dict[str, Path] = {}
         for package in packages:
             code = subprocess.run(
@@ -850,6 +877,7 @@ def main() -> int:
                 RUNTIME_SCRIPT,
             ),
             ("wb-tool", [built["tool-contracts"], built["wb-tool"]], WB_SCRIPT),
+            ("nuclei-tool", [built["tool-contracts"], built["nuclei-tool"]], NUCLEI_SCRIPT),
             (
                 "bioimage-app",
                 [built["tool-contracts"], built["platform-runtime"], built["bioimage-app"]],
