@@ -18,3 +18,5 @@ PR63的4ebb14d仍运行原必需CI，不推送其活动分支新HEAD。此补充
 - [Cellpose当前模型文档](https://cellpose.readthedocs.io/en/latest/models.html)页头为4.2.1-1-ga54cb48，列有SAM/DINO模型，首次调用会自动下载权重。不能依“latest”不加区分地安装；下一项需固定具体发布/模型，先核权重许可、大小与CPU可行性，再决定是否纳入少量候选。这里没有授权下载大模型或证明性能。
 
 BBBC038/039及DSB2018关系已在任务卡标明；下阶段先检索未参与候选训练的适用公开标注，再冻结独立留出，无法核实重叠则仅报告诊断表现。
+
+另已只读核对BBBC039官方metadata.zip中的`metadata/segmentation_cp3.cppipe`，不是新编pipeline。文件头Version:3/DateRevision:300/ModuleCount:14；IdentifyPrimaryObjects输入为DNA_subtract_edges_background，典型直径20–80px、Shape去粘连/Intensity分界，含固定平滑等设置。仅说明官方有可直接调用的历史参考链，不把这些字段解释为全部生效参数或转换成功。下一项应先核官方当前示例与该旧pipeline的版本兼容、前处理及标签导出，真实运行后才比较，不能自行简化复写后声称同一pipeline。该参考是否利用过全部BBBC039调参尚未知，故其数据集表现也不能冒充外部独立泛化。
