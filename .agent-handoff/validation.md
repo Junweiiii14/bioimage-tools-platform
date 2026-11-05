@@ -178,3 +178,7 @@ ed830e1准确完整门禁1503 passed/756.15s+全部isolated wheels/exit0，HEAD/
 ## 2026-11-03 B019文档检查
 
 五HTML桌面/窄屏/搜索/菜单/打印通过，250本地MD链接无缺失，3历史Git blob摘要一致，15工作包/10卡检查通过，1243文件格式与policy通过。未验新实验/科学/用户/付费；准确提交PR检查另核验，详细见work/evidence/B-019/validation.md。
+
+## 2026-11-05 P012工程验收
+
+最终dd99855，PR62/main f30ea5d。CI42044467802 Windows1703passed/1154.86s、Linux1699passed/4既有skip/669.38s，双平台wheel/check--all通过；规则/桌面依赖success。本机全量1701pass/2旧canvas失败/1264.29s exit1，CI环境定向6pass/28.64s exit0，单独wheel exit0。GPU根因UNKNOWN；详见P012/final-delivery，非科学或真人试用通过。
