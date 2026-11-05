@@ -25,8 +25,10 @@
 - `uv run --locked --no-sync pytest tests/test_intake_web_ui.py::test_sequence_field_blur_preserves_next_real_click tests/test_wb_student_results.py -q`：4 passed / 30.44s，exit 0。实际 Qt 鼠标验证单击焦点/来源，自动处理三组用例保留既有正反例断言并增加完整关闭/打开路由检查；未弱化预期或容差。
 - 生成器新目录执行 exit 0；独立像素检查与走查 TIFF 完全相同、uint16。对同目录再执行得到预期 FileExistsError 非零，前后文件 SHA 不变；外层验证 exit 0。
 - 独立 ZIP/XML/PNG 检查 exit 0，详细临时数据在 `.local/p012-artifact-check.json`；本页记录必要结果，不提交长日志。
-- 完整门禁、准确候选独审与 PR 集成结果后续记录；此处不预报通过。
+- 准确候选 76bd5b7 已通过[独立审查](independent-review.md)。PR62 必需 CI 运行中；本机完整门禁已出现两项失败及 GPU context-lost 日志，等待终态定位，不预报通过。
 
 ## 试用边界
 
 [学生练习及观察项](../../../examples/wb-first-use/README.md) 交给准备人员生成素材，再由学生独立尝试。真实实验配对、组别、重复和原软件扣背景口径仍 UNKNOWN；本次不猜测。科学适用性、真人学生独立使用、干净 Windows/GPU/DPI 与外部表格软件均未验，不由合成走查或工程测试代替。
+
+补充核验：所有导出记录以断言检查数值/空值/身份，原始 A/B SHA 与走查开始记录逐字一致，exit 0。原基线走查窗口正常关闭并确认消失。修复版另开窗口后工具报告用户输入/最小化，停止继续抢占；修复回归已有真实 Qt 鼠标和关闭重开验证，不将本次未完成手工复查写成通过。
