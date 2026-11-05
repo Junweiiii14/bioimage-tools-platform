@@ -42,6 +42,11 @@ def normalization_table_rows(
             "比值原因",
             "相对值状态",
             "相对值原因",
+            "实验 ID",
+            "处理组",
+            "生物重复 ID",
+            "技术重复 ID",
+            "样本身份状态",
         )
     ]
     audit: list[tuple[Cell, ...]] = [
@@ -98,6 +103,11 @@ def normalization_table_rows(
                 c.ratio_reason,
                 c.relative_status,
                 c.relative_reason,
+                c.experiment_id,
+                c.group,
+                c.biological_replicate,
+                c.technical_replicate,
+                "已填写（未自动汇总）" if c.identity_status == "specified" else "身份未填全",
             )
         )
         plan = plans[c.target_row_id]

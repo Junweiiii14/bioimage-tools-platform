@@ -1,6 +1,6 @@
 # P-011 WB学生结果闭环
 
-<!-- PROGRAM_TASK_META {"id":"P-011","status":"in_progress","work_package":"W06","depends_on":["P-010","P-002","P-003","P-009"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex WB implementation","base_commit":"c8f1bcbacbfcc02a1bbfbb190ae8a967012e120b","head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-011","status":"in_progress","work_package":"W06","depends_on":["P-010","P-002","P-003","P-009"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex WB implementation","base_commit":"87dba64196f8591405dd222f05a69dca07434291","head_commit":null} -->
 
 ## 范围
 
@@ -11,7 +11,7 @@
 3. 当前结果页提供连续的样本对应/归一化路径和逐记录交换表，沿用条带图导出；保存重开保留配置、身份与正式运行来源。
 4. 用明确身份的解析合成输入走真实网页/worker/导出/重开；必要回归与绑定提交独审后经PR必需检查集成。最终工程、科学、用户三类结果分开报告。
 
-不引入新方法/正式几何、第二实验、全套统计、通用实验管理或Agent。真实材料仅用于已授权只读核对，不提交私有原图或表格。科学留出、负责人判据与学生独立试用仍缺，不冻结无依赖工程。
+不引入新积分公式/正式几何变换、第二实验、全套统计、通用实验管理或Agent。真实材料仅用于已授权只读核对，不提交私有原图或表格。科学留出、负责人判据与学生独立试用仍缺，不冻结无依赖工程。
 
 ## 完成条件
 
@@ -22,4 +22,14 @@
 
 ## 当前进度
 
-已建立任务，待重载范围后实施。P010接续树初始缺依赖已按现有锁安装；当前主线不重做P009。
+产品候选918af16；测试入口修正e349b2e；静态视觉证据1970937。前置调研PR61已按必需检查正常合入main87dba64，产品分支已合入该主线，P011规则及唯一集成清单已重载到准确基线。历史回执全部保留，未修改门禁。产品PR60仍为草稿，独立审查已完成，尚未合并。
+
+当前入口单图/三联图正例、dtype_min负例均经真实worker/归一化/导出/重开通过；原图、既存归档及run ID保持。新解析面积与邻带/孔洞/裁图边界/旧wire5例通过，相关现有42例通过。visual/三张CDP原始截图已查看：配对、重复身份和五行结果显示完整。
+
+旧PR60 head35cfe的双平台全门禁通过：Windows1702passed，Linux1698passed/4既有平台skip；隔离wheel及desktop-environment通过。本机初次全门禁1696pass/5fail完整保留，后续定位并修正测试绕过网页token、预览读取busy同步两项；定向3例通过。未改产品取消保护、超时或科学质量判据。测试修正后的最终HEAD仍需重跑服务器必需检查。详细失败/修正过程见[progress](../evidence/P-011/progress.md)。
+
+用户授权的只读独立审查发现身份草稿共享P2，已在4dcd41e修复并通过独立Node及真实网页复审。审查绑定base87dba64及产品HEAD4dcd41e，详见[independent-review](../evidence/P-011/independent-review.md)。旧head7e875d1规则/desktop已通过；修复后的最终HEAD仍需完整服务器必需检查及正常PR集成。科学适用性、独立学生试用、干净Windows/GPU/DPI未验；CDP工具曾打印0xc0000139但exit0，保留环境限制。
+
+## 必要的背景范围修正
+
+当前入口把允许背景搜索范围等同于窄条带目标，导致已有anchored_background@1无法工作。新增版本化bounded_background_context@1：目标槽位和显示框不变，仅在原图裁图、有效膜区内且不跨其他检测标签的位置允许最多25%上下文，实际是否采用仍由现有背景检查决定。旧记录缺新标记保持原范围与原值，不重算历史；不修改积分、阈值、对照或质量判据。契约见[有界背景](../../docs/contracts/wb-bounded-background-context-v1.md)。

@@ -1,0 +1,11 @@
+# WB有界背景上下文 v1
+
+P011当前批次入口回归发现：prominent采样目标按核心加3像素边距生成，旧common_sampling_crop_limits@1把背景搜索限制为目标本身，完整矩形条带也可能无法满足anchored_background@1的持续背景支持。旧结果仍真实记录此失败。
+
+新检测保持source/guided_prominent_band_geometry@1的主行选择、目标槽位、显示框和原值裁剪不变。新增子策略bounded_background_context@1，仅为目标建立允许搜索的原坐标Y范围：最多原目标高度25%（与现有anchored_context整数舍入一致），限于当前裁图与检测有效区域；遇到任意列的膜外/孔洞或非选中检测标签即停止，不跨越邻行。X和目标身份不变。检测坐标反投影只判断区域合法性，采样与积分继续读取原始uint8/uint16像素。
+
+是否实际扩大仍由既有anchored_background@1尝试5/10/15/20/25%并取首个满足原判据的范围决定；不按面积最大化，不改变profile_integral@1、背景阈值、饱和/失败判据或归一化。新策略不证明未检出邻带不存在，不代表真实实验适用性已验证。
+
+持久化IntakeFixedGrid新增context_policy。缺字段读为crop_bounds@1，写回省略默认值，保留旧采样限制；新值bounded_background_context@1须绑定检测同名flag，范围不能越出裁图。未知版本拒绝；旧软件对新字段明确拒读。已完成测量、旧草稿、原图和归档不迁移、不重算；明确重新执行才产生新证据。
+
+验证：test_bounded_background_context验证独立解析面积13×30000、邻带/膜孔洞/裁图边界、旧wire稳定；test_wb_student_results走当前网页/真实worker/归一化/导出/重开，正常输入比值1，含dtype_min像素的输入保持无效，原图与原归档SHA保持。用例不是独立科学或学生验收。

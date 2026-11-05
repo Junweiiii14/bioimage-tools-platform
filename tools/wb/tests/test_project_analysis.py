@@ -26,6 +26,7 @@ from wb_tool.api import (
     ProjectOCRRow,
     ProjectOCRState,
     ProjectRowAnalysis,
+    SampleIdentity,
     SamplePair,
     TextBounds,
     TextToken,
@@ -680,3 +681,61 @@ def test_metadata_batch_preserves_verified_ocr_and_ratios_until_n_changes(tmp_pa
     assert changed.analyses == renamed.analyses and changed.ocr == renamed.ocr
     assert all(c.ratio is None for c in fill_project_normalization(changed, results, loaded).cells)
     assert fill_project_ocr_table(changed, results, loaded)[0].value is None
+
+
+def test_sample_identity_roundtrip_export_and_legacy_shape(tmp_path: Path) -> None:
+    import csv
+    import io
+
+    from wb_tool.adapters.normalization_export import normalization_csv_bytes
+
+    project, paths = configured(tmp_path)
+    project, results = complete(project, paths)
+    plan = make_normalization_plan(project, "row0", "row1", "housekeeping")
+    identity = SampleIdentity(
+        experiment_id="experiment-1",
+        group="=control",
+        biological_replicate="animal-1",
+        technical_replicate="measurement-1",
+    )
+    # Old pairs retain exactly their old wire shape; no inferred identity on read.
+    old_pair = SamplePair(target_lane=1, sample="sample-1", reference_lane=1)
+    assert "identity" not in old_pair.model_dump(mode="json")
+    assert SamplePair.model_validate_json(old_pair.model_dump_json()).identity is None
+    pairs = (
+        old_pair.model_copy(update={"identity": identity, "control": True}),
+        plan.pairs[1],
+        SamplePair(target_lane=3, sample="sample-3", reference_lane=2),
+    )
+    plan = plan.model_copy(
+        update={"pairs": pairs, "confirmed": True, "control_mode": "single_control"}
+    )
+    normalized = project_with_normalizations(project, (plan,))
+    reopened = read_figure_project(normalized.model_dump_json().encode())
+    assert reopened == normalized
+    cells = fill_project_normalization(normalized, results).cells
+    assert [c.ratio for c in cells] == [0.5, None, 0]
+    assert [c.relative for c in cells] == [1, None, 0]
+    assert [c.identity_status for c in cells] == ["specified", "incomplete", "incomplete"]
+    records = list(
+        csv.DictReader(
+            io.StringIO(normalization_csv_bytes(normalized, results, None).decode("utf-8-sig"))
+        )
+    )
+    assert records[0]["处理组"] == "text:=control"
+    records = [{k: v.removeprefix("text:") for k, v in row.items()} for row in records]
+    assert len(records) == 3
+    assert records[0]["实验 ID"] == "experiment-1"
+    assert records[0]["生物重复 ID"] == "animal-1"
+    assert records[0]["技术重复 ID"] == "measurement-1"
+    assert records[1]["目标/参照"] == ""
+    assert float(records[2]["目标/参照"]) == 0
+    assert records[2]["样本身份状态"] == "身份未填全"
+    assert records[0]["来源_目标运行"] == "row0"
+    with pytest.raises(ValueError):
+        SampleIdentity.model_validate({"schema_version": 2})
+    path = tmp_path / "identity.xlsx"
+    export_project_normalization(normalized, results, None, str(path))
+    with ZipFile(path) as archive:
+        raw = archive.read("xl/worksheets/sheet1.xml")
+        assert b"=control" in raw and b"<f>" not in raw

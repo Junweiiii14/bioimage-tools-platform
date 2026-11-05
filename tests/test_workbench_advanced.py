@@ -382,9 +382,41 @@ def test_actual_web_forms_save_reopen_and_export(
         for i in range(3):
             field(f"plans.0.pairs.{i}.sample", f"sample-{i + 1}")
             field(f"plans.0.pairs.{i}.reference_lane", i + 1)
+            field(f"plans.0.pairs.{i}.identity.experiment_id", "experiment-1")
+            field(f"plans.0.pairs.{i}.identity.group", "control" if i == 0 else "treated")
+            field(f"plans.0.pairs.{i}.identity.biological_replicate", f"animal-{i + 1}")
+            field(f"plans.0.pairs.{i}.identity.technical_replicate", "measurement-1")
         js("document.querySelector('[data-adv-path=\"plans.0.confirmed\"]').click()")
         click("normalization_apply")
         completed()
+        # A failed reread after discard must not retain edits in the saved snapshot.
+        field("plans.0.pairs.0.identity.group", "discarded-group")
+        manager = window.bridge.advanced_commands
+
+        def fail_read(request: dict[str, object]) -> None:
+            assert request["operation"] == "open"
+            manager.emit(str(request["requestId"]), "failed", "Read unavailable")
+
+        with monkeypatch.context() as patch:
+            patch.setattr(manager, "command", fail_read)
+            click("discard")
+            qtbot.waitUntil(
+                lambda: (
+                    javascript(
+                        window, qtbot, "document.querySelector('#advanced-status').textContent"
+                    )
+                    == "Read unavailable"
+                )
+            )
+        field("plans.0.pairs.0.sample", "renamed-sample")
+        js("document.querySelector('[data-adv-path=\"plans.0.confirmed\"]').click()")
+        click("normalization_apply")
+        completed()
+        after_discard = host.view.project()
+        assert isinstance(after_discard, WBNormalizedProject)
+        pair = after_discard.normalizations[0].pairs[0]
+        assert pair.sample == "renamed-sample"
+        assert pair.identity and pair.identity.group == "control"
         norm_path = tmp_path / "web-normalization.csv"
         monkeypatch.setattr(
             "bioimage_app.web_advanced.QFileDialog.getSaveFileName",
@@ -396,6 +428,17 @@ def test_actual_web_forms_save_reopen_and_export(
         saved = host.view.project()
         assert isinstance(saved, WBNormalizedProject)
         assert saved.normalizations[0].confirmed and host.current_draft_saved
+        identity = saved.normalizations[0].pairs[0].identity
+        assert identity and identity.experiment_id == "experiment-1"
+        assert identity.biological_replicate == "animal-1"
+        assert "text:animal-1" in norm_path.read_text(encoding="utf-8-sig")
+        click("tables_refresh")
+        completed()
+        assert "已填写" in str(
+            javascript(window, qtbot, "document.querySelector('[data-derived-table]').textContent")
+        )
+        qtbot.wait(150)  # Let the native compositor present the new form before capture.
+        assert window.grab().save(str(tmp_path / "sample-identity.png"))
         js("closeDrawer()")
         host.load_document(saved.project_id)
         qtbot.waitUntil(lambda: not host.operation_busy, timeout=20000)

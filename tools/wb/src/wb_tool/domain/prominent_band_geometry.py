@@ -14,6 +14,7 @@ from numpy.typing import NDArray
 from wb_tool.domain.automatic import AutoWBSettings
 from wb_tool.domain.band_geometry_support import (
     BandCore,
+    bounded_background_limits,
     closing,
     fit_row,
     marker_end,
@@ -415,6 +416,7 @@ def detect_prominent_band_geometry(
                     frame_height=frame_height,
                 )
                 lanes = sampling_rectangles(lanes, plane, support, cx, cy, frame.width, angle)
+                limits = bounded_background_limits(lanes, crop, plane, (labels > 0) & ~support)
                 evidence = (
                     *flags,
                     "prominent_band_row@1",
@@ -422,7 +424,7 @@ def detect_prominent_band_geometry(
                     "fixed_n_frame@2",
                     "prominent_envelope_frame@1",
                     "source_axis_partition@2",
-                    "common_sampling_crop_limits@1",
+                    "bounded_background_context@1",
                     f"prominent_row_score:{score:.6f}",
                     f"prominent_row_cores:{len(members)}",
                     "column_local_threshold@1" if local else "global_core_threshold@1",
@@ -457,7 +459,7 @@ def detect_prominent_band_geometry(
                     (candidate,),
                     evidence,
                     algorithm,
-                    lanes,
+                    limits,
                     missing,
                 )
             except ValueError as error:

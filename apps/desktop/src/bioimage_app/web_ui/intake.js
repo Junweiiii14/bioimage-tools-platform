@@ -1717,10 +1717,11 @@ window.intakeWorkspace = (() => {
         if (showingResults) {
             if (!$('.intake-full-records', root)) {
                 root.innerHTML =
-                    '<div class="intake-heading"><div><h1>本次结果</h1><p>选择蛋白可返回对应原图与范围。</p></div><button class="button subtle" data-intake-table-export>导出 Excel / CSV</button></div><div data-intake-result-grid></div><details class="intake-full-records"><summary>完整测量记录 · 有效信号与状态</summary></details><div data-intake-result-output></div>';
+                    '<div class="intake-heading"><div><h1>本次结果</h1><p>选择蛋白可查看原图与范围；需要相对表达量时，继续填写样本对应。</p></div><div class="advanced-actions"><button class="button primary" data-action="advanced" data-section="normalization">样本对应与归一化</button><button class="button subtle" data-intake-table-export>导出原始积分</button></div></div><div data-intake-result-grid></div><details class="intake-full-records"><summary>完整测量记录 · 有效信号与状态</summary></details><div data-intake-result-output></div>';
                 $('.intake-full-records', root).append(resultStage);
             }
             $('[data-intake-table-export]', root).disabled = state.busy || hasDraft();
+            $('[data-section=normalization]', root).disabled = state.busy || hasDraft();
             updateMarkup(
                 $('[data-intake-result-grid]', root),
                 window.intakeViews.results({

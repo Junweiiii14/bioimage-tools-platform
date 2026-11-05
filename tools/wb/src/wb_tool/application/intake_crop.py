@@ -73,6 +73,9 @@ class IntakeWidthCalibration(DocumentIO):
 
 
 class IntakeFixedGrid(DocumentIO):
+    context_policy: Literal["crop_bounds@1", "bounded_background_context@1"] = Field(
+        default="crop_bounds@1", exclude_if=lambda value: value == "crop_bounds@1"
+    )
     policy: Literal["fixed_n_frame@1", "fixed_n_frame@2"] = "fixed_n_frame@1"
     sampling_policy: Literal["source_axis_partition@1", "source_axis_partition@2"] = (
         "source_axis_partition@1"
@@ -354,6 +357,16 @@ class IntakeCropEvidence(DocumentIO):
         if any((s.roi is None) != (s.signal == "unlocated") for s in self.slots):
             raise ValueError("未定位槽位不能伪装为信号状态")
         if (grid := self.fixed_grid) is not None:
+            if grid.context_policy == "bounded_background_context@1" and (
+                self.detection is None
+                or grid.context_policy not in self.detection.flags
+                or self.crop is None
+                or any(
+                    not self.crop.y0 <= limit.y0 < limit.y1 <= self.crop.y1
+                    for limit in grid.sampling_limits
+                )
+            ):
+                raise ValueError("背景上下文须绑定版本化检测证据并保留在原裁图内")
             if tuple(sorted(set(grid.review_positions))) != grid.review_positions or any(
                 type(i) is not int or not 1 <= i <= self.lane_count for i in grid.review_positions
             ):
@@ -579,6 +592,9 @@ def make_intake_crop_evidence(
             calibration=width_calibration,
             source_estimate=width_estimate,
             sampling_limits=sampling_limits,
+            context_policy="bounded_background_context@1"
+            if "bounded_background_context@1" in detection.flags
+            else "crop_bounds@1",
             review_positions=review_positions,
         )
         if candidate

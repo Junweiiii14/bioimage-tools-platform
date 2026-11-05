@@ -1,11 +1,13 @@
 # 当前恢复入口
 
-2026-11-04：用户授权P010，从WB研究普通学生的完整流程、结果和现有缺口，并交新窗口使用真实目标模式持续推进。活动树bioimage-plan-sync，分支codex/p010-wb-discovery；继承200720f的B019本地收尾，main基线c8f1bcb。原主目录旧dirty不碰。
+2026-11-04，当前任务[ P011 WB学生结果闭环 ](../work/tasks/P-011-wb-student-results.md)，无预算active goal继续。活动树C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync，分支codex/p010-wb-discovery；原bioimage-tools-platform旧dirty树不碰。
 
-- 当前任务转work/tasks/P-011-wb-student-results.md；P010调研记录见work/evidence/P-010/wb-discovery.md。明确缺口：自动裁图reviewed=false与旧归一化人工标记不兼容、重复身份未结构化；归一化UI本已接入，不重写。
-- 当前优先：复用已有WB测量、配对/归一化、成图导出，研究学生完整路径；样本/重复与统计交换表是候选缺口。P009已完成，不照旧审计重建执行器。
-- 本聊天已成功create_goal，active、无token预算。继续P011最小完整切片，不全面扩展其他实验或Agent；待重载P011 context后修改产品。
-- 用户确认不知道配对/分组重复/软件背景方法，并要求少问、自主调研。这些科学语义保留UNKNOWN，明确合成身份支持工程对照，真实科学/学生验收不宣称通过。
-- 基线bf52b61归一化15测试、网页worker/CAS2测试、自动完整入口17checks通过；offscreen GPU日志及原生computer-use窗口绑定失败保留。接续树原缺依赖，已uv sync --locked --all-groups；不改锁。原生验收进程45312由本聊天启动，尚需正常关闭，不操作其他窗口。
-- 用户要求不要过度设计/过度防御：小文案与收尾记录随正常任务处理，不追加完整检查轮次；数据保护、科学口径和既有必需检查保留。
-- 真实未验边界仍见risks及Issue57；资料目录可只读核对，原图、旧结果和未提交内容不覆盖、不上传。
+- P010调研已完成并经PR61正常合入main87dba64196f8591405dd222f05a69dca07434291。P002/M1/M2/P009不重做。
+- 当前产品HEAD4dcd41e（修复身份草稿共享），合入main提交411aadb，产品918af16，测试修正e349b2e，视觉证据1970937。P011回执已重载新基线，唯一当前integration清单历史为空；P010/B019原回执在main完整保留，未删改门禁。
+- 产品PR60仍draft：https://github.com/Junweiiii14/bioimage-tools-platform/pull/60。7e875d1的rules-context和desktop已成功，双平台旧运行41839649342不能覆盖4dcd41e；本次提交审查记录后push触发最终CI。旧head35cfe的Windows/Linux全门禁与desktop已成功，不能代替新HEAD检查。
+- 本机全门禁91098已终态exit1：1696pass/5fail；父目录p011-check-all.log。定向诊断发现两处测试入口/同步问题：native freeze无网页token触发正确的dirty保护；snapshot预览读取未完就continue。只改测试走真实按钮/等待ready，3例通过；没有改产品保护或门槛。
+- 当前端到端单图/三联图/无效反例3例通过，解析面积/背景边界/旧wire5例通过。CDP实际画面已查看，证据work/evidence/P-011/visual；Qt grab可陈旧，CDP工具打印0xc0000139但exit0，仍不代表干净目标环境验收。
+- 没有本机测试进程仍需等待；91098、78523、39739、56657、65363、63827、23692均已终态。自行启动原生窗口45312及子53468已正常关闭。下一步只追踪PR60新CI，勿重启已完成测试。
+- 只读独立审查已完成：初审发现身份草稿共享P2，4dcd41e修复；独立Node及真实GUI复审通过，见P011/independent-review.md。独审绑定最终产品提交；作者自验不算独审。尚未满足产品合并/goal完成条件。
+- 用户不知道真实配对/处理组/重复/原软件背景方法，并要求少问自主推进。科学语义保持UNKNOWN，合成输入不证明真实实验效果；独立学生试用、科学留出与干净Windows/DPI待办见risks，不冻结无依赖工程。
+- 用户不要过度设计：普通文案/交接随任务处理，不扩展其他实验、Agent、安装器发布、外联、花费或数据上传。

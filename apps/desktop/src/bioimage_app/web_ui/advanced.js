@@ -123,7 +123,21 @@ window.advancedWorkspace = (() => {
             reference: '',
             kind: '',
             active: data.normalizations[0]?.target.row_id || '',
-            plans: copy(data.normalizations),
+            plans: data.normalizations.map((plan) => ({
+                ...copy(plan),
+                pairs: plan.pairs.map((pair) => ({
+                    ...copy(pair),
+                    identity: copy(
+                        pair.identity || {
+                            schema_version: 1,
+                            experiment_id: '',
+                            group: '',
+                            biological_replicate: '',
+                            technical_replicate: '',
+                        },
+                    ),
+                })),
+            })),
             ocrLabels: false,
         };
     }
@@ -621,19 +635,36 @@ window.advancedWorkspace = (() => {
                           ['single_control', '相对单个对照'],
                           ['control_mean', '相对所选对照均值'],
                       ],
-                  )}</label>${field('实验对应说明', p + 'notes', plan.notes)}</div><div class="advanced-table-scroll"><table class="advanced-table"><thead><tr><th>目标泳道</th><th>样本 / 重复编号</th><th>参照泳道</th><th>包含</th><th>对照</th></tr></thead><tbody>${plan.pairs.map((r, i) => `<tr><th>${r.target_lane}</th><td>${input(p + `pairs.${i}.sample`, r.sample)}</td><td>${input(p + `pairs.${i}.reference_lane`, r.reference_lane, 'number', `min="1" max="${plan.reference.lane_count}" placeholder="未对应"`)}</td><td>${input(p + `pairs.${i}.included`, r.included, 'checkbox')}</td><td>${input(p + `pairs.${i}.control`, r.control, 'checkbox')}</td></tr>`).join('')}</tbody></table></div><label class="advanced-check">${input(p + 'confirmed', plan.confirmed, 'checkbox')}我已核对样本对应与参照</label><div class="advanced-actions">${button('normalization_remove', '移除此关系')}</div></section>`
+                  )}</label>${field('实验对应说明', p + 'notes', plan.notes)}</div><div class="advanced-table-scroll"><table class="advanced-table"><thead><tr><th>目标泳道</th><th>样本 ID</th><th>参照泳道</th><th>包含</th><th>对照</th></tr></thead><tbody>${plan.pairs.map((r, i) => `<tr><th>${r.target_lane}</th><td>${input(p + `pairs.${i}.sample`, r.sample)}</td><td>${input(p + `pairs.${i}.reference_lane`, r.reference_lane, 'number', `min="1" max="${plan.reference.lane_count}" placeholder="未对应"`)}</td><td>${input(p + `pairs.${i}.included`, r.included, 'checkbox')}</td><td>${input(p + `pairs.${i}.control`, r.control, 'checkbox')}</td></tr>`).join('')}</tbody></table></div><h3>实验与重复身份</h3><p>每个测量保留一行。生物重复标识独立生物样本，技术重复标识同一样本的重复测量；软件不据此计算独立样本数或自动取平均。未知请留空，导出会标明身份未填全。</p><div class="advanced-table-scroll"><table class="advanced-table"><thead><tr><th>目标泳道</th><th>实验 ID</th><th>处理组</th><th>生物重复 ID</th><th>技术重复 ID</th></tr></thead><tbody>${plan.pairs
+                      .map(
+                          (r, i) =>
+                              `<tr><th>${r.target_lane}</th>${[
+                                  ['experiment_id', '实验 ID'],
+                                  ['group', '处理组'],
+                                  ['biological_replicate', '生物重复 ID'],
+                                  ['technical_replicate', '技术重复 ID'],
+                              ]
+                                  .map(
+                                      ([key, label]) =>
+                                          `<td>${input(p + `pairs.${i}.identity.${key}`, r.identity[key], 'text', `maxlength="128" aria-label="泳道 ${r.target_lane} ${label}"`)}</td>`,
+                                  )
+                                  .join('')}</tr>`,
+                      )
+                      .join(
+                          '',
+                      )}</tbody></table></div><label class="advanced-check">${input(p + 'confirmed', plan.confirmed, 'checkbox')}我已核对样本对应与参照</label><div class="advanced-actions">${button('normalization_remove', '移除此关系')}</div></section>`
                 : ''
-        }<section class="advanced-section"><h3>归一化结果</h3><div class="advanced-actions">${button('tables_refresh', '刷新结果')}<label class="advanced-check">${input('ocrLabels', d.ocrLabels, 'checkbox')}使用已确认 OCR 标签</label>${button('normalization_export', '导出结果')}</div>${resultTable(d.ocrLabels ? data.tables.normalization?.ocr_cells || [] : data.tables.normalization?.cells || [], true)}</section>`;
+        }<section class="advanced-section"><h3>归一化结果</h3><div class="advanced-actions">${button('tables_refresh', '刷新结果')}<label class="advanced-check">${input('ocrLabels', d.ocrLabels, 'checkbox')}使用已确认 OCR 标签</label>${button('normalization_export', '导出逐样本结果')}</div>${resultTable(d.ocrLabels ? data.tables.normalization?.ocr_cells || [] : data.tables.normalization?.cells || [], true)}</section>`;
     }
     function resultTable(rows, normal) {
         return (
             '<div data-derived-table>' +
             (rows.length
-                ? `<div class="advanced-table-scroll"><table class="advanced-table"><thead><tr>${(normal ? ['样本', '目标泳道', '参照泳道', '比值', '相对值', '状态'] : ['Fig', '蛋白', '泳道', '有效信号', '原始积分', '状态']).map((x) => '<th>' + x + '</th>').join('')}</tr></thead><tbody>${rows
+                ? `<div class="advanced-table-scroll"><table class="advanced-table"><thead><tr>${(normal ? ['样本', '目标泳道', '参照泳道', '比值', '相对值', '状态', '身份'] : ['Fig', '蛋白', '泳道', '有效信号', '原始积分', '状态']).map((x) => '<th>' + x + '</th>').join('')}</tr></thead><tbody>${rows
                       .slice(page * 50, page * 50 + 50)
                       .map(
                           (r) =>
-                              `<tr>${(normal ? [r.sample, r.target_lane, r.reference_lane, number(r.ratio), number(r.relative), r.ratio_reason || r.relative_reason || r.ratio_status] : [r.figure, r.protein, r.lane_index, number(r.value), number(r.raw_integral), r.reason || r.status]).map((x) => '<td>' + esc(x ?? '—') + '</td>').join('')}</tr>`,
+                              `<tr>${(normal ? [r.sample, r.target_lane, r.reference_lane, number(r.ratio), number(r.relative), r.ratio_reason || r.relative_reason || r.ratio_status, r.identity_status === 'specified' ? '已填写' : '身份未填全'] : [r.figure, r.protein, r.lane_index, number(r.value), number(r.raw_integral), r.reason || r.status]).map((x) => '<td>' + esc(x ?? '—') + '</td>').join('')}</tr>`,
                       )
                       .join('')}</tbody></table></div>${pagination(rows.length)}`
                 : '<p class="advanced-empty">尚无可显示结果。缺失或无效数据保持为空。</p>') +
@@ -874,7 +905,13 @@ window.advancedWorkspace = (() => {
                         plan: {
                             kind: p.kind,
                             control_mode: p.control_mode,
-                            pairs: p.pairs,
+                            pairs: p.pairs.map(({ identity, ...pair }) =>
+                                Object.entries(identity).some(
+                                    ([k, v]) => k !== 'schema_version' && v.trim(),
+                                )
+                                    ? { ...pair, identity }
+                                    : pair,
+                            ),
                             confirmed: p.confirmed,
                             notes: p.notes,
                         },

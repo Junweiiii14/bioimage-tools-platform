@@ -14,6 +14,7 @@ from wb_tool.api import (
     IntakeFigure,
     IntakeProtein,
     IntakeSource,
+    SamplePair,
     WBFigureProject,
     WBIntakeCropProject,
     WBIntakeFigureProject,
@@ -26,13 +27,16 @@ from wb_tool.api import (
     confirm_intake,
     create_intake,
     export_intake_crop,
+    fill_project_normalization,
     intake_digest,
     intake_workflow_digest,
     load_tiff,
+    make_normalization_plan,
     prepare_intake_crops,
     prepare_intake_figure,
     prepare_intake_figures,
     prepare_intake_workflow,
+    project_with_normalizations,
     propose_intake_crop,
     read_figure_project,
     record_intake_crop_proposal,
@@ -44,6 +48,102 @@ from wb_tool.api import (
 )
 
 from tools.wb.tests.test_source_geometry import membrane
+
+
+def test_machine_crop_pairing_uses_current_evidence_without_human_review(tmp_path: Path) -> None:
+    p = create_intake(WBFigureProject(project_id="machine-pairs"))
+    keys = ("target", "reference")
+    p = replace_intake_plan(
+        p,
+        (IntakeFigure(figure_id="f", label="Fig", lane_count=5),),
+        tuple(IntakeProtein(protein_id=k, figure_id="f", label=k) for k in keys),
+        expected_digest=intake_digest(p),
+    )
+    paths: dict[str, Path] = {}
+    for index, key in enumerate(keys):
+        pixels = membrane(angle=0, marker=False)
+        pixels[0, 0] += index
+        path = tmp_path / f"{key}.tiff"
+        tifffile.imwrite(path, pixels)
+        paths[key] = path
+        ref = AssetRef(
+            asset_id=key,
+            relative_path=f"assets/{key}.tiff",
+            sha256=sha256(path.read_bytes()).hexdigest(),
+            size_bytes=path.stat().st_size,
+        )
+        p = register_intake_source(
+            p,
+            IntakeSource(
+                source_id=key,
+                asset=ref,
+                original_name=path.name,
+                relative_path=path.name,
+                width=pixels.shape[1],
+                height=pixels.shape[0],
+                bit_depth=16,
+            ),
+            expected_digest=intake_digest(p),
+        )
+    p = assign_intake_sources(
+        p,
+        tuple(IntakeAssignment(protein_id=k, source_id=k) for k in keys),
+        expected_digest=intake_digest(p),
+    )
+    p = confirm_intake(p, expected_digest=intake_digest(p))
+    cropped = prepare_intake_crops(
+        prepare_intake_workflow(p, expected_digest=intake_digest(p), batch_stages=True)
+    )
+    for key, path in paths.items():
+        active, ticket = claim_intake_workflow_step(
+            approve_intake_workflow(cropped, expected_digest=intake_workflow_digest(cropped)),
+            session_key="pairing",
+            stage_filter="crop",
+        )
+        assert (
+            isinstance(active, WBIntakeCropProject)
+            and ticket is not None
+            and ticket.target_id == key
+        )
+        evidence = propose_intake_crop(str(path), active, key)
+        assert automatic_intake_crop_allowed(evidence)
+        accepted = accept_automatic_intake_crop(active, ticket, evidence)
+        active, ticket = claim_intake_workflow_step(
+            accepted, session_key="pairing", stage_filter="crop"
+        )
+        assert isinstance(active, WBIntakeCropProject) and ticket is not None
+        output = tmp_path / f"{key}-crop.tiff"
+        export_intake_crop(str(path), active, key, str(output), ticket=ticket)
+        cropped = complete_intake_crop(
+            active,
+            ticket,
+            AssetRef(
+                asset_id=f"{key}-crop",
+                relative_path=f"assets/{key}-crop.tiff",
+                sha256=sha256(output.read_bytes()).hexdigest(),
+                size_bytes=output.stat().st_size,
+            ),
+        )
+    assert all(not r.reviewed for r in cropped.rows)
+    plan = make_normalization_plan(cropped, "target", "reference", "housekeeping")
+    assert not plan.confirmed and all(pair.reference_lane is None for pair in plan.pairs)
+    plan = plan.model_copy(
+        update={
+            "confirmed": True,
+            "pairs": tuple(
+                SamplePair(target_lane=i, reference_lane=i, sample=f"sample-{i}")
+                for i in range(1, 6)
+            ),
+        }
+    )
+    normalized = project_with_normalizations(cropped, (plan,))
+    assert read_figure_project(normalized.model_dump_json().encode()) == normalized
+    cells = fill_project_normalization(normalized, ()).cells
+    assert all(c.ratio_status == "invalid_target" and c.ratio is None for c in cells)
+    stale = normalized.model_copy(update={"intake_crops": ()})
+    assert all(c.ratio_status == "stale" for c in fill_project_normalization(stale, ()).cells)
+    with pytest.raises(ValueError, match="当前有效"):
+        make_normalization_plan(stale, "target", "reference", "housekeeping")
 
 
 @pytest.mark.parametrize("double_row", [False, True])

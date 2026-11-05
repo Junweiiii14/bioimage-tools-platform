@@ -1,0 +1,13 @@
+# WB样本身份扩展 v1
+
+P011为归一化配对增加可选 `SamplePair.identity`，其内部 `schema_version=1`，包含 experiment_id、group、biological_replicate、technical_replicate。原sample字段仍是该目标行内唯一的样本ID，不从文本解析重复信息。每项最大128字符；空白可保存，结果明确标记身份未填全。
+
+这是嵌套记录的版本化扩展，不改变项目容器schema或lane_reference_ratio@1公式。旧配对缺identity时读为None、序列化继续省略该字段，旧项目不自动补编号。填写后保存携带identity版本；旧版本软件会因未知字段明确拒读，不能静默丢弃身份。新软件读取已有schema1–15沿用原路径。未知identity版本拒绝。
+
+生物重复ID表示用户声明的独立生物样本，技术重复ID表示同一样本的重复测量；实验ID限定所属实验，处理组保存设计标签。字段填写不证明独立性，不据此计算n、均值或显著性，不跨膜汇总。多蛋白对应同一样本时允许重复使用同一身份。若同一生物样本用于多个处理条件，保留相同生物ID及各自组别，不能伪造独立样本。
+
+逐样本XLSX/CSV保留全部配对，包括排除和失败行，增加四个身份字段及身份状态。已填写只表示样本名及四字段均非空，不代表科学审核通过。有效0保留；无效比值/相对值仍为空且带原因。现有来源/run/修订与方法审计列继续保留，字面标签不成为公式。条带图和原始测量不变。
+
+归一化来源现在沿用测量的row_is_ready：人工确认或当前匹配的机器裁图证据，source SHA/ROI/N不符仍过期；不把机器采纳标为人工审核。创建关系仍为空配对，用户明确选择参照、样本和对照后确认；实际比值仍要求目标/参照测量valid，不借身份填写或机器定位绕过质量门槛。
+
+当前结果页直接进入同一“样本对应与归一化”编辑器，宿主仍调用公开make_normalization_plan/project_with_normalizations并通过既有CAS保存；导出复用export_project_normalization，重开复用read_figure_project。相关回归见test_project_analysis.py、test_intake_automatic_crop.py、test_workbench_advanced.py。工程、科学适用性和学生试用各自见P011任务，契约不是验收证明。

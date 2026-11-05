@@ -136,6 +136,11 @@ def test_visible_delivery_controls_and_unsaved_layout_guard(
         """,
     )
     assert javascript(window, qtbot, "!document.querySelector('.intake-delivery-bar').hidden")
+    assert javascript(
+        window,
+        qtbot,
+        "!document.querySelector('#intake-workspace [data-section=normalization]').disabled",
+    )
     for selector, action in (
         ('[data-intake-crop-action="export"]', "intake_export"),
         ('[data-ig-export="all"]', "intake_grid_export"),

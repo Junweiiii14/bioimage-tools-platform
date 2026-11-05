@@ -1,0 +1,30 @@
+{
+  "source_commit": "e349b2e341858c5cebfadc86bb4d8c59ed09e00a",
+  "case": "test_automatic_batch_to_explicit_sample_results[True-False]",
+  "input": "synthetic uint16, two 5-lane images, identical measured regions",
+  "capture": "Qt WebEngine CDP Page.captureScreenshot fromSurface; scroll only, no image alteration",
+  "viewport": [
+    1440,
+    940
+  ],
+  "result": "1 passed in 12.48 seconds, exit 0",
+  "limitations": [
+    "Static developer inspection, not independent student usability",
+    "QtWebSocket initialization emitted Windows native exception 0xc0000139 despite exit 0; cause unverified",
+    "Does not establish clean target Windows/GPU/DPI acceptance"
+  ],
+  "files": [
+    {
+      "file": "cdp-current.png",
+      "sha256": "1b445f1c7edc3ddfd113b98b14a98c3280dd974cc3b78093c66864e3cb3cdcf6"
+    },
+    {
+      "file": "cdp-identity.png",
+      "sha256": "884429666cf61130cde09f2e7c215f811bd986c61c1bd2ca22245b10006dcbd6"
+    },
+    {
+      "file": "cdp-results.png",
+      "sha256": "25eaab3e5f68c3c504b6b7659282f0ee40080fdc1d9fc27d70410d084ac864ef"
+    }
+  ]
+}

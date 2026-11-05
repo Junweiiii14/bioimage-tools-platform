@@ -1,0 +1,49 @@
+# P011进行中验证
+
+活动树bioimage-plan-sync，HEAD3caf797，产品修改未提交。Windows本机Python3.12/Qt，现有锁依赖。
+
+- P011 context --scope . --record --integration：exit0，回执同目录。
+- 定向identity/machine/normalization：6 passed，40 deselected；网页原测试2 passed；原生网页身份保存+导出忙态2 passed。
+- pyright及npm check:web在新增连续回归之前通过；最终候选尚待重跑。无锁/依赖变化。
+- 连续回归 tests/test_wb_student_results.py：最新exit1，1 failed/1 passed，18.23秒。正例值仍无效；负例全部失败行可导出/保存重开，原始输入和既存归档SHA不变。测试先修复DOM重绘后的失效元素引用，未放宽busy guard或质量阈值。
+- 三联图、Gaussian及矩形候选均在当前批次common采样限制下缺少背景。历史prepared路径允许扩大背景，不能作为当前路径完成证据。原因见任务；下一步解决方法衔接，当前不能称最小完整流程完成。
+- GPU/mailbox日志仍有；window.grab先前截图不能可靠反映抽屉，没有合格视觉验收结论。真实学生/独立科学/干净Windows未验。
+- 全门禁、独立审查、PR和集成：未运行。保留历史回执，不绕过门禁。
+
+## 后续修复验证
+
+新增bounded_background_context@1：原目标不变，仅有界开放原坐标背景上下文；记录版本，旧wire省略默认字段。当前网页真实worker/归一化/导出/重开正反例2 passed，19.31秒，exit0。反例改为含dtype_min原值，仍明确无效；原先背景不足在旧limits解析测试保留，没有改质量预期为成功。
+
+新5例通过：解析面积13×30000、其他条带、膜孔洞、裁图界限、旧wire/未知版本。首次新测试有两个测试代码错误（遗漏polarity与strict Python tuple输入），修正为显式dark及真正JSON wire；未修改产品以迁就测试。现有几何/自动裁图42例通过。
+
+全门禁首次被新测试长行ruff拒绝（exit1），仅断行后再次执行；当前session91098仍运行。静态/类型/边界/web通过，pytest尚未完成。日志父目录p011-check-all.log，勿提交长日志。原生grab仍没有可靠显示抽屉，视觉验收未通过。待最终独审与集成。
+
+## 集成阶段修正（35cfe0b）
+
+PR60 rules-context失败：Integration needs exactly one changed integration context。原因是P010/P011均含集成清单；不删除/重命名历史回执、不修改门禁。按既有runbook拆文档前置PR61（head3caf797，basec8f1bcb），本地准确base/head规则检查exit0；PR61服务器rules-context与desktop-environment已SUCCESS，foundation双平台仍运行。待PR61按必需检查集成后，再更新P011准确基线及回执。PR60保持草稿。
+
+本机check--all session91098仍live（pytest已到38%，至少4fail，未出最终摘要）。此轮未重启测试。原自行启动验收窗口45312的真实子进程53468已CloseMainWindow正常退出，父/子均确认不存在；未强杀或操作其他应用。
+
+## 全门禁结果与测试入口修正
+
+本机check--all（session91098）已终态exit1：1696 passed / 5 failed / 11 warnings，1427.22秒。失败：v5恢复批次、两个旋转canvas、失败route诊断、workflow cancel退出。原日志父目录p011-check-all.log保留；含GPU context-lost及一个子进程UTF8解码warning。后续未把失败抹为通过。
+
+使用CI相同offscreen/--disable-gpu定向5旧失败+3新端到端：7 passed/1 failed，65.02秒；旧cancel仍超时，新单图、三联图、dtype_min反例均通过。静态Qtgrab能显示抽屉，但显示内容帧仍陈旧，不能称完整视觉验收；下一步用已有CDP捕获路径验证真实当前DOM。
+
+隔离cancel诊断1 passed；原顺序组合诊断2 failed/3 passed。失败时捕获stage=confirm_draft、authoring.dirty=True、batch=cancelled/closed：测试直接native freeze没有网页pending token，网页正确保护未知回执后的草稿。修正测试为连接就绪后点击真实wf-run按钮；不自动丢弃草稿。v5测试的snapshot会发起预览asset读取，因此在继续请求前等既有wait_saved（不延长超时、不绕过busy）。这三例最终3 passed/12.43秒，exit0。临时print诊断已移除。产品取消/保存代码没有修改。
+
+PR60 Ubuntu foundation已SUCCESS，Windows仍运行；PR61的规则和desktop已SUCCESS，foundation仍运行。待准确最终HEAD所有必需CI与独审，不凭定向通过宣称全门禁完成。
+
+## 双平台CI与实际页面画面
+
+PR60 head35cfe0b，Actions41834236478：Windows foundation成功（1702 passed/10 warnings，1488.73秒），Ubuntu foundation成功（1698 passed/4既有平台skip/10 warnings，989.54秒）；随后各自隔离wheel与其余check--all均成功，desktop-environment成功。规则检查仍因阶段清单冲突失败，按PR61前置处理。e349b2e仅修正测试入口与等待，待后续最终HEAD重新CI；不把35cfe检查写成覆盖未推送提交。
+
+CDP捕获当前实际WebEngine画面，而非Qt grab缓存：e349b2e的当前入口三例在临时本地捕获探针下3 passed/30.62秒；单图补拍滚动位置1 passed/12.48秒，exit0。visual/capture.json记录来源与SHA，3张原始PNG未经图像修改。已查看：配对、实验/处理组/生物/技术身份、5行比值/相对值1与导出入口均显示完整。QtWebSocket初始化打印原生异常0xc0000139但进程完成exit0，原因未定位；这属于捕获工具环境限制，不声明干净原生环境已通过。真实学生试用仍未验。
+
+## 独立审查发现与修复（4dcd41e）
+
+用户明确允许只读子代理后，p011_independent_review审查87dba64..7e875d1，发现P2：seed()中的pair.identity共享已保存快照对象，保存后再次编辑、撤销重读失败时，可意外持久化已撤销组别。Node直接提取真实seed复现cachedServer与discardDraft均变为UNSAVED。已在4dcd41e深拷贝身份，未改变保存协议或科学公式。
+
+真实网页回归先在旧代码确认失败（group为discarded-group而非control，exit1），修复后保留control；重命名sample会按既有规则取消confirmed，测试补真实确认点击，不放宽保护。最终tests/test_workbench_advanced.py两例通过9.52秒exit0（Windows/锁环境，offscreen、--disable-gpu、PYTHONUTF8=1）；pyright、npm check:web、Ruff及提交钩子通过。首轮提交被ruff格式拒绝，格式化后通过；没有改测试期望、超时或门禁。
+
+7e875d1的rules-context与desktop成功，双平台41839649342仍运行；新产品修复需最终HEAD重新CI，不继承旧检查。绑定4dcd41e的独立复审通过：Node反例关闭，真实网页1 passed/8.42s；完整记录见independent-review.md。
