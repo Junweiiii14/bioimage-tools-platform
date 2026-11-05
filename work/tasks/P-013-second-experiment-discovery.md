@@ -1,6 +1,6 @@
 # P-013 第二实验需求比较与最小方法验证
 
-<!-- PROGRAM_TASK_META {"id":"P-013","status":"in_progress","work_package":"W07","depends_on":["P-012"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex second-experiment research","base_commit":"f30ea5d515a8fedaece994edc6cb583db752d536","head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-013","status":"done","work_package":"W07","depends_on":["P-012"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex second-experiment research","base_commit":"f30ea5d515a8fedaece994edc6cb583db752d536","head_commit":"887fd536800c4657a267d09d8ca5f6a2f3ffc4bd"} -->
 
 ## 授权与范围
 
@@ -16,15 +16,13 @@
 
 ## 当前状态
 
-当前活动分支codex/p013-algorithm-reuse-plan，活动树bioimage-plan-sync。研究PR63已合入main d85c3e5a9f48ba7d3b66200cc656ce0ba1baca25，核验与候选4ebb14d文件树一致。新分支保留本地准则补充并合入main；squash导致3份交接/回执文件冲突，核对只差较新的补充后保留本地版本，产品树不变。main更新后重新加载context。
+研究及用户追加的库内准则同步已完成。活动树bioimage-plan-sync、分支codex/p013-algorithm-reuse-plan。PR63候选4ebb14d合入d85c3e5，PR64候选887fd53合入main cddf759d20368f10e3ea1d447503dcc3cf3740ea；两次fetch均核验候选与合入文件树一致。两PR的Windows1703passed、Linux1699passed/4既有skip，以及双平台wheel/check--all、rules/desktop全部通过，无重试/门禁变化。探针独审476b47e通过。完整命令、环境、结果、未验边界及下一项见[最终交付](../evidence/P-013/final-delivery.md)和[完成审计](../evidence/P-013/objective-audit.md)。
 
-三候选比较与预声明 CPU 探针已完成，见[主研究](../../docs/research/2026-11-05-second-experiment.md)及[实验收据](../evidence/P-013/README.md)。12张留出核计数watershed F1=0.8722、平均相对计数误差10.45%，最差图71.01%；原始强度无独立参考。研究主选核计数、备选具体assay孔板；下一步优先失败分层，不把平均指标当正式准入。固定依赖隔离安装，原数据在仓库外，产品依赖和源码未改。
-
-Ruff检查/格式、policy、解析指标边界、两次成功运行数值CSV一致及handoff容量检查均退出0；首次下载元数据解码失败、RGB断言失败和一次评价警告完整保留解释。下一步独立复核研究材料、正常PR及必需CI，集成后回传上游接续；任务仍in_progress。
-
-研究验收：独审绑定476b47e，无阻断发现，另用SciPy逐对象评价核对30行完全一致；收据见 independent-review.md。后续4ebb14d仅补文档。[PR63](https://github.com/Junweiiii14/bioimage-tools-platform/pull/63)于2026-11-05T15:44:13Z正常合入。quality42053261398全部必需项成功：Windows1703passed/10warnings/1378.01s，Linux1699passed/4既有skip/10warnings/975.19s，后续双平台wheel/check--all通过；rules42053261484成功。未重试、未改门禁。用户追加准则c442d61及来源补充8eade38/b0cc762已本地提交并成功回传，下一步通过后续正常PR同步main；P013整体仍in_progress直到本项同步及最终回传完成。
+主方案第5节、开发流程第3节及同名HTML已经在远端main，不是仅本地修改。仅研究/文档，无产品或正式依赖变更；真实学生/科学准入/目标机未验。后续优先直接调用成熟实现及核对训练泄漏，不堆简易基线补丁。最终上游回传待本轮交接发送后记回执；不阻塞已完成的工程/研究事实。收尾记录随下一正常任务带入。
 
 ## 用户纠偏与后续接续
+
+准则PR64已正常合入main，quality42058419612与rules42058419433成功；原监测54710已退出0，PR63监测99476也已终态。22个本轮MD本地链接检查通过。此段替换旧待验状态，实际验收见final-delivery。
 
 追加明确授权：用户要求将成熟优质算法优先准则实际写入库内主方案第5节、开发流程第3节及同名HTML，并提交Git、经后续正常PR同步main。属于本研究选型规则的文档补充；先本地完成回传准确commit，再跟进正常集成。不得重启PR63当前CI；不触碰产品或改变门禁。编辑前重新运行P013 context --scope . --record --integration并读取，保留原提交的历史回执。
 
