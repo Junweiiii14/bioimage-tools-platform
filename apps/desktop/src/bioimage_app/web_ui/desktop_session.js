@@ -99,7 +99,7 @@ const desktopSession = (() => {
         lastPosition = '';
         manualQuant.pendingImport = false;
         if (state.intake) {
-            switchMode('intake');
+            switchMode(intakeWorkspace.allowedModes().includes(r.mode) ? r.mode : 'intake');
             position();
             return;
         }

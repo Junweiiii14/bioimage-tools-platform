@@ -1,0 +1,27 @@
+# P-012 WB首次使用走查与试用准备
+
+<!-- PROGRAM_TASK_META {"id":"P-012","status":"in_progress","work_package":"W06","depends_on":["P-011"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex WB first-use walkthrough","base_commit":"8299f71a02e144bf95e9a987b4718f7fee052159","head_commit":null} -->
+
+## 范围与授权
+
+2026-11-05用户在上游要求继续派发任务，由本窗口接续WB首次使用走查。目标工具已实际创建，无token预算。复用P011完整工程，不重做科学方法、执行器或统计系统；不扩大第二实验/Agent/安装器发布、在用安装替换、私有数据上传或花费。原dirty树不碰，84e83cb/eab15eb合入后收据保留并随本任务带入。
+
+## 工作及完成条件
+
+1. 使用非私有、身份明确的最小样例，从空项目经真实GUI完成导入、自动处理、必要信息、归一化、表图导出及保存重开。记录真实障碍与前后证据，开发者走查不冒充学生独立试用。
+2. 仅修复证据确认的理解/操作缺口；检查入口/下一步、身份填写、失败定位恢复、结果解释及导出重开。没有缺陷则不强行改产品。
+3. 交付可本地使用的已有或最小示例及简短试用任务/待观察项，不建立新文档体系。
+4. 产品变更适当验证、绑定提交只读独审（本次明确授权）、正常PR必需检查集成；无新复现不追查历史OCR挂起，不放宽门禁。
+5. 更新任务/handoff，按用户授权回传上游01a19bfd-f3ab-7502-86da-9f61953d1c8a（local），分别报告工程、科学与真人试用边界。
+
+## 当前状态
+
+分支 codex/p012-wb-first-use，基线 ec7588d。真实 GUI 完整流程已完成；两处已确认操作障碍已作最小修复，尚待绑定提交独审及正常 PR 集成。详见 [走查证据](../evidence/P-012/walkthrough.md)。
+
+新增真实 Qt 鼠标回归覆盖 N 输入后单击蛋白框、输入多行蛋白后单击来源；既有三组自动处理用例追加真实关闭项目、重新打开和结果页恢复。定向命令 4 passed / 30.44s，exit 0。完整 dev.py check --all 已结束 exit 1：1701 passed / 2 failed / 10 warnings，1264.29s。仅两个既有旋转 canvas 刷新用例超时，伴随 GPU context-lost；新增回归通过。按 CI 的 --disable-gpu 环境定向复核两项及新增用例：6 passed / 28.64s，exit 0，未改测试预期/超时。原失败及 GPU 日志保留，根因 UNKNOWN。独立 wheel 安装检查单独补完 exit 0（含原始输入、OCR、真实 worker、保存重开及工作流）；原 check --all 的 exit 1 不改写。
+
+提供 [练习生成器及学生短任务](../../examples/wb-first-use/README.md)，不含私有素材。生成器像素与走查输入相同、uint16、既存目标拒绝且无改写、PNG 尺寸核验均通过；导出表 XML 读取确认数值和身份。
+
+已向上游回传完整流程及正在修复/验证的阶段进度。科学适用性、真人学生独立试用、干净目标 Windows 未验。未最终回传或宣告完成。
+
+候选产品 76bd5b7，证据候选 8077336；绑定独审无新增发现，见 independent-review.md。PR62 OPEN；最终 quality run42041925936 Windows/Linux 未终态，rules-context 与 desktop-environment 已过。原本机全量会话7883已终态，不重启同一运行。

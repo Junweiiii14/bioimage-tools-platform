@@ -47,3 +47,13 @@ CDP捕获当前实际WebEngine画面，而非Qt grab缓存：e349b2e的当前入
 真实网页回归先在旧代码确认失败（group为discarded-group而非control，exit1），修复后保留control；重命名sample会按既有规则取消confirmed，测试补真实确认点击，不放宽保护。最终tests/test_workbench_advanced.py两例通过9.52秒exit0（Windows/锁环境，offscreen、--disable-gpu、PYTHONUTF8=1）；pyright、npm check:web、Ruff及提交钩子通过。首轮提交被ruff格式拒绝，格式化后通过；没有改测试期望、超时或门禁。
 
 7e875d1的rules-context与desktop成功，双平台41839649342仍运行；新产品修复需最终HEAD重新CI，不继承旧检查。绑定4dcd41e的独立复审通过：Node反例关闭，真实网页1 passed/8.42s；完整记录见independent-review.md。
+
+## 2026-11-05恢复与最终CI首轮
+
+准确headf3a7d86，Actions41841250194首轮：Linux1698 passed/4既有平台skip/10warnings/989.97秒，其后隔离wheel及其余check--all通过；desktop与rules成功。Windows在test_project_ocr_inflight_close_or_edit_does_not_overwrite[close]等待resources_closed时挂起，60秒Python栈位于WB _Work.retire的moveToThread；主线程原生栈含QObject子对象销毁与PyGILState_Ensure。30分钟job上限取消，没有pytest终态，也未执行wheel；不能据此声称Windows通过或确定全部历史同因。完整日志保留父目录p011-final-windows.log，Linux日志p011-final-linux.log。
+
+本次PR未修改background.py或test_project_measurements.py。先复查历史CI006已有owner线程析构约束，未盲改为worker析构。锁定Windows/offscreen/--disable-gpu/PYTHONUTF8=1下顺序执行 `pytest tests/test_project_measurements.py::test_real_project_ocr_bind_fill_export_reopen_and_cancel tests/test_project_measurements.py::test_project_ocr_inflight_close_or_edit_does_not_overwrite -q --tb=short --show-capture=no -o faulthandler_timeout=60`：3 passed/28.76秒/exit0。这不能销账远端挂起；根因保留UNKNOWN。确认旧job终态后仅 `gh run rerun 41841250194 --job 126613694828` 重试Windows必需检查，exit0，服务返回queued；不修改测试、超时、依赖或门禁。
+
+## 最终CI与正常集成
+
+2026-11-05，Actions41841250194第二attempt Windows job127139120974成功：1702 passed/10 warnings/1178.73秒，后续隔离wheel及其余check--all全部通过。Linux保留首attempt1698passed/4skip及wheel成功；desktop和rules均成功。PR60 mergeStateStatus=CLEAN，准确headf3a7d86；通过expected_head_sha正常merge，返回8299f71a02e144bf95e9a987b4718f7fee052159。随后fetch origin/main及PR state=MERGED核验，f3a7d86到main文件树diff为空。未绕过门禁。Windows首次挂起原因UNKNOWN仍保留，不被重试成功关闭。最终Windows日志父目录p011-windows-attempt2.log，原始私有资料未提交。

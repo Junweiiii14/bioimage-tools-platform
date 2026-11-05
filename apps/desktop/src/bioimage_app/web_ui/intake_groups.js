@@ -508,6 +508,14 @@ window.intakeGroups = (() => {
             if (locked()) return;
             const el = event.target,
                 g = group(el.dataset.id);
+            // These sequence fields already update the draft and visible bindings on input.
+            // Replacing them on blur destroys the next mouse-down target before its click.
+            if (
+                sequential() &&
+                (el.hasAttribute('data-group-search') ||
+                    ['fig-label', 'lanes', 'proteins'].includes(el.dataset.groupField))
+            )
+                return;
             if (el.dataset.groupSelect) {
                 if (el.checked) selected.add(el.dataset.groupSelect);
                 else selected.delete(el.dataset.groupSelect);
