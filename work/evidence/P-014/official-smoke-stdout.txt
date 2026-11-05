@@ -1,0 +1,1 @@
+Starting CellProfiler 4.2.8

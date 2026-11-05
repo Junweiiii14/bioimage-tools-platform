@@ -160,3 +160,6 @@ T050初次归档复制因archive目录尚不存在失败，随后从未修改的
 - [work-log-20261104T134644825927Z.md](archive/work-log-20261104T134644825927Z.md): work log exceeded 64 KiB or 30 dated sections
 - [work-log-20261105T090405991722Z.md](archive/work-log-20261105T090405991722Z.md): work log exceeded 64 KiB or 30 dated sections
 - [work-log-20261105T144928635489Z.md](archive/work-log-20261105T144928635489Z.md): work log exceeded 64 KiB or 30 dated sections
+
+- [P013收尾前快照](archive/P013-before-closeout-snapshot.md)：保留P011/P012历史与P013当时待验状态；当前以任务卡和final-delivery为准。
+- [work-log-20261105T161941152870Z.md](archive/work-log-20261105T161941152870Z.md): work log exceeded 64 KiB or 30 dated sections

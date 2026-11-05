@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "development_selection": "Highest unweighted per-image F1 among predeclared candidates; no evaluation images read",
+  "cellprofiler": "4.2.8",
+  "cellprofiler_pipeline_sha256": "662ee8de723f59a763e49bf500fad771be9ff4df63d53e14dd6c223092441612",
+  "stardist": "0.9.2",
+  "model": "2D_versatile_fluo",
+  "model_archive_sha256": "4ad678d0758eed6e55625f1b5ae30771e59adb79f1239e09b9772eac8846c3dd",
+  "scale": 0.5,
+  "normalization_percentiles": [
+    3,
+    99.8
+  ],
+  "normalization_clip": false,
+  "n_tiles": [
+    2,
+    2
+  ],
+  "threads": [
+    4,
+    1
+  ],
+  "prob_thresh": 0.479071463157368,
+  "nms_thresh": 0.3,
+  "score": "P013 strict IoU > 0.5 on original-coordinate label matrices, compact IDs only",
+  "evaluation_images": 10,
+  "no_further_tuning": true,
+  "model_files_sha256": {
+    "config.json": "836da16282c3e0db1ba2e58f377e977419887ace8c737ebde16a094d58d50f74",
+    "thresholds.json": "5cd6aac6e923f8659b63a9e297485920d45a59dad35371ddb8b6ae4be398d805",
+    "weights_best.h5": "42202bd269c8106782316f1a2c75afb3f5ffa65e525c2e155ee0ced3a95da349"
+  }
+}

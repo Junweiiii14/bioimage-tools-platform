@@ -1,0 +1,38 @@
+[
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/rawimages/Ganglioneuroblastoma_0.tif",
+    "path": "..\\p014-research\\dataset\\rawimages\\Ganglioneuroblastoma_0.tif",
+    "bytes": 466798,
+    "sha256": "4810aba10a57cd2c883eea3bf33ed77a7424a4fb40edc2636f147fd87388284f"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/groundtruth/Ganglioneuroblastoma_0.tif",
+    "path": "..\\p014-research\\dataset\\groundtruth\\Ganglioneuroblastoma_0.tif",
+    "bytes": 2239668,
+    "sha256": "97446247851e41b5349a81f1a689339fef0bdd21e648dd274cd8882bc90f853a"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/rawimages/Neuroblastoma_0.tif",
+    "path": "..\\p014-research\\dataset\\rawimages\\Neuroblastoma_0.tif",
+    "bytes": 1311278,
+    "sha256": "607599e67c49e8d9580f195d8942b729d6c257921f7f2133533e357a0a4cd57e"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/groundtruth/Neuroblastoma_0.tif",
+    "path": "..\\p014-research\\dataset\\groundtruth\\Neuroblastoma_0.tif",
+    "bytes": 2621808,
+    "sha256": "7259c1c51aec6225a2053c6dba0c39ad149a04acce58665c2b13a6eec86c3a00"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/rawimages/normal_0.tif",
+    "path": "..\\p014-research\\dataset\\rawimages\\normal_0.tif",
+    "bytes": 1311278,
+    "sha256": "223f3d1292e7ef38c3b5d8818d2ea974c94cf1e550de1f337933510e3309eb60"
+  },
+  {
+    "url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/groundtruth/normal_0.tif",
+    "path": "..\\p014-research\\dataset\\groundtruth\\normal_0.tif",
+    "bytes": 2621808,
+    "sha256": "6ab6fba3813989335ad334b2349c74342a7c3002c24b83600ec8d98e8b06f56d"
+  }
+]

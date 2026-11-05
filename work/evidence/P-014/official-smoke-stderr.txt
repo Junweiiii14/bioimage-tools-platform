@@ -1,0 +1,15 @@
+Times reported are CPU and Wall-clock times for each module
+Fri Nov  6 00:38:12 2026: Image # 1, module Images # 1: CPU_time = 0.00 secs, Wall_time = 0.00 secs
+Fri Nov  6 00:38:12 2026: Image # 1, module Metadata # 2: CPU_time = 0.00 secs, Wall_time = 0.00 secs
+Fri Nov  6 00:38:12 2026: Image # 1, module NamesAndTypes # 3: CPU_time = 0.22 secs, Wall_time = 0.21 secs
+Fri Nov  6 00:38:12 2026: Image # 1, module Groups # 4: CPU_time = 0.00 secs, Wall_time = 0.00 secs
+Fri Nov  6 00:38:12 2026: Image # 1, module IdentifyPrimaryObjects # 5: CPU_time = 0.14 secs, Wall_time = 0.14 secs
+Fri Nov  6 00:38:12 2026: Image # 1, module IdentifyPrimaryObjects # 6: CPU_time = 0.09 secs, Wall_time = 0.10 secs
+Fri Nov  6 00:38:12 2026: Image # 1, module RelateObjects # 7: CPU_time = 0.00 secs, Wall_time = 0.00 secs
+Fri Nov  6 00:38:12 2026: Image # 1, module IdentifySecondaryObjects # 8: CPU_time = 0.31 secs, Wall_time = 0.32 secs
+Fri Nov  6 00:38:12 2026: Image # 1, module IdentifyTertiaryObjects # 9: CPU_time = 0.05 secs, Wall_time = 0.05 secs
+Fri Nov  6 00:38:12 2026: Image # 1, module MeasureObjectIntensity # 10: CPU_time = 0.28 secs, Wall_time = 0.27 secs
+Fri Nov  6 00:38:13 2026: Image # 1, module MeasureObjectSizeShape # 11: CPU_time = 2.05 secs, Wall_time = 2.05 secs
+Fri Nov  6 00:38:15 2026: Image # 1, module OverlayOutlines # 12: CPU_time = 0.02 secs, Wall_time = 0.01 secs
+Fri Nov  6 00:38:15 2026: Image # 1, module SaveImages # 13: CPU_time = 0.05 secs, Wall_time = 0.21 secs
+Fri Nov  6 00:38:15 2026: Image # 1, module ExportToSpreadsheet # 14: CPU_time = 0.00 secs, Wall_time = 0.00 secs

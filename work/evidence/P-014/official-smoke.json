@@ -1,0 +1,28 @@
+{
+  "command": [
+    "C:/Program Files/CellProfiler/CellProfiler.exe",
+    "-c",
+    "-r",
+    "-p",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p014-research\\official-human\\ExampleHuman\\ExampleHuman.cppipe",
+    "-i",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p014-research\\official-human\\ExampleHuman\\images",
+    "-o",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p014-research\\cp-official-human-01",
+    "-d",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p014-research\\cp-official-human-01\\done.txt",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p014-research\\cp-official-human-01\\measurements.h5"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 9.441393099958077,
+  "pipeline_sha256": "3fc7ace9921e5591f6455ee04ba4cff3754ea70a9f8035ce5cd8eeffe74bce3f",
+  "memory_measured": false,
+  "program_version": "4.2.8",
+  "exe_sha256": "889fd8eb2e32209ba712f974020e0574239e5d07cd8d085d47851cad212d53ba",
+  "source_url": "https://cellprofiler-examples.s3.amazonaws.com/ExampleHuman.zip",
+  "archive_sha256": "7b35c66b775b5a25d0e39f917e0c52982ff2605017ded9c0cd0dc39a206b0138",
+  "done": "Complete",
+  "image_sets": 1,
+  "nuclei_count": 289,
+  "scope": "Unmodified official example execution smoke only; no accuracy or memory claim"
+}

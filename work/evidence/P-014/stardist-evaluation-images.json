@@ -1,0 +1,114 @@
+{
+  "model_load_seconds": 0.20865339995361865,
+  "tensorflow": "2.21.0",
+  "cpu_only": true,
+  "intra_threads": 4,
+  "inter_threads": 1,
+  "normalization_percentiles": [
+    3,
+    99.8
+  ],
+  "rows": [
+    {
+      "image": "Ganglioneuroblastoma_10",
+      "source_shape": [
+        1024,
+        1360
+      ],
+      "count": 46,
+      "read_normalize_predict_seconds": 1.2485800000140443,
+      "scale": 0.5
+    },
+    {
+      "image": "Ganglioneuroblastoma_4",
+      "source_shape": [
+        914,
+        1225,
+        3
+      ],
+      "count": 403,
+      "read_normalize_predict_seconds": 0.49539489997550845,
+      "scale": 0.5
+    },
+    {
+      "image": "Neuroblastoma_13",
+      "source_shape": [
+        1024,
+        1280
+      ],
+      "count": 18,
+      "read_normalize_predict_seconds": 0.5129912999691442,
+      "scale": 0.5
+    },
+    {
+      "image": "Neuroblastoma_15",
+      "source_shape": [
+        1024,
+        1280
+      ],
+      "count": 139,
+      "read_normalize_predict_seconds": 0.717214799951762,
+      "scale": 0.5
+    },
+    {
+      "image": "normal_26",
+      "source_shape": [
+        1024,
+        1280
+      ],
+      "count": 29,
+      "read_normalize_predict_seconds": 0.6077750000404194,
+      "scale": 0.5
+    },
+    {
+      "image": "normal_28",
+      "source_shape": [
+        1024,
+        1280
+      ],
+      "count": 19,
+      "read_normalize_predict_seconds": 0.5809631999582052,
+      "scale": 0.5
+    },
+    {
+      "image": "normal_34",
+      "source_shape": [
+        1024,
+        1360
+      ],
+      "count": 797,
+      "read_normalize_predict_seconds": 0.5535946000600234,
+      "scale": 0.5
+    },
+    {
+      "image": "otherspecimen_0",
+      "source_shape": [
+        1024,
+        1280
+      ],
+      "count": 25,
+      "read_normalize_predict_seconds": 0.5400182999437675,
+      "scale": 0.5
+    },
+    {
+      "image": "otherspecimen_2",
+      "source_shape": [
+        1024,
+        1280
+      ],
+      "count": 183,
+      "read_normalize_predict_seconds": 0.7064157999120653,
+      "scale": 0.5
+    },
+    {
+      "image": "otherspecimen_5",
+      "source_shape": [
+        1024,
+        1024
+      ],
+      "count": 20,
+      "read_normalize_predict_seconds": 0.44536589994095266,
+      "scale": 0.5
+    }
+  ]
+}

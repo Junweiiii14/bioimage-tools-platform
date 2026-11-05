@@ -1,0 +1,18 @@
+{
+  "cellprofiler": {
+    "images": 10,
+    "mean_f1": 0.21546666216056712,
+    "mean_relative_count_error": 13.150250976770668,
+    "tp": 1098,
+    "fp": 4450,
+    "fn": 570
+  },
+  "stardist": {
+    "images": 10,
+    "mean_f1": 0.8599533178852086,
+    "mean_relative_count_error": 0.11590139564305799,
+    "tp": 1488,
+    "fp": 191,
+    "fn": 180
+  }
+}

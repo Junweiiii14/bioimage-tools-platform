@@ -1,0 +1,42 @@
+{
+  "cp_default": {
+    "images": 3,
+    "mean_f1": 0.24077207785685031,
+    "mean_relative_count_error": 16.892222222222223,
+    "tp": 255,
+    "fp": 1364,
+    "fn": 96
+  },
+  "cp_otsu": {
+    "images": 3,
+    "mean_f1": 0.2577495637970078,
+    "mean_relative_count_error": 16.453809523809525,
+    "tp": 250,
+    "fp": 1271,
+    "fn": 101
+  },
+  "sd_1": {
+    "images": 3,
+    "mean_f1": 0.5638336745529976,
+    "mean_relative_count_error": 0.46873015873015866,
+    "tp": 306,
+    "fp": 181,
+    "fn": 45
+  },
+  "sd_05": {
+    "images": 3,
+    "mean_f1": 0.8641474241700041,
+    "mean_relative_count_error": 0.17587301587301588,
+    "tp": 312,
+    "fp": 112,
+    "fn": 39
+  },
+  "sd_025": {
+    "images": 3,
+    "mean_f1": 0.73908184080399,
+    "mean_relative_count_error": 0.12174603174603175,
+    "tp": 163,
+    "fp": 114,
+    "fn": 188
+  }
+}

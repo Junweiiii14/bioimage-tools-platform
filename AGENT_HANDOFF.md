@@ -46,7 +46,9 @@
 
 ## Current Pointer
 
-- 当前：[P013 第二实验比较与最小方法验证](work/tasks/P-013-second-experiment-discovery.md)，活动树 bioimage-plan-sync，分支 codex/p013-second-experiment；仅研究，不新增产品。完成验收后回传上游连续接续，已再次发送用户要求。
+- 当前：[P014 成熟荧光核计数方法直接调用](work/tasks/P-014-mature-nuclei-methods.md)，分支codex/p014-mature-nuclei-methods；先CellProfiler官方流程，再合理预训练对照，纯研究。
+
+- 最近完成：[P013 第二实验比较与最小方法验证](work/tasks/P-013-second-experiment-discovery.md)，PR63研究/PR64正式准则及HTML已同步main cddf759，证据见[P013交付](work/evidence/P-013/final-delivery.md)。下一项由上游连续派发，优先成熟实现真实调用及训练数据重叠核验；未授予核计数科学准入。
 
 - 最近完成：[P012 WB首次使用走查与试用准备](work/tasks/P-012-wb-first-use.md)，PR62集成，工程验收证据见final-delivery；科学/学生/目标机未验保留。用户要求由上游在回传后连续派发推进下一项。
 
