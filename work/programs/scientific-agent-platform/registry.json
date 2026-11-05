@@ -65,6 +65,10 @@
     {
       "id": "P-015",
       "path": "work/tasks/P-015-nuclei-research-adapter.md"
+    },
+    {
+      "id": "P-016",
+      "path": "work/tasks/P-016-nuclei-single-image-flow.md"
     }
   ],
   "work_packages": [
@@ -156,7 +160,8 @@
       "task_ids": [
         "P-013",
         "P-014",
-        "P-015"
+        "P-015",
+        "P-016"
       ]
     },
     {

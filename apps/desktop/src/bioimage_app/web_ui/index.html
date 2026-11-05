@@ -19,6 +19,8 @@
   <link rel="stylesheet" href="module_compare.css">
   <link rel="stylesheet" href="workflow_graph.css">
   <link rel="stylesheet" href="workflow_authoring.css">
+  <link rel="stylesheet" href="nuclei.css">
+  <script src="nuclei.js" defer></script>
 </head>
 <body>
   <aside class="platform-rail" aria-label="工具平台">
@@ -35,7 +37,8 @@
     <main id="platform-view" class="platform-view" aria-label="工具平台首页">
       <header class="platform-intro"><div><h1>选择工具，开始工作。</h1><p>图像处理与分析，都在你的工作空间。</p></div></header>
       <div class="platform-layout">
-        <section aria-labelledby="installed-tools-title"><div class="platform-section-title"><h2 id="installed-tools-title">已安装工具</h2><span>1</span></div>
+        <section aria-labelledby="installed-tools-title"><div class="platform-section-title"><h2 id="installed-tools-title">已安装工具</h2><span>2</span></div>
+          <button class="nuclei-entry" data-nuclei-open><span><strong>单图核分割</strong><small>研究工具 · 原图、实例轮廓与核数</small></span><span class="tool-launch">进入核分割<i data-icon="arrow"></i></span></button>
           <button class="installed-tool" data-page="wb" data-folder-drop aria-label="进入 WB 图像处理，可拖入原图文件夹" aria-describedby="folder-drop-status">
             <span class="tool-top"><span class="tool-symbol">WB</span><span class="tool-installed"><i data-icon="check"></i>已安装</span></span>
             <span class="tool-description"><strong>WB 图像处理</strong><span>裁剪 · 拼图 · 灰度定量</span></span>
@@ -124,6 +127,22 @@
     <section id="wf-start" class="wf-start"><h3>从一个可运行流程开始</h3><p>选择原始 TIFF，用现有 WB 旧方法生成整图的自动建议；也可以绑定已保存的实验室模板。建议、工程完成与科学审核分开。</p><div class="wf-start-options"><label>已知泳道数<input id="wf-lane-count" type="number" min="1" max="96" step="1" placeholder="从原图新建时必填"></label><label>信号极性<select id="wf-polarity"><option value="dark">暗条带</option><option value="light">亮条带</option></select></label><label>工程样例<select id="wf-example"><option value="triangle_u16">16 位三角峰 · 4000</option><option value="triangle_u8">8 位三角峰 · 40</option><option value="flat_zero">平坦剖面 · 有效零</option><option value="invalid_roi">越界 ROI · 无效空值</option></select></label></div><div class="wf-start-actions"><button class="button primary" data-wf-choose="new_original">选择原图并新建</button><button class="button subtle" data-wf-choose="new_example">用合成样例开始</button><button class="button subtle" data-wf-choose="open_project">打开工作流项目</button></div></section>
     <section id="wf-workspace" class="wf-workspace" hidden><nav class="wf-views" aria-label="编排视图"><button class="button subtle" data-wf-view="graph" aria-pressed="true">画布</button><button class="button subtle" data-wf-view="parameters" aria-pressed="false">步骤参数</button><button class="button subtle" data-wf-view="results" aria-pressed="false">已提交成果</button><span id="wf-save-state"></span></nav><div class="wf-body"><aside class="wf-catalogue"><h3>模块目录</h3><div id="wf-catalogue-list"></div><h3>当前步骤</h3><ol id="wf-steps"></ol></aside><section class="wf-canvas"><div id="wf-graph"></div><section class="wf-checks"><h3>预检与输入</h3><p id="wf-check-summary"></p><ul id="wf-issues"></ul><div id="wf-sources"></div></section></section><aside class="wf-inspector"><section id="wf-node-panel" class="wf-node-panel"><h3>选择一个步骤</h3></section><section id="wf-results" class="wf-results"><h3>已提交成果</h3><button id="wf-refresh-results" class="button subtle">读取本批成果</button><div id="wf-sample-states"></div><div id="wf-output-list"><p>运行后可以查看真实表格、报告与曲线数据；中间成果只在提交后出现。</p></div></section></aside></div></section>
     <footer class="wf-footer"><span>原图与历史结果保留；科学适用性仍待独立验证。</span><button id="wf-revert" class="button subtle" disabled>撤销未保存修改</button></footer>
+  </dialog>
+  <dialog id="nuclei-dialog" aria-labelledby="nuclei-heading">
+    <header class="module-heading"><h2 id="nuclei-heading">单图核分割</h2><button id="nuclei-close" class="button subtle">返回工作台</button></header>
+    <div class="module-body">
+      <p class="module-intro">研究工具：仅支持单页 8 位灰度 TIFF，科学适用性尚待独立验证。</p>
+      <div class="module-controls"><button class="button primary" data-nuclei-choose="source" disabled>选择原图</button><button id="nuclei-run" class="button primary" disabled>开始分析</button><button class="button subtle" data-nuclei-choose="open" disabled>打开已保存项目</button><button id="nuclei-cancel" class="button subtle" hidden>取消运行</button><button id="nuclei-settings-toggle" class="text-button">运行设置</button></div>
+      <section id="nuclei-settings" hidden aria-label="核分割运行设置"><h3>运行设置</h3><p>首次使用，请由环境维护者按准备指南配置运行环境和固定模型，再选择下面两个位置。以后选择原图即可分析。</p><button class="button subtle" data-nuclei-choose="worker" disabled>选择运行程序</button><output id="nuclei-worker">尚未设置</output><button class="button subtle" data-nuclei-choose="model" disabled>选择模型文件夹</button><output id="nuclei-model">尚未设置</output><p>运行程序：已准备环境中的 python.exe；模型目录包含 config.json、thresholds.json 和 weights_best.h5。准备指南见源码 tools/nuclei/README.md。</p></section>
+      <p id="nuclei-status" class="module-status" role="status" aria-live="polite">请在桌面应用中使用此工具。</p>
+      <section id="nuclei-image-section" hidden aria-label="原图与核分割结果">
+        <div class="module-tabs"><button id="nuclei-original" class="button subtle" aria-pressed="true">原图</button><button id="nuclei-overlay" class="button subtle" aria-pressed="false" disabled>实例轮廓</button><label>缩放 <select id="nuclei-zoom" aria-label="图像缩放"><option value="fit">适应窗口</option><option value="0.5">50%</option><option value="1">100%</option><option value="2">200%</option></select></label><strong id="nuclei-count">尚无结果</strong></div>
+        <div id="nuclei-viewport"><img id="nuclei-image" alt="原图预览"></div>
+        <p id="nuclei-source" class="module-caption"></p>
+        <details class="module-provenance"><summary>保存位置与来源</summary><dl><dt>项目</dt><dd id="nuclei-workspace"></dd><dt>原图 SHA256</dt><dd id="nuclei-sha"></dd><dt>运行</dt><dd id="nuclei-run-id"></dd></dl></details>
+      </section>
+    </div>
+    <footer class="module-footer"><button class="button primary" data-nuclei-choose="export" disabled>导出表、图与标签</button><span>结果自动保存；显示缩放不影响原始标签。</span></footer>
   </dialog>
 </body>
 </html>

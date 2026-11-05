@@ -282,3 +282,6 @@ P005后继已有生产WorkflowSession与CLI（完整M1/M2仍在开发）。可�
 
 
 P008批量CLI：`python -m bioimage_app --workflow-batch --workspace <新目录> --validation triangle_u16 --validation triangle_u8`。父控制器复用同一WorkflowSession/存储，支持样本隔离、整批控制、持久身份恢复、真实图模板绑定及依赖缓存。--manifest接显式原图/参数，--resume重开，--rerun在同目录创建新批次。实际验收状态只看P008任务卡，中文操作见 ../../docs/runbooks/workflow-batch.md。
+
+
+P016：当前工作台新增单图核分割研究入口，复用 P015 固定方法、WorkflowSession 和 Workspace。选原图、后台分析、原坐标轮廓/核数、导出与已提交结果重开见 [操作指南](../../docs/runbooks/nuclei-single-image.md)。宿主新增轻量 nuclei-tool 默认依赖，保留 nuclei extra 兼容原命令；TensorFlow/StarDist仍仅在显式隔离研究环境，默认包不加载或安装它们。平台存储schema及WB公式未改。

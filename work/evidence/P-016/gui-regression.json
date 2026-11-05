@@ -1,0 +1,25 @@
+{
+  "zero": {
+    "state": "succeeded",
+    "count": 0,
+    "run_id": "644bf375639a4dcebb394c73e59e5881",
+    "workspace": "C:\\Users\\70236\\Documents\\BioImage\\Projects\\Nuclei-10c8ff1efc7f"
+  },
+  "unsupported_previous_run_preserved": "644bf375639a4dcebb394c73e59e5881",
+  "missing_model": {
+    "state": "failed",
+    "count": null,
+    "message": "分析未完成，可检查运行设置后重试：ValueError: model_missing: prepare the fixed P014 model directory explicitly"
+  },
+  "cancelled": {
+    "state": "cancelled",
+    "count": null,
+    "workspace": "C:\\Users\\70236\\Documents\\BioImage\\Projects\\Nuclei-ecf30c79a4eb"
+  },
+  "cancel_observed_pid": 12044,
+  "original_unchanged": true,
+  "old_labels_unchanged": true,
+  "heartbeat_samples": 336,
+  "max_heartbeat_gap_seconds": 0.06299999996554106,
+  "note": "Qt controller actual model; native dialogs substituted. Not student/scientific acceptance."
+}

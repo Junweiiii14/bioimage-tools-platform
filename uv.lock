@@ -26,6 +26,7 @@ name = "bioimage-app"
 version = "0.14.0"
 source = { editable = "apps/desktop" }
 dependencies = [
+    { name = "nuclei-tool" },
     { name = "platform-runtime" },
     { name = "pyside6" },
     { name = "tool-contracts" },
@@ -41,6 +42,7 @@ wb = [
 
 [package.metadata]
 requires-dist = [
+    { name = "nuclei-tool", editable = "tools/nuclei" },
     { name = "nuclei-tool", marker = "extra == 'nuclei'", editable = "tools/nuclei" },
     { name = "platform-runtime", editable = "packages/platform_runtime" },
     { name = "pyside6", specifier = "==6.12.0" },

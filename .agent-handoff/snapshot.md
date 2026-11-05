@@ -1,9 +1,9 @@
 # 当前恢复入口
 
-[P015核分割研究适配器](../work/tasks/P-015-nuclei-research-adapter.md)已完成授权工程验收、独审、正常集成与正式回传。活动树bioimage-plan-sync，分支codex/p015-nuclei-research-adapter；PR66 main a7612843e5216f0471b51be93bd3687f0b8dbc82与候选8f00757文件树一致，本地合入为528c821。收尾文档随下一正常任务带入，原dirty树/GUI/安装/原图不碰。
+活动任务 [P016 单图核分割研究用户流程](../work/tasks/P-016-nuclei-single-image-flow.md)，goal已建立且active、无预算。只在 bioimage-plan-sync 工作树，分支 codex/p016-nuclei-single-image-flow；HEAD仍为P015收尾2b1447a，当前P016代码/回执/任务未提交。原bioimage-tools-platform dirty树、旧P012 GUI、安装与原图不碰。
 
-完整收据见[P015 final-delivery](../work/evidence/P-015/final-delivery.md)、objective-audit、validation.json。14真实Windows场景通过，9张标签每像素/ID匹配P014；产品a490d2e与门禁测试95ecb02独审通过。本机check --all exit0/1728passed/全部wheel；最终quality42086151498 Windows1728passed、Linux1724passed+4既有skip，双平台wheel及desktop成功；rules42086151033成功。首次4失败、GPU未解决边界、3研究库源码warnings均如实保留。所有本地实验/全量/CI监测命令已终态，无需重启。
+首条实际GUI点击的公开样例46核、P014标签每像素一致，导出/关闭/新进程重开同run、原SHA不变；见P016/first-gui-run.json。窗口命令72364/44488均已exit0，不重启旧进程或碰旧窗口。当前相关Python类型/Ruff通过，既有21项回归通过；新增异常回归/独审/完整CI/PR/主线和最终回传未完成。下一步按任务卡补零核/缺模型/不支持输入/取消/源变化与历史保护、小窗口/导航、准确提交独审和正常集成。
 
-正式验收回传上游01a19bfd-f3ab-7502-86da-9f61953d1c8a（local）已成功，工具isError=false；上游已核对交付并正式派发下一单图研究用户流程（预计P016，须查重）：现有工作台选择单图/运行/原图叠加与核数/导出/重开，复用P015和既有执行提交，设置环境路径但无自动安装下载。先完成P015收尾提交和goal关闭，再查重建卡/context并实际创建新goal（无预算）。完整范围来自上游派发；不猜编号、不扩科学准入/发布/外联/花费。
+P016已读Impeccable context及当前UI契约，保持现有视觉；首屏工具入口与核图对话框复用现有组件。Computer Use @oai/sky已实际操作；原生文件对话框UIA索引缓存不可靠，截图与键盘输入成功，不当产品缺陷。新工具显示API改变包implementation fingerprint，已构建 .local/p016-wheels 并重装P015自有worker环境（P014历史环境不动）。若继续改变工具代码，实际模型前须同步wheel。
 
-已见数据仅工程回归；训练重叠、患者独立性、16bit、Linux实际模型、实验室/学生/目标机仍未知。旧P014/P013/P012/P011及T082科学、GPU与目标环境缺项保留于risks/backlog和各final-delivery，不由当前工程验收销账。
+P015已完成PR66/main a761284、独审/真实模型/双平台CI/正式回传，goal已complete，不重做。当前上游01a19bfd-f3ab-7502-86da-9f61953d1c8a(local)已获用户自动接续要求（成功发送）：执行/验收后回传→上游继续派发，不等待催促。P016未完成前不宣称验收或派发新任务。科学/训练重叠/患者独立性/学生/16bit/Linux真实模型与旧GPU/目标机缺项保持。

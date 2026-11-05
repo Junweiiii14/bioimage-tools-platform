@@ -714,7 +714,12 @@ from shiboken6 import isValid
 assert Path(bioimage_app.workflow_authoring_bridge.__file__).is_relative_to(Path(sys.prefix))
 web_assets = Path(bioimage_app.api.__file__).parent / 'web_ui'
 assert all((web_assets / name).is_file() for name in (
-    'workflow_authoring.js', 'workflow_authoring.css', 'workflow_graph.js', 'workflow_graph.css'))
+    'workflow_authoring.js', 'workflow_authoring.css', 'workflow_graph.js', 'workflow_graph.css',
+    'nuclei.js', 'nuclei.css'))
+import bioimage_app.nuclei_bridge
+import nuclei_tool.api
+assert Path(nuclei_tool.api.__file__).is_relative_to(Path(sys.prefix))
+assert 'tensorflow' not in sys.modules and 'stardist' not in sys.modules
 app = QApplication([])
 app.setQuitOnLastWindowClosed(False)
 editor = WebWorkbenchWindow(settings=QSettings(str(Path('authoring-ui.ini').resolve()),
@@ -880,7 +885,12 @@ def main() -> int:
             ("nuclei-tool", [built["tool-contracts"], built["nuclei-tool"]], NUCLEI_SCRIPT),
             (
                 "bioimage-app",
-                [built["tool-contracts"], built["platform-runtime"], built["bioimage-app"]],
+                [
+                    built["tool-contracts"],
+                    built["platform-runtime"],
+                    built["nuclei-tool"],
+                    built["bioimage-app"],
+                ],
                 DESKTOP_SCRIPT,
             ),
         ):
@@ -894,10 +904,11 @@ def main() -> int:
                 built["tool-contracts"],
                 built["platform-runtime"],
                 built["wb-tool"],
+                built["nuclei-tool"],
                 built["bioimage-app"],
             ],
             (GUI_SCRIPT, AUTHORING_SCRIPT),
-            ("wb",),
+            ("wb", "nuclei"),
         )
 
 
