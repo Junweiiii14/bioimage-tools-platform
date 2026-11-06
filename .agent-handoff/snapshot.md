@@ -1,7 +1,9 @@
 # 当前恢复入口
 
-当前任务 [P023 本机独立交付候选](../work/tasks/P-023-local-candidate.md)，执行窗01a1b120-a7b5-77f0-a129-d782b3435b55。共享树bioimage-plan-sync / codex/p023-local-candidate，起始a621078保留P022收尾；本窗持有写入，尚未释放。
+[P023 本机独立交付候选](../work/tasks/P-023-local-candidate.md)工程完成，PR75/main d3733a7e1edae6e195d129c751a707e62b7fedea，与指定独审5dbfb394763227cb9a0befc1e28fd5a5c11a3334完整树相同，四项必需CI首轮成功。
 
-复用私有CPython/锁定六wheel/原生EXE，独立验收通道；先构建可启动目录，再核验三工具真实执行/正式结果/冷重开和模板复用，冻结准确提交回上游派固定独审，正常CI通过后集成。本窗只做P023及修复，不开下一任务。
+共享树bioimage-plan-sync / codex/p023-closeout：一次本地证据/任务收尾，保留随下一正常任务带入，不单独推收据。完成提交后本窗释放写入，下一任务由上游新窗口派发，本窗不续开。实际HEAD/dirty仍须恢复时核对。
 
-P022已合入PR74/main b13e71a。Linux首轮关闭挂起根因UNKNOWN保留，不能称已修。科学、真人、物理DPI、干净目标机仍未验。旧dirty树、原图、历史、在用安装及用户设置保护；卡片堆叠仅聊天预览。
+最终候选入口 `.local/releases/runtime-5dbfb3947632-acceptance-p023-local/app/BioImageWB-Acceptance.exe`，版本0.14.0、独立验收通道；真实三工具/模板/冷重开证据及最终目录/启动/关闭独审见[最终交付](../work/evidence/P-023/final-delivery.md)。旧安装未替换，核worker和模型外置。
+
+N01来源核验器单向集合既有缺口非阻断，实际工件双向集合已核验无未知源码；随相关任务处理。Linux历史关闭UNKNOWN、科学/真人/物理DPI/干净目标机未验保留。堆叠卡片仅聊天预览，不自动纳入实施。
