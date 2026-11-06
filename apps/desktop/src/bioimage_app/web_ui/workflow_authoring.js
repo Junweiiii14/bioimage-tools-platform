@@ -4,7 +4,11 @@
     const get = (id) => document.getElementById(id);
     const copy = (value) => structuredClone(value);
     const ports = {
-        source: '原图',
+        source: '原始输入',
+        record: '板记录',
+        labels: '核标签与核数',
+        wells: '逐孔结果',
+        samples: '技术样本结果',
         validation: '预检记录',
         analysis: '分析记录',
         measurements: '定量表',
@@ -169,13 +173,22 @@
         else renderLinks();
     }
     function bindRaw(node) {
-        const source = saved.project.sources.find((s) => s.sample_id === graph.sample_id).asset;
+        const sample = saved.project.sources.find((s) => s.sample_id === graph.sample_id);
+        const source = sample.asset;
         graph.inputs = graph.inputs.filter((p) => p.node_id !== node.node_id);
-        for (const p of node.module.input_ports.filter((p) => p.kind === 'raw_image')) {
+        for (const p of node.module.input_ports.filter(
+            (p) =>
+                p.kind === 'raw_image' ||
+                (saved.project.tool === 'bca' && ['source', 'record'].includes(p.name)),
+        )) {
             graph.edges = graph.edges.filter(
                 (e) => e.target_node !== node.node_id || e.target_port !== p.name,
             );
-            graph.inputs.push({ node_id: node.node_id, port: p.name, asset: copy(source) });
+            graph.inputs.push({
+                node_id: node.node_id,
+                port: p.name,
+                asset: copy(p.name === 'record' ? sample.record : source),
+            });
         }
     }
     function addModule(moduleId) {
@@ -305,6 +318,10 @@
         json.id = 'wf-parameters';
         json.setAttribute('aria-label', '步骤完整参数');
         json.value = JSON.stringify(JSON.parse(node.parameters_json), null, 2);
+        const fixedResearch = ['nuclei-stardist-research', 'bca-pierce25-research'].includes(
+            node.module.module_id,
+        );
+        json.readOnly = fixedResearch;
         parameterNode = node.node_id;
         const item = catalogue.find((c) => c.interface.module.module_id === node.module.module_id);
         if (item) {
@@ -480,7 +497,8 @@
             const entries = Object.entries(params).sort(
                 ([a], [b]) => Number(primary.has(b)) - Number(primary.has(a)),
             );
-            for (const [key, value] of entries)
+            if (fixedResearch) root.append(element('p', item.limits));
+            for (const [key, value] of fixedResearch ? [] : entries)
                 field(
                     technical.has(key) ? moduleSettings : root,
                     key,
@@ -511,7 +529,7 @@
             composing = false;
         });
         for (const [id, text] of [
-            ['wf-bind-raw', '将原图绑定到本步骤'],
+            ['wf-bind-raw', '将当前输入绑定到本步骤'],
             ['wf-mark-output', '切换本步骤为流程成果'],
             ['wf-node-results', '查看本步骤已提交成果'],
             ['wf-delete-node', '删除本步骤'],
@@ -552,7 +570,7 @@
               ? '草稿已保存，运行仍被预检问题阻止。'
               : '最近保存的流程通过预检。';
         get('wf-sources').textContent = (saved?.project.sources || [])
-            .map((s) => s.label + (s.reason ? '：' + s.reason : ' · 原图已保留'))
+            .map((s) => s.label + (s.reason ? '：' + s.reason : ' · 原始输入已保留'))
             .join('；');
     }
     function renderResults() {
@@ -601,10 +619,12 @@
                     ),
                 );
             }
+            if (output.port === 'labels' && output.text) section.append(element('p', output.text));
             if (output.preview) {
                 const image = element('img');
                 image.src = output.preview;
-                image.alt = '从已提交资产读取的报告';
+                image.alt =
+                    output.port === 'labels' ? '原坐标核轮廓显示图' : '从已提交资产读取的报告';
                 section.append(image);
             }
             const button = element('button', '打开已核验文件', 'button subtle');
@@ -623,6 +643,8 @@
                         output.asset.sha256,
                 ),
             );
+            if (output.text && !output.table.length && output.port !== 'labels')
+                details.append(element('pre', output.text));
             section.append(details);
             root.append(section);
         });
@@ -669,9 +691,14 @@
             token,
             operation,
             serial,
-            context: ['new_original', 'new_template', 'new_example', 'open_project'].includes(
-                chooseAction,
-            ),
+            context: [
+                'new_original',
+                'new_template',
+                'new_example',
+                'new_nuclei',
+                'new_bca',
+                'open_project',
+            ].includes(chooseAction),
             wasReady: contextReady,
         };
         status('正在' + (operation === 'freeze' ? '保存并预检运行请求…' : '处理…'));
@@ -712,7 +739,6 @@
         if (request) pending = null;
         if (error) {
             controlPending = '';
-            if (request?.context) contextReady = false;
             status(error, true);
             renderChrome();
             return;
@@ -927,6 +953,8 @@
             status('请新建或打开工作流项目。');
             bridge.documentChanged.connect(received);
             bridge.workspaceChanged.connect((path) => {
+                contextReady = false;
+                renderChrome();
                 get('wf-workspace-path').textContent = path;
                 get('wf-workspace-path').title = path;
             });

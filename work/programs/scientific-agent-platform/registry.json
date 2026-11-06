@@ -85,6 +85,10 @@
     {
       "id": "P-020",
       "path": "work/tasks/P-020-unified-workbench.md"
+    },
+    {
+      "id": "P-021",
+      "path": "work/tasks/P-021-research-workflow.md"
     }
   ],
   "work_packages": [
@@ -241,7 +245,8 @@
         "W12"
       ],
       "task_ids": [
-        "P-009"
+        "P-009",
+        "P-021"
       ]
     },
     {

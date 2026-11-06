@@ -214,3 +214,7 @@ PR71/main1c819aeaae9813fdc29606cbad463b08a191fbab与已审4cb48ad51dc71f5e4b3619
 ## 2026-11-06 P020作者候选自验
 
 三卡/真实BCA桌面闭环/核分割帮助/真实WB编排入口完成，未动方法或门禁。定向22+10通过、WB3通过、真实核分割46核与新进程重开通过；16图核验。全check仍在运行，初轮格式失败和GPU中断保留。待准确候选独审、CI和上游集成，唯一写入权未释放；详P020/README与任务卡。
+
+## 2026-11-06 P020最终验收
+
+准确0d83f4d的quality42204821003成功：Windows1767pass/10warnings/1018.15s，Linux1763pass/4既有skip/10warnings/825.35s，两平台完整wheel/check --all通过；desktop/rules42204821004通过。指定独审与两次增量pass；main aa3302a与已审树diff exit0。旧失败与中断保留，详P020/final-delivery。

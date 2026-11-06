@@ -204,6 +204,7 @@ class WebWorkbenchWindow(QMainWindow):
                 or self.bca.busy
                 or self._stage != "idle"
             ),
+            settings=self.settings,
         )
         self.authoring.idle.connect(self._finish_exit_if_ready)
         self.channel.registerObject("workflowAuthoring", self.authoring)

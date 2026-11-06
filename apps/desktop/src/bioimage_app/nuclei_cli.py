@@ -7,7 +7,7 @@ import sys
 from dataclasses import asdict
 from pathlib import Path
 
-from nuclei_tool.api import read_nuclei_input
+from nuclei_tool.api import NucleiInput, read_nuclei_input
 from platform_runtime.api import Workspace, WorkspaceError
 from PySide6.QtCore import QCoreApplication, QTimer
 from tool_contracts.api import (
@@ -29,33 +29,39 @@ def prepare(
     if expected_sha256 is not None and supplied.sha256 != expected_sha256:
         raise ValueError("原图已改变，请重新选择后分析")
     with Workspace.create(workspace) as store:
-        ref = store.import_asset(Path(source_path), supplied.sha256)
-        copied = read_nuclei_input(str(store.asset_path(ref)))
-        source = ScientificAsset(
-            payload=ref,
-            sample_id="sample",
-            producing_method=None,
-            parameters_sha256=None,
-            description=ScientificType(
-                kind="raw_image",
-                unit="pixel_intensity",
-                image=ImageMetadata(
-                    dtype="uint8",
-                    axes=("y", "x"),
-                    shape=copied.pixels.shape,
-                    acquisition_bit_depth=None,
-                    acquisition_range=None,
-                    acquisition_range_source=None,
-                    frame=CoordinateFrame(
-                        frame_id="original_pixels",
-                        origin_asset_sha256=ref.sha256,
-                        physical_pixel_size_yx=None,
-                        physical_unit=None,
-                    ),
+        return host.build(import_source(store, source_path, "sample", supplied))
+
+
+def import_source(
+    store: Workspace, source_path: str, sample_id: str, supplied: NucleiInput
+) -> ScientificAsset:
+    ref = store.import_asset(Path(source_path), supplied.sha256)
+    copied = read_nuclei_input(str(store.asset_path(ref)))
+    source = ScientificAsset(
+        payload=ref,
+        sample_id=sample_id,
+        producing_method=None,
+        parameters_sha256=None,
+        description=ScientificType(
+            kind="raw_image",
+            unit="pixel_intensity",
+            image=ImageMetadata(
+                dtype="uint8",
+                axes=("y", "x"),
+                shape=copied.pixels.shape,
+                acquisition_bit_depth=None,
+                acquisition_range=None,
+                acquisition_range_source=None,
+                frame=CoordinateFrame(
+                    frame_id="original_pixels",
+                    origin_asset_sha256=ref.sha256,
+                    physical_pixel_size_yx=None,
+                    physical_unit=None,
                 ),
             ),
-        )
-        return host.build(source)
+        ),
+    )
+    return source
 
 
 def main(arguments: list[str] | None = None) -> int:

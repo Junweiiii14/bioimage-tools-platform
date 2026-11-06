@@ -1,5 +1,9 @@
 # 当前恢复入口
 
-当前任务 work/tasks/P-020-unified-workbench.md，PR72统一工作台/BCA桌面MVP。活动树bioimage-plan-sync，分支codex/p020-unified-workbench，base1c819aeaae9813fdc29606cbad463b08a191fbab；保留P019本地收尾6c06283。首轮候选3056334由上游正式派指定独审，R01身份翻译/R02帮助链接及占用提示已最小修复，准备增量候选。定向17通过，详work/evidence/P-020/review-fixes.md。完整本机check中断不算通过；最终CI/独审/集成未完成。
+当前任务 work/tasks/P-021-research-workflow.md。活动树 bioimage-plan-sync，分支 codex/p021-research-workflow；本窗 01a1b08b-a875-79b1-9e86-cde0563c42c9 持有写入所有权，尚未释放。基线产品 main aa3302ad2980dfeec1ac6f7776fec6176f18fcda，保留 P020 本地收尾 a5d9ca8。
 
-本窗01a1b02f-dc63-7573-94bb-014c0cb2aadc仍唯一写入者，未释放。下一步冻结增量head回上游01a19bfd-f3ab-7502-86da-9f61953d1c8a，指定独审01a1af0d-808e-7131-ae29-237aded27938增量复核，等必需CI并由上游安排合入。本窗不自行合并/另派审查，不为纯CI收据再推head；合入后本地一次收尾并明确释放。科学/真人/物理DPI/安装未验，旧dirty树/旧安装/原图历史不动。
+核分割/BCA已接现有P009目录、模板、执行及结果；两个公开研究图的真实核标签与P015逐字节相同，BCA表与同输入CLI逐字节相同。研究模板/新输入/冷读及旧schema显式保存测试已过；PR73初审R01/R02已整改；本机混合源码全量诊断1 failed/1770 passed（唯一R01已修复），不声明准确head通过。证据 work/evidence/P-021/，命令与失败原样保留。
+
+下一步：冻结R02新head并回上游01a19bfd-f3ab-7502-86da-9f61953d1c8a，由上游派固定独审窗01a1af0d-808e-7131-ae29-237aded27938。作者不自行派重复独审或合并。修复仍在本窗。
+
+不改第三方算法/权重/依赖，不动旧dirty树、安装、原图与历史。当前仅固定方法编排MVP；跨实验语义组合、插件装卸、Agent、科学/真人/物理DPI/目标机及用户安装更新均未完成。

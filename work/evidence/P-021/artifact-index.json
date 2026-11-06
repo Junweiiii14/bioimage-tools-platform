@@ -1,0 +1,159 @@
+[
+  {
+    "source": ".local/p021-desktop.log",
+    "artifact": "p021-desktop.log.gz",
+    "sha256": "7cfa748372813e8f49af7f49d89a3a18befeb2fe3cef24cb5a92bda08685af87",
+    "bytes": 30364
+  },
+  {
+    "source": ".local/p021-desktop-final.log",
+    "artifact": "p021-desktop-final.log.gz",
+    "sha256": "105185e243227e751b120c4d528561d1fea225eecfc19e32c71656b13dc9ad23",
+    "bytes": 70700
+  },
+  {
+    "source": ".local/p021-bca-capture.log",
+    "artifact": "p021-bca-capture.log.gz",
+    "sha256": "028b7cacc9dcbf3e4b688dfdc8957d38c144d3b0334751351584a2ccae2b69a6",
+    "bytes": 101
+  },
+  {
+    "source": ".local/p021-targeted-final.log",
+    "artifact": "p021-targeted-final.log.gz",
+    "sha256": "7182a9f3bddbf13ab83adf5460bd898c582573ce3b1b312a559c908adef48e1c",
+    "bytes": 101
+  },
+  {
+    "source": ".local/p021-research-final.log",
+    "artifact": "p021-research-final.log.gz",
+    "sha256": "805b9fc66a0a77f59ae50257dacdd46f4def4fc3da81f849736aefb228efc6ae",
+    "bytes": 101
+  },
+  {
+    "source": ".local/p021-design-detect.json",
+    "artifact": "p021-design-detect.json.gz",
+    "sha256": "39160164037598af56cc5fd3c96b47ed3b8d9c9b18c256d8fdbe95aa5ee6650d",
+    "bytes": 9528
+  },
+  {
+    "source": ".local/p021_desktop_test.py",
+    "artifact": "p021_desktop_test.py.gz",
+    "sha256": "6ccd3845e88386a56cf912bddd1db1b6a8920ea3c28828c8bdfa117cd4604e7d",
+    "bytes": 4676
+  },
+  {
+    "source": ".local/p021_bca_capture_test.py",
+    "artifact": "p021_bca_capture_test.py.gz",
+    "sha256": "d5785ffd198278df971855a398cc1ab7cfb2163f4ce01d3fe4d7316d1aadb0a7",
+    "bytes": 1645
+  },
+  {
+    "artifact": "screenshots/bca-ember-1440.png",
+    "sha256": "6c87cf7b755ee21876a2c649aa0413618739ea4112db06b0dc5dafed3e40eb7e",
+    "bytes": 240104
+  },
+  {
+    "artifact": "screenshots/bca-ember-960.png",
+    "sha256": "0ec6c21215940a594fe481e670154c11f6413cd56e9f116b9eb1fd6812a57011",
+    "bytes": 175793
+  },
+  {
+    "artifact": "screenshots/bca-forest-1440.png",
+    "sha256": "00877b0e2f8c8f6bdb6fb1dc69fc336d128eb00fe5275c226fe73dc302df3862",
+    "bytes": 240903
+  },
+  {
+    "artifact": "screenshots/bca-forest-960.png",
+    "sha256": "45dc0a370ba0564c28c6877439eef4ac3daaa462b79696c4fcbd32aca3d72705",
+    "bytes": 176269
+  },
+  {
+    "artifact": "screenshots/bca-graph-final.png",
+    "sha256": "3f16691115c1e9a14545e34543243b4706316807dce0c5c357675aaf7e7179ec",
+    "bytes": 169359
+  },
+  {
+    "artifact": "screenshots/bca-iris-1440.png",
+    "sha256": "2c8598773f1e195d90a8abff07e20264b1c0fc5522bc23ab969ff33f15f6854f",
+    "bytes": 239117
+  },
+  {
+    "artifact": "screenshots/bca-iris-960.png",
+    "sha256": "4b67969ca952f0cb679900782176a206629d8ed9b8b09fcd7eab25d612939003",
+    "bytes": 174576
+  },
+  {
+    "artifact": "screenshots/bca-neutral-1440.png",
+    "sha256": "435d3766698812765ba309f113131961772b158da2da4fd091339e75056a21e7",
+    "bytes": 238419
+  },
+  {
+    "artifact": "screenshots/bca-neutral-960.png",
+    "sha256": "ec86e3f8a3bfec8612382982ea98ab75c0d67372b5da0e00b65b0cff0aef26cd",
+    "bytes": 173787
+  },
+  {
+    "artifact": "screenshots/nuclei-ember-1440.png",
+    "sha256": "6e0568f2778e10216692c58b563641fb469d0e0b5339f6c9ff94e9a3ae3dc789",
+    "bytes": 479586
+  },
+  {
+    "artifact": "screenshots/nuclei-ember-960.png",
+    "sha256": "22da6d8c9fed8da952d5d53a4d43d705768d66a9402e4b9d8e1cc1cef5027d5f",
+    "bytes": 322834
+  },
+  {
+    "artifact": "screenshots/nuclei-forest-1440.png",
+    "sha256": "663d8bfc64a16abf8ab12b80a087a8d29ec6584e3b6030e682ccfcc12d950816",
+    "bytes": 480303
+  },
+  {
+    "artifact": "screenshots/nuclei-forest-960.png",
+    "sha256": "778b2abdef098aecbe83f4f7998e119b4345468d854f6c6ed057ddabd78f05e9",
+    "bytes": 323399
+  },
+  {
+    "artifact": "screenshots/nuclei-iris-1440.png",
+    "sha256": "aededcc5e1a5352f48189efa15b6a000279df593b85f92aeb832ba5ca2c3e5e0",
+    "bytes": 478851
+  },
+  {
+    "artifact": "screenshots/nuclei-iris-960.png",
+    "sha256": "05c76aa789ac728a6456e4b6c326b60caf54ff9a34b15a642987dc0f30cd1cd4",
+    "bytes": 321788
+  },
+  {
+    "artifact": "screenshots/nuclei-neutral-1440.png",
+    "sha256": "b1ace9ae058e7dd1baa7c2cacba3a64481c36d665942f98e1563d0585a525ff7",
+    "bytes": 479134
+  },
+  {
+    "artifact": "screenshots/nuclei-neutral-960.png",
+    "sha256": "e0255e4d9e3c0a185f452feb88e774644572fba6fd5ff8fae7e570cb1f8d8343",
+    "bytes": 321507
+  },
+  {
+    "source": ".local\\p021-lint-final.log",
+    "artifact": "p021-lint-final.log.gz",
+    "sha256": "47cbc43de7765809297f4e37295688d055ccde62906f1b68f1069524ff1190a0",
+    "bytes": 1090
+  },
+  {
+    "source": ".local\\p021-input-fix.log",
+    "artifact": "p021-input-fix.log.gz",
+    "sha256": "3c793f3c1abd170e8b867a34a3a8e6dec5bbcfb1547b745ff990b2d261d2f1ce",
+    "bytes": 102
+  },
+  {
+    "source": ".local/p021-check-all.log",
+    "artifact": "p021-check-all.log.gz",
+    "sha256": "440dd1e18f845daebc510f19aeac4b3246593d7fd6e1b8d132ac723ac5a67dbe",
+    "bytes": 9498
+  },
+  {
+    "source": ".local/p021-r02-final.log",
+    "artifact": "p021-r02-final.log.gz",
+    "sha256": "9b1b8f392ba7fd43b454f71bb06aa7396f5e52f2aa1474bbbdaad4a3399597ef",
+    "bytes": 5943
+  }
+]

@@ -9,7 +9,7 @@ import sys
 from dataclasses import asdict, replace
 from pathlib import Path
 
-from bca_tool.api import METHOD, read_plate
+from bca_tool.api import METHOD, PlateInput, read_plate
 from platform_runtime.api import Workspace, WorkspaceError, validate_workflow_result_selection
 from PySide6.QtCore import QCoreApplication, QTimer
 from tool_contracts.api import (
@@ -27,29 +27,33 @@ from bioimage_app.workflow_session import WorkflowSession, WorkflowStatus
 def prepare(workspace: Path, source_path: str, record_path: str, host: BcaHost) -> ExecutionPlan:
     supplied = read_plate(source_path, record_path)
     with Workspace.create(workspace) as store:
-        source = store.import_asset(
-            Path(source_path), hashlib.sha256(supplied.csv_bytes).hexdigest()
-        )
-        record = store.import_asset(
-            Path(record_path), hashlib.sha256(supplied.record_bytes).hexdigest()
-        )
-        identity = supplied.wells[0].plate_id
-        return host.build(
-            ScientificAsset(
-                payload=source,
-                sample_id=identity,
-                producing_method=None,
-                parameters_sha256=None,
-                description=ScientificType(kind="analysis_result", unit="A562"),
-            ),
-            ScientificAsset(
-                payload=record,
-                sample_id=identity,
-                producing_method=None,
-                parameters_sha256=None,
-                description=ScientificType(kind="run_manifest", unit=None),
-            ),
-        )
+        return host.build(*import_sources(store, source_path, record_path, supplied))
+
+
+def import_sources(
+    store: Workspace, source_path: str, record_path: str, supplied: PlateInput
+) -> tuple[ScientificAsset, ScientificAsset]:
+    source = store.import_asset(Path(source_path), hashlib.sha256(supplied.csv_bytes).hexdigest())
+    record = store.import_asset(
+        Path(record_path), hashlib.sha256(supplied.record_bytes).hexdigest()
+    )
+    identity = supplied.wells[0].plate_id
+    return (
+        ScientificAsset(
+            payload=source,
+            sample_id=identity,
+            producing_method=None,
+            parameters_sha256=None,
+            description=ScientificType(kind="analysis_result", unit="A562"),
+        ),
+        ScientificAsset(
+            payload=record,
+            sample_id=identity,
+            producing_method=None,
+            parameters_sha256=None,
+            description=ScientificType(kind="run_manifest", unit=None),
+        ),
+    )
 
 
 def verified_outputs(workspace: Path, ledger: WorkflowLedger) -> dict[str, str]:

@@ -289,3 +289,6 @@ P016：当前工作台新增单图核分割研究入口，复用 P015 固定方�
 P019新增`python -m bioimage_app.bca_cli`研究入口，严格单板CSV与记录→真实worker→已提交逐孔/样本CSV与出处→重开验证。仅显式装配bca_tool，未改平台存储或WB/核分割语义；操作与限制见[工具README](../../tools/bca/README.md)。
 
 P020 统一工作台：三工具同骨架入口；BCA 桌面选 CSV/板记录、真实 worker、已核验结果/导出/重开；首页进入既有 P009 编排。操作见 [统一工作台](../../docs/runbooks/unified-workbench.md)。旧任务记录不改写，未更新用户安装。
+
+
+P021 源码新增固定核分割/BCA研究方法的现有画布接入：模板保存、重开与新输入绑定仍共用既有执行/提交，操作与边界见 [研究编排](../../docs/runbooks/research-workflow.md)。研究参数不自由调节，未替换用户安装。

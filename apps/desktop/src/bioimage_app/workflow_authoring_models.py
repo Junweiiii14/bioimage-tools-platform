@@ -33,6 +33,7 @@ class AuthoringSource(BaseModel):
     label: Annotated[str, Field(min_length=1, max_length=256)]
     asset: ScientificAsset | None = None
     reason: Annotated[str, Field(max_length=1024)] = ""
+    record: ScientificAsset | None = None
 
     @model_validator(mode="after")
     def source_facts(self) -> Self:
@@ -40,12 +41,15 @@ class AuthoringSource(BaseModel):
             raise ValueError("A failed input requires its actual reason")
         if self.asset is not None and self.asset.sample_id != self.sample_id:
             raise ValueError("Input identity differs from the scientific source")
+        if self.record is not None and self.record.sample_id != self.sample_id:
+            raise ValueError("Plate record identity differs from its source")
         return self
 
 
 class AuthoringProject(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid", strict=True)
-    schema_version: Literal[1] = 1
+    schema_version: Literal[1, 2] = 1
+    tool: Literal["wb", "nuclei", "bca"] = "wb"
     document_id: Annotated[str, Field(min_length=1, max_length=80)]
     revision: Annotated[int, Field(ge=0)] = 0
     graph: AuthoringGraph
@@ -56,6 +60,10 @@ class AuthoringProject(BaseModel):
 
     @model_validator(mode="after")
     def identities(self) -> Self:
+        if self.tool != "wb" and self.schema_version != 2:
+            raise ValueError("Research editor documents require schema version 2")
+        if self.tool == "bca" and any(s.record is None for s in self.sources):
+            raise ValueError("BCA sources require their explicit plate record")
         if len({item.sample_id for item in self.sources}) != len(self.sources):
             raise ValueError("Duplicate editor input identity")
         if not any(item.sample_id == self.graph.sample_id and item.asset for item in self.sources):
@@ -77,6 +85,8 @@ class AuthoringCommand(BaseModel):
         ],
         Field(max_length=16),
     ] = ()
+    tool: Literal["wb", "nuclei", "bca"] = "wb"
+    record_path: Annotated[str, Field(max_length=4096)] = ""
     lane_count: Annotated[int, Field(ge=1, le=96)] | None = None
     polarity: Literal["dark", "light"] = "dark"
     template_path: Annotated[str, Field(max_length=4096)] = ""
@@ -98,7 +108,7 @@ class AuthoringCommand(BaseModel):
             if self.operation == "initialize" and not self.template_path:
                 if len(self.source_paths or self.validation_cases) != 1:
                     raise ValueError("Create the first template from one input, then bind a batch")
-                if self.source_paths and self.lane_count is None:
+                if self.tool == "wb" and self.source_paths and self.lane_count is None:
                     raise ValueError("Declare the lane count for the original WB suggestion")
         if self.operation == "export" and not self.destination:
             raise ValueError("Choose a new template file")
