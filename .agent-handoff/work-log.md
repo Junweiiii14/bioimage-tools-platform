@@ -9,10 +9,6 @@
 
 用户明确整组Fig展示，现为蛋白行×泳道列，跨蛋白编辑等正确快照、缺项保留草稿入口。86c9产品及c90诊断独审Accepted；新包19checks/11.437秒通过，首重开超时真实保留。使用与交付入口已更新，最终服务器检查看PR35，合并另行确认。
 
-## 2026-11-02 P007契约候选与P006正常集成
-
-P006准确839..b0c71e1非作者Accepted，PR50四必需CI后正常合dc9618e/tree同候选。Windows1569passed/723.79秒、Linux1565passed/4既有skip/497.04秒，双wheel原评估/V0通过；integration/review-final保存。性能超线/前台UNKNOWN/准备取消边界保留。P007从839开始草案，保留自身修改快进dc主线后真实context重载，无冲突；科学资产/端口/有限图/计算键/可信预检和真实P002计划保存重开已草拟，87项相关组合通过。旧23schema摘要不变；独立wheel/准确提交独审/PR尚待，仍in_progress。M1/M2目标active。
-
 ## 2026-11-02 P007最终独审及PR51 CI
 
 准确dc9618e..23d4056 Accepted，独立31tests/4秒和六组攻击、四原件SHA、v1 Git字节与真实wheel日志校验通过。作者准确6bb合同命令/完整独立wheel0，最终Pyright0、plan/rulecheck0。PR51 ready、远端冻结23d4056，双平台完整CI尚进行；本地仅保存独审/交接记录，不推送重启CI。保持in_review，下一正常merge前核实四必需成功/tree一致，之后P005→P008→P009。P005只读草拟笔记在.local，未激活/实现。
@@ -139,3 +135,7 @@ CP4.2.8/StarDist0.9.2真实CPU对照，冻结3开发/10评估，20行独审复�
 ## 2026-11-06 P015 isolated nuclei adapter
 
 独立轻量nuclei-tool及显式CLI接既有WorkflowSession，固定进程外StarDist环境/权重，uint8准入/原坐标标签/核数/出处/零与失败区分。真实对照及独审修复signed TIFF、长错误原因、venv入口；补传递边界负例，所有必需CI后正常合PR66/main a761284，正式回传上游自动接续。未改WB、未扩科学准入或安装发布。
+
+## 2026-11-06 P016研究用户流程完成
+
+最终验收：PR67已合入main 6bd4680530dc4697f8d394a96fd288723222ddb8，与候选16d32b12f3980cf2dcaeb3ec9d145488378c6dcd文件树diff退出0。quality42157212799成功：Windows1737 passed/10 warnings/1410.11s；Linux1733 passed/4既有Windows专用skip/10 warnings/951.94s；两平台随后wheel/check --all完整通过。rules42157213226、desktop-environment通过。只读独审绑定候选通过。2026-11-06已成功向上游01a19bfd-f3ab-7502-86da-9f61953d1c8a(local)发送正式入口/截图/证据/CI/独审/PRmain/边界和下一建议，要求自动接续。观察进程87597已exit0。 科学/学生/环境边界见P016/final-delivery，不由工程通过关闭。
