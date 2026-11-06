@@ -1,7 +1,7 @@
 # 当前恢复入口
 
-当前任务 [P022可选装配](../work/tasks/P-022-optional-tools.md)，上游2026-11-06明确派发。实际树 bioimage-plan-sync，分支 codex/p022-optional-tools；起始 e5b3d52（含P021一次收尾），main基线2a3c7a3。当前开发窗01a1b0c7-c5ea-71a2-9e7e-b25ee7daaa74独占写入；未释放。
+最近完成[P022可选装配](../work/tasks/P-022-optional-tools.md)，PR74/main b13e71aa5aaebe91edecde44f386fc20ef693b19与指定独审候选47ded5e同树。准确CI、固定独审及集成补充允许集成；详[最终交付](../work/evidence/P-022/final-delivery.md)。
 
-先完成平台/单工具/全工具/停用与移除的隔离wheel真实桌面矩阵、自验和准确候选，再回传上游01a19bfd-f3ab-7502-86da-9f61953d1c8a派固定独审窗；不自行合并。P021已交付，不重做图画布/算法。原树、原图、历史和在用安装不动。
+实际共享树bioimage-plan-sync，本地codex/p022-closeout完成一次收尾后释放给上游01a19bfd-f3ab-7502-86da-9f61953d1c8a。下一任务由上游新窗口派发准备可运行交付候选，编号以新任务卡为准；本窗不续开任务。卡片堆叠交互仍仅聊天预览，未授权加入软件。
 
-科学、真人、物理DPI、目标机、安装更新均未验。具体进度和检查只在任务与P022证据。
+Linux首次全量关闭挂起根因UNKNOWN，非阻断判断有固定独审依据；同SHA仅一次重跑通过不称根因修复。科学、真人、物理DPI、目标机、安装更新均未验。原树、原图、历史和在用安装不动。

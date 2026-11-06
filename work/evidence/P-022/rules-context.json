@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "task": "P-022",
-  "base_commit": "2a3c7a32936c6e4daf63dac23fb953cc4512e840",
+  "base_commit": "b13e71aa5aaebe91edecde44f386fc20ef693b19",
   "scopes": [
     "."
   ],
