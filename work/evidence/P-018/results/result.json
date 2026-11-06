@@ -1,0 +1,20 @@
+{
+  "evidence": "analytic_synthetic_only",
+  "method": "pierce25-point-v0-research",
+  "python": "3.12.14",
+  "numpy": "2.5.4",
+  "blank_mean": 0.05,
+  "atol": 1e-10,
+  "rtol": 1e-10,
+  "S1_technical_n": 2,
+  "S1_original_mean_ug_ml": 5008.680555555556,
+  "S1_original_sd_ug_ml": 208.69470972519616,
+  "inverse_of_mean_assayed_ug_ml": 500,
+  "boundary_rejections": {
+    "nonfinite": "nonfinite_input",
+    "flat": "nonmonotonic_calibration",
+    "descending": "nonmonotonic_calibration"
+  },
+  "LoQ": null,
+  "chemical_validation": false
+}

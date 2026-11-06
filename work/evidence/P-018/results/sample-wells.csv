@@ -1,0 +1,6 @@
+sample_id,a562,corrected_a562,dilution_factor,assayed_ug_ml,original_ug_ml,status
+S1,0.42,0.37,10,486.1111111111111,4861.111111111111,research_estimate
+S1,0.44,0.39,10,515.625,5156.25,research_estimate
+LOW,0.06,0.009999999999999995,1,,,below_supported_range
+HIGH,1.14,1.0899999999999999,1,,,outside_calibration
+NEGATIVE,0.04,-0.010000000000000002,1,,,outside_calibration

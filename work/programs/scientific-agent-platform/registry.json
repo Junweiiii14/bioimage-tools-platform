@@ -73,6 +73,10 @@
     {
       "id": "P-017",
       "path": "work/tasks/P-017-endpoint-assay-research.md"
+    },
+    {
+      "id": "P-018",
+      "path": "work/tasks/P-018-bca-method-contract.md"
     }
   ],
   "work_packages": [
@@ -166,7 +170,8 @@
         "P-014",
         "P-015",
         "P-016",
-        "P-017"
+        "P-017",
+        "P-018"
       ]
     },
     {

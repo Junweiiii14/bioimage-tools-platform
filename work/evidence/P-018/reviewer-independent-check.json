@@ -1,0 +1,56 @@
+{
+  "head": "8f947b4e67fbf53bcd926b37a1a2f56b8e5343ea",
+  "python": "3.12.14",
+  "method": "independent Decimal(50) interpolation from committed synthetic raw CSV, no numpy in oracle",
+  "rows": 23,
+  "blank_mean": "0.050",
+  "standards": 9,
+  "wells": [
+    {
+      "sample_id": "S1",
+      "corrected": "0.370",
+      "interpolated": "486.11111111111111111111111111111111111111111111111",
+      "status": "research_estimate",
+      "original": "4861.1111111111111111111111111111111111111111111111"
+    },
+    {
+      "sample_id": "S1",
+      "corrected": "0.390",
+      "interpolated": "515.62499999999999023437500000000610351562499999618",
+      "status": "research_estimate",
+      "original": "5156.2499999999999023437500000000610351562499999618"
+    },
+    {
+      "sample_id": "LOW",
+      "corrected": "0.010",
+      "interpolated": "12.5",
+      "status": "below_supported_range",
+      "original": null
+    },
+    {
+      "sample_id": "HIGH",
+      "corrected": "1.090",
+      "interpolated": null,
+      "status": "outside_calibration",
+      "original": null
+    },
+    {
+      "sample_id": "NEGATIVE",
+      "corrected": "-0.010",
+      "interpolated": null,
+      "status": "outside_calibration",
+      "original": null
+    }
+  ],
+  "mean_original_ug_ml": "5008.6805555555555067274305555555860731336805555365",
+  "sd_original_ug_ml": "208.69470972519624891213038162248428533628963638044",
+  "max_abs_well_error_ug_ml": "1.111111111111111111111111111111111E-13",
+  "reproduction_semantically_equal": {
+    "synthetic-input.csv": true,
+    "sample-wells.csv": true,
+    "result.json": true
+  },
+  "existing_output_exit_code": 1,
+  "existing_output_unchanged": true,
+  "scientific_validation": false
+}

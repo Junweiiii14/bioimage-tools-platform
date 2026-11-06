@@ -202,3 +202,7 @@ PR66 main a761284与8f00757树一致；本机check --all exit0，1728passed1208.
 ## 2026-11-06 P016最终验收
 
 最终验收：PR67已合入main 6bd4680530dc4697f8d394a96fd288723222ddb8，与候选16d32b12f3980cf2dcaeb3ec9d145488378c6dcd文件树diff退出0。quality42157212799成功：Windows1737 passed/10 warnings/1410.11s；Linux1733 passed/4既有Windows专用skip/10 warnings/951.94s；两平台随后wheel/check --all完整通过。rules42157213226、desktop-environment通过。只读独审绑定候选通过。2026-11-06已成功向上游01a19bfd-f3ab-7502-86da-9f61953d1c8a(local)发送正式入口/截图/证据/CI/独审/PRmain/边界和下一建议，要求自动接续。观察进程87597已exit0。 科学/学生/环境边界见P016/final-delivery，不由工程通过关闭。
+
+## 2026-11-06 P017最终验收
+
+PR68/main f8f69b5与独审最终b2eaccd树一致；quality42164152689双平台check --all/wheel成功（Windows1737passed/10warnings/1132.98s；Linux1733passed/4既有skip/10warnings/909.25s），rules42164152703及desktop成功。指定独审与增量pass。研究完成，未授科学/学生准入；收据本地提交随下一任务，树释放，下一任务上游新窗口。详P017/final-delivery。
