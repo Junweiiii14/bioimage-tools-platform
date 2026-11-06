@@ -38,6 +38,8 @@ P017 · 2026-11-06 · 研究候选，未授予科学或学生使用准入。
 
 CCK-8公式/450 nm及干扰边界来自[Dojindo CK04](https://www.dojindo.com/manual/CK04/)和[官方流程](https://www.dojindo.com/products/pdf/Protocol/Cell_Counting_Kit-8.pdf)：结果是相对代谢显色信号，不能自动等同死亡百分比；有颜色/还原活性处理需匹配的无细胞背景，不能机械共用一个空白。公开[CCK-8原始附件线索](https://pmc.ncbi.nlm.nih.gov/articles/PMC12843558/)受站点验证阻挡，本轮未取到完整原始布局，不称其不存在。
 
+FPCountR补注（指定独审P017-R01）：固定`get_conc_bca`的`a562_baseline_csv=NULL`表示基线文件可选，未提供时按0处理；蛋白序列等参数仍必需。[历史预声明](../../work/evidence/P-017/experiment-plan.md)第7行“要求基线”的表述保留为历史，现以此更正，不改变算法或选择结论。
+
 ## 实际最小实验
 
 计划在拟合前提交8098d0b，来源摘要与独立环境固定于68bed12；[脚本、重现命令和限制](../../work/evidence/P-017/README.md)。96个原始读数保留在上游，42个定义孔参与本次分析；原始表不复制进本仓库。SciPy与statsmodels各直接计算正/反向OLS；反向值与上游6样本参考最大差1.78e-15 mg/mL，满足预声明1e-10绝对/相对容差。该容差只检查软件双精度复现。

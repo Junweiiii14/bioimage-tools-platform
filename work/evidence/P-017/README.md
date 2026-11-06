@@ -31,4 +31,4 @@ uv pip install --python .local/p017-reproduce/Scripts/python.exe -r work/evidenc
 
 ## 检查与交付状态
 
-本轮为研究与B020规划集成，无产品代码/产品锁/门禁改变。独审、规则/计划/政策检查及正常PR必需CI以[审查收据](review-and-validation.md)和任务卡记录，未完成前不声称已集成。P016 ac10a07收尾、B020 e4209e9保留随本PR带入。MVP先行，完整版集中统一前端；按主方案第11节区分工程MVP、统一交互、运行候选、用户安装更新、科学/真人试用。
+本轮为研究与B020规划集成，无产品代码/产品锁/门禁改变。指定独审bcf57ce已通过研究/规划范围，原文及独立复算收据见[审查收据](review-and-validation.md)；最终增量确认、规则/计划/政策检查及正常PR必需CI以[审查收据](review-and-validation.md)和任务卡记录，未完成前不声称已集成。P016 ac10a07收尾、B020 e4209e9保留随本PR带入。MVP先行，完整版集中统一前端；按主方案第11节区分工程MVP、统一交互、运行候选、用户安装更新、科学/真人试用。

@@ -1,0 +1,128 @@
+{
+  "head": "bcf57ce4d2553b765adf6b67d85b5fffb0d1aceb",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.14",
+  "versions": {
+    "contourpy": "1.4.0",
+    "cycler": "0.12.1",
+    "et-xmlfile": "2.0.0",
+    "fonttools": "4.68.0",
+    "kiwisolver": "1.5.1",
+    "matplotlib": "3.10.8",
+    "numpy": "2.5.4",
+    "openpyxl": "3.1.5",
+    "packaging": "26.3",
+    "pandas": "2.2.3",
+    "patsy": "1.0.3",
+    "pillow": "13.0.0",
+    "pyparsing": "3.3.3",
+    "python-dateutil": "4.0.0",
+    "pytz": "2026.6",
+    "scipy": "1.18.1",
+    "statsmodels": "0.14.4",
+    "tzdata": "2026.6"
+  },
+  "sources": [
+    {
+      "path": "examples/BCA_assay_metadata.csv",
+      "sha256": "a125988090905dafada297e740ba7fea3e964ad67cc7ef713ad6a2c8fb47d0e0",
+      "bytes": 321,
+      "remote": "fixed_remote_matches"
+    },
+    {
+      "path": "examples/example_run/experimental_data/processed_data/Protein/2026.06.15_PTN_analytical_performance.csv",
+      "sha256": "315a52e26247a870348f2d44091327e5f4100bbf511487d789c8375b2ac3de4e",
+      "bytes": 192,
+      "remote": "fixed_remote_matches"
+    },
+    {
+      "path": "examples/example_run/experimental_data/processed_data/Protein/2026.06.15_PTN_levels.csv",
+      "sha256": "c51dd2fbee27c4135fd086405dc9022b960016cf4b86585579d4cbb41fb84cca",
+      "bytes": 352,
+      "remote": "fixed_remote_matches"
+    },
+    {
+      "path": "examples/example_run/experimental_data/raw_data/2026.06.15_BCA_assay_data.xlsx",
+      "sha256": "17156825204b185af298c7a70881f607fa94bbce34b8d2562648f04c793b4499",
+      "bytes": 10805,
+      "remote": "fixed_remote_matches"
+    },
+    {
+      "path": "examples/example_run/experimental_data/raw_data/2026.06.15_BCA_exp_metadata.csv",
+      "sha256": "c8dc64ce42a1bdd96d629d7c377f09757629c285edb7af33c40511ff82e308ed",
+      "bytes": 2792,
+      "remote": "fixed_remote_matches"
+    },
+    {
+      "path": "examples/example_run/run_example.R",
+      "sha256": "3eca2df715e22c32aabe93f46985f55168c97e910cbbecf4b3e4f27fca83c693",
+      "bytes": 2217,
+      "remote": "fixed_remote_matches"
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "db5a50f083264ed552a689212b4e0966741940f7d4fdbbd1e2fead8748af50b7",
+      "bytes": 1071,
+      "remote": "fixed_remote_matches"
+    },
+    {
+      "path": "process_synergy2_endpoint_std_curve.R",
+      "sha256": "e37f4be8cb72af26b3b9a5ba8363df592aa68d6787c4431d7bc206dbde24009c",
+      "bytes": 23543,
+      "remote": "fixed_remote_matches"
+    },
+    {
+      "path": "README.md",
+      "sha256": "87f577791f29fddf5811dd19967c037a4e191c4dcd668f7d49e5ef7ae57c4dcb",
+      "bytes": 21694,
+      "remote": "fixed_remote_matches"
+    }
+  ],
+  "independent_decimal": {
+    "counts": [
+      42,
+      3,
+      21,
+      18,
+      6
+    ],
+    "blank": "0.034",
+    "forward_slope": "0.64909722222222222222222222222222222222222222222227",
+    "forward_intercept": "0.06211458333333333333333333333333333333333333333332",
+    "loq": "0.36653675832314305547211824201058044945703647366077",
+    "below_loq": 18,
+    "reference_errors": {
+      "G025": "3.378068899892305737010943408867196E-15",
+      "G026": "1.3510868590501796114160878105666617E-15",
+      "G027": "2.213425485033328775251536459041307E-15",
+      "G028": "1.0622971659236001470308244902714263E-15",
+      "G029": "4.21269055633529862852232984434940E-16",
+      "G030": "1.7478528662016341196633078878755163E-15"
+    }
+  },
+  "derived_csv": {
+    "all-defined-wells.csv": {
+      "csv_cells_equal": true,
+      "byte_equal": false,
+      "only_LF_vs_CRLF": true
+    },
+    "standards.csv": {
+      "csv_cells_equal": true,
+      "byte_equal": false,
+      "only_LF_vs_CRLF": true
+    },
+    "sample-wells.csv": {
+      "csv_cells_equal": true,
+      "byte_equal": false,
+      "only_LF_vs_CRLF": true
+    },
+    "samples.csv": {
+      "csv_cells_equal": true,
+      "byte_equal": false,
+      "only_LF_vs_CRLF": true
+    }
+  },
+  "previous_reviewer_check": "Exited 1 on CSV byte equality; diagnosed solely LF checkout versus Windows CRLF output. All CSV cells and normalized bytes identical; no numerical tolerance or product change.",
+  "scope": "Independent raw-input Decimal arithmetic and fixed source bytes. No R execution or chemical validation.",
+  "exit_code": 0
+}
