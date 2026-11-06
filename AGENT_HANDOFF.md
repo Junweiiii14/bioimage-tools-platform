@@ -46,7 +46,7 @@
 
 ## Current Pointer
 
-- 当前：[P020 统一工作台与 BCA 桌面 MVP](work/tasks/P-020-unified-workbench.md)，实施/自验中，独审未完成；活动树由本窗独占，详 snapshot。
+- 当前：[P020 统一工作台与 BCA 桌面 MVP](work/tasks/P-020-unified-workbench.md)，工程验收完成（PR72），最终独审与必需CI通过；一次本地收尾后树释放，下一任务上游新窗口，详 snapshot。
 
 - 最近完成：[P019 固定BCA单板CSV研究适配](work/tasks/P-019-bca-csv-adapter.md)。工程完成，PR71/main1c819ae、指定增量独审及必需CI通过；[最终交付](work/evidence/P-019/final-delivery.md)。本地收尾后释放共享树，由上游新窗口推进统一入口/交互。
 

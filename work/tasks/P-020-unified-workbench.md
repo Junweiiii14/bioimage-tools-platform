@@ -1,8 +1,8 @@
 # P020 统一工作台与 BCA 桌面 MVP
 
-<!-- PROGRAM_TASK_META {"id": "P-020", "status": "in_progress", "work_package": "W05", "depends_on": ["P-009", "P-016", "P-019"], "execution_root": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync", "owner": "chat-01a1b02f-dc63-7573-94bb-014c0cb2aadc", "base_commit": "1c819aeaae9813fdc29606cbad463b08a191fbab", "head_commit": null} -->
+<!-- PROGRAM_TASK_META {"id": "P-020", "status": "done", "work_package": "W05", "depends_on": ["P-009", "P-016", "P-019"], "execution_root": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync", "owner": "chat-01a1b02f-dc63-7573-94bb-014c0cb2aadc", "base_commit": "1c819aeaae9813fdc29606cbad463b08a191fbab", "head_commit": "0d83f4dc75804e90291d408302027fe590286fdf"} -->
 
-状态：实现与定向自验完成，PR72首轮独审R01/R02修复后准备增量复审；本机全量中断，待必需CI。2026-11-06，上游授权独占 bioimage-plan-sync；基线 main 1c819aeaae9813fdc29606cbad463b08a191fbab，起点 6c06283190c044491c862d5961f9e3b9f6b800e9（P019 本地收尾保留）。分支 codex/p020-unified-workbench。
+状态：工程范围完成。PR72已合入main aa3302ad2980dfeec1ac6f7776fec6176f18fcda，与最终已审0d83f4dc75804e90291d408302027fe590286fdf树一致；最终独审及全部必需CI通过。
 
 ## 范围与退出条件
 
@@ -28,3 +28,7 @@
 ## CI 重开等待修正
 
 c9a4d42指定增量独审pass；Windows CI唯一旧重开测试在空宿主idle窗口提前返回，Linux完整通过。已用250ms延迟探针实证原条件失败/界面未宣告成功，只增加目标workspace身份等待，保留20秒及业务断言。定向15通过；详work/evidence/P-020/ci-reopen-wait.md。新测试候选待准确增量复审/必需CI，不合入未通过提交。
+
+## 最终验收
+
+详work/evidence/P-020/final-delivery.md。Windows1767pass、Linux1763pass/4既有skip及两平台wheel/check --all成功，rules/desktop通过。指定三份独审原报告保留，R01/R02与等待条件增量闭环。一次本地收尾随下一任务带入，树释放；下一任务上游新窗口。科学/真人/IME/DPI/目标机/安装未验，用户旧安装未替换。

@@ -9,10 +9,6 @@
 
 用户明确整组Fig展示，现为蛋白行×泳道列，跨蛋白编辑等正确快照、缺项保留草稿入口。86c9产品及c90诊断独审Accepted；新包19checks/11.437秒通过，首重开超时真实保留。使用与交付入口已更新，最终服务器检查看PR35，合并另行确认。
 
-## 2026-11-02 P007正常集成，P005依赖就绪激活
-
-PR51准确c243四必需SUCCESS，正常merge006e9f1/tree与独审候选相同。Windows1601pass/945.30秒、Linux1597pass/4既有skip/602.61秒，双完整wheels通过；原失败/竞态修复证据保留，integration.json。保留本地交接50dc与main正常合14c后切codex/p005-workflow-executor，P007 done、P005 in_progress；按新base真实context并完整读取。冻结execution-test-design，尚无P005产品实现/测试；后续实现真实三节点/ledger/state/control/cache/recovery，P008同一实现扩批量、P009同一后端编辑。
-
 ## 2026-11-02 P005 journal storage integration
 
 固定workflow操作接AsyncStorage后台归约/序列化/CAS，真实RunRecord/manifest与全输入输出核验；新增plan7/document0、准备后关联ENOSPC重开唯一run、GUI响应屏障与物理缓存损坏反例。最终受影响99pass26.76s，Ruff/Pyright/policy/九import边界0。首版26f独审Request changes的修订混用P1已修，新head须复审；正式GraphSession/三节点WB和当前环境认证仍未实现。首轮组件记录保留于自动轮转work-log-20261102T053838281121Z.md，非删除。
@@ -139,3 +135,7 @@ PR68/main f8f69b5与独审最终b2eaccd树一致；quality42164152689双平台ch
 ## 2026-11-06 P020统一工作台候选
 
 三卡/真实BCA桌面闭环/核分割帮助/真实WB编排入口完成，未动方法或门禁。定向22+10通过、WB3通过、真实核分割46核与新进程重开通过；16图核验。全check仍在运行，初轮格式失败和GPU中断保留。待准确候选独审、CI和上游集成，唯一写入权未释放；详P020/README与任务卡。
+
+## 2026-11-06 P020统一工作台交付
+
+三工具入口/BCA真实桌面提交结果/核分割帮助/真实WB编排入口完成。独审R01/R02及CI旧等待竞态最小修复，PR72正常集成main aa3302a，与0d83f4d树一致。一次本地收尾后释放，下一任务上游新窗；详P020/final-delivery。
