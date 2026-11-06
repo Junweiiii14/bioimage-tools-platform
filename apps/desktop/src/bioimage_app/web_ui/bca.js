@@ -99,7 +99,9 @@
                                 maximumSignificantDigits: 7,
                                 useGrouping: false,
                             })
-                          : meanings[value] || value;
+                          : ['role', 'status', 'reason'].includes(key)
+                            ? meanings[value] || value
+                            : value;
                 cell.title = value;
                 if (key === 'reason') cell.className = 'result-reason';
             });

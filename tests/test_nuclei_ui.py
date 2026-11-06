@@ -16,8 +16,10 @@ from bioimage_app.nuclei_workflow_host import NucleiHost
 from nuclei_tool.api import NucleiInput, read_nuclei_input
 from PIL import Image
 from platform_runtime.api import Workspace
-from PySide6.QtCore import QSettings
-from PySide6.QtWidgets import QFileDialog, QWidget
+from PySide6.QtCore import QPoint, QSettings, Qt, QUrl
+from PySide6.QtGui import QDesktopServices
+from PySide6.QtTest import QTest
+from PySide6.QtWidgets import QFileDialog, QTextBrowser, QWidget
 from pytestqt.qtbot import QtBot
 
 
@@ -41,6 +43,42 @@ def select_source(monkeypatch: pytest.MonkeyPatch, bridge: NucleiBridge, path: P
 
     monkeypatch.setattr(QFileDialog, "getOpenFileName", choose)
     bridge.choose("source")
+
+
+def test_help_links_open_externally_without_erasing_instructions(
+    qtbot: QtBot, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    bridge, _ = make_bridge(qtbot, tmp_path)
+    opened: list[str] = []
+
+    def open_url(url: QUrl) -> bool:
+        opened.append(url.toString())
+        return True
+
+    monkeypatch.setattr(QDesktopServices, "openUrl", open_url)
+    bridge.help()
+    browser = bridge.window.findChild(QTextBrowser)
+    assert browser is not None
+    instructions = browser.toPlainText()
+    for label in ("StarDist models v0.1", "P014来源"):
+        assert browser.find(label)
+        cursor = browser.textCursor()
+        cursor.setPosition(cursor.selectionStart() + 1)
+        browser.setTextCursor(cursor)
+        browser.ensureCursorVisible()
+        QTest.mouseClick(
+            browser.viewport(),
+            Qt.MouseButton.LeftButton,
+            pos=browser.cursorRect().center() + QPoint(2, 0),
+        )
+        assert browser.toPlainText() == instructions
+    assert len(opened) == 2 and all(url.startswith("https://") for url in opened)
+    assert opened[0].endswith("python_2D_versatile_fluo.zip")
+    assert "/blob/1c819aeaae9813fdc29606cbad463b08a191fbab/" in opened[1]
+    assert opened[1].endswith("/work/evidence/P-014/license-sources.json")
+    browser.anchorClicked.emit(QUrl("file:///untrusted"))
+    assert len(opened) == 2
+    bridge.close()
 
 
 def test_unsupported_selection_preserves_previous_source(

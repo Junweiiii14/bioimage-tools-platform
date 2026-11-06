@@ -9,7 +9,18 @@ from uuid import uuid4
 
 from nuclei_tool.api import NucleiInput, original_png, read_nuclei_input, verify_model
 from platform_runtime.api import WorkspaceError
-from PySide6.QtCore import QObject, QSettings, QStandardPaths, Qt, QThread, QTimer, Signal, Slot
+from PySide6.QtCore import (
+    QObject,
+    QSettings,
+    QStandardPaths,
+    Qt,
+    QThread,
+    QTimer,
+    QUrl,
+    Signal,
+    Slot,
+)
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QDialog, QFileDialog, QTextBrowser, QVBoxLayout, QWidget
 from tool_contracts.api import ExecutionPlan
 
@@ -86,6 +97,13 @@ class NucleiBridge(QObject):
         dialog.resize(800, 620)
         layout = QVBoxLayout(dialog)
         text = QTextBrowser(dialog)
+        text.setOpenLinks(False)
+
+        def open_link(url: QUrl) -> None:
+            if url.scheme() == "https":
+                QDesktopServices.openUrl(url)
+
+        text.anchorClicked.connect(open_link)
         text.setMarkdown(
             (Path(__file__).parent / "web_ui" / "nuclei_setup.md").read_text(encoding="utf-8")
         )

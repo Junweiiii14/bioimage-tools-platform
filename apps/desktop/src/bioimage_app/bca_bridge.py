@@ -166,7 +166,10 @@ class BcaBridge(QObject):
 
     @Slot(str)
     def run(self, record_json: str) -> None:
-        if self.busy or self._closing or self.unavailable() or not self._source:
+        if self.busy or self._closing or not self._source:
+            return
+        if self.unavailable():
+            self._error("请等待当前任务完成，或先取消运行。")
             return
         try:
             record = PlateRecord.model_validate_json(record_json)

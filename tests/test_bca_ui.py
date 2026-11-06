@@ -60,3 +60,29 @@ def test_cancel_and_missing_facts_preserve_no_result(
     assert pids and states[-1]["state"] == "cancelled"
     assert states[-1]["result"] is None
     bridge.close()
+
+
+def test_run_reports_another_tool_busy(qtbot: QtBot, monkeypatch: pytest.MonkeyPatch) -> None:
+    window = QWidget()
+    qtbot.addWidget(window)
+    unavailable = False
+    bridge = BcaBridge(window, lambda: unavailable)
+    states: list[dict[str, Any]] = []
+
+    def record(raw: str) -> None:
+        states.append(json.loads(raw))
+
+    def choose(*_args: object) -> tuple[str, str]:
+        return str(EXAMPLES / "synthetic.csv"), ""
+
+    bridge.changed.connect(record)
+    monkeypatch.setattr(QFileDialog, "getOpenFileName", choose)
+    bridge.choose("source")
+    qtbot.waitUntil(lambda: not bridge.busy)
+    unavailable = True
+    bridge.run("{}")
+    state = states[-1]
+    assert state["state"] == "failed"
+    assert "请等待当前任务完成" in state["message"]
+    assert state["result"] is None and not bridge.busy
+    bridge.close()

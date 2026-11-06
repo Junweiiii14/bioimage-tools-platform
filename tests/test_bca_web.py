@@ -1,5 +1,6 @@
 """Real desktop WebChannel → worker → verified result; no scientific admission."""
 
+import hashlib
 import json
 import subprocess
 import sys
@@ -19,11 +20,13 @@ from tests.test_project_navigation_session import session_window as session_wind
 EXAMPLES = Path(__file__).parents[1] / "tools/bca/examples"
 
 
+@pytest.mark.parametrize("sample_ids", [("S1", "LOW"), ("blank", "空白")])
 def test_bca_desktop_commit_export_reopen_and_corruption(
     session_window: WebWorkbenchWindow,
     qtbot: QtBot,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    sample_ids: tuple[str, str],
 ) -> None:
     window = session_window
 
@@ -31,7 +34,19 @@ def test_bca_desktop_commit_export_reopen_and_corruption(
         return str(tmp_path)
 
     monkeypatch.setattr(QStandardPaths, "writableLocation", directory)
-    selected = EXAMPLES / "synthetic.csv"
+    selected = tmp_path / "synthetic.csv"
+    selected.write_text(
+        (EXAMPLES / "synthetic.csv")
+        .read_text(encoding="utf-8")
+        .replace(",S1,", f",{sample_ids[0]},")
+        .replace(",LOW,", f",{sample_ids[1]},")
+        .replace("synthetic,", "sample,"),
+        encoding="utf-8",
+    )
+    metadata = json.loads((EXAMPLES / "record.json").read_text(encoding="utf-8"))
+    metadata["source_sha256"] = hashlib.sha256(selected.read_bytes()).hexdigest()
+    record_path = tmp_path / "record.json"
+    record_path.write_text(json.dumps(metadata), encoding="utf-8")
 
     def choose(*_args: object, **_kw: object) -> tuple[str, str]:
         return str(selected), ""
@@ -59,7 +74,7 @@ def test_bca_desktop_commit_export_reopen_and_corruption(
             == "synthetic.csv"
         )
     )
-    selected = EXAMPLES / "record.json"
+    selected = record_path
     js(window, qtbot, "document.querySelector('[data-bca-choose=record]').click();true")
     qtbot.waitUntil(
         lambda: (
@@ -75,7 +90,7 @@ def test_bca_desktop_commit_export_reopen_and_corruption(
     result = read_result(str(next((tmp_path / "BioImage/Projects").iterdir())))
     rows = result.table("samples")
     assert float(
-        next(r for r in rows if r["sample_id"] == "S1")["mean_original_ug_ml"]
+        next(r for r in rows if r["sample_id"] == sample_ids[0])["mean_original_ug_ml"]
     ) == pytest.approx(5008.680555555556)
     assert sum(r["status"] == "partial" and r["mean_original_ug_ml"] == "" for r in rows) == 4
     qtbot.waitUntil(
@@ -83,6 +98,15 @@ def test_bca_desktop_commit_export_reopen_and_corruption(
             js(window, qtbot, "document.querySelectorAll('#bca-samples tbody tr').length")
             == len(rows)
         )
+    )
+    assert js(
+        window,
+        qtbot,
+        "JSON.stringify(Array.from(document.querySelectorAll('#bca-samples tbody tr'),"
+        "r=>r.cells[0].textContent))",
+    ) == json.dumps([r["sample_id"] for r in rows], ensure_ascii=False, separators=(",", ":"))
+    assert (
+        js(window, qtbot, "document.querySelector('#bca-wells tbody td').textContent") == "sample"
     )
     monkeypatch.setattr(QFileDialog, "getExistingDirectory", directory)
     js(window, qtbot, "document.querySelector('[data-bca-choose=export]').click();true")

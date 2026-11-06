@@ -27,7 +27,7 @@ def test_platform_and_tool_home_preserve_draft_and_ignore_background_navigation(
         qtbot,
         "!document.querySelector('#platform-view').hidden && "
         "document.querySelector('#home-view').hidden && "
-        "document.querySelectorAll('.installed-tool').length===1",
+        "document.querySelectorAll('.installed-tool').length===3",
     )
     # An actual WebChannel snapshot must not reopen the workspace while browsing.
     bridge_snapshot(window, qtbot, "({...state,status:'后台状态已更新'})")

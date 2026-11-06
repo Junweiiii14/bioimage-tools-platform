@@ -2,7 +2,7 @@
 
 <!-- PROGRAM_TASK_META {"id": "P-020", "status": "in_progress", "work_package": "W05", "depends_on": ["P-009", "P-016", "P-019"], "execution_root": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync", "owner": "chat-01a1b02f-dc63-7573-94bb-014c0cb2aadc", "base_commit": "1c819aeaae9813fdc29606cbad463b08a191fbab", "head_commit": null} -->
 
-状态：实现与定向自验完成，准备冻结独审候选；全量检查仍在运行。2026-11-06，上游授权独占 bioimage-plan-sync；基线 main 1c819aeaae9813fdc29606cbad463b08a191fbab，起点 6c06283190c044491c862d5961f9e3b9f6b800e9（P019 本地收尾保留）。分支 codex/p020-unified-workbench。
+状态：实现与定向自验完成，PR72首轮独审R01/R02修复后准备增量复审；本机全量中断，待必需CI。2026-11-06，上游授权独占 bioimage-plan-sync；基线 main 1c819aeaae9813fdc29606cbad463b08a191fbab，起点 6c06283190c044491c862d5961f9e3b9f6b800e9（P019 本地收尾保留）。分支 codex/p020-unified-workbench。
 
 ## 范围与退出条件
 
@@ -20,3 +20,7 @@
 ## 验证记录
 
 已完成真实 BCA worker/提交/导出/新进程重开/取消/损坏拒绝与导航回归；定向22+10测试通过，WB3测试通过，真实核分割46核及新进程重开通过。16张双尺寸/主题截图全部核对。全量check仍运行，初次格式失败及GPU中断不计通过。详 work/evidence/P-020/README.md；独审、CI、集成尚未完成。
+
+## 首轮独审修复
+
+3056334候选由上游派指定独审，回传R01身份误翻译、R02帮助链接空白，连同占用提示集中修复。定向17通过/15.36s，类型/格式/Web通过；旧单卡数量测试明确改为授权三卡，其他断言保留。完整本机check中断不计通过，CI与增量复审尚待；详work/evidence/P-020/review-fixes.md。
