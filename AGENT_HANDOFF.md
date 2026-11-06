@@ -46,7 +46,7 @@
 
 ## Current Pointer
 
-- 当前：[P021 核分割与 BCA 研究工作流](work/tasks/P-021-research-workflow.md)，已接入既有画布并完成定向/真实模型自验，完整门禁与准确候选独审待完成；活动树仍由本窗持有。
+- 当前：[P021 核分割与 BCA 研究工作流](work/tasks/P-021-research-workflow.md)，工程完成，PR73/main2a3c7a3与已审3f425b5同树，指定独审与必需CI通过；本地一次收尾后释放，详[交付](work/evidence/P-021/final-delivery.md)。
 
 - 最近完成：[P019 固定BCA单板CSV研究适配](work/tasks/P-019-bca-csv-adapter.md)。工程完成，PR71/main1c819ae、指定增量独审及必需CI通过；[最终交付](work/evidence/P-019/final-delivery.md)。本地收尾后释放共享树，由上游新窗口推进统一入口/交互。
 

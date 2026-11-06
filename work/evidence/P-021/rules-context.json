@@ -1,16 +1,9 @@
 {
   "schema": 1,
   "task": "P-021",
-  "base_commit": "aa3302ad2980dfeec1ac6f7776fec6176f18fcda",
+  "base_commit": "2a3c7a32936c6e4daf63dac23fb953cc4512e840",
   "scopes": [
-    ".agent-handoff",
-    "AGENT_HANDOFF.md",
-    "apps/desktop",
-    "docs",
-    "tests",
-    "tools/bca",
-    "tools/nuclei",
-    "work"
+    "."
   ],
   "rules": {
     "AGENTS.md": "398079c4b4d0723abab2a2fdb88c3751ad51905b5fc22c4e8268b36fcc02281d",

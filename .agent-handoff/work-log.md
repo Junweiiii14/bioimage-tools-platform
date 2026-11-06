@@ -9,14 +9,6 @@
 
 用户明确整组Fig展示，现为蛋白行×泳道列，跨蛋白编辑等正确快照、缺项保留草稿入口。86c9产品及c90诊断独审Accepted；新包19checks/11.437秒通过，首重开超时真实保留。使用与交付入口已更新，最终服务器检查看PR35，合并另行确认。
 
-## 2026-11-02 P005 journal storage integration
-
-固定workflow操作接AsyncStorage后台归约/序列化/CAS，真实RunRecord/manifest与全输入输出核验；新增plan7/document0、准备后关联ENOSPC重开唯一run、GUI响应屏障与物理缓存损坏反例。最终受影响99pass26.76s，Ruff/Pyright/policy/九import边界0。首版26f独审Request changes的修订混用P1已修，新head须复审；正式GraphSession/三节点WB和当前环境认证仍未实现。首轮组件记录保留于自动轮转work-log-20261102T053838281121Z.md，非删除。
-
-8bb独审11pass/2.71秒确认P1修复，但独立旧hello反例发现存储封装漏来源attempt/run的P2（Request changes）。已补worker/started/finish/abandon来源核对，新增真实失败→重试→旧hello/finish拒绝且新hello可接受。最终12新测试/受影响100passed27.19s，Ruff/Pyright0；新准确提交须复审，正式图仍待实现。
-
-准确3215..8d0非作者组件Accepted，独立12pass3.29s及缺来源/旧hello-started-finish-abandon反例/plan9-document0均过。全部四wheel构建与各隔离安装实际exit0，新增ledger API保存重开/幂等及原V0真实4000、正式提交重开、桌面/OCR仍过，logSHA见journal-wheels.json。规则实际main基线/计划检查0，新增wheel脚本Ruff长行已分行通过；没有完整pytest/CI或正式图结论。下一工作点host-integration-pending记录PID-started/allow_request排序与真实环境/三节点接线。
-
 ## 2026-11-02 P005 real node workers and dispatch acknowledgement
 
 节点修复b80非作者Accepted后，新增生产WorkflowSession/后台准备/固定WB装配/--workflow CLI，真实自动3节点正式提交及暂停继续通过；删内部重复全图/env核验和检查回调，开始一次/resume一次后台核验有测试断言。相关23pass36.34s、最后控制器2pass10.86s；CLI自有triangle_u16实际退出0，关闭重开4000.0/三run及runtime源码指纹相同，auto-session.json。当前是可运行单图后端原型，cache/取消恢复矩阵/UI/完整CI及最终候选独审仍待完成，不标整卡done。旧snapshot已完整归档再替换短入口。
@@ -139,3 +131,7 @@ PR68/main f8f69b5与独审最终b2eaccd树一致；quality42164152689双平台ch
 ## 2026-11-06 P020统一工作台交付
 
 三工具入口/BCA真实桌面提交结果/核分割帮助/真实WB编排入口完成。独审R01/R02及CI旧等待竞态最小修复，PR72正常集成main aa3302a，与0d83f4d树一致。一次本地收尾后释放，下一任务上游新窗；详P020/final-delivery。
+
+## 2026-11-06 P021工程交付
+
+P021核分割/BCA固定研究方法接入既有画布/模板/执行成果，真实模型与同输入数值一致。R01/R02经指定增量独审关闭，PR73按上游安排正常合入main2a3c7a3，与3f425b5同树。一次本地收尾后释放，下一任务上游新窗；详P021/final-delivery。
