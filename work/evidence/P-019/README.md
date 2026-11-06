@@ -22,3 +22,5 @@ Windows / Python3.12.14 / NumPy2.5.4，活动树bioimage-plan-sync；PR基线394
 B021只从7a0d718bcb8b76d2a59124307ed91f4abfa69616带入任务、agreement、validation、final-delivery四份已核对收据；未采用其snapshot/规则回执。P018收尾2bfd40c保留。
 
 同SOP真实逐孔/独立化学真值/LoQ/真人/用户安装均未验；研究状态不解除这些缺项。单节点覆盖本固定方法，GUI、自由拆分节点、全套可卸载矩阵及统一前端不属本轮。下一最小建议按主方案第11节集中统一已有工具入口/结果与编排，不继续扩孔板后端。
+
+冻结前Git字节核验发现CSV换行正规化会使示例source_sha256失配；已为tools/bca/examples及本轮results加窄路径-text属性，保留生产者字节。入口摘要校验未放松。正常git commit首次因未激活环境找不到pre-commit被拒，改用uv run --locked --no-sync git commit后全部提交hook通过，没有跳过hook。

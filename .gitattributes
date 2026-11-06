@@ -16,3 +16,7 @@
 /work/evidence/P-003/scientific-request-report*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 /work/evidence/P-006/frozen-runs/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 /work/evidence/P-009/frozen-runs/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+# P019 CSV/record and result evidence carry exact byte digests.
+/tools/bca/examples/** -text
+/work/evidence/P-019/results/** -text
