@@ -1,0 +1,29 @@
+{
+  "base": "dc2609dd79de98a63d4e8283e6c6db9e7c8e28ba",
+  "head": "bff711c1df1b42fee6de99985f16ce616c3b01a8",
+  "previously_reviewed": "8f947b4e67fbf53bcd926b37a1a2f56b8e5343ea",
+  "checks": {
+    "research": {
+      "exit_code": 0,
+      "diff": ""
+    },
+    "main_rules_historical_product": {
+      "exit_code": 0,
+      "diff": ""
+    },
+    "independent-review-8f947b4.md": {
+      "normalized_text_identical": true,
+      "sha256_normalized_utf8": "ee552fe65c1b4d2f35bfa25d209f6ddb1ec60e109f7cd0416c2cb1a528e4968e"
+    },
+    "reviewer-independent-check.json": {
+      "normalized_text_identical": true,
+      "sha256_normalized_utf8": "8f35d501db4a93bc2a66e2766ca7f6e947eecc7e3b7db38713ab19915c7fb170"
+    },
+    "diff_check_exit_code": 0,
+    "changed_receipts": [
+      "work/evidence/P-018/rules-context.json"
+    ]
+  },
+  "numerical_rerun": false,
+  "reason": "method, probe and results identical to reviewed candidate; independent reproduction remains applicable"
+}

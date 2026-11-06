@@ -69,6 +69,30 @@ def installed_check(
     return 0
 
 
+BCA_SCRIPT = """
+import importlib.util
+import sys
+import subprocess
+from pathlib import Path
+import bca_tool.api
+from bca_tool.api import read_plate, analyze_plate, bca_module_spec
+assert Path(bca_tool.api.__file__).is_relative_to(Path(sys.prefix))
+for name in ('PySide6', 'platform_runtime', 'wb_tool', 'nuclei_tool', 'scipy'):
+    assert importlib.util.find_spec(name) is None
+source, record = Path('bca.csv'), Path('bca.json')
+source.write_bytes(CSV_BYTES)
+record.write_bytes(RECORD_BYTES)
+result = analyze_plate(read_plate(str(source), str(record)).wells)
+assert abs(result.samples[0].mean_original_ug_ml - 5008.680555555556) < 1e-10
+assert result.samples[-1].mean_original_ug_ml is None
+assert bca_module_spec().method_version == 'pierce25-point-v0-research'
+worker = subprocess.run([sys.executable, '-I', '-m', 'bca_tool.worker'],
+                        input=b'', capture_output=True, timeout=15)
+assert worker.returncode == 2 and b'"kind":"hello"' in worker.stdout
+print('Isolated BCA wheel: CSV/API numeric result and worker hello; no GUI/storage/other tools')
+"""
+
+
 NUCLEI_SCRIPT = """
 import importlib.util
 import subprocess
@@ -861,7 +885,14 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="bioimage-wheel-") as temporary:
         folder = Path(temporary)
         wheel_dir = folder / "wheels"
-        packages = ("wb-tool", "nuclei-tool", "tool-contracts", "platform-runtime", "bioimage-app")
+        packages = (
+            "bca-tool",
+            "wb-tool",
+            "nuclei-tool",
+            "tool-contracts",
+            "platform-runtime",
+            "bioimage-app",
+        )
         built: dict[str, Path] = {}
         for package in packages:
             code = subprocess.run(
@@ -884,11 +915,22 @@ def main() -> int:
             ("wb-tool", [built["tool-contracts"], built["wb-tool"]], WB_SCRIPT),
             ("nuclei-tool", [built["tool-contracts"], built["nuclei-tool"]], NUCLEI_SCRIPT),
             (
+                "bca-tool",
+                [built["tool-contracts"], built["bca-tool"]],
+                "CSV_BYTES = "
+                + repr((ROOT / "tools/bca/examples/synthetic.csv").read_bytes())
+                + "\nRECORD_BYTES = "
+                + repr((ROOT / "tools/bca/examples/record.json").read_bytes())
+                + "\n"
+                + BCA_SCRIPT,
+            ),
+            (
                 "bioimage-app",
                 [
                     built["tool-contracts"],
                     built["platform-runtime"],
                     built["nuclei-tool"],
+                    built["bca-tool"],
                     built["bioimage-app"],
                 ],
                 DESKTOP_SCRIPT,
@@ -905,6 +947,7 @@ def main() -> int:
                 built["platform-runtime"],
                 built["wb-tool"],
                 built["nuclei-tool"],
+                built["bca-tool"],
                 built["bioimage-app"],
             ],
             (GUI_SCRIPT, AUTHORING_SCRIPT),

@@ -46,7 +46,9 @@
 
 ## Current Pointer
 
-- 当前：[P018 固定BCA方法与研究契约](work/tasks/P-018-bca-method-contract.md)。本窗口完成有界来源核验与透明API探针，研究独审pass，待最终增量与正常PR；准确状态只看任务卡。
+- 当前：[P019 固定BCA单板CSV研究适配](work/tasks/P-019-bca-csv-adapter.md)。待冻结候选与指定独审，工作树未释放；见snapshot及work/evidence/P-019/README.md。
+
+- 最近完成：[P018 固定BCA方法与研究契约](work/tasks/P-018-bca-method-contract.md)。研究范围完成，PR70/main3947261、指定研究/增量独审及必需CI通过；[最终交付](work/evidence/P-018/final-delivery.md)。本地收尾后释放共享树，上游直接新窗口派发下一任务，科学与产品未验保留。
 
 - 独审协议：[B021方案](docs/plans/independent-review.md)随PR69/main dc2609dd集成；按阶段审查，准确候选回传上游。
 

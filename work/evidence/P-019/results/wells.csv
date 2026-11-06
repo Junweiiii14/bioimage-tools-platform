@@ -1,0 +1,29 @@
+plate_id,well,role,sample_id,technical_replicate,a562,standard_ug_ml,dilution_factor,blank_mean,corrected_a562,standard_mean,standard_residual,assayed_ug_ml,original_ug_ml,status,reason,method_id,api_version
+synthetic,A1,blank,BSA_0,1,0.049,0.0,1.0,0.05,-0.0010000000000000009,-3.469446951953614e-18,-0.0009999999999999974,,,not_applicable,calibration well,pierce25-point-v0-research,0.1.0
+synthetic,B1,blank,BSA_0,2,0.051,0.0,1.0,0.05,0.000999999999999994,-3.469446951953614e-18,0.0009999999999999974,,,not_applicable,calibration well,pierce25-point-v0-research,0.1.0
+synthetic,A2,standard,BSA_25,1,0.069,25.0,1.0,0.05,0.019000000000000003,0.019999999999999997,-0.000999999999999994,,,not_applicable,calibration well,pierce25-point-v0-research,0.1.0
+synthetic,B2,standard,BSA_25,2,0.071,25.0,1.0,0.05,0.02099999999999999,0.019999999999999997,0.000999999999999994,,,not_applicable,calibration well,pierce25-point-v0-research,0.1.0
+synthetic,A3,standard,BSA_125,1,0.14900000000000002,125.0,1.0,0.05,0.09900000000000002,0.1,-0.000999999999999987,,,not_applicable,calibration well,pierce25-point-v0-research,0.1.0
+synthetic,B3,standard,BSA_125,2,0.151,125.0,1.0,0.05,0.10099999999999999,0.1,0.000999999999999987,,,not_applicable,calibration well,pierce25-point-v0-research,0.1.0
+synthetic,A4,standard,BSA_250,1,0.249,250.0,1.0,0.05,0.199,0.2,-0.0010000000000000009,,,not_applicable,calibration well,pierce25-point-v0-research,0.1.0
+synthetic,B4,standard,BSA_250,2,0.251,250.0,1.0,0.05,0.201,0.2,0.0010000000000000009,,,not_applicable,calibration well,pierce25-point-v0-research,0.1.0
+synthetic,A5,standard,BSA_500,1,0.429,500.0,1.0,0.05,0.379,0.38,-0.0010000000000000009,,,not_applicable,calibration well,pierce25-point-v0-research,0.1.0
+synthetic,B5,standard,BSA_500,2,0.431,500.0,1.0,0.05,0.381,0.38,0.0010000000000000009,,,not_applicable,calibration well,pierce25-point-v0-research,0.1.0
+synthetic,A6,standard,BSA_750,1,0.5890000000000001,750.0,1.0,0.05,0.539,0.54,-0.0010000000000000009,,,not_applicable,calibration well,pierce25-point-v0-research,0.1.0
+synthetic,B6,standard,BSA_750,2,0.5910000000000001,750.0,1.0,0.05,0.541,0.54,0.0010000000000000009,,,not_applicable,calibration well,pierce25-point-v0-research,0.1.0
+synthetic,A7,standard,BSA_1000,1,0.7290000000000001,1000.0,1.0,0.05,0.679,0.68,-0.0010000000000000009,,,not_applicable,calibration well,pierce25-point-v0-research,0.1.0
+synthetic,B7,standard,BSA_1000,2,0.7310000000000001,1000.0,1.0,0.05,0.681,0.68,0.0010000000000000009,,,not_applicable,calibration well,pierce25-point-v0-research,0.1.0
+synthetic,A8,standard,BSA_1500,1,0.9490000000000001,1500.0,1.0,0.05,0.899,0.9,-0.0010000000000000009,,,not_applicable,calibration well,pierce25-point-v0-research,0.1.0
+synthetic,B8,standard,BSA_1500,2,0.9510000000000001,1500.0,1.0,0.05,0.901,0.9,0.0010000000000000009,,,not_applicable,calibration well,pierce25-point-v0-research,0.1.0
+synthetic,A9,standard,BSA_2000,1,1.129,2000.0,1.0,0.05,1.079,1.08,-0.001000000000000112,,,not_applicable,calibration well,pierce25-point-v0-research,0.1.0
+synthetic,B9,standard,BSA_2000,2,1.131,2000.0,1.0,0.05,1.081,1.08,0.0009999999999998899,,,not_applicable,calibration well,pierce25-point-v0-research,0.1.0
+synthetic,C1,sample,S1,1,0.42,,10.0,0.05,0.37,,,486.1111111111111,4861.111111111111,research_estimate,LoQ and chemical accuracy unknown,pierce25-point-v0-research,0.1.0
+synthetic,C2,sample,S1,2,0.44,,10.0,0.05,0.39,,,515.625,5156.25,research_estimate,LoQ and chemical accuracy unknown,pierce25-point-v0-research,0.1.0
+synthetic,C3,sample,LOW,1,0.06,,1.0,0.05,0.009999999999999995,,,,,below_supported_range,below lowest nonzero standard (25 ug/mL); LoQ unknown,pierce25-point-v0-research,0.1.0
+synthetic,C4,sample,HIGH,1,1.14,,1.0,0.05,1.0899999999999999,,,,,above_supported_range,above calibration; no extrapolation,pierce25-point-v0-research,0.1.0
+synthetic,C5,sample,NEGATIVE,1,0.04,,1.0,0.05,-0.010000000000000002,,,,,below_supported_range,below lowest nonzero standard (25 ug/mL); LoQ unknown,pierce25-point-v0-research,0.1.0
+synthetic,C6,sample,LOW,2,0.06,,1.0,0.05,0.009999999999999995,,,,,below_supported_range,below lowest nonzero standard (25 ug/mL); LoQ unknown,pierce25-point-v0-research,0.1.0
+synthetic,C7,sample,HIGH,2,1.14,,1.0,0.05,1.0899999999999999,,,,,above_supported_range,above calibration; no extrapolation,pierce25-point-v0-research,0.1.0
+synthetic,C8,sample,NEGATIVE,2,0.04,,1.0,0.05,-0.010000000000000002,,,,,below_supported_range,below lowest nonzero standard (25 ug/mL); LoQ unknown,pierce25-point-v0-research,0.1.0
+synthetic,D1,sample,PARTIAL,1,0.42,,1.0,0.05,0.37,,,486.1111111111111,486.1111111111111,research_estimate,LoQ and chemical accuracy unknown,pierce25-point-v0-research,0.1.0
+synthetic,D2,sample,PARTIAL,2,0.06,,1.0,0.05,0.009999999999999995,,,,,below_supported_range,below lowest nonzero standard (25 ug/mL); LoQ unknown,pierce25-point-v0-research,0.1.0

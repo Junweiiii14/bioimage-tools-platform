@@ -1,6 +1,6 @@
 # P018 验收记录
 
-研究候选8f947b4已获指定独审pass，尚未集成。预声明提交24373f1；实际研究脚本和研究契约以最终候选提交为准。
+研究及最终增量独审已通过，PR70已集成；最终准确main/CI见final-delivery.md。预声明提交24373f1；实际研究脚本和研究契约以最终候选提交为准。
 
 | 命令/动作 | 实际结果 |
 |---|---|
@@ -20,3 +20,5 @@
 独审准确8f947b4/base f8f69b5的rule_context退出1（历史回执集合未完整登记）如实保留。经上游明确同意，采用dc2609dd中的P017 rules-context.json及integration-context.json原件；这两份是PR68正式集成的原始回执。0d134926收尾重载版仍完整保留在Git祖先，不删除文件、不改门禁/历史摘要，不把收尾重载误作新PR当前清单。相对实际main仅P018回执变化，因此不新增无历史差异的integration清单。
 
 P018 context以准确dc2609dd基线重新生成，scope为docs/research、work、.agent-handoff、AGENT_HANDOFF.md，exit0。研究报告/探针/合成输入输出与已审8f947b4完全不变；不重跑数值或产品矩阵。最终提交的准确rule_context/diff/policy/容量检查及PR地址由上游候选回传记录，CI与增量结论未完成前不称通过。
+
+最终准确bff711c规则检查exit0、增量独审pass，PR70/main3947261树diff0；quality42170582602/rules42170582534全部必需成功。完整事实见final-delivery.md；本地收尾不重推CI。

@@ -1,0 +1,16 @@
+[project]
+name = "bca-tool"
+version = "0.1.1"
+description = "Fixed Pierce25 single-plate BCA research adapter"
+requires-python = ">=3.12,<3.13"
+dependencies = ["tool-contracts", "numpy==2.5.4"]
+
+[tool.uv.sources]
+tool-contracts = { workspace = true }
+
+[build-system]
+requires = ["uv_build==0.13.6"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "bca_tool"

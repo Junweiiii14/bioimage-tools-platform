@@ -1,0 +1,6 @@
+sample_id,dilution_factor,n_total,n_valid,mean_original_ug_ml,sd_original_ug_ml,status,reason,method_id,api_version
+S1,10.0,2,2,5008.680555555556,208.69470972519616,research_estimate,technical replicates only; LoQ unknown,pierce25-point-v0-research,0.1.0
+LOW,1.0,2,0,,,partial,one or more wells outside supported range; no complete summary,pierce25-point-v0-research,0.1.0
+HIGH,1.0,2,0,,,partial,one or more wells outside supported range; no complete summary,pierce25-point-v0-research,0.1.0
+NEGATIVE,1.0,2,0,,,partial,one or more wells outside supported range; no complete summary,pierce25-point-v0-research,0.1.0
+PARTIAL,1.0,2,1,,,partial,one or more wells outside supported range; no complete summary,pierce25-point-v0-research,0.1.0
