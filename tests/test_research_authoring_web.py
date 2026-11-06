@@ -5,7 +5,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+import numpy as np
 import pytest
+import tifffile
 from bioimage_app.web_window import WebWorkbenchWindow
 from PySide6.QtWidgets import QFileDialog
 from pytestqt.qtbot import QtBot
@@ -13,6 +15,7 @@ from pytestqt.qtbot import QtBot
 from tests.test_project_navigation_session import js
 from tests.test_project_navigation_session import session_window as session_window
 from tests.test_research_authoring import plate_at
+from tests.test_workflow_authoring_web import editor_window as editor_window
 
 
 def test_bca_graph_run_template_reuse_and_integrity(
@@ -154,3 +157,73 @@ def test_bca_graph_run_template_reuse_and_integrity(
         timeout=30,
     )
     assert failed.returncode != 0
+
+
+@pytest.mark.parametrize("action", ["new_nuclei", "new_bca"])
+def test_failed_research_switch_disables_old_editor_and_recovers(
+    editor_window: WebWorkbenchWindow,
+    qtbot: QtBot,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    action: str,
+) -> None:
+    window = editor_window
+    assert window.authoring.projection is not None
+    old_id = window.authoring.projection.project.document_id
+    # A pre-dialog dirty rejection has not switched the host and must keep its draft usable.
+    js(
+        window,
+        qtbot,
+        "document.querySelector('#wf-title').value='保留草稿';"
+        "document.querySelector('#wf-title').dispatchEvent(new Event('input'));"
+        f"document.querySelector('[data-wf-choose={action}]').click();true",
+    )
+    qtbot.waitUntil(lambda: js(window, qtbot, "!workflowEditor.snapshot().pending") is True)
+    assert window.authoring.projection.project.document_id == old_id
+    assert js(window, qtbot, "document.querySelector('#wf-save').disabled") is False
+    assert js(window, qtbot, "workflowEditor.hasDraft()") is True
+    js(window, qtbot, "document.querySelector('#wf-save').click();true")
+    qtbot.waitUntil(lambda: js(window, qtbot, "!workflowEditor.snapshot().pending") is True)
+
+    def cancel(*_args: object, **_kw: object) -> tuple[str, str]:
+        return "", ""
+
+    monkeypatch.setattr(QFileDialog, "getOpenFileName", cancel)
+    js(window, qtbot, f"document.querySelector('[data-wf-choose={action}]').click();true")
+    qtbot.waitUntil(lambda: js(window, qtbot, "!workflowEditor.snapshot().pending") is True)
+    assert window.authoring.projection.project.document_id == old_id
+    assert js(window, qtbot, "document.querySelector('#wf-run').disabled") is False
+    assert js(window, qtbot, "document.querySelector('#wf-workspace').hidden") is False
+    if action == "new_bca":
+        source, record = plate_at(tmp_path, "invalid")
+        Path(record).write_text("{}", encoding="utf-8")
+        paths = [source, record]
+    else:
+        source = tmp_path / "unsupported.tif"
+        tifffile.imwrite(source, np.zeros((20, 25), dtype=np.uint16))
+        paths = [str(source)]
+
+    def choose(*_args: object, **_kw: object) -> tuple[str, str]:
+        return paths.pop(0), ""
+
+    monkeypatch.setattr(QFileDialog, "getOpenFileName", choose)
+    js(window, qtbot, f"document.querySelector('[data-wf-choose={action}]').click();true")
+    qtbot.waitUntil(
+        lambda: js(window, qtbot, "document.querySelector('#wf-status').dataset.error") == "true",
+        timeout=15000,
+    )
+    assert window.authoring.projection is None
+    assert js(window, qtbot, "document.querySelector('#wf-workspace').hidden") is True
+    assert js(window, qtbot, "document.querySelector('#wf-start').hidden") is False
+    assert js(window, qtbot, "document.querySelector('#wf-run').disabled") is True
+    assert js(window, qtbot, "document.querySelector('#wf-save').disabled") is True
+    js(window, qtbot, "document.querySelector('[data-wf-choose=new_example]').click();true")
+    qtbot.waitUntil(
+        lambda: js(window, qtbot, "!workflowEditor.snapshot().pending") is True,
+        timeout=15000,
+    )
+    assert window.authoring.projection is not None
+    assert window.authoring.projection.project.document_id != old_id
+    assert not window.authoring.projection.issues
+    assert js(window, qtbot, "document.querySelector('#wf-workspace').hidden") is False
+    assert js(window, qtbot, "document.querySelector('#wf-run').disabled") is False

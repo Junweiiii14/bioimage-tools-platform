@@ -143,5 +143,17 @@
     "artifact": "p021-input-fix.log.gz",
     "sha256": "3c793f3c1abd170e8b867a34a3a8e6dec5bbcfb1547b745ff990b2d261d2f1ce",
     "bytes": 102
+  },
+  {
+    "source": ".local/p021-check-all.log",
+    "artifact": "p021-check-all.log.gz",
+    "sha256": "440dd1e18f845daebc510f19aeac4b3246593d7fd6e1b8d132ac723ac5a67dbe",
+    "bytes": 9498
+  },
+  {
+    "source": ".local/p021-r02-final.log",
+    "artifact": "p021-r02-final.log.gz",
+    "sha256": "9b1b8f392ba7fd43b454f71bb06aa7396f5e52f2aa1474bbbdaad4a3399597ef",
+    "bytes": 5943
   }
 ]

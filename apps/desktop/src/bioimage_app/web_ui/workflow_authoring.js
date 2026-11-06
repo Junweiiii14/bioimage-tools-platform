@@ -691,9 +691,14 @@
             token,
             operation,
             serial,
-            context: ['new_original', 'new_template', 'new_example', 'open_project'].includes(
-                chooseAction,
-            ),
+            context: [
+                'new_original',
+                'new_template',
+                'new_example',
+                'new_nuclei',
+                'new_bca',
+                'open_project',
+            ].includes(chooseAction),
             wasReady: contextReady,
         };
         status('正在' + (operation === 'freeze' ? '保存并预检运行请求…' : '处理…'));
@@ -734,7 +739,6 @@
         if (request) pending = null;
         if (error) {
             controlPending = '';
-            if (request?.context) contextReady = false;
             status(error, true);
             renderChrome();
             return;
@@ -949,6 +953,8 @@
             status('请新建或打开工作流项目。');
             bridge.documentChanged.connect(received);
             bridge.workspaceChanged.connect((path) => {
+                contextReady = false;
+                renderChrome();
                 get('wf-workspace-path').textContent = path;
                 get('wf-workspace-path').title = path;
             });

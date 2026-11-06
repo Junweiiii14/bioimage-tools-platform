@@ -26,7 +26,7 @@ Windows 11 / Python 3.12.14 / 已锁定 PySide6 QtWebEngine。普通测试离屏
 | [numerical-parity.json](numerical-parity.json) | 两张核标签文件SHA与P015固定已见研究结果相同；BCA相同CSV摘要、同输入CLI重新执行的wells/samples逐字节相同。属于工程一致性，不是独立科学准确性 |
 | `ruff check` / `ruff format --check` / 定向 `pyright` / `npm run check:web` | 最终自验exit0，Pyright 0 errors；日志p021-lint-final.log.gz包含环境烟测通过。未加忽略、skip、改容差或门禁 |
 | `dev.py policy` | exit0，248个产品文件边界扫描；不等于动态沙箱或全科学证明 |
-| `dev.py check --all` | 本机运行中；已有GPU日志和至少一个失败尚待最终定位，不宣称通过。最终候选必需CI另记 |
+| `dev.py check --all` | exit1，1 failed / 1770 passed / 1307.65s；唯一失败为下述R01。执行期间源码变化，仅作诊断，不对应准确head全量通过；最终候选必需CI另记 |
 
 原始日志/探针为无损 gzip，摘要及截图见 [artifact-index.json](artifact-index.json)。完整运行语义和结果依赖真实投影，不以截图替代执行。图像来自既有公开研究数据与合成板，无私有原图。两轮UI有界检查后仅将核数文本移至显示图之前（不改计算/样式），通过DOM及源码检查，未追加第三轮视觉精修。机械detect返回全页面既有CSS对比度/动画/glow警告；本轮无CSS/token改动，不将此扫描写成全页面无问题。
 
@@ -41,3 +41,9 @@ Windows 11 / Python 3.12.14 / 已锁定 PySide6 QtWebEngine。普通测试离屏
 旧候选0027432在本机全量第329号用例 `test_changed_source_rejected_before_workspace_creation` 失败：输入导入提取使原图SHA变化的拒绝发生在Workspace.create之后。恢复先公开read/校验再创建；导入接收已验证NucleiInput/PlateInput，保持入口验证一次及快照摘要核验。BCA同类CLI顺序一并恢复，数值/worker/方法未改。
 
 `pytest tests/test_nuclei_ui.py::test_changed_source_rejected_before_workspace_creation tests/test_research_authoring.py tests/test_research_authoring_web.py tests/test_nuclei_host.py tests/test_bca_host.py -q` exit0，12 passed / 17.92s，原断言未修改。相关Ruff与Pyright exit0。全量原进程继续诊断；执行期间有工作区变更，最终日志不得作为任一冻结head的全量通过。修复后准确提交的必需CI承担完整验证。
+
+## 独审 R02 上下文切换修复
+
+独审初审原件见 independent-review-0027432.md，结论 changes_required（R01/R02）。R01在0f4cac5修复；本批R02将new_nuclei/new_bca纳入既有上下文动作，在实际workspaceChanged时撤销旧ready，避免新来源初始化失败后仍展示旧WB并允许运行。取消对话框或dirty前置拒绝没有切换宿主，原草稿/保存能力保持。首页旧“研究尚未接入”文案同时更新，不改样式或算法。
+
+`pytest tests/test_research_authoring_web.py tests/test_workflow_authoring_web.py::test_web_editor_saves_and_runs_actual_fixture -q` exit0，4 passed / 32.37s（p021-r02-final.log.gz）：两个研究入口各验证dirty拒绝、取消、真实切换失败、恢复示例；另含BCA真实模板执行和WB三节点执行。Windows离屏、disable-gpu，已有mailbox警告仍在。Ruff、format、定向Pyright及npm check:web全部exit0。未更改旧预期/容差/忽略/门禁。此次为行为回归检查，未增加第三轮视觉精修。
