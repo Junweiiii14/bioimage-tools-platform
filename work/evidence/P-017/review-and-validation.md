@@ -10,3 +10,5 @@
 - 格式后run3退出0，4份CSV与run2逐字节一致（0.1206秒、不含导入）。ruff最终通过。dev.py policy与git diff --check通过；handoff容量维护先归档1段，硬限制无问题。check_plan.py退出1：既存P010 done但head_commit=null；main同样如此，不修改历史状态冒充通过。P017依赖P013/P016均done已核。
 
 - 先前子代理只读审查同一bcf57ce无P1/P2，现作为补充，不替代指定窗口独审。作者另测独立研究环境文件逻辑大小291.29MiB（含绘图与对照库，非产品增量/物理占用/峰值内存）。未追加全量本地产品测试。
+
+- 最终状态覆盖前述运行中记录：PR68/main f8f69b5与独审最终b2eaccd树一致；quality42164152689双平台check --all/wheel成功（Windows1737passed/10warnings/1132.98s；Linux1733passed/4既有skip/10warnings/909.25s），rules42164152703及desktop成功。指定独审与增量pass。研究完成，未授科学/学生准入；收据本地提交随下一任务，树释放，下一任务上游新窗口。详P017/final-delivery。

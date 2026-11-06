@@ -46,7 +46,9 @@
 
 ## Current Pointer
 
-- 当前：[P017 BCA孔板研究](work/tasks/P-017-endpoint-assay-research.md)。已完成公开软件参考复现，待独审/PR；前端阶段按[主方案第11节](docs/plans/research-platform-rd.md)。
+- 当前审查：[B021 持续独立审查协议](work/tasks/B-021-continuous-independent-review.md)，[共同方案](docs/plans/independent-review.md)经上游核对，PR69待最终增量核对、CI及集成。产品活动树 `bioimage-plan-sync` 已由新窗口登记P018，恢复开发读取该树实际任务卡 `work/tasks/P-018-bca-method-contract.md`；本树不复制或改写其状态。
+
+- 最近完成：[P017 BCA孔板研究](work/tasks/P-017-endpoint-assay-research.md)。研究/规划已完成，PR68/main f8f69b5、指定独审及双平台CI通过；[最终交付](work/evidence/P-017/final-delivery.md)。科学/用户/安装限制保留；前端阶段按[主方案第11节](docs/plans/research-platform-rd.md)。
 
 - 最近完成：[P016 单图核分割研究用户流程](work/tasks/P-016-nuclei-single-image-flow.md)。PR67/main6bd4680、真实GUI/异常回归、准确独审及双平台CI通过，已正式回传上游自动接续；见snapshot及[最终交付](work/evidence/P-016/final-delivery.md)。
 
