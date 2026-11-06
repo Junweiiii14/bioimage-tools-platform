@@ -69,6 +69,10 @@
     {
       "id": "P-016",
       "path": "work/tasks/P-016-nuclei-single-image-flow.md"
+    },
+    {
+      "id": "P-017",
+      "path": "work/tasks/P-017-endpoint-assay-research.md"
     }
   ],
   "work_packages": [
@@ -161,7 +165,8 @@
         "P-013",
         "P-014",
         "P-015",
-        "P-016"
+        "P-016",
+        "P-017"
       ]
     },
     {

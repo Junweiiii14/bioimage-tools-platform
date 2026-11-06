@@ -1,14 +1,16 @@
 {
   "schema": 1,
   "task": "B-021",
-  "base_commit": "6bd4680530dc4697f8d394a96fd288723222ddb8",
+  "base_commit": "f8f69b51e01446ffed6301dec99d2cf28fcdb85c",
   "scopes": [
     ".agent-handoff",
     "AGENTS.md",
+    "AGENT_HANDOFF.md",
     "docs/ai-workflow.md",
     "docs/plans",
     "work/evidence/B-021",
-    "work/tasks/B-021-continuous-independent-review.md"
+    "work/evidence/P-017",
+    "work/tasks"
   ],
   "rules": {
     "AGENTS.md": "398079c4b4d0723abab2a2fdb88c3751ad51905b5fc22c4e8268b36fcc02281d",

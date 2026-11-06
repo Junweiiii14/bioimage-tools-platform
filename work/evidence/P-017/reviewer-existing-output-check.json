@@ -1,0 +1,8 @@
+{
+  "candidate": "bcf57ce4d2553b765adf6b67d85b5fffb0d1aceb",
+  "probe_exit_code": 1,
+  "expected_failure": "FileExistsError",
+  "all_previous_output_hashes_preserved": true,
+  "stderr": "Traceback (most recent call last):\n  File \"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p017\\work\\evidence\\P-017\\run_probe.py\", line 25, in <module>\n    args.output.mkdir(parents=True, exist_ok=False)\n  File \"C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\Lib\\pathlib.py\", line 1311, in mkdir\n    os.mkdir(self, mode)\nFileExistsError: [WinError 183] \u5f53\u6587\u4ef6\u5df2\u5b58\u5728\u65f6\uff0c\u65e0\u6cd5\u521b\u5efa\u8be5\u6587\u4ef6\u3002: '.local\\\\reviewer-reproduction'\n",
+  "check_exit_code": 0
+}
