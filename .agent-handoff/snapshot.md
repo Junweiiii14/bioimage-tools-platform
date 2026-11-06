@@ -1,11 +1,9 @@
 # 当前恢复入口
 
-P016单图核分割研究流程已完成工程验收，任务唯一状态见work/tasks/P-016-nuclei-single-image-flow.md。PR67/main 6bd4680530dc4697f8d394a96fd288723222ddb8与准确独审候选16d32b12f3980cf2dcaeb3ec9d145488378c6dcd树一致；双平台完整CI/wheel、规则与环境通过。正式回传上游01a19bfd-f3ab-7502-86da-9f61953d1c8a(local)成功，等待其按用户授权自动派发下一项；不猜编号/扩范围。goal随后关闭，下一goal需对应明确派发。
+当前P017明确孔板终点研究，唯一状态见work/tasks/P-017-endpoint-assay-research.md。活动树bioimage-plan-sync，分支codex/p017-endpoint-assay-research；goal active无预算。已保留P016 ac10a07收尾并合入已验main6bd4680（00becc8），上游B020前端规划e4209e9随本次正常PR集成。旧dirty树、P012窗口、用户安装及原图不动。
 
-仅在bioimage-plan-sync，当前分支codex/p016-nuclei-single-image-flow；本地P016收尾文档随下一任务带入，不为小收据循环PR。原bioimage-tools-platform dirty树、旧P012 GUI、安装与原图不碰；P015收尾2b1447a保留。
+研究主选BCA单板562nm/BSA浓度整理。真实42孔/6样本参考与SciPy+statsmodels直接调用一致；18技术孔均低于原软件计算LoQ，体积3/10uL与空白身份未获SOP验证，不能把未外推当科学通过。详docs/research/2026-11-06-endpoint-assay.md和work/evidence/P-017/README.md。下一步准确候选独审、规则/必要检查与PR CI集成、回传上游；不直接构建万能孔板工具。
 
-证据入口work/evidence/P-016/final-delivery.md、objective-audit.md和review-and-validation.md。真实46核原生GUI/导出/新进程重开同run、冻结标签一致，风险回归包括真实0/缺模型/16bit/取消/历史保留；最终截图.local/p016-final-1440.png与p016-final-960.png。SQLite独审P2已修复，独立复审无其他阻断。已结束进程73881/87597及GUI72364/44488等不可当活跃任务重启。
+主方案docs/plans/research-platform-rd.md第11节已明确MVP先行、当前小批次后集中统一前端/既有P009图形编排；资料不足不无限推迟统一。分别报告工程MVP、统一交互验收、源码可运行候选、用户安装更新、科学/真人试用；规划不代表实施，用户仍使用旧安装。每完成一个实验换新窗口，当前BCA后续最小任务可在本窗口按上游派发推进；不自行切换下一实验。
 
-科学/训练重叠/患者独立性/学生/16bit/Linux真实模型与旧GPU/目标机缺项仍保留；研究模型/环境无自动下载，未更新旧安装。下一建议为首次准备及重开结果的可操作走查，具体依上游派发。普通实现自主处理，执行→验收→回传→再派发，不等用户催促。
-
-2026-11-06上游已确认收到验收，并转达用户最新规则：每个实验完成后换新窗口开展下一实验，持续推进仍有效。本窗口仅P016收尾、关闭goal并释放共享bioimage-plan-sync树，不启动P017或其他实验；上游创建下一窗口，收到释放回传后才允许其编辑。首次环境准备/真人试用/科学边界仍为真实待办。
+P016核分割已完成PR67/main6bd4680、独审/双平台CI，证据见P016/final-delivery。既有科学/训练重叠/患者独立性/学生/16bit/Linux真实模型/旧GPU与目标机限制保留；R全流程、BCA独立化学真值及学生需求本轮未验。普通已授权步骤继续，不要求用户反复批准。

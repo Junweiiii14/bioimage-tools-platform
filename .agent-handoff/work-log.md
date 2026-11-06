@@ -9,10 +9,6 @@
 
 用户明确整组Fig展示，现为蛋白行×泳道列，跨蛋白编辑等正确快照、缺项保留草稿入口。86c9产品及c90诊断独审Accepted；新包19checks/11.437秒通过，首重开超时真实保留。使用与交付入口已更新，最终服务器检查看PR35，合并另行确认。
 
-## 2026-11-02 P007最终独审及PR51 CI
-
-准确dc9618e..23d4056 Accepted，独立31tests/4秒和六组攻击、四原件SHA、v1 Git字节与真实wheel日志校验通过。作者准确6bb合同命令/完整独立wheel0，最终Pyright0、plan/rulecheck0。PR51 ready、远端冻结23d4056，双平台完整CI尚进行；本地仅保存独审/交接记录，不推送重启CI。保持in_review，下一正常merge前核实四必需成功/tree一致，之后P005→P008→P009。P005只读草拟笔记在.local，未激活/实现。
-
 ## 2026-11-02 P007首轮CI失败后的显示pan竞态修复
 
 PR51旧23d Linux1596pass/4skip/613.11秒/wheels过，Windows1fail1599pass/929.22秒，旧manual pan40/25超时，未合。原样单测过不足定因；扣留首个rAF的trusted事件40/25被fitImage首次panKey初始化归零，受控新回归修前确切失败、修后两支完整测试2pass/17.20秒，邻近7pass/12.76秒。共享视图pan同步在pointerdown捕获offset前完成，未改ROI/原像素/1000-800/取消/历史/超时/容差。Ruff/type/web/detector过，等待新准确提交独审/CI。历史CI现场同因未证，不统一销账native/GPU。
@@ -139,3 +135,7 @@ CP4.2.8/StarDist0.9.2真实CPU对照，冻结3开发/10评估，20行独审复�
 ## 2026-11-06 P016研究用户流程完成
 
 最终验收：PR67已合入main 6bd4680530dc4697f8d394a96fd288723222ddb8，与候选16d32b12f3980cf2dcaeb3ec9d145488378c6dcd文件树diff退出0。quality42157212799成功：Windows1737 passed/10 warnings/1410.11s；Linux1733 passed/4既有Windows专用skip/10 warnings/951.94s；两平台随后wheel/check --all完整通过。rules42157213226、desktop-environment通过。只读独审绑定候选通过。2026-11-06已成功向上游01a19bfd-f3ab-7502-86da-9f61953d1c8a(local)发送正式入口/截图/证据/CI/独审/PRmain/边界和下一建议，要求自动接续。观察进程87597已exit0。 科学/学生/环境边界见P016/final-delivery，不由工程通过关闭。
+
+## 2026-11-06 P017 孔板研究
+
+收到释放后保留P016收尾并合入main；上游B020规划随本任务集成。冻结公开BCA原表/布局/参考摘要，直接运行SciPy与statsmodels，发现LoQ及体积/空白风险，不授科学准入。当前独审与PR未完成，详P017任务与研究证据。
