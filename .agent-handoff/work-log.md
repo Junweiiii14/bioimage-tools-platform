@@ -9,14 +9,6 @@
 
 用户明确整组Fig展示，现为蛋白行×泳道列，跨蛋白编辑等正确快照、缺项保留草稿入口。86c9产品及c90诊断独审Accepted；新包19checks/11.437秒通过，首重开超时真实保留。使用与交付入口已更新，最终服务器检查看PR35，合并另行确认。
 
-## 2026-11-02 P007显示pan新候选独审
-
-准确dc..dc4cc24新完整候选Accepted；独立Qt完整两支2pass/17.23秒、12组实际处理器/视图/取消组合及原件/日志SHA、rule/plan/diff/detect0。原断言/5000ms/数值/ROI未放宽，历史CI现场根因未冒称全证。P007转in_review绑定dc4cc；状态记录增量复核后更新PR51重新执行必需全门禁。P005仍等实际集成，不提前实施。
-
-## 2026-11-02 P007 r2完整候选CI派发
-
-最终dc..c243933非作者Accepted，7份后继meta/档案核实且无源码变化。已push PR51 c243933，quality41390321525实际running、rules41390321566 SUCCESS，尚无全部通过/集成结论；ci-r2-dispatch只快照。本地后继仅独审/交接收据不push重启CI，正常merge须matchc243且四必需成功/tree一致。P005仍未激活，P007 done后接续M1/M2。
-
 ## 2026-11-02 P007正常集成，P005依赖就绪激活
 
 PR51准确c243四必需SUCCESS，正常merge006e9f1/tree与独审候选相同。Windows1601pass/945.30秒、Linux1597pass/4既有skip/602.61秒，双完整wheels通过；原失败/竞态修复证据保留，integration.json。保留本地交接50dc与main正常合14c后切codex/p005-workflow-executor，P007 done、P005 in_progress；按新base真实context并完整读取。冻结execution-test-design，尚无P005产品实现/测试；后续实现真实三节点/ledger/state/control/cache/recovery，P008同一实现扩批量、P009同一后端编辑。
@@ -139,3 +131,11 @@ CP4.2.8/StarDist0.9.2真实CPU对照，冻结3开发/10评估，20行独审复�
 ## 2026-11-06 P017最终验收
 
 PR68/main f8f69b5与独审最终b2eaccd树一致；quality42164152689双平台check --all/wheel成功（Windows1737passed/10warnings/1132.98s；Linux1733passed/4既有skip/10warnings/909.25s），rules42164152703及desktop成功。指定独审与增量pass。研究完成，未授科学/学生准入；收据本地提交随下一任务，树释放，下一任务上游新窗口。详P017/final-delivery。
+
+## 2026-11-06 P019单板CSV研究适配完成
+
+独立bca_tool 0.1.1贯穿严格CSV/记录、逐孔插值、真实worker/提交和核验重开；独审修复资产完整性及ULP端点，PR71正常集成。未改第三方/P018参考/旧UI，未扩科学准入。一次本地收尾后释放树，上游新窗统一入口/结果与编排。
+
+## 2026-11-06 P020统一工作台候选
+
+三卡/真实BCA桌面闭环/核分割帮助/真实WB编排入口完成，未动方法或门禁。定向22+10通过、WB3通过、真实核分割46核与新进程重开通过；16图核验。全check仍在运行，初轮格式失败和GPU中断保留。待准确候选独审、CI和上游集成，唯一写入权未释放；详P020/README与任务卡。

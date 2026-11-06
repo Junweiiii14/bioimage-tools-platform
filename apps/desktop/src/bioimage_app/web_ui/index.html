@@ -21,6 +21,8 @@
   <link rel="stylesheet" href="workflow_authoring.css">
   <link rel="stylesheet" href="nuclei.css">
   <script src="nuclei.js" defer></script>
+  <link rel="stylesheet" href="research_tools.css">
+  <script src="bca.js" defer></script>
 </head>
 <body>
   <aside class="platform-rail" aria-label="工具平台">
@@ -37,18 +39,31 @@
     <main id="platform-view" class="platform-view" aria-label="工具平台首页">
       <header class="platform-intro"><div><h1>选择工具，开始工作。</h1><p>图像处理与分析，都在你的工作空间。</p></div></header>
       <div class="platform-layout">
-        <section aria-labelledby="installed-tools-title"><div class="platform-section-title"><h2 id="installed-tools-title">已安装工具</h2><span>2</span></div>
-          <button class="nuclei-entry" data-nuclei-open><span><strong>单图核分割</strong><small>研究工具 · 原图、实例轮廓与核数</small></span><span class="tool-launch">进入核分割<i data-icon="arrow"></i></span></button>
-          <button class="installed-tool" data-page="wb" data-folder-drop aria-label="进入 WB 图像处理，可拖入原图文件夹" aria-describedby="folder-drop-status">
-            <span class="tool-top"><span class="tool-symbol">WB</span><span class="tool-installed"><i data-icon="check"></i>已安装</span></span>
+        <section aria-labelledby="installed-tools-title"><div class="platform-section-title"><h2 id="installed-tools-title">已实现工具</h2><span>3</span></div>
+          <div class="tool-catalogue"><button class="installed-tool" data-page="wb" data-folder-drop aria-describedby="folder-drop-status">
+            <span class="tool-top"><span class="tool-symbol">WB</span><span class="tool-installed">实验工具</span></span>
             <span class="tool-description"><strong>WB 图像处理</strong><span>裁剪 · 拼图 · 灰度定量</span></span>
-            <span class="tool-bottom"><span class="tool-launch">进入 WB<i data-icon="arrow"></i></span><span class="tool-mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span></span>
+            <span class="tool-readiness">运行环境已就绪</span>
+            <span class="tool-bottom"><span class="tool-launch">进入 WB<i data-icon="arrow"></i></span></span>
           </button>
+<button class="installed-tool" data-nuclei-open>
+            <span class="tool-top"><span class="tool-symbol">核</span><span class="tool-installed">研究工具</span></span>
+            <span class="tool-description"><strong>单图核分割</strong><span>原图 · 实例轮廓 · 核数</span></span>
+            <span class="tool-readiness" id="nuclei-readiness">首次使用需准备环境</span>
+            <span class="tool-bottom"><span class="tool-launch">进入核分割<i data-icon="arrow"></i></span></span>
+          </button>
+<button class="installed-tool" data-bca-open>
+            <span class="tool-top"><span class="tool-symbol">BCA</span><span class="tool-installed">研究工具</span></span>
+            <span class="tool-description"><strong>BCA 蛋白定量</strong><span>单板 CSV · 逐孔与技术样本结果</span></span>
+            <span class="tool-readiness">运行环境已就绪</span>
+            <span class="tool-bottom"><span class="tool-launch">进入 BCA<i data-icon="arrow"></i></span></span>
+          </button></div>
           <p id="folder-drop-status" class="folder-drop-status" role="status">可将一个或多个本机原图文件夹拖到 WB 入口，创建仪器导入项目。</p>
           <div class="platform-resume" data-resume-project hidden><div><small>当前打开 · WB</small><strong data-current-project-name></strong></div><button class="text-button" data-page="project">继续工作<i data-icon="arrow"></i></button></div>
         </section>
         <section class="platform-recents" aria-labelledby="platform-recents-title"><div class="platform-section-title"><h2 id="platform-recents-title">最近项目</h2></div><div id="platform-recents"><div class="platform-empty"><i data-icon="folder"></i><p>从工具创建项目，<br>或打开已有项目继续。</p><button class="text-button" data-session="open">打开项目<i data-icon="arrow"></i></button></div></div></section>
       </div>
+      <section class="workflow-entry"><div><h2>工作流编排</h2><p>编辑现有 WB 模块、连接和参数，保存模板并运行。BCA 与核分割尚未接入此画布。</p></div><button class="button subtle" data-workflow-open>打开编排画布<i data-icon="arrow"></i></button></section>
       <p class="platform-foot"><i data-icon="shield"></i>本地工作空间 · 原始文件保留</p>
     </main>
     <main id="home-view" class="home-view" hidden>
@@ -121,9 +136,9 @@
     <footer class="module-footer"><button id="module-reopen" class="button subtle" disabled>关闭并重开核验</button><button id="module-folder" class="text-button" disabled>打开工程文件夹</button></footer>
   </dialog>
   <dialog id="workflow-editor-dialog" class="wf-editor" data-view="graph" aria-labelledby="wf-heading">
-    <header class="wf-heading"><div><h2 id="wf-heading">工作流编排</h2><p id="wf-workspace-path">独立工作流项目，保留原图与历史成果。</p></div><button id="wf-hide" class="button subtle">收起编排</button></header>
+    <header class="wf-heading"><div><h2 id="wf-heading">工作流编排</h2><p id="wf-workspace-path">独立工作流项目，保留原图与历史成果。</p></div><button id="wf-hide" class="button subtle">返回工作台</button></header>
     <div class="wf-toolbar"><details class="wf-menu"><summary>项目与模板</summary><nav><button data-wf-choose="new_original">从原图新建…</button><button data-wf-choose="new_example">用合成样例新建…</button><button data-wf-choose="new_template">从实验室模板新建…</button><button data-wf-choose="open_project">打开工作流项目…</button><button data-wf-choose="bind_sources">绑定下一批原图…</button><button data-wf-choose="bind_example">绑定另一个合成样例</button><button data-wf-choose="export_template">保存为实验室模板…</button></nav></details><label class="wf-title-label">流程名称<input id="wf-title" aria-label="流程名称" disabled></label><button id="wf-save" class="button subtle" disabled>保存并预检</button><button id="wf-run" class="button primary" disabled>运行当前流程</button><button id="wf-pause" class="button subtle" hidden>暂停</button><button id="wf-resume" class="button subtle" hidden>继续批次</button><button id="wf-cancel" class="button subtle" hidden>取消批次</button></div>
-    <p id="wf-status" class="wf-status" role="status" aria-live="polite">新建或打开一个工作流项目。</p>
+    <p id="wf-status" class="wf-status" role="status" aria-live="polite">新建或打开一个工作流项目。</p><p class="wf-status">当前支持已注册 WB 模块与模板；核分割和 BCA 暂在各自工具中运行。</p>
     <section id="wf-start" class="wf-start"><h3>从一个可运行流程开始</h3><p>选择原始 TIFF，用现有 WB 旧方法生成整图的自动建议；也可以绑定已保存的实验室模板。建议、工程完成与科学审核分开。</p><div class="wf-start-options"><label>已知泳道数<input id="wf-lane-count" type="number" min="1" max="96" step="1" placeholder="从原图新建时必填"></label><label>信号极性<select id="wf-polarity"><option value="dark">暗条带</option><option value="light">亮条带</option></select></label><label>工程样例<select id="wf-example"><option value="triangle_u16">16 位三角峰 · 4000</option><option value="triangle_u8">8 位三角峰 · 40</option><option value="flat_zero">平坦剖面 · 有效零</option><option value="invalid_roi">越界 ROI · 无效空值</option></select></label></div><div class="wf-start-actions"><button class="button primary" data-wf-choose="new_original">选择原图并新建</button><button class="button subtle" data-wf-choose="new_example">用合成样例开始</button><button class="button subtle" data-wf-choose="open_project">打开工作流项目</button></div></section>
     <section id="wf-workspace" class="wf-workspace" hidden><nav class="wf-views" aria-label="编排视图"><button class="button subtle" data-wf-view="graph" aria-pressed="true">画布</button><button class="button subtle" data-wf-view="parameters" aria-pressed="false">步骤参数</button><button class="button subtle" data-wf-view="results" aria-pressed="false">已提交成果</button><span id="wf-save-state"></span></nav><div class="wf-body"><aside class="wf-catalogue"><h3>模块目录</h3><div id="wf-catalogue-list"></div><h3>当前步骤</h3><ol id="wf-steps"></ol></aside><section class="wf-canvas"><div id="wf-graph"></div><section class="wf-checks"><h3>预检与输入</h3><p id="wf-check-summary"></p><ul id="wf-issues"></ul><div id="wf-sources"></div></section></section><aside class="wf-inspector"><section id="wf-node-panel" class="wf-node-panel"><h3>选择一个步骤</h3></section><section id="wf-results" class="wf-results"><h3>已提交成果</h3><button id="wf-refresh-results" class="button subtle">读取本批成果</button><div id="wf-sample-states"></div><div id="wf-output-list"><p>运行后可以查看真实表格、报告与曲线数据；中间成果只在提交后出现。</p></div></section></aside></div></section>
     <footer class="wf-footer"><span>原图与历史结果保留；科学适用性仍待独立验证。</span><button id="wf-revert" class="button subtle" disabled>撤销未保存修改</button></footer>
@@ -133,7 +148,7 @@
     <div class="module-body">
       <p class="module-intro">研究工具：仅支持单页 8 位灰度 TIFF，科学适用性尚待独立验证。</p>
       <div class="module-controls"><button class="button primary" data-nuclei-choose="source" disabled>选择原图</button><button id="nuclei-run" class="button primary" disabled>开始分析</button><button class="button subtle" data-nuclei-choose="open" disabled>打开已保存项目</button><button id="nuclei-cancel" class="button subtle" hidden>取消运行</button><button id="nuclei-settings-toggle" class="text-button">运行设置</button></div>
-      <section id="nuclei-settings" hidden aria-label="核分割运行设置"><h3>运行设置</h3><p>首次使用，请由环境维护者按准备指南配置运行环境和固定模型，再选择下面两个位置。以后选择原图即可分析。</p><button class="button subtle" data-nuclei-choose="worker" disabled>选择运行程序</button><output id="nuclei-worker">尚未设置</output><button class="button subtle" data-nuclei-choose="model" disabled>选择模型文件夹</button><output id="nuclei-model">尚未设置</output><p>运行程序：已准备环境中的 python.exe；模型目录包含 config.json、thresholds.json 和 weights_best.h5。准备指南见源码 tools/nuclei/README.md。</p></section>
+      <section id="nuclei-settings" hidden aria-label="核分割运行设置"><h3>运行设置</h3><p>首次使用，请由环境维护者按准备指南配置运行环境和固定模型，再选择下面两个位置。以后选择原图即可分析。</p><button class="button subtle" data-nuclei-choose="worker" disabled>选择运行程序</button><output id="nuclei-worker">尚未设置</output><button class="button subtle" data-nuclei-choose="model" disabled>选择模型文件夹</button><output id="nuclei-model">尚未设置</output><p>运行程序：已准备环境中的 python.exe；模型目录包含 config.json、thresholds.json 和 weights_best.h5。<button class="text-button" id="nuclei-help">打开准备指南</button></p></section>
       <p id="nuclei-status" class="module-status" role="status" aria-live="polite">请在桌面应用中使用此工具。</p>
       <section id="nuclei-image-section" hidden aria-label="原图与核分割结果">
         <div class="module-tabs"><button id="nuclei-original" class="button subtle" aria-pressed="true">原图</button><button id="nuclei-overlay" class="button subtle" aria-pressed="false" disabled>实例轮廓</button><label>缩放 <select id="nuclei-zoom" aria-label="图像缩放"><option value="fit">适应窗口</option><option value="0.5">50%</option><option value="1">100%</option><option value="2">200%</option></select></label><strong id="nuclei-count">尚无结果</strong></div>
@@ -143,6 +158,36 @@
       </section>
     </div>
     <footer class="module-footer"><button class="button primary" data-nuclei-choose="export" disabled>导出表、图与标签</button><span>结果自动保存；显示缩放不影响原始标签。</span></footer>
+  </dialog>
+  <dialog id="bca-dialog" class="research-dialog" aria-labelledby="bca-heading">
+    <header class="module-heading"><h2 id="bca-heading">BCA 蛋白定量</h2><button id="bca-close" class="button subtle">返回工作台</button></header>
+    <div class="module-body">
+      <p class="module-intro">固定 Pierce25 单板研究方法；化学准确性与 LoQ 尚未独立验证。</p>
+      <div class="module-controls"><button class="button primary" data-bca-choose="source" disabled>选择 CSV</button><button class="button subtle" data-bca-choose="record" disabled>加载板记录</button><button class="button subtle" data-bca-choose="open" disabled>打开已保存项目</button><button id="bca-cancel" class="button subtle" hidden>取消运行</button></div>
+      <p id="bca-source">尚未选择 CSV</p>
+      <details id="bca-record-panel" open><summary>板记录与固定方法</summary><button id="bca-new-record" class="text-button" type="button">新建空白板记录</button>
+        <p>MAN0011430 Rev D · 样本 25 µL + 工作液 200 µL（A:B 50:1），混匀 30 秒，37°C 30 分钟，562 nm 原始吸光度。零 BSA 空白；标准 0、25、125、250、500、750、1000、1500、2000 µg/mL，每组至少 2 个技术孔。</p>
+        <form id="bca-record" class="plate-record">
+          <label>试剂盒<select name="kit"><option value="23225">23225</option><option value="23227">23227</option><option value="A65453">A65453</option></select></label>
+          <label>读板日期<input name="read_date" type="date" required></label>
+          <label>稀释液<input name="diluent" required maxlength="512"></label>
+          <label>仪器<input name="instrument" required maxlength="512"></label>
+          <label class="wide">基质兼容依据<input name="matrix_compatibility_basis" required maxlength="512"></label>
+          <label class="wide">CSV SHA256（新记录由所选文件填入，加载记录保留原值）<input name="source_sha256" required pattern="[0-9a-f]{64}" readonly></label>
+          <label class="wide"><input name="cooled_to_room_temperature" type="checkbox" required>已冷却至室温</label>
+          <label class="wide"><input name="same_diluent_for_all_wells" type="checkbox" required>所有孔使用相同稀释液</label>
+          <label class="wide"><input name="same_treatment_for_all_wells" type="checkbox" required>所有孔按上述固定 SOP 同样处理</label>
+        </form>
+        <p>CSV 列：plate_id, well, role, sample_id, technical_replicate, a562, standard_ug_ml, dilution_factor。未知记录不能以合成示例代替；样本预稀释倍数在 CSV 明示。</p>
+      </details>
+      <p id="bca-status" class="module-status" role="status" aria-live="polite">请在桌面应用中使用此工具。</p>
+      <section id="bca-results" hidden aria-label="已保存 BCA 结果"><h3>已保存结果</h3><p id="bca-result-origin"></p><p>浓度单位 µg/mL；样本汇总已乘预稀释倍数。低于 25 / 高于 2000 的被测溶液不外推；partial 表示部分孔受限，汇总留空，空值不是零。</p>
+        <h4>技术样本</h4><div id="bca-samples" class="research-table" tabindex="0" aria-label="技术样本结果表"></div>
+        <details><summary>逐孔结果与原因</summary><div id="bca-wells" class="research-table" tabindex="0" aria-label="逐孔结果表"></div></details>
+        <details><summary>保存位置与来源</summary><dl id="bca-provenance" class="module-provenance"></dl></details>
+      </section>
+    </div>
+    <footer class="module-footer"><button id="bca-run" class="button primary" disabled>开始分析</button><button class="button subtle" data-bca-choose="export" disabled>导出表与来源</button><span>完整提交并核验后显示已保存。</span></footer>
   </dialog>
 </body>
 </html>

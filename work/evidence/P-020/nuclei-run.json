@@ -1,0 +1,13 @@
+{
+  "state": "succeeded",
+  "message": "结果已保存。可导出或关闭后重新打开项目。",
+  "busy": false,
+  "running": false,
+  "source": "",
+  "count": 46,
+  "run_id": "59402a48488a4c64aa4c9e16ce4031f4",
+  "workspace": "C:\\Users\\70236\\AppData\\Local\\Temp\\pytest-of-70236\\pytest-1389\\test_actual_nuclei0\\BioImage\\Projects\\Nuclei-1376cc47a05d",
+  "source_sha256": "77f7b965733145a6edae173090ba1b9081266c708a3f141a12f8b281af640074",
+  "worker": "C:/Users/70236/ResearchVault/Codex-Workbench/p015-research/worker-env/Scripts/python.exe",
+  "model": "C:/Users/70236/ResearchVault/Codex-Workbench/p014-research/models/2D_versatile_fluo"
+}

@@ -25,7 +25,8 @@
         get('status').dataset.tone = state.state === 'failed' ? 'error' : '';
         get('run').disabled = state.busy || !state.source;
         get('cancel').hidden = !state.running;
-        get('close').disabled = state.busy;
+        document.getElementById('nuclei-readiness').textContent =
+            state.worker && state.model ? '已配置 · 运行前核验' : '首次使用需准备环境';
         document.querySelectorAll('[data-nuclei-choose]').forEach((button) => {
             button.disabled =
                 state.busy || (button.dataset.nucleiChoose === 'export' && state.count === null);
@@ -55,9 +56,7 @@
     get('run').addEventListener('click', () => bridge?.run());
     get('cancel').addEventListener('click', () => bridge?.cancel());
     get('close').addEventListener('click', () => dialog.close());
-    dialog.addEventListener('cancel', (event) => {
-        if (state.busy) event.preventDefault();
-    });
+    get('help').addEventListener('click', () => bridge?.help());
     get('settings-toggle').addEventListener('click', () => {
         get('settings').hidden = !get('settings').hidden;
     });

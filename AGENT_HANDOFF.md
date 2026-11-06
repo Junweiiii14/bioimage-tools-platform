@@ -46,7 +46,9 @@
 
 ## Current Pointer
 
-- 当前：[P019 固定BCA单板CSV研究适配](work/tasks/P-019-bca-csv-adapter.md)。待冻结候选与指定独审，工作树未释放；见snapshot及work/evidence/P-019/README.md。
+- 当前：[P020 统一工作台与 BCA 桌面 MVP](work/tasks/P-020-unified-workbench.md)，实施/自验中，独审未完成；活动树由本窗独占，详 snapshot。
+
+- 最近完成：[P019 固定BCA单板CSV研究适配](work/tasks/P-019-bca-csv-adapter.md)。工程完成，PR71/main1c819ae、指定增量独审及必需CI通过；[最终交付](work/evidence/P-019/final-delivery.md)。本地收尾后释放共享树，由上游新窗口推进统一入口/交互。
 
 - 最近完成：[P018 固定BCA方法与研究契约](work/tasks/P-018-bca-method-contract.md)。研究范围完成，PR70/main3947261、指定研究/增量独审及必需CI通过；[最终交付](work/evidence/P-018/final-delivery.md)。本地收尾后释放共享树，上游直接新窗口派发下一任务，科学与产品未验保留。
 

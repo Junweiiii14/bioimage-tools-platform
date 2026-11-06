@@ -9,8 +9,19 @@ from uuid import uuid4
 
 from nuclei_tool.api import NucleiInput, original_png, read_nuclei_input, verify_model
 from platform_runtime.api import WorkspaceError
-from PySide6.QtCore import QObject, QSettings, QStandardPaths, QThread, QTimer, Signal, Slot
-from PySide6.QtWidgets import QFileDialog, QWidget
+from PySide6.QtCore import (
+    QObject,
+    QSettings,
+    QStandardPaths,
+    Qt,
+    QThread,
+    QTimer,
+    QUrl,
+    Signal,
+    Slot,
+)
+from PySide6.QtGui import QDesktopServices
+from PySide6.QtWidgets import QDialog, QFileDialog, QTextBrowser, QVBoxLayout, QWidget
 from tool_contracts.api import ExecutionPlan
 
 from bioimage_app.nuclei_cli import prepare
@@ -78,6 +89,27 @@ class NucleiBridge(QObject):
     @property
     def resources_closed(self) -> bool:
         return not self.busy
+
+    @Slot()
+    def help(self) -> None:
+        dialog = QDialog(self.window)
+        dialog.setWindowTitle("核分割准备指南")
+        dialog.resize(800, 620)
+        layout = QVBoxLayout(dialog)
+        text = QTextBrowser(dialog)
+        text.setOpenLinks(False)
+
+        def open_link(url: QUrl) -> None:
+            if url.scheme() == "https":
+                QDesktopServices.openUrl(url)
+
+        text.anchorClicked.connect(open_link)
+        text.setMarkdown(
+            (Path(__file__).parent / "web_ui" / "nuclei_setup.md").read_text(encoding="utf-8")
+        )
+        layout.addWidget(text)
+        dialog.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+        dialog.show()
 
     @Slot()
     def refresh(self) -> None:

@@ -154,8 +154,13 @@ def test_prepare_workflow_saves_reopens_and_returns_to_editing_without_processin
     workspace = window.host.workspace_path
     epoch = window.bridge.session_epoch
     window.open_project(workspace)
+    # A replacement host is briefly idle before the queued reopen continuation.
     qtbot.waitUntil(
-        lambda: window.bridge.session_epoch > epoch and window.shutdown_stage == "idle",
+        lambda: (
+            window.bridge.session_epoch > epoch
+            and window.shutdown_stage == "idle"
+            and window.host.workspace_path == workspace
+        ),
         timeout=20000,
     )
     wait_saved(window, qtbot)

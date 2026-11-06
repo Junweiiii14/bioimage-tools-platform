@@ -81,6 +81,10 @@
     {
       "id": "P-019",
       "path": "work/tasks/P-019-bca-csv-adapter.md"
+    },
+    {
+      "id": "P-020",
+      "path": "work/tasks/P-020-unified-workbench.md"
     }
   ],
   "work_packages": [
@@ -142,7 +146,8 @@
         "W00"
       ],
       "task_ids": [
-        "P-006"
+        "P-006",
+        "P-020"
       ]
     },
     {
