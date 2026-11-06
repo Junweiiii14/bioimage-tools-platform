@@ -287,3 +287,5 @@ P008批量CLI：`python -m bioimage_app --workflow-batch --workspace <新目录>
 P016：当前工作台新增单图核分割研究入口，复用 P015 固定方法、WorkflowSession 和 Workspace。选原图、后台分析、原坐标轮廓/核数、导出与已提交结果重开见 [操作指南](../../docs/runbooks/nuclei-single-image.md)。宿主新增轻量 nuclei-tool 默认依赖，保留 nuclei extra 兼容原命令；TensorFlow/StarDist仍仅在显式隔离研究环境，默认包不加载或安装它们。平台存储schema及WB公式未改。
 
 P019新增`python -m bioimage_app.bca_cli`研究入口，严格单板CSV与记录→真实worker→已提交逐孔/样本CSV与出处→重开验证。仅显式装配bca_tool，未改平台存储或WB/核分割语义；操作与限制见[工具README](../../tools/bca/README.md)。
+
+P020 统一工作台：三工具同骨架入口；BCA 桌面选 CSV/板记录、真实 worker、已核验结果/导出/重开；首页进入既有 P009 编排。操作见 [统一工作台](../../docs/runbooks/unified-workbench.md)。旧任务记录不改写，未更新用户安装。

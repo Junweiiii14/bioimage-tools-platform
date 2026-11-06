@@ -210,3 +210,7 @@ PR68/main f8f69b5与独审最终b2eaccd树一致；quality42164152689双平台ch
 ## 2026-11-06 P019最终验收
 
 PR71/main1c819aeaae9813fdc29606cbad463b08a191fbab与已审4cb48ad51dc71f5e4b36195e3caa1356507665b0树一致；指定增量独审pass，R01/R02关闭。quality42190949103 Windows1761pass/Linux1757pass4既有skip及全部wheel通过，desktop/rules42190949095通过。本机初次GPU两失败及受保护CRLF告警保留；详P019/final-delivery。
+
+## 2026-11-06 P020作者候选自验
+
+三卡/真实BCA桌面闭环/核分割帮助/真实WB编排入口完成，未动方法或门禁。定向22+10通过、WB3通过、真实核分割46核与新进程重开通过；16图核验。全check仍在运行，初轮格式失败和GPU中断保留。待准确候选独审、CI和上游集成，唯一写入权未释放；详P020/README与任务卡。

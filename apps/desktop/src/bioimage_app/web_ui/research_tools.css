@@ -1,0 +1,35 @@
+/* Shared catalogue and research result framing; scientific displays keep their own geometry. */
+.platform-layout {grid-template-columns:minmax(0, 1fr) 260px;gap:var(--space-group)}
+.tool-catalogue {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-inner)}
+.tool-catalogue .installed-tool {min-height:290px;padding:var(--space-group)}
+.tool-catalogue .tool-description {margin-top:var(--space-group)}
+.tool-catalogue .tool-description strong {font-size:20px}
+.tool-catalogue .tool-description>span {font-size:13px;line-height:1.7}
+.tool-catalogue .tool-symbol {width:48px;height:48px;font-size:18px;border-radius:12px}
+.tool-catalogue .tool-top {gap:8px;flex-wrap:wrap}
+.tool-readiness {margin-top:var(--space-inner);font-size:12px;color:var(--shell-muted)}
+.tool-catalogue .tool-bottom {padding-top:var(--space-group)}
+.workflow-entry {display:flex;align-items:center;justify-content:space-between;gap:var(--space-group);margin-top:var(--space-page);padding-block:var(--space-group);border-block:1px solid var(--line)}
+.workflow-entry h2 {font-size:20px;margin:0 0 8px}
+.workflow-entry p {color:var(--muted);max-width:65ch;margin:0}
+.workflow-entry button {flex-shrink:0}
+.research-dialog {width:1120px;max-width:calc(100vw - 32px);max-height:92dvh;margin:auto;padding:0;border:1px solid var(--line);border-radius:12px;color:var(--ink);background:var(--paper)}
+.research-dialog[open] {display:flex;flex-direction:column}
+.research-dialog::backdrop {background:rgb(24 60 52 / .24)}
+.research-dialog .module-body {min-height:0;overflow:auto}
+.research-dialog .module-footer {align-items:center;flex-wrap:wrap;color:var(--muted)}
+.plate-record {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-inner);margin-block:var(--space-group)}
+.plate-record label {display:flex;flex-direction:column;gap:6px}
+.plate-record .wide {grid-column:1/-1}
+.plate-record label:has([type=checkbox]) {flex-direction:row;align-items:center}
+.plate-record input:not([type=checkbox]),.plate-record select {min-width:0;min-height:var(--control);padding:8px;font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:8px}
+.research-table {overflow:auto;max-height:320px;margin-block:var(--space-inner);font-variant-numeric:tabular-nums}
+.research-table table {border-collapse:collapse;width:100%;font-size:13px}
+.research-table th,.research-table td {padding:10px 12px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--line)}
+.research-table th {position:sticky;top:0;background:var(--soft-header);font-weight:550}
+#bca-provenance dd {overflow-wrap:anywhere;user-select:text}
+#bca-record-panel {line-height:1.7;margin-block:var(--space-group)}
+@media(max-width:1100px) {.platform-layout {grid-template-columns:minmax(0,1fr)}.tool-catalogue .installed-tool {min-height:260px}.platform-recents {max-width:100%}}
+@media(max-width:700px) {.tool-catalogue,.plate-record {grid-template-columns:minmax(0,1fr)}.workflow-entry {align-items:flex-start;flex-direction:column}}
+
+.research-table .result-reason {white-space:normal;min-width:160px;max-width:260px}

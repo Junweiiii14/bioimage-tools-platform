@@ -1,9 +1,7 @@
 # 当前恢复入口
 
-P019工程范围已完成，唯一状态见work/tasks/P-019-bca-csv-adapter.md。PR71/main 1c819aeaae9813fdc29606cbad463b08a191fbab与准确已审4cb48ad51dc71f5e4b36195e3caa1356507665b0树一致，指定增量独审pass、必需双平台CI及规则通过。交付work/evidence/P-019/final-delivery.md，操作tools/bca/README.md。
+当前任务 work/tasks/P-020-unified-workbench.md，统一工作台/BCA桌面MVP进行中。活动树 bioimage-plan-sync，分支 codex/p020-unified-workbench；起点6c06283190c044491c862d5961f9e3b9f6b800e9，PR基线origin/main1c819aeaae9813fdc29606cbad463b08a191fbab。P019本地收尾随本轮保留。
 
-活动树bioimage-plan-sync，codex/p019-bca-csv-adapter；一次必要收尾仅本地提交，随下一正常任务带入，不重推小收据。正式回传后释放共享树，上游01a19bfd-f3ab-7502-86da-9f61953d1c8a立即新窗口派发下一任务，本窗关闭goal、不续开。旧dirty树、原图、用户安装不动。
+本窗01a1b02f-dc63-7573-94bb-014c0cb2aadc是唯一写入者，未释放共享树。已建无预算goal、任务卡与规则回执。三工具卡、BCA界面/真实提交/导出重开、核分割帮助和原有编排入口已实现，定向回归通过；全check在.local/p020-check-ci-env.log运行（前两轮失败/中断如实记录）。截图在work/evidence/P-020/screenshots，已逐张核验；准确候选提交与独审待完成，不宣称产品完成。
 
-下一最小范围按主方案第11节统一已有工具入口、结果展示及受支持编排；BCA当前仅CLI，无GUI。不要继续扩孔板后端/算法或重启已完成P018研究。科学/同SOP真实板/LoQ/真人/目标机/安装未验保持；既有GPU失败不由CI通过销账。
-
-2bfd40c的P018收尾及7a0d718白名单B021四份完成收据已随PR71集成；历史回执原样保留。按docs/plans/independent-review.md由上游派指定独审，不由作者自验代替。
+下一步核对本轮测试/截图，补操作与范围证据，冻结准确base/head和PR，向上游01a19bfd-f3ab-7502-86da-9f61953d1c8a回“待独审候选”。上游派指定独审窗01a1af0d-808e-7131-ae29-237aded27938；作者不另派重复审查、不自行合并。修复回本窗。科学/真人/物理DPI/安装未验；原图、历史、旧dirty树和用户旧安装不动。

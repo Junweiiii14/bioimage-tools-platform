@@ -1545,6 +1545,7 @@ async function bootstrap() {
                 window.moduleComparison?.connect(channel.objects.comparison);
                 window.workflowEditor.connect(channel.objects.workflowAuthoring);
                 window.nucleiView.connect(channel.objects.nuclei);
+                window.bcaView.connect(channel.objects.bca);
                 boundaryDiagnostics.connect(bridge);
                 window.desktopSession?.connect(bridge);
                 bridge.progressChanged?.connect((raw) => {
