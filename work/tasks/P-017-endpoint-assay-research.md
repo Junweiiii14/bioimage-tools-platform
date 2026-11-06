@@ -1,6 +1,6 @@
 # P-017 明确孔板终点实验与成熟方法研究
 
-<!-- PROGRAM_TASK_META {"id":"P-017","status":"in_progress","work_package":"W07","depends_on":["P-013","P-016"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex endpoint assay research","base_commit":"6bd4680530dc4697f8d394a96fd288723222ddb8","head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-017","status":"done","work_package":"W07","depends_on":["P-013","P-016"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex endpoint assay research","base_commit":"6bd4680530dc4697f8d394a96fd288723222ddb8","head_commit":"b2eaccddeec2b132f1b63e4478edf5a36258a0eb"} -->
 
 ## 授权与范围
 
@@ -18,4 +18,4 @@
 
 研究候选已完成：主选BCA；42孔/6样本发布参考真实复现，全部18技术孔低于上游计算LoQ。详[实验说明](../../docs/research/2026-11-06-endpoint-assay.md)、[复现入口](../evidence/P-017/README.md)。无科学/学生准入；下一任务需固定合规SOP和严格入口，不直接用公开示例设默认。
 
-保留P016 ac10a07收尾与B020 e4209e9规划，主线合并00becc8，预声明8098d0b/源摘要68bed12。B020最新用户澄清为MVP先行、当前批次后统一前端，不把统一规范实施作为研究暂停条件。指定窗口已正式独审bcf57ce并pass（仅研究/规划）；P3更正与原文/两JSON收据本次集中提交。PR68规则/环境通过、双平台仍运行；最终增量确认、必需CI/集成和验收回传未完成。下一新任务由上游另开窗口，同任务修复/复审仍在本窗口。
+指定独审bcf57ce及最终b2eaccd增量pass，PR68于2026-11-06合入main f8f69b51e01446ffed6301dec99d2cf28fcdb85c且树一致；双平台完整必需检查成功。研究/规划完成，无产品/科学准入。详[最终交付](../evidence/P-017/final-delivery.md)和[完成审计](../evidence/P-017/objective-audit.md)。P016收尾和B020规划保留；最终本地收据随下一正常任务带入，不再push。收尾后释放共享树，下一任务由上游另开窗口，本窗口不续开。

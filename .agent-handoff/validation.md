@@ -1,5 +1,9 @@
 # Validation Index
 
+## 2026-11-06 B021方案验证
+
+文档任务的context/policy/diff和后续准确提交核对见work/evidence/B-021/validation.md；无产品实现修改，本机产品/科学/GUI验收未运行。候选审查与GitHub集成事实见任务，不以文档检查代替产品合规。
+
 ## 2026-11-03 B018
 
 B018：P009转移文件逐字节复制，集成候选/main tree一致，两个gzip及解压SHA核验通过；后续给P卡新增版本导航说明，原科学/性能/CI记录不改署。格式/链接/HTML/回执检查见work/evidence/B-018/validation.md。

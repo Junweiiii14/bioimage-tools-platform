@@ -9,10 +9,6 @@
 
 用户明确整组Fig展示，现为蛋白行×泳道列，跨蛋白编辑等正确快照、缺项保留草稿入口。86c9产品及c90诊断独审Accepted；新包19checks/11.437秒通过，首重开超时真实保留。使用与交付入口已更新，最终服务器检查看PR35，合并另行确认。
 
-## 2026-11-02 P007首轮CI失败后的显示pan竞态修复
-
-PR51旧23d Linux1596pass/4skip/613.11秒/wheels过，Windows1fail1599pass/929.22秒，旧manual pan40/25超时，未合。原样单测过不足定因；扣留首个rAF的trusted事件40/25被fitImage首次panKey初始化归零，受控新回归修前确切失败、修后两支完整测试2pass/17.20秒，邻近7pass/12.76秒。共享视图pan同步在pointerdown捕获offset前完成，未改ROI/原像素/1000-800/取消/历史/超时/容差。Ruff/type/web/detector过，等待新准确提交独审/CI。历史CI现场同因未证，不统一销账native/GPU。
-
 ## 2026-11-02 P007显示pan新候选独审
 
 准确dc..dc4cc24新完整候选Accepted；独立Qt完整两支2pass/17.23秒、12组实际处理器/视图/取消组合及原件/日志SHA、rule/plan/diff/detect0。原断言/5000ms/数值/ROI未放宽，历史CI现场根因未冒称全证。P007转in_review绑定dc4cc；状态记录增量复核后更新PR51重新执行必需全门禁。P005仍等实际集成，不提前实施。
@@ -139,3 +135,7 @@ CP4.2.8/StarDist0.9.2真实CPU对照，冻结3开发/10评估，20行独审复�
 ## 2026-11-06 P017 孔板研究
 
 收到释放后保留P016收尾并合入main；上游B020规划随本任务集成。冻结公开BCA原表/布局/参考摘要，直接运行SciPy与statsmodels，发现LoQ及体积/空白风险，不授科学准入。当前独审与PR未完成，详P017任务与研究证据。
+
+## 2026-11-06 P017最终验收
+
+PR68/main f8f69b5与独审最终b2eaccd树一致；quality42164152689双平台check --all/wheel成功（Windows1737passed/10warnings/1132.98s；Linux1733passed/4既有skip/10warnings/909.25s），rules42164152703及desktop成功。指定独审与增量pass。研究完成，未授科学/学生准入；收据本地提交随下一任务，树释放，下一任务上游新窗口。详P017/final-delivery。
