@@ -154,7 +154,7 @@ def test_new_checkout_candidate_and_installed_payload_match_exact_source(
     candidate: dict[str, Any], tmp_path: Path
 ) -> None:
     result = verify(candidate)
-    assert result["source"]["shipped_source_files"] == 5
+    assert result["source"]["shipped_source_files"] == 7  # Six packages plus sequence helper.
     installed = tmp_path / "安装 空格"
     shutil.copytree(candidate["root"], installed)
     (installed / "unins000.dat").write_bytes(b"installer bookkeeping")

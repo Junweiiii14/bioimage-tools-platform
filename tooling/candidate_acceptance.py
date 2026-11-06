@@ -27,6 +27,8 @@ PACKAGES = {
     "platform_runtime": "packages/platform_runtime/src/platform_runtime/",
     "tool_contracts": "packages/tool_contracts/src/tool_contracts/",
     "wb_tool": "tools/wb/src/wb_tool/",
+    "nuclei_tool": "tools/nuclei/src/nuclei_tool/",
+    "bca_tool": "tools/bca/src/bca_tool/",
 }
 DIAGNOSTICS = ("--verify-installation", "--verify-supervision-installation")
 
@@ -154,6 +156,7 @@ def verify_source(root: Path, manifest: Json, source_repo: Path) -> Json:
                                 ".html",
                                 ".json",
                                 ".txt",
+                                ".md",
                             } or shipped_bytes.replace(b"\r\n", b"\n") != data.replace(
                                 b"\r\n", b"\n"
                             ):

@@ -154,7 +154,11 @@ def test_directory_toolchain_needs_no_installer_but_still_checks_compiler(
 ) -> None:
     lock, paths = tool_inputs
     paths["iscc"].unlink()
-    monkeypatch.setattr(integrity, "_probe", lambda *_args, **_kwargs: "locked-version")
+
+    def probe(*_args: object, **_kwargs: object) -> str:
+        return "locked-version"
+
+    monkeypatch.setattr(integrity, "_probe", probe)
     verified = integrity.verify_toolchain(lock, gcc=paths["gcc"], iscc=None)
     assert verified.iscc is None
     assert "iscc" not in verified.identity and "inno_runtime" not in verified.identity

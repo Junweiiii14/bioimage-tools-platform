@@ -248,7 +248,12 @@ def main() -> int:
     (site / "bioimage_app/build-identity.json").write_text(
         json.dumps({"version": version, "commit": commit, "channel": channel}), encoding="utf-8"
     )
-    shutil.copyfile(ROOT / f"tooling/{distribution}_readme.txt", dist / "安装与使用说明.txt")
+    readme_source = (
+        ROOT / "tooling/windows_directory_readme.txt"
+        if args.directory_only
+        else ROOT / f"tooling/{distribution}_readme.txt"
+    )
+    shutil.copyfile(readme_source, dist / "安装与使用说明.txt")
     if acceptance is not None:
         readme_path = dist / "安装与使用说明.txt"
         readme = readme_path.read_text(encoding="utf-8")
