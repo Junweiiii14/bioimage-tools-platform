@@ -1,0 +1,86 @@
+{
+  "author_self_check": true,
+  "api_version": "0.1.1",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "elapsed_seconds": 1.2884976000059396,
+  "timing_scope": "new workspace; warm installed environment/cache",
+  "execution": {
+    "phase": "finished",
+    "execution_id": "d2e52bed75e744f89174bfb2f5c43320",
+    "state": "succeeded",
+    "revision": 7,
+    "completed_nodes": 1,
+    "total_nodes": 1,
+    "node_id": "quantify",
+    "run_id": "098843665a014ac89faf4ca6b9c29230",
+    "pid": 62524,
+    "message": "",
+    "reused_nodes": 0,
+    "error_code": "",
+    "outputs": {
+      "wells": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\p019-r1-evidence\\assets\\92ca3a935665426481c8015c226b7897\\source.csv",
+      "samples": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\p019-r1-evidence\\assets\\db7ce1489a4e45bb99580c77fbb9c88f\\source.csv",
+      "provenance": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\p019-r1-evidence\\assets\\7ce0a28786974ff5940c136e687e1724\\source.json"
+    },
+    "stop_reason": "",
+    "failure_reason": "",
+    "workspace": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\p019-r1-evidence",
+    "readiness": "research_not_scientifically_admitted"
+  },
+  "reopened": {
+    "phase": "finished",
+    "execution_id": "d2e52bed75e744f89174bfb2f5c43320",
+    "state": "succeeded",
+    "revision": 7,
+    "completed_nodes": 1,
+    "total_nodes": 1,
+    "node_id": "quantify",
+    "run_id": "",
+    "pid": null,
+    "message": "",
+    "reused_nodes": 0,
+    "error_code": "",
+    "outputs": {
+      "wells": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\p019-r1-evidence\\assets\\92ca3a935665426481c8015c226b7897\\source.csv",
+      "samples": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\p019-r1-evidence\\assets\\db7ce1489a4e45bb99580c77fbb9c88f\\source.csv",
+      "provenance": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\p019-r1-evidence\\assets\\7ce0a28786974ff5940c136e687e1724\\source.json"
+    },
+    "stop_reason": "",
+    "failure_reason": "",
+    "workspace": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\p019-r1-evidence",
+    "readiness": "research_not_scientifically_admitted"
+  },
+  "legacy_0_1_0_reopened": {
+    "phase": "finished",
+    "execution_id": "b82f3b47954b46b4943b03f8455873f9",
+    "state": "succeeded",
+    "revision": 7,
+    "completed_nodes": 1,
+    "total_nodes": 1,
+    "node_id": "quantify",
+    "run_id": "",
+    "pid": null,
+    "message": "",
+    "reused_nodes": 0,
+    "error_code": "",
+    "outputs": {
+      "wells": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\p019-evidence\\assets\\bd741e9fae3c4003a36adb1c0ba169be\\source.csv",
+      "samples": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\p019-evidence\\assets\\a4b58d0f4d3b4946a3f2f78b1d1abe2f\\source.csv",
+      "provenance": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\p019-evidence\\assets\\5c83d4e7c1ee42b39bf228ef0e72b0ea\\source.json"
+    },
+    "stop_reason": "",
+    "failure_reason": "",
+    "workspace": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\p019-evidence",
+    "readiness": "research_not_scientifically_admitted"
+  },
+  "exit_codes": {
+    "run": 0,
+    "reopen": 0,
+    "legacy_reopen": 0
+  },
+  "output_sha256": {
+    "provenance.json": "79c25d691f06404e66aef720e2cbc0a142e7c13b0b093ac6bf4a8f5d4bd76b53",
+    "samples.csv": "983f420821e0975caf76b4a09160047e9cca2a3a00f6bb391c4fa5f5ad74ad40",
+    "wells.csv": "50ac78824072bcc8715c9de4c2693e55c1386b1390777f19b9c48c52cb2c3370"
+  }
+}

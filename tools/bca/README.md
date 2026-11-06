@@ -2,7 +2,7 @@
 
 公开API `bca_tool.api`：`read_plate(csv, record)`严格解析一次；`analyze_plate(validated.wells)`接受已验证的不可变孔记录，返回逐孔和技术样本结果。领域不做I/O，适配层产生候选文件；宿主沿用WorkflowSession/Workspace完成真实worker、取消、事务提交及重开。内部不重复猜测实验事实。
 
-方法仅为[P018契约](../../docs/research/2026-11-06-bca-method-contract.md) `pierce25-point-v0-research`，API/出处schema版本1（包0.1.0）。旧P017研究结果不迁移、不重算。固定25/200 µL、37℃30分钟、562 nm、零BSA空白、固定9个标准水平；每个水平与样本至少2技术孔。逐孔扣空白→NumPy2.5.4 interp→明确预稀释→技术均值/SD；禁止外推、工作液倍数、离群移除、生物n或自动择模。
+方法仅为[P018契约](../../docs/research/2026-11-06-bca-method-contract.md) `pierce25-point-v0-research`，API/包版本0.1.1、出处schema版本1。旧P017研究结果不迁移、不重算。固定25/200 µL、37℃30分钟、562 nm、零BSA空白、固定9个标准水平；每个水平与样本至少2技术孔。逐孔扣空白→NumPy2.5.4 interp→明确预稀释→技术均值/SD；禁止外推、工作液倍数、离群移除、生物n或自动择模。
 
 ## 从CSV运行与重开
 
@@ -22,3 +22,5 @@ uv run --locked --no-sync python -m bioimage_app.bca_cli --workspace .local/my-b
 样本支持25–2000 µg/mL（稀释前被测溶液），低/高范围逐孔空值；任一技术孔受限，整个样本汇总留空并标partial，保留有效单孔。标准/空白的浓度输出not_applicable，保留标准均值/残差。空值不是0；LoD/LoQ未知，不把厂家范围当LoQ。CSV和JSON均不覆盖原表/历史；结果留在Workspace，其发布由宿主负责。
 
 没有同SOP真实逐孔化学参考、LoQ、学生/真人或安装态验收。这里只提供源码研究CLI，未做GUI、所有板格式、自动拟合、统计/批处理或安装发布。当前一个真实模块节点覆盖本方法计算；逐步骤自由节点编排和可卸载GUI未在本轮承诺。
+
+0.1.1修复P019独审R01/R02：结果返回前通过Workspace核验运行/请求/清单及实际输入输出摘要，损坏/缺失返回失败且不修补历史。标准均值采用P018探针的原读数均值减空白；仅在25和2000端点将原读数与端点均值相差不超过两者最大ULP的2倍视为机器等价，交给同一interp反算。它不是科学容差或全域端点钳制，真正越界仍空值。固定方法ID与LoQ未知不变；包/API及implementation digest标明修正，已有0.1.0成果可核验读取而不会被重新计算覆盖。

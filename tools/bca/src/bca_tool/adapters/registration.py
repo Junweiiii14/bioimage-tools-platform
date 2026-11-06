@@ -17,7 +17,7 @@ def bca_module_spec() -> ModuleSpec:
         digest.update(path.read_bytes().replace(b"\r\n", b"\n"))
     return ModuleSpec(
         module_id="bca-pierce25-research",
-        module_version="0.1.0",
+        module_version="0.1.1",
         method_version=METHOD,
         implementation_digest=digest.hexdigest(),
         input_ports=(

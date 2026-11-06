@@ -1,6 +1,7 @@
 """Validated single-plate data and fixed P018 numerical semantics; no I/O."""
 
 from dataclasses import dataclass
+from math import ulp
 from statistics import mean, stdev
 from typing import Literal
 
@@ -56,10 +57,11 @@ class PlateResult:
 def analyze_plate(wells: tuple[Well, ...]) -> PlateResult:
     """Consume input validated by read_plate; invert each well before summarizing."""
     blank = mean(w.a562 for w in wells if w.role == "blank")
-    standards = {
-        c: mean(w.a562 - blank for w in wells if w.role != "sample" and w.standard_ug_ml == c)
+    raw_means = {
+        c: mean(w.a562 for w in wells if w.role != "sample" and w.standard_ug_ml == c)
         for c in LEVELS
     }
+    standards = {c: value - blank for c, value in raw_means.items()}
     curve = tuple(standards.values())
     if not all(np.isfinite(curve)) or any(a >= b for a, b in zip(curve, curve[1:], strict=False)):
         raise ValueError("invalid_curve: corrected standard means must strictly increase")
@@ -70,15 +72,23 @@ def analyze_plate(wells: tuple[Well, ...]) -> PlateResult:
         assayed = original = None
         status, reason = "not_applicable", "calibration well"
         if w.role == "sample":
-            if corrected < curve[1]:
+            reading = corrected
+            # Equivalence only at the two endpoints: input conversion/mean rounding,
+            # bounded by two raw-reading ULPs, not a scientific range tolerance.
+            for endpoint in (LEVELS[1], LEVELS[-1]):
+                raw_endpoint = raw_means[endpoint]
+                if abs(w.a562 - raw_endpoint) <= 2 * max(ulp(w.a562), ulp(raw_endpoint)):
+                    reading = standards[endpoint]
+                    break
+            if reading < curve[1]:
                 status, reason = (
                     "below_supported_range",
                     "below lowest nonzero standard (25 ug/mL); LoQ unknown",
                 )
-            elif corrected > curve[-1]:
+            elif reading > curve[-1]:
                 status, reason = "above_supported_range", "above calibration; no extrapolation"
             else:
-                assayed = float(np.interp(corrected, curve, LEVELS, left=np.nan, right=np.nan))
+                assayed = float(np.interp(reading, curve, LEVELS, left=np.nan, right=np.nan))
                 original = assayed * w.dilution_factor
                 if not np.isfinite(original):
                     raise ValueError("numerical_overflow: original concentration is not finite")

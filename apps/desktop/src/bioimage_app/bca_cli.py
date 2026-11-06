@@ -6,13 +6,19 @@ import hashlib
 import json
 import signal
 import sys
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 
-from bca_tool.api import read_plate
-from platform_runtime.api import Workspace, WorkspaceError
+from bca_tool.api import METHOD, read_plate
+from platform_runtime.api import Workspace, WorkspaceError, validate_workflow_result_selection
 from PySide6.QtCore import QCoreApplication, QTimer
-from tool_contracts.api import ExecutionPlan, ScientificAsset, ScientificType
+from tool_contracts.api import (
+    ExecutionPlan,
+    OutputManifest,
+    ScientificAsset,
+    ScientificType,
+    WorkflowLedger,
+)
 
 from bioimage_app.bca_workflow_host import BcaHost
 from bioimage_app.workflow_session import WorkflowSession, WorkflowStatus
@@ -44,6 +50,29 @@ def prepare(workspace: Path, source_path: str, record_path: str, host: BcaHost) 
                 description=ScientificType(kind="run_manifest", unit=None),
             ),
         )
+
+
+def verified_outputs(workspace: Path, ledger: WorkflowLedger) -> dict[str, str]:
+    """Read committed evidence after the session releases storage; never recompute."""
+    if len(ledger.results) != 1 or len(ledger.plan.nodes) != 1:
+        raise ValueError("Expected a committed single-plate BCA result")
+    result = ledger.results[0]
+    with Workspace.open(workspace) as store:
+        run = store.get_run(result.run.run_id)
+        if run.result is None:
+            raise ValueError("Missing committed result manifest")
+        manifest = OutputManifest.model_validate_json(store.read_asset(run.result))
+        validate_workflow_result_selection(ledger, ledger.plan.nodes[0], result, run, manifest)
+        if store.read_asset(run.request) != manifest.request.model_dump_json().encode():
+            raise ValueError("Stored request differs from committed manifest")
+        module = manifest.request.module
+        if module.module_id != "bca-pierce25-research" or module.method_version != METHOD:
+            raise ValueError("Saved result is not the supported BCA research method")
+        for bound in manifest.request.inputs:
+            store.asset_path(bound.asset)
+        if {item.port for item in result.outputs} != {"wells", "samples", "provenance"}:
+            raise ValueError("BCA result outputs are incomplete")
+        return {item.port: str(store.asset_path(item.asset)) for item in result.outputs}
 
 
 def main(arguments: list[str] | None = None) -> int:
@@ -83,16 +112,20 @@ def main(arguments: list[str] | None = None) -> int:
             session.cancel()
 
     def changed(status: WorkflowStatus) -> None:
-        print(json.dumps({"phase": "progress", **asdict(status)}), flush=True)
+        progress = asdict(status)
+        if status.state == "succeeded":
+            progress["state"] = "verifying"
+        print(json.dumps({"phase": "progress", **progress}), flush=True)
 
     def finished(status: WorkflowStatus) -> None:
         nonlocal exit_code
         outputs: dict[str, str] = {}
         ledger = session.ledger
-        if ledger is not None and ledger.state == "succeeded":
-            for result in ledger.results:
-                for item in result.outputs:
-                    outputs[item.port] = str(workspace / item.asset.relative_path)
+        if ledger is not None and status.state == "succeeded" and not status.message:
+            try:
+                outputs = verified_outputs(workspace, ledger)
+            except (ValueError, OSError, WorkspaceError) as error:
+                status = replace(status, state="failed", message=f"result_integrity: {error}")
         print(
             json.dumps(
                 {
@@ -100,7 +133,8 @@ def main(arguments: list[str] | None = None) -> int:
                     **asdict(status),
                     "outputs": outputs,
                     "stop_reason": stop_reason,
-                    "failure_reason": (
+                    "failure_reason": status.message
+                    or (
                         ledger.reason
                         or next(
                             (

@@ -51,7 +51,7 @@ def execute(start: BcaStart, cancelled: Callable[[], bool]) -> OutputManifest:
         rows.append(row)
     for name, data in (("wells", rows), ("samples", [dict(asdict(s)) for s in result.samples])):
         for row in data:
-            row.update(method_id=METHOD, api_version="0.1.0")
+            row.update(method_id=METHOD, api_version="0.1.1")
         with (output / f"{name}.csv").open("x", encoding="utf-8", newline="") as stream:
             writer = csv.DictWriter(stream, fieldnames=list(data[0]))
             writer.writeheader()
@@ -59,7 +59,7 @@ def execute(start: BcaStart, cancelled: Callable[[], bool]) -> OutputManifest:
     provenance = {
         "schema_version": 1,
         "method_id": METHOD,
-        "api_version": "0.1.0",
+        "api_version": "0.1.1",
         "readiness": "research_not_scientifically_admitted",
         "lod": None,
         "loq": None,

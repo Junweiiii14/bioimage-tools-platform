@@ -1,6 +1,6 @@
 # 当前恢复入口
 
-当前P019固定BCA单板CSV研究适配，唯一状态见work/tasks/P-019-bca-csv-adapter.md；实现与定向自验完成，准备冻结候选回传上游指定独审，未集成。证据work/evidence/P-019/README.md，操作tools/bca/README.md。
+当前P019固定BCA单板CSV研究适配，唯一状态见work/tasks/P-019-bca-csv-adapter.md；PR71首候选独审两项阻断已做R1修复/定向验证，准备冻结新候选增量复审，未集成。证据work/evidence/P-019/README.md，操作tools/bca/README.md。
 
 活动树bioimage-plan-sync，codex/p019-bca-csv-adapter，由本窗口01a1af83-f87a-7c01-a728-697c87e59a54持有，尚未释放。保留2bfd40c的P018收尾；P018/PR70已main3947261。旧dirty树、原图、用户安装不动。
 

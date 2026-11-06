@@ -63,6 +63,23 @@ def test_real_csv_worker_commit_reopen_and_protection(tmp_path: Path) -> None:
     assert {k: p.read_bytes() for k, p in paths.items()} == saved
     assert source.read_bytes() == original
 
+    # Real committed-file corruption must fail reopening, without repairing history.
+    corrupted = saved["wells"].replace(b"486.", b"986.", 1)
+    assert corrupted != saved["wells"] and len(corrupted) == len(saved["wells"])
+    paths["wells"].write_bytes(corrupted)
+    code, rejected = cli(workspace, "--reopen", finished["execution_id"])
+    assert code != 0 and rejected["state"] == "failed", rejected
+    assert rejected["outputs"] == {} and "result_integrity" in rejected["failure_reason"]
+    assert paths["wells"].read_bytes() == corrupted
+    assert {k: paths[k].read_bytes() for k in ("samples", "provenance")} == {
+        k: saved[k] for k in ("samples", "provenance")
+    }
+    paths["wells"].unlink()  # Only this test's disposable generated result.
+    code, missing = cli(workspace, "--reopen", finished["execution_id"])
+    assert code != 0 and missing["state"] == "failed", missing
+    assert missing["outputs"] == {} and missing["pid"] is None
+    assert not paths["wells"].exists()  # No automatic recomputation or repair.
+
 
 def test_worker_curve_failure_has_no_results(tmp_path: Path) -> None:
     source, record = tmp_path / "bad.csv", tmp_path / "record.json"

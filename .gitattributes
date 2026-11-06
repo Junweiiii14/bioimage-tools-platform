@@ -20,3 +20,4 @@
 # P019 CSV/record and result evidence carry exact byte digests.
 /tools/bca/examples/** -text
 /work/evidence/P-019/results/** -text
+/work/evidence/P-019/results-r1/** -text
