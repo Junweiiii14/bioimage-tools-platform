@@ -1,0 +1,52 @@
+{
+  "repository": "https://github.com/mdc-science/plateReadeR",
+  "commit": "cfb05bd403747b3192999debe9889fa5d1fefb78",
+  "license": "MIT (repository); no separate data license located; originals not redistributed",
+  "files": [
+    {
+      "path": "examples/BCA_assay_metadata.csv",
+      "sha256": "a125988090905dafada297e740ba7fea3e964ad67cc7ef713ad6a2c8fb47d0e0",
+      "bytes": 321
+    },
+    {
+      "path": "examples/example_run/experimental_data/processed_data/Protein/2026.06.15_PTN_analytical_performance.csv",
+      "sha256": "315a52e26247a870348f2d44091327e5f4100bbf511487d789c8375b2ac3de4e",
+      "bytes": 192
+    },
+    {
+      "path": "examples/example_run/experimental_data/processed_data/Protein/2026.06.15_PTN_levels.csv",
+      "sha256": "c51dd2fbee27c4135fd086405dc9022b960016cf4b86585579d4cbb41fb84cca",
+      "bytes": 352
+    },
+    {
+      "path": "examples/example_run/experimental_data/raw_data/2026.06.15_BCA_assay_data.xlsx",
+      "sha256": "17156825204b185af298c7a70881f607fa94bbce34b8d2562648f04c793b4499",
+      "bytes": 10805
+    },
+    {
+      "path": "examples/example_run/experimental_data/raw_data/2026.06.15_BCA_exp_metadata.csv",
+      "sha256": "c8dc64ce42a1bdd96d629d7c377f09757629c285edb7af33c40511ff82e308ed",
+      "bytes": 2792
+    },
+    {
+      "path": "examples/example_run/run_example.R",
+      "sha256": "3eca2df715e22c32aabe93f46985f55168c97e910cbbecf4b3e4f27fca83c693",
+      "bytes": 2217
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "db5a50f083264ed552a689212b4e0966741940f7d4fdbbd1e2fead8748af50b7",
+      "bytes": 1071
+    },
+    {
+      "path": "process_synergy2_endpoint_std_curve.R",
+      "sha256": "e37f4be8cb72af26b3b9a5ba8363df592aa68d6787c4431d7bc206dbde24009c",
+      "bytes": 23543
+    },
+    {
+      "path": "README.md",
+      "sha256": "87f577791f29fddf5811dd19967c037a4e191c4dcd668f7d49e5ef7ae57c4dcb",
+      "bytes": 21694
+    }
+  ]
+}
