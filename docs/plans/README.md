@@ -9,6 +9,7 @@
 | 如何调研、复用算法并交付实验 | [开发流程](workflow-development.md) · [HTML](workflow-development.html) |
 | 实验候选与选择依据 | [实验路线](experiment-research-roadmap.md) · [HTML](experiment-research-roadmap.html) |
 | 可读性、审查与长期维护 | [维护计划](../maintenance-plan.md) · [HTML](../maintenance-plan.html) |
+| 实验可插拔、图形编排与开发后独审闭环 | [持续独立审查方案](independent-review.md)，验收按任务阶段与准确候选执行 |
 | 已有WB研究的来源和限制 | [2026-11-02审计](../research/2026-11-02-wb-workflow-audit.md) |
 | 当前任务与真实进度 | [交接入口](../../AGENT_HANDOFF.md) → 任务卡 |
 | 旧版本与章节号 | [版本索引](history.md) |

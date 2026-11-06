@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "task": "P-018",
-  "base_commit": "f8f69b51e01446ffed6301dec99d2cf28fcdb85c",
+  "base_commit": "dc2609dd79de98a63d4e8283e6c6db9e7c8e28ba",
   "scopes": [
     ".agent-handoff",
     "AGENT_HANDOFF.md",
@@ -9,8 +9,8 @@
     "work"
   ],
   "rules": {
-    "AGENTS.md": "38dff343a0ab4853fb112d85cfdd900e23b3a331e0188192a737e2ef085492f1",
-    "docs/ai-workflow.md": "2b91317961421b1ebdba19cd3a45f81b81beded5ba7d9f23c2e87f56609c5cae",
+    "AGENTS.md": "398079c4b4d0723abab2a2fdb88c3751ad51905b5fc22c4e8268b36fcc02281d",
+    "docs/ai-workflow.md": "fd6a62e4351d5ec4639aa9641aabdcb170fd627529838f6e058fec5d68b364ef",
     "docs/architecture.md": "e3cbcd8a0ba0c081f2c6930fe32b3ee38b0aaaaf30bb2ea90160aeb7b81babe8",
     "docs/coding-standards.md": "f1ff3ed5bb1c4ac5256ec1b6b85cc71684b713b8b6b08df51723f62644b11974",
     "docs/module-map.md": "ed88d137cd94787fd9b1676c14ec5227652e5d53157a0801bd22a207c7f82cc4",
@@ -18,8 +18,8 @@
     "docs/runbooks/rule-enforcement.md": "6db3eacb3d49b8015ac54fca756236dbc8906ba5a0746741a28afd12fb7398e0"
   },
   "base_rules": {
-    "AGENTS.md": "38dff343a0ab4853fb112d85cfdd900e23b3a331e0188192a737e2ef085492f1",
-    "docs/ai-workflow.md": "2b91317961421b1ebdba19cd3a45f81b81beded5ba7d9f23c2e87f56609c5cae",
+    "AGENTS.md": "398079c4b4d0723abab2a2fdb88c3751ad51905b5fc22c4e8268b36fcc02281d",
+    "docs/ai-workflow.md": "fd6a62e4351d5ec4639aa9641aabdcb170fd627529838f6e058fec5d68b364ef",
     "docs/architecture.md": "e3cbcd8a0ba0c081f2c6930fe32b3ee38b0aaaaf30bb2ea90160aeb7b81babe8",
     "docs/coding-standards.md": "f1ff3ed5bb1c4ac5256ec1b6b85cc71684b713b8b6b08df51723f62644b11974",
     "docs/module-map.md": "ed88d137cd94787fd9b1676c14ec5227652e5d53157a0801bd22a207c7f82cc4",

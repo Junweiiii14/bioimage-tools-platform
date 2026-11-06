@@ -1,6 +1,6 @@
 # P-018 固定BCA方法与研究输入契约
 
-<!-- PROGRAM_TASK_META {"id":"P-018","status":"in_progress","work_package":"W07","depends_on":["P-017"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex BCA method research","base_commit":"f8f69b51e01446ffed6301dec99d2cf28fcdb85c","head_commit":null} -->
+<!-- PROGRAM_TASK_META {"id":"P-018","status":"in_progress","work_package":"W07","depends_on":["P-017"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex BCA method research","base_commit":"dc2609dd79de98a63d4e8283e6c6db9e7c8e28ba","head_commit":null} -->
 
 ## 范围与验收
 
@@ -14,4 +14,4 @@
 
 ## 当前状态
 
-来源/契约/探针已形成候选，见docs/research/2026-11-06-bca-method-contract.md及work/evidence/P-018/README.md。解析合成数值验证通过，完整真实板参考仍缺；不授科学或产品准入。待B021 main重载及自验/指定独审/PR集成。
+来源/契约/探针已形成候选，见docs/research/2026-11-06-bca-method-contract.md及work/evidence/P-018/README.md。解析合成数值验证通过，完整真实板参考仍缺；不授科学或产品准入。8f947b4研究内容经指定独审pass；已合B021/main dc2609dd并重载规则，待准确最终增量复核与PR必需CI/上游集成。
