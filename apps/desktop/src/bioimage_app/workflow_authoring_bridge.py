@@ -12,6 +12,7 @@ from PySide6.QtCore import QObject, QSettings, QUrl, Signal, Slot
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QFileDialog, QWidget
 
+from bioimage_app.tool_assembly import ToolAssembly
 from bioimage_app.workflow_authoring_models import AuthoringProjection
 from bioimage_app.workflow_authoring_session import WorkflowAuthoringSession
 from bioimage_app.workflow_batch_session import WorkflowBatchStatus
@@ -27,10 +28,15 @@ class WorkflowAuthoringBridge(QObject):
     idle = Signal()
 
     def __init__(
-        self, window: QWidget, unavailable: Callable[[], bool], settings: QSettings | None = None
+        self,
+        window: QWidget,
+        unavailable: Callable[[], bool],
+        settings: QSettings | None = None,
+        tools: ToolAssembly | None = None,
     ) -> None:
         super().__init__(window)
         self._settings = settings
+        self._tools = tools
         self._window = window
         self._unavailable = unavailable
         self._session: WorkflowAuthoringSession | None = None
@@ -124,6 +130,8 @@ class WorkflowAuthoringBridge(QObject):
                     tool = {"nuclei-research": "nuclei", "bca-research": "bca"}.get(
                         definition.workflow_id, "wb"
                     )
+                if self._tools is not None:
+                    self._tools.require(tool)
                 if action != "new_example":
                     source, _filter = QFileDialog.getOpenFileName(
                         self._window,
@@ -230,15 +238,11 @@ class WorkflowAuthoringBridge(QObject):
             self._start_switch()
 
     def _start_switch(self) -> None:
-        from bioimage_app.wb_workflow_host import wb_workflow_registry
-
         assert self._switch_to is not None
         token, path, initialization = self._switch_to
         self._switch_to = None
         from tool_contracts.api import ExecutionPlan
 
-        from bioimage_app.bca_workflow_host import BcaHost
-        from bioimage_app.nuclei_workflow_host import NucleiHost
         from bioimage_app.workflow_preparation import WorkflowHostModule
 
         config = (
@@ -248,12 +252,29 @@ class WorkflowAuthoringBridge(QObject):
 
         def registry(plan: ExecutionPlan) -> tuple[WorkflowHostModule, ...]:
             if plan.workflow_id == "nuclei-research":
+                from bioimage_app.nuclei_workflow_host import NucleiHost
+
                 return NucleiHost(*config).registry(plan)
             if plan.workflow_id == "bca-research":
+                from bioimage_app.bca_workflow_host import BcaHost
+
                 return BcaHost().registry(plan)
+            from bioimage_app.wb_workflow_host import wb_workflow_registry
+
             return wb_workflow_registry(plan)
 
-        session = WorkflowAuthoringSession(registry, self, nuclei_configuration=config)
+        session = WorkflowAuthoringSession(
+            registry,
+            self,
+            nuclei_configuration=config,
+            unavailable_tools={
+                key: self._tools.reason(key)
+                for key in self._tools.states
+                if not self._tools.available(key)
+            }
+            if self._tools
+            else {},
+        )
         self._session = session
         self._opening_token = token
 

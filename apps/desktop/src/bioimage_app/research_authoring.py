@@ -2,7 +2,6 @@
 
 import sys
 
-from nuclei_tool.api import NucleiParameters
 from platform_runtime.api import compile_workflow
 from tool_contracts.api import (
     ExecutionPlan,
@@ -12,8 +11,6 @@ from tool_contracts.api import (
     canonical_module_json,
 )
 
-from bioimage_app.bca_workflow_host import BcaHost
-from bioimage_app.nuclei_workflow_host import NucleiHost
 from bioimage_app.workflow_authoring_models import AuthoringSource
 from bioimage_app.workflow_preparation import WorkflowHostModule
 
@@ -21,16 +18,24 @@ from bioimage_app.workflow_preparation import WorkflowHostModule
 def research_definition(tool: str, sample: AuthoringSource) -> WorkflowDefinition:
     assert sample.asset is not None
     if tool == "bca":
+        from bioimage_app.bca_workflow_host import BcaHost
+
         assert sample.record is not None
         return BcaHost().definition(sample.asset, sample.record)
+    from bioimage_app.nuclei_workflow_host import NucleiHost
+
     return NucleiHost(sys.executable, "").definition(sample.asset)
 
 
 def research_modules(tool: str, sample: AuthoringSource) -> tuple[WorkflowHostModule, ...]:
     assert sample.asset is not None
     if tool == "bca":
+        from bioimage_app.bca_workflow_host import BcaHost
+
         return BcaHost().registry_definition()
     # Metadata assembly only. Execution uses the explicitly configured research host.
+    from bioimage_app.nuclei_workflow_host import NucleiHost
+
     return NucleiHost(sys.executable, "").modules(sample.asset)
 
 
@@ -46,6 +51,8 @@ def bind_research_template(
     for node in definition.nodes:
         raw = node.parameters_json
         if tool == "nuclei":
+            from nuclei_tool.api import NucleiParameters
+
             # Validate the frozen method before replacing only source metadata.
             old = NucleiParameters.model_validate_json(raw)
             image = sample.asset.description.image

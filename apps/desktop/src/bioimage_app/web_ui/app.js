@@ -1542,10 +1542,13 @@ async function bootstrap() {
         script.onload = () =>
             new QWebChannel(qt.webChannelTransport, (channel) => {
                 bridge = channel.objects.workbench;
-                window.moduleComparison?.connect(channel.objects.comparison);
+                render();
+                if (channel.objects.comparison)
+                    window.moduleComparison?.connect(channel.objects.comparison);
                 window.workflowEditor.connect(channel.objects.workflowAuthoring);
-                window.nucleiView.connect(channel.objects.nuclei);
-                window.bcaView.connect(channel.objects.bca);
+                if (channel.objects.nuclei) window.nucleiView.connect(channel.objects.nuclei);
+                if (channel.objects.bca) window.bcaView.connect(channel.objects.bca);
+                window.toolAssembly.connect(channel.objects.tools);
                 boundaryDiagnostics.connect(bridge);
                 window.desktopSession?.connect(bridge);
                 bridge.progressChanged?.connect((raw) => {

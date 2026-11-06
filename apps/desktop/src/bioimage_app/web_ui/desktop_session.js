@@ -201,7 +201,7 @@ const desktopSession = (() => {
     function connect(bridgeObject) {
         if (channel) return;
         channel = bridgeObject;
-        window.advancedWorkspace?.connect(bridgeObject);
+        if (bridgeObject.advancedStateChanged) window.advancedWorkspace?.connect(bridgeObject);
         channel.sessionStateChanged.connect((raw) => {
             let phase = 'parse';
             let restore;
