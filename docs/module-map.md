@@ -7,6 +7,7 @@
 | `dev.py`、`tooling/`、`.github/` | 开发检查、来源/边界、构建与验收工具；不含实验算法 | [开发命令](runbooks/development.md)、[规则回执](runbooks/rule-enforcement.md)、[发行入口](runbooks/release.md)；相关工具锁与测试 |
 | `apps/desktop/` | 异步存储、运行/取消/关闭、WB 宿主、网页桥接及本机入口 | [模块 README](../apps/desktop/README.md)、[工作台修订](contracts/wb-workbench-revision-v1.md)、[安装诊断](contracts/wb-installed-diagnostics-v1.md) |
 | `tools/wb/` | `wb_tool.api`；WB 数值、用例、输入/输出适配及可选 Qt 视图 | [模块 README](../tools/wb/README.md)、下方当前流程契约；外部不得导入内部实现 |
+| `tools/bca/` | `bca_tool.api`；固定Pierce25单板CSV研究方法，纯数值/输入输出分离 | [模块README及命令](../tools/bca/README.md)、[P018方法契约](research/2026-11-06-bca-method-contract.md)；宿主`bca_cli`复用WorkflowSession，科学准入未授予 |
 | `tools/nuclei/` | `nuclei_tool.api`；固定StarDist研究worker，原坐标实例标签；独立环境、不含GUI | [模块README及命令](../tools/nuclei/README.md)、[P015任务](../work/tasks/P-015-nuclei-research-adapter.md)；宿主`nuclei_cli`复用WorkflowSession，科学准入未授予 |
 | `packages/tool_contracts/` | `tool_contracts.api`；文件资产、修订、运行/退出与恢复消息 | [模块 README](../packages/tool_contracts/README.md) 和公开 `api.py` |
 | `packages/platform_runtime/` | `platform_runtime.api.Workspace`；输入快照、草稿 CAS、结果事务、恢复与备份 | [模块 README](../packages/platform_runtime/README.md)、[架构](architecture.md)；不含 WB 实验特判 |

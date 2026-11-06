@@ -77,6 +77,10 @@
     {
       "id": "P-018",
       "path": "work/tasks/P-018-bca-method-contract.md"
+    },
+    {
+      "id": "P-019",
+      "path": "work/tasks/P-019-bca-csv-adapter.md"
     }
   ],
   "work_packages": [
@@ -171,7 +175,8 @@
         "P-015",
         "P-016",
         "P-017",
-        "P-018"
+        "P-018",
+        "P-019"
       ]
     },
     {

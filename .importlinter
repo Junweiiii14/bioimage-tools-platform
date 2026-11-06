@@ -2,6 +2,7 @@
 root_packages =
     wb_tool
     nuclei_tool
+    bca_tool
     tool_contracts
     platform_runtime
     bioimage_app
@@ -51,6 +52,7 @@ forbidden_modules =
     platform_runtime
     wb_tool
     nuclei_tool
+    bca_tool
     PySide6
     numpy
     sqlite3
@@ -62,6 +64,7 @@ source_modules = platform_runtime
 forbidden_modules =
     wb_tool
     nuclei_tool
+    bca_tool
     PySide6
     numpy
 
@@ -71,6 +74,7 @@ type = independence
 modules =
     wb_tool
     nuclei_tool
+    bca_tool
     platform_runtime
 
 [importlinter:contract:host-storage-purity]
@@ -80,6 +84,7 @@ source_modules = bioimage_app.storage
 forbidden_modules =
     wb_tool
     nuclei_tool
+    bca_tool
     numpy
 
 [importlinter:contract:lower-host-independence]
@@ -90,6 +95,7 @@ source_modules =
     platform_runtime
     wb_tool
     nuclei_tool
+    bca_tool
 forbidden_modules = bioimage_app
 
 
@@ -115,3 +121,15 @@ forbidden_modules =
     PySide6
     sqlite3
     subprocess
+
+[importlinter:contract:bca-domain]
+name = BCA numerical domain stays pure
+type = forbidden
+source_modules = bca_tool.domain
+forbidden_modules =
+    bca_tool.adapters
+    PySide6
+    sqlite3
+    subprocess
+    multiprocessing
+    pathlib

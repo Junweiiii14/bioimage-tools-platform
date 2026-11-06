@@ -1,0 +1,21 @@
+{
+  "method_id": "pierce25-point-v0-research",
+  "kit": "23225",
+  "sop": "MAN0011430 Rev D",
+  "sample_volume_ul": 25,
+  "working_reagent_ul": 200,
+  "reagent_a_to_b": "50:1",
+  "mixing_seconds": 30,
+  "incubation_c": 37,
+  "incubation_minutes": 30,
+  "wavelength_nm": 562,
+  "cooled_to_room_temperature": true,
+  "diluent": "synthetic example: water",
+  "same_diluent_for_all_wells": true,
+  "same_treatment_for_all_wells": true,
+  "matrix_compatibility_basis": "Synthetic construction only; no real chemistry is certified",
+  "instrument": "synthetic analytical values, no instrument",
+  "read_date": "2026-11-06",
+  "reading_kind": "raw_absorbance",
+  "source_sha256": "297f027954d555e646c711d4e114277c860087a6382d97e417ac1b5afac276e3"
+}

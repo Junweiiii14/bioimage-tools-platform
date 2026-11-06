@@ -4,6 +4,7 @@ requires-python = "==3.12.*"
 
 [manifest]
 members = [
+    "bca-tool",
     "bioimage-app",
     "bioimage-tools-platform",
     "nuclei-tool",
@@ -22,10 +23,26 @@ wheels = [
 ]
 
 [[package]]
+name = "bca-tool"
+version = "0.1.0"
+source = { editable = "tools/bca" }
+dependencies = [
+    { name = "numpy" },
+    { name = "tool-contracts" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "numpy", specifier = "==2.5.4" },
+    { name = "tool-contracts", editable = "packages/tool_contracts" },
+]
+
+[[package]]
 name = "bioimage-app"
 version = "0.14.0"
 source = { editable = "apps/desktop" }
 dependencies = [
+    { name = "bca-tool" },
     { name = "nuclei-tool" },
     { name = "platform-runtime" },
     { name = "pyside6" },
@@ -42,6 +59,7 @@ wb = [
 
 [package.metadata]
 requires-dist = [
+    { name = "bca-tool", editable = "tools/bca" },
     { name = "nuclei-tool", editable = "tools/nuclei" },
     { name = "nuclei-tool", marker = "extra == 'nuclei'", editable = "tools/nuclei" },
     { name = "platform-runtime", editable = "packages/platform_runtime" },
@@ -56,6 +74,7 @@ name = "bioimage-tools-platform"
 version = "0.0.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "bca-tool" },
     { name = "bioimage-app", extra = ["nuclei", "wb"] },
     { name = "nuclei-tool" },
     { name = "platform-runtime" },
@@ -91,6 +110,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "bca-tool", editable = "tools/bca" },
     { name = "bioimage-app", extras = ["wb", "nuclei"], editable = "apps/desktop" },
     { name = "nuclei-tool", editable = "tools/nuclei" },
     { name = "platform-runtime", editable = "packages/platform_runtime" },

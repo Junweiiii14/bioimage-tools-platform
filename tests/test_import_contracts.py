@@ -14,6 +14,8 @@ ROOT = Path(__file__).resolve().parents[1]
     "violation",
     [
         "none",
+        "bca-storage",
+        "runtime-bca",
         "storage",
         "reverse-layer",
         "independence",
@@ -42,11 +44,25 @@ def test_import_linter_rejects_transitive_dependencies(tmp_path: Path, violation
     (adapters / "__init__.py").write_text("", encoding="utf-8")
     (adapters / "tiff_input.py").write_text("VALUE = 1\n", encoding="utf-8")
     (package / "__init__.py").write_text("", encoding="utf-8")
-    for owner in ("tool_contracts", "platform_runtime", "bioimage_app", "nuclei_tool"):
+    for owner in ("tool_contracts", "platform_runtime", "bioimage_app", "nuclei_tool", "bca_tool"):
         folder = tmp_path / owner
         folder.mkdir()
         (folder / "__init__.py").write_text("", encoding="utf-8")
         (folder / "api.py").write_text("VALUE = 1\n", encoding="utf-8")
+    for layer in ("domain", "adapters"):
+        folder = tmp_path / "bca_tool" / layer
+        folder.mkdir()
+        (folder / "__init__.py").write_text("", encoding="utf-8")
+        (folder / "entry.py").write_text("VALUE = 1\n", encoding="utf-8")
+    if violation == "bca-storage":
+        (tmp_path / "bca_tool/domain/entry.py").write_text(
+            "from bca_tool import bridge\n", encoding="utf-8"
+        )
+        (tmp_path / "bca_tool/bridge.py").write_text("import sqlite3\n", encoding="utf-8")
+    if violation == "runtime-bca":
+        (tmp_path / "platform_runtime/api.py").write_text(
+            "from bca_tool import api\n", encoding="utf-8"
+        )
     for layer in ("domain", "application", "adapters"):
         folder = tmp_path / "nuclei_tool" / layer
         folder.mkdir()
@@ -58,6 +74,8 @@ def test_import_linter_rejects_transitive_dependencies(tmp_path: Path, violation
     (domain / "quantify.py").write_text("from wb_tool.domain import bridge\n", encoding="utf-8")
     bridge = {
         "none": "VALUE = 1\n",
+        "bca-storage": "VALUE = 1\n",
+        "runtime-bca": "VALUE = 1\n",
         "storage": "import sqlite3\n",
         "reverse-layer": "from wb_tool import api\n",
         "independence": "VALUE = 1\n",
@@ -146,4 +164,4 @@ def test_import_linter_rejects_transitive_dependencies(tmp_path: Path, violation
         check=False,
     )
     assert result.returncode == (0 if violation == "none" else 1), result.stdout + result.stderr
-    assert ("BROKEN" if violation != "none" else "Contracts: 11 kept, 0 broken") in result.stdout
+    assert ("BROKEN" if violation != "none" else "Contracts: 12 kept, 0 broken") in result.stdout

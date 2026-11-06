@@ -3,13 +3,14 @@ name = "bioimage-app"
 version = "0.14.0"
 description = "Explicit desktop host assembly"
 requires-python = ">=3.12,<3.13"
-dependencies = ["platform-runtime", "tool-contracts", "nuclei-tool", "PySide6==6.12.0"]
+dependencies = ["platform-runtime", "tool-contracts", "nuclei-tool", "bca-tool", "PySide6==6.12.0"]
 
 [project.optional-dependencies]
 nuclei = ["nuclei-tool"]
 wb = ["wb-tool[desktop,ocr]"]
 
 [tool.uv.sources]
+bca-tool = { workspace = true }
 platform-runtime = { workspace = true }
 tool-contracts = { workspace = true }
 nuclei-tool = { workspace = true }
