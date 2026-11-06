@@ -46,6 +46,8 @@
 
 ## Current Pointer
 
+- 当前：[P018 固定BCA方法与研究契约](work/tasks/P-018-bca-method-contract.md)。本窗口完成有界来源核验与透明API探针，待上游指定独审/正常PR；准确状态只看任务卡。
+
 - 当前：[P017 BCA孔板研究](work/tasks/P-017-endpoint-assay-research.md)。研究/规划已完成，PR68/main f8f69b5、指定独审及双平台CI通过；[最终交付](work/evidence/P-017/final-delivery.md)。共享树收尾后释放，下一任务由上游新开窗口；前端阶段按[主方案第11节](docs/plans/research-platform-rd.md)。
 
 - 最近完成：[P016 单图核分割研究用户流程](work/tasks/P-016-nuclei-single-image-flow.md)。PR67/main6bd4680、真实GUI/异常回归、准确独审及双平台CI通过，已正式回传上游自动接续；见snapshot及[最终交付](work/evidence/P-016/final-delivery.md)。
