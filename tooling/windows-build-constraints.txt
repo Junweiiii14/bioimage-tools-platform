@@ -1,0 +1,2 @@
+# Existing backend version; Windows x64 wheel hash from PyPI JSON, 2026-11-06.
+uv-build==0.13.6 --hash=sha256:2a2350fbea9a3cf578481b5efc2d333f0477f26696aa615d312866acd170acf6

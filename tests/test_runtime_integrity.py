@@ -149,6 +149,24 @@ def test_matching_digest_does_not_excuse_wrong_version_or_failed_probe(
         integrity.verify_toolchain(lock, gcc=paths["gcc"], iscc=paths["iscc"])
 
 
+def test_directory_toolchain_needs_no_installer_but_still_checks_compiler(
+    tool_inputs: tuple[Path, dict[str, Path]], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    lock, paths = tool_inputs
+    paths["iscc"].unlink()
+
+    def probe(*_args: object, **_kwargs: object) -> str:
+        return "locked-version"
+
+    monkeypatch.setattr(integrity, "_probe", probe)
+    verified = integrity.verify_toolchain(lock, gcc=paths["gcc"], iscc=None)
+    assert verified.iscc is None
+    assert "iscc" not in verified.identity and "inno_runtime" not in verified.identity
+    paths["gcc"].write_bytes(b"changed")
+    with pytest.raises(RuntimeError, match="SHA256 mismatch"):
+        integrity.verify_toolchain(lock, gcc=paths["gcc"], iscc=None)
+
+
 def test_builder_rejects_untrusted_tools_before_creating_output(
     tool_inputs: tuple[Path, dict[str, Path]], monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -245,7 +263,17 @@ def test_real_uv_rejects_tampered_wheel_and_installs_locked_valid_wheels(tmp_pat
     wheel.write_bytes(original)
     passed = install("good")
     assert passed.returncode == 0, passed.stderr
-    assert len(list((tmp_path / "good").glob("*.dist-info"))) == 4
+    assert {p.name for p in (tmp_path / "good").glob("*.dist-info")} == {
+        f"{name}-1.0.dist-info"
+        for name in (
+            "tool_contracts",
+            "platform_runtime",
+            "wb_tool",
+            "nuclei_tool",
+            "bca_tool",
+            "bioimage_app",
+        )
+    }
 
 
 def test_payload_inventory_can_locate_exact_file_tampering(tmp_path: Path) -> None:

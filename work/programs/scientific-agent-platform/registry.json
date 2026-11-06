@@ -93,6 +93,10 @@
     {
       "id": "P-022",
       "path": "work/tasks/P-022-optional-tools.md"
+    },
+    {
+      "id": "P-023",
+      "path": "work/tasks/P-023-local-candidate.md"
     }
   ],
   "work_packages": [
@@ -251,7 +255,8 @@
       "task_ids": [
         "P-009",
         "P-021",
-        "P-022"
+        "P-022",
+        "P-023"
       ]
     },
     {

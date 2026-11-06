@@ -5,6 +5,7 @@ import json
 import shutil
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
 from tooling.acceptance_profile import acceptance_identity
@@ -30,7 +31,8 @@ def run(arguments: list[str], *, log: Path | None = None) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--iscc", required=True, type=Path)
+    parser.add_argument("--iscc", type=Path)
+    parser.add_argument("--directory-only", action="store_true", help="Build without an installer")
     parser.add_argument("--gcc", required=True, type=Path)
     parser.add_argument("--acceptance-id", help="Disposable identity; requires --laboratory")
     profiles = parser.add_mutually_exclusive_group()
@@ -70,10 +72,18 @@ def main() -> int:
     acceptance = acceptance_identity(args.acceptance_id) if args.acceptance_id is not None else None
     if acceptance is not None and not args.laboratory:
         parser.error("--acceptance-id requires --laboratory")
+    if args.directory_only and acceptance is None:
+        parser.error("--directory-only requires an isolated --laboratory --acceptance-id")
+    if not args.directory_only and args.iscc is None:
+        parser.error("--iscc is required when building an installer")
     if subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT).strip():
         raise RuntimeError("A committed, clean checkout is required")
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
-    toolchain = verify_toolchain(ROOT / "tooling/toolchain-lock.json", gcc=args.gcc, iscc=args.iscc)
+    toolchain = verify_toolchain(
+        ROOT / "tooling/toolchain-lock.json",
+        gcc=args.gcc,
+        iscc=None if args.directory_only else args.iscc,
+    )
     uv = str(toolchain.uv)
     suffix = f"-acceptance-{args.acceptance_id}" if acceptance is not None else ""
     output = ROOT / ".local/releases" / ("runtime-" + commit[:12] + suffix)
@@ -99,6 +109,14 @@ def main() -> int:
             "--no-dev",
             "--no-editable",
             "--no-emit-workspace",
+            "--package",
+            "bioimage-app",
+            "--extra",
+            "wb",
+            "--extra",
+            "nuclei",
+            "--extra",
+            "bca",
             "--output-file",
             str(requirements),
         ],
@@ -111,6 +129,8 @@ def main() -> int:
                 uv,
                 "build",
                 "--require-build-hashes",
+                "--build-constraints",
+                str(ROOT / "tooling/windows-build-constraints.txt"),
                 "--package",
                 name,
                 "--wheel",
@@ -222,7 +242,18 @@ def main() -> int:
     )
     if acceptance is not None:
         channel = str(acceptance["release_channel"])
-    shutil.copyfile(ROOT / f"tooling/{distribution}_readme.txt", dist / "安装与使用说明.txt")
+    version = tomllib.loads((ROOT / "apps/desktop/pyproject.toml").read_text(encoding="utf-8"))[
+        "project"
+    ]["version"]
+    (site / "bioimage_app/build-identity.json").write_text(
+        json.dumps({"version": version, "commit": commit, "channel": channel}), encoding="utf-8"
+    )
+    readme_source = (
+        ROOT / "tooling/windows_directory_readme.txt"
+        if args.directory_only
+        else ROOT / f"tooling/{distribution}_readme.txt"
+    )
+    shutil.copyfile(readme_source, dist / "安装与使用说明.txt")
     if acceptance is not None:
         readme_path = dist / "安装与使用说明.txt"
         readme = readme_path.read_text(encoding="utf-8")
@@ -302,6 +333,7 @@ def main() -> int:
         "schema": 1,
         "method": "private-cpython-locked-wheels",
         "commit": commit,
+        "app_version": version,
         "python": sys.version,
         "runtime_source": str(base),
         "uv_lock_sha256": digest(ROOT / "uv.lock"),
@@ -314,6 +346,7 @@ def main() -> int:
         "msvc_runtime": {p.name: digest(runtime / p.name) for p in redistributables},
         "wheels": wheel_hashes,
         "build_inputs_contract": "verified-runtime-inputs@1",
+        "build_constraints_sha256": digest(ROOT / "tooling/windows-build-constraints.txt"),
         "toolchain": toolchain.identity,
         "requirements_sha256": digest(requirements),
         "product_requirements_sha256": digest(local_requirements),
@@ -395,6 +428,9 @@ def main() -> int:
     manifest["payload_manifest_sha256"] = digest(payload_manifest)
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     shutil.copyfile(manifest_path, dist / "build-manifest.json")
+    if args.directory_only:
+        print(output, flush=True)
+        return 0
     run(
         [
             str(toolchain.iscc),

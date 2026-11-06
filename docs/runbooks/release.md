@@ -26,3 +26,11 @@ manifest 记录：app/build/git/lock 摘要、Python/Qt/编译器、工具及算
 无明确发布请求时只生成候选产物和证据。当前没有自动发布、生产账号、代码签名证书或后台自动更新器。
 
 本轮只交付本地测试候选，不创建正式GitHub Release。干净Win10、物理DPI和独立科学真值/留出按用户决定留待后续，必须在测试说明和manifest中明确未验，不因缺口冻结已授权产品技术栈。新包验证前不回收旧测试安装/产物；用户原图、项目、结果和旧工作树始终保留。
+
+## P023 独立目录候选
+
+当前构建包含 contracts/runtime/app 及 WB、核分割、BCA 六个 wheel，第三方依赖沿锁文件。可用 `--laboratory --acceptance-id p023-local --directory-only --gcc <固定编译器>` 只生成私有运行时目录和原生 EXE，不生成或执行安装器，不需 Inno。原安装器路径仍要求并校验 Inno；目录模式仍严格核验 Python、uv、GCC/windres 及运行库摘要，不放宽现有校验。
+
+目录中 `BioImageWB-Acceptance.exe` 为直接入口。构建写入 `bioimage_app/build-identity.json`，窗口标题显示 app 版本、独立通道和源码 SHA 前12位；完整 SHA 与锁/产物摘要见 build-manifest.json。设置使用 Acceptance-<id> 独立命名空间。该目录可本机启动不等于干净 Windows 或科学/真人验收；不自动注册快捷方式、关联或替换旧安装。
+
+核分割 worker 和模型不捆绑、不下载，沿现有核分割准备设置显式配置已经验证的固定路径。实际本机路径、验证和体量见 P023 证据。历史 WB 安装诊断不代替三工具候选验证。

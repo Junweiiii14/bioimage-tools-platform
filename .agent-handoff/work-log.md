@@ -9,15 +9,6 @@
 
 用户明确整组Fig展示，现为蛋白行×泳道列，跨蛋白编辑等正确快照、缺项保留草稿入口。86c9产品及c90诊断独审Accepted；新包19checks/11.437秒通过，首重开超时真实保留。使用与交付入口已更新，最终服务器检查看PR35，合并另行确认。
 
-## 2026-11-02 P005 real node workers and dispatch acknowledgement
-
-节点修复b80非作者Accepted后，新增生产WorkflowSession/后台准备/固定WB装配/--workflow CLI，真实自动3节点正式提交及暂停继续通过；删内部重复全图/env核验和检查回调，开始一次/resume一次后台核验有测试断言。相关23pass36.34s、最后控制器2pass10.86s；CLI自有triangle_u16实际退出0，关闭重开4000.0/三run及runtime源码指纹相同，auto-session.json。当前是可运行单图后端原型，cache/取消恢复矩阵/UI/完整CI及最终候选独审仍待完成，不标整卡done。旧snapshot已完整归档再替换短入口。
-
-用户追加要求先验证社区简洁代码项目再配置、减少防御编程与审批耗时。Karpathy-guidelines固定2c60614项目安装，作者/非作者各自核对raw2518B与SHA一致、仅SKILL无脚本/hook，policy/固定树摘要通过后完成配置；AGENTS/coding-standards落实入口一次校验/内部信任、无一次性抽象与臆测异常，候选集中独审，不新增审批。配置独立提交，保留未提交生产WorkflowSession文件，后续直接MVP测试，不把规则技能当自动有效性保证。
-
-89ba603之后实现RunSession可选请求确认/原始ExecutionEvent、三固定WB原值节点和实际宿主源码/依赖身份函数；旧对照入口/数值/schema不变。五组15次实际worker/正式存储提交/重开40/4000/真0/invalid-review空值通过；最终6节点22.93s、新增确认期间取消与节点12项28.82s、此前关联114项57.89s；Ruff/type/policy/九边界0。报告PNG已查看可读（首次预览目录名错误已纠正）。来源/预算/状态及精确范围worker-slice.md。仍由测试父进程串接，GraphSession/后台当前准入和完整故障矩阵未实现；新源准确独审/完整门禁/新wheels/CI待做，不标M1/P005完成。
-
-
 ## 2026-11-02 P005同一执行器的缓存、恢复与桌面入口
 
 实际取消五阶段、worker非零/崩溃/重复错身份、ENOSPC前后及重开对账、五类缓存矩阵19项通过。新增--workflow-ui共享WorkflowSession，后台输入导入、新运行/暂停/继续/取消/重开/应用调整；23联合101.88秒及新增暂停调整、5界面18.38秒通过。输入失败重入关闭首轮1fail3pass71.83秒，定位双retire后修复，原失败不销账。四wheel隔离三节点/4000/重开/两节点复用通过；随后最后样式/打印修补待全量最终验。原生windows字体与系统主题对比度实际查看后修正；截图与准确SHA见P005/runtime-gui-recovery.json。整卡仍in_progress，下一步一次最终候选独审/完整门禁/PR，之后P008/P009。
@@ -135,3 +126,7 @@ PR68/main f8f69b5与独审最终b2eaccd树一致；quality42164152689双平台ch
 ## 2026-11-06 P021工程交付
 
 P021核分割/BCA固定研究方法接入既有画布/模板/执行成果，真实模型与同输入数值一致。R01/R02经指定增量独审关闭，PR73按上游安排正常合入main2a3c7a3，与3f425b5同树。一次本地收尾后释放，下一任务上游新窗；详P021/final-delivery。
+
+## 2026-11-06 P022工程交付
+
+P022可选装配完成，R01/N01经指定独审关闭；准确47ded5e全部必需CI成功，PR74正常合入main b13e71a，完整树一致。首轮Linux关闭挂起保留UNKNOWN，单次重跑后固定独审允许集成。一次本地收尾后释放树，上游新窗派下一任务，详P022/final-delivery。

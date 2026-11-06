@@ -1,0 +1,26 @@
+[
+  {
+    "name": "p022-ci-linux-failed.log",
+    "path": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\p022-ci-linux-failed.log",
+    "bytes": 175827,
+    "sha256": "f11b12b5ca591b8e525a69e1aac7a7905f103c042b314660af3b7116cc657031"
+  },
+  {
+    "name": "p022-ci-linux-attempt2.log",
+    "path": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\p022-ci-linux-attempt2.log",
+    "bytes": 592839,
+    "sha256": "e2dc28e98aa38e17342c62038567d08d168968ff431f2f4f3cc2306de29c2dce"
+  },
+  {
+    "name": "p022-ci-windows.log",
+    "path": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\p022-ci-windows.log",
+    "bytes": 343787,
+    "sha256": "89982d07da8a9d52c4a10514aa8b4a3b02ba889eff167708852061fe76b314e3"
+  },
+  {
+    "name": "p022-ci-close-repro.log",
+    "path": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\p022-ci-close-repro.log",
+    "bytes": 102,
+    "sha256": "64b460a62884b812526785025cab3fe0f8ffdc8a7d1b5581702d9e7ce994ac40"
+  }
+]

@@ -122,5 +122,25 @@
   "web.log.gz": {
     "bytes": 328,
     "sha256": "0dbe569a3678daa67d0f1d8584b4db79f9c38e0fe0618d942436e674849e2d69"
+  },
+  "p022-ci-linux-failed.log.gz": {
+    "bytes": 32814,
+    "sha256": "26f3c3b593558321f866701f6ef6af558ca02c4c087ab98633530f03188a9268"
+  },
+  "p022-ci-linux-attempt2.log.gz": {
+    "bytes": 92419,
+    "sha256": "05c9543544d64b1d3b9d0e8ff4eadbe63a8c87ac7e2ca5fa7d9a4de8255979bc"
+  },
+  "p022-ci-windows.log.gz": {
+    "bytes": 60730,
+    "sha256": "b09e8bbec311c0256c0eadcb7983d23caabcb3110b8ed94d7e11c08ad2e21b76"
+  },
+  "p022-ci-close-repro.log.gz": {
+    "bytes": 55,
+    "sha256": "2386255e251df9182505ea1f5eae364bfc8963a32dcf30a7fc08e00b853bfac5"
+  },
+  "p022-check-all-final.log.gz": {
+    "bytes": 4230,
+    "sha256": "0099c56d979ed4f385e35498026756a53653170fa3efb4e648dac693494e91db"
   }
 }
