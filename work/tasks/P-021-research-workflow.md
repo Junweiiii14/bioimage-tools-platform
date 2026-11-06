@@ -1,8 +1,8 @@
 # P021 核分割与 BCA 研究工作流
 
-<!-- PROGRAM_TASK_META {"id":"P-021","status":"in_progress","work_package":"W13","depends_on":["P-009","P-015","P-019","P-020"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync","owner":"chat-01a1b08b-a875-79b1-9e86-cde0563c42c9","base_commit":"aa3302ad2980dfeec1ac6f7776fec6176f18fcda"} -->
+<!-- PROGRAM_TASK_META {"id":"P-021","status":"done","work_package":"W13","depends_on":["P-009","P-015","P-019","P-020"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync","owner":"chat-01a1b08b-a875-79b1-9e86-cde0563c42c9","base_commit":"aa3302ad2980dfeec1ac6f7776fec6176f18fcda"} -->
 
-状态：实施中。2026-11-06，上游聊天 01a19bfd-f3ab-7502-86da-9f61953d1c8a 明确派发；活动树 bioimage-plan-sync，基线 a5d9ca847c4aab6702a743216680748b4b6a64d7（含 P020 本地收尾），产品 main aa3302ad2980dfeec1ac6f7776fec6176f18fcda。
+状态：工程范围完成。PR73/main 2a3c7a32936c6e4daf63dac23fb953cc4512e840与最终已审3f425b5树一致，独审及全部必需CI通过。2026-11-06，上游聊天 01a19bfd-f3ab-7502-86da-9f61953d1c8a 明确派发；活动树 bioimage-plan-sync，基线 a5d9ca847c4aab6702a743216680748b4b6a64d7（含 P020 本地收尾），产品 main aa3302ad2980dfeec1ac6f7776fec6176f18fcda。
 
 ## 范围与验收
 
@@ -21,4 +21,6 @@
 
 ## 检查与边界
 
-定向5项研究回归、10项既有编辑/会话回归及WB最小真实回归通过；两张真实StarDist标签与P015逐字节相同，BCA表与同输入CLI逐字节相同。本机全量诊断结束1 failed/1770 passed，唯一R01已修复；不绑定冻结head。PR73初审R01/R02已整改，准确新候选增量独审/必需CI待完成。详细原始证据见 work/evidence/P-021/README.md。科学/化学准确性、LoQ、真人、目标环境与实际安装更新均不在本轮完成声明内。完整跨实验编排、插件安装卸载与 Agent 未实施。
+定向5项研究回归、10项既有编辑/会话回归及WB最小真实回归通过；两张真实StarDist标签与P015逐字节相同，BCA表与同输入CLI逐字节相同。本机全量诊断结束1 failed/1770 passed，唯一R01已修复；不绑定冻结head。PR73最终独审pass，R01/R02关闭，准确候选四项必需CI全部通过。详细原始证据见 work/evidence/P-021/README.md。科学/化学准确性、LoQ、真人、目标环境与实际安装更新均不在本轮完成声明内。完整跨实验编排、插件安装卸载与 Agent 未实施。
+
+最终交付、运行入口及保留边界见 [final-delivery](../evidence/P-021/final-delivery.md)。本地一次收尾后释放共享树，下一任务由上游新窗口派发。

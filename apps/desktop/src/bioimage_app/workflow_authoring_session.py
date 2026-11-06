@@ -26,12 +26,17 @@ class WorkflowAuthoringSession(QObject):
         parent: QObject | None = None,
         *,
         nuclei_configuration: tuple[str, str] = ("", ""),
+        unavailable_tools: dict[str, str] | None = None,
     ) -> None:
         super().__init__(parent)
         self._registry = registry
         self._store = AsyncStorage(
             self,
-            authoring=partial(execute_authoring_store, nuclei_configuration=nuclei_configuration),
+            authoring=partial(
+                execute_authoring_store,
+                nuclei_configuration=nuclei_configuration,
+                unavailable_tools=unavailable_tools,
+            ),
         )
         self._store.replied.connect(self._reply)
         self._store.closed.connect(self._closed)

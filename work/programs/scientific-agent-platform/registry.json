@@ -89,6 +89,10 @@
     {
       "id": "P-021",
       "path": "work/tasks/P-021-research-workflow.md"
+    },
+    {
+      "id": "P-022",
+      "path": "work/tasks/P-022-optional-tools.md"
     }
   ],
   "work_packages": [
@@ -246,7 +250,8 @@
       ],
       "task_ids": [
         "P-009",
-        "P-021"
+        "P-021",
+        "P-022"
       ]
     },
     {

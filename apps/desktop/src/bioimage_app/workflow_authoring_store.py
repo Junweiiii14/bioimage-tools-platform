@@ -6,8 +6,6 @@ import io
 from pathlib import Path
 from uuid import uuid4
 
-from bca_tool.api import read_plate
-from nuclei_tool.api import present_nuclei_result, read_nuclei_input, verify_model
 from platform_runtime.api import (
     IntegrityError,
     StateConflict,
@@ -28,25 +26,11 @@ from tool_contracts.api import (
     WorkflowLayout,
     canonical_module_json,
 )
-from wb_tool.api import (
-    LaneROI,
-    WBReportParameters,
-    load_tiff,
-    suggest_analysis_for_crop,
-    wb_validation_input,
-)
 
-from bioimage_app.bca_cli import import_sources as import_bca_sources
-from bioimage_app.nuclei_cli import import_source as import_nuclei_source
 from bioimage_app.research_authoring import (
     bind_research_template,
     research_definition,
     research_modules,
-)
-from bioimage_app.wb_workflow_host import (
-    bind_wb_workflow_template,
-    build_wb_workflow,
-    wb_workflow_modules,
 )
 from bioimage_app.workflow_authoring_models import (
     AuthoringCommand,
@@ -60,7 +44,6 @@ from bioimage_app.workflow_authoring_models import (
     AuthoringSource,
 )
 from bioimage_app.workflow_batch_storage import WorkflowBatchStoreCommand, execute_batch_store
-from bioimage_app.workflow_input import import_wb_workflow_source
 from bioimage_app.workflow_template import WorkflowTemplate, load_workflow_template
 
 _TOOL = "workflow_authoring_v1"
@@ -118,6 +101,10 @@ def _preflight(project: AuthoringProject) -> AuthoringProjection:
         sample = next(s for s in project.sources if s.sample_id == project.graph.sample_id)
         modules = research_modules(project.tool, sample)
     else:
+        from wb_tool.api import WBReportParameters
+
+        from bioimage_app.wb_workflow_host import wb_workflow_modules
+
         seed_report = WBReportParameters.model_validate_json(defaults["wb-publish-original"])
         report_node = next(
             (
@@ -174,6 +161,10 @@ def _inputs(store: Workspace, command: AuthoringCommand) -> tuple[AuthoringSourc
             raise ValueError("研究流程每次绑定一个真实输入；BCA 还需对应板记录")
         path = command.source_paths[0]
         if command.tool == "bca":
+            from bca_tool.api import read_plate
+
+            from bioimage_app.bca_cli import import_sources as import_bca_sources
+
             if not command.record_path:
                 raise ValueError("BCA 需要明确的板记录 JSON")
             asset, record = import_bca_sources(
@@ -184,6 +175,10 @@ def _inputs(store: Workspace, command: AuthoringCommand) -> tuple[AuthoringSourc
             asset = asset.model_copy(update={"sample_id": sample_id})
             record = record.model_copy(update={"sample_id": sample_id})
         else:
+            from nuclei_tool.api import read_nuclei_input
+
+            from bioimage_app.nuclei_cli import import_source as import_nuclei_source
+
             asset, record = (
                 import_nuclei_source(store, path, uuid4().hex, read_nuclei_input(path)),
                 None,
@@ -193,6 +188,10 @@ def _inputs(store: Workspace, command: AuthoringCommand) -> tuple[AuthoringSourc
                 sample_id=asset.sample_id, label=Path(path).name, asset=asset, record=record
             ),
         )
+    from wb_tool.api import wb_validation_input
+
+    from bioimage_app.workflow_input import import_wb_workflow_source
+
     result: list[AuthoringSource] = []
     for supplied in command.validation_cases or command.source_paths:
         sample_id = uuid4().hex
@@ -225,6 +224,8 @@ def _initialize(store: Workspace, command: AuthoringCommand) -> AuthoringProject
         with Path(command.template_path).open("rb") as stream:
             template = load_workflow_template(stream.read(1048577).decode("utf-8"))
         if command.tool == "wb":
+            from bioimage_app.wb_workflow_host import bind_wb_workflow_template
+
             definition, _plan = bind_wb_workflow_template(template.definition, primary)
         else:
             definition, _plan = bind_research_template(
@@ -237,6 +238,10 @@ def _initialize(store: Workspace, command: AuthoringCommand) -> AuthoringProject
             positions=(NodePosition(node_id=definition.nodes[0].node_id, x=40.0, y=40.0),)
         )
     else:
+        from wb_tool.api import LaneROI, load_tiff, suggest_analysis_for_crop, wb_validation_input
+
+        from bioimage_app.wb_workflow_host import build_wb_workflow
+
         if command.validation_cases:
             request = wb_validation_input(command.validation_cases[0]).request
         else:
@@ -314,6 +319,8 @@ def _freeze(
         if sample.asset is not None:
             try:
                 if project.tool == "wb":
+                    from bioimage_app.wb_workflow_host import bind_wb_workflow_template
+
                     _bound, plan = bind_wb_workflow_template(definition, sample.asset)
                 else:
                     _bound, plan = bind_research_template(definition, sample, project.tool)
@@ -415,6 +422,8 @@ def _outputs(
                 store.asset_path(committed.asset)
             nuclei_display = None
             if node.interface.module.module_id == "nuclei-stardist-research":
+                from nuclei_tool.api import present_nuclei_result, read_nuclei_input
+
                 members = {item.port: item.asset for item in result.outputs}
                 source = read_nuclei_input(str(store.asset_path(manifest.request.inputs[0].asset)))
                 nuclei_display = present_nuclei_result(
@@ -471,18 +480,29 @@ def _outputs(
 
 
 def execute_authoring_store(
-    store: Workspace, raw: bytes, *, nuclei_configuration: tuple[str, str] = ("", "")
+    store: Workspace,
+    raw: bytes,
+    *,
+    nuclei_configuration: tuple[str, str] = ("", ""),
+    unavailable_tools: dict[str, str] | None = None,
 ) -> AuthoringProjection:
     if len(raw) > 1048576:
         raise ValueError("Editor command exceeds the 1MiB input budget")
     command = AuthoringCommand.model_validate_json(
         canonical_module_json(raw.decode("utf-8")), strict=True
     )
+    unavailable_tools = unavailable_tools or {}
     if command.operation == "initialize":
+        if command.tool in unavailable_tools:
+            raise ValueError(unavailable_tools[command.tool] + "；请准备工具后重启。")
         project = _initialize(store, command)
         _save(store, project, None)
         return _preflight(project).model_copy(update={"operation": command.operation})
     project = load_authoring_project(store, command.document_id)
+    if project.tool in unavailable_tools:
+        raise ValueError(
+            unavailable_tools[project.tool] + "；此历史项目不可执行，原图和成果保持原样。"
+        )
     if (
         command.operation in ("save", "freeze", "bind")
         and command.previous_revision != project.revision
@@ -504,6 +524,8 @@ def execute_authoring_store(
         batch = None
         if command.operation == "freeze" and projection.plan is not None:
             if updated.tool == "nuclei":
+                from nuclei_tool.api import verify_model
+
                 worker, model = nuclei_configuration
                 nodes = ", ".join(n.node_id + "/source" for n in updated.graph.nodes)
                 if not worker or not Path(worker).is_file() or not model:
@@ -538,6 +560,8 @@ def execute_authoring_store(
             raise ValueError("没有可绑定的原图：" + "; ".join(s.reason for s in sources))
         definition = WorkflowDefinition.model_validate(project.graph.model_dump(mode="python"))
         if project.tool == "wb":
+            from bioimage_app.wb_workflow_host import bind_wb_workflow_template
+
             bound, _plan = bind_wb_workflow_template(definition, primary)
             seed, _seed_plan = bind_wb_workflow_template(project.seed, primary)
         else:

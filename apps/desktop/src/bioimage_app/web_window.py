@@ -1,12 +1,14 @@
 """Same local HTML document in browser preview and Qt desktop shell."""
 
+from __future__ import annotations
+
 import json
 import os
 import re
 import time
 from collections.abc import Callable
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 from uuid import uuid4
 
 from PySide6.QtCore import QSettings, QStandardPaths, Qt, QTimer, QUrl, Slot
@@ -22,19 +24,21 @@ from PySide6.QtWebEngineCore import (
 )
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import QApplication, QFileDialog, QMainWindow
-from wb_tool.api import WBIntakeProject
 
 from bioimage_app.appearance import WorkbenchAppearance
-from bioimage_app.bca_bridge import BcaBridge
-from bioimage_app.figure_window import FigureProjectWindow
 from bioimage_app.folder_drop import FolderDropView, folder_paths
-from bioimage_app.module_bridge import ComparisonBridge
-from bioimage_app.nuclei_bridge import NucleiBridge
 from bioimage_app.project_navigation import MODES, ProjectNavigation
 from bioimage_app.shortcuts import WorkbenchShortcuts
 from bioimage_app.source_origins import SourceOrigins
-from bioimage_app.web_bridge import WorkbenchBridge
+from bioimage_app.tool_assembly import PlatformBridge, ToolAssembly
 from bioimage_app.workflow_authoring_bridge import WorkflowAuthoringBridge
+
+if TYPE_CHECKING:
+    from bioimage_app.bca_bridge import BcaBridge
+    from bioimage_app.module_bridge import ComparisonBridge
+    from bioimage_app.nuclei_bridge import NucleiBridge
+    from bioimage_app.wb_web_host import AdvancedHost
+    from bioimage_app.web_bridge import WorkbenchBridge
 
 
 class LocalAssetFilter(QWebEngineUrlRequestInterceptor):
@@ -62,17 +66,6 @@ class LocalWorkbenchPage(QWebEnginePage):
     ) -> bool:
         url = QUrl(url)
         return url.isLocalFile() and Path(url.toLocalFile()).resolve() == self.index
-
-
-class AdvancedHost(FigureProjectWindow):
-    shutdown_requested = False
-
-    def closeEvent(self, event: QCloseEvent) -> None:
-        if not self.shutdown_requested:
-            self.hide()
-            event.ignore()
-        else:
-            super().closeEvent(event)
 
 
 class WebWorkbenchWindow(QMainWindow):
@@ -121,6 +114,11 @@ class WebWorkbenchWindow(QMainWindow):
         if acceptance:
             settings_name = "Acceptance-" + acceptance.group(1)
         self.settings = settings or QSettings("BioImageTools", settings_name)
+        self.tools = ToolAssembly(self.settings, self)
+        self._host: AdvancedHost | None = None
+        self._nuclei: NucleiBridge | None = None
+        self._bca: BcaBridge | None = None
+        self._comparison: ComparisonBridge | None = None
         self.shortcuts = WorkbenchShortcuts(self.settings)
         self.appearance = WorkbenchAppearance(self.settings)
         self._appearance_refresh = 0.0
@@ -143,15 +141,18 @@ class WebWorkbenchWindow(QMainWindow):
         self._route_number = 0
         self._since = time.monotonic()
         self._previous_session = ""
-        self.host = AdvancedHost()
-        self.host.source_origins = SourceOrigins(self.settings)
-        self.host.setParent(self, Qt.WindowType.Window)
-        self.host.automatic.crop_policy = "source_geometry@2"
-        self.host.automatic.quant_policy = "anchored_background@1"
-        self.host.closed.connect(self._backend_closed)
-        self.host.workspace_opened.connect(self._workspace_ready)
+        if self.tools.available("wb"):
+            from bioimage_app.wb_web_host import AdvancedHost
+
+            self.host = AdvancedHost()
+            self.host.source_origins = SourceOrigins(self.settings)
+            self.host.setParent(self, Qt.WindowType.Window)
+            self.host.automatic.crop_policy = "source_geometry@2"
+            self.host.automatic.quant_policy = "anchored_background@1"
+            self.host.closed.connect(self._backend_closed)
+            self.host.workspace_opened.connect(self._workspace_ready)
         self.web = FolderDropView(
-            self, self._folder_dropped, lambda: (id(self.host), self.bridge.session_epoch)
+            self, self._folder_dropped, lambda: (id(self._host), self.session_bridge.session_epoch)
         )
         index = (asset_directory or Path(__file__).with_name("web_ui")) / "index.html"
         page = LocalWorkbenchPage(index, self.web)
@@ -192,61 +193,80 @@ class WebWorkbenchWindow(QMainWindow):
             QWebEngineSettings.WebAttribute.JavascriptCanOpenWindows, False
         )
         self.channel = QWebChannel(page)
-        self.bridge = WorkbenchBridge(self.host, self.choose, self)
-        self.bridge.sessionRequested.connect(self._session_request)
-        self.channel.registerObject("workbench", self.bridge)
+        self._bridge: WorkbenchBridge | None = None
+        self.session_bridge: WorkbenchBridge | PlatformBridge
+        if self.tools.available("wb"):
+            from bioimage_app.web_bridge import WorkbenchBridge
+
+            self._bridge = WorkbenchBridge(self.host, self.choose, self)
+            self.session_bridge = self._bridge
+        else:
+            self.session_bridge = PlatformBridge(self.tools, self)
+        self.session_bridge.sessionRequested.connect(self._session_request)
+        self.channel.registerObject("workbench", self.session_bridge)
+        self.channel.registerObject("tools", self.tools)
         self.authoring = WorkflowAuthoringBridge(
             self,
             lambda: (
-                self.host.operation_busy
-                or self.comparison.busy
-                or self.nuclei.busy
-                or self.bca.busy
+                (self._host is not None and self.host.operation_busy)
+                or (self._comparison is not None and self._comparison.busy)
+                or (self._nuclei is not None and self._nuclei.busy)
+                or (self._bca is not None and self._bca.busy)
                 or self._stage != "idle"
             ),
             settings=self.settings,
+            tools=self.tools,
         )
         self.authoring.idle.connect(self._finish_exit_if_ready)
         self.channel.registerObject("workflowAuthoring", self.authoring)
         self._comparison_transition: tuple[str, Callable[[], None] | None] | None = None
-        self.comparison = ComparisonBridge(
-            self,
-            lambda: (
-                self.host.operation_busy
-                or self.authoring.busy
-                or self.nuclei.busy
-                or self.bca.busy
-                or self._stage != "idle"
-                or self._comparison_transition is not None
-            ),
-        )
-        self.comparison.idle.connect(self._comparison_idle)
-        self.channel.registerObject("comparison", self.comparison)
-        self.nuclei = NucleiBridge(
-            self,
-            self.settings,
-            lambda: (
-                self.host.operation_busy
-                or self.bca.busy
-                or self.authoring.busy
-                or self.comparison.busy
-                or self._stage != "idle"
-            ),
-        )
-        self.nuclei.idle.connect(self._finish_exit_if_ready)
-        self.channel.registerObject("nuclei", self.nuclei)
-        self.bca = BcaBridge(
-            self,
-            lambda: (
-                self.host.operation_busy
-                or self.authoring.busy
-                or self.comparison.busy
-                or self.nuclei.busy
-                or self._stage != "idle"
-            ),
-        )
-        self.bca.idle.connect(self._finish_exit_if_ready)
-        self.channel.registerObject("bca", self.bca)
+        if self.tools.available("wb"):
+            from bioimage_app.module_bridge import ComparisonBridge
+
+            self._comparison = ComparisonBridge(
+                self,
+                lambda: (
+                    (self._host is not None and self.host.operation_busy)
+                    or self.authoring.busy
+                    or (self._nuclei is not None and self._nuclei.busy)
+                    or (self._bca is not None and self._bca.busy)
+                    or self._stage != "idle"
+                    or self._comparison_transition is not None
+                ),
+            )
+            self._comparison.idle.connect(self._comparison_idle)
+            self.channel.registerObject("comparison", self._comparison)
+        if self.tools.available("nuclei"):
+            from bioimage_app.nuclei_bridge import NucleiBridge
+
+            self._nuclei = NucleiBridge(
+                self,
+                self.settings,
+                lambda: (
+                    (self._host is not None and self.host.operation_busy)
+                    or (self._bca is not None and self._bca.busy)
+                    or self.authoring.busy
+                    or (self._comparison is not None and self._comparison.busy)
+                    or self._stage != "idle"
+                ),
+            )
+            self._nuclei.idle.connect(self._finish_exit_if_ready)
+            self.channel.registerObject("nuclei", self._nuclei)
+        if self.tools.available("bca"):
+            from bioimage_app.bca_bridge import BcaBridge
+
+            self._bca = BcaBridge(
+                self,
+                lambda: (
+                    (self._host is not None and self.host.operation_busy)
+                    or self.authoring.busy
+                    or (self._comparison is not None and self._comparison.busy)
+                    or (self._nuclei is not None and self._nuclei.busy)
+                    or self._stage != "idle"
+                ),
+            )
+            self._bca.idle.connect(self._finish_exit_if_ready)
+            self.channel.registerObject("bca", self._bca)
         page.setWebChannel(self.channel)
         self.setCentralWidget(self.web)
         self.web.setUrl(QUrl.fromLocalFile(str(index.resolve())))
@@ -256,11 +276,55 @@ class WebWorkbenchWindow(QMainWindow):
         self.session_timer.timeout.connect(self._poll_session)
         self.session_timer.start()
 
+    @property
+    def nuclei(self) -> NucleiBridge:
+        self.tools.require("nuclei")
+        assert self._nuclei is not None
+        return self._nuclei
+
+    @property
+    def bca(self) -> BcaBridge:
+        self.tools.require("bca")
+        assert self._bca is not None
+        return self._bca
+
+    @property
+    def comparison(self) -> ComparisonBridge:
+        self.tools.require("wb")
+        assert self._comparison is not None
+        return self._comparison
+
+    @property
+    def bridge(self) -> WorkbenchBridge:
+        self.tools.require("wb")
+        assert self._bridge is not None
+        return self._bridge
+
+    @property
+    def host(self) -> AdvancedHost:
+        self.tools.require("wb")
+        assert self._host is not None
+        return self._host
+
+    @host.setter
+    def host(self, host: AdvancedHost) -> None:
+        self._host = host
+
     def _folder_dropped(self, urls: tuple[QUrl, ...]) -> None:
         try:
-            if self.comparison.busy or self.authoring.busy or self.nuclei.busy or self.bca.busy:
+            if (
+                (self._comparison is not None and self._comparison.busy)
+                or self.authoring.busy
+                or (self._nuclei is not None and self._nuclei.busy)
+                or (self._bca is not None and self._bca.busy)
+            ):
                 raise ValueError("请先完成或取消当前对照或工作流批次")
-            if self._closing or self._starting or self._stage != "idle" or self.host.operation_busy:
+            if (
+                self._closing
+                or self._starting
+                or self._stage != "idle"
+                or (self._host is not None and self.host.operation_busy)
+            ):
                 raise ValueError("当前任务仍在处理中，请完成或取消后再拖入文件夹。")
             paths = folder_paths(urls)
             self.start_from_images(paths, automatic=False, intake=True, folders_only=True)
@@ -270,6 +334,7 @@ class WebWorkbenchWindow(QMainWindow):
             )
 
     def choose(self, action: str) -> None:
+        self.tools.require("wb")
         if action in {
             "new_quant_images",
             "new_review_images",
@@ -290,7 +355,9 @@ class WebWorkbenchWindow(QMainWindow):
         elif action in {"new_intake_folder", "intake_import_folder"}:
             directory = QFileDialog.getExistingDirectory(self, "选择仪器直接导出的 TIFF 文件夹")
             if directory:
-                if action == "intake_import_folder" and self.host.workspace_path:
+                if action == "intake_import_folder" and (
+                    self._host.workspace_path if self._host else ""
+                ):
                     self.host.intake.import_folder(Path(directory))
                 else:
                     self.start_from_images([Path(directory)], automatic=False, intake=True)
@@ -326,7 +393,7 @@ class WebWorkbenchWindow(QMainWindow):
         elif action == "import_folder":
             path = QFileDialog.getExistingDirectory(self, "选择 WB 原图文件夹")
             if path:
-                if self.host.workspace_path:
+                if self._host.workspace_path if self._host else "":
                     self.host.automatic.import_directory(path)
                 else:
                     self.start_from_images([Path(path)])
@@ -341,18 +408,19 @@ class WebWorkbenchWindow(QMainWindow):
 
     def open_project(self, path: str) -> None:
         """Open persisted project data, rather than only its storage container."""
+        self.tools.require("wb")
         if (Path(path) / ".wb-delivery.json").is_file() or Path(path).suffix.casefold() == ".zip":
             self.open_delivery(path)
             return
-        if self.host.workspace_path:
+        if self._host.workspace_path if self._host else "":
             self._request_transition("open", lambda: self.open_project(path))
             return
         if (
-            self.host.operation_busy
+            (self._host is not None and self.host.operation_busy)
             or self.host.is_closing
             or self.authoring.busy
-            or self.nuclei.busy
-            or self.bca.busy
+            or (self._nuclei is not None and self._nuclei.busy)
+            or (self._bca is not None and self._bca.busy)
         ):
             raise ValueError("当前任务仍在处理中，请稍候或取消")
         self._restore = self.navigation.read(path)
@@ -367,15 +435,15 @@ class WebWorkbenchWindow(QMainWindow):
 
     def open_delivery(self, path: str) -> None:
         """Restore into a fresh local workspace and enter the same main UI."""
-        if self.host.workspace_path:
+        if self._host.workspace_path if self._host else "":
             self._request_transition("open", lambda: self.open_delivery(path))
             return
         if (
-            self.host.operation_busy
+            (self._host is not None and self.host.operation_busy)
             or self.host.is_closing
             or self.authoring.busy
-            or self.nuclei.busy
-            or self.bca.busy
+            or (self._nuclei is not None and self._nuclei.busy)
+            or (self._bca is not None and self._bca.busy)
         ):
             raise ValueError("当前任务仍在处理中，请稍候或取消")
         default = (
@@ -410,7 +478,8 @@ class WebWorkbenchWindow(QMainWindow):
         intake: bool = False,
         folders_only: bool = False,
     ) -> None:
-        if self.host.workspace_path:
+        self.tools.require("wb")
+        if self._host.workspace_path if self._host else "":
             self._request_transition(
                 "new",
                 lambda: self.start_from_images(
@@ -440,7 +509,12 @@ class WebWorkbenchWindow(QMainWindow):
         self._request_transition("exit")
 
     def _check_close_failure(self) -> None:
-        if self._closing and not self.host.is_closing and not self.host.resources_closed:
+        if (
+            self._host is not None
+            and self._closing
+            and not self.host.is_closing
+            and not self.host.resources_closed
+        ):
             self._closing = False
             self.host.shutdown_requested = False
             self._stage = "failed"
@@ -448,6 +522,8 @@ class WebWorkbenchWindow(QMainWindow):
             self.raise_()
 
     def _backend_closed(self) -> None:
+        from bioimage_app.wb_web_host import AdvancedHost
+
         self.bridge.timer.stop()
         self.host.closed.disconnect(self._backend_closed)
         if self._intent == "exit":
@@ -481,24 +557,25 @@ class WebWorkbenchWindow(QMainWindow):
         if (
             self._intent != "exit"
             or not self._closing
-            or not self.host.resources_closed
+            or (self._host is not None and not self.host.resources_closed)
             or not self.authoring.resources_closed
-            or not self.nuclei.resources_closed
-            or not self.bca.resources_closed
+            or (self._nuclei is not None and not self._nuclei.resources_closed)
+            or (self._bca is not None and not self._bca.resources_closed)
         ):
             return
         self.session_timer.stop()
         self._exit_ready = True
         self.web.stop()
         self.web.page().deleteLater()
-        self.host.hide()
-        for child in self.host.findChildren(QMainWindow):
-            child.hide()
+        if self._host is not None:
+            self.host.hide()
+            for child in self.host.findChildren(QMainWindow):
+                child.hide()
         QTimer.singleShot(0, self.close)
 
     def _import_paths(self, paths: list[Path], *, automatic: bool) -> None:
         self._target_mode = "review" if automatic else "quant"
-        if self.host.workspace_path:
+        if self._host.workspace_path if self._host else "":
             self._starting = True
             self._stage = "opening"
             self.host.import_images(tuple(str(path) for path in paths), automatic=automatic)
@@ -512,9 +589,11 @@ class WebWorkbenchWindow(QMainWindow):
     def _request_transition(
         self, intent: str, continuation: Callable[[], None] | None = None
     ) -> None:
-        if self.comparison.busy:
+        if intent != "exit":
+            self.tools.require("wb")
+        if self._comparison is not None and self._comparison.busy:
             self._comparison_transition = (intent, continuation)
-            self.comparison.cancel()
+            self._comparison.cancel()
             return
         if self._stage in {"confirm_busy", "confirm_dirty", "confirm_draft", "cancel", "shutdown"}:
             if intent == "exit":
@@ -525,8 +604,14 @@ class WebWorkbenchWindow(QMainWindow):
         self._intent = intent
         self._continuation = continuation
         self._discard = False
-        self.host.pause_auto_save(True)
-        if self.host.operation_busy or self.authoring.busy or self.nuclei.busy or self.bca.busy:
+        if self._host is not None:
+            self.host.pause_auto_save(True)
+        if (
+            (self._host is not None and self.host.operation_busy)
+            or self.authoring.busy
+            or (self._nuclei is not None and self._nuclei.busy)
+            or (self._bca is not None and self._bca.busy)
+        ):
             self._stage = "confirm_busy"
             self._message = "正在处理项目。取消任务后，已提交的结果会保留。"
         elif self._draft or (intent == "exit" and self.authoring.dirty):
@@ -536,7 +621,7 @@ class WebWorkbenchWindow(QMainWindow):
                 if intent == "exit" and self.authoring.dirty
                 else "有尚未应用的清单、分配或图像调整。请返回应用修改，或放弃这部分草稿。"
             )
-        elif self.host.has_unsaved_changes:
+        elif self._host is not None and self.host.has_unsaved_changes:
             self._stage = "confirm_dirty"
             self._message = "当前项目有未保存修改。保存后可从当前页面和 Fig 继续工作。"
         else:
@@ -557,29 +642,37 @@ class WebWorkbenchWindow(QMainWindow):
         self._closing = True
         if self._intent == "exit":
             self.authoring.close()
-            self.nuclei.close()
-            self.bca.close()
-        self.host.prepare_shutdown(save_changes=not self._discard)
-        self.host.shutdown_requested = True
-        self.host.close()
-        self._check_close_failure()
+            if self._nuclei is not None:
+                self._nuclei.close()
+            if self._bca is not None:
+                self._bca.close()
+        if self._host is not None:
+            self.host.prepare_shutdown(save_changes=not self._discard)
+            self.host.shutdown_requested = True
+            self.host.close()
+            self._check_close_failure()
+        else:
+            self._finish_exit_if_ready()
 
     def _reply(self, choice: str) -> None:
         if choice == "return":
             self._stage = "opening" if self._starting else "idle"
             self._closing = False
-            self.host.pause_auto_save(False)
+            if self._host is not None:
+                self.host.pause_auto_save(False)
             self._continuation = None
             if self._intent == "exit" and self.authoring.dirty:
                 self.authoring.reveal()
         elif choice == "retry" and self._stage == "failed":
             self._request_transition(self._intent, self._continuation)
         elif choice == "cancel" and self._stage == "confirm_busy":
-            if self.host.operation_busy:
+            if self._host is not None and self.host.operation_busy:
                 self.host.cancel()
             self.authoring.cancel()
-            self.nuclei.cancel()
-            self.bca.cancel()
+            if self._nuclei is not None:
+                self._nuclei.cancel()
+            if self._bca is not None:
+                self._bca.cancel()
             self._stage = "cancel"
             self._since = time.monotonic()
             self._message = "正在取消任务，等待工作进程结束…"
@@ -587,7 +680,7 @@ class WebWorkbenchWindow(QMainWindow):
             self._draft = False
             if self._intent == "exit":
                 self.authoring.discard_draft()
-            if self.host.has_unsaved_changes:
+            if self._host is not None and self.host.has_unsaved_changes:
                 self._stage = "confirm_dirty"
                 self._message = "项目还有未保存修改。请选择保存，或明确放弃未保存修改。"
             else:
@@ -607,7 +700,9 @@ class WebWorkbenchWindow(QMainWindow):
             if not isinstance(raw, dict):
                 raise ValueError("操作参数无效")
             data = cast(dict[str, object], raw)
-            if action == "position":
+            if action == "missing_wb":
+                self.tools.require("wb")
+            elif action == "position":
                 if self._ready_project and data.get("projectId") == self._ready_project:
                     # A queued page heartbeat may predate the close request. Once
                     # cancelling/closing, it must not erase the captured draft.
@@ -615,7 +710,9 @@ class WebWorkbenchWindow(QMainWindow):
                         self._draft = data.get("draft") is True
                     elif self._stage in {"confirm_busy", "cancel"}:
                         self._draft = self._draft or data.get("draft") is True
-                    self.navigation.remember(self.host.workspace_path, data)
+                    self.navigation.remember(
+                        (self._host.workspace_path if self._host else ""), data
+                    )
             elif action == "reply":
                 self._reply(str(data.get("choice", "")))
             elif action == "exit":
@@ -633,7 +730,7 @@ class WebWorkbenchWindow(QMainWindow):
             elif action == "restore":
                 self.choose("restore_project")
             elif action == "new_from_folder":
-                if self._last_open_path and not self.host.workspace_path:
+                if self._last_open_path and not (self._host.workspace_path if self._host else ""):
                     self.start_from_images([Path(self._last_open_path)], automatic=False)
             elif action == "new":
                 self._request_transition("new", lambda: self.choose("quant_import"))
@@ -697,10 +794,10 @@ class WebWorkbenchWindow(QMainWindow):
         self._check_close_failure()
         if (
             self._stage == "cancel"
-            and not self.host.operation_busy
+            and not (self._host is not None and self.host.operation_busy)
             and not self.authoring.busy
-            and not self.nuclei.busy
-            and not self.bca.busy
+            and not (self._nuclei is not None and self._nuclei.busy)
+            and not (self._bca is not None and self._bca.busy)
         ):
             # Cancellation can leave submitted results, unsaved edits, and UI drafts.
             # Reevaluate them without losing the requested exit/project switch.
@@ -708,7 +805,13 @@ class WebWorkbenchWindow(QMainWindow):
             self._request_transition(self._intent, self._continuation)
         elif self._stage in {"cancel", "shutdown"} and time.monotonic() - self._since > 20:
             self._message = "仍在等待本次会话的后台资源退出，窗口将保持可见。"
-        if self._starting and self._stage == "opening" and not self.host.operation_busy:
+        if (
+            self._starting
+            and self._stage == "opening"
+            and not (self._host is not None and self.host.operation_busy)
+        ):
+            from wb_tool.api import WBIntakeProject
+
             project = self.host.view.project()
             has_content = bool(project.rows) or (
                 isinstance(project, WBIntakeProject) and bool(project.intake.sources)
@@ -744,7 +847,7 @@ class WebWorkbenchWindow(QMainWindow):
                     "lane": restore.get("lane", 1),
                 }
                 self.navigation.remember(
-                    self.host.workspace_path,
+                    (self._host.workspace_path if self._host else ""),
                     {
                         "projectId": project.project_id,
                         "name": project.name,
@@ -764,7 +867,7 @@ class WebWorkbenchWindow(QMainWindow):
         state = json.dumps(
             {
                 "stage": self._stage,
-                "epoch": self.bridge.session_epoch,
+                "epoch": self.session_bridge.session_epoch,
                 "message": self._message,
                 "intent": self._intent,
                 "route": self._route,
@@ -778,22 +881,22 @@ class WebWorkbenchWindow(QMainWindow):
                     "receipt": self._layout_receipt,
                     "error": self._layout_error,
                 },
-                "workspace": self.host.workspace_path,
+                "workspace": (self._host.workspace_path if self._host else ""),
                 "saveState": "处理中"
-                if self.host.operation_busy
+                if (self._host is not None and self.host.operation_busy)
                 else "有未保存修改"
-                if self.host.has_unsaved_changes
+                if (self._host is not None and self.host.has_unsaved_changes)
                 else "已保存"
-                if self.host.workspace_path
+                if (self._host.workspace_path if self._host else "")
                 else "尚未打开项目",
                 "projectParent": str(
                     self.settings.value("project_parent", "文档 / BioImage / Projects")
                 ),
                 "canImportFailedFolder": bool(self._last_open_path)
-                and not self.host.workspace_path,
+                and not (self._host.workspace_path if self._host else ""),
             },
             ensure_ascii=False,
         )
         if state != self._previous_session:
             self._previous_session = state
-            self.bridge.sessionStateChanged.emit(state)
+            self.session_bridge.sessionStateChanged.emit(state)

@@ -42,14 +42,15 @@ name = "bioimage-app"
 version = "0.14.0"
 source = { editable = "apps/desktop" }
 dependencies = [
-    { name = "bca-tool" },
-    { name = "nuclei-tool" },
     { name = "platform-runtime" },
     { name = "pyside6" },
     { name = "tool-contracts" },
 ]
 
 [package.optional-dependencies]
+bca = [
+    { name = "bca-tool" },
+]
 nuclei = [
     { name = "nuclei-tool" },
 ]
@@ -59,15 +60,14 @@ wb = [
 
 [package.metadata]
 requires-dist = [
-    { name = "bca-tool", editable = "tools/bca" },
-    { name = "nuclei-tool", editable = "tools/nuclei" },
+    { name = "bca-tool", marker = "extra == 'bca'", editable = "tools/bca" },
     { name = "nuclei-tool", marker = "extra == 'nuclei'", editable = "tools/nuclei" },
     { name = "platform-runtime", editable = "packages/platform_runtime" },
     { name = "pyside6", specifier = "==6.12.0" },
     { name = "tool-contracts", editable = "packages/tool_contracts" },
     { name = "wb-tool", extras = ["desktop", "ocr"], marker = "extra == 'wb'", editable = "tools/wb" },
 ]
-provides-extras = ["nuclei", "wb"]
+provides-extras = ["bca", "nuclei", "wb"]
 
 [[package]]
 name = "bioimage-tools-platform"

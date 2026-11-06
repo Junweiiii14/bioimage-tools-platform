@@ -1,9 +1,7 @@
 # 当前恢复入口
 
-当前任务 work/tasks/P-021-research-workflow.md。活动树 bioimage-plan-sync，分支 codex/p021-research-workflow；本窗 01a1b08b-a875-79b1-9e86-cde0563c42c9 持有写入所有权，尚未释放。基线产品 main aa3302ad2980dfeec1ac6f7776fec6176f18fcda，保留 P020 本地收尾 a5d9ca8。
+当前任务 [P022可选装配](../work/tasks/P-022-optional-tools.md)，上游2026-11-06明确派发。实际树 bioimage-plan-sync，分支 codex/p022-optional-tools；起始 e5b3d52（含P021一次收尾），main基线2a3c7a3。当前开发窗01a1b0c7-c5ea-71a2-9e7e-b25ee7daaa74独占写入；未释放。
 
-核分割/BCA已接现有P009目录、模板、执行及结果；两个公开研究图的真实核标签与P015逐字节相同，BCA表与同输入CLI逐字节相同。研究模板/新输入/冷读及旧schema显式保存测试已过；PR73初审R01/R02已整改；本机混合源码全量诊断1 failed/1770 passed（唯一R01已修复），不声明准确head通过。证据 work/evidence/P-021/，命令与失败原样保留。
+先完成平台/单工具/全工具/停用与移除的隔离wheel真实桌面矩阵、自验和准确候选，再回传上游01a19bfd-f3ab-7502-86da-9f61953d1c8a派固定独审窗；不自行合并。P021已交付，不重做图画布/算法。原树、原图、历史和在用安装不动。
 
-下一步：冻结R02新head并回上游01a19bfd-f3ab-7502-86da-9f61953d1c8a，由上游派固定独审窗01a1af0d-808e-7131-ae29-237aded27938。作者不自行派重复独审或合并。修复仍在本窗。
-
-不改第三方算法/权重/依赖，不动旧dirty树、安装、原图与历史。当前仅固定方法编排MVP；跨实验语义组合、插件装卸、Agent、科学/真人/物理DPI/目标机及用户安装更新均未完成。
+科学、真人、物理DPI、目标机、安装更新均未验。具体进度和检查只在任务与P022证据。

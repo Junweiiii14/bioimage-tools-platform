@@ -829,6 +829,43 @@ print('Installed authoring: actual WebChannel assets, edit/save/reopen, 4000/40,
 """
 
 
+BASE_GUI_SCRIPT = """
+import importlib.util
+import sys
+from PySide6.QtCore import QTimer
+from PySide6.QtWidgets import QApplication
+from bioimage_app import desktop_entry
+from bioimage_app.__main__ import main
+for package in ('wb_tool', 'bca_tool', 'nuclei_tool', 'numpy', 'PIL', 'tensorflow'):
+    assert importlib.util.find_spec(package) is None, package
+create = desktop_entry.create_desktop_window
+checked = []
+def capture(mode):
+    window = create(mode)
+    assert all(state == 'missing' for state in window.tools.states.values())
+    def inspect():
+        window.web.page().runJavaScript(
+            "document.querySelector('#runtime-badge').textContent === '桌面工作台' && "
+            "document.querySelectorAll('#tool-enablement input:disabled').length === 3",
+            receive,
+        )
+    def receive(ready):
+        if not ready:
+            QTimer.singleShot(100, inspect)
+            return
+        checked.append(True)
+        window.close()
+    QTimer.singleShot(100, inspect)
+    QTimer.singleShot(15000, lambda: QApplication.instance().exit(91))
+    return window
+desktop_entry.create_desktop_window = capture
+sys.argv = ['bioimage_app']
+assert main() == 0 and checked
+assert not any(name.startswith(('wb_tool', 'bca_tool', 'nuclei_tool')) for name in sys.modules)
+print('Isolated platform: desktop entry, availability and shutdown; no tools/numerical libraries')
+"""
+
+
 DESKTOP_SCRIPT = """
 import sys
 from pathlib import Path
@@ -929,11 +966,9 @@ def main() -> int:
                 [
                     built["tool-contracts"],
                     built["platform-runtime"],
-                    built["nuclei-tool"],
-                    built["bca-tool"],
                     built["bioimage-app"],
                 ],
-                DESKTOP_SCRIPT,
+                (DESKTOP_SCRIPT, BASE_GUI_SCRIPT),
             ),
         ):
             code = installed_check(folder, package, wheels, script)
@@ -951,7 +986,7 @@ def main() -> int:
                 built["bioimage-app"],
             ],
             (GUI_SCRIPT, AUTHORING_SCRIPT),
-            ("wb", "nuclei"),
+            ("wb", "nuclei", "bca"),
         )
 
 
