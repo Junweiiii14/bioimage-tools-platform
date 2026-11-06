@@ -97,6 +97,13 @@ class WebWorkbenchWindow(QMainWindow):
             self.setWindowTitle("BioImage · WB 实验室版")
         if acceptance:
             self.setWindowTitle("BioImage · WB 验收测试")
+        identity_path = Path(__file__).with_name("build-identity.json")
+        if identity_path.is_file():
+            identity = json.loads(identity_path.read_text(encoding="utf-8"))
+            self.setWindowTitle(
+                f"BioImage · 工具平台 {identity['version']} · {identity['channel']}"
+                f" · {identity['commit'][:12]}"
+            )
         self.setWindowIcon(QIcon(str(Path(__file__).with_name("web_ui") / "bioimage.svg")))
         self.resize(1440, 940)
         settings_name = {

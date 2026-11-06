@@ -12,7 +12,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
 
-PRODUCTS = ("tool-contracts", "platform-runtime", "wb-tool", "bioimage-app")
+PRODUCTS = (
+    "tool-contracts",
+    "platform-runtime",
+    "wb-tool",
+    "nuclei-tool",
+    "bca-tool",
+    "bioimage-app",
+)
 
 
 def digest(path: Path) -> str:
@@ -74,12 +81,12 @@ class VerifiedToolchain:
     uv: Path
     gcc: Path
     windres: Path
-    iscc: Path
+    iscc: Path | None
     identity: dict[str, object]
     python_tree: dict[str, object]
 
 
-def verify_toolchain(lock_path: Path, *, gcc: Path, iscc: Path) -> VerifiedToolchain:
+def verify_toolchain(lock_path: Path, *, gcc: Path, iscc: Path | None) -> VerifiedToolchain:
     lock = cast(dict[str, Any], json.loads(lock_path.read_text(encoding="utf-8")))
     policy = lock["runtime_candidate"]
     if policy["schema"] != 1 or sys.platform != "win32" or platform.machine().lower() != "amd64":
@@ -93,8 +100,9 @@ def verify_toolchain(lock_path: Path, *, gcc: Path, iscc: Path) -> VerifiedToolc
         "uv": Path(found_uv),
         "gcc": gcc,
         "windres": gcc.with_name("windres.exe"),
-        "iscc": iscc,
     }
+    if iscc is not None:
+        paths["iscc"] = iscc
     paths = {name: path.absolute() for name, path in paths.items()}
     # Validate every binary before executing even a --version command.
     for name, path in paths.items():
@@ -106,8 +114,9 @@ def verify_toolchain(lock_path: Path, *, gcc: Path, iscc: Path) -> VerifiedToolc
     compiler_identity = tree_identity(paths["gcc"].parent.parent)
     if compiler_identity != policy["compiler_runtime"]["tree"]:
         raise RuntimeError("GCC runtime differs from the verified official archive")
-    for name, expected in policy["inno_runtime"]["files"].items():
-        verify_file(paths["iscc"].parent / name, expected)
+    if iscc is not None:
+        for name, expected in policy["inno_runtime"]["files"].items():
+            verify_file(paths["iscc"].parent / name, expected)
     identity: dict[str, object] = {}
     for name, path in paths.items():
         spec = policy["tools"][name]
@@ -126,13 +135,14 @@ def verify_toolchain(lock_path: Path, *, gcc: Path, iscc: Path) -> VerifiedToolc
         "python_exe_sha256": digest(base / "python.exe"),
     }
     identity["gcc_runtime"] = compiler_identity
-    identity["inno_runtime"] = policy["inno_runtime"]
+    if iscc is not None:
+        identity["inno_runtime"] = policy["inno_runtime"]
     identity["toolchain_lock_sha256"] = digest(lock_path)
     return VerifiedToolchain(
         uv=paths["uv"],
         gcc=paths["gcc"],
         windres=paths["windres"],
-        iscc=paths["iscc"],
+        iscc=paths.get("iscc"),
         identity=identity,
         python_tree=python_identity,
     )
@@ -144,7 +154,7 @@ def freeze_local_wheels(wheels: Path, requirements: Path) -> dict[str, str]:
     for wheel in sorted(wheels.glob("*.whl")):
         name = wheel.name.split("-")[0].replace("_", "-")
         if name not in PRODUCTS or name in products:
-            raise RuntimeError("Expected exactly one wheel for each of the four product packages")
+            raise RuntimeError("Expected exactly one wheel for each product package")
         products.add(name)
         hashes[wheel.name] = digest(wheel)
     if products != set(PRODUCTS):
