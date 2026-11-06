@@ -13,7 +13,8 @@ from pathlib import Path
 
 from bioimage_app import desktop_entry
 from bioimage_app.__main__ import main
-from PySide6.QtCore import QSettings, QTimer
+from PySide6.QtCore import QMimeData, QPoint, QPointF, QSettings, Qt, QTimer, QUrl
+from PySide6.QtGui import QDragEnterEvent, QDropEvent
 from PySide6.QtWidgets import QApplication, QFileDialog
 
 config = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
@@ -109,6 +110,58 @@ def capture(mode):
                         )
                         for n in sys.modules
                     )
+            if config.get("native_drop"):
+                folder = output / "original-folder"
+                folder.mkdir()
+                raw = js(
+                    "JSON.stringify((()=>{const r=document.querySelector('[data-folder-drop]')"
+                    ".getBoundingClientRect();return [r.x+r.width/2,r.y+r.height/2]})())"
+                )
+                x, y = json.loads(raw)
+                point = QPoint(
+                    round(x * window.web.zoomFactor()), round(y * window.web.zoomFactor())
+                )
+                mime = QMimeData()
+                mime.setUrls([QUrl.fromLocalFile(str(folder))])
+                receiver = window.web.focusProxy() or window.web
+                enter = QDragEnterEvent(
+                    point,
+                    Qt.DropAction.CopyAction,
+                    mime,
+                    Qt.MouseButton.LeftButton,
+                    Qt.KeyboardModifier.NoModifier,
+                )
+                QApplication.sendEvent(receiver, enter)
+                drop = QDropEvent(
+                    QPointF(point),
+                    Qt.DropAction.CopyAction,
+                    mime,
+                    Qt.MouseButton.LeftButton,
+                    Qt.KeyboardModifier.NoModifier,
+                )
+                QApplication.sendEvent(receiver, drop)
+                assert enter.isAccepted() and drop.isAccepted()
+                wait(
+                    lambda: (
+                        window.tools.reason("wb")
+                        in js("document.querySelector('#folder-drop-status').textContent")
+                    )
+                )
+                deadline = time.monotonic() + 0.4
+                wait(lambda: time.monotonic() >= deadline)
+                assert window.shutdown_stage == "idle"
+                choices = []
+                QFileDialog.getOpenFileName = lambda *a, **k: (choices.append(True) or "", "")
+                click("[data-bca-open]")
+                click("[data-bca-choose=source]")
+                wait(lambda: bool(choices))
+                js("document.querySelector('#bca-dialog').close();true")
+                report["native_drop"] = {
+                    "accepted": True,
+                    "stage": window.shutdown_stage,
+                    "bca_source_dialog": True,
+                    "message": js("document.querySelector('#folder-drop-status').textContent"),
+                }
             if config.get("missing_model"):
                 click("[data-nuclei-open]")
                 report["model_readiness"] = js(

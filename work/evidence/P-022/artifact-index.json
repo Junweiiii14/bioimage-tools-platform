@@ -71,6 +71,26 @@
     "bytes": 760,
     "sha256": "470b643dd4251ed267179c0af05167db3e9810ba6c6bb77f0997475f95368824"
   },
+  "r01-disabled.log.gz": {
+    "bytes": 750,
+    "sha256": "abb215759a602205357c9619e96e1cb661896d3b69824055ea02c75bde92a52b"
+  },
+  "r01-missing.log.gz": {
+    "bytes": 749,
+    "sha256": "62b520cfc2df5221758aea10e88c9e0bd128535d592a12230ddea9651a87b4a1"
+  },
+  "r01-native-drop.json.gz": {
+    "bytes": 15434,
+    "sha256": "b241a48522f4facefa71ed6af35ed9abc1fb85792380cb2dfc6d035f68ee5666"
+  },
+  "r01-tests.log.gz": {
+    "bytes": 641,
+    "sha256": "28b4233be55b88cd8d9c52be2e3a68abd4561b26b3f148e72be7733e2882d8a5"
+  },
+  "r01-types.log.gz": {
+    "bytes": 256,
+    "sha256": "07c53c20f163a901995442e67a89cebba2c3447826c50f7654faa58a41e0dc6b"
+  },
   "removed.log.gz": {
     "bytes": 545,
     "sha256": "e712ea26acd96135e3e31044bbef8b6fee5acc03e8a39f71d39aa66cd828d371"

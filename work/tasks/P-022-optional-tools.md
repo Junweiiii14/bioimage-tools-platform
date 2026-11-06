@@ -2,7 +2,7 @@
 
 <!-- PROGRAM_TASK_META {"id":"P-022","status":"in_progress","work_package":"W13","depends_on":["P-021"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync","owner":"chat-01a1b0c7-c5ea-71a2-9e7e-b25ee7daaa74","base_commit":"2a3c7a32936c6e4daf63dac23fb953cc4512e840"} -->
 
-2026-11-06 上游明确派发。起始 HEAD e5b3d52cee737f3cd7f7fad46ecd30aeb1cc47ad，干净，保留 P021 本地收尾。状态：最小实现和隔离矩阵自验完成，准备冻结候选；全量检查进行中，尚未独审/集成。
+2026-11-06 上游明确派发。起始 HEAD e5b3d52cee737f3cd7f7fad46ecd30aeb1cc47ad，干净，保留 P021 本地收尾。状态：PR74首审唯一阻断R01已最小修复，新增真实缺包/停用drop及BCA继续自验通过；集中新候选待指定增量复审/必需CI，尚未集成。
 
 ## 范围与验收
 

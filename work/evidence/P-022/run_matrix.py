@@ -105,7 +105,8 @@ for name, extras in [
         probe(
             "disabled",
             python,
-            disabled=["wb"],
+            settings_name=result["configuration"]["name"],
+            preserve_settings=True,
             run_tools=["bca"],
             unavailable_history=[result["runs"][0]],
         )

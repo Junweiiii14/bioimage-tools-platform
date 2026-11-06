@@ -47,3 +47,15 @@ Windows11 / CPython3.12.14 / PySide6 6.12.0，Qt offscreen，既有`--disable-gp
 首次矩阵WB完成计算后，探针未处理关闭确认，强制期限后进程3221226505；不能称该次完整通过，原生退出原因不进一步猜测。第二次全工具探针在页面按钮仍禁用时点击下一工具，误读旧投影；改为等待真实按钮可用、正确项目身份及批次终态后，仅重跑受影响全工具及后续场景。两次失败原日志保留，未改产品数值或放宽成功状态。早期页面缺少WB高级信号连接导致JS错误已修正；最终仅平台/停用UI和既有回归通过。GLES/mailbox旧警告保留，不宣称GPU问题解决。
 
 本轮仅自研宿主、UI、依赖声明与验证改变。第三方算法源码、权重、冻结参考、工具领域/API和版本都未改；不用作者自验替代指定独审。科学/化学真值/LoQ/患者独立性、真人、物理DPI/OS IME、干净目标机、用户安装更新、正式发布均未验证或未执行。下一候选应尽快进入可启动交付准备，不扩大框架。
+
+
+## 首审 R01 修复与增量自验
+
+指定独审对47c8d08首审结论changes_required，唯一阻断P022-R01/P2：停用WB后真实目录drop先写入opening，再因缺工具抛错，轮询异常导致BCA被不存在的任务阻塞。修复仅在`start_from_images`任何状态写入之前调用`tools.require("wb")`；原外层处理明确错误，不建立补偿状态机制。
+
+- `pytest tests/test_optional_tools.py tests/test_folder_drop.py tests/test_bca_web.py -q`：exit0，15 passed/11 warnings/14.89s；覆盖missing/disabled真实QDragEnterEvent/QDropEvent后两次会话轮询无异常、状态idle、BCA选文件仍可进入，以及既有有效WB多文件夹/缩放路径与BCA真实提交。缺包单测为受控find_spec反例，下面另有真实缺包wheel。
+- 重新构建app wheel，在新的独立BCA-only和WB+BCA（WB停用）环境，普通main入口接收真实Qt drop，均明确拒绝且stage=idle，BCA原生文件选择继续；随后BCA真实worker/正式提交成功。两个进程exit0。完整投影/状态见`r01-native-drop.json.gz`，原始日志`r01-missing.log.gz`和`r01-disabled.log.gz`。
+- Pyright exit0，0 errors/3条既有重模型源码warnings；格式/lint与提交钩子继续执行。无科学/数值/版本/容差改变，不重跑未受影响的整套模型矩阵。
+- N01非阻断建议同次修正：`run_matrix.py`停用场景引用前一全工具进程的实际settings_name并设置preserve_settings，不再重写开关。先前已提交matrix中的真实跨进程保留证据仍有效。
+
+47c8d08的本机全量检查尚在后台执行；本轮中途有上述实质修复，后续结果只作诊断，不能冒充新head准确全量通过。最终集成依赖新head的指定增量复审与必需CI；首审报告在最终一次收尾归档，不为纯收据另推HEAD。

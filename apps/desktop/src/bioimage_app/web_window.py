@@ -478,6 +478,7 @@ class WebWorkbenchWindow(QMainWindow):
         intake: bool = False,
         folders_only: bool = False,
     ) -> None:
+        self.tools.require("wb")
         if self._host.workspace_path if self._host else "":
             self._request_transition(
                 "new",
