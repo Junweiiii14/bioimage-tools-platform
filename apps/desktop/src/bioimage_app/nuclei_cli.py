@@ -22,8 +22,12 @@ from bioimage_app.nuclei_workflow_host import NucleiHost
 from bioimage_app.workflow_session import WorkflowSession, WorkflowStatus
 
 
-def prepare(workspace: Path, source_path: str, host: NucleiHost) -> ExecutionPlan:
+def prepare(
+    workspace: Path, source_path: str, host: NucleiHost, *, expected_sha256: str | None = None
+) -> ExecutionPlan:
     supplied = read_nuclei_input(source_path)
+    if expected_sha256 is not None and supplied.sha256 != expected_sha256:
+        raise ValueError("原图已改变，请重新选择后分析")
     with Workspace.create(workspace) as store:
         ref = store.import_asset(Path(source_path), supplied.sha256)
         copied = read_nuclei_input(str(store.asset_path(ref)))

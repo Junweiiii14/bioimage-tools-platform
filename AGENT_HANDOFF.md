@@ -46,7 +46,9 @@
 
 ## Current Pointer
 
-- 当前：[P015 StarDist研究适配器](work/tasks/P-015-nuclei-research-adapter.md)，上游已明确派发，新goal已创建；复用既有工作流执行和结果提交，独立工具包，不扩科学准入。
+- 当前：[P016 单图核分割研究用户流程](work/tasks/P-016-nuclei-single-image-flow.md)。首条真实GUI分析/导出/退出重开已跑通；异常回归、独审、CI/PR及最终验收回传未完成。详情见snapshot和任务卡。
+
+- 最近完成：[P015 StarDist研究适配器](work/tasks/P-015-nuclei-research-adapter.md)，PR66/main a761284，真实模型/独审/双平台CI及正式回传完成，见[P015交付](work/evidence/P-015/final-delivery.md)。上游已正式派发下一单图研究用户流程，先关闭P015后查重建卡/创建新goal；见snapshot，不猜编号、不扩科学准入。
 
 - 最近完成：[P014 成熟荧光核计数方法直接调用](work/tasks/P-014-mature-nuclei-methods.md)，PR65合入main07838c2，实验/独审/双平台CI及回传完成；详见[P014交付](work/evidence/P-014/final-delivery.md)。下一任务由已收到验收回传的上游自动接续派发，不猜编号；科学缺项保留。
 

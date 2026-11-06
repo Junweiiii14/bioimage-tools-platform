@@ -9,10 +9,6 @@
 
 用户明确整组Fig展示，现为蛋白行×泳道列，跨蛋白编辑等正确快照、缺项保留草稿入口。86c9产品及c90诊断独审Accepted；新包19checks/11.437秒通过，首重开超时真实保留。使用与交付入口已更新，最终服务器检查看PR35，合并另行确认。
 
-## 2026-11-02 P006真实原生基线
-
-源码a9bda313冻结后完成rows-normal四主题/准备取消5+30及其余五例R09负载，六例exit0。旧f3首轮失败保留。raw/SHA/fixture/所有分布复算见P006/native-results.json；报告明确设置四主题超100ms、前台UNKNOWN、取消全部preparing/run=null、host确认28ms与服务关闭6.4秒分开。上界快照/刷新/payload及内存超线完整保留。记录12个host/renderer均已退出，未杀进程。P006 in_review，待最终独审/CI正常PR；目标仍M1/M2，下一P007前置满足。
-
 ## 2026-11-02 P007契约候选与P006正常集成
 
 P006准确839..b0c71e1非作者Accepted，PR50四必需CI后正常合dc9618e/tree同候选。Windows1569passed/723.79秒、Linux1565passed/4既有skip/497.04秒，双wheel原评估/V0通过；integration/review-final保存。性能超线/前台UNKNOWN/准备取消边界保留。P007从839开始草案，保留自身修改快进dc主线后真实context重载，无冲突；科学资产/端口/有限图/计算键/可信预检和真实P002计划保存重开已草拟，87项相关组合通过。旧23schema摘要不变；独立wheel/准确提交独审/PR尚待，仍in_progress。M1/M2目标active。
@@ -139,3 +135,7 @@ P010调研PR61全部必需检查成功，正常merge为87dba64；产品PR60保�
 ## 2026-11-06 P014完成成熟核计数直接调用研究
 
 CP4.2.8/StarDist0.9.2真实CPU对照，冻结3开发/10评估，20行独审复算一致。PR65候选c86e3db合入main07838c2且tree一致；最终双平台全门禁/wheel成功。规则清单初失败已保留历史并修复，旧CI取消不计通过。研究结论/成本/科学限制和下一范围见P014/final-delivery；原dirty树和安装保留。
+
+## 2026-11-06 P015 isolated nuclei adapter
+
+独立轻量nuclei-tool及显式CLI接既有WorkflowSession，固定进程外StarDist环境/权重，uint8准入/原坐标标签/核数/出处/零与失败区分。真实对照及独审修复signed TIFF、长错误原因、venv入口；补传递边界负例，所有必需CI后正常合PR66/main a761284，正式回传上游自动接续。未改WB、未扩科学准入或安装发布。

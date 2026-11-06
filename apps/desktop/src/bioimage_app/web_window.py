@@ -28,6 +28,7 @@ from bioimage_app.appearance import WorkbenchAppearance
 from bioimage_app.figure_window import FigureProjectWindow
 from bioimage_app.folder_drop import FolderDropView, folder_paths
 from bioimage_app.module_bridge import ComparisonBridge
+from bioimage_app.nuclei_bridge import NucleiBridge
 from bioimage_app.project_navigation import MODES, ProjectNavigation
 from bioimage_app.shortcuts import WorkbenchShortcuts
 from bioimage_app.source_origins import SourceOrigins
@@ -195,7 +196,12 @@ class WebWorkbenchWindow(QMainWindow):
         self.channel.registerObject("workbench", self.bridge)
         self.authoring = WorkflowAuthoringBridge(
             self,
-            lambda: self.host.operation_busy or self.comparison.busy or self._stage != "idle",
+            lambda: (
+                self.host.operation_busy
+                or self.comparison.busy
+                or self.nuclei.busy
+                or self._stage != "idle"
+            ),
         )
         self.authoring.idle.connect(self._finish_exit_if_ready)
         self.channel.registerObject("workflowAuthoring", self.authoring)
@@ -205,12 +211,25 @@ class WebWorkbenchWindow(QMainWindow):
             lambda: (
                 self.host.operation_busy
                 or self.authoring.busy
+                or self.nuclei.busy
                 or self._stage != "idle"
                 or self._comparison_transition is not None
             ),
         )
         self.comparison.idle.connect(self._comparison_idle)
         self.channel.registerObject("comparison", self.comparison)
+        self.nuclei = NucleiBridge(
+            self,
+            self.settings,
+            lambda: (
+                self.host.operation_busy
+                or self.authoring.busy
+                or self.comparison.busy
+                or self._stage != "idle"
+            ),
+        )
+        self.nuclei.idle.connect(self._finish_exit_if_ready)
+        self.channel.registerObject("nuclei", self.nuclei)
         page.setWebChannel(self.channel)
         self.setCentralWidget(self.web)
         self.web.setUrl(QUrl.fromLocalFile(str(index.resolve())))
@@ -222,7 +241,7 @@ class WebWorkbenchWindow(QMainWindow):
 
     def _folder_dropped(self, urls: tuple[QUrl, ...]) -> None:
         try:
-            if self.comparison.busy or self.authoring.busy:
+            if self.comparison.busy or self.authoring.busy or self.nuclei.busy:
                 raise ValueError("请先完成或取消当前对照或工作流批次")
             if self._closing or self._starting or self._stage != "idle" or self.host.operation_busy:
                 raise ValueError("当前任务仍在处理中，请完成或取消后再拖入文件夹。")
@@ -311,7 +330,12 @@ class WebWorkbenchWindow(QMainWindow):
         if self.host.workspace_path:
             self._request_transition("open", lambda: self.open_project(path))
             return
-        if self.host.operation_busy or self.host.is_closing or self.authoring.busy:
+        if (
+            self.host.operation_busy
+            or self.host.is_closing
+            or self.authoring.busy
+            or self.nuclei.busy
+        ):
             raise ValueError("当前任务仍在处理中，请稍候或取消")
         self._restore = self.navigation.read(path)
         self._last_open_path = path
@@ -328,7 +352,12 @@ class WebWorkbenchWindow(QMainWindow):
         if self.host.workspace_path:
             self._request_transition("open", lambda: self.open_delivery(path))
             return
-        if self.host.operation_busy or self.host.is_closing or self.authoring.busy:
+        if (
+            self.host.operation_busy
+            or self.host.is_closing
+            or self.authoring.busy
+            or self.nuclei.busy
+        ):
             raise ValueError("当前任务仍在处理中，请稍候或取消")
         default = (
             Path(QStandardPaths.writableLocation(QStandardPaths.StandardLocation.DocumentsLocation))
@@ -435,6 +464,7 @@ class WebWorkbenchWindow(QMainWindow):
             or not self._closing
             or not self.host.resources_closed
             or not self.authoring.resources_closed
+            or not self.nuclei.resources_closed
         ):
             return
         self.session_timer.stop()
@@ -476,7 +506,7 @@ class WebWorkbenchWindow(QMainWindow):
         self._continuation = continuation
         self._discard = False
         self.host.pause_auto_save(True)
-        if self.host.operation_busy or self.authoring.busy:
+        if self.host.operation_busy or self.authoring.busy or self.nuclei.busy:
             self._stage = "confirm_busy"
             self._message = "正在处理项目。取消任务后，已提交的结果会保留。"
         elif self._draft or (intent == "exit" and self.authoring.dirty):
@@ -507,6 +537,7 @@ class WebWorkbenchWindow(QMainWindow):
         self._closing = True
         if self._intent == "exit":
             self.authoring.close()
+            self.nuclei.close()
         self.host.prepare_shutdown(save_changes=not self._discard)
         self.host.shutdown_requested = True
         self.host.close()
@@ -526,6 +557,7 @@ class WebWorkbenchWindow(QMainWindow):
             if self.host.operation_busy:
                 self.host.cancel()
             self.authoring.cancel()
+            self.nuclei.cancel()
             self._stage = "cancel"
             self._since = time.monotonic()
             self._message = "正在取消任务，等待工作进程结束…"
@@ -641,7 +673,12 @@ class WebWorkbenchWindow(QMainWindow):
             self.appearance.refresh()
             self._appearance_refresh = time.monotonic()
         self._check_close_failure()
-        if self._stage == "cancel" and not self.host.operation_busy and not self.authoring.busy:
+        if (
+            self._stage == "cancel"
+            and not self.host.operation_busy
+            and not self.authoring.busy
+            and not self.nuclei.busy
+        ):
             # Cancellation can leave submitted results, unsaved edits, and UI drafts.
             # Reevaluate them without losing the requested exit/project switch.
             self._stage = "idle"

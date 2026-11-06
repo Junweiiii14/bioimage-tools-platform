@@ -190,3 +190,7 @@ PR63 quality42053261398：Windows1703pass/1378.01s、Linux1699pass/4旧skip/975.
 ## 2026-11-06 P014最终验收
 
 候选c86e3db，quality42071385491 success：Windows1703passed/10warnings/1402.35s，Linux1699passed/4既有skip/10warnings/998.77s；两平台check --all及wheel、desktop通过。rules42071385465 success，精确HEAD一致。PR65 main07838c2与候选diff退出0。实验20行实例指标独审9ffa327复算一致，fd88b76增量复审通过；研究输入/模型SHA脚本exit0。真实失败/取消及未验边界见P014/final-delivery。
+
+## 2026-11-06 P015 final
+
+PR66 main a761284与8f00757树一致；本机check --all exit0，1728passed1208.32s及全部wheel。quality42086151498 Windows1728passed1420.98s/Linux1724passed4既有skip810.58s，两平台wheel/desktop成功；rules42086151033成功。14真实进程场景、9张每像素/ID相等，独审a490d2e/95ecb02通过。初轮4失败与3Pyright隔离源码warnings保留，未弱化检查；详P015/final-delivery及validation.json。

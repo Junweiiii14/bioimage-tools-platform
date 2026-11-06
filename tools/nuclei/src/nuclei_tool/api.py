@@ -1,6 +1,7 @@
 """Public research interface. Import does not load TensorFlow, models, or files."""
 
 from nuclei_tool.adapters.input import NucleiInput, read_nuclei_input
+from nuclei_tool.adapters.presentation import NucleiDisplay, original_png, present_nuclei_result
 from nuclei_tool.adapters.protocol import (
     NucleiConversation,
     NucleiStart,
@@ -12,6 +13,9 @@ from nuclei_tool.application.contracts import NucleiParameters
 from nuclei_tool.domain.method import method_description
 
 __all__ = [
+    "NucleiDisplay",
+    "original_png",
+    "present_nuclei_result",
     "NucleiInput",
     "NucleiParameters",
     "NucleiStart",

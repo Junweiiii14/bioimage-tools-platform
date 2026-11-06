@@ -39,3 +39,6 @@ uv run --locked --no-sync python -m bioimage_app.nuclei_cli --source "C:/researc
 - Windows本机真实模型证据、完整命令和限制见[P015任务](../../work/tasks/P-015-nuclei-research-adapter.md)和[证据](../../work/evidence/P-015/README.md)。Linux普通边界/隔离wheel检查不等于Linux真实模型验收。
 
 P014图像已经用于研究，当前对照仅证明工程封装一致性，**不是新独立科学验证**。训练数据重叠、患者独立性、真实实验室、学生使用和16bit适用性仍未知。没有IF强度、全细胞、统计或Agent能力，也没有发布安装器。
+
+
+P016增加公开 `NucleiDisplay`、`original_png`、`present_nuclei_result`：从宿主已验证提交的原图、标签、出处和冻结请求生成原坐标显示PNG，并交叉核对来源/标签摘要和核数。显示变换不回流推理；算法/参数/方法版本未变，新增源码使implementation digest自然变化。已有P015结果可只读重开，不要求历史worker仍安装。实际桌面入口见[单图操作指南](../../docs/runbooks/nuclei-single-image.md)。

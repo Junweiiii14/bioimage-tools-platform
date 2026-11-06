@@ -1,0 +1,20 @@
+{
+  "workspace": "C:/Users/70236/Documents/BioImage/Projects/Nuclei-2e1ef41119f6",
+  "execution_id": "4ee071fdc29d47d28bd74ed88c960c8a",
+  "run_id": "e1ac56de87bd4842bab553b63a9ca027",
+  "count": 46,
+  "source_sha256": "77f7b965733145a6edae173090ba1b9081266c708a3f141a12f8b281af640074",
+  "labels_equal_p014": true,
+  "labels_sha256": "fc707624198066c884fd4c328802c71cf0a89376a99ac913c0df0194cc84299f",
+  "entry": "Platform > single image nuclei > native TIFF chooser > Start (actual Computer Use clicks)",
+  "scientific_admission": false,
+  "status": "GUI native choose/run/export/close/new-process reopen passed; risk regressions/review/CI pending",
+  "export_directory": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p016-research\\核分割结果-72c9e7896ad8",
+  "export_labels_and_provenance_identical": true,
+  "export_table_matches_run": true,
+  "original_unchanged": true,
+  "first_gui_exit_code": 0,
+  "gui_reopened_in_new_process": true,
+  "reopen_same_run": true,
+  "run_count_after_reopen": 1
+}

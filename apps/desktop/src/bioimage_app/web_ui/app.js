@@ -1544,6 +1544,7 @@ async function bootstrap() {
                 bridge = channel.objects.workbench;
                 window.moduleComparison?.connect(channel.objects.comparison);
                 window.workflowEditor.connect(channel.objects.workflowAuthoring);
+                window.nucleiView.connect(channel.objects.nuclei);
                 boundaryDiagnostics.connect(bridge);
                 window.desktopSession?.connect(bridge);
                 bridge.progressChanged?.connect((raw) => {

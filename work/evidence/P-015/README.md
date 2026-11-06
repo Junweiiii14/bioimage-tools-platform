@@ -1,5 +1,7 @@
 # P015 研究适配器验收入口
 
+已完成PR66/main a761284工程验收及正式回传；[最终交付](final-delivery.md)、[目标核对](objective-audit.md)、[最终验证](validation.json)。下方阶段记录保留当时状态，最终状态以任务卡/本段收据为准。
+
 当前实现与状态以[任务卡](../../tasks/P-015-nuclei-research-adapter.md)为准。独立包、CLI和环境命令见[工具README](../../../tools/nuclei/README.md)。本目录不包含权重、原图或安装包。
 
 ## 已执行与待完成

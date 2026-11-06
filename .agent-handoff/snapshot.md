@@ -1,13 +1,9 @@
 # 当前恢复入口
 
-当前任务[P015核分割研究适配器](../work/tasks/P-015-nuclei-research-adapter.md)，活动树bioimage-plan-sync，分支codex/p015-nuclei-research-adapter。已实现独立工具/显式CLI及既有WorkflowSession接线；21新增用例与14真实模型进程场景已通过，证据见P015/real-regression.json。首次全量4项失败已分别修正/定向核验，门禁测试增量95ecb02独审通过；最终全仓正在同CI渲染设置执行；最终产品独审a490d2e已通过；下一步最终CI和正常PR66集成，再验收回传上游自动派发。原dirty树/GUI/安装不碰；科学边界不关闭。
+活动任务 [P016 单图核分割研究用户流程](../work/tasks/P-016-nuclei-single-image-flow.md)，goal已建立且active、无预算。只在 bioimage-plan-sync 工作树，分支 codex/p016-nuclei-single-image-flow；候选HEAD c08979d，PR67已创建，当前有数据库异常修复与WB测试等待条件改动待提交。原bioimage-tools-platform dirty树、旧P012 GUI、安装与原图不碰。
 
-[P014成熟核计数直接调用研究](../work/tasks/P-014-mature-nuclei-methods.md)已完成实验、独审与正常集成，最终证据见[final-delivery](../work/evidence/P-014/final-delivery.md)。PR65 main07838c293390b0ce209b9c1500d49d734bc393a6与候选c86e3db树一致；活动树bioimage-plan-sync已合入main为58ad6c7，原dirty树/GUI/安装不碰。
+首条实际GUI公开样例46核/标签一致、导出/关闭/同run重开已通过；真实零核/缺模型/16bit/取消/历史保护回归通过。c08979d本地全门禁exit0、1735 passed、wheel通过（73881已终止）；PR67 Linux通过，Windows一个既有WB重开测试先读到临时空白host，增加等待原workspace条件，不改结果断言/超时。独审实证损坏SQLite导致线程失败无通知，已在IO边界补捕获，新增损坏/缺失DB真实QThread两例，控制器6 passed。独审代理随后用量限制退出，尚无完整通过结论。详见P016/review-and-validation.md。下一步新提交、准确独审/必需CI、最终截图与逐项验收；不重启已结束73881，不动旧P012窗口。
 
-CP4.2.8与StarDist0.9.2 CPU真实对照、3开发/10评估先冻结、20行指标独审一致。SD平均F1 0.8600/计数相对误差11.59%，最差38.46%；只作研究适配候选，未知训练重叠/患者独立性、16bit/实验室/学生等边界仍保留。
+P016已读Impeccable context及当前UI契约，保持现有视觉；首屏工具入口与核图对话框复用现有组件。Computer Use @oai/sky已实际操作；原生文件对话框UIA索引缓存不可靠，截图与键盘输入成功，不当产品缺陷。新工具显示API改变包implementation fingerprint，已构建 .local/p016-wheels 并重装P015自有worker环境（P014历史环境不动）。若继续改变工具代码，实际模型前须同步wheel。
 
-独审fd88b76通过；最终quality42071385491和rules42071385465成功。Windows1703passed/Linux1699passed+4既有skip，两平台wheel及desktop通过。旧质量42070466221已cancelled，不计通过；watch session41138终态exit0，不重启实验或监测。
-
-本轮正式验收已成功回传（工具返回目标threadId、isError=false）；下一步由上游01a19bfd-f3ab-7502-86da-9f61953d1c8a（local）自动接续，用户已明确授权且不等待再次催促。建议最小独立核分割研究适配器，固定模型/参数、进程外执行、原坐标标签、失败/取消/资源边界；不扩展IF强度/全细胞/科学准入或发布。下一任务编号只按上游派发/任务卡，不自行猜测。
-
-P013 PR63/64、P012、P011及T082旧交付/科学与目标环境缺项均保留，见risks/backlog及各final-delivery。P014本地收尾收据与main集成候选区分，下一正常任务带入。
+P015已完成PR66/main a761284、独审/真实模型/双平台CI/正式回传，goal已complete，不重做。当前上游01a19bfd-f3ab-7502-86da-9f61953d1c8a(local)已获用户自动接续要求（成功发送）：执行/验收后回传→上游继续派发，不等待催促。P016未完成前不宣称验收或派发新任务。科学/训练重叠/患者独立性/学生/16bit/Linux真实模型与旧GPU/目标机缺项保持。

@@ -1,6 +1,7 @@
 """Input, identity, candidate safety and zero/failure boundaries without model downloads."""
 
 import hashlib
+import io
 import json
 import subprocess
 import sys
@@ -20,6 +21,7 @@ from nuclei_tool.adapters.protocol import (
     execution_identity,
 )
 from nuclei_tool.adapters.registration import nuclei_module_spec, research_environment, verify_model
+from nuclei_tool.api import present_nuclei_result
 from nuclei_tool.application.contracts import NucleiParameters
 from nuclei_tool.domain.labels import validate_labels
 from numpy.typing import NDArray
@@ -286,3 +288,39 @@ raise SystemExit(main())
     assert len(events[-1].reason) == 1024
     assert events[-1].reason.startswith("RuntimeError: ")
     assert not Path(start.output_directory).exists()
+
+
+@pytest.mark.parametrize("zero", (True, False))
+def test_result_display_keeps_labels_and_original_coordinates(
+    start: NucleiStart, monkeypatch: pytest.MonkeyPatch, zero: bool
+) -> None:
+    labels = np.zeros((6, 8), dtype=np.uint32)
+    if not zero:
+        labels[1:3, 1:3] = 7
+        labels[4, 6] = 19
+
+    def predicted(*_args: object) -> NDArray[np.uint32]:
+        return labels
+
+    monkeypatch.setattr(execution, "predict", predicted)
+    execution.execute(start, lambda: False)
+    output = Path(start.output_directory)
+    raw = (output / "labels.npy").read_bytes()
+    provenance = (output / "provenance.json").read_bytes()
+    source = read_nuclei_input(start.source_path)
+    display = present_nuclei_result(source, raw, provenance, start.request)
+    assert display.count == (0 if zero else 2)
+    original = np.array(Image.open(io.BytesIO(display.original_png)))
+    overlay = np.array(Image.open(io.BytesIO(display.overlay_png)))
+    np.testing.assert_array_equal(original, source.pixels)
+    np.testing.assert_array_equal(overlay[0, 0], [source.pixels[0, 0]] * 3)
+    if not zero:
+        np.testing.assert_array_equal(overlay[4, 6], [215, 237, 130])
+        np.testing.assert_array_equal(overlay[1, 1], [215, 237, 130])
+    assert raw == (output / "labels.npy").read_bytes()
+    invalid = json.loads(provenance)
+    invalid["nuclei_count"] = 100
+    with pytest.raises(ValueError, match="provenance differs"):
+        present_nuclei_result(source, raw, json.dumps(invalid).encode(), start.request)
+    with pytest.raises(ValueError):
+        present_nuclei_result(source, b"not an npy file", provenance, start.request)
