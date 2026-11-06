@@ -2,6 +2,7 @@
 
 import base64
 import json
+import sqlite3
 from collections.abc import Callable
 from pathlib import Path
 from uuid import uuid4
@@ -34,7 +35,14 @@ class _ImageIO(QThread):
     def run(self) -> None:
         try:
             self.value = self.operation()
-        except (ValueError, OSError, EOFError, RuntimeError, WorkspaceError) as error:
+        except (
+            ValueError,
+            OSError,
+            EOFError,
+            RuntimeError,
+            WorkspaceError,
+            sqlite3.Error,
+        ) as error:
             self.error = str(error)
 
 

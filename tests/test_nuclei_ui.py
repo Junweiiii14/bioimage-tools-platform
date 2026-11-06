@@ -15,6 +15,7 @@ from bioimage_app.nuclei_cli import prepare
 from bioimage_app.nuclei_workflow_host import NucleiHost
 from nuclei_tool.api import NucleiInput, read_nuclei_input
 from PIL import Image
+from platform_runtime.api import Workspace
 from PySide6.QtCore import QSettings
 from PySide6.QtWidgets import QFileDialog, QWidget
 from pytestqt.qtbot import QtBot
@@ -124,3 +125,41 @@ def test_changed_source_rejected_before_workspace_creation(tmp_path: Path) -> No
             expected_sha256=previous,
         )
     assert not workspace.exists()
+
+
+@pytest.mark.parametrize("damage", ["corrupt", "missing"])
+def test_damaged_project_reader_finishes_and_allows_retry(
+    qtbot: QtBot, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, damage: str
+) -> None:
+    bridge, states = make_bridge(qtbot, tmp_path)
+    source = tmp_path / "original.tif"
+    Image.fromarray(np.zeros((8, 12), dtype=np.uint8)).save(source)
+    select_source(monkeypatch, bridge, source)
+    qtbot.waitUntil(lambda: not bridge.busy)
+    before = states[-1]
+    root = tmp_path / "broken-project"
+    with Workspace.create(root):
+        pass
+    database = root / "metadata.sqlite"
+    if damage == "corrupt":
+        database.write_bytes(b"not a sqlite database")
+    else:
+        database.unlink()
+
+    def choose(*_args: object, **_kwargs: object) -> str:
+        return str(root)
+
+    monkeypatch.setattr(QFileDialog, "getExistingDirectory", choose)
+    with qtbot.waitSignal(bridge.idle, timeout=10000):
+        bridge.choose("open")
+    after = states[-1]
+    assert after["state"] == "failed"
+    assert after["busy"] is False
+    assert after["count"] is None
+    assert "操作未完成" in str(after["message"])
+    assert after["original"] == before["original"]
+    assert after["source_sha256"] == before["source_sha256"]
+    select_source(monkeypatch, bridge, source)
+    qtbot.waitUntil(lambda: not bridge.busy)
+    assert states[-1]["state"] == "ready"
+    bridge.close()

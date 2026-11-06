@@ -1423,7 +1423,11 @@ def test_export_discovery_real_worker_save_and_reopen(
     workspace, epoch = window.host.workspace_path, window.bridge.session_epoch
     window.open_project(workspace)
     qtbot.waitUntil(
-        lambda: window.bridge.session_epoch > epoch and window.shutdown_stage == "idle",
+        lambda: (
+            window.bridge.session_epoch > epoch
+            and window.shutdown_stage == "idle"
+            and window.host.workspace_path == workspace
+        ),
         timeout=20000,
     )
     wait_saved(window, qtbot)
