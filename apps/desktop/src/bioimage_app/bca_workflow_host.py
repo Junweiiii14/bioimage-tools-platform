@@ -87,6 +87,13 @@ class BcaHost:
         return self.registry_definition()
 
     def build(self, source: ScientificAsset, record: ScientificAsset) -> ExecutionPlan:
+        definition = self.definition(source, record)
+        modules = self.registry_definition()
+        return compile_workflow(
+            definition, tuple(m.registration for m in modules), modules[0].environment
+        )
+
+    def definition(self, source: ScientificAsset, record: ScientificAsset) -> WorkflowDefinition:
         spec = bca_module_spec()
         definition = WorkflowDefinition(
             workflow_id="bca-research",
@@ -104,10 +111,7 @@ class BcaHost:
                 for p in spec.output_ports
             ),
         )
-        modules = self.registry_definition()
-        return compile_workflow(
-            definition, tuple(m.registration for m in modules), modules[0].environment
-        )
+        return definition
 
     def registry_definition(self) -> tuple[WorkflowHostModule, ...]:
         # Registration is independent of input bytes; restore recompiles the frozen plan.

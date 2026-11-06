@@ -25,37 +25,45 @@ from bioimage_app.workflow_session import WorkflowSession, WorkflowStatus
 def prepare(
     workspace: Path, source_path: str, host: NucleiHost, *, expected_sha256: str | None = None
 ) -> ExecutionPlan:
+    with Workspace.create(workspace) as store:
+        return host.build(
+            import_source(store, source_path, "sample", expected_sha256=expected_sha256)
+        )
+
+
+def import_source(
+    store: Workspace, source_path: str, sample_id: str, *, expected_sha256: str | None = None
+) -> ScientificAsset:
     supplied = read_nuclei_input(source_path)
     if expected_sha256 is not None and supplied.sha256 != expected_sha256:
         raise ValueError("原图已改变，请重新选择后分析")
-    with Workspace.create(workspace) as store:
-        ref = store.import_asset(Path(source_path), supplied.sha256)
-        copied = read_nuclei_input(str(store.asset_path(ref)))
-        source = ScientificAsset(
-            payload=ref,
-            sample_id="sample",
-            producing_method=None,
-            parameters_sha256=None,
-            description=ScientificType(
-                kind="raw_image",
-                unit="pixel_intensity",
-                image=ImageMetadata(
-                    dtype="uint8",
-                    axes=("y", "x"),
-                    shape=copied.pixels.shape,
-                    acquisition_bit_depth=None,
-                    acquisition_range=None,
-                    acquisition_range_source=None,
-                    frame=CoordinateFrame(
-                        frame_id="original_pixels",
-                        origin_asset_sha256=ref.sha256,
-                        physical_pixel_size_yx=None,
-                        physical_unit=None,
-                    ),
+    ref = store.import_asset(Path(source_path), supplied.sha256)
+    copied = read_nuclei_input(str(store.asset_path(ref)))
+    source = ScientificAsset(
+        payload=ref,
+        sample_id=sample_id,
+        producing_method=None,
+        parameters_sha256=None,
+        description=ScientificType(
+            kind="raw_image",
+            unit="pixel_intensity",
+            image=ImageMetadata(
+                dtype="uint8",
+                axes=("y", "x"),
+                shape=copied.pixels.shape,
+                acquisition_bit_depth=None,
+                acquisition_range=None,
+                acquisition_range_source=None,
+                frame=CoordinateFrame(
+                    frame_id="original_pixels",
+                    origin_asset_sha256=ref.sha256,
+                    physical_pixel_size_yx=None,
+                    physical_unit=None,
                 ),
             ),
-        )
-        return host.build(source)
+        ),
+    )
+    return source
 
 
 def main(arguments: list[str] | None = None) -> int:

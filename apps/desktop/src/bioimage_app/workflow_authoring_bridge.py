@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import cast
 from uuid import uuid4
 
-from PySide6.QtCore import QObject, QUrl, Signal, Slot
+from PySide6.QtCore import QObject, QSettings, QUrl, Signal, Slot
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QFileDialog, QWidget
 
@@ -26,8 +26,11 @@ class WorkflowAuthoringBridge(QObject):
     draftDiscarded = Signal()
     idle = Signal()
 
-    def __init__(self, window: QWidget, unavailable: Callable[[], bool]) -> None:
+    def __init__(
+        self, window: QWidget, unavailable: Callable[[], bool], settings: QSettings | None = None
+    ) -> None:
         super().__init__(window)
+        self._settings = settings
         self._window = window
         self._unavailable = unavailable
         self._session: WorkflowAuthoringSession | None = None
@@ -102,8 +105,10 @@ class WorkflowAuthoringBridge(QObject):
                 else:
                     self.documentChanged.emit(token, "cancelled", "", "")
                 return
-            if action in ("new_original", "new_example", "new_template"):
+            if action in ("new_original", "new_example", "new_template", "new_nuclei", "new_bca"):
                 source = ""
+                record = ""
+                tool = {"new_nuclei": "nuclei", "new_bca": "bca"}.get(action, "wb")
                 template = ""
                 if action == "new_template":
                     template, _filter = QFileDialog.getOpenFileName(
@@ -112,11 +117,28 @@ class WorkflowAuthoringBridge(QObject):
                     if not template:
                         self.documentChanged.emit(token, "cancelled", "", "")
                         return
+                    from bioimage_app.workflow_template import load_workflow_template
+
+                    with Path(template).open("r", encoding="utf-8") as stream:
+                        definition = load_workflow_template(stream.read(1048577)).definition
+                    tool = {"nuclei-research": "nuclei", "bca-research": "bca"}.get(
+                        definition.workflow_id, "wb"
+                    )
                 if action != "new_example":
                     source, _filter = QFileDialog.getOpenFileName(
-                        self._window, "选择原始 TIFF", "", "原始图像 (*.tif *.tiff)"
+                        self._window,
+                        "选择原始输入",
+                        "",
+                        "单板长 CSV (*.csv)" if tool == "bca" else "原始图像 (*.tif *.tiff)",
                     )
                     if not source:
+                        self.documentChanged.emit(token, "cancelled", "", "")
+                        return
+                if tool == "bca":
+                    record, _filter = QFileDialog.getOpenFileName(
+                        self._window, "选择对应板记录", "", "板记录 (*.json)"
+                    )
+                    if not record:
                         self.documentChanged.emit(token, "cancelled", "", "")
                         return
                 parent = QFileDialog.getExistingDirectory(
@@ -128,7 +150,12 @@ class WorkflowAuthoringBridge(QObject):
                 path = Path(parent) / (
                     "工作流-" + datetime.now().strftime("%Y%m%d-%H%M%S-") + uuid4().hex[:6]
                 )
-                values: dict[str, object] = {"operation": "initialize", "document_id": uuid4().hex}
+                values: dict[str, object] = {
+                    "operation": "initialize",
+                    "document_id": uuid4().hex,
+                    "tool": tool,
+                    "record_path": record,
+                }
                 if action == "new_example":
                     values["validation_cases"] = [options.get("validation", "triangle_u16")]
                 else:
@@ -155,7 +182,26 @@ class WorkflowAuthoringBridge(QObject):
                 values.update(operation="export", destination=destination)
             elif action in ("bind_sources", "bind_example"):
                 values.update(operation="bind", previous_revision=project.revision)
-                if action == "bind_sources":
+                if action == "bind_sources" and project.tool != "wb":
+                    source, _filter = QFileDialog.getOpenFileName(
+                        self._window,
+                        "选择新研究输入",
+                        "",
+                        "CSV (*.csv)" if project.tool == "bca" else "原始图像 (*.tif *.tiff)",
+                    )
+                    if not source:
+                        self.documentChanged.emit(token, "cancelled", "", "")
+                        return
+                    record = ""
+                    if project.tool == "bca":
+                        record, _filter = QFileDialog.getOpenFileName(
+                            self._window, "选择对应板记录", "", "板记录 (*.json)"
+                        )
+                        if not record:
+                            self.documentChanged.emit(token, "cancelled", "", "")
+                            return
+                    values.update(source_paths=[source], record_path=record, tool=project.tool)
+                elif action == "bind_sources":
                     sources, _filter = QFileDialog.getOpenFileNames(
                         self._window,
                         "绑定下一批原始 TIFF（最多16个）",
@@ -189,7 +235,25 @@ class WorkflowAuthoringBridge(QObject):
         assert self._switch_to is not None
         token, path, initialization = self._switch_to
         self._switch_to = None
-        session = WorkflowAuthoringSession(wb_workflow_registry, self)
+        from tool_contracts.api import ExecutionPlan
+
+        from bioimage_app.bca_workflow_host import BcaHost
+        from bioimage_app.nuclei_workflow_host import NucleiHost
+        from bioimage_app.workflow_preparation import WorkflowHostModule
+
+        config = (
+            str(self._settings.value("nuclei_worker_v1", "")) if self._settings else "",
+            str(self._settings.value("nuclei_model_v1", "")) if self._settings else "",
+        )
+
+        def registry(plan: ExecutionPlan) -> tuple[WorkflowHostModule, ...]:
+            if plan.workflow_id == "nuclei-research":
+                return NucleiHost(*config).registry(plan)
+            if plan.workflow_id == "bca-research":
+                return BcaHost().registry(plan)
+            return wb_workflow_registry(plan)
+
+        session = WorkflowAuthoringSession(registry, self, nuclei_configuration=config)
         self._session = session
         self._opening_token = token
 

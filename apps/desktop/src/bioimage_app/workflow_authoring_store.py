@@ -6,6 +6,7 @@ import io
 from pathlib import Path
 from uuid import uuid4
 
+from nuclei_tool.api import present_nuclei_result, read_nuclei_input, verify_model
 from platform_runtime.api import (
     IntegrityError,
     StateConflict,
@@ -34,6 +35,13 @@ from wb_tool.api import (
     wb_validation_input,
 )
 
+from bioimage_app.bca_cli import import_sources as import_bca_sources
+from bioimage_app.nuclei_cli import import_source as import_nuclei_source
+from bioimage_app.research_authoring import (
+    bind_research_template,
+    research_definition,
+    research_modules,
+)
 from bioimage_app.wb_workflow_host import (
     bind_wb_workflow_template,
     build_wb_workflow,
@@ -56,11 +64,20 @@ from bioimage_app.workflow_template import WorkflowTemplate, load_workflow_templ
 
 _TOOL = "workflow_authoring_v1"
 _TITLES = {
+    "nuclei-stardist-research": "固定 StarDist 核分割 · 研究",
+    "bca-pierce25-research": "Pierce25 BCA 浓度 · 研究",
     "wb-verify-original": "原图预检",
     "wb-analyze-original": "WB 粗分析",
     "wb-publish-original": "发布表与曲线",
 }
 _LIMITS = {
+    "nuclei-stardist-research": (
+        "仅原始 uint8 灰度 TIFF；固定 StarDist 方法，参数锁定。模型由工具设置准备，科学适用性未验。"
+    ),
+    "bca-pierce25-research": (
+        "原始 A562 长 CSV + 明确板记录；固定 Pierce25 / BCA API 0.1.1，参数锁定。"
+        "partial 不等于零，LoQ 未知。"
+    ),
     "wb-verify-original": "原始二维 uint8/uint16；保留位深、坐标与来源，不接收显示图。",
     "wb-analyze-original": "沿已有 WB 旧方法；无效、未检测、待复核与真实零分开，科学适用性未验。",
     "wb-publish-original": "发布节点共用一致报告画布；显示样式不改变定量。",
@@ -95,31 +112,38 @@ def _preflight(project: AuthoringProject) -> AuthoringProjection:
     defaults = {
         node.module.module_id: node.parameters_json for node in reversed(project.seed.nodes)
     }
-    seed_report = WBReportParameters.model_validate_json(defaults["wb-publish-original"])
-    report_node = next(
-        (node for node in project.graph.nodes if node.module.module_id == "wb-publish-original"),
-        None,
-    )
     issue: WorkflowIssue | None = None
-    report = seed_report
-    if report_node is not None:
-        try:
-            report = WBReportParameters.model_validate_json(report_node.parameters_json)
-        except ValidationError as error:
-            # The saved incomplete draft remains visible, but no plan is admitted.
-            issue = WorkflowIssue(
-                code="parameters_invalid", node_id=report_node.node_id, message=str(error)[:1024]
-            )
-    modules = wb_workflow_modules(primary, report)
+    if project.tool != "wb":
+        sample = next(s for s in project.sources if s.sample_id == project.graph.sample_id)
+        modules = research_modules(project.tool, sample)
+    else:
+        seed_report = WBReportParameters.model_validate_json(defaults["wb-publish-original"])
+        report_node = next(
+            (
+                node
+                for node in project.graph.nodes
+                if node.module.module_id == "wb-publish-original"
+            ),
+            None,
+        )
+        report = seed_report
+        if report_node is not None:
+            try:
+                report = WBReportParameters.model_validate_json(report_node.parameters_json)
+            except ValidationError as error:
+                # The saved incomplete draft remains visible, but no plan is admitted.
+                issue = WorkflowIssue(
+                    code="parameters_invalid",
+                    node_id=report_node.node_id,
+                    message=str(error)[:1024],
+                )
+        modules = wb_workflow_modules(primary, report)
+        defaults["wb-publish-original"] = report.model_dump_json()
     catalogue = tuple(
         AuthoringModule(
             title=_TITLES[host.registration.interface.module.module_id],
             interface=host.registration.interface,
-            parameters_json=(
-                report.model_dump_json()
-                if host.registration.interface.module.module_id == "wb-publish-original"
-                else defaults[host.registration.interface.module.module_id]
-            ),
+            parameters_json=defaults[host.registration.interface.module.module_id],
             limits=_LIMITS[host.registration.interface.module.module_id],
         )
         for host in modules
@@ -144,6 +168,25 @@ def _preflight(project: AuthoringProject) -> AuthoringProjection:
 
 
 def _inputs(store: Workspace, command: AuthoringCommand) -> tuple[AuthoringSource, ...]:
+    if command.tool != "wb":
+        if command.validation_cases or len(command.source_paths) != 1:
+            raise ValueError("研究流程每次绑定一个真实输入；BCA 还需对应板记录")
+        path = command.source_paths[0]
+        if command.tool == "bca":
+            if not command.record_path:
+                raise ValueError("BCA 需要明确的板记录 JSON")
+            asset, record = import_bca_sources(store, path, command.record_path)
+            # Each newly bound plate is a distinct editor input, even with reused plate IDs.
+            sample_id = uuid4().hex
+            asset = asset.model_copy(update={"sample_id": sample_id})
+            record = record.model_copy(update={"sample_id": sample_id})
+        else:
+            asset, record = import_nuclei_source(store, path, uuid4().hex), None
+        return (
+            AuthoringSource(
+                sample_id=asset.sample_id, label=Path(path).name, asset=asset, record=record
+            ),
+        )
     result: list[AuthoringSource] = []
     for supplied in command.validation_cases or command.source_paths:
         sample_id = uuid4().hex
@@ -175,8 +218,18 @@ def _initialize(store: Workspace, command: AuthoringCommand) -> AuthoringProject
     if command.template_path:
         with Path(command.template_path).open("rb") as stream:
             template = load_workflow_template(stream.read(1048577).decode("utf-8"))
-        definition, _plan = bind_wb_workflow_template(template.definition, primary)
+        if command.tool == "wb":
+            definition, _plan = bind_wb_workflow_template(template.definition, primary)
+        else:
+            definition, _plan = bind_research_template(
+                template.definition, sources[0], command.tool
+            )
         layout = template.layout
+    elif command.tool != "wb":
+        definition = research_definition(command.tool, sources[0])
+        layout = WorkflowLayout(
+            positions=(NodePosition(node_id=definition.nodes[0].node_id, x=40.0, y=40.0),)
+        )
     else:
         if command.validation_cases:
             request = wb_validation_input(command.validation_cases[0]).request
@@ -199,6 +252,8 @@ def _initialize(store: Workspace, command: AuthoringCommand) -> AuthoringProject
             )
         )
     return AuthoringProject(
+        schema_version=2,
+        tool=command.tool,
         document_id=command.document_id,
         graph=AuthoringGraph.model_validate(definition.model_dump(mode="python")),
         layout=layout,
@@ -221,7 +276,12 @@ def _edit(project: AuthoringProject, command: AuthoringCommand) -> AuthoringProj
     )
     graph = graph.model_copy(update={"revision": project.graph.revision + int(computational)})
     return project.model_copy(
-        update={"graph": graph, "layout": command.layout, "revision": project.revision + 1}
+        update={
+            "schema_version": 2,
+            "graph": graph,
+            "layout": command.layout,
+            "revision": project.revision + 1,
+        }
     )
 
 
@@ -247,7 +307,10 @@ def _freeze(
         reason = sample.reason
         if sample.asset is not None:
             try:
-                _bound, plan = bind_wb_workflow_template(definition, sample.asset)
+                if project.tool == "wb":
+                    _bound, plan = bind_wb_workflow_template(definition, sample.asset)
+                else:
+                    _bound, plan = bind_research_template(definition, sample, project.tool)
             except ValueError as error:
                 reason = str(error)[:1024]
         items.append(
@@ -338,6 +401,22 @@ def _outputs(
             manifest = OutputManifest.model_validate_json(store.read_asset(run.result))
             node = next(node for node in child.plan.nodes if node.node_id == result.node_id)
             validate_workflow_result_selection(child, node, result, run, manifest)
+            if store.read_asset(run.request) != manifest.request.model_dump_json().encode():
+                raise StateConflict("保存的请求与提交清单不一致")
+            for bound in manifest.request.inputs:
+                store.asset_path(bound.asset)
+            for committed in result.outputs:
+                store.asset_path(committed.asset)
+            nuclei_display = None
+            if node.interface.module.module_id == "nuclei-stardist-research":
+                members = {item.port: item.asset for item in result.outputs}
+                source = read_nuclei_input(str(store.asset_path(manifest.request.inputs[0].asset)))
+                nuclei_display = present_nuclei_result(
+                    source,
+                    store.read_asset(members["labels"]),
+                    store.read_asset(members["provenance"]),
+                    manifest.request,
+                )
             for output in result.outputs:
                 if command.port and output.port != command.port:
                     continue
@@ -346,13 +425,21 @@ def _outputs(
                 table_rows = 0
                 if command.operation == "open":
                     opened = str(store.asset_path(output.asset))
+                elif nuclei_display is not None and output.port == "labels":
+                    preview = "data:image/png;base64," + base64.b64encode(
+                        nuclei_display.overlay_png
+                    ).decode("ascii")
+                    text = f"核数：{nuclei_display.count}；原坐标 uint32 实例标签；叠加图仅显示。"
                 elif sample.sample_id == preview_sample and output.asset.size_bytes <= 262144:
                     data = store.read_asset(output.asset)
                     if output.kind == "display_image":
                         preview = "data:image/png;base64," + base64.b64encode(data).decode("ascii")
                     else:
                         text = data.decode("utf-8-sig")
-                        if output.kind == "typed_table":
+                        if output.kind == "typed_table" or (
+                            node.interface.module.module_id == "bca-pierce25-research"
+                            and output.port in ("wells", "samples")
+                        ):
                             rows = tuple(tuple(row) for row in csv.reader(io.StringIO(text)))
                             table_rows = max(0, len(rows) - 1)
                             table = rows[:101]
@@ -377,7 +464,9 @@ def _outputs(
     return batch, tuple(outputs), opened
 
 
-def execute_authoring_store(store: Workspace, raw: bytes) -> AuthoringProjection:
+def execute_authoring_store(
+    store: Workspace, raw: bytes, *, nuclei_configuration: tuple[str, str] = ("", "")
+) -> AuthoringProjection:
     if len(raw) > 1048576:
         raise ValueError("Editor command exceeds the 1MiB input budget")
     command = AuthoringCommand.model_validate_json(
@@ -408,6 +497,18 @@ def execute_authoring_store(store: Workspace, raw: bytes) -> AuthoringProjection
         projection = _preflight(updated)
         batch = None
         if command.operation == "freeze" and projection.plan is not None:
+            if updated.tool == "nuclei":
+                worker, model = nuclei_configuration
+                nodes = ", ".join(n.node_id + "/source" for n in updated.graph.nodes)
+                if not worker or not Path(worker).is_file() or not model:
+                    raise ValueError(
+                        nodes + "：核分割运行环境未配置，请在首页核分割工具设置中准备环境与模型，"
+                        "再重开工作流"
+                    )
+                try:
+                    verify_model(model)
+                except (ValueError, OSError) as error:
+                    raise ValueError(nodes + ": " + str(error)) from error
             definition = WorkflowDefinition.model_validate(updated.graph.model_dump(mode="python"))
             batch = _freeze(store, updated, definition)
             updated = updated.model_copy(update={"last_batch_id": batch.batch_id})
@@ -424,15 +525,21 @@ def execute_authoring_store(store: Workspace, raw: bytes) -> AuthoringProjection
             }
         )
     if command.operation == "bind":
+        command = command.model_copy(update={"tool": project.tool})
         sources = _inputs(store, command)
         primary = next((s.asset for s in sources if s.asset is not None), None)
         if primary is None:
             raise ValueError("没有可绑定的原图：" + "; ".join(s.reason for s in sources))
         definition = WorkflowDefinition.model_validate(project.graph.model_dump(mode="python"))
-        bound, _plan = bind_wb_workflow_template(definition, primary)
-        seed, _seed_plan = bind_wb_workflow_template(project.seed, primary)
+        if project.tool == "wb":
+            bound, _plan = bind_wb_workflow_template(definition, primary)
+            seed, _seed_plan = bind_wb_workflow_template(project.seed, primary)
+        else:
+            bound, _plan = bind_research_template(definition, sources[0], project.tool)
+            seed, _seed_plan = bind_research_template(project.seed, sources[0], project.tool)
         updated = project.model_copy(
             update={
+                "schema_version": 2,
                 "revision": project.revision + 1,
                 "graph": AuthoringGraph.model_validate(bound.model_dump(mode="python")),
                 "seed": seed,

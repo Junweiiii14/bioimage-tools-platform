@@ -1,0 +1,25 @@
+[
+  {
+    "case": "Ganglioneuroblastoma_10",
+    "labels_sha256": "fc707624198066c884fd4c328802c71cf0a89376a99ac913c0df0194cc84299f",
+    "source_sha256": "77f7b965733145a6edae173090ba1b9081266c708a3f141a12f8b281af640074",
+    "count": 46,
+    "all_label_bytes_equal_P015": true
+  },
+  {
+    "case": "Neuroblastoma_13",
+    "labels_sha256": "d85cf46376cc50f314e16ff0ecc8bc249ed10dc772272d10017653acc6d29d4a",
+    "source_sha256": "a0a1e82c1fc1c84f358c9764df12634a8cc74b18b710e0f06c81f912e6d611b7",
+    "count": 18,
+    "all_label_bytes_equal_P015": true
+  },
+  {
+    "case": "BCA_same_input_CLI",
+    "equal_csv_bytes": {
+      "wells": true,
+      "samples": true
+    },
+    "cli_state": "succeeded",
+    "graph_batch_state": "completed_with_issues"
+  }
+]

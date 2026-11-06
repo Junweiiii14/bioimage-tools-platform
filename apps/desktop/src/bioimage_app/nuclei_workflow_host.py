@@ -136,11 +136,18 @@ class NucleiHost:
         roots = tuple(
             item.asset for node in plan.nodes for item in node.inputs if item.asset is not None
         )
-        if len(plan.nodes) != 1 or len(roots) != 1:
-            raise ValueError("This research entry supports exactly one image and node")
+        if not roots:
+            raise ValueError("Nuclei workflow requires an original image")
         return self.modules(roots[0])
 
     def build(self, source: ScientificAsset) -> ExecutionPlan:
+        definition = self.definition(source)
+        modules = self.modules(source)
+        return compile_workflow(
+            definition, tuple(m.registration for m in modules), modules[0].environment
+        )
+
+    def definition(self, source: ScientificAsset) -> WorkflowDefinition:
         modules = self.modules(source)
         image = source.description.image
         assert image is not None
@@ -164,9 +171,7 @@ class NucleiHost:
                 for name in ("labels", "provenance")
             ),
         )
-        return compile_workflow(
-            definition, tuple(m.registration for m in modules), modules[0].environment
-        )
+        return definition
 
 
 def _validate_parameters(expected: NucleiParameters, raw: str) -> None:

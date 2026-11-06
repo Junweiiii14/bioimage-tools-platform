@@ -1,6 +1,7 @@
 """One editor storage owner and the same finite batch controller used by the CLI."""
 
 import json
+from functools import partial
 
 from PySide6.QtCore import QObject, Signal, Slot
 from tool_contracts.api import DraftSnapshot
@@ -19,10 +20,19 @@ class WorkflowAuthoringSession(QObject):
     activityChanged = Signal(bool, bool)
     finished = Signal()
 
-    def __init__(self, registry: HostRegistryFactory, parent: QObject | None = None) -> None:
+    def __init__(
+        self,
+        registry: HostRegistryFactory,
+        parent: QObject | None = None,
+        *,
+        nuclei_configuration: tuple[str, str] = ("", ""),
+    ) -> None:
         super().__init__(parent)
         self._registry = registry
-        self._store = AsyncStorage(self, authoring=execute_authoring_store)
+        self._store = AsyncStorage(
+            self,
+            authoring=partial(execute_authoring_store, nuclei_configuration=nuclei_configuration),
+        )
         self._store.replied.connect(self._reply)
         self._store.closed.connect(self._closed)
         self._pending: dict[str, tuple[str, str]] = {}

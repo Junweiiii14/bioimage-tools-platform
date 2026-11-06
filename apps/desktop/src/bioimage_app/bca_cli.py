@@ -25,31 +25,35 @@ from bioimage_app.workflow_session import WorkflowSession, WorkflowStatus
 
 
 def prepare(workspace: Path, source_path: str, record_path: str, host: BcaHost) -> ExecutionPlan:
-    supplied = read_plate(source_path, record_path)
     with Workspace.create(workspace) as store:
-        source = store.import_asset(
-            Path(source_path), hashlib.sha256(supplied.csv_bytes).hexdigest()
-        )
-        record = store.import_asset(
-            Path(record_path), hashlib.sha256(supplied.record_bytes).hexdigest()
-        )
-        identity = supplied.wells[0].plate_id
-        return host.build(
-            ScientificAsset(
-                payload=source,
-                sample_id=identity,
-                producing_method=None,
-                parameters_sha256=None,
-                description=ScientificType(kind="analysis_result", unit="A562"),
-            ),
-            ScientificAsset(
-                payload=record,
-                sample_id=identity,
-                producing_method=None,
-                parameters_sha256=None,
-                description=ScientificType(kind="run_manifest", unit=None),
-            ),
-        )
+        return host.build(*import_sources(store, source_path, record_path))
+
+
+def import_sources(
+    store: Workspace, source_path: str, record_path: str
+) -> tuple[ScientificAsset, ScientificAsset]:
+    supplied = read_plate(source_path, record_path)
+    source = store.import_asset(Path(source_path), hashlib.sha256(supplied.csv_bytes).hexdigest())
+    record = store.import_asset(
+        Path(record_path), hashlib.sha256(supplied.record_bytes).hexdigest()
+    )
+    identity = supplied.wells[0].plate_id
+    return (
+        ScientificAsset(
+            payload=source,
+            sample_id=identity,
+            producing_method=None,
+            parameters_sha256=None,
+            description=ScientificType(kind="analysis_result", unit="A562"),
+        ),
+        ScientificAsset(
+            payload=record,
+            sample_id=identity,
+            producing_method=None,
+            parameters_sha256=None,
+            description=ScientificType(kind="run_manifest", unit=None),
+        ),
+    )
 
 
 def verified_outputs(workspace: Path, ledger: WorkflowLedger) -> dict[str, str]:
