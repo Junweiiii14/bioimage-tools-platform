@@ -1,0 +1,73 @@
+{
+  "premerge": {
+    "baseRefOid": "3947261244143e3414b9bbf151bbe77c6edb5991",
+    "headRefOid": "4cb48ad51dc71f5e4b36195e3caa1356507665b0",
+    "state": "OPEN",
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-11-06T09:22:28Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/42190949103/job/127802766776",
+        "name": "foundation (windows-latest)",
+        "startedAt": "2026-11-06T08:54:20Z",
+        "status": "COMPLETED",
+        "workflowName": "quality"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-11-06T08:53:46Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/42190949095/job/127802526207",
+        "name": "rules-context",
+        "startedAt": "2026-11-06T08:53:42Z",
+        "status": "COMPLETED",
+        "workflowName": "rules-context"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-11-06T09:12:59Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/42190949103/job/127802766813",
+        "name": "foundation (ubuntu-latest)",
+        "startedAt": "2026-11-06T08:54:20Z",
+        "status": "COMPLETED",
+        "workflowName": "quality"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-11-06T08:54:45Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/42190949103/job/127802766410",
+        "name": "desktop-environment",
+        "startedAt": "2026-11-06T08:54:19Z",
+        "status": "COMPLETED",
+        "workflowName": "quality"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-11-06T08:54:17Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/Junweiiii14/bioimage-tools-platform/actions/runs/42190949103/job/127802768128",
+        "name": "native-case",
+        "startedAt": "2026-11-06T08:54:17Z",
+        "status": "COMPLETED",
+        "workflowName": "quality"
+      }
+    ]
+  },
+  "merged": {
+    "headRefOid": "4cb48ad51dc71f5e4b36195e3caa1356507665b0",
+    "mergeCommit": {
+      "oid": "1c819aeaae9813fdc29606cbad463b08a191fbab"
+    },
+    "mergedAt": "2026-11-06T09:23:21Z",
+    "state": "MERGED"
+  },
+  "reviewed_tree_equals_main": true,
+  "tree_diff_exit_code": 0,
+  "ci_summary": {
+    "windows": "1761 passed, 10 warnings, 1475.40s; full check and wheels passed",
+    "linux": "1757 passed, 4 existing skips, 10 warnings, 971.50s; full check and wheels passed"
+  }
+}

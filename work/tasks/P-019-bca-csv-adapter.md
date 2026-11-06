@@ -1,6 +1,6 @@
 # P-019 固定BCA单板CSV研究适配
 
-<!-- PROGRAM_TASK_META {"id":"P-019","status":"in_progress","work_package":"W07","depends_on":["P-018"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex BCA adapter","base_commit":"3947261244143e3414b9bbf151bbe77c6edb5991"} -->
+<!-- PROGRAM_TASK_META {"id":"P-019","status":"done","work_package":"W07","depends_on":["P-018"],"execution_root":"C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync","owner":"Codex BCA adapter","head_commit":"4cb48ad51dc71f5e4b36195e3caa1356507665b0","base_commit":"3947261244143e3414b9bbf151bbe77c6edb5991"} -->
 
 ## 范围与验收
 
@@ -10,6 +10,6 @@
 
 ## 当前状态
 
-实现与36项定向测试、独立BCA wheel、真实CSV执行/重开已完成；作者自验见work/evidence/P-019/README.md。本机全量1757通过、2个既有旋转canvas超时，CI环境定向3通过、所有wheel通过，原失败保留，不称首次全量通过。待冻结准确候选/PR与上游指定独审，尚未集成/释放。B021四份完成收据已按白名单带入；原P018研究与2bfd40c收尾保留。
+工程范围完成，PR71正常合入main 1c819aeaae9813fdc29606cbad463b08a191fbab，与准确已审4cb48ad51dc71f5e4b36195e3caa1356507665b0树一致。R01/R02已关闭，指定增量独审pass及四项必需CI成功。Windows1761通过/Linux1757通过4既有skip，两平台完整check与wheel通过；本机首轮GPU两失败保留。详work/evidence/P-019/final-delivery.md。
 
-PR71首候选0a73a4d指定独审changes_required（R01结果完整性、R02浮点端点）；原报告与R1修复证据见README。两项已实现最小修复，38定向测试/新wheel/新旧成果重开通过；当前待准确新候选增量复审和CI，不自行集成。
+当前仅一次必要本地收尾，随下一任务带入；回传上游后释放共享树并关闭goal。科学/同SOP真实板/LoQ/真人/目标机/安装未验，未做BCA GUI。下一新任务上游新窗口集中统一入口与结果/编排，本窗不扩孔板后端。
