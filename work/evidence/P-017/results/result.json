@@ -1,0 +1,30 @@
+{
+  "python": "3.12.14",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "versions": {
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "statsmodels": "0.14.4",
+    "pandas": "2.2.3",
+    "openpyxl": "3.1.5"
+  },
+  "seconds_excluding_imports": 0.12026869994588196,
+  "defined_wells": 42,
+  "blank_A562": 0.034,
+  "forward_slope": 0.6490972222222222,
+  "forward_intercept": 0.06211458333333328,
+  "reverse_slope": 1.5170702868386001,
+  "reverse_intercept": -0.08866812849895339,
+  "calculated_lod_mg_ml": 0.10996102749694289,
+  "calculated_loq_mg_ml": 0.366536758323143,
+  "adjusted_r2": 0.9839222201082158,
+  "max_reference_error": 1.7763568394002505e-15,
+  "synthetic_library_errors": {
+    "nan": "The input contains nan values",
+    "constant_x": {
+      "returned_finite_slope": false,
+      "slope": "nan"
+    }
+  },
+  "scope": "software-reference reproduction; no chemical truth or student validation"
+}

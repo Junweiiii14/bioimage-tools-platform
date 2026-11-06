@@ -11,3 +11,21 @@
 - _ImageIO 明确捕获 sqlite3.Error，沿原失败路径发布错误、释放忙状态，不吞异常为零，不改存储或历史。
 - 新增真实 QThread / 临时 Workspace 两例：数据库损坏、缺失，检查 idle、busy=false、failed、count=None、保留前一图和SHA，随后可重新选图。test_nuclei_ui.py 共6 passed /31.45秒；定向 Ruff 与 pyright 0错误。没有模型/网络依赖，也没有更改任何数值容差或skip。
 - 后续需：新提交独审、更新PR必需CI、最终截图与逐项验收。尚未集成或完成。
+
+## 16d32b12f3980cf2dcaeb3ec9d145488378c6dcd 独审通过
+
+只读代理 /root/p011_independent_review 已完成，base a7612843e5216f0471b51be93bd3687f0b8dbc82。结论：已发现P2关闭，无其他可复现阻断问题。核查提交身份、原图/标签摘要、原坐标显示、唯一目录导出、取消与关闭等待接线、轻量默认依赖及隔离wheel调整，P015数值流程未变。
+
+独立 `pytest tests/test_nuclei_ui.py tests/test_nuclei_web.py tests/test_instrument_intake_desktop.py::test_export_discovery_real_worker_save_and_reopen -q` 为8 passed /6.98s/exit0；显示适配2 passed/0.84s/exit0，Windows offscreen、--disable-gpu。实际保存样例独立核对46个非零实例ID、运行身份、标签摘要、显示尺寸、导出字节及项目内导出拒绝。
+
+审查限制：未独立重跑真实模型、全仓或完整应用运行中关闭；四主题、高DPI、Linux实际模型、学生首次配置和科学验收未覆盖。首次配置指南仍需读源码README，没有界内直接打开指南，为非阻断可用性改进项。
+
+作者增量验证：6控制器通过，Ruff/pyright通过；WB正确目标测试等待条件修改后1 passed/3.45s。规则回执检查16d32b1相对main通过。产品/测试已push，PR67新quality run 42157212799运行中，规则run42157213226及desktop-environment已通过；尚未合入。
+
+## 最终截图
+
+16d32b1当前Qt工作台，经真实WebChannel打开已提交公开46核项目（此次原生目录选择器替换，仅用于可重复截图，不冒充实际点击走查）。`.local/p016-final-1440.png` 和 `.local/p016-final-960.png` 分别1440×940、960×640；已由view_image人工检查，当前“已保存核数46”、原坐标轮廓、切换/缩放、设置及固定导出按钮可见。小窗口正文可滚动；截图不代表四主题/高DPI验收。临时harness `.local/p016_capture_test.py` exit0，1 passed/3.72s；首次harness错误等待裸字符串46（实际为已保存核数46）超时，改为实际可见文案后通过，未为截图更改产品。
+
+## 最终CI与集成
+
+最终验收：PR67已合入main 6bd4680530dc4697f8d394a96fd288723222ddb8，与候选16d32b12f3980cf2dcaeb3ec9d145488378c6dcd文件树diff退出0。quality42157212799成功：Windows1737 passed/10 warnings/1410.11s；Linux1733 passed/4既有Windows专用skip/10 warnings/951.94s；两平台随后wheel/check --all完整通过。rules42157213226、desktop-environment通过。只读独审绑定候选通过。2026-11-06已成功向上游01a19bfd-f3ab-7502-86da-9f61953d1c8a(local)发送正式入口/截图/证据/CI/独审/PRmain/边界和下一建议，要求自动接续。观察进程87597已exit0。

@@ -194,3 +194,7 @@ PR63 quality42053261398：Windows1703pass/1378.01s、Linux1699pass/4旧skip/975.
 ## 2026-11-06 P015 final
 
 PR66 main a761284与8f00757树一致；本机check --all exit0，1728passed1208.32s及全部wheel。quality42086151498 Windows1728passed1420.98s/Linux1724passed4既有skip810.58s，两平台wheel/desktop成功；rules42086151033成功。14真实进程场景、9张每像素/ID相等，独审a490d2e/95ecb02通过。初轮4失败与3Pyright隔离源码warnings保留，未弱化检查；详P015/final-delivery及validation.json。
+
+## 2026-11-06 P016最终验收
+
+最终验收：PR67已合入main 6bd4680530dc4697f8d394a96fd288723222ddb8，与候选16d32b12f3980cf2dcaeb3ec9d145488378c6dcd文件树diff退出0。quality42157212799成功：Windows1737 passed/10 warnings/1410.11s；Linux1733 passed/4既有Windows专用skip/10 warnings/951.94s；两平台随后wheel/check --all完整通过。rules42157213226、desktop-environment通过。只读独审绑定候选通过。2026-11-06已成功向上游01a19bfd-f3ab-7502-86da-9f61953d1c8a(local)发送正式入口/截图/证据/CI/独审/PRmain/边界和下一建议，要求自动接续。观察进程87597已exit0。 科学/学生/环境边界见P016/final-delivery，不由工程通过关闭。
