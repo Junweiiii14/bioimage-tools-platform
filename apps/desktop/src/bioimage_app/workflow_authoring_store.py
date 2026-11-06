@@ -6,6 +6,7 @@ import io
 from pathlib import Path
 from uuid import uuid4
 
+from bca_tool.api import read_plate
 from nuclei_tool.api import present_nuclei_result, read_nuclei_input, verify_model
 from platform_runtime.api import (
     IntegrityError,
@@ -175,13 +176,18 @@ def _inputs(store: Workspace, command: AuthoringCommand) -> tuple[AuthoringSourc
         if command.tool == "bca":
             if not command.record_path:
                 raise ValueError("BCA 需要明确的板记录 JSON")
-            asset, record = import_bca_sources(store, path, command.record_path)
+            asset, record = import_bca_sources(
+                store, path, command.record_path, read_plate(path, command.record_path)
+            )
             # Each newly bound plate is a distinct editor input, even with reused plate IDs.
             sample_id = uuid4().hex
             asset = asset.model_copy(update={"sample_id": sample_id})
             record = record.model_copy(update={"sample_id": sample_id})
         else:
-            asset, record = import_nuclei_source(store, path, uuid4().hex), None
+            asset, record = (
+                import_nuclei_source(store, path, uuid4().hex, read_nuclei_input(path)),
+                None,
+            )
         return (
             AuthoringSource(
                 sample_id=asset.sample_id, label=Path(path).name, asset=asset, record=record

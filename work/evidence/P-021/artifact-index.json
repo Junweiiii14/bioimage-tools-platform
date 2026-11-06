@@ -137,5 +137,11 @@
     "artifact": "p021-lint-final.log.gz",
     "sha256": "47cbc43de7765809297f4e37295688d055ccde62906f1b68f1069524ff1190a0",
     "bytes": 1090
+  },
+  {
+    "source": ".local\\p021-input-fix.log",
+    "artifact": "p021-input-fix.log.gz",
+    "sha256": "3c793f3c1abd170e8b867a34a3a8e6dec5bbcfb1547b745ff990b2d261d2f1ce",
+    "bytes": 102
   }
 ]

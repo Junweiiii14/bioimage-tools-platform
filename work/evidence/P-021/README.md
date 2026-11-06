@@ -35,3 +35,9 @@ Windows 11 / Python 3.12.14 / 已锁定 PySide6 QtWebEngine。普通测试离屏
 科学/化学准确性、LoQ、训练重叠/患者独立性、真人、物理DPI/OS IME/干净目标机与用户安装更新全部保留。模型环境/磁盘成本沿P014/P015，未新增重依赖或环境；本轮未测新峰值内存，未重做P009全性能矩阵。新图结果读取复用原图/标签显示，数值资产保持原始精度。
 
 既有取消/失败/旧草稿保护由上述10项和P009/P015/P019证据约束；本轮新增缺运行配置、无效来源、错误连线和资产损坏反例，不重复全部历史异常矩阵。作者自验不替代独审。共享树仍由开发窗持有，冻结后回上游，由指定独审窗按准确base/head审查；不自行合并。
+
+## 创建顺序回归修复
+
+旧候选0027432在本机全量第329号用例 `test_changed_source_rejected_before_workspace_creation` 失败：输入导入提取使原图SHA变化的拒绝发生在Workspace.create之后。恢复先公开read/校验再创建；导入接收已验证NucleiInput/PlateInput，保持入口验证一次及快照摘要核验。BCA同类CLI顺序一并恢复，数值/worker/方法未改。
+
+`pytest tests/test_nuclei_ui.py::test_changed_source_rejected_before_workspace_creation tests/test_research_authoring.py tests/test_research_authoring_web.py tests/test_nuclei_host.py tests/test_bca_host.py -q` exit0，12 passed / 17.92s，原断言未修改。相关Ruff与Pyright exit0。全量原进程继续诊断；执行期间有工作区变更，最终日志不得作为任一冻结head的全量通过。修复后准确提交的必需CI承担完整验证。
