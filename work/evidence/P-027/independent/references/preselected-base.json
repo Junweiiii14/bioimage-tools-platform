@@ -1,0 +1,78 @@
+{
+  "version": "base",
+  "ui_path": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p027\\.local\\references\\preselect-run1\\test_preselected_reference_can1\\base-ui",
+  "selected_before_identification": {
+    "group_id": "group-7c54bbca3b1a6702e9024e694a618a49",
+    "source_ids": [
+      "7c585f9e662b4abe8b2aadec595d73b9"
+    ],
+    "figure_id": "5851a9f4-ad8d-4685-9618-68fd1497ce89",
+    "protein_label": "Target",
+    "selected_source_id": "7c585f9e662b4abe8b2aadec595d73b9",
+    "region_index": null,
+    "reuse_confirmed": false
+  },
+  "clean_discovery_conflict": true,
+  "before_rejected_save": {
+    "notice": "参考结果仍有裁剪源选择，请在参考区取消选择。",
+    "footer": "导入清单已保存，可重新打开。",
+    "saveEnabled": true,
+    "startDisabled": true,
+    "keep": true
+  },
+  "after_rejected_save": {
+    "notice": "参考结果仍有裁剪源选择，请在参考区取消选择。",
+    "status": "操作失败：当前选择是参考成品或读取失败来源，请核对原图",
+    "dirty": true,
+    "saveEnabled": true,
+    "unpickEnabled": true
+  },
+  "accepted_digest": "bd086989383b1028627c752da619faae05759a46b78eeb5e26703a8508ef2c23",
+  "persisted": {
+    "schema_version": 2,
+    "figures": [
+      {
+        "figure_id": "5851a9f4-ad8d-4685-9618-68fd1497ce89",
+        "label": "Fig 1",
+        "lane_count": 5
+      }
+    ],
+    "groups": [
+      {
+        "group_id": "group-7c54bbca3b1a6702e9024e694a618a49",
+        "source_ids": [
+          "7c585f9e662b4abe8b2aadec595d73b9"
+        ],
+        "figure_id": null,
+        "protein_label": "",
+        "selected_source_id": null,
+        "region_index": null,
+        "reuse_confirmed": false
+      },
+      {
+        "group_id": "group-578f794c2b238d97e500a11978343292",
+        "source_ids": [
+          "9ec068916ac44cf9b5bf79bd782deb0c"
+        ],
+        "figure_id": "5851a9f4-ad8d-4685-9618-68fd1497ce89",
+        "protein_label": "Target",
+        "selected_source_id": "9ec068916ac44cf9b5bf79bd782deb0c",
+        "region_index": null,
+        "reuse_confirmed": false
+      }
+    ],
+    "sequence": [
+      {
+        "entry_id": "aa0ca29b-714e-4171-bdb1-63ba89a5dd98",
+        "figure_id": "5851a9f4-ad8d-4685-9618-68fd1497ce89",
+        "label": "Target"
+      }
+    ],
+    "excluded_group_ids": [],
+    "reference_group_ids": [
+      "group-7c54bbca3b1a6702e9024e694a618a49"
+    ]
+  },
+  "success": true,
+  "workspace": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p027\\.local\\references\\preselect-run1\\test_preselected_reference_can1\\projects\\folder-20261109-024913-dee8e250"
+}

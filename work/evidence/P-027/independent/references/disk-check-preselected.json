@@ -1,0 +1,12 @@
+{
+  "base": {
+    "revision": 3,
+    "sha256": "33077692576716ac4f49ee64362ff6b07ed16dc05211e48172b8c966cf480695",
+    "grouping_equal": true
+  },
+  "candidate": {
+    "revision": 3,
+    "sha256": "a30769536c750d76d064ea1bdd6a1535e293e88042428e4ed20ad207a2f2ee3c",
+    "grouping_equal": true
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "module": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p027\\apps\\desktop\\src\\bioimage_app\\web_window.py",
+  "conflict": {
+    "label": "Local edited Fig",
+    "notice": "后台清单已改变，本地输入保留；请核对后重新载入。",
+    "saved": "Committed Fig",
+    "candidates": [
+      "group-9de338bfba4701af0a0689db00b7d07d"
+    ],
+    "dirty": true
+  },
+  "persisted": {
+    "schema_version": 2,
+    "figures": [
+      {
+        "figure_id": "371b14dd-e1af-4a7c-a40d-b7f7f9e51344",
+        "label": "Committed Fig",
+        "lane_count": null
+      }
+    ],
+    "groups": [
+      {
+        "group_id": "group-4d2733808663869272e4e3924fa92f64",
+        "source_ids": [
+          "be34eeb463ee4538874a06abd29e2d69"
+        ],
+        "figure_id": "371b14dd-e1af-4a7c-a40d-b7f7f9e51344",
+        "protein_label": "TestProtein",
+        "selected_source_id": null,
+        "region_index": null,
+        "reuse_confirmed": false
+      },
+      {
+        "group_id": "group-9de338bfba4701af0a0689db00b7d07d",
+        "source_ids": [
+          "07740864c99a4d78ae1ed8a538d6c8d4"
+        ],
+        "figure_id": null,
+        "protein_label": "",
+        "selected_source_id": null,
+        "region_index": null,
+        "reuse_confirmed": false
+      }
+    ],
+    "sequence": [
+      {
+        "entry_id": "9ed9f0e2-04db-4953-94f3-dc46167b71de",
+        "figure_id": "371b14dd-e1af-4a7c-a40d-b7f7f9e51344",
+        "label": "TestProtein"
+      }
+    ],
+    "excluded_group_ids": [],
+    "reference_group_ids": [
+      "group-9de338bfba4701af0a0689db00b7d07d"
+    ]
+  },
+  "success": true
+}

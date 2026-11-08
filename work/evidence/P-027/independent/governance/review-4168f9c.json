@@ -1,0 +1,208 @@
+{
+  "base": "8321615773c73ede412e1a60b2688e545f537f8a",
+  "head": "4168f9c4b9d55f1fbc67b124244be15f0c0393da",
+  "rules": {
+    "command": [
+      "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe",
+      "-B",
+      "-I",
+      "tooling/rule_context.py",
+      "check",
+      "--base",
+      "8321615773c73ede412e1a60b2688e545f537f8a",
+      "--head",
+      "4168f9c4b9d55f1fbc67b124244be15f0c0393da"
+    ],
+    "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p027",
+    "exit": 0,
+    "stdout": "Rule context receipt matches this PR's base, scope and rule versions",
+    "stderr": ""
+  },
+  "integration": {
+    "schema": 1,
+    "task": "P-027",
+    "base_commit": "8321615773c73ede412e1a60b2688e545f537f8a",
+    "source_head": "20703a5adaa7b87efc759e6a7fee67f6db37bccb",
+    "historical_receipts": {
+      "work/evidence/P-026/rules-context.json": "20703a5adaa7b87efc759e6a7fee67f6db37bccb"
+    }
+  },
+  "history_receipt_sha256": "f7e967ed3748dc5f6657b9d2dcb9f9752c2199673e9155f6ad05fb2d72d3e172",
+  "archived_p026_and_merged_base_trees_identical": true,
+  "archived_p026_files": [
+    {
+      "path": "work/evidence/P-026/independent/exact-probe.txt",
+      "reviewer_sha256": "f69bba0547523eb0ff311528a5f0ef3b1b8b309e14a999dd77f4cd3154bd5d24",
+      "commit_sha256": "3f9cc332d8c87e9832de84daa604d4b59ba7c20a8d973332036b7494e486289b",
+      "bytes_equal": false
+    },
+    {
+      "path": "work/evidence/P-026/independent/independent-review-44a6109.md",
+      "reviewer_sha256": "7f848163b971b925edebc2ed46e3241049500962e4cd887e223fecdb30843c66",
+      "commit_sha256": "7e31e2ed1c6eb1f46e9fcbd0e632800301bf07811d77135ba452a7f2be8587c1",
+      "bytes_equal": false
+    },
+    {
+      "path": "work/evidence/P-026/independent/independent-review-45daa37.md",
+      "reviewer_sha256": "2768f3b349a92a55a9d40253d87ffa3f830f4fd48e78c4501c5fc7036f32803e",
+      "commit_sha256": "2768f3b349a92a55a9d40253d87ffa3f830f4fd48e78c4501c5fc7036f32803e",
+      "bytes_equal": true
+    },
+    {
+      "path": "work/evidence/P-026/independent/iocbio-input.json",
+      "reviewer_sha256": "cf205b6ccb9f6e0f8ddaf96d9dce2f9859ac62bc305672f68c3fcaa361eaae7b",
+      "commit_sha256": "ad20790112718ee69bc4b38ca67392fefda9e740aa7b264369e91de707bd78c5",
+      "bytes_equal": false
+    },
+    {
+      "path": "work/evidence/P-026/independent/recheck-45daa37.json",
+      "reviewer_sha256": "aa3faa0181360d610496f74d8ddf194aa3b144188f5fe3eec498c09613c34b4c",
+      "commit_sha256": "30960852dc88506d0a06ce1d80ad3e0a71d35eb0132f6f55ee66cbedcaf8b7b7",
+      "bytes_equal": false
+    },
+    {
+      "path": "work/evidence/P-026/independent/scope-receipt.json",
+      "reviewer_sha256": "732675560dd060f4c05fd64e95a1ca0775fb12b7ac1309a5eec1f5fef47cceed",
+      "commit_sha256": "75dfd8173e497e5fc7efdca69ea94fa5f87c653b4efc342fb5fb2833c0e5b2ca",
+      "bytes_equal": false
+    }
+  ],
+  "protected": {
+    "command": [
+      "git",
+      "diff",
+      "--exit-code",
+      "8321615773c73ede412e1a60b2688e545f537f8a",
+      "4168f9c4b9d55f1fbc67b124244be15f0c0393da",
+      "--",
+      "AGENTS.md",
+      "dev.py",
+      ".github",
+      ".agents",
+      ".importlinter",
+      ".gitattributes",
+      "work/programs/scientific-agent-platform/check_plan.py",
+      "docs/runbooks/rule-enforcement.md",
+      "docs/plans/independent-review.md",
+      "tools",
+      "packages",
+      "tooling",
+      "pyproject.toml",
+      "uv.lock",
+      "apps/desktop/pyproject.toml"
+    ],
+    "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p027",
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "changed_tests": [
+    "tests/test_instrument_intake_desktop.py"
+  ],
+  "allowed_task_status": [
+    "blocked",
+    "done",
+    "in_progress",
+    "in_review",
+    "planned"
+  ],
+  "states": {
+    "base": {
+      "invalid_status": [],
+      "missing_reviewed_commit": [
+        "P-010",
+        "P-021",
+        "P-022",
+        "P-023"
+      ],
+      "P026": {
+        "id": "P-026",
+        "status": "in_review",
+        "work_package": "W06",
+        "depends_on": [
+          "P-010"
+        ],
+        "execution_root": "C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync",
+        "owner": "chat-01a1bc48-5289-7521-9c01-f54e1f988183",
+        "head_commit": "4374bf0ef23fbc17a4a655e085795942fbb3c173",
+        "base_commit": "e846a681c85e04d53904fe8b6b384376e98f6032"
+      },
+      "P027": null
+    },
+    "candidate": {
+      "invalid_status": [
+        "P-027"
+      ],
+      "missing_reviewed_commit": [
+        "P-010",
+        "P-021",
+        "P-022",
+        "P-023"
+      ],
+      "P026": {
+        "id": "P-026",
+        "status": "done",
+        "work_package": "W06",
+        "depends_on": [
+          "P-010"
+        ],
+        "execution_root": "C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync",
+        "owner": "chat-01a1bc48-5289-7521-9c01-f54e1f988183",
+        "head_commit": "45daa37cfc42e11103597acb4ad0a2b7452a6d48",
+        "base_commit": "e846a681c85e04d53904fe8b6b384376e98f6032"
+      },
+      "P027": {
+        "id": "P-027",
+        "status": "active",
+        "work_package": "W06",
+        "depends_on": [
+          "P-023",
+          "P-024",
+          "P-026"
+        ],
+        "execution_root": "C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync",
+        "owner": "chat-01a1bc6f-d8d2-7cd2-bc55-e08d8d6a41c8",
+        "head_commit": null,
+        "base_commit": "8321615773c73ede412e1a60b2688e545f537f8a"
+      }
+    }
+  },
+  "plan_checks": {
+    "base": {
+      "command": [
+        "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe",
+        "-B",
+        "work/programs/scientific-agent-platform/check_plan.py"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p027\\.local\\governance\\snapshot-83216157",
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Plan check failed: Missing reviewed commit: P-010"
+    },
+    "candidate": {
+      "command": [
+        "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe",
+        "-B",
+        "work/programs/scientific-agent-platform/check_plan.py"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p027\\.local\\governance\\snapshot-4168f9c4",
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Plan check failed: Missing reviewed commit: P-010"
+    },
+    "prioritized_candidate": {
+      "command": [
+        "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe",
+        "-B",
+        "work/programs/scientific-agent-platform/check_plan.py"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p027\\.local\\governance\\prioritized-P027",
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Plan check failed: Invalid task metadata: P-027"
+    }
+  },
+  "js_delta": "one removed assignment to optional reference_group_ids",
+  "git_status": "clean",
+  "evidence_collection_exit": 0
+}

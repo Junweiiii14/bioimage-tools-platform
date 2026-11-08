@@ -1,3 +1,3 @@
 # 当前恢复入口
 
-[P027 普通 WB 文件夹走查](../work/tasks/P-027-wb-folder.md)的候选与修复版走查已记录于[实际结果](../work/evidence/P-027/README.md)，下一步为准确提交独审与必需 CI。此前 [P026 最终交付](../work/evidence/P-026/final-delivery.md)已随本分支带入。
+[P027 普通 WB 文件夹走查](../work/tasks/P-027-wb-folder.md)已合入 PR79/main 3103063d1abf116ef1d98694b9cc57f4dc70ae22，与最终独审 05d04b2 同树。单图导入、N 留空阻断、草稿冲突修复、两次 Windows 作业及未验范围见[最终交付](../work/evidence/P-027/final-delivery.md)。一次本地收尾后释放共享树，由上游另窗派发。

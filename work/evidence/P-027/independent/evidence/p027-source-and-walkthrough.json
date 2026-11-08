@@ -1,0 +1,46 @@
+{
+  "head": "4168f9c4b9d55f1fbc67b124244be15f0c0393da",
+  "archive_sha256": "66c84b4a5557ccfd203bec15becbc9e85ca7c681e9e2b2545f24092b60059c46",
+  "image_sha256": "af35f27d9171f1699a8247611dc48683833f03eae1ed30a1e795ad5966ab3a64",
+  "image_bytes": 12583637,
+  "tiff_tags": {
+    "256": 3072,
+    "257": 2048,
+    "258": 16,
+    "262": 0,
+    "277": 1
+  },
+  "modes": {
+    "intake": {
+      "saved_revision": 0,
+      "observed_snippets": 2,
+      "formal_runs": 0,
+      "identical_source_bytes": true
+    },
+    "quant": {
+      "saved_revision": 0,
+      "observed_snippets": 2,
+      "formal_runs": 0,
+      "identical_source_bytes": true
+    },
+    "details": {
+      "saved_revision": 1,
+      "observed_snippets": 4,
+      "formal_runs": 0,
+      "identical_source_bytes": true,
+      "discovery_method": "export_signal_regions@1"
+    },
+    "fixed": {
+      "saved_revision": 2,
+      "observed_snippets": 5,
+      "formal_runs": 0,
+      "identical_source_bytes": true,
+      "discovery_method": "export_signal_regions@1",
+      "lane_count": null,
+      "protein": "GAPDH",
+      "selected_source_bound": true,
+      "start_disabled": true
+    }
+  },
+  "tracked_status": ""
+}

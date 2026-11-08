@@ -1,0 +1,14 @@
+{
+  "base": "8321615773c73ede412e1a60b2688e545f537f8a",
+  "previous": "4168f9c4b9d55f1fbc67b124244be15f0c0393da",
+  "final": "05d04b2e942078cc1f5b988af135aaedde2d695b",
+  "only_changed": "work/tasks/P-027-wb-folder.md",
+  "status": "in_review",
+  "head_commit": "4168f9c4b9d55f1fbc67b124244be15f0c0393da",
+  "base_and_final_problems": [
+    "P-010",
+    "P-021",
+    "P-022",
+    "P-023"
+  ]
+}
