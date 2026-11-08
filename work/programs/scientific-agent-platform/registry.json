@@ -101,6 +101,10 @@
     {
       "id": "P-024",
       "path": "work/tasks/P-024-first-use-inputs.md"
+    },
+    {
+      "id": "P-025",
+      "path": "work/tasks/P-025-first-order.md"
     }
   ],
   "work_packages": [
@@ -225,7 +229,9 @@
       "depends_on": [
         "W00"
       ],
-      "task_ids": []
+      "task_ids": [
+        "P-025"
+      ]
     },
     {
       "id": "W11",
