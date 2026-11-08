@@ -1,0 +1,109 @@
+{
+  "head": "3103063d1abf116ef1d98694b9cc57f4dc70ae22",
+  "review_python": "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12.14-windows-x86_64-none\\python.exe",
+  "candidate_root": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\releases\\runtime-3103063d1abf-acceptance-p028-local\\app",
+  "exe_sha256": "c296f84d2b661386ba0fd6ff1b18b51803ebac529edbe45145b1592398847992",
+  "identity": {
+    "version": "0.14.0",
+    "commit": "3103063d1abf116ef1d98694b9cc57f4dc70ae22",
+    "channel": "wb-acceptance-p028-local"
+  },
+  "manifest_sha256": "2b318419fa25d541503debb563d17cd884a69336e905319667cb0df360141424",
+  "payload_manifest_sha256": "367473a38d51c01b28ff70c735abf6a1aa46b92e3edc467ea578848cda6518fd",
+  "frozen_files_verified": 7900,
+  "generated_pyc_outside_frozen_files": 1006,
+  "source": {
+    "commit": "3103063d1abf116ef1d98694b9cc57f4dc70ae22",
+    "git_verified_source_files": 506,
+    "shipped_source_files": 308,
+    "crlf_only_source_differences": [
+      "runtime/Lib/site-packages/bioimage_app/bca_cli.py",
+      "runtime/Lib/site-packages/bioimage_app/bca_workflow_host.py",
+      "runtime/Lib/site-packages/bioimage_app/nuclei_bridge.py",
+      "runtime/Lib/site-packages/bioimage_app/nuclei_cli.py",
+      "runtime/Lib/site-packages/bioimage_app/nuclei_workflow_host.py",
+      "runtime/Lib/site-packages/bioimage_app/research_authoring.py",
+      "runtime/Lib/site-packages/bioimage_app/tool_assembly.py",
+      "runtime/Lib/site-packages/bioimage_app/wb_web_host.py",
+      "runtime/Lib/site-packages/bioimage_app/web_ui/index.html",
+      "runtime/Lib/site-packages/bioimage_app/web_ui/nuclei.css",
+      "runtime/Lib/site-packages/bioimage_app/web_ui/nuclei_setup.md",
+      "runtime/Lib/site-packages/bioimage_app/web_ui/research_tools.css",
+      "runtime/Lib/site-packages/bioimage_app/web_window.py",
+      "runtime/Lib/site-packages/bioimage_app/workflow_authoring_bridge.py",
+      "runtime/Lib/site-packages/bioimage_app/workflow_authoring_models.py",
+      "runtime/Lib/site-packages/bioimage_app/workflow_authoring_session.py",
+      "runtime/Lib/site-packages/bioimage_app/workflow_authoring_store.py",
+      "runtime/Lib/site-packages/bca_tool/adapters/execute.py",
+      "runtime/Lib/site-packages/bca_tool/adapters/input.py",
+      "runtime/Lib/site-packages/bca_tool/adapters/protocol.py",
+      "runtime/Lib/site-packages/bca_tool/adapters/registration.py",
+      "runtime/Lib/site-packages/bca_tool/api.py",
+      "runtime/Lib/site-packages/bca_tool/domain/plate.py",
+      "runtime/Lib/site-packages/bca_tool/worker.py",
+      "runtime/Lib/site-packages/nuclei_tool/domain/runtime.py"
+    ],
+    "reference_archive_sha256": "db7478860dafadcc1f0220949de4d5c96eb4578abe775f053fc78ab7cd3bbe5f"
+  },
+  "wheels": {
+    "bca_tool-0.1.1-py3-none-any.whl": {
+      "sha256": "3014a962d8873f001d5cd4a5f33c8272f98d0d22a64d5c92dbb7aa8961f83c45",
+      "identical_to_p023": true,
+      "members_changed": [],
+      "installed_product_files": 11
+    },
+    "bioimage_app-0.14.0-py3-none-any.whl": {
+      "sha256": "6c611eecf85207fa5a89ff4741bde5efe56cf0fe04d86ee36946d6fc578b2f08",
+      "identical_to_p023": false,
+      "members_changed": [
+        "bioimage_app-0.14.0.dist-info/RECORD",
+        "bioimage_app/web_ui/intake_groups.js"
+      ],
+      "installed_product_files": 124
+    },
+    "nuclei_tool-0.1.0-py3-none-any.whl": {
+      "sha256": "84fe2c725bce02b4e9958f07b9a8283dcfa6abb2860bbe608bda5c309c59603b",
+      "identical_to_p023": true,
+      "members_changed": [],
+      "installed_product_files": 17
+    },
+    "platform_runtime-0.2.0-py3-none-any.whl": {
+      "sha256": "b1f2e8b88a19f8d3e94f38680d24f93a2efe3433f12f950333224867f9785c71",
+      "identical_to_p023": true,
+      "members_changed": [],
+      "installed_product_files": 7
+    },
+    "tool_contracts-0.1.0-py3-none-any.whl": {
+      "sha256": "1f9af6940d86a8749b69ad8305d90b21a92d4cadfd16dd0f4584bd2ddd40ae62",
+      "identical_to_p023": true,
+      "members_changed": [],
+      "installed_product_files": 8
+    },
+    "wb_tool-0.19.0-py3-none-any.whl": {
+      "sha256": "90e3498e7e4e0d5585277dda926b2096e7a539773a7ed234465abd1b1ce9533f",
+      "identical_to_p023": true,
+      "members_changed": [],
+      "installed_product_files": 141
+    }
+  },
+  "package_generated_cache_counts": {
+    "bca_tool": 8,
+    "bioimage_app": 58,
+    "nuclei_tool": 13,
+    "platform_runtime": 6,
+    "tool_contracts": 7,
+    "wb_tool": 108
+  },
+  "onnx_files": 6,
+  "msvc_files": 10,
+  "practice_zip_sha256": "73ccd34c0ed1dbb971241edf200c90ccbe58539f1188189a31f387e423944d2c",
+  "single_tiff_sha256": "af35f27d9171f1699a8247611dc48683833f03eae1ed30a1e795ad5966ab3a64",
+  "external_worker_interpreter_exists": true,
+  "external_model_files": {
+    "config.json": "836da16282c3e0db1ba2e58f377e977419887ace8c737ebde16a094d58d50f74",
+    "thresholds.json": "5cd6aac6e923f8659b63a9e297485920d45a59dad35371ddb8b6ae4be398d805",
+    "weights_best.h5": "42202bd269c8106782316f1a2c75afb3f5ffa65e525c2e155ee0ced3a95da349"
+  },
+  "run_product": false,
+  "tracked_status": ""
+}

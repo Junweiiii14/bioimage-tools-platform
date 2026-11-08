@@ -1,0 +1,67 @@
+{
+  "mode": "reopen",
+  "pid": 47868,
+  "runtime": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\releases\\runtime-3103063d1abf-acceptance-p028-local\\app\\runtime\\python.exe",
+  "module": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\releases\\runtime-3103063d1abf-acceptance-p028-local\\app\\runtime\\Lib\\site-packages\\bioimage_app\\__init__.py",
+  "title": "BioImage · 工具平台 0.14.0 · wb-acceptance-p028-local · 3103063d1abf",
+  "qpa": "offscreen",
+  "settings": "C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-review-p028/.local/wb/independent.ini",
+  "chooser": [],
+  "controls": {
+    "fig": "Fig 1",
+    "protein": "GAPDH",
+    "N": "",
+    "selected": true,
+    "start_disabled": true,
+    "draft": {
+      "schema_version": 2,
+      "figures": [
+        {
+          "figure_id": "4549a53f-4ead-4a4c-bec3-ffd14db775da",
+          "label": "Fig 1",
+          "lane_count": null
+        }
+      ],
+      "groups": [
+        {
+          "group_id": "group-a942544af66dac102873b2e725c42942",
+          "source_ids": [
+            "9ae2a3aa9c594200867d27d7523a77f3"
+          ],
+          "figure_id": "4549a53f-4ead-4a4c-bec3-ffd14db775da",
+          "protein_label": "GAPDH",
+          "selected_source_id": "9ae2a3aa9c594200867d27d7523a77f3",
+          "region_index": null,
+          "reuse_confirmed": false
+        }
+      ],
+      "sequence": [
+        {
+          "entry_id": "7ff09783-45c4-44de-8f8c-506f2ae453e3",
+          "figure_id": "4549a53f-4ead-4a4c-bec3-ffd14db775da",
+          "label": "GAPDH"
+        }
+      ],
+      "excluded_group_ids": []
+    },
+    "discovery": [
+      {
+        "source_id": "9ae2a3aa9c594200867d27d7523a77f3",
+        "sha256": "af35f27d9171f1699a8247611dc48683833f03eae1ed30a1e795ad5966ab3a64",
+        "group_id": "21cb6cf5ea3025ac194bbd34",
+        "role": "unknown",
+        "reasons": [
+          "暗背景膜片；需比较同组白光与合并图"
+        ],
+        "regions": [],
+        "error": ""
+      }
+    ]
+  },
+  "project": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p028\\.local\\wb\\projects\\independent-input-20261109-040137-273ddea4",
+  "no_run_or_result": true,
+  "source_hash": "af35f27d9171f1699a8247611dc48683833f03eae1ed30a1e795ad5966ab3a64",
+  "checks_ok": true,
+  "gui_exit": 0,
+  "resources_closed": true
+}

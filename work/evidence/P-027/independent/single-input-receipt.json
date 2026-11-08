@@ -1,0 +1,53 @@
+{
+  "chooser": [
+    "\u9009\u62e9\u4eea\u5668\u76f4\u63a5\u5bfc\u51fa\u7684 TIFF \u6587\u4ef6\u5939"
+  ],
+  "source_sha256": "af35f27d9171f1699a8247611dc48683833f03eae1ed30a1e795ad5966ab3a64",
+  "discovery": [
+    {
+      "source_id": "ba07c2f668204e04a3ffac393acbc8e9",
+      "sha256": "af35f27d9171f1699a8247611dc48683833f03eae1ed30a1e795ad5966ab3a64",
+      "group_id": "f231a70aa982106636fbd6cd",
+      "role": "unknown",
+      "reasons": [
+        "\u6697\u80cc\u666f\u819c\u7247\uff1b\u9700\u6bd4\u8f83\u540c\u7ec4\u767d\u5149\u4e0e\u5408\u5e76\u56fe"
+      ],
+      "regions": [],
+      "error": ""
+    }
+  ],
+  "saved_and_reopened": {
+    "schema_version": 2,
+    "figures": [
+      {
+        "figure_id": "1f4e3c1c-e8d9-4f72-8453-f7a5f3010a56",
+        "label": "Fig 1",
+        "lane_count": null
+      }
+    ],
+    "groups": [
+      {
+        "group_id": "group-b813601831aa9e49717896542c448b45",
+        "source_ids": [
+          "ba07c2f668204e04a3ffac393acbc8e9"
+        ],
+        "figure_id": "1f4e3c1c-e8d9-4f72-8453-f7a5f3010a56",
+        "protein_label": "GAPDH",
+        "selected_source_id": "ba07c2f668204e04a3ffac393acbc8e9",
+        "region_index": null,
+        "reuse_confirmed": false
+      }
+    ],
+    "sequence": [
+      {
+        "entry_id": "5e5f5ac7-18cd-485f-a8b8-b12aa64070eb",
+        "figure_id": "1f4e3c1c-e8d9-4f72-8453-f7a5f3010a56",
+        "label": "GAPDH"
+      }
+    ],
+    "excluded_group_ids": []
+  },
+  "dirty_immediately_after_click": false,
+  "actual_add_fig_click": true,
+  "start_disabled_before_and_after_reopen": true
+}

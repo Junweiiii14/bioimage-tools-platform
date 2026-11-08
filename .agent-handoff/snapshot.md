@@ -1,3 +1,3 @@
 # 当前恢复入口
 
-[P027 普通 WB 文件夹走查](../work/tasks/P-027-wb-folder.md)的候选与修复版走查已记录于[实际结果](../work/evidence/P-027/README.md)，下一步为准确提交独审与必需 CI。此前 [P026 最终交付](../work/evidence/P-026/final-delivery.md)已随本分支带入。
+[P029 qPCR 研究任务](../work/tasks/P-029-qpcr-research.md)已冻结研究内容，待固定独审和必需 CI。[公开样本、工作表差异与排期建议](../docs/research/2026-11-09-qpcr-relative.md)。随正常 PR 携带 P027/P028 本地收尾。
