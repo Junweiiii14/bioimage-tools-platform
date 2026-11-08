@@ -10,6 +10,7 @@ from nuclei_tool.adapters.protocol import (
 )
 from nuclei_tool.adapters.registration import nuclei_module_spec, research_environment, verify_model
 from nuclei_tool.application.contracts import NucleiParameters
+from nuclei_tool.domain.intensity import measure_intensity
 from nuclei_tool.domain.method import method_description
 
 __all__ = [
@@ -24,6 +25,7 @@ __all__ = [
     "nuclei_module_spec",
     "research_environment",
     "verify_model",
+    "measure_intensity",
     "method_description",
     "execution_identity",
     "encode_frame",
