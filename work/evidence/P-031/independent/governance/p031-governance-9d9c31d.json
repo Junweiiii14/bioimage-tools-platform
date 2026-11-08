@@ -1,0 +1,308 @@
+{
+  "base": "3b8de00eaa14901ababf129f5a110e1b0a8e7a8c",
+  "first": "e50e740dffa044391260270824a57163de620113",
+  "final": "9d9c31dd4457f0e175c627c6a9c230e3effe4c62",
+  "content": "bef2475d959067535457c793ab8e3ae438bfc8e3",
+  "integration": {
+    "schema": 1,
+    "task": "P-031",
+    "base_commit": "3b8de00eaa14901ababf129f5a110e1b0a8e7a8c",
+    "source_head": "e50e740dffa044391260270824a57163de620113",
+    "historical_receipts": {
+      "work/evidence/P-030/rules-context.json": "9b88c8b9740140dd04da4c71e614943aae238058"
+    }
+  },
+  "source_bytes": [
+    {
+      "source": "9b88c8b9740140dd04da4c71e614943aae238058",
+      "path": "work/evidence/P-030/compare.py",
+      "sha256": "97df76dc0b376d79baedb15dcd3f95aa0cc2fbeb9d67433c7a162878e99c7d85",
+      "blob": "b0e2cccf2c571e46c9ad2d6ceb2b41b62e634e9d"
+    },
+    {
+      "source": "9b88c8b9740140dd04da4c71e614943aae238058",
+      "path": "work/evidence/P-030/comparison.csv",
+      "sha256": "bd10d1f004e64c0e9243a134d3916720aa62d806ac7a1e65e8973e52a98c8a4f",
+      "blob": "b036c3c3ff90aa47ce19921a5c8bdea12d6f1591"
+    },
+    {
+      "source": "9b88c8b9740140dd04da4c71e614943aae238058",
+      "path": "work/evidence/P-030/contours.jpg",
+      "sha256": "7b9ecece8a5acb7c8cd6951c474a51b0fb9d081b2591150d0d713480098e81bd",
+      "blob": "65560f49b2bf80e4e70e05ef8b5b43fe7ab0a3d6"
+    },
+    {
+      "source": "9b88c8b9740140dd04da4c71e614943aae238058",
+      "path": "work/evidence/P-030/final-delivery.md",
+      "sha256": "ed123bc5f56fce2f65f3884dc21a268a8e00c774b45abfebf807aa4f464a67ee",
+      "blob": "5aeda2c876f438bf2203a034f0171264c1874bbd"
+    },
+    {
+      "source": "9b88c8b9740140dd04da4c71e614943aae238058",
+      "path": "work/evidence/P-030/independent/governance/p030-governance-5228adf.json",
+      "sha256": "c7a340629d42dbfd01223501b237dc08616069ca9231fdfc329ecadba6aae1cf",
+      "blob": "31b82d1aad280e548fca221e404753287e95af4e"
+    },
+    {
+      "source": "9b88c8b9740140dd04da4c71e614943aae238058",
+      "path": "work/evidence/P-030/independent/independent-review-5228adf.md",
+      "sha256": "459207e9c5fd4f05af147470209ff8a3acc5a2050a9c83bb1875f458ba33177a",
+      "blob": "1dd96799846b3ce76736f318240c7487b41fd7fd"
+    },
+    {
+      "source": "9b88c8b9740140dd04da4c71e614943aae238058",
+      "path": "work/evidence/P-030/independent/macro/run-1/receipt.json",
+      "sha256": "8947db1fdf4a91e7f7ace9b8ac856597c45e70d4f27d9ac81a569e1d41e17e34",
+      "blob": "be428d706169bccf07084440a930122f7a7cf1e4"
+    },
+    {
+      "source": "9b88c8b9740140dd04da4c71e614943aae238058",
+      "path": "work/evidence/P-030/independent/quant/receipt.json",
+      "sha256": "4760e367d6a2e1e95f9bda5be1075f8fdd027449d5cf03f841101971347fb240",
+      "blob": "a3927fe6d0d018b2b625bfe23b90653c3f50df35"
+    },
+    {
+      "source": "9b88c8b9740140dd04da4c71e614943aae238058",
+      "path": "work/evidence/P-030/independent/source/receipt.json",
+      "sha256": "61cf14ff81daa623633323c01ae61accc87ae0013568c01753309a3642d73815",
+      "blob": "d032c75a52f175bfc32ac93f6d175ae6e297bb09"
+    },
+    {
+      "source": "9b88c8b9740140dd04da4c71e614943aae238058",
+      "path": "work/evidence/P-030/integration-context.json",
+      "sha256": "90100824e22138c28370f423525cd163a18666d5d995e7f8ab7c00892a92373a",
+      "blob": "7a1435fee84ab14b345e8073642a9070fce8f3ea"
+    },
+    {
+      "source": "9b88c8b9740140dd04da4c71e614943aae238058",
+      "path": "work/evidence/P-030/manifest.json",
+      "sha256": "0daf6615e38575d9453e0d0f6fe79946fc526cf46e8efc2deffee005af66f35b",
+      "blob": "76ec383148869e2799991eaa09ea7c95fee1ac99"
+    },
+    {
+      "source": "9b88c8b9740140dd04da4c71e614943aae238058",
+      "path": "work/evidence/P-030/replay.py",
+      "sha256": "3ba4d426ba76dba85eb205158472a98f62514aeb67405e4a38bc339da623e8ca",
+      "blob": "83c4ff9dea56cd17a5100016228c59ce1a08f103"
+    },
+    {
+      "source": "9b88c8b9740140dd04da4c71e614943aae238058",
+      "path": "work/evidence/P-030/rules-context.json",
+      "sha256": "295ba95644fcc615b0e3ee6acdf2c2801a243dbae5140beb572d5a3e0609ec3c",
+      "blob": "e3930b5355710ddc63f8f263b900707a82e5a494"
+    },
+    {
+      "source": "9b88c8b9740140dd04da4c71e614943aae238058",
+      "path": "work/evidence/P-030/whst_batch_results.csv",
+      "sha256": "f9a5efa29025ed1058168ea1654ce1cbeca8ee960e4bd0838683d82323ee51b1",
+      "blob": "8a5d40721437d5d09ba066639af476fa4467b754"
+    },
+    {
+      "source": "9b88c8b9740140dd04da4c71e614943aae238058",
+      "path": "work/tasks/P-030-scratch.md",
+      "sha256": "7915fbc672dd39e6b5cdc4517d1af8d58045ab882e5b7aeb0532f63a77cbf4c8",
+      "blob": "f4a9b791919b3bd9c1e87038a60327b220cf9243"
+    },
+    {
+      "source": "e50e740dffa044391260270824a57163de620113",
+      "path": "work/evidence/P-031/rules-context.json",
+      "sha256": "7389c268776a256178d4128b4c8d4f62683a2d91a514629c2e22f042d0246b13",
+      "blob": "9a8cf55c93c4f2a10832c8bd664e0c9d3d1da97b"
+    },
+    {
+      "source": "bef2475d959067535457c793ab8e3ae438bfc8e3",
+      "path": "work/evidence/P-031/C2-detail.png",
+      "sha256": "77aac3ef25459f1ce7718f355805b0e9b2a6989ab47f836e77e1a7e0d8f1cf4f",
+      "blob": "52509c57d557e1b89c36488daf985ed5e46324cd"
+    },
+    {
+      "source": "bef2475d959067535457c793ab8e3ae438bfc8e3",
+      "path": "work/evidence/P-031/counts.csv",
+      "sha256": "a10c8a32763670531cece38c3b20011492d1b43bd8542b57a357bfd22bd50a6c",
+      "blob": "c4aecab8e63a85a2939dadb1fa9526a29d4b024a"
+    },
+    {
+      "source": "bef2475d959067535457c793ab8e3ae438bfc8e3",
+      "path": "work/evidence/P-031/replay.py",
+      "sha256": "f7353ac5f671a2b1916ea131bd1c20fe49e2983ce533c788a97b74b0e02b2957",
+      "blob": "7392f3e6e62b64cd4003af7ef52616a459730267"
+    },
+    {
+      "source": "bef2475d959067535457c793ab8e3ae438bfc8e3",
+      "path": "docs/research/2026-11-09-clonogenic-count.md",
+      "sha256": "3d7ed6ac4ff71282367fbbe1935d60f83826c166ae7734aaef708439e2ffb872",
+      "blob": "76f03a3622b2bc85033f2bc4acbfdf69a7aec641"
+    }
+  ],
+  "previous_reviewer_originals": [
+    {
+      "path": "governance/p030-governance-5228adf.json",
+      "original_sha256": "b5fd10935167cf2f6529387cf7adc1cb3d1b7bb2ab243d69a18814e44df6cbfc",
+      "git_sha256": "c7a340629d42dbfd01223501b237dc08616069ca9231fdfc329ecadba6aae1cf",
+      "raw_equal": false
+    },
+    {
+      "path": "independent-review-5228adf.md",
+      "original_sha256": "459207e9c5fd4f05af147470209ff8a3acc5a2050a9c83bb1875f458ba33177a",
+      "git_sha256": "459207e9c5fd4f05af147470209ff8a3acc5a2050a9c83bb1875f458ba33177a",
+      "raw_equal": true
+    },
+    {
+      "path": "macro/run-1/receipt.json",
+      "original_sha256": "41f4fb8d75d012ba5095aa2117770b1c9b0997d9fc29b1fca4855cb0c73d454f",
+      "git_sha256": "8947db1fdf4a91e7f7ace9b8ac856597c45e70d4f27d9ac81a569e1d41e17e34",
+      "raw_equal": false
+    },
+    {
+      "path": "quant/receipt.json",
+      "original_sha256": "86c90dc536075479db3c68393ecba0cb27981a2f3f4a4e3d32e287021b6f6733",
+      "git_sha256": "4760e367d6a2e1e95f9bda5be1075f8fdd027449d5cf03f841101971347fb240",
+      "raw_equal": false
+    },
+    {
+      "path": "source/receipt.json",
+      "original_sha256": "ea257a24a67f1a7d7a1d26d756fed7934f6942101e1bed203ed2ac0f34820bfd",
+      "git_sha256": "61cf14ff81daa623633323c01ae61accc87ae0013568c01753309a3642d73815",
+      "raw_equal": false
+    }
+  ],
+  "states": {
+    "base": {
+      "task_count": 30,
+      "missing_reviewed": [
+        "P-010",
+        "P-021",
+        "P-022",
+        "P-023"
+      ],
+      "invalid_status": []
+    },
+    "candidate": {
+      "task_count": 31,
+      "missing_reviewed": [
+        "P-010",
+        "P-021",
+        "P-022",
+        "P-023"
+      ],
+      "invalid_status": []
+    }
+  },
+  "checks": {
+    "first_rules": {
+      "command": [
+        "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe",
+        "-I",
+        "-B",
+        "tooling/rule_context.py",
+        "check",
+        "--base",
+        "3b8de00eaa14901ababf129f5a110e1b0a8e7a8c",
+        "--head",
+        "e50e740dffa044391260270824a57163de620113"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p031",
+      "exit": 1,
+      "stdout": "ERROR PR needs exactly one changed rules-context.json; use an explicit integration context for preserved historical receipts",
+      "stderr": ""
+    },
+    "final_rules": {
+      "command": [
+        "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe",
+        "-I",
+        "-B",
+        "tooling/rule_context.py",
+        "check",
+        "--base",
+        "3b8de00eaa14901ababf129f5a110e1b0a8e7a8c",
+        "--head",
+        "9d9c31dd4457f0e175c627c6a9c230e3effe4c62"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p031",
+      "exit": 0,
+      "stdout": "Rule context receipt matches this PR's base, scope and rule versions",
+      "stderr": ""
+    },
+    "base_plan": {
+      "command": [
+        "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe",
+        "-B",
+        "work/programs/scientific-agent-platform/check_plan.py"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p031\\.local\\governance\\input-3b8de00e",
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Plan check failed: Missing reviewed commit: P-010"
+    },
+    "candidate_plan": {
+      "command": [
+        "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe",
+        "-B",
+        "work/programs/scientific-agent-platform/check_plan.py"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p031\\.local\\governance\\input-9d9c31dd",
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Plan check failed: Missing reviewed commit: P-010"
+    },
+    "product_algo_gates": {
+      "command": [
+        "git",
+        "diff",
+        "--exit-code",
+        "3b8de00eaa14901ababf129f5a110e1b0a8e7a8c",
+        "9d9c31dd4457f0e175c627c6a9c230e3effe4c62",
+        "--",
+        "AGENTS.md",
+        "dev.py",
+        "apps",
+        "tools",
+        "packages",
+        "tooling",
+        "tests",
+        "examples",
+        ".agents",
+        ".github",
+        ".gitattributes",
+        ".importlinter",
+        "uv.lock",
+        "pyproject.toml",
+        "work/programs/scientific-agent-platform/check_plan.py",
+        "docs/plans/independent-review.md",
+        "docs/runbooks/rule-enforcement.md"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p031",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "diff_check": {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "3b8de00eaa14901ababf129f5a110e1b0a8e7a8c",
+        "9d9c31dd4457f0e175c627c6a9c230e3effe4c62"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p031",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "policy": {
+      "command": [
+        "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe",
+        "-B",
+        "dev.py",
+        "policy"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p031",
+      "exit": 0,
+      "stdout": "Product boundary scan: 250 files; zero means product is not implemented",
+      "stderr": ""
+    }
+  },
+  "git_status": "clean",
+  "execution_note": "Detached checkout policy-run source:e50e740dffa044391260270824a57163de620113. Final governance command uses explicit final Git SHA; the sole incremental change is a new integration-context.json.",
+  "evidence_exit": 0
+}

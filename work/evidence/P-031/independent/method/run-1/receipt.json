@@ -1,0 +1,206 @@
+{
+  "review_head": "e50e740dffa044391260270824a57163de620113",
+  "package": "1.0.2",
+  "raw_source_sha256": {
+    "softagar/cli.py": "de6f46f35a76794851bd7ea703deb28452d73a58eb8a482fb0e128da991609ed",
+    "softagar/io.py": "85c453552d2794c51a1786ad1366a8aba61f2a6c3a10017c83e629acda7a5b20",
+    "softagar/engine.py": "5c547d0d3bd8221bf7af2518c138fdd4263d4825e48bf3c62a1fe52b3ce4067a"
+  },
+  "archive_md5": "1d45b5a3bd7c50c80e628ab4cb664445",
+  "cli": [
+    "C:\\Users\\70236\\AppData\\Local\\Temp\\p031-research\\venv\\Scripts\\python.exe",
+    "-I",
+    "-B",
+    "-m",
+    "softagar.cli",
+    "count",
+    "-i",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p031\\.local\\method\\run-1\\images",
+    "-o",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p031\\.local\\method\\run-1\\cli.csv"
+  ],
+  "cli_exit": 0,
+  "recorded_cli_equal": true,
+  "per_flask": {
+    "T47D-0412-C1": {
+      "rgb16_to_uint8_exact_high_byte": true,
+      "stage_external_contours": {
+        "union": 80525,
+        "opening": 409,
+        "dilation": 142,
+        "closing": 86
+      },
+      "gate": {
+        "below_or_at_min": 56,
+        "accepted": 28,
+        "above_or_at_max": 2
+      },
+      "gt": 37,
+      "three_observers": [
+        40,
+        37,
+        33
+      ],
+      "signed_delta": -9,
+      "selected_contours": [
+        {
+          "contour_area": 240.0,
+          "bounds": [
+            372,
+            244,
+            18,
+            16
+          ],
+          "classification": "below_or_at_min",
+          "contained_gt": [
+            [
+              379.667,
+              254.333
+            ]
+          ]
+        },
+        {
+          "contour_area": 829351.0,
+          "bounds": [
+            0,
+            0,
+            2125,
+            2985
+          ],
+          "classification": "above_or_at_max",
+          "contained_gt": [
+            [
+              153.0,
+              849.0
+            ],
+            [
+              161.0,
+              1729.333
+            ],
+            [
+              1326.667,
+              2948.667
+            ]
+          ]
+        }
+      ],
+      "c2_pair_by_stage": []
+    },
+    "T47D-0412-C2": {
+      "rgb16_to_uint8_exact_high_byte": true,
+      "stage_external_contours": {
+        "union": 55444,
+        "opening": 421,
+        "dilation": 158,
+        "closing": 107
+      },
+      "gate": {
+        "below_or_at_min": 75,
+        "accepted": 30,
+        "above_or_at_max": 2
+      },
+      "gt": 48,
+      "three_observers": [
+        48,
+        50,
+        46
+      ],
+      "signed_delta": -18,
+      "selected_contours": [
+        {
+          "contour_area": 2562.5,
+          "bounds": [
+            400,
+            888,
+            70,
+            46
+          ],
+          "classification": "accepted",
+          "contained_gt": [
+            [
+              418.333,
+              909.333
+            ],
+            [
+              450.333,
+              913.333
+            ]
+          ]
+        }
+      ],
+      "c2_pair_by_stage": [
+        [
+          "union",
+          [
+            [
+              41213
+            ],
+            [
+              41213
+            ]
+          ],
+          true
+        ],
+        [
+          "opening",
+          [
+            [
+              271
+            ],
+            [
+              271
+            ]
+          ],
+          true
+        ],
+        [
+          "dilation",
+          [
+            [
+              114
+            ],
+            [
+              114
+            ]
+          ],
+          true
+        ],
+        [
+          "closing",
+          [
+            [
+              81
+            ],
+            [
+              81
+            ]
+          ],
+          true
+        ]
+      ]
+    },
+    "T47D-0412-C3": {
+      "rgb16_to_uint8_exact_high_byte": true,
+      "stage_external_contours": {
+        "union": 63723,
+        "opening": 392,
+        "dilation": 137,
+        "closing": 87
+      },
+      "gate": {
+        "below_or_at_min": 51,
+        "accepted": 34,
+        "above_or_at_max": 2
+      },
+      "gt": 45,
+      "three_observers": [
+        48,
+        44,
+        44
+      ],
+      "signed_delta": -11,
+      "selected_contours": [],
+      "c2_pair_by_stage": []
+    }
+  }
+}
