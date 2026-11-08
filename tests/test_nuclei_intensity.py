@@ -1,6 +1,10 @@
+from pathlib import Path
+
 import numpy as np
 import pytest
-from nuclei_tool.api import measure_intensity
+from bioimage_app.nuclei_intensity import measure_intensity
+from bioimage_app.nuclei_intensity_cli import export
+from platform_runtime.api import Workspace
 
 
 def test_sparse_ids_and_raw_values() -> None:
@@ -12,3 +16,13 @@ def test_sparse_ids_and_raw_values() -> None:
         list(measure_intensity(labels, pixels[:, :1]))
     with pytest.raises(ValueError, match="uint8"):
         list(measure_intensity(labels, pixels.astype(np.uint16)))
+
+
+def test_export_rejects_another_workspace_results(tmp_path: Path) -> None:
+    other = tmp_path / "another-project"
+    with Workspace.create(other):
+        pass
+    with pytest.raises(ValueError, match="outside all managed workspaces"):
+        export(tmp_path / "source-project", tmp_path / "target.tif", other / "results")
+    with Workspace.open(other) as reopened:
+        assert not reopened.list_documents()

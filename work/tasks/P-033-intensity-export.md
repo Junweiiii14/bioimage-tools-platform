@@ -5,3 +5,5 @@
 继承 P032 收尾 d6de0df。通过正式 CLI 选择已提交核分割项目与同坐标目标通道原图，按原标签导出逐核原始强度。验收覆盖真实结果、官方固定标签参考、稀疏编号和零核。
 
 Windows 本机以 P015 固定 worker 和模型对 ExampleHuman 的 AS_09125_050116030001_D03f00d0.tif 执行 nuclei_cli，再通过 nuclei_intensity_cli 配对 d1.tif。已提交 run 58a49b09055a41088bfee997c38bd08c 输出 233 行。运行 `uv run --locked --no-sync python work/evidence/P-033/verify.py <workspace> <d1.tif> <per-nucleus.csv>`，逐个掩膜核对 CSV，并用 P032 固定标签比较 289 组 PH3 编号、面积、均值和积分，全部精确相等，exit 0。两套标签来自不同分割方法。P015 历史 regression-03/valid-empty 运行同一导出入口得到仅有表头的 CSV 和核数 0 的出处。Windows 本机 tools/nuclei/tests 21 passed，ruff、定向 pyright 和 policy exit 0；未在作者机运行全量套件。
+
+独审 R01/R02 修复。导出前沿解析后的目标父目录查找项目标记，任何项目内部均拒绝；用两个有效项目复验，A→B/results exit 2，B 随后正常导出并逐核复算。测量函数移至宿主的独立 NumPy 模块。相对 PR 基线 `tools/nuclei/src` 零差异，原分割器身份校验完整保留。第一轮 233 核工作区是在改动分割包前生成的，未覆盖首版宿主与旧 worker 的组合。现用修复后的宿主、原 P015 worker 和固定模型重新运行 nuclei_cli，run 8491c70064a0439aa6b53b1013d5e98d 成功；正式导出及 verify.py 对 233 个实际标签、289 个 P032 固定标签均 exit 0。两组针对性测试共 22 passed，定向 pyright、policy exit 0。计划检查仍首报既有 P010 缺 reviewed commit。

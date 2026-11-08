@@ -11,16 +11,17 @@ from tempfile import TemporaryDirectory
 from uuid import uuid4
 
 import numpy as np
-from nuclei_tool.api import measure_intensity, read_nuclei_input
+from nuclei_tool.api import read_nuclei_input
 from platform_runtime.api import WorkspaceError
 
+from bioimage_app.nuclei_intensity import measure_intensity
 from bioimage_app.nuclei_results import read_result
 
 
 def export(workspace: Path, target: Path, parent: Path) -> Path:
     parent = parent.resolve()
-    if parent.is_relative_to(workspace.resolve()):
-        raise ValueError("Choose an export directory outside the nuclei workspace")
+    if any((p / "workspace.json").is_file() for p in (parent, *parent.parents)):
+        raise ValueError("Choose an export directory outside all managed workspaces")
     result = read_result(str(workspace))
     channel = read_nuclei_input(str(target))
     labels = np.load(io.BytesIO(result.labels), allow_pickle=False)

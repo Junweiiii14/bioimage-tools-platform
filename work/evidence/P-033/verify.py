@@ -9,8 +9,9 @@ from pathlib import Path
 
 import numpy as np
 import tifffile
+from bioimage_app.nuclei_intensity import measure_intensity
 from bioimage_app.nuclei_results import read_result
-from nuclei_tool.api import measure_intensity, read_nuclei_input
+from nuclei_tool.api import read_nuclei_input
 
 
 def verify(workspace: Path, target: Path, table: Path) -> None:
@@ -49,7 +50,11 @@ def verify(workspace: Path, target: Path, table: Path) -> None:
             if r["channel"] == "PH3"
         ]
     fixed = tifffile.imread(reference / "nuclei-labels.tif")
-    assert list(measure_intensity(fixed, read_nuclei_input(str(target)).pixels)) == expected
+    assert fixed.dtype == np.int32 and fixed.min() >= 0
+    assert (
+        list(measure_intensity(fixed.astype(np.uint32), read_nuclei_input(str(target)).pixels))
+        == expected
+    )
     print(f"Verified {len(rows)} committed StarDist objects and {len(expected)} fixed PH3 objects")
 
 
