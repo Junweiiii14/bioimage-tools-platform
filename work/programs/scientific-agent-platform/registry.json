@@ -105,6 +105,10 @@
     {
       "id": "P-025",
       "path": "work/tasks/P-025-first-order.md"
+    },
+    {
+      "id": "P-026",
+      "path": "work/tasks/P-026-wb-public-reference.md"
     }
   ],
   "work_packages": [
@@ -184,7 +188,8 @@
       ],
       "task_ids": [
         "P-011",
-        "P-012"
+        "P-012",
+        "P-026"
       ]
     },
     {

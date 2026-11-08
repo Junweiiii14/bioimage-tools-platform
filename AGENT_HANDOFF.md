@@ -46,7 +46,9 @@
 
 ## Current Pointer
 
-当前：[P025 首单研究](work/tasks/P-025-first-order.md)。
+当前：[P026 公开 WB 材料实核](work/tasks/P-026-wb-public-reference.md)。
+
+最近完成：[P025 首单研究](work/tasks/P-025-first-order.md)，见[最终交付](work/evidence/P-025/final-delivery.md)。
 
 - 最近完成：[P024 三工具首次练习](work/tasks/P-024-first-use-inputs.md)。实际练习包、PR76 集成和共享树交接见[最终交付](work/evidence/P-024/final-delivery.md)。
 

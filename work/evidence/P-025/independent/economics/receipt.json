@@ -1,0 +1,30 @@
+{
+  "head": "6868040bb3b0dee6a09d80a455c19f79f8f30964",
+  "annual_hours": 690,
+  "cases": {
+    "base": {
+      "cash_break_even_orders": 10,
+      "cash_over_100k_orders": 101,
+      "hours_at_target": 606,
+      "cash_at_target": 101100,
+      "capacity_orders": 115,
+      "cash_at_capacity": 116500,
+      "economic_surplus_at_cash_target": 40500,
+      "economic_contribution_per_order": 500,
+      "economic_surplus_at_capacity": 47500,
+      "economic_over_100k_orders": 221
+    },
+    "stress": {
+      "cash_break_even_orders": 38,
+      "cash_over_100k_orders": 163,
+      "hours_at_target": 1304,
+      "cash_at_target": 100400,
+      "capacity_orders": 86,
+      "cash_at_capacity": 38800,
+      "economic_surplus_at_cash_target": -30000,
+      "economic_contribution_per_order": 0,
+      "economic_surplus_at_capacity": -30000,
+      "economic_over_100k_orders": null
+    }
+  }
+}
