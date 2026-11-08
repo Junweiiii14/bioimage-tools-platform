@@ -1,3 +1,3 @@
 # 当前恢复入口
 
-[P026 公开 WB 证据](../work/tasks/P-026-wb-public-reference.md)：原值走查与作者稀释表已核，见[研究记录](../docs/research/2026-11-09-wb-public-reference.md)。下一步固定独审与必需 CI；T082 科学、学校试用与预算仍待证据。前项 [P025 最终交付](../work/evidence/P-025/final-delivery.md)。
+[P027 普通 WB 文件夹走查](../work/tasks/P-027-wb-folder.md)的候选与修复版走查已记录于[实际结果](../work/evidence/P-027/README.md)，下一步为准确提交独审与必需 CI。此前 [P026 最终交付](../work/evidence/P-026/final-delivery.md)已随本分支带入。

@@ -46,7 +46,7 @@
 
 ## Current Pointer
 
-当前：[P026 公开 WB 材料实核](work/tasks/P-026-wb-public-reference.md)。
+最近完成：[P026 公开 WB 材料实核](work/tasks/P-026-wb-public-reference.md)，见[最终交付](work/evidence/P-026/final-delivery.md)。
 
 最近完成：[P025 首单研究](work/tasks/P-025-first-order.md)，见[最终交付](work/evidence/P-025/final-delivery.md)。
 

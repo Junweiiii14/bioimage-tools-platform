@@ -1,0 +1,13 @@
+{
+  "butler_metadata_license": "CC BY",
+  "butler_infrared_G1": "Infrared Fluorescence",
+  "butler_G3_unicode": "Protein Amount (\u03bcg)",
+  "butler_infrared_membrane_cells_empty": [
+    "H13",
+    "H14",
+    "I14"
+  ],
+  "clegg_v1_docx_md5": "136d8ae92b1011bc871308db30073b10",
+  "clegg_v1_docx_has_Fiji": true,
+  "clegg_v1_docx_has_ChemiDoc": false
+}

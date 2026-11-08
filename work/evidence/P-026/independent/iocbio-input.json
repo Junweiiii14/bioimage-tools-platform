@@ -1,0 +1,41 @@
+{
+  "archive_sha256": "66c84b4a5557ccfd203bec15becbc9e85ca7c681e9e2b2545f24092b60059c46",
+  "members": [
+    "gel_images/",
+    "gel_images/gel2_LTCC_expo10min.tif",
+    "gel_images/gel3_AVG_Ponceau.tif",
+    "gel_images/gel3_GAPDH_expo3min.tif",
+    "gel_images/gel1_LTCC_expo5min.tif",
+    "gel_images/gel2_AVG_Ponceau.tif",
+    "gel_images/gel1_GAPDH_expo1min.tif",
+    "gel_images/gel1_AVG_Ponceau.tif",
+    "gel_images/gel2_GAPDH_expo3min.tif",
+    "gel_images/gel3_LTCC_expo15min.tif"
+  ],
+  "selected": "gel_images/gel1_GAPDH_expo1min.tif",
+  "member_sha256": "af35f27d9171f1699a8247611dc48683833f03eae1ed30a1e795ad5966ab3a64",
+  "raw_pixels_equal": true,
+  "tags": {
+    "ImageWidth": 3072,
+    "ImageLength": 2048,
+    "BitsPerSample": 16,
+    "SamplesPerPixel": 1,
+    "Model": "ImageQuant LAS 4000",
+    "ImageDescription": "Comment : \r\n\r\nIllumination=NONE\r\nFilter=1 Through\r\nIris=0.85\r\nShading Correction=FUJI_chemilumi_1.chd\r\nDistortion Correction=YES\r\nDark Frame=YES\r\nSpotting=YES\r\nInverted=NO\r\nBinning=High Resolution\r\nExposure time=1min\r\nRepeat time=1\r\nLens type=VRF43LMD\r\nPosition=1 STD\r\nCCD Temperature=-24.9"
+  },
+  "settings": {
+    "lane_count": 13,
+    "crop_height": 30,
+    "polarity": "light",
+    "left_marker": true,
+    "min_snr": 4.0,
+    "membrane_hint": null,
+    "include_membrane_edges": false
+  },
+  "shape": [
+    2048,
+    3072
+  ],
+  "dtype": "uint16",
+  "photometric": "MINISWHITE"
+}

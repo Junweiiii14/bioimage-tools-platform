@@ -28,7 +28,6 @@ window.intakeGroups = (() => {
         draft.sequence = draft.figures.flatMap((f) =>
             draft.sequence.filter((p) => p.figure_id === f.figure_id),
         );
-        draft.reference_group_ids ||= [];
         const names = entries();
         let index = 0;
         draft.groups.forEach((g) => {
