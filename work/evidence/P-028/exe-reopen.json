@@ -1,0 +1,13 @@
+{
+  "result": {
+    "type": "object",
+    "value": {
+      "fig": "Fig 1",
+      "protein": "GAPDH",
+      "N": "",
+      "selected": true,
+      "disabled": true,
+      "text": "BioImage\n工具平台\nWB\ninput · 2026-11-09\n新建 Fig\n工作流编排\n旧方法对照\n文件\n已保存\n桌面工作台\n1\n配置原图\n2\n自动裁图\n3\n拼图排版\n4\n灰度定量\n5\n结果表\n项目工具\n1 个蛋白 · 1 个 Fig\n开始自动处理\n配置本次实验\n\n填写 Fig 和蛋白名，再选择每个采集组用于裁剪的原图。\n\n添加图片文件夹\nFig 名称\n泳道数 N\n蛋白名 · 按顺序，每行一个\n自动分配\n\n对应采集组 01–采集组 01\n\n···\n＋ 添加 Fig\n蛋白顺序跨 Fig 连续对应采集组，名称中的标点保留。\n选择原图\n查找采集组\n来源选项\nGAPDH\n\n采集组 01\n\nFig 1 / GAPDH · N=待填\n\n取消选择\n用于裁剪\ngel1_GAPDH_expo1min.tif\n放大\n3072 × 2048 · 16 位\n1 个蛋白 · 已分配 1 / 1 组 · 已选原图 1 / 1\n\nFig 1：请填写 Fig 名称和 1–96 的泳道数 N。\n\n定位待补项\n\n输出位置：C:\\Users\\70236\\Documents\\BioImage\\Projects\\input-20261109-035434-56032c2f\\outputs · 自动创建独立子目录 更改\n\n相同原图复用\n放弃修改并重新载入\n保存草稿\n缩略图加载结束；0 张失败。\n本地工作空间 · 原图保留"
+    }
+  }
+}

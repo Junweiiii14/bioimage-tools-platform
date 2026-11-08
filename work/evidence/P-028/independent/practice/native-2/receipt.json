@@ -1,0 +1,40 @@
+{
+  "commit": "3103063d1abf116ef1d98694b9cc57f4dc70ae22",
+  "exe": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\releases\\runtime-3103063d1abf-acceptance-p028-local\\app\\BioImageWB-Acceptance.exe",
+  "exe_sha256": "c296f84d2b661386ba0fd6ff1b18b51803ebac529edbe45145b1592398847992",
+  "settings_before": "aefa800d38f94938dd914442f57746b1e8754e6610a15310b0421193168f8c83",
+  "pid": 19916,
+  "web_ui_url": "file:///C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync/.local/releases/runtime-3103063d1abf-acceptance-p028-local/app/runtime/Lib/site-packages/bioimage_app/web_ui/index.html",
+  "bca_entry": {
+    "heading": "BCA 蛋白定量",
+    "inputs": [
+      [
+        "source",
+        "选择 CSV",
+        true
+      ],
+      [
+        "record",
+        "加载板记录",
+        true
+      ],
+      [
+        "open",
+        "打开已保存项目",
+        true
+      ],
+      [
+        "export",
+        "导出表与来源",
+        false
+      ]
+    ],
+    "source": "尚未选择 CSV",
+    "run_disabled": true,
+    "method": true
+  },
+  "normal_exit": 0,
+  "settings_after": "aefa800d38f94938dd914442f57746b1e8754e6610a15310b0421193168f8c83",
+  "success": true,
+  "exit": 0
+}

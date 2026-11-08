@@ -113,6 +113,10 @@
     {
       "id": "P-027",
       "path": "work/tasks/P-027-wb-folder.md"
+    },
+    {
+      "id": "P-028",
+      "path": "work/tasks/P-028-local-refresh.md"
     }
   ],
   "work_packages": [
@@ -194,7 +198,8 @@
         "P-011",
         "P-012",
         "P-026",
-        "P-027"
+        "P-027",
+        "P-028"
       ]
     },
     {

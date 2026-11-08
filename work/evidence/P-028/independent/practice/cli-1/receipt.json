@@ -1,0 +1,61 @@
+{
+  "private_python": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\releases\\runtime-3103063d1abf-acceptance-p028-local\\app\\runtime\\python.exe",
+  "inputs": [
+    "297f027954d555e646c711d4e114277c860087a6382d97e417ac1b5afac276e3",
+    "4949ddadf2283dccbd3788592cc7ad985fbf6bb057e6aa97ff31885c4e83cf4e"
+  ],
+  "zip_sha256": "73ccd34c0ed1dbb971241edf200c90ccbe58539f1188189a31f387e423944d2c",
+  "workspace": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p028\\.local\\practice\\cli-1\\project",
+  "run_cmd": [
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\releases\\runtime-3103063d1abf-acceptance-p028-local\\app\\runtime\\python.exe",
+    "-B",
+    "-I",
+    "-X",
+    "utf8",
+    "-m",
+    "bioimage_app.bca_cli",
+    "--workspace",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p028\\.local\\practice\\cli-1\\project",
+    "--source",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p028\\.local\\practice\\cli-1\\synthetic.csv",
+    "--record",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p028\\.local\\practice\\cli-1\\record.json"
+  ],
+  "run_exit": 0,
+  "reopen_cmd": [
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\releases\\runtime-3103063d1abf-acceptance-p028-local\\app\\runtime\\python.exe",
+    "-B",
+    "-I",
+    "-X",
+    "utf8",
+    "-m",
+    "bioimage_app.bca_cli",
+    "--workspace",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p028\\.local\\practice\\cli-1\\project",
+    "--reopen",
+    "0e0fe84d300347ad875e83ff7dd82c3a"
+  ],
+  "reopen_exit": 0,
+  "execution_id": "0e0fe84d300347ad875e83ff7dd82c3a",
+  "run_id": "1789687f2c2d41f1bb9ac4a6aa6e05c7",
+  "pid": 7352,
+  "output_hashes": {
+    "wells": "50ac78824072bcc8715c9de4c2693e55c1386b1390777f19b9c48c52cb2c3370",
+    "samples": "983f420821e0975caf76b4a09160047e9cca2a3a00f6bb391c4fa5f5ad74ad40",
+    "provenance": "25e6350d81ed788aa3da973cfe1c98b33ae4bbc70296f95fa350ac9103d116fd"
+  },
+  "s1": {
+    "sample_id": "S1",
+    "dilution_factor": "10.0",
+    "n_total": "2",
+    "n_valid": "2",
+    "mean_original_ug_ml": "5008.680555555556",
+    "sd_original_ug_ml": "208.69470972519616",
+    "status": "research_estimate",
+    "reason": "technical replicates only; LoQ unknown",
+    "method_id": "pierce25-point-v0-research",
+    "api_version": "0.1.1"
+  },
+  "partial_groups": 4,
+  "success": true
+}

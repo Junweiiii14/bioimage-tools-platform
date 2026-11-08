@@ -1,0 +1,65 @@
+{
+  "native": {
+    "title": "BioImage · 工具平台 0.14.0 · wb-acceptance-p028-local · 3103063d1abf",
+    "home": [
+      "WB 实验工具 WB 图像处理 裁剪 · 拼图 · 灰度定量 运行环境已就绪 进入 WB",
+      "进入 WB",
+      "核 研究工具 单图核分割 原图 · 实例轮廓 · 核数 已配置 · 运行前核验 进入核分割",
+      "进入核分割",
+      "BCA 研究工具 BCA 蛋白定量 单板 CSV · 逐孔与技术样本结果 运行环境已就绪 进入 BCA",
+      "进入 BCA"
+    ],
+    "close_exit": 0
+  },
+  "exe_walk": {
+    "project": "input-20261109-035434-56032c2f",
+    "input_sha256": "af35f27d9171f1699a8247611dc48683833f03eae1ed30a1e795ad5966ab3a64",
+    "saved_and_reopened": {
+      "fig": "Fig 1",
+      "protein": "GAPDH",
+      "N": "",
+      "selected": true,
+      "disabled": true
+    },
+    "discovery_role": "unknown",
+    "regions": [],
+    "discovery_error": "",
+    "project_documents_with_observed_discovery": [
+      "drafts\\16596c05ec684e9292167f172d26bdf8\\document.json",
+      "drafts\\851c90499332401c84476476c6766755\\document.json"
+    ],
+    "cold_exit": 0
+  },
+  "protection": {
+    "files": [
+      {
+        "Path": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB 实验室版\\BioImageWB.exe",
+        "Hash": "59F6EC8877E777428B778CE95B95F92F2FD2DDEDD5921A1431FC5ADEBA310873"
+      },
+      {
+        "Path": "C:\\Users\\70236\\AppData\\Local\\Programs\\BioImage WB 实验室版\\unins000.exe",
+        "Hash": "3434D510D2C6727B175595AAFB2476F9E4B54047B8E8D49FFC7084DE616FBDB5"
+      },
+      {
+        "Path": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\releases\\runtime-5dbfb3947632-acceptance-p023-local\\app\\BioImageWB-Acceptance.exe",
+        "Hash": "B112D76395588E438E09BFFF5408359D2E7D45E520CEB35880E6FA0AD81A4A30"
+      },
+      {
+        "Path": "C:\\Users\\70236\\Desktop\\BioImage WB 实验室版.lnk",
+        "Hash": "0C5063F60A465E80FB2D73A1237A5D44C9B012F14754064FE1AB0CA1C714F578"
+      },
+      {
+        "Path": "C:\\Users\\70236\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\BioImage WB 实验室版\\BioImage WB 实验室版.lnk",
+        "Hash": "F07CBA4634CB1E99A5B3C0AF20C57D802E1B6281AD500F74818D28556ED7AFE2"
+      }
+    ],
+    "prior_settings_namespaces_observed_unchanged": [
+      "Laboratory",
+      "Acceptance-p023-local",
+      "Platform",
+      "Motion",
+      "SourceOrigins"
+    ]
+  },
+  "practice_zip_sha256": "73ccd34c0ed1dbb971241edf200c90ccbe58539f1188189a31f387e423944d2c"
+}

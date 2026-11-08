@@ -46,6 +46,8 @@
 
 ## Current Pointer
 
+最近完成：[P028 本机独立体验版](work/tasks/P-028-local-refresh.md)。[新版入口、练习指南与固定独审](work/evidence/P-028/README.md)。
+
 最近完成：[P027 普通 WB 文件夹走查](work/tasks/P-027-wb-folder.md)，见[最终交付](work/evidence/P-027/final-delivery.md)。
 
 最近完成：[P026 公开 WB 材料实核](work/tasks/P-026-wb-public-reference.md)，见[最终交付](work/evidence/P-026/final-delivery.md)。
