@@ -46,7 +46,7 @@
 
 ## Current Pointer
 
-[P029 qPCR 研究](work/tasks/P-029-qpcr-research.md)进入独审；[结论与复现](docs/research/2026-11-09-qpcr-relative.md)。
+[P029 qPCR 研究](work/tasks/P-029-qpcr-research.md)已完成；[研究、独审与 PR80 交付](work/evidence/P-029/final-delivery.md)。
 
 最近完成：[P028 本机独立体验版](work/tasks/P-028-local-refresh.md)。[新版入口、练习指南与固定独审](work/evidence/P-028/README.md)。
 

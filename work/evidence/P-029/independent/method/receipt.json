@@ -1,0 +1,37 @@
+{
+  "head": "506c96881c2e748ab9c2c1bb513a01914387f952",
+  "python": "3.11.15 (main, Jun 23 2026, 15:20:37) [MSC v.1944 64 bit (AMD64)]",
+  "pypi_wheel_sha256": "2bdff940a0c6f0cc5c8db6179e30cd39b854ade5069fb6a651fa86a37cbaa2ff",
+  "qpcr_files_compared": 43,
+  "qpcr_version": "4.1.4",
+  "pandas_version": "3.1.1",
+  "paper": "https://gene-quantification.de/pfaffl-nar-2001.pdf",
+  "condition": "Table 2 and Table 3, high input, 100%, 20 ng",
+  "mean_cps_and_factors": [
+    [
+      "TyrA",
+      "2.09",
+      "20.303",
+      "15.020"
+    ],
+    [
+      "Gst",
+      "1.99",
+      "14.277",
+      "14.533"
+    ]
+  ],
+  "target_sample_relative_to_control": "49.1284236585059608352327452085937423548959346",
+  "ref_sample_relative_to_control": "0.838481746223365772366022599473081223409275693",
+  "decimal_ratio": "58.5921206750021324210171803556737940829672245",
+  "paper_table3": "58.625",
+  "signed_delta_fold": "-0.0328793249978675789828196443262059170327755",
+  "difference_percent_of_table3": "0.0560841364569169790751721011960868520814933902",
+  "library_control_sample": [
+    1.0,
+    58.59212067500217
+  ],
+  "input_convention": "F/2 supplied to Assay.efficiency(float), exponent base then 2*x",
+  "scope": "one presummarized target and reference with already aligned rows",
+  "tracked_status": ""
+}

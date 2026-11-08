@@ -1,0 +1,4 @@
+workbook [('Control 1', 0.93), ('Control 2', 1.04), ('Control 3', 1.03), ('Control 4', 1.22), ('Control 5', 0.79), ('Control 6', 0.99), ('Treatment 1', 1.61), ('Treatment 2', 1.28), ('Treatment 3', 5.92), ('Treatment 4', 1.91), ('Treatment 5', 1.59), ('Treatment 6', 1.36)]
+treatment mean (unrounded / from displayed): 2.2786937035103008 2.2783333333333333
+heading [('Control 1', 0.93), ('Control 2', 1.05), ('Control 3', 1.03), ('Control 4', 1.22), ('Control 5', 0.79), ('Control 6', 0.99), ('Treatment 1', 1.61), ('Treatment 2', 1.29), ('Treatment 3', 1.56), ('Treatment 4', 1.92), ('Treatment 5', 1.59), ('Treatment 6', 1.36)]
+treatment mean (unrounded / from displayed): 1.555518355933591 1.5550000000000002
