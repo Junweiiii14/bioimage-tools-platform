@@ -1,6 +1,6 @@
 # P033 已提交核标签的目标通道强度导出
 
-<!-- PROGRAM_TASK_META {"id":"P-033","status":"in_review","head_commit":"f5fba3f3b0510fbbcbc6db6918c1088c6f9fdb40","work_package":"W14","depends_on":["P-016","P-032"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync","owner":"chat-01a1bd6d-3ea8-7303-8448-27d9d1848f1b","base_commit":"fb6638eb7145dc9f0af61679a48aaef24a681606"} -->
+<!-- PROGRAM_TASK_META {"id":"P-033","status":"in_review","head_commit":"002b13c3cbd7ba294109abb1b310fb6e488f4bd4","work_package":"W14","depends_on":["P-016","P-032"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync","owner":"chat-01a1bd6d-3ea8-7303-8448-27d9d1848f1b","base_commit":"fb6638eb7145dc9f0af61679a48aaef24a681606"} -->
 
 继承 P032 收尾 d6de0df。通过正式 CLI 选择已提交核分割项目与同坐标目标通道原图，按原标签导出逐核原始强度。验收覆盖真实结果、官方固定标签参考、稀疏编号和零核。
 
