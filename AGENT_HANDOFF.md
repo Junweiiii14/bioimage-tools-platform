@@ -46,6 +46,8 @@
 
 ## Current Pointer
 
+当前任务：[P031 克隆形成计数研究](work/tasks/P-031-clonogenic.md)。
+
 最近完成：[P030 划痕闭合研究](work/tasks/P-030-scratch.md)，见[研究、独审与 PR81 交付](work/evidence/P-030/final-delivery.md)。
 
 [P029 qPCR 研究](work/tasks/P-029-qpcr-research.md)已完成；[研究、独审与 PR80 交付](work/evidence/P-029/final-delivery.md)。

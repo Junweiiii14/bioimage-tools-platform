@@ -125,6 +125,10 @@
     {
       "id": "P-030",
       "path": "work/tasks/P-030-scratch.md"
+    },
+    {
+      "id": "P-031",
+      "path": "work/tasks/P-031-clonogenic.md"
     }
   ],
   "work_packages": [
@@ -304,7 +308,8 @@
       "task_ids": [
         "P-010",
         "P-029",
-        "P-030"
+        "P-030",
+        "P-031"
       ]
     }
   ],
