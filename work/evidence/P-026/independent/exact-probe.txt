@@ -1,0 +1,4 @@
+1 ImageQuant LAS 4000
+af35f27d9171f1699a8247611dc48683833f03eae1ed30a1e795ad5966ab3a64 MINISWHITE None (2048, 3072) uint16
+941 30497 0 0
+membrane_periodic_profile_candidates@1 ('membrane_not_found',) 0
