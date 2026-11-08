@@ -1,0 +1,528 @@
+{
+  "base": "3103063d1abf116ef1d98694b9cc57f4dc70ae22",
+  "candidate": "506c96881c2e748ab9c2c1bb513a01914387f952",
+  "content": "69376e4e078928842988a889577021c5bc28969c",
+  "active_manifest": {
+    "schema": 1,
+    "task": "P-029",
+    "base_commit": "3103063d1abf116ef1d98694b9cc57f4dc70ae22",
+    "source_head": "c566cbeddecf023f8af36c2150fe04288bd70d7b",
+    "historical_receipts": {
+      "work/evidence/P-027/rules-context.json": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "work/evidence/P-028/rules-context.json": "c566cbeddecf023f8af36c2150fe04288bd70d7b"
+    }
+  },
+  "archived_manifest": {
+    "schema": 1,
+    "task": "P-028",
+    "base_commit": "3103063d1abf116ef1d98694b9cc57f4dc70ae22",
+    "source_head": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+    "historical_receipts": {
+      "work/evidence/P-027/rules-context.json": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98"
+    }
+  },
+  "source_byte_pairs": [
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/evidence/P-027/README.md",
+      "dst": "work/evidence/P-027/README.md",
+      "blob": "caad3a3f0aca8f5ff2051ca8c944b3c3e65a4a4b",
+      "sha256": "cdaa2bf0959722b7d1fc76b55a62eb859d8386e2e4c6b389941b822056431433",
+      "bytes": 4164
+    },
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/evidence/P-027/final-delivery.md",
+      "dst": "work/evidence/P-027/final-delivery.md",
+      "blob": "f85854e4444a88916455758d4be16401ba66b74b",
+      "sha256": "45f84bf2c8df74b3995c2a567e2736695bd85207a749515ad1c8c1fd54dd0bc9",
+      "bytes": 2325
+    },
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/evidence/P-027/independent/evidence/p027-source-and-walkthrough.json",
+      "dst": "work/evidence/P-027/independent/evidence/p027-source-and-walkthrough.json",
+      "blob": "c1aad443fa522fc9feb2081f0b8ebce71e4e9c15",
+      "sha256": "0a05bd3a1a009cca530aa23575982fb5201008f010749ecbfade7afe33a8ace6",
+      "bytes": 1184
+    },
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/evidence/P-027/independent/governance/recheck-05d04b2.json",
+      "dst": "work/evidence/P-027/independent/governance/recheck-05d04b2.json",
+      "blob": "318eae96243610fd836153dc5f858a18ab198609",
+      "sha256": "46165b8d530f61e95f3be6cc0771fcc7f282f64696a7f259e194a6d26d30195f",
+      "bytes": 393
+    },
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/evidence/P-027/independent/governance/review-4168f9c.json",
+      "dst": "work/evidence/P-027/independent/governance/review-4168f9c.json",
+      "blob": "ae0eaccbceb4157cf397d1e8c16a269a0f77f314",
+      "sha256": "6b5cfccd7e8c518e30dbdc511d56b12fa5dc55d191d610beb8703872db27af83",
+      "bytes": 7129
+    },
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/evidence/P-027/independent/independent-review-05d04b2.md",
+      "dst": "work/evidence/P-027/independent/independent-review-05d04b2.md",
+      "blob": "e45420f5ddc5950285ee0e9ba04f5437c0b70306",
+      "sha256": "1d79a347fa394560f704de2d06f311d39f752bcd84787e6cf50103501ff6c865",
+      "bytes": 1281
+    },
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/evidence/P-027/independent/independent-review-4168f9c.md",
+      "dst": "work/evidence/P-027/independent/independent-review-4168f9c.md",
+      "blob": "4a09f8f18d3bdd05d4b1192d47ad49ac054c074f",
+      "sha256": "a324c7fb9e915abc18dddcb425b09a0ade7d4b62465179a107941e0cbe4089e2",
+      "bytes": 5130
+    },
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/evidence/P-027/independent/references/disk-check-preselected.json",
+      "dst": "work/evidence/P-027/independent/references/disk-check-preselected.json",
+      "blob": "f740dc65defcd1602515a66536811994b91fc7c7",
+      "sha256": "3bcc12b0660aed81cfebaf6ea96b7ad18a985a8806ac4b5d60f6f27b4b830dd3",
+      "bytes": 297
+    },
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/evidence/P-027/independent/references/disk-check.json",
+      "dst": "work/evidence/P-027/independent/references/disk-check.json",
+      "blob": "20827af9c110f8e98205117ef5e3bf0ca985fe4d",
+      "sha256": "8a9db9f3025ab2717e3afe18b5a6dc6b27cdfa1904e5cb2b9a93e1161aad68f3",
+      "bytes": 351
+    },
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/evidence/P-027/independent/references/observations.json",
+      "dst": "work/evidence/P-027/independent/references/observations.json",
+      "blob": "cbd4fa735c43911b426c9ec71d8bf76904d0d076",
+      "sha256": "2424c16d185753555fc171d4cfc5acdb6ce289cd73696e514de17900684d2ee3",
+      "bytes": 1631
+    },
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/evidence/P-027/independent/references/preselected-base.json",
+      "dst": "work/evidence/P-027/independent/references/preselected-base.json",
+      "blob": "36a5ecb75dd637c5522d4db3e572a1ba20caea0a",
+      "sha256": "ae9a6ce139697d0fd2be2009ba1163232e1e9a724ad7a3d6c56a76ca23aa56f8",
+      "bytes": 2656
+    },
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/evidence/P-027/independent/references/preselected-candidate.json",
+      "dst": "work/evidence/P-027/independent/references/preselected-candidate.json",
+      "blob": "d36548a852a452b6c9b46eab94b370e7491d2d2d",
+      "sha256": "2de98f44c082c6ae300e5d31f98c917533c6eea0adbac411a0ae195cbdeac095",
+      "bytes": 2626
+    },
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/evidence/P-027/independent/references/receipt.md",
+      "dst": "work/evidence/P-027/independent/references/receipt.md",
+      "blob": "ae4f936d960a11f7a009683d2a8131f4e06875ac",
+      "sha256": "8c254f7d6a2a901cb0cd49bfd591bc64d495c0bdb35927c3b389c87cef8bdb7b",
+      "bytes": 3244
+    },
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/evidence/P-027/independent/single-input-final.log",
+      "dst": "work/evidence/P-027/independent/single-input-final.log",
+      "blob": "cd0a6b76ad6bf531e2eb352c1e6f56bf37c7689e",
+      "sha256": "9c23876f93c99179dca85785c921ff24eab0ea7e0609e9c7755b510e9dd7409e",
+      "bytes": 1363
+    },
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/evidence/P-027/independent/single-input-receipt.json",
+      "dst": "work/evidence/P-027/independent/single-input-receipt.json",
+      "blob": "8fcc13365e93682b78a192d1d2b7ffb7bdf65783",
+      "sha256": "b54226aca7689a914dd368298bbf03914e9be370a5255a8cc994b90616e50cbc",
+      "bytes": 1573
+    },
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/evidence/P-027/integration-context.json",
+      "dst": "work/evidence/P-027/integration-context.json",
+      "blob": "d2fc358b29c176be104b2548d077a6abd99e34d4",
+      "sha256": "707c6a3e165d8fd50b798e6415d791ec308cbdeab97badec1a5b557cf9f7314e",
+      "bytes": 280
+    },
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/evidence/P-027/observations.json",
+      "dst": "work/evidence/P-027/observations.json",
+      "blob": "202c3b4b86edbc5dc66b347ceb21d24c52b22fb4",
+      "sha256": "bee01fa4c2818509e1ea3fb6110b60242197d2b4a03c0e92098efb1b39e9f494",
+      "bytes": 11057
+    },
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/evidence/P-027/rules-context.json",
+      "dst": "work/evidence/P-027/rules-context.json",
+      "blob": "43dec615b80a8f2503758d4f437e690fff0a3536",
+      "sha256": "8af6d441631a596f5b5d300e3cd3f9c21464cc76b0bf9da2147ee5c7aa0d88d9",
+      "bytes": 1524
+    },
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/evidence/P-027/windows-attempt1.log.gz",
+      "dst": "work/evidence/P-027/windows-attempt1.log.gz",
+      "blob": "485d0176bd4da18493a16658df74a32bca31de05",
+      "sha256": "7fb0a3a9b06bde1f0ce336c880a539c027481996a68e325a9299f8ba389d8c29",
+      "bytes": 58345
+    },
+    {
+      "source": "c566cbeddecf023f8af36c2150fe04288bd70d7b",
+      "src": "work/evidence/P-028/README.md",
+      "dst": "work/evidence/P-028/README.md",
+      "blob": "fd363ef15c3554053eb4e7c2309f3aa81770f78c",
+      "sha256": "f6cbad7d09648a96e1ce8006d7a8f59f17e02629b8d85ed8eb841883da4f65c5",
+      "bytes": 4014
+    },
+    {
+      "source": "c566cbeddecf023f8af36c2150fe04288bd70d7b",
+      "src": "work/evidence/P-028/audit.json",
+      "dst": "work/evidence/P-028/audit.json",
+      "blob": "2d35227f697dfa337177eb4a34c05151e775a598",
+      "sha256": "2f5d603077fee6cea22ccbff9900636b22e70c9f4865fa4aa7d73c8c6f5c98c8",
+      "bytes": 3783
+    },
+    {
+      "source": "c566cbeddecf023f8af36c2150fe04288bd70d7b",
+      "src": "work/evidence/P-028/exe-reopen.json",
+      "dst": "work/evidence/P-028/exe-reopen.json",
+      "blob": "89f20cf84738c8d82a039e6fbd6b35d1aa8fc087",
+      "sha256": "f252702511ede69ead6770b6399112bafc013c9a1338f0b75a09187781103598",
+      "bytes": 1407
+    },
+    {
+      "source": "c566cbeddecf023f8af36c2150fe04288bd70d7b",
+      "src": "work/evidence/P-028/exe-saved.json",
+      "dst": "work/evidence/P-028/exe-saved.json",
+      "blob": "9fe5a2f21ed28ef7fbd28a25d2dde46a4ed78c72",
+      "sha256": "9297401dbe030a2f6cadd59ca5c4d651348c882a26116f1b148061f4c622b6c0",
+      "bytes": 1411
+    },
+    {
+      "source": "c566cbeddecf023f8af36c2150fe04288bd70d7b",
+      "src": "work/evidence/P-028/independent/independent-review-3103063.md",
+      "dst": "work/evidence/P-028/independent/independent-review-3103063.md",
+      "blob": "eee10ebefa8e2399708bedd081705a2f9b63ba6e",
+      "sha256": "cf5a0a63e39046bc73b85c55923516eeefbf2018e736c19df790b963ca4bd3b3",
+      "bytes": 4050
+    },
+    {
+      "source": "c566cbeddecf023f8af36c2150fe04288bd70d7b",
+      "src": "work/evidence/P-028/independent/practice/cli-1/receipt.json",
+      "dst": "work/evidence/P-028/independent/practice/cli-1/receipt.json",
+      "blob": "fb34ef48f698df216732f4b20609fd8bbcb0b064",
+      "sha256": "1a220abf51e75c756db526fcd1c93367db24ad262527f1477b8217c359c3f199",
+      "bytes": 2504
+    },
+    {
+      "source": "c566cbeddecf023f8af36c2150fe04288bd70d7b",
+      "src": "work/evidence/P-028/independent/practice/native-2/receipt.json",
+      "dst": "work/evidence/P-028/independent/practice/native-2/receipt.json",
+      "blob": "688eacaaf18fd0f7aca407bfc9e137c278c7ebe7",
+      "sha256": "29dd83b07dc7eea9b3abb621eec0b8c60e0bd182d52ced0185526187ad52be68",
+      "bytes": 1234
+    },
+    {
+      "source": "c566cbeddecf023f8af36c2150fe04288bd70d7b",
+      "src": "work/evidence/P-028/independent/provenance/receipt.json",
+      "dst": "work/evidence/P-028/independent/provenance/receipt.json",
+      "blob": "93a221b1dcb6d96942c67c9624d3f5e60363cfdc",
+      "sha256": "c17f6469fa9fa51b6fe1aafd9d51cad24db3182ad15364efc0df2e41358109d2",
+      "bytes": 5103
+    },
+    {
+      "source": "c566cbeddecf023f8af36c2150fe04288bd70d7b",
+      "src": "work/evidence/P-028/independent/wb/reopen.json",
+      "dst": "work/evidence/P-028/independent/wb/reopen.json",
+      "blob": "89f33d685659abb2e8f3e0ac2ac99e923a8886b0",
+      "sha256": "2e0d9d82811ce914f9e3199a4661ee26634caf9652ddbad0caf6d9b759874dad",
+      "bytes": 2394
+    },
+    {
+      "source": "c566cbeddecf023f8af36c2150fe04288bd70d7b",
+      "src": "work/evidence/P-028/independent/wb/save.json",
+      "dst": "work/evidence/P-028/independent/wb/save.json",
+      "blob": "701f2e2027c375dea9461c5319f5904ac4940f12",
+      "sha256": "98b7ca9761171bdac2f801f3e0a1b084b6a54beb6a3af2b7298863ce88dd6e03",
+      "bytes": 2484
+    },
+    {
+      "source": "c566cbeddecf023f8af36c2150fe04288bd70d7b",
+      "src": "work/evidence/P-028/integration-context.json",
+      "dst": "work/evidence/P-028/historical-integration-context.json",
+      "blob": "9c8843c087e93cea2fb40007c57687a7688bc7a3",
+      "sha256": "f4da06fe3e7994f0f72724060837b8585226bc163dd6dc602c8abfff72413aa9",
+      "bytes": 280
+    },
+    {
+      "source": "c566cbeddecf023f8af36c2150fe04288bd70d7b",
+      "src": "work/evidence/P-028/observations.json",
+      "dst": "work/evidence/P-028/observations.json",
+      "blob": "3d5dd648c70d123760e744f6c04697edc3f69f7e",
+      "sha256": "b22b09dbc4049816abe5238dff4dbae0aede551e010f3a77cce47ddb0f7ec840",
+      "bytes": 2569
+    },
+    {
+      "source": "c566cbeddecf023f8af36c2150fe04288bd70d7b",
+      "src": "work/evidence/P-028/rules-context.json",
+      "dst": "work/evidence/P-028/rules-context.json",
+      "blob": "00d1d7a17c549b70d3b1bb11a7a5c535c60201fb",
+      "sha256": "87b73981ad7dec7ae8bc93a2d4b752e1478c732c4abd8741da8d5e347420f715",
+      "bytes": 1524
+    },
+    {
+      "source": "e58ef89bc94f9b539eca8500f82386fa1bf8bb98",
+      "src": "work/tasks/P-027-wb-folder.md",
+      "dst": "work/tasks/P-027-wb-folder.md",
+      "blob": "dc3bdc837cd88230fa1f5c75bc4f176838678544",
+      "sha256": "4609f33cfd677e2a8bdf43e2cb653148fd330cb666a5e0f371efab0b9993724c",
+      "bytes": 792
+    },
+    {
+      "source": "c566cbeddecf023f8af36c2150fe04288bd70d7b",
+      "src": "work/tasks/P-028-local-refresh.md",
+      "dst": "work/tasks/P-028-local-refresh.md",
+      "blob": "d3f6626f5cd4b520726bded2b8d7d037504881c3",
+      "sha256": "50a28b1184294211e5ebbcdb00d5ed39cc118fa947a8d23bf27c02364e9edda8",
+      "bytes": 703
+    },
+    {
+      "source": "69376e4e078928842988a889577021c5bc28969c",
+      "src": "work/evidence/P-029/probe.py",
+      "dst": "work/evidence/P-029/probe.py",
+      "blob": "f6dac6f44f84dbb88c9ab78a5eb6813374520313",
+      "sha256": "0fdb9cbd067b7813f3161e37c3ca385a20932493a081d2623afd49c855d06a8a",
+      "bytes": 1917
+    },
+    {
+      "source": "69376e4e078928842988a889577021c5bc28969c",
+      "src": "work/evidence/P-029/pfaffl.py",
+      "dst": "work/evidence/P-029/pfaffl.py",
+      "blob": "e41d00696ec2ccd43bd486e2a527cb00f9fbf51c",
+      "sha256": "9aaeeb7b6f6571c796d83674e8c98d755deccc0d99138402c539daaf8f49241b",
+      "bytes": 548
+    },
+    {
+      "source": "69376e4e078928842988a889577021c5bc28969c",
+      "src": "work/evidence/P-029/research-versions.txt",
+      "dst": "work/evidence/P-029/research-versions.txt",
+      "blob": "c779f6f53fddb76ee8b69a346ed2508c28b93754",
+      "sha256": "951d275b4b7d841ace1569422b955f99bde06101047be8eaf6d8f09e0ad438aa",
+      "bytes": 441
+    },
+    {
+      "source": "69376e4e078928842988a889577021c5bc28969c",
+      "src": "docs/research/2026-11-09-qpcr-relative.md",
+      "dst": "docs/research/2026-11-09-qpcr-relative.md",
+      "blob": "249b1fc10827e33b1228a5ac48daf38bdf366ea4",
+      "sha256": "a3e9776acec8e0b6e8130eceb1a30bd6aa4d7c721a630d617649e6b5e9fbc266",
+      "bytes": 9304
+    }
+  ],
+  "checks": {
+    "candidate_rule_context": {
+      "command": [
+        "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe",
+        "-I",
+        "-B",
+        "tooling/rule_context.py",
+        "check",
+        "--base",
+        "3103063d1abf116ef1d98694b9cc57f4dc70ae22",
+        "--head",
+        "506c96881c2e748ab9c2c1bb513a01914387f952"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p029",
+      "exit": 0,
+      "stdout": "Rule context receipt matches this PR's base, scope and rule versions",
+      "stderr": ""
+    },
+    "first_content_rule_context": {
+      "command": [
+        "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe",
+        "-I",
+        "-B",
+        "tooling/rule_context.py",
+        "check",
+        "--base",
+        "3103063d1abf116ef1d98694b9cc57f4dc70ae22",
+        "--head",
+        "69376e4e078928842988a889577021c5bc28969c"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p029",
+      "exit": 1,
+      "stdout": "ERROR Integration needs exactly one changed integration context",
+      "stderr": ""
+    },
+    "head_policy": {
+      "command": [
+        "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe",
+        "-B",
+        "dev.py",
+        "policy"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p029",
+      "exit": 0,
+      "stdout": "Product boundary scan: 250 files; zero means product is not implemented",
+      "stderr": ""
+    },
+    "base_plan_check": {
+      "command": [
+        "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe",
+        "-B",
+        "work/programs/scientific-agent-platform/check_plan.py"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p029\\.local\\governance\\plan-inputs-3103063d",
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Plan check failed: Missing reviewed commit: P-010"
+    },
+    "candidate_plan_check": {
+      "command": [
+        "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe",
+        "-B",
+        "work/programs/scientific-agent-platform/check_plan.py"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p029\\.local\\governance\\plan-inputs-506c9688",
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Plan check failed: Missing reviewed commit: P-010"
+    },
+    "whitespace": {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "3103063d1abf116ef1d98694b9cc57f4dc70ae22",
+        "506c96881c2e748ab9c2c1bb513a01914387f952"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p029",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  "states": {
+    "base": {
+      "task_count": 27,
+      "missing_reviewed": [
+        "P-010",
+        "P-021",
+        "P-022",
+        "P-023"
+      ],
+      "invalid_status": [],
+      "changed_task_metadata": {
+        "P-027": {
+          "id": "P-027",
+          "status": "in_review",
+          "work_package": "W06",
+          "depends_on": [
+            "P-023",
+            "P-024",
+            "P-026"
+          ],
+          "execution_root": "C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync",
+          "owner": "chat-01a1bc6f-d8d2-7cd2-bc55-e08d8d6a41c8",
+          "head_commit": "4168f9c4b9d55f1fbc67b124244be15f0c0393da",
+          "base_commit": "8321615773c73ede412e1a60b2688e545f537f8a"
+        }
+      }
+    },
+    "candidate": {
+      "task_count": 29,
+      "missing_reviewed": [
+        "P-010",
+        "P-021",
+        "P-022",
+        "P-023"
+      ],
+      "invalid_status": [],
+      "changed_task_metadata": {
+        "P-027": {
+          "id": "P-027",
+          "status": "done",
+          "work_package": "W06",
+          "depends_on": [
+            "P-023",
+            "P-024",
+            "P-026"
+          ],
+          "execution_root": "C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync",
+          "owner": "chat-01a1bc6f-d8d2-7cd2-bc55-e08d8d6a41c8",
+          "head_commit": "05d04b2e942078cc1f5b988af135aaedde2d695b",
+          "base_commit": "8321615773c73ede412e1a60b2688e545f537f8a"
+        },
+        "P-028": {
+          "id": "P-028",
+          "status": "done",
+          "head_commit": "3103063d1abf116ef1d98694b9cc57f4dc70ae22",
+          "work_package": "W06",
+          "depends_on": [
+            "P-023",
+            "P-024",
+            "P-027"
+          ],
+          "execution_root": "C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync",
+          "owner": "chat-01a1bcb3-76c8-7853-a5a1-50738c62b12e",
+          "base_commit": "3103063d1abf116ef1d98694b9cc57f4dc70ae22"
+        },
+        "P-029": {
+          "id": "P-029",
+          "status": "in_review",
+          "head_commit": "69376e4e078928842988a889577021c5bc28969c",
+          "work_package": "W14",
+          "depends_on": [
+            "P-010"
+          ],
+          "execution_root": "C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync",
+          "owner": "chat-01a1bcc3-ddb1-7e02-933f-2b2cc6c3bbce",
+          "base_commit": "3103063d1abf116ef1d98694b9cc57f4dc70ae22"
+        }
+      }
+    }
+  },
+  "code_gate_scope": {
+    "command": [
+      "git",
+      "diff",
+      "--exit-code",
+      "3103063d1abf116ef1d98694b9cc57f4dc70ae22",
+      "506c96881c2e748ab9c2c1bb513a01914387f952",
+      "--",
+      "AGENTS.md",
+      "dev.py",
+      "apps",
+      "tools",
+      "packages",
+      "tooling",
+      "tests",
+      "examples",
+      ".agents",
+      ".github",
+      ".gitattributes",
+      ".importlinter",
+      "uv.lock",
+      "pyproject.toml",
+      "work/programs/scientific-agent-platform/check_plan.py",
+      "docs/plans/independent-review.md",
+      "docs/runbooks/rule-enforcement.md"
+    ],
+    "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p029",
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "product_tests_run": 0,
+  "research_probes_run": 0,
+  "git_status": "clean",
+  "evidence_exit": 0
+}

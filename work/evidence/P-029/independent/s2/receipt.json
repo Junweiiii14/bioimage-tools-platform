@@ -1,0 +1,167 @@
+{
+  "review_head": "506c96881c2e748ab9c2c1bb513a01914387f952",
+  "sha256": "392883b5337f65c5099f04143bb160fa294492d438d1ebab49c7318ab6b18be3",
+  "efficiency_means": {
+    "C": "1.80486111111111110833333333333333333333333333",
+    "D": "1.80747222222222221944444444444444444444444444",
+    "E": "1.80138888888888888888888888888888888888888889"
+  },
+  "sample_ids": [
+    "Control 1",
+    "Control 2",
+    "Control 3",
+    "Control 4",
+    "Control 5",
+    "Control 6",
+    "Treatment 1",
+    "Treatment 2",
+    "Treatment 3",
+    "Treatment 4",
+    "Treatment 5",
+    "Treatment 6"
+  ],
+  "formulas_at_treatment3": {
+    "G": "Efficiencies!$E$40^(-(AVERAGE(E30:E32)))",
+    "H": "Efficiencies!$C$40^(-(AVERAGE(E30:E32)))",
+    "I": "Efficiencies!$D$40^(-(AVERAGE(F30:F32)))",
+    "J": "GEOMEAN(H30:I32)",
+    "K": "G30/J30",
+    "L": "(ROUND(K30/AVERAGE($K$6:$K$23),2))"
+  },
+  "treatment3_raw_cq": {
+    "TARGET": [
+      "28.254631042480469",
+      "28.383310317993164",
+      "28.269216537475586"
+    ],
+    "REF1": [
+      "25.984390258789063",
+      "25.952678680419922",
+      "26.181207656860352"
+    ],
+    "REF2": [
+      "21.078775405883789",
+      "21.171483993530273",
+      "21.153160095214844"
+    ]
+  },
+  "modes": {
+    "literal": {
+      "control1": "0.93",
+      "treatment3": "5.92",
+      "all_shown": [
+        "0.93",
+        "1.04",
+        "1.03",
+        "1.22",
+        "0.79",
+        "0.99",
+        "1.61",
+        "1.28",
+        "5.92",
+        "1.91",
+        "1.59",
+        "1.36"
+      ],
+      "controls": 6,
+      "control_arithmetic_nq": "0.042412908815521828792547286011982232170081039",
+      "treatment_mean_rounded_first": "2.27833333333333333333333333333333333333333333",
+      "treatment_mean_full_precision": "2.27869370351030022066303994744441242081021462",
+      "treatment3_columns": [
+        [
+          "TARGET",
+          "E",
+          "E"
+        ],
+        [
+          "REF1",
+          "C",
+          "E"
+        ],
+        [
+          "REF2",
+          "D",
+          "F"
+        ]
+      ]
+    },
+    "header_mapping": {
+      "control1": "0.93",
+      "treatment3": "1.56",
+      "all_shown": [
+        "0.93",
+        "1.05",
+        "1.03",
+        "1.22",
+        "0.79",
+        "0.99",
+        "1.61",
+        "1.29",
+        "1.56",
+        "1.92",
+        "1.59",
+        "1.36"
+      ],
+      "controls": 6,
+      "control_arithmetic_nq": "0.0394659663179426943520782038293861640819134023",
+      "treatment_mean_rounded_first": "1.555",
+      "treatment_mean_full_precision": "1.55551835593359096077425773170040241295602574",
+      "treatment3_columns": [
+        [
+          "TARGET",
+          "C",
+          "D"
+        ],
+        [
+          "REF1",
+          "D",
+          "E"
+        ],
+        [
+          "REF2",
+          "E",
+          "F"
+        ]
+      ]
+    },
+    "per_sample_sensitivity": {
+      "control1": "0.89",
+      "treatment3": "0.94",
+      "all_shown": [
+        "0.89",
+        "0.50",
+        "1.49",
+        "1.24",
+        "0.38",
+        "1.50",
+        "2.95",
+        "1.36",
+        "0.94",
+        "1.13",
+        "2.52",
+        "0.88"
+      ],
+      "controls": 6,
+      "control_arithmetic_nq": "0.0433071601653502312116504767324919660828561223",
+      "treatment_mean_rounded_first": "1.63",
+      "treatment_mean_full_precision": "1.63131908030422366752428101337163916092031640",
+      "treatment3_columns": [
+        [
+          "TARGET",
+          "C",
+          "D"
+        ],
+        [
+          "REF1",
+          "D",
+          "E"
+        ],
+        [
+          "REF2",
+          "E",
+          "F"
+        ]
+      ]
+    }
+  }
+}

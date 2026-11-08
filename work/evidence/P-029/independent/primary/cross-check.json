@@ -1,0 +1,42 @@
+{
+  "rdml": {
+    "reactions": 90,
+    "combinations": 30,
+    "valid_cq": 88,
+    "missing": [
+      [
+        "B10",
+        "R-HCtrl13",
+        "GusBP1"
+      ],
+      [
+        "B11",
+        "R-HCtrl13",
+        "GusBP1"
+      ]
+    ],
+    "first": [
+      "A1",
+      "R-MoH9",
+      "HoxB1P1",
+      "25.4648305780052"
+    ]
+  },
+  "s2": {
+    "column_factors": [
+      1.804861111111111,
+      1.8074722222222221,
+      1.801388888888889
+    ],
+    "T3_F_local": [
+      1.8396666666666668,
+      1.8463333333333334,
+      1.776
+    ],
+    "sheet_heading_F_all_assays_T3": 1.5626788111481362,
+    "sheet_heading_F_all_assays_treatment_mean": 1.5555183559335906,
+    "alternate_per_sample_F_T3": 0.9416617364892238,
+    "alternate_per_sample_F_treatment_mean": 1.6313190803042228,
+    "alternate_is_sensitivity_only": true
+  }
+}

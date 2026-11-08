@@ -121,6 +121,10 @@
     {
       "id": "P-029",
       "path": "work/tasks/P-029-qpcr-research.md"
+    },
+    {
+      "id": "P-030",
+      "path": "work/tasks/P-030-scratch.md"
     }
   ],
   "work_packages": [
@@ -299,7 +303,8 @@
       ],
       "task_ids": [
         "P-010",
-        "P-029"
+        "P-029",
+        "P-030"
       ]
     }
   ],
