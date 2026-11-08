@@ -21,4 +21,3 @@ Windows、CPython 3.11.15、SoftCount 1.0.2、NumPy 2.2.6、Pillow 12.3.0、Open
 ![C2 的两个参考中心被计为一个](C2-detail.png)
 
 C2 原坐标框 (350,840) 至 (530,960)，取自回放生成的 C2-overlay.png，再按最近邻放大三倍；左上原点，右、下为正方向。绿色算法圈、洋红显微中心，两点均在同一获计轮廓内。图源 Arous 等，2021，CC BY 4.0，已裁切、叠标与放大。[数据与作者](https://doi.org/10.5281/zenodo.4593510) · [完整研究](../../../docs/research/2026-11-09-clonogenic-count.md)
-
