@@ -2,6 +2,7 @@
 root_packages =
     wb_tool
     nuclei_tool
+    nuclei_intensity
     bca_tool
     tool_contracts
     platform_runtime
@@ -52,6 +53,7 @@ forbidden_modules =
     platform_runtime
     wb_tool
     nuclei_tool
+    nuclei_intensity
     bca_tool
     PySide6
     numpy
@@ -64,6 +66,7 @@ source_modules = platform_runtime
 forbidden_modules =
     wb_tool
     nuclei_tool
+    nuclei_intensity
     bca_tool
     PySide6
     numpy
@@ -74,6 +77,7 @@ type = independence
 modules =
     wb_tool
     nuclei_tool
+    nuclei_intensity
     bca_tool
     platform_runtime
 
@@ -84,6 +88,7 @@ source_modules = bioimage_app.storage
 forbidden_modules =
     wb_tool
     nuclei_tool
+    nuclei_intensity
     bca_tool
     numpy
 
@@ -95,6 +100,7 @@ source_modules =
     platform_runtime
     wb_tool
     nuclei_tool
+    nuclei_intensity
     bca_tool
 forbidden_modules = bioimage_app
 
@@ -102,7 +108,9 @@ forbidden_modules = bioimage_app
 [importlinter:contract:nuclei-domain]
 name = Nuclei domain stays pure
 type = forbidden
-source_modules = nuclei_tool.domain
+source_modules =
+    nuclei_tool.domain
+    nuclei_intensity
 forbidden_modules =
     nuclei_tool.adapters
     nuclei_tool.application

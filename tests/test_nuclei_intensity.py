@@ -2,8 +2,8 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from bioimage_app.nuclei_intensity import measure_intensity
 from bioimage_app.nuclei_intensity_cli import export
+from nuclei_intensity.api import measure_intensity
 from platform_runtime.api import Workspace
 
 

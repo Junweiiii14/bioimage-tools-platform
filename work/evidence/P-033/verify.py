@@ -9,8 +9,8 @@ from pathlib import Path
 
 import numpy as np
 import tifffile
-from bioimage_app.nuclei_intensity import measure_intensity
 from bioimage_app.nuclei_results import read_result
+from nuclei_intensity.api import measure_intensity
 from nuclei_tool.api import read_nuclei_input
 
 

@@ -18,6 +18,7 @@ MODULES: dict[str, tuple[str, frozenset[str]]] = {
                 "desktop_sdk",
                 "wb_tool",
                 "nuclei_tool",
+                "nuclei_intensity",
                 "bca_tool",
             }
         ),
@@ -31,6 +32,7 @@ MODULES: dict[str, tuple[str, frozenset[str]]] = {
         frozenset({"imaging_core", "desktop_sdk", "tool_contracts"}),
     ),
     "bca_tool": ("tools/bca/src", frozenset({"tool_contracts"})),
+    "nuclei_intensity": ("tools/nuclei/src", frozenset()),
     "nuclei_tool": ("tools/nuclei/src", frozenset({"tool_contracts"})),
     "wb_tool": (
         "tools/wb/src",
@@ -104,18 +106,18 @@ def violations(source: str, module: str, filename: str = "<source>") -> list[str
 def check_repository(root: Path) -> tuple[int, list[str]]:
     count = 0
     errors: list[str] = []
-    registered = {(root / folder).resolve() for folder, _ in MODULES.values()}
+    registered = {root / folder for folder, _ in MODULES.values()}
     for category in ("packages", "tools", "apps"):
         for folder in (root / category).glob("*/src"):
-            if folder.resolve() not in registered:
+            if folder not in registered:
                 errors.append(f"{folder.relative_to(root)}: register package boundary before use")
-    for owner, (folder, _) in MODULES.items():
-        src = root / folder
+    for src in sorted(registered):
         for path in src.rglob("*.py"):
             count += 1
             module = ".".join(path.relative_to(src).with_suffix("").parts)
-            if module.split(".")[0] != owner:
-                errors.append(f"{path.relative_to(root)}: source root must contain {owner}")
+            owner = module.split(".")[0]
+            if owner not in MODULES or root / MODULES[owner][0] != src:
+                errors.append(f"{path.relative_to(root)}: unexpected package in source root")
                 continue
             errors.extend(violations(path.read_text(encoding="utf-8"), module, str(path)))
     return count, errors

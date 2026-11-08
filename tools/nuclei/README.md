@@ -1,6 +1,6 @@
 # 固定核分割研究工具
 
-唯一公开入口`nuclei_tool.api`。固定P014 StarDist0.9.2/2D_versatile_fluo研究方法，尚无科学准入。
+分割入口为 `nuclei_tool.api`，逐核强度计算入口为同一 wheel 的 `nuclei_intensity.api`。固定P014 StarDist0.9.2/2D_versatile_fluo研究方法，尚无科学准入。
 领域只验证数组和标签；输入/模型/输出I/O在适配层，宿主通过既有WorkflowSession运行独立worker。
 TensorFlow不属于本包默认依赖，不得在宿主导入时加载，也不运行时下载权重。
 
