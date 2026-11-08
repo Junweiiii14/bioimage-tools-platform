@@ -1,0 +1,70 @@
+{
+  "head": "5228adf0ea23de3b78c7f70fedab1b1f7239f4d3",
+  "input_directory": "C:\\Users\\70236\\AppData\\Local\\Temp\\p030-scratch-replay2",
+  "rows": {
+    "0": {
+      "predicted": 1597483,
+      "reference": 1365072,
+      "intersection": 1257003,
+      "union": 1705552,
+      "iou": "0.7370065527172434496280383125",
+      "polygon_vertices": [
+        383
+      ],
+      "mask_sha256": "c2ff62e2d1d192c46372b5badd3cc5afe0f5a1c4b9c12d300e70c0b2518b386e",
+      "pil_reference": 1364549,
+      "method_closure_pct": "0",
+      "reference_closure_pct": "0",
+      "difference_pp": "0",
+      "pil_reference_closure_pct": "0"
+    },
+    "8": {
+      "predicted": 484039,
+      "reference": 741429,
+      "intersection": 473772,
+      "union": 751696,
+      "iou": "0.6302707477490900576828930844",
+      "polygon_vertices": [
+        446
+      ],
+      "mask_sha256": "98a24683bfc5a8607b0fb128a24623f9aa7179e1c0de2634c1a4c03e25b85b9e",
+      "pil_reference": 740669,
+      "method_closure_pct": "69.69989664991740131193884379",
+      "reference_closure_pct": "45.68572207180280600583705475",
+      "difference_pp": "24.01417457811459530610178904",
+      "pil_reference_closure_pct": "45.72060072595414309050096405"
+    },
+    "12": {
+      "predicted": 2148570,
+      "reference": 626030,
+      "intersection": 613201,
+      "union": 2161399,
+      "iou": "0.2837055999378180521042158343",
+      "polygon_vertices": [
+        329
+      ],
+      "mask_sha256": "3e41794136f47a1c77459b6e595f2322a7c50659ec734d9d20cbe4c409d93612",
+      "pil_reference": 625568,
+      "method_closure_pct": "-34.49720591705827229460344805",
+      "reference_closure_pct": "54.13941535684564623697504600",
+      "difference_pp": "-88.63662127390391853157849405",
+      "pil_reference_closure_pct": "54.15569539825979133032232628"
+    },
+    "24": {
+      "predicted": 1737870,
+      "reference": 404039,
+      "intersection": 402786,
+      "union": 1739123,
+      "iou": "0.2316029401025689384822120115",
+      "polygon_vertices": [
+        326
+      ],
+      "mask_sha256": "e48248e5bc07d1793cc4e5431c39e12c9905491c1e83f142729788cbfb5df16e",
+      "pil_reference": 403307,
+      "method_closure_pct": "-8.788012141600254900991121658",
+      "reference_closure_pct": "70.40163449253958765544967591",
+      "difference_pp": "-79.18964663413984255644079757",
+      "pil_reference_closure_pct": "70.44393422295571650413433303"
+    }
+  }
+}

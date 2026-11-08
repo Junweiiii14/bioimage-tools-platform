@@ -1,0 +1,68 @@
+{
+  "review_head": "5228adf0ea23de3b78c7f70fedab1b1f7239f4d3",
+  "upstream_url": "https://raw.githubusercontent.com/nykemariotto/scratch-assay-segmentation/6cbd78da604291a4b1dbf1926b06e44279381af3/stage4/whst_batch.ijm",
+  "upstream_macro_sha256": "540a29fd80b371991fec5672a769fed689f8c2d81954806e113127eb82981da4",
+  "local_macro_sha256": "7866d4334ab5ada6d659034deb6ca40edeaf6de5664d53ead0275f5c698e7418",
+  "author_runs_compared": {
+    "p030-scratch": {
+      "changed_source_lines": [
+        65,
+        66
+      ],
+      "extra_blank_lines": 1
+    },
+    "p030-scratch-replay2": {
+      "changed_source_lines": [
+        65,
+        66
+      ],
+      "extra_blank_lines": 0
+    }
+  },
+  "jar_sha256": "2e1a09961dfb41cee66ddc821b2577a41a072566ce45a49bae69267099741e20",
+  "java_command": [
+    "C:/Program Files/CellProfiler/java/bin/java.exe",
+    "-Xmx1g",
+    "-Duser.home=C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p030\\.local\\macro\\run-1\\home",
+    "-Djava.io.tmpdir=C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p030\\.local\\macro\\run-1\\javatmp",
+    "-cp",
+    "ij.jar",
+    "ij.ImageJ",
+    "-batch",
+    "batch.ijm"
+  ],
+  "java_exit": 0,
+  "csv_matches_all_fields": true,
+  "inputs_bytes": 18900498,
+  "observed": {
+    "0": {
+      "area_px2": 1597483,
+      "roi_candidates": 245,
+      "mask_sha256": "c2ff62e2d1d192c46372b5badd3cc5afe0f5a1c4b9c12d300e70c0b2518b386e",
+      "author_mask_identical": true,
+      "signed_closure_percent": 0.0
+    },
+    "12": {
+      "area_px2": 2148570,
+      "roi_candidates": 223,
+      "mask_sha256": "3e41794136f47a1c77459b6e595f2322a7c50659ec734d9d20cbe4c409d93612",
+      "author_mask_identical": true,
+      "signed_closure_percent": -34.497205917058274
+    },
+    "24": {
+      "area_px2": 1737870,
+      "roi_candidates": 157,
+      "mask_sha256": "e48248e5bc07d1793cc4e5431c39e12c9905491c1e83f142729788cbfb5df16e",
+      "author_mask_identical": true,
+      "signed_closure_percent": -8.788012141600255
+    },
+    "8": {
+      "area_px2": 484039,
+      "roi_candidates": 67,
+      "mask_sha256": "98a24683bfc5a8607b0fb128a24623f9aa7179e1c0de2634c1a4c03e25b85b9e",
+      "author_mask_identical": true,
+      "signed_closure_percent": 69.6998966499174
+    }
+  },
+  "scope": "prediction only, 4 selected training frames, no independent annotation/held-out test"
+}

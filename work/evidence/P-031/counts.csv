@@ -1,0 +1,4 @@
+filename,count,global_thresh,adaptive_block_size,adaptive_C,morph_kernel_size,opening_iterations,dilation_iterations,closing_iterations,min_area,max_area,clahe_clip_limit,clahe_tile_grid_size
+T47D-0412-C1.tif,28,127,21,4,3,2,3,6,525,15000,2.0,8
+T47D-0412-C2.tif,30,127,21,4,3,2,3,6,525,15000,2.0,8
+T47D-0412-C3.tif,34,127,21,4,3,2,3,6,525,15000,2.0,8

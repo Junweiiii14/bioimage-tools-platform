@@ -1,3 +1,3 @@
 # 当前恢复入口
 
-[P030 划痕闭合研究](../work/tasks/P-030-scratch.md)；[四帧对照与排期条件](../docs/research/2026-11-09-scratch-closure.md)。当前从任务卡恢复独审和集成。P029 已完成，见其最终交付。
+[P031 克隆形成研究](../work/tasks/P-031-clonogenic.md)已完成三瓶复算，见[计数、误差与排期条件](../docs/research/2026-11-09-clonogenic-count.md)。下一步按任务卡冻结独审并核对 PR 必需检查。P030 一次收尾随本轮携带。
