@@ -1,6 +1,6 @@
 # P024 候选首次使用与输入准备
 
-<!-- PROGRAM_TASK_META {"id":"P-024","status":"done","work_package":"W13","depends_on":["P-023"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync","owner":"chat-01a1b161-9a6d-70f1-84ae-86e53af2eba8","base_commit":"d3733a7e1edae6e195d129c751a707e62b7fedea"} -->
+<!-- PROGRAM_TASK_META {"id":"P-024","status":"done","work_package":"W13","depends_on":["P-023"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync","owner":"chat-01a1b161-9a6d-70f1-84ae-86e53af2eba8","head_commit":"9d684ebb7089150273ef8da1760d6a6153a29d1d","base_commit":"d3733a7e1edae6e195d129c751a707e62b7fedea"} -->
 
 2026-11-06 从干净72651ea恢复，保留P023一次收尾。仅本窗口写入共享树。
 
