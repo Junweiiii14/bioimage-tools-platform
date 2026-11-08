@@ -1,3 +1,3 @@
 # 当前恢复入口
 
-[P025 首单研究](../work/tasks/P-025-first-order.md)已合入 PR77/main e846a681c85e04d53904fe8b6b384376e98f6032，与独审通过的 472247f 同树。交接见[最终交付](../work/evidence/P-025/final-delivery.md)。本机练习入口沿用 P024；下一条商业证据需用户协调学生走查与预算答复。真实付款、复购及科学/目标机限制均未验证。一次本地收尾后释放共享树。
+[P026 公开 WB 证据](../work/tasks/P-026-wb-public-reference.md)：原值走查与作者稀释表已核，见[研究记录](../docs/research/2026-11-09-wb-public-reference.md)。下一步固定独审与必需 CI；T082 科学、学校试用与预算仍待证据。前项 [P025 最终交付](../work/evidence/P-025/final-delivery.md)。
