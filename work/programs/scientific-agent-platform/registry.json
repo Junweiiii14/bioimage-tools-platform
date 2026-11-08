@@ -117,6 +117,10 @@
     {
       "id": "P-028",
       "path": "work/tasks/P-028-local-refresh.md"
+    },
+    {
+      "id": "P-029",
+      "path": "work/tasks/P-029-qpcr-research.md"
     }
   ],
   "work_packages": [
@@ -294,7 +298,8 @@
         "W13"
       ],
       "task_ids": [
-        "P-010"
+        "P-010",
+        "P-029"
       ]
     }
   ],
