@@ -230,3 +230,7 @@ PR71/main1c819aeaae9813fdc29606cbad463b08a191fbab与已审4cb48ad51dc71f5e4b3619
 ## 2026-11-06 P023
 
 准确5dbfb39独审pass，最终7900payload/506archive/308资源、六wheel字节同源，原生标题/三入口/退出0、设置不变。PR75四必需CI首轮成功，Windows1778passed、Linux1774passed/4既有skip，后续wheel门禁成功，main d3733a7同树。详work/evidence/P-023/final-delivery.md和原始压缩日志；N01/历史UNKNOWN及未验项保留。
+
+## 2026-11-09 P024
+
+三路线导出/重开与156项已记录文件摘要核对通过，BCA最后重开是离屏Qt。指定独审复建同字节练习ZIP并验证17个文件，PR76同一head四项必需CI首轮通过，main完整树diff exit 0。见work/evidence/P-024/final-delivery.md。

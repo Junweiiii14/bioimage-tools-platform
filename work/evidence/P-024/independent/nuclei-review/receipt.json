@@ -1,0 +1,82 @@
+{
+  "review_head": "9d684ebb7089150273ef8da1760d6a6153a29d1d",
+  "source_record": "https://uk1s3.embassy.ebi.ac.uk/bia-integrator-data/pages/S-BIAD634.html",
+  "official_record_raw": "IM197",
+  "official_record_mask": "IM68",
+  "official_licence": "CC0",
+  "licence_deed": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "official_readme_url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/readme.txt",
+  "raw_url": "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/634/S-BIAD634/Files/dataset/rawimages/Ganglioneuroblastoma_10.tif",
+  "http_official_readme_and_image": [
+    200,
+    200
+  ],
+  "raw_bytes": 1393214,
+  "file_sha256": {
+    "official": "77f7b965733145a6edae173090ba1b9081266c708a3f141a12f8b281af640074",
+    "git": "77f7b965733145a6edae173090ba1b9081266c708a3f141a12f8b281af640074",
+    "working_copy": "77f7b965733145a6edae173090ba1b9081266c708a3f141a12f8b281af640074",
+    "p014_cache": "77f7b965733145a6edae173090ba1b9081266c708a3f141a12f8b281af640074"
+  },
+  "readme": {
+    "official": {
+      "bytes": 3166,
+      "sha256": "34083d38b4335553ae1b886d373e4dcbc5ea4c2387125d864d8e68424458df79",
+      "crlf_count": 39,
+      "lf_only_count": 0,
+      "same_text_normalizing_crlf": true
+    },
+    "git": {
+      "bytes": 3127,
+      "sha256": "46f56872acfa6a56da8fc8486a3859078133aec0ea3b49bbafa3bdd8ccda0089",
+      "crlf_count": 0,
+      "lf_only_count": 39,
+      "same_text_normalizing_crlf": true
+    },
+    "working_copy": {
+      "bytes": 3127,
+      "sha256": "46f56872acfa6a56da8fc8486a3859078133aec0ea3b49bbafa3bdd8ccda0089",
+      "crlf_count": 0,
+      "lf_only_count": 39,
+      "same_text_normalizing_crlf": true
+    },
+    "p014_cache": {
+      "bytes": 3166,
+      "sha256": "34083d38b4335553ae1b886d373e4dcbc5ea4c2387125d864d8e68424458df79",
+      "crlf_count": 39,
+      "lf_only_count": 0,
+      "same_text_normalizing_crlf": true
+    }
+  },
+  "historical_p014_metrics": {
+    "method": "stardist",
+    "image": "Ganglioneuroblastoma_10",
+    "gt_count": "38",
+    "pred_count": "46",
+    "absolute_count_error": "8",
+    "relative_count_error": "0.21052631578947367",
+    "tp": "27",
+    "fp": "19",
+    "fn": "11",
+    "f1": "0.6428571428571429"
+  },
+  "p024_record_keys": [
+    "bca-export",
+    "bca-input",
+    "bca-reopen",
+    "bca-result",
+    "before-reopen-hashes",
+    "nuclei-export",
+    "nuclei-input",
+    "nuclei-reopen",
+    "nuclei-result",
+    "wb-export",
+    "wb-input",
+    "wb-reopen",
+    "wb-result",
+    "exports",
+    "after_reopen_hashes"
+  ],
+  "tracked_status": "",
+  "model_executed": false
+}

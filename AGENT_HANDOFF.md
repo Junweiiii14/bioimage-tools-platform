@@ -46,6 +46,10 @@
 
 ## Current Pointer
 
+当前：[P025 首单研究](work/tasks/P-025-first-order.md)。
+
+- 最近完成：[P024 三工具首次练习](work/tasks/P-024-first-use-inputs.md)。实际练习包、PR76 集成和共享树交接见[最终交付](work/evidence/P-024/final-delivery.md)。
+
 - 最近完成：[P022 可选工具装配与重启停用](work/tasks/P-022-optional-tools.md)，PR74/main b13e71a与已审47ded5e同树，必需CI通过；Linux首轮挂起UNKNOWN保留。一次本地收尾后释放bioimage-plan-sync，下一任务由上游新窗口派发；见[交付](work/evidence/P-022/final-delivery.md)。
 
 - 最近完成：[P021 核分割与 BCA 研究工作流](work/tasks/P-021-research-workflow.md)，工程完成，PR73/main2a3c7a3与已审3f425b5同树，指定独审与必需CI通过；本地一次收尾后释放，详[交付](work/evidence/P-021/final-delivery.md)。

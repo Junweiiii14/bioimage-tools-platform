@@ -1,0 +1,49 @@
+{
+  "head": "9d684ebb7089150273ef8da1760d6a6153a29d1d",
+  "python": "C:\\Users\\70236\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+  "version": "3.14.6",
+  "captures_matched": 12,
+  "exports_rehashed": 12,
+  "files_rehashed_by_workspace": {
+    "Nuclei-04e831efe9ae": 29,
+    "BCA-8485a3ce4ce1": 33,
+    "inputs-20261106-231443-c5ea5a66": 94
+  },
+  "sqlite_open_mode": "ro&immutable=1",
+  "formal_workers": {
+    "3b914b640dde43fdaee28276dccbe484": {
+      "pid": 49972,
+      "project": "Nuclei-04e831efe9ae"
+    },
+    "63647dd725694a7ba63805cd3623febe": {
+      "pid": 22496,
+      "project": "BCA-8485a3ce4ce1"
+    },
+    "05abde4b880246afa19588afc5093771": {
+      "pid": 38752,
+      "project": "inputs-20261106-231443-c5ea5a66"
+    },
+    "76af5cb7b5204544b414e6f900369fb1": {
+      "pid": 31096,
+      "project": "inputs-20261106-231443-c5ea5a66"
+    }
+  },
+  "wb_source_sha256": [
+    "26f5b862839b7f992922de0fcd4a4c530e74e75c52717e92e71f73f6e51d61e9",
+    "b70e638b0017b901ce9da1943c4a69696a4fad8dd0f9f8dde2eb1e69cf9d7204"
+  ],
+  "wb_raw_integrals_per_row": [
+    268125,
+    375375,
+    268125,
+    375375,
+    268125
+  ],
+  "nuclei_source_sha256": "77f7b965733145a6edae173090ba1b9081266c708a3f141a12f8b281af640074",
+  "nuclei_distinct_nonzero_ids": 46,
+  "bca_source_sha256": "297f027954d555e646c711d4e114277c860087a6382d97e417ac1b5afac276e3",
+  "bca_wells_bound": 28,
+  "bca_s1": "5008.680555555556",
+  "bca_partial_groups_with_empty_mean": 4,
+  "success": true
+}
