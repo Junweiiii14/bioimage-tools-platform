@@ -1,0 +1,118 @@
+[
+  {
+    "arquivo_b": "E6 0H 2_png.rf.qIyWYgA9w4tryEhjNmUS.png",
+    "timepoint_h": "0",
+    "grp_huvec": "LUIS RAW||PEP+GB||E6",
+    "campo": "2",
+    "lote": "LUIS RAW",
+    "status": "ok",
+    "resolucao": "ok_hash",
+    "split_huvec": "train",
+    "similaridade": "1.0",
+    "images": {
+      "path": "dataset/images/train/E6 0H 2_png.rf.qIyWYgA9w4tryEhjNmUS.png",
+      "range": [
+        2432111912,
+        2436877168
+      ],
+      "sha256": "ed51f9871a60d666e066bef7106d733765f59b8a77dcc09f52118f2e83944426",
+      "compressed_size": 4765038
+    },
+    "labels": {
+      "path": "dataset/labels/train/E6 0H 2_png.rf.qIyWYgA9w4tryEhjNmUS.txt",
+      "range": [
+        3678718662,
+        3678721375
+      ],
+      "sha256": "557046369a144169da65cbb822e43529e1276a1204952c3550390acd4309ef2e",
+      "compressed_size": 2495
+    }
+  },
+  {
+    "arquivo_b": "E6 8H 2_png.rf.hEmiyn8BWhtuUW3q3YCM.png",
+    "timepoint_h": "8",
+    "grp_huvec": "LUIS RAW||PEP+GB||E6",
+    "campo": "2",
+    "lote": "LUIS RAW",
+    "status": "ok",
+    "resolucao": "ok_hash",
+    "split_huvec": "train",
+    "similaridade": "1.0",
+    "images": {
+      "path": "dataset/images/train/E6 8H 2_png.rf.hEmiyn8BWhtuUW3q3YCM.png",
+      "range": [
+        2479043354,
+        2484045052
+      ],
+      "sha256": "25a7f36549c5d1d8f97632c6940d7e4f1f3dbb1de4ffb7b7feaf55efc0e14db4",
+      "compressed_size": 5001480
+    },
+    "labels": {
+      "path": "dataset/labels/train/E6 8H 2_png.rf.hEmiyn8BWhtuUW3q3YCM.txt",
+      "range": [
+        3678739821,
+        3678742875
+      ],
+      "sha256": "6efb16b63f6f4a7cd77e72c161194e144698944849adb4407e72675698153ae3",
+      "compressed_size": 2836
+    }
+  },
+  {
+    "arquivo_b": "E6 12H 2_png.rf.TsrNibUXSGYTAPRKTkyw.png",
+    "timepoint_h": "12",
+    "grp_huvec": "LUIS RAW||PEP+GB||E6",
+    "campo": "2",
+    "lote": "LUIS RAW",
+    "status": "ok",
+    "resolucao": "ok_hash",
+    "split_huvec": "train",
+    "similaridade": "1.0",
+    "images": {
+      "path": "dataset/images/train/E6 12H 2_png.rf.TsrNibUXSGYTAPRKTkyw.png",
+      "range": [
+        2447434997,
+        2451981468
+      ],
+      "sha256": "7afa9cad0220208d6cac99f78c0d33ecda975766c3054562f5e4ae48e98ca075",
+      "compressed_size": 4546252
+    },
+    "labels": {
+      "path": "dataset/labels/train/E6 12H 2_png.rf.TsrNibUXSGYTAPRKTkyw.txt",
+      "range": [
+        3678726825,
+        3678729126
+      ],
+      "sha256": "4d5e5de1a9c55aed4ef67932be6c883a1d3a7cc645bbf8c5e925a83e72cb1572",
+      "compressed_size": 2082
+    }
+  },
+  {
+    "arquivo_b": "E6 24H 2_png.rf.xPxa5zfkuhQQMYWCu9UE.png",
+    "timepoint_h": "24",
+    "grp_huvec": "LUIS RAW||PEP+GB||E6",
+    "campo": "2",
+    "lote": "LUIS RAW",
+    "status": "ok",
+    "resolucao": "ok_hash",
+    "split_huvec": "train",
+    "similaridade": "1.0",
+    "images": {
+      "path": "dataset/images/train/E6 24H 2_png.rf.xPxa5zfkuhQQMYWCu9UE.png",
+      "range": [
+        2463093678,
+        2467681625
+      ],
+      "sha256": "dbdc784c3c7facf4f92cc1a3ede3103b7bb8f83cfe16af4194a7af137081d25e",
+      "compressed_size": 4587728
+    },
+    "labels": {
+      "path": "dataset/labels/train/E6 24H 2_png.rf.xPxa5zfkuhQQMYWCu9UE.txt",
+      "range": [
+        3678731964,
+        3678734220
+      ],
+      "sha256": "352ac2e12287992ef611732c081025227db1ec87fef178fdf4b7d8236f90dc85",
+      "compressed_size": 2037
+    }
+  }
+]

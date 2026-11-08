@@ -1,0 +1,5 @@
+filename,area_px,area_pct,width_px,width_sd,n_rois,status,unit_check,pw_check
+E6 0H 2_png.rf.qIyWYgA9w4tryEhjNmUS.png,1597483.000,31.688,979.763,417.805,245,ok,pixels,1.000000
+E6 12H 2_png.rf.TsrNibUXSGYTAPRKTkyw.png,2148570.000,42.619,1496.055,851.693,223,ok,pixels,1.000000
+E6 24H 2_png.rf.xPxa5zfkuhQQMYWCu9UE.png,1737870.000,34.473,1180.691,635.862,157,ok,pixels,1.000000
+E6 8H 2_png.rf.hEmiyn8BWhtuUW3q3YCM.png,484039.000,9.601,469.938,129.479,67,ok,pixels,1.000000
