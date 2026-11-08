@@ -1,6 +1,6 @@
 # P024 候选首次使用与输入准备
 
-<!-- PROGRAM_TASK_META {"id":"P-024","status":"in_progress","work_package":"W13","depends_on":["P-023"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync","owner":"chat-01a1b161-9a6d-70f1-84ae-86e53af2eba8","base_commit":"d3733a7e1edae6e195d129c751a707e62b7fedea"} -->
+<!-- PROGRAM_TASK_META {"id":"P-024","status":"done","work_package":"W13","depends_on":["P-023"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync","owner":"chat-01a1b161-9a6d-70f1-84ae-86e53af2eba8","base_commit":"d3733a7e1edae6e195d129c751a707e62b7fedea"} -->
 
 2026-11-06 从干净72651ea恢复，保留P023一次收尾。仅本窗口写入共享树。
 
@@ -14,4 +14,4 @@
 
 WB已有生成器但普通学生不能直接取得图；核说明依赖未附带的P014资料；BCA CSV/记录已有源码样例。已把同一批合法材料汇入[练习入口](../../examples/first-use/README.md)，以独立设置与工作目录完成三工具导出和冷重开。BCA 最后一步在用户恢复后用新离屏 Qt 进程补验，细节与命令见[作者证据](../evidence/P-024/README.md)。
 
-当前待准确候选独审与必需 CI 后正常集成。
+2026-11-09 工程完成。指定独审通过 9d684eb，四项必需 CI 首轮通过，PR76 合入 main 4d3c3fa 并核对同树。练习 ZIP 已解压验证，资料入口、证据、限制与下一步均见[最终交付](../evidence/P-024/final-delivery.md)。一次收尾后释放共享树。

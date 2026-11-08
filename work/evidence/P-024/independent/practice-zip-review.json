@@ -1,0 +1,54 @@
+{
+  "head": "9d684ebb7089150273ef8da1760d6a6153a29d1d",
+  "python": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-plan-sync\\.local\\releases\\runtime-5dbfb3947632-acceptance-p023-local\\app\\runtime\\python.exe",
+  "zip_sha256": "73ccd34c0ed1dbb971241edf200c90ccbe58539f1188189a31f387e423944d2c",
+  "size": 594408,
+  "git_archive_bytes_equal": true,
+  "files": [
+    "docs/research/2026-11-06-mature-nuclei-methods.md",
+    "docs/runbooks/nuclei-single-image.md",
+    "docs/runbooks/research-workflow.md",
+    "docs/runbooks/unified-workbench.md",
+    "examples/first-use/README.md",
+    "examples/first-use/nuclei/Ganglioneuroblastoma_10.tif",
+    "examples/first-use/nuclei/source-readme.txt",
+    "examples/first-use/wb/inputs/A_123456 (1).tiff",
+    "examples/first-use/wb/inputs/B_123456 (1).tiff",
+    "examples/wb-first-use/README.md",
+    "examples/wb-first-use/generate.py",
+    "tools/bca/README.md",
+    "tools/bca/examples/record.json",
+    "tools/bca/examples/synthetic.csv",
+    "tools/nuclei/README.md",
+    "tools/nuclei/requirements-research.txt",
+    "work/evidence/P-023/final-delivery.md"
+  ],
+  "student_guide_local_links": [
+    "../wb-first-use/README.md",
+    "../../docs/runbooks/nuclei-single-image.md",
+    "../../tools/bca/examples/synthetic.csv",
+    "../../docs/runbooks/unified-workbench.md",
+    "../../work/evidence/P-023/final-delivery.md",
+    "../../tools/nuclei/README.md",
+    "../wb-first-use/README.md",
+    "../../tools/bca/README.md",
+    "../../docs/research/2026-11-06-mature-nuclei-methods.md"
+  ],
+  "extracted": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p024\\.local\\practice-9f0wc99i",
+  "regenerated_wb_sha256": {
+    "A_123456 (1).tiff": "26f5b862839b7f992922de0fcd4a4c530e74e75c52717e92e71f73f6e51d61e9",
+    "B_123456 (1).tiff": "b70e638b0017b901ce9da1943c4a69696a4fad8dd0f9f8dde2eb1e69cf9d7204"
+  },
+  "wb_each": "700x300 uint16",
+  "nuclei_sha256": "77f7b965733145a6edae173090ba1b9081266c708a3f141a12f8b281af640074",
+  "nuclei_shape": [
+    1024,
+    1360
+  ],
+  "nuclei_dtype": "uint8",
+  "bca_csv_sha256": "297f027954d555e646c711d4e114277c860087a6382d97e417ac1b5afac276e3",
+  "bca_record_sha256": "4949ddadf2283dccbd3788592cc7ad985fbf6bb057e6aa97ff31885c4e83cf4e",
+  "bca_wells": 28,
+  "bca_s1_mean_ug_ml": 5008.680555555556,
+  "other_partial_with_null_mean": 4
+}
