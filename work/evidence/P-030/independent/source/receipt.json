@@ -1,0 +1,163 @@
+{
+  "head": "5228adf0ea23de3b78c7f70fedab1b1f7239f4d3",
+  "zenodo_record": 21779854,
+  "version": "2.0.0",
+  "dataset_size": 3679998682,
+  "archive_checksum_from_zenodo": "md5:eae5de694812ef393128644bf9124840",
+  "archive_digest_independently_computed": false,
+  "central_dir_ranges_206": [
+    [
+      3679933146,
+      3679998681
+    ],
+    [
+      3679683820,
+      3679998583
+    ]
+  ],
+  "central_members": 2734,
+  "git_source_sha": "6cbd78da604291a4b1dbf1926b06e44279381af3",
+  "source_hashes": {
+    "huvec.csv": "7ff6596bc0376fd1d351a0cba09e12d20ea728dc23c7513a3e465745e5e9cdf8",
+    "partition.csv": "f5d9a4a9fcd9e861d46d9936b0584a2ace6eab709061b882281fba94f38d6937",
+    "macro.ijm": "540a29fd80b371991fec5672a769fed689f8c2d81954806e113127eb82981da4",
+    "NOTICE.txt": "353c2d4d38143bb552e5fe66e17db61ec6475473cb593cb2b352eaa96bfef9ef",
+    "dataset-readme.md": "693686f03ffc0e87cf11b36b7fc06284b49598876bbd4054f44dcbc21661d23a",
+    "closure.py": "06a6c1a49628f9ae136c2bdc8ea81f5fa198ca7463d8cce74d9a890a8311b8ad"
+  },
+  "selection_key": [
+    "LUIS RAW||PEP+GB||E6",
+    "2",
+    "LUIS RAW"
+  ],
+  "eligible_complete_groups": 79,
+  "matches_first_sorted_eligible": true,
+  "members": [
+    {
+      "kind": "images",
+      "path": "dataset/images/train/E6 0H 2_png.rf.qIyWYgA9w4tryEhjNmUS.png",
+      "hours": "0",
+      "http": 206,
+      "requested_range": [
+        2432111912,
+        2436877168
+      ],
+      "bytes": 4765038,
+      "crc32": "a89be3c6",
+      "sha256": "ed51f9871a60d666e066bef7106d733765f59b8a77dcc09f52118f2e83944426",
+      "wh": [
+        2452,
+        2056
+      ]
+    },
+    {
+      "kind": "labels",
+      "path": "dataset/labels/train/E6 0H 2_png.rf.qIyWYgA9w4tryEhjNmUS.txt",
+      "hours": "0",
+      "http": 206,
+      "requested_range": [
+        3678718662,
+        3678721375
+      ],
+      "bytes": 6895,
+      "crc32": "4adb78d1",
+      "sha256": "557046369a144169da65cbb822e43529e1276a1204952c3550390acd4309ef2e",
+      "polygon_count": 1
+    },
+    {
+      "kind": "images",
+      "path": "dataset/images/train/E6 8H 2_png.rf.hEmiyn8BWhtuUW3q3YCM.png",
+      "hours": "8",
+      "http": 206,
+      "requested_range": [
+        2479043354,
+        2484045052
+      ],
+      "bytes": 5001480,
+      "crc32": "fa27431e",
+      "sha256": "25a7f36549c5d1d8f97632c6940d7e4f1f3dbb1de4ffb7b7feaf55efc0e14db4",
+      "wh": [
+        2452,
+        2056
+      ]
+    },
+    {
+      "kind": "labels",
+      "path": "dataset/labels/train/E6 8H 2_png.rf.hEmiyn8BWhtuUW3q3YCM.txt",
+      "hours": "8",
+      "http": 206,
+      "requested_range": [
+        3678739821,
+        3678742875
+      ],
+      "bytes": 8029,
+      "crc32": "7daae1d7",
+      "sha256": "6efb16b63f6f4a7cd77e72c161194e144698944849adb4407e72675698153ae3",
+      "polygon_count": 1
+    },
+    {
+      "kind": "images",
+      "path": "dataset/images/train/E6 12H 2_png.rf.TsrNibUXSGYTAPRKTkyw.png",
+      "hours": "12",
+      "http": 206,
+      "requested_range": [
+        2447434997,
+        2451981468
+      ],
+      "bytes": 4546252,
+      "crc32": "bc94a248",
+      "sha256": "7afa9cad0220208d6cac99f78c0d33ecda975766c3054562f5e4ae48e98ca075",
+      "wh": [
+        2452,
+        2056
+      ]
+    },
+    {
+      "kind": "labels",
+      "path": "dataset/labels/train/E6 12H 2_png.rf.TsrNibUXSGYTAPRKTkyw.txt",
+      "hours": "12",
+      "http": 206,
+      "requested_range": [
+        3678726825,
+        3678729126
+      ],
+      "bytes": 5923,
+      "crc32": "a9b2d375",
+      "sha256": "4d5e5de1a9c55aed4ef67932be6c883a1d3a7cc645bbf8c5e925a83e72cb1572",
+      "polygon_count": 1
+    },
+    {
+      "kind": "images",
+      "path": "dataset/images/train/E6 24H 2_png.rf.xPxa5zfkuhQQMYWCu9UE.png",
+      "hours": "24",
+      "http": 206,
+      "requested_range": [
+        2463093678,
+        2467681625
+      ],
+      "bytes": 4587728,
+      "crc32": "4991cf24",
+      "sha256": "dbdc784c3c7facf4f92cc1a3ede3103b7bb8f83cfe16af4194a7af137081d25e",
+      "wh": [
+        2452,
+        2056
+      ]
+    },
+    {
+      "kind": "labels",
+      "path": "dataset/labels/train/E6 24H 2_png.rf.xPxa5zfkuhQQMYWCu9UE.txt",
+      "hours": "24",
+      "http": 206,
+      "requested_range": [
+        3678731964,
+        3678734220
+      ],
+      "bytes": 5869,
+      "crc32": "c985de22",
+      "sha256": "352ac2e12287992ef611732c081025227db1ec87fef178fdf4b7d8236f90dc85",
+      "polygon_count": 1
+    }
+  ],
+  "unseen_test_val_pixels_and_labels": true,
+  "tracked_status": ""
+}
