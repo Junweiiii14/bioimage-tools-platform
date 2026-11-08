@@ -1,0 +1,117 @@
+{
+  "head": "e50e740dffa044391260270824a57163de620113",
+  "record_id": 4593510,
+  "conceptrecid": "4593509",
+  "revision": 2,
+  "metadata_version": null,
+  "license": {
+    "id": "cc-by-4.0"
+  },
+  "archive_bytes": 478985743,
+  "md5": "1d45b5a3bd7c50c80e628ab4cb664445",
+  "sha256": "c47abdf9004e19e1de1b1634ba07bbbfa423329444c38855adf4c5a07347ea3f",
+  "zip_files": 80,
+  "ids_with_tiff_and_all_four_nonempty_point_files": 16,
+  "no_individual_license_file": true,
+  "archive_common_id_prefixes": {
+    "T47D-0412": 8,
+    "T47D-1812": 8
+  },
+  "selected": {
+    "T47D-0412-C1": {
+      "tiff_tags": {
+        "256": [
+          2125
+        ],
+        "257": [
+          2985
+        ],
+        "258": [
+          16,
+          16,
+          16
+        ],
+        "262": [
+          2
+        ],
+        "277": [
+          3
+        ],
+        "282": 1200.0,
+        "283": 1200.0
+      },
+      "tiff_sha256": "a4d1408daa2152ccbfc2b40923e5bbce04801368ee29bfc6459f33751d3751e4",
+      "counts": {
+        "GT": 37,
+        "MCC_Observer1": 40,
+        "MCC_Observer2": 37,
+        "MCC_Observer3": 33
+      }
+    },
+    "T47D-0412-C2": {
+      "tiff_tags": {
+        "256": [
+          2125
+        ],
+        "257": [
+          2985
+        ],
+        "258": [
+          16,
+          16,
+          16
+        ],
+        "262": [
+          2
+        ],
+        "277": [
+          3
+        ],
+        "282": 1200.0,
+        "283": 1200.0
+      },
+      "tiff_sha256": "157e40d15778fcb4765f2ac51aeeff6eee35b8a3269ef9640ea0afca5274ae22",
+      "counts": {
+        "GT": 48,
+        "MCC_Observer1": 48,
+        "MCC_Observer2": 50,
+        "MCC_Observer3": 46
+      }
+    },
+    "T47D-0412-C3": {
+      "tiff_tags": {
+        "256": [
+          2125
+        ],
+        "257": [
+          2985
+        ],
+        "258": [
+          16,
+          16,
+          16
+        ],
+        "262": [
+          2
+        ],
+        "277": [
+          3
+        ],
+        "282": 1200.0,
+        "283": 1200.0
+      },
+      "tiff_sha256": "ee47fac0b9d659d6229d85ae1109cd60d3801d27202686eee0e9609e1cc919c8",
+      "counts": {
+        "GT": 45,
+        "MCC_Observer1": 48,
+        "MCC_Observer2": 44,
+        "MCC_Observer3": 44
+      }
+    }
+  },
+  "paper": "https://www.tandfonline.com/doi/full/10.1080/21681163.2022.2035822",
+  "mask_or_negative_annotations_provided": false,
+  "complete_casewise_manual_condition_or_seeding_record": false,
+  "gt_exhaustiveness_proven": false,
+  "tracked_status": ""
+}

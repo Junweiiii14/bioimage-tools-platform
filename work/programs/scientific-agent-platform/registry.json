@@ -129,6 +129,10 @@
     {
       "id": "P-031",
       "path": "work/tasks/P-031-clonogenic.md"
+    },
+    {
+      "id": "P-032",
+      "path": "work/tasks/P-032-nuclear-intensity.md"
     }
   ],
   "work_packages": [
@@ -309,7 +313,8 @@
         "P-010",
         "P-029",
         "P-030",
-        "P-031"
+        "P-031",
+        "P-032"
       ]
     }
   ],

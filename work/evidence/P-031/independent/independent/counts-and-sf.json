@@ -1,0 +1,168 @@
+{
+  "research_commit": "bef2475d959067535457c793ab8e3ae438bfc8e3",
+  "samples": {
+    "T47D-0412-C1": {
+      "gt": 37,
+      "observers": [
+        40,
+        37,
+        33
+      ],
+      "observer_range": 7,
+      "reported": 28,
+      "delta": -9,
+      "accepted_by_n_centres": {
+        "0": 6,
+        "1": 19,
+        "2": 3
+      },
+      "gt_outside_any_accepted_external_contour": 12,
+      "selected_examples": [
+        {
+          "area": 240.0,
+          "bounding_box": [
+            372,
+            244,
+            18,
+            16
+          ],
+          "points": [
+            {
+              "xy": [
+                379.667,
+                254.333
+              ],
+              "inside_margin_px": 4.6670074462890625,
+              "same_connected_foreground": true
+            }
+          ]
+        },
+        {
+          "area": 829351.0,
+          "bounding_box": [
+            0,
+            0,
+            2125,
+            2985
+          ],
+          "points": [
+            {
+              "xy": [
+                153.0,
+                849.0
+              ],
+              "inside_margin_px": 43.0,
+              "same_connected_foreground": true
+            },
+            {
+              "xy": [
+                161.0,
+                1729.333
+              ],
+              "inside_margin_px": 32.0,
+              "same_connected_foreground": true
+            },
+            {
+              "xy": [
+                1326.667,
+                2948.667
+              ],
+              "inside_margin_px": 13.6669921875,
+              "same_connected_foreground": true
+            }
+          ]
+        }
+      ]
+    },
+    "T47D-0412-C2": {
+      "gt": 48,
+      "observers": [
+        48,
+        50,
+        46
+      ],
+      "observer_range": 4,
+      "reported": 30,
+      "delta": -18,
+      "accepted_by_n_centres": {
+        "1": 27,
+        "0": 2,
+        "2": 1
+      },
+      "gt_outside_any_accepted_external_contour": 19,
+      "selected_examples": [
+        {
+          "area": 2562.5,
+          "bounding_box": [
+            400,
+            888,
+            70,
+            46
+          ],
+          "points": [
+            {
+              "xy": [
+                418.333,
+                909.333
+              ],
+              "inside_margin_px": 16.868896793547943,
+              "same_connected_foreground": true
+            },
+            {
+              "xy": [
+                450.333,
+                913.333
+              ],
+              "inside_margin_px": 12.98335440213245,
+              "same_connected_foreground": true
+            }
+          ]
+        }
+      ]
+    },
+    "T47D-0412-C3": {
+      "gt": 45,
+      "observers": [
+        48,
+        44,
+        44
+      ],
+      "observer_range": 4,
+      "reported": 34,
+      "delta": -11,
+      "accepted_by_n_centres": {
+        "0": 3,
+        "1": 31
+      },
+      "gt_outside_any_accepted_external_contour": 14,
+      "selected_examples": []
+    }
+  },
+  "protocol": {
+    "protocol": "Rafehi Table 1, Manual (digital image), FEP-1811",
+    "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3197314/",
+    "untreated": [
+      22,
+      23,
+      34,
+      15,
+      22
+    ],
+    "treated": [
+      42,
+      33,
+      31,
+      42,
+      31
+    ],
+    "seeded_per_dish": [
+      100,
+      1000
+    ],
+    "pe": "29/125",
+    "four_gy_fraction": "179/5000",
+    "sf": "179/1160",
+    "sf_decimal": "0.1543103448275862068965517241",
+    "printed_sf": "0.16"
+  }
+}

@@ -46,7 +46,9 @@
 
 ## Current Pointer
 
-当前任务：[P031 克隆形成计数研究](work/tasks/P-031-clonogenic.md)。
+当前任务：[P032 固定核实例双通道强度复验](work/tasks/P-032-nuclear-intensity.md)。
+
+最近完成：[P031 克隆形成计数研究](work/tasks/P-031-clonogenic.md)，见[固定独审及 PR82 交付](work/evidence/P-031/final-delivery.md)。
 
 最近完成：[P030 划痕闭合研究](work/tasks/P-030-scratch.md)，见[研究、独审与 PR81 交付](work/evidence/P-030/final-delivery.md)。
 

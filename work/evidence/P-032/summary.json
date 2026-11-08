@@ -1,0 +1,29 @@
+{
+  "DNA": {
+    "file": "AS_09125_050116030001_D03f00d0.tif",
+    "scale": 255.0,
+    "max_raw": 255,
+    "ceiling_field_px": 2,
+    "ceiling_nuclear_px": 2,
+    "nuclei_at_ceiling": 1,
+    "median_nuclear_mean": 54.01960784313726,
+    "max_abs_error_cp_units": {
+      "MeanIntensity": 1.1275969491464366e-08,
+      "IntegratedIntensity": 3.1380676688286258e-06
+    }
+  },
+  "PH3": {
+    "file": "AS_09125_050116030001_D03f00d1.tif",
+    "scale": 255.0,
+    "max_raw": 245,
+    "ceiling_field_px": 0,
+    "ceiling_nuclear_px": 0,
+    "nuclei_at_ceiling": 0,
+    "median_nuclear_mean": 10.245283018867925,
+    "max_abs_error_cp_units": {
+      "MeanIntensity": 1.0142285455927436e-08,
+      "IntegratedIntensity": 1.1949854723525277e-06
+    }
+  },
+  "labels_npy_sha256": "419adaef8927ad73dfa6ad5b0bac24bcb084f58b2bcb6f4a3d89d4617ed7bb60"
+}
