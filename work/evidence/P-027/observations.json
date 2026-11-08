@@ -1,0 +1,62 @@
+{
+  "intake": [
+    [
+      "chooser",
+      "选择仪器直接导出的 TIFF 文件夹"
+    ],
+    [
+      "settled",
+      "BioImage\n工具平台\nWB\ninput · 2026-11-09\n新建 Fig\n工作流编排\n旧方法对照\n文件\n已保存\n桌面工作台\n1\n配置原图\n2\n自动裁图\n3\n拼图排版\n4\n灰度定量\n5\n结果表\n项目工具\n0 个蛋白 · 0 个 Fig\n开始自动处理\n配置本次实验\n\n填写 Fig 和蛋白名，再选择每个采集组用于裁剪的原图。\n\n添加图片文件夹\nFig 名称\n泳道数 N\n蛋白名 · 按顺序，每行一个\n自动分配\n\n新建 Fig，填写名称、N 和蛋白名。\n\n＋ 添加 Fig\n蛋白顺序跨 Fig 连续对应采集组，名称中的标点保留。\n选择原图\n查找采集组\n来源选项\n采集组 01\n\n采集组 01\n\n未纳入本次\n\n待选原图\ngel1_GAPDH_expo1min.tif\n放大\n3072 × 2048 · 16 位\n0 个蛋白 · 已分配 0 / 1 组 · 已选原图 0 / 0\n\n先在上方添加 Fig，填写名称、N 和蛋白顺序。\n\n定位待补项\n确认剩余 1 组不纳入本次处理（原图保留）\n\n输出位置：<isolated>\\projects-intake\\input-20261109-023536-1febc2bc\\outputs · 自动创建独立子目录 更改\n\n相同原图复用\n放弃修改并重新载入\n保存草稿\n导入清单已保存，可重新打开。\n本地工作空间 · 原图保留"
+    ]
+  ],
+  "quant": [
+    [
+      "chooser",
+      "选择 TIFF 原图文件夹"
+    ],
+    [
+      "settled",
+      "BioImage\n工具平台\nWB\ninput · 2026-11-09\n工作流编排\n旧方法对照\n文件\n已保存\n桌面工作台\n添加原图\n导出结果\n原图裁剪\n拼图排版\n灰度定量\n结果\n项目工具\nFig 分组 1\n按 Fig 自动分组并定量\n手动泳道工具\nFig1\n1 个条带 · 当前组\n条带 1\ngel1_GAPDH_expo1min.tif\n原图始终保留\n调整仅影响当前分析草稿\nFig1 · 条带 1\n\n原图：gel1_GAPDH_expo1min.tif · 3072 × 2048 px\n\n手形平移\n原图 · 聚焦裁剪区域\n适应窗口\n选择完整泳道\n\n一条泳道可包含多排蛋白条带。计算后检查全部泳道曲线，或进入单泳道调整。\n\n拖动框体或曲线边界调整 · 可返回整组\n独立灰度分析\n原图测量\n完整泳道定量\n框选方式\n独立泳道 · WBQuant\n规则网格 · 指定 N\n积分方式\n条带峰 · 保留多个峰\n整段拖尾 · UB 总灰度\n\n已框选 0 条泳道。复制后拖动框体，方向键微调。\n\n规则网格与精确区域（高级）\n\n点击计算即确认本次测量区域和泳道数。使用原始像素；背景直线、积分边界和质量原因可在曲线中查看与调整。\n\n计算当前原图\n添加测量原图\ngel1_GAPDH_expo1min.tif · 3072 × 2048 · 16 位；框选时请排除 Marker。\n本地工作空间 · 原图保留"
+    ]
+  ],
+  "details": [
+    [
+      "chooser",
+      "选择仪器直接导出的 TIFF 文件夹"
+    ],
+    [
+      "discovery",
+      "BioImage\n工具平台\nWB\ninput · 2026-11-09\n新建 Fig\n工作流编排\n旧方法对照\n文件\n已保存\n桌面工作台\n1\n配置原图\n2\n自动裁图\n3\n拼图排版\n4\n灰度定量\n5\n结果表\n项目工具\n0 个蛋白 · 0 个 Fig\n开始自动处理\n配置本次实验\n\n填写 Fig 和蛋白名，再选择每个采集组用于裁剪的原图。\n\n添加图片文件夹\n\n后台清单已改变，本地输入保留；请核对后重新载入。\n\nFig 名称\n泳道数 N\n蛋白名 · 按顺序，每行一个\n自动分配\n\n新建 Fig，填写名称、N 和蛋白名。\n\n＋ 添加 Fig\n蛋白顺序跨 Fig 连续对应采集组，名称中的标点保留。\n选择原图\n查找采集组\n来源选项\n采集组 01\n\n采集组 01\n\n未纳入本次\n\n待选原图\ngel1_GAPDH_expo1min.tif\n放大\n3072 × 2048 · 16 位\n0 个蛋白 · 已分配 0 / 1 组 · 已选原图 0 / 0\n\n后台输入已变化，本地配置保留；请重新载入后核对。\n\n定位待补项\n确认剩余 1 组不纳入本次处理（原图保留）\n\n输出位置：<isolated>\\projects-details\\input-20261109-023651-9f9870f9\\outputs · 自动创建独立子目录 更改\n\n相同原图复用\n放弃修改并重新载入\n保存草稿\n导入清单已保存，可重新打开。\n本地工作空间 · 原图保留"
+    ],
+    [
+      "controls",
+      "[[\"<input type=\\\"radio\\\" name=\\\"group-group-372459d4841483d5d91873a57b2e6529\\\" data-group-source=\\\"a59deb2563dc4aca82ff2ec8f2b18060\\\" data-id=\\\"group-372459d4841483d5d91873a57b2e6529\\\" aria-label=\\\"采集组 01，选择 gel1\",true,\"on\"],[\"<button class=\\\"button primary\\\" data-group-action=\\\"start\\\" disabled=\\\"\\\" aria-keyshortcuts=\\\"Control+Enter\\\" title=\\\"继续当前批次处理 · Ctrl+Enter\\\">开始自动处理</button>\",true,\"\"]]"
+    ],
+    [
+      "known fields",
+      "BioImage\n工具平台\nWB\ninput · 2026-11-09\n新建 Fig\n工作流编排\n旧方法对照\n文件\n已保存\n桌面工作台\n1\n配置原图\n2\n自动裁图\n3\n拼图排版\n4\n灰度定量\n5\n结果表\n项目工具\n0 个蛋白 · 0 个 Fig\n开始自动处理\n配置本次实验\n\n填写 Fig 和蛋白名，再选择每个采集组用于裁剪的原图。\n\n添加图片文件夹\n\n后台清单已改变，本地输入保留；请核对后重新载入。\n\nFig 名称\n泳道数 N\n蛋白名 · 按顺序，每行一个\n自动分配\n\n新建 Fig，填写名称、N 和蛋白名。\n\n＋ 添加 Fig\n蛋白顺序跨 Fig 连续对应采集组，名称中的标点保留。\n选择原图\n查找采集组\n来源选项\n采集组 01\n\n采集组 01\n\n未纳入本次\n\n待选原图\ngel1_GAPDH_expo1min.tif\n放大\n3072 × 2048 · 16 位\n0 个蛋白 · 已分配 0 / 1 组 · 已选原图 0 / 0\n\n后台输入已变化，本地配置保留；请重新载入后核对。\n\n定位待补项\n确认剩余 1 组不纳入本次处理（原图保留）\n\n输出位置：<isolated>\\projects-details\\input-20261109-023651-9f9870f9\\outputs · 自动创建独立子目录 更改\n\n相同原图复用\n放弃修改并重新载入\n保存草稿\n导入清单已保存，可重新打开。\n本地工作空间 · 原图保留"
+    ]
+  ],
+  "fixed": [
+    [
+      "chooser",
+      "选择仪器直接导出的 TIFF 文件夹"
+    ],
+    [
+      "discovery",
+      "BioImage\n工具平台\nWB\ninput · 2026-11-09\n新建 Fig\n工作流编排\n旧方法对照\n文件\n已保存\n桌面工作台\n1\n配置原图\n2\n自动裁图\n3\n拼图排版\n4\n灰度定量\n5\n结果表\n项目工具\n0 个蛋白 · 0 个 Fig\n开始自动处理\n配置本次实验\n\n填写 Fig 和蛋白名，再选择每个采集组用于裁剪的原图。\n\n添加图片文件夹\nFig 名称\n泳道数 N\n蛋白名 · 按顺序，每行一个\n自动分配\n\n新建 Fig，填写名称、N 和蛋白名。\n\n＋ 添加 Fig\n蛋白顺序跨 Fig 连续对应采集组，名称中的标点保留。\n选择原图\n查找采集组\n来源选项\n采集组 01\n\n采集组 01\n\n未纳入本次\n\n待选原图\ngel1_GAPDH_expo1min.tif\n放大\n3072 × 2048 · 16 位\n0 个蛋白 · 已分配 0 / 1 组 · 已选原图 0 / 0\n\n先在上方添加 Fig，填写名称、N 和蛋白顺序。\n\n定位待补项\n确认剩余 1 组不纳入本次处理（原图保留）\n\n输出位置：<isolated>\\projects-fixed\\input-20261109-023812-ab8be6fd\\outputs · 自动创建独立子目录 更改\n\n相同原图复用\n放弃修改并重新载入\n保存草稿\n导入清单已保存，可重新打开。\n本地工作空间 · 原图保留"
+    ],
+    [
+      "controls",
+      "[[\"<input aria-label=\\\"Fig 1 名称\\\" type=\\\"text\\\" data-group-field=\\\"fig-label\\\" data-id=\\\"d93272c8-d897-415e-b2d3-d44152ddad97\\\" value=\\\"Fig 1\\\" maxlength=\\\"120\\\">\",false,\"Fig 1\"],[\"<input aria-label=\\\"Fig 1 泳道数 N\\\" type=\\\"number\\\" min=\\\"1\\\" max=\\\"96\\\" step=\\\"1\\\" data-group-field=\\\"lanes\\\" data-id=\\\"d93272c8-d897-415e-b2d3-d44152ddad97\\\" value=\\\"\\\">\",false,\"\"],[\"<input type=\\\"radio\\\" name=\\\"group-group-4780dbfd5ac0417da4f1126d273d1ae0\\\" data-group-source=\\\"e1cbe403536545ea92e219b2aba07972\\\" data-id=\\\"group-4780dbfd5ac0417da4f1126d273d1ae0\\\" aria-label=\\\"采集组 01，选择 gel1\",false,\"on\"],[\"<button class=\\\"button primary\\\" data-group-action=\\\"start\\\" disabled=\\\"\\\" aria-keyshortcuts=\\\"Control+Enter\\\" title=\\\"继续当前批次处理 · Ctrl+Enter\\\">开始自动处理</button>\",true,\"\"]]"
+    ],
+    [
+      "known fields",
+      "BioImage\n工具平台\nWB\ninput · 2026-11-09\n新建 Fig\n工作流编排\n旧方法对照\n文件\n已保存\n桌面工作台\n1\n配置原图\n2\n自动裁图\n3\n拼图排版\n4\n灰度定量\n5\n结果表\n项目工具\n1 个蛋白 · 1 个 Fig\n开始自动处理\n配置本次实验\n\n填写 Fig 和蛋白名，再选择每个采集组用于裁剪的原图。\n\n添加图片文件夹\nFig 名称\n泳道数 N\n蛋白名 · 按顺序，每行一个\n自动分配\n\n对应采集组 01–采集组 01\n\n···\n＋ 添加 Fig\n蛋白顺序跨 Fig 连续对应采集组，名称中的标点保留。\n选择原图\n查找采集组\n来源选项\nGAPDH\n\n采集组 01\n\nFig 1 / GAPDH · N=待填\n\n取消选择\n用于裁剪\ngel1_GAPDH_expo1min.tif\n放大\n3072 × 2048 · 16 位\n1 个蛋白 · 已分配 1 / 1 组 · 已选原图 1 / 1\n\nFig 1：请填写 Fig 名称和 1–96 的泳道数 N。\n\n定位待补项\n\n输出位置：<isolated>\\projects-fixed\\input-20261109-023812-ab8be6fd\\outputs · 自动创建独立子目录 更改\n\n相同原图复用\n放弃修改并重新载入\n保存草稿\n导入清单已保存，可重新打开。\n本地工作空间 · 原图保留"
+    ],
+    [
+      "saved",
+      "BioImage\n工具平台\nWB\ninput · 2026-11-09\n新建 Fig\n工作流编排\n旧方法对照\n文件\n已保存\n桌面工作台\n1\n配置原图\n2\n自动裁图\n3\n拼图排版\n4\n灰度定量\n5\n结果表\n项目工具\n1 个蛋白 · 1 个 Fig\n开始自动处理\n配置本次实验\n\n填写 Fig 和蛋白名，再选择每个采集组用于裁剪的原图。\n\n添加图片文件夹\nFig 名称\n泳道数 N\n蛋白名 · 按顺序，每行一个\n自动分配\n\n对应采集组 01–采集组 01\n\n···\n＋ 添加 Fig\n蛋白顺序跨 Fig 连续对应采集组，名称中的标点保留。\n选择原图\n查找采集组\n来源选项\nGAPDH\n\n采集组 01\n\nFig 1 / GAPDH · N=待填\n\n取消选择\n用于裁剪\ngel1_GAPDH_expo1min.tif\n放大\n3072 × 2048 · 16 位\n1 个蛋白 · 已分配 1 / 1 组 · 已选原图 1 / 1\n\nFig 1：请填写 Fig 名称和 1–96 的泳道数 N。\n\n定位待补项\n\n输出位置：<isolated>\\projects-fixed\\input-20261109-023812-ab8be6fd\\outputs · 自动创建独立子目录 更改\n\n相同原图复用\n放弃修改并重新载入\n保存草稿\n导入清单已保存，可重新打开。\n本地工作空间 · 原图保留"
+    ]
+  ]
+}

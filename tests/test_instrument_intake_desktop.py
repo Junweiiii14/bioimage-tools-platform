@@ -1403,9 +1403,24 @@ def test_export_discovery_real_worker_save_and_reopen(
     for i, raw in enumerate((signal, white, merged), 1):
         tifffile.imwrite(directory / f"P_123456_0 ({i}).tiff", raw)
     start(window, qtbot, directory)
-    request(window, "intake_discover")
+
+    def js(code: str) -> object:
+        replies: list[object] = []
+        window.web.page().runJavaScript(code, replies.append)
+        qtbot.waitUntil(lambda: bool(replies), timeout=10000)
+        return replies[0]
+
+    qtbot.waitUntil(
+        lambda: js("document.querySelector('[data-group-action=discover]')?.disabled") is False
+    )
+    assert (
+        js("document.querySelector('[data-group-action=discover]').click();intakeGroups.hasDraft()")
+        is False
+    )
     qtbot.waitUntil(lambda: current(window).intake.discovery is not None, timeout=20000)
     wait_saved(window, qtbot)
+    qtbot.waitUntil(lambda: js("!!state.intake?.discovery && !state.busy") is True, timeout=10000)
+    assert js("document.querySelector('[data-group-action=add-fig]').disabled") is False
     report = current(window).intake.discovery
     assert report is not None
     signal_record = next(o for o in report.observations if o.role == "signal")

@@ -109,6 +109,10 @@
     {
       "id": "P-026",
       "path": "work/tasks/P-026-wb-public-reference.md"
+    },
+    {
+      "id": "P-027",
+      "path": "work/tasks/P-027-wb-folder.md"
     }
   ],
   "work_packages": [
@@ -189,7 +193,8 @@
       "task_ids": [
         "P-011",
         "P-012",
-        "P-026"
+        "P-026",
+        "P-027"
       ]
     },
     {
