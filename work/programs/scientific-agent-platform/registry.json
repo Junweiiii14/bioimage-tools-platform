@@ -97,6 +97,10 @@
     {
       "id": "P-023",
       "path": "work/tasks/P-023-local-candidate.md"
+    },
+    {
+      "id": "P-024",
+      "path": "work/tasks/P-024-first-use-inputs.md"
     }
   ],
   "work_packages": [
@@ -256,7 +260,8 @@
         "P-009",
         "P-021",
         "P-022",
-        "P-023"
+        "P-023",
+        "P-024"
       ]
     },
     {
