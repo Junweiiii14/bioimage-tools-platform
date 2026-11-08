@@ -2,7 +2,9 @@
 
 这些图是程序画出的矩形，不是真实实验；用于熟悉操作，不用于判断检测准确率、科学适用性或统计显著性。生成器复用已有回归的五泳道几何，不含私有原图。
 
-在仓库根目录运行（需要已安装的项目开发环境）：
+普通使用者可直接选择[已生成练习图](../first-use/wb/inputs)，从下方五步开始；三工具材料总入口见[首次练习](../first-use/README.md)。
+
+准备人员重新生成时，在仓库根目录运行（需要已安装的项目开发环境）：
 
 ```powershell
 uv run --locked --no-sync python examples/wb-first-use/generate.py ../wb-practice-new

@@ -1,6 +1,6 @@
 # P023 本机独立交付候选
 
-<!-- PROGRAM_TASK_META {"id":"P-023","status":"in_progress","work_package":"W13","depends_on":["P-022"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync","owner":"chat-01a1b120-a7b5-77f0-a129-d782b3435b55","base_commit":"b13e71aa5aaebe91edecde44f386fc20ef693b19"} -->
+<!-- PROGRAM_TASK_META {"id":"P-023","status":"done","work_package":"W13","depends_on":["P-022"],"execution_root":"C:/Users/70236/ResearchVault/Codex-Workbench/bioimage-plan-sync","owner":"chat-01a1b120-a7b5-77f0-a129-d782b3435b55","base_commit":"b13e71aa5aaebe91edecde44f386fc20ef693b19"} -->
 
 2026-11-06 上游派发，起始干净 HEAD a6210780bddf49fc45c1037e61a7d4b174b92e07，保留 P022 一次收尾。
 
@@ -16,4 +16,8 @@
 
 ## 实施与作者证据
 
-8e05f77/9693479：六wheel与明确三extra，独立directory-only模式、窗口构建身份；同版uv-build哈希约束修复首轮构建拒绝，未升级依赖。9693479真实私有启动器的三工具正式结果/冷重开、模板换数据、设置跨重启、三次正常退出通过。详见 `work/evidence/P-023/README.md` 与压缩原始证据。18项可选工具/打包定向测试通过；后续完整打包校验49通过。最终冻结补目录说明、六包源码校验与Markdown换行识别，产品六wheel内容未再修改；仍需最终构建同源确认、必需CI及独审。
+8e05f77/9693479：六wheel与明确三extra，独立directory-only模式、窗口构建身份；同版uv-build哈希约束修复首轮构建拒绝，未升级依赖。9693479真实私有启动器的三工具正式结果/冷重开、模板换数据、设置跨重启、三次正常退出通过。详见 `work/evidence/P-023/README.md` 与压缩原始证据。18项可选工具/打包定向测试通过；后续完整打包校验49通过。最终冻结补目录说明、六包源码校验与Markdown换行识别，产品六wheel内容未再修改；最终构建同源确认、必需CI及独审均已完成，详下述完成记录。
+
+## 完成
+
+PR75/main d3733a7e1edae6e195d129c751a707e62b7fedea 与指定独审5dbfb394763227cb9a0befc1e28fd5a5c11a3334同树，四项必需CI首轮通过；最终独立目录及原生启动/退出已核对，限定沿用字节相同六wheel的三工具功能证据。准确工件入口、检查、独审N01和未验边界见 [最终交付](../evidence/P-023/final-delivery.md)。一次本地收尾后释放共享树；本窗不开始下一任务。

@@ -1,7 +1,5 @@
 # 当前恢复入口
 
-当前任务 [P023 本机独立交付候选](../work/tasks/P-023-local-candidate.md)，执行窗01a1b120-a7b5-77f0-a129-d782b3435b55。共享树bioimage-plan-sync / codex/p023-local-candidate，起始a621078保留P022收尾；本窗持有写入，尚未释放。
+[P024 候选首次使用与输入准备](../work/tasks/P-024-first-use-inputs.md)已完成三路线作者走查。实际练习入口、导出及冷重开见[验证记录](../work/evidence/P-024/README.md)。共享树由本开发窗口持有，准确候选待上游派审、必需CI和正常集成。
 
-复用私有CPython/锁定六wheel/原生EXE，独立验收通道；先构建可启动目录，再核验三工具真实执行/正式结果/冷重开和模板复用，冻结准确提交回上游派固定独审，正常CI通过后集成。本窗只做P023及修复，不开下一任务。
-
-P022已合入PR74/main b13e71a。Linux首轮关闭挂起根因UNKNOWN保留，不能称已修。科学、真人、物理DPI、干净目标机仍未验。旧dirty树、原图、历史、在用安装及用户设置保护；卡片堆叠仅聊天预览。
+P023 冻结目录及外置核环境见[P023交付](../work/evidence/P-023/final-delivery.md)。保留 N01、历史 Linux 关闭 UNKNOWN 及科学/真人/干净 Windows 未验。
