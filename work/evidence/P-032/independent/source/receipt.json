@@ -1,0 +1,171 @@
+{
+  "head": "cf91bc59b6708316664af78bae61fa8b0e1f347d",
+  "archive_source": "https://cellprofiler-examples.s3.amazonaws.com/ExampleHuman.zip",
+  "official_archive_bytes": 355588,
+  "official_sha256": "7b35c66b775b5a25d0e39f917e0c52982ff2605017ded9c0cd0dc39a206b0138",
+  "archive_readme_image_license": "CC-0",
+  "image_donor": "Jason Moffat",
+  "original_study_doi": "10.1016/j.cell.2006.01.040",
+  "software_license": "BSD-3-Clause",
+  "channel_tiffs": {
+    "AS_09125_050116030001_D03f00d0.tif": {
+      "sha256": "2751ba667c4067c5d30817cff004aa06f6f6287f1cdbb5b8c9c6a500308cb456",
+      "width_height_bits_samples_photometric_orientation": [
+        512,
+        512,
+        8,
+        1,
+        1,
+        1
+      ],
+      "resolution": {
+        "282": [
+          1207959552,
+          16777216
+        ],
+        "283": [
+          1207959552,
+          16777216
+        ],
+        "296": [
+          2
+        ]
+      }
+    },
+    "AS_09125_050116030001_D03f00d1.tif": {
+      "sha256": "141d66a67e8e9892be822465b0197c268e94c809d0213013d06cfc8c759453b4",
+      "width_height_bits_samples_photometric_orientation": [
+        512,
+        512,
+        8,
+        1,
+        1,
+        1
+      ],
+      "resolution": {
+        "282": [
+          1207959552,
+          16777216
+        ],
+        "283": [
+          1207959552,
+          16777216
+        ],
+        "296": [
+          2
+        ]
+      }
+    },
+    "AS_09125_050116030001_D03f00d2.tif": {
+      "sha256": "607300fa55d9ae7a722b6e0c7e2e38cad8584a2b94c3a0a0ed486c94832254d1",
+      "width_height_bits_samples_photometric_orientation": [
+        512,
+        512,
+        8,
+        1,
+        1,
+        1
+      ],
+      "resolution": {
+        "282": [
+          720000,
+          10000
+        ],
+        "283": [
+          720000,
+          10000
+        ],
+        "296": [
+          2
+        ]
+      }
+    }
+  },
+  "pipeline_sha256": "3fc7ace9921e5591f6455ee04ba4cff3754ea70a9f8035ce5cd8eeffe74bce3f",
+  "source_image_set_count": 1,
+  "original_pipeline_modules": [
+    [
+      "Images",
+      "1"
+    ],
+    [
+      "Metadata",
+      "2"
+    ],
+    [
+      "NamesAndTypes",
+      "3"
+    ],
+    [
+      "Groups",
+      "4"
+    ],
+    [
+      "IdentifyPrimaryObjects",
+      "5"
+    ],
+    [
+      "IdentifyPrimaryObjects",
+      "6"
+    ],
+    [
+      "RelateObjects",
+      "7"
+    ],
+    [
+      "IdentifySecondaryObjects",
+      "8"
+    ],
+    [
+      "IdentifyTertiaryObjects",
+      "9"
+    ],
+    [
+      "MeasureObjectIntensity",
+      "10"
+    ],
+    [
+      "MeasureObjectSizeShape",
+      "11"
+    ],
+    [
+      "OverlayOutlines",
+      "12"
+    ],
+    [
+      "SaveImages",
+      "13"
+    ],
+    [
+      "ExportToSpreadsheet",
+      "14"
+    ]
+  ],
+  "last_two_export_modules": [
+    [
+      "ConvertObjectsToImage",
+      "15"
+    ],
+    [
+      "SaveImages",
+      "16"
+    ]
+  ],
+  "label_npy_sha256": "419adaef8927ad73dfa6ad5b0bac24bcb084f58b2bcb6f4a3d89d4617ed7bb60",
+  "committed_label_tiff_sha256": "471fd7ff09b05aae6f72538b2f5c1f1ec8482f0bb95aebcbb274888c88e01a6b",
+  "same_all_label_pixels_run05_run06": true,
+  "nucleus_ids": 289,
+  "cp_Nuclei_csv_sha256": "25f1c18542ca8a4fcc39afd3586fb9d0f552a61d403e30865d10c2eddc11cee7",
+  "native_columns_already_available": [
+    "Intensity_MeanIntensity_DNA",
+    "Intensity_IntegratedIntensity_DNA",
+    "Intensity_MeanIntensity_PH3",
+    "Intensity_IntegratedIntensity_PH3"
+  ],
+  "matched_area_count": 289,
+  "biological_sample_treatment_replicate_metadata": "not supplied in this example",
+  "microscope_physical_pixel_size": "not supplied; d0/d1 TIFF ResolutionUnit inch and XYResolution 72",
+  "independent_human_labels_available": false,
+  "ran_standalone_cellprofiler": false,
+  "tracked_status": ""
+}
