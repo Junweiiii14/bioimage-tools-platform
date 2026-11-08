@@ -26,3 +26,5 @@ git archive --format=zip --output=.local/p024-first-use.zip HEAD examples/first-
 ```
 
 ZIP 用于现成候选练习，准备环境/追溯历史时可查完整仓库。冻结候选已有的说明不回写；本任务修订的随包说明适用于后续构建。
+
+规则核验首次报“Integration needs exactly one changed integration context”。P023收尾另生成了以合并后 main 为基线的空历史清单，覆盖了原PR75集成清单。两份均保留：原PR75清单位于原路径，72651ea收尾清单逐字节归档为 P-023/closeout-integration-context.json，P023收尾 rules-context 保持原字节且登记在 P024 清单。未修改门禁。
