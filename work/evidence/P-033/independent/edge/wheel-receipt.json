@@ -1,0 +1,36 @@
+{
+  "head": "4fb45866cda22a3509cdd42d805f375ca6dab3a4",
+  "real_wheel_sha256": "f3dc3e27e98a8340dc1dd5f0d41a0a656219741d8799639243175941262ac6a2",
+  "compared_installed_segmenter_members_to_p028": 17,
+  "segmenter_semantic_differences": [],
+  "wheel_added": [
+    "nuclei_intensity/__init__.py",
+    "nuclei_intensity/api.py",
+    "nuclei_intensity/py.typed"
+  ],
+  "wheel_removed": [],
+  "existing_member_bytes_changed": [
+    "nuclei_tool-0.1.0.dist-info/RECORD",
+    "nuclei_tool/domain/runtime.py"
+  ],
+  "segmenter_runtime_py_change": "line endings only, 62 CRLF in P028, 62 LF in reviewer wheel, ignored by existing fingerprint",
+  "api_file": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3\\.local\\governance\\wheels\\nuclei_tool-0.1.0-py3-none-any.whl\\nuclei_intensity\\api.py",
+  "cli_uses_same_public_callable": true,
+  "sparse_max_id_test": [
+    [
+      7,
+      2,
+      127.5,
+      255
+    ],
+    [
+      4294967295,
+      1,
+      0.0,
+      0
+    ]
+  ],
+  "valid_empty_segmentation_result": [],
+  "zero_height_empty_pixels_result": [],
+  "numerical_scope": "public wheel API; standard CLI separately enforces pixels.size >= 1 in admitted TIFF"
+}

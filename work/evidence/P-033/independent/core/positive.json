@@ -1,0 +1,44 @@
+{
+  "checked_head": "4fb45866cda22a3509cdd42d805f375ca6dab3a4",
+  "base": "fb6638eb7145dc9f0af61679a48aaef24a681606",
+  "normal_cli": 0,
+  "rows": 233,
+  "origins": {
+    "method": "nuclear-raw-intensity@1",
+    "nuclei_count": 233,
+    "workspace": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3\\.local\\core\\fresh-field",
+    "execution_id": "e249d4597ee64c29bcd5874ff4acf5f3",
+    "run_id": "96cd08b54077405e81d787520b32ee24",
+    "source_sha256": "2751ba667c4067c5d30817cff004aa06f6f6287f1cdbb5b8c9c6a500308cb456",
+    "label_sha256": "ccefc8813dff4264b0d52555b52983e87424f58d29f4534b7549ca4d6a33cfba",
+    "target_file": "AS_09125_050116030001_D03f00d1.tif",
+    "target_sha256": "141d66a67e8e9892be822465b0197c268e94c809d0213013d06cfc8c759453b4",
+    "shape_yx": [
+      512,
+      512
+    ],
+    "pairing": "user_confirmed_same_field_and_pixel_coordinates"
+  },
+  "first_tuple": [
+    1,
+    219,
+    10.269406392694064,
+    2249
+  ],
+  "distinct_repeat_preserves": true,
+  "p032_all_DNA_and_PH3_rows": 578,
+  "executed": [
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3\\.local\\reviewer-venv\\Scripts\\python.exe",
+    "-I",
+    "-B",
+    "-m",
+    "bioimage_app.nuclei_intensity_cli",
+    "--workspace",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3\\.local\\core\\fresh-field",
+    "--target",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p014-research\\official-human\\ExampleHuman\\images\\AS_09125_050116030001_D03f00d1.tif",
+    "--output-dir",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3\\.local\\core\\export-parent",
+    "--confirm-same-frame"
+  ]
+}

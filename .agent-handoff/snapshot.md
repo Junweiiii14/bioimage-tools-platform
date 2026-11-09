@@ -1,3 +1,3 @@
 # 当前恢复入口
 
-[P033 逐核强度导出](../work/tasks/P-033-intensity-export.md)实现与本机复验完成，待准确候选独审及必需 CI。功能使用说明见[核工具 README](../tools/nuclei/README.md)。
+[P033 逐核强度导出](../work/tasks/P-033-intensity-export.md)已完成，PR84/main 88e8952 与固定独审 4fb4586 同树。共享树已释放，下一窗口携带本次收尾。下次目录验收的 F01 源码映射与私有导入探针见任务卡。
