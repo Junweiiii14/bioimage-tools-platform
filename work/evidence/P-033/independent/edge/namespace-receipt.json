@@ -1,0 +1,20 @@
+{
+  "head": "4fb45866cda22a3509cdd42d805f375ca6dab3a4",
+  "git_archive": {
+    "commit": "4fb45866cda22a3509cdd42d805f375ca6dab3a4",
+    "git_verified_source_files": 510,
+    "shipped_source_files": 309,
+    "crlf_only_source_differences": [],
+    "reference_archive_sha256": "91a1edbd87a9ad32c3de603cf1971cf7afa4cbb898b1e7a0f250604679c7acce"
+  },
+  "actual_expected_installed_members": 312,
+  "unregistered_namespace_members": [
+    "nuclei_intensity/__init__.py",
+    "nuclei_intensity/api.py",
+    "nuclei_intensity/py.typed"
+  ],
+  "missing_api_passed_verify_source": true,
+  "changed_formula_passed_verify_source": true,
+  "registered_owner": false,
+  "note": "Synthetic install fixture; real wheel content is checked separately; artifact payload-after-freeze integrity remains separate."
+}

@@ -21,10 +21,11 @@ from PySide6.QtCore import (
     Slot,
 )
 from PySide6.QtGui import QDesktopServices
-from PySide6.QtWidgets import QDialog, QFileDialog, QTextBrowser, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QDialog, QFileDialog, QMessageBox, QTextBrowser, QVBoxLayout, QWidget
 from tool_contracts.api import ExecutionPlan
 
 from bioimage_app.nuclei_cli import prepare
+from bioimage_app.nuclei_intensity_cli import export as export_intensity
 from bioimage_app.nuclei_results import NucleiResult, export_result, read_result
 from bioimage_app.nuclei_workflow_host import NucleiHost
 from bioimage_app.workflow_session import WorkflowSession, WorkflowStatus
@@ -168,6 +169,42 @@ class NucleiBridge(QObject):
             path = QFileDialog.getExistingDirectory(self.window, "打开核分割项目目录")
             if path:
                 self._start_io(lambda: read_result(path), "result", path)
+        elif action == "intensity" and self._result is not None:
+            result = self._result
+            target, _ = QFileDialog.getOpenFileName(
+                self.window,
+                "选择配对的原始目标通道（单张 8 位灰度 TIFF）",
+                "",
+                "原始 TIFF (*.tif *.tiff)",
+            )
+            if not target:
+                return
+            answer = QMessageBox.question(
+                self.window,
+                "确认通道配对",
+                f"目标通道：{Path(target).name}\n核分割项目：{Path(result.workspace).name}\n"
+                "已确认两张原图来自同一视野，且像素坐标逐一对应？",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel,
+                QMessageBox.StandardButton.Cancel,
+            )
+            if answer != QMessageBox.StandardButton.Yes:
+                return
+            parent = QFileDialog.getExistingDirectory(
+                self.window, "选择逐核强度导出位置（项目目录之外）"
+            )
+            if parent:
+
+                def measure() -> str:
+                    return str(
+                        export_intensity(
+                            Path(result.workspace),
+                            Path(target),
+                            Path(parent),
+                            expected_run_id=result.run_id,
+                        )
+                    )
+
+                self._start_io(measure, "intensity", parent)
         elif action == "export":
             result = self._result
             if result is not None:
@@ -188,7 +225,7 @@ class NucleiBridge(QObject):
     ) -> None:
         job = _ImageIO(operation, self)
         self._io = job
-        self._message = "正在读取并核验…" if purpose != "export" else "正在导出…"
+        self._message = "正在读取并核验…" if purpose not in {"export", "intensity"} else "正在导出…"
         job.finished.connect(lambda: self._io_finished(job, purpose, path))
         job.start()
         self.refresh()
@@ -218,7 +255,10 @@ class NucleiBridge(QObject):
             self._state, self._message = "succeeded", "结果已保存。可导出或关闭后重新打开项目。"
         else:
             assert isinstance(job.value, str)
+            self._state = "succeeded"
             self._message = "已导出至：" + job.value
+            if purpose == "intensity":
+                self._message += "（逐核表 per-nucleus.csv，来源 provenance.json）"
         self.refresh()
         self.idle.emit()
 

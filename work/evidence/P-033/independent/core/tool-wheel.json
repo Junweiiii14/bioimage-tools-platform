@@ -1,0 +1,26 @@
+{
+  "head": "4fb45866cda22a3509cdd42d805f375ca6dab3a4",
+  "package": "nuclei-tool",
+  "version": "0.1.0",
+  "installed_path": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3\\.local\\governance\\nuclei-wheel-env\\Lib\\site-packages\\nuclei_intensity\\api.py",
+  "absent": [
+    "bioimage_app",
+    "PySide6",
+    "tensorflow",
+    "stardist"
+  ],
+  "result": [
+    [
+      4,
+      2,
+      4.0,
+      8
+    ],
+    [
+      7,
+      1,
+      0.0,
+      0
+    ]
+  ]
+}

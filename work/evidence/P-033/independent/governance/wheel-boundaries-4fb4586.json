@@ -1,0 +1,275 @@
+{
+  "base": "fb6638eb7145dc9f0af61679a48aaef24a681606",
+  "head": "4fb45866cda22a3509cdd42d805f375ca6dab3a4",
+  "content": "e77d67a3ec2d9a8789ab6bea105fd6d3ab50b3b7",
+  "manifest": {
+    "schema": 1,
+    "task": "P-033",
+    "base_commit": "fb6638eb7145dc9f0af61679a48aaef24a681606",
+    "source_head": "a719efcbaf883cd8bf368504cd56db5820b7fb66",
+    "historical_receipts": {
+      "work/evidence/P-032/rules-context.json": "d6de0dfa869c67f8e6ad0c87445770c81ac00cf3"
+    }
+  },
+  "rule_receipt_sha256": {
+    "work/evidence/P-032/rules-context.json": "dc16687d565bd3629ef2831b6c8d6772a787600f45b2c619dbac37e794c16f68",
+    "work/evidence/P-033/rules-context.json": "9689d55ba65e6e174db7be12e3c5b8cb51cbdb537877e98b7ce184fb168c2230"
+  },
+  "preexisting_missing_reviewed": [
+    "P-010",
+    "P-021",
+    "P-022",
+    "P-023"
+  ],
+  "new_missing": 0,
+  "checks": {
+    "independent_api": {
+      "command": [
+        "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3\\.local\\governance\\nuclei-wheel-env\\Scripts\\python.exe",
+        "-I",
+        "-B",
+        "-c",
+        "import importlib.util, json, sys\nfrom pathlib import Path\nfrom importlib.metadata import distributions, metadata\nimport numpy as np\nfrom nuclei_intensity import api\nlabels = np.array([[2**32-1,0,7],[7,4,4]],dtype=np.uint32)\npixels = np.array([[0,255,200],[20,1,2]],dtype=np.uint8)\nrows = list(api.measure_intensity(labels,pixels))\nassert rows == [(4,2,1.5,3),(7,2,110.0,220),(2**32-1,1,0.0,0)]\nassert list(api.measure_intensity(np.zeros_like(labels),pixels)) == []\nassert Path(api.__file__).is_relative_to(sys.prefix)\nabsent=['PySide6','bioimage_app','platform_runtime','wb_tool','bca_tool','tensorflow','stardist','scipy']\nassert all(importlib.util.find_spec(n) is None for n in absent)\nassert not any(k.split('.')[0] in ('nuclei_tool','tool_contracts','platform_runtime','PySide6','PIL','tensorflow') for k in sys.modules)\nfrom nuclei_tool.api import nuclei_module_spec\nprint(json.dumps(dict(file=api.__file__, prefix=sys.prefix, packages_absent=absent, rows=rows, zero_nuclei_rows=0, segmenter_digest=nuclei_module_spec().implementation_digest, inventory={d.metadata['Name']:d.version for d in distributions()}, requires_dist=metadata('nuclei-tool').get_all('Requires-Dist'))))"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3\\.local\\governance\\installed-probe",
+      "exit": 0,
+      "stdout": "{\"file\": \"C:\\\\Users\\\\70236\\\\ResearchVault\\\\Codex-Workbench\\\\bioimage-review-p033-r3\\\\.local\\\\governance\\\\nuclei-wheel-env\\\\Lib\\\\site-packages\\\\nuclei_intensity\\\\api.py\", \"prefix\": \"C:\\\\Users\\\\70236\\\\ResearchVault\\\\Codex-Workbench\\\\bioimage-review-p033-r3\\\\.local\\\\governance\\\\nuclei-wheel-env\", \"packages_absent\": [\"PySide6\", \"bioimage_app\", \"platform_runtime\", \"wb_tool\", \"bca_tool\", \"tensorflow\", \"stardist\", \"scipy\"], \"rows\": [[4, 2, 1.5, 3], [7, 2, 110.0, 220], [4294967295, 1, 0.0, 0]], \"zero_nuclei_rows\": 0, \"segmenter_digest\": \"004eec08bec7aa4436dc30e9fd2f3041257139fbf6e2d3730db7e4b506262889\", \"inventory\": {\"annotated-types\": \"0.8.0\", \"nuclei-tool\": \"0.1.0\", \"numpy\": \"2.5.4\", \"pillow\": \"12.3.0\", \"pydantic\": \"2.14.1\", \"pydantic_core\": \"2.50.1\", \"tool-contracts\": \"0.1.0\", \"typing_extensions\": \"4.16.0\", \"typing-inspection\": \"0.4.4\"}, \"requires_dist\": [\"tool-contracts\", \"numpy==2.5.4\", \"pillow>=12.3,<14\"]}",
+      "stderr": ""
+    },
+    "existing_worker_spec": {
+      "command": [
+        "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p015-research\\worker-env\\Scripts\\python.exe",
+        "-I",
+        "-B",
+        "-c",
+        "from nuclei_tool.api import nuclei_module_spec; print(nuclei_module_spec().implementation_digest)"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3\\.local\\governance\\installed-probe",
+      "exit": 0,
+      "stdout": "004eec08bec7aa4436dc30e9fd2f3041257139fbf6e2d3730db7e4b506262889",
+      "stderr": ""
+    },
+    "repository_nuclei_wheel": {
+      "command": [
+        "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3\\.local\\governance\\nuclei-wheel-env\\Scripts\\python.exe",
+        "-I",
+        "-B",
+        "-u",
+        "-c",
+        "\nimport importlib.util\nimport subprocess\nimport sys\nfrom pathlib import Path\nimport numpy as np\nfrom PIL import Image\nimport nuclei_tool.api\nfrom nuclei_tool.api import read_nuclei_input, nuclei_module_spec\nfrom nuclei_intensity import api as intensity\nassert Path(nuclei_tool.api.__file__).is_relative_to(Path(sys.prefix))\nfor name in ('tensorflow', 'stardist', 'PySide6', 'platform_runtime', 'wb_tool'):\n    assert importlib.util.find_spec(name) is None\n    assert name not in sys.modules\nsource = Path('nuclei-original.tif')\nImage.fromarray(np.arange(48, dtype=np.uint8).reshape(6, 8)).save(source)\nassert Path(intensity.__file__).is_relative_to(Path(sys.prefix))\nassert list(intensity.measure_intensity(np.array([[7]], dtype=np.uint32),\n                                        np.array([[9]], dtype=np.uint8))) == [(7, 1, 9.0, 9)]\noriginal = source.read_bytes()\nloaded = read_nuclei_input(str(source))\nnp.testing.assert_array_equal(loaded.pixels, np.arange(48).reshape(6, 8))\nassert source.read_bytes() == original\nassert nuclei_module_spec().module_id == 'nuclei-stardist-research'\nprocess = subprocess.run([sys.executable, '-I', '-m', 'nuclei_tool.worker'],\n                         input=b'', capture_output=True, timeout=15, check=False)\nassert process.returncode == 2\nassert b'\"kind\":\"hello\"' in process.stdout\nprint('Isolated nuclei wheel: original input and worker hello; no model/GUI/storage dependencies')\n"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3\\.local\\governance\\installed-probe",
+      "exit": 0,
+      "stdout": "Isolated nuclei wheel: original input and worker hello; no model/GUI/storage dependencies",
+      "stderr": ""
+    },
+    "rules": {
+      "command": [
+        "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe",
+        "-I",
+        "-B",
+        "tooling/rule_context.py",
+        "check",
+        "--base",
+        "fb6638eb7145dc9f0af61679a48aaef24a681606",
+        "--head",
+        "4fb45866cda22a3509cdd42d805f375ca6dab3a4"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3",
+      "exit": 0,
+      "stdout": "Rule context receipt matches this PR's base, scope and rule versions",
+      "stderr": ""
+    },
+    "policy": {
+      "command": [
+        "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe",
+        "-B",
+        "dev.py",
+        "policy"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3",
+      "exit": 0,
+      "stdout": "Product boundary scan: 253 files; zero means product is not implemented",
+      "stderr": ""
+    },
+    "format": {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "fb6638eb7145dc9f0af61679a48aaef24a681606",
+        "4fb45866cda22a3509cdd42d805f375ca6dab3a4"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "protected": {
+      "command": [
+        "git",
+        "diff",
+        "--exit-code",
+        "fb6638eb7145dc9f0af61679a48aaef24a681606",
+        "4fb45866cda22a3509cdd42d805f375ca6dab3a4",
+        "--",
+        "tools/nuclei/src/nuclei_tool",
+        "tools/nuclei/requirements-research.txt",
+        "packages",
+        "uv.lock",
+        "pyproject.toml",
+        "apps/desktop/pyproject.toml",
+        "tools/wb",
+        "tools/bca",
+        ".github",
+        ".agents"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "plan": {
+      "command": [
+        "C:\\Users\\70236\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe",
+        "-B",
+        "work/programs/scientific-agent-platform/check_plan.py"
+      ],
+      "cwd": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3",
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Plan check failed: Missing reviewed commit: P-010"
+    }
+  },
+  "ast_negative_controls": {
+    "back_import": [
+      "<source>:1: nuclei_intensity must not import bioimage_app"
+    ],
+    "private_cross_import": [
+      "<source>:1: use nuclei_intensity.api, not package internals"
+    ],
+    "public_cross_import": []
+  },
+  "public_api": {
+    "file": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3\\.local\\governance\\nuclei-wheel-env\\Lib\\site-packages\\nuclei_intensity\\api.py",
+    "prefix": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3\\.local\\governance\\nuclei-wheel-env",
+    "packages_absent": [
+      "PySide6",
+      "bioimage_app",
+      "platform_runtime",
+      "wb_tool",
+      "bca_tool",
+      "tensorflow",
+      "stardist",
+      "scipy"
+    ],
+    "rows": [
+      [
+        4,
+        2,
+        1.5,
+        3
+      ],
+      [
+        7,
+        2,
+        110.0,
+        220
+      ],
+      [
+        4294967295,
+        1,
+        0.0,
+        0
+      ]
+    ],
+    "zero_nuclei_rows": 0,
+    "segmenter_digest": "004eec08bec7aa4436dc30e9fd2f3041257139fbf6e2d3730db7e4b506262889",
+    "inventory": {
+      "annotated-types": "0.8.0",
+      "nuclei-tool": "0.1.0",
+      "numpy": "2.5.4",
+      "pillow": "12.3.0",
+      "pydantic": "2.14.1",
+      "pydantic_core": "2.50.1",
+      "tool-contracts": "0.1.0",
+      "typing_extensions": "4.16.0",
+      "typing-inspection": "0.4.4"
+    },
+    "requires_dist": [
+      "tool-contracts",
+      "numpy==2.5.4",
+      "pillow>=12.3,<14"
+    ]
+  },
+  "wheels": [
+    {
+      "wheel": "nuclei_tool-0.1.0-py3-none-any.whl",
+      "base_bytes": 16038,
+      "candidate_bytes": 17247,
+      "added": [
+        "nuclei_intensity/",
+        "nuclei_intensity/__init__.py",
+        "nuclei_intensity/api.py",
+        "nuclei_intensity/py.typed"
+      ],
+      "changed": [
+        "nuclei_tool-0.1.0.dist-info/RECORD"
+      ],
+      "removed": [],
+      "base_sha256": "1a009859ff91b3e2775c3989e758d2c723a57870cdf65d5de1a16e709980353a",
+      "candidate_sha256": "f3dc3e27e98a8340dc1dd5f0d41a0a656219741d8799639243175941262ac6a2",
+      "unchanged_requires_dist": [
+        "tool-contracts",
+        "numpy==2.5.4",
+        "pillow>=12.3,<14"
+      ]
+    },
+    {
+      "wheel": "bioimage_app-0.14.0-py3-none-any.whl",
+      "base_bytes": 11795338,
+      "candidate_bytes": 11796891,
+      "added": [
+        "bioimage_app/nuclei_intensity_cli.py"
+      ],
+      "changed": [
+        "bioimage_app-0.14.0.dist-info/RECORD"
+      ],
+      "removed": [],
+      "base_sha256": "1df2581961f9b1b40b146042d8e365ec2989c296dfacdc352e92bacf0ed31afa",
+      "candidate_sha256": "20de0584cd757ebcb6a9c8e0ae81e2e09a60f59fa175abc3380e3b656d9de961",
+      "unchanged_requires_dist": [
+        "platform-runtime",
+        "tool-contracts",
+        "pyside6==6.12.0",
+        "bca-tool ; extra == 'bca'",
+        "nuclei-tool ; extra == 'nuclei'",
+        "wb-tool[desktop,ocr] ; extra == 'wb'"
+      ]
+    }
+  ],
+  "wheel_builds": {
+    "command": "uv build --offline --package <package> --wheel --out-dir .local/governance/wheels",
+    "exit_codes": {
+      "tool-contracts": 0,
+      "nuclei-tool": 0,
+      "bioimage-app": 0
+    }
+  },
+  "dependency_sync_install_exit": [
+    0,
+    0
+  ],
+  "boundary_pytest": {
+    "exit": 0,
+    "passed": 14
+  },
+  "import_linter": {
+    "exit": 0,
+    "kept": 12,
+    "broken": 0
+  },
+  "harness_note": "An initial local wheel-diff assertion counted a ZIP directory entry as a file. The independent check records raw members and checks file additions separately. Underlying API and repository wheel probes passed.",
+  "git_status": "clean",
+  "exit_code": 0
+}

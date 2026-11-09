@@ -1,0 +1,49 @@
+{
+  "head": "4fb45866cda22a3509cdd42d805f375ca6dab3a4",
+  "interpreter": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3\\.local\\reviewer-venv\\Scripts\\python.exe",
+  "module": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3\\apps\\desktop\\src\\bioimage_app\\nuclei_intensity_cli.py",
+  "ids": [
+    "cc42a317f6d34f60ad3d9a6dbe04bbc1",
+    "dcd424e1571140a9b3d13402b74e3240"
+  ],
+  "calls": {
+    "B opens before": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3\\.local\\integrity\\recheck\\outside\\nuclear-intensity-7e8f410271884bc6a92086cbb542b6f7\\per-nucleus.csv"
+    },
+    "A to B results": {
+      "exit": 2,
+      "stderr": "Choose an export directory outside all managed workspaces",
+      "stdout": ""
+    },
+    "A to alias for B results": {
+      "exit": 2,
+      "stderr": "Choose an export directory outside all managed workspaces",
+      "stdout": ""
+    },
+    "B opens after": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3\\.local\\integrity\\recheck\\outside\\nuclear-intensity-8c6e1b0963534ce2b93856ac3416de35\\per-nucleus.csv"
+    },
+    "A to ordinary external parent": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3\\.local\\integrity\\recheck\\outside\\nuclear-intensity-80b1ca655c4c4251bedacf15fae48e35\\per-nucleus.csv"
+    },
+    "plain folder below unrelated JSON": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p033-r3\\.local\\integrity\\recheck\\unrelated-folder\\exports\\nuclear-intensity-2f036c646b8449c392fae09f45510984\\per-nucleus.csv"
+    }
+  },
+  "A_unchanged_files_dirs": 51,
+  "B_unchanged_files_dirs": 51,
+  "direct_and_alias_left_no_staging_or_extra_file": true,
+  "B_reopened_with_identical_header_only_csv": true,
+  "normal_233_csv_sha256": "179bdf529042bf4f8a1b3857faad0a97eb0d57306f94da55c9263d90d7474106",
+  "normal_233_identical_to_initial_candidate": true,
+  "unrelated_workspace_json_false_positive_reversed": true,
+  "earlier_exports_rehashed_unchanged": true
+}
