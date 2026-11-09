@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "task": "P-034",
+  "base_commit": "88e89525446f3f976995f6a15cd51b3c2a522879",
+  "source_head": "a102e458c9cc4ed6e74f8c6175316182d4da1cef",
+  "historical_receipts": {
+    "work/evidence/P-033/rules-context.json": "a102e458c9cc4ed6e74f8c6175316182d4da1cef"
+  }
+}

@@ -137,6 +137,10 @@
     {
       "id": "P-033",
       "path": "work/tasks/P-033-intensity-export.md"
+    },
+    {
+      "id": "P-034",
+      "path": "work/tasks/P-034-intensity-ui.md"
     }
   ],
   "work_packages": [
@@ -319,7 +323,8 @@
         "P-030",
         "P-031",
         "P-032",
-        "P-033"
+        "P-033",
+        "P-034"
       ]
     }
   ],

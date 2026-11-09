@@ -29,7 +29,9 @@
             state.worker && state.model ? '已配置 · 运行前核验' : '首次使用需准备环境';
         document.querySelectorAll('[data-nuclei-choose]').forEach((button) => {
             button.disabled =
-                state.busy || (button.dataset.nucleiChoose === 'export' && state.count === null);
+                state.busy ||
+                (['export', 'intensity'].includes(button.dataset.nucleiChoose) &&
+                    state.count === null);
         });
         get('overlay').disabled = !state.overlay;
         get('image-section').hidden = !state.original;

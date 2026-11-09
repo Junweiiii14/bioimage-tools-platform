@@ -19,7 +19,9 @@ from tool_contracts.api import WorkspaceFormat
 from bioimage_app.nuclei_results import read_result
 
 
-def export(workspace: Path, target: Path, parent: Path) -> Path:
+def export(
+    workspace: Path, target: Path, parent: Path, *, expected_run_id: str | None = None
+) -> Path:
     parent = parent.resolve()
     for directory in (parent, *parent.parents):
         header = directory / "workspace.json"
@@ -30,6 +32,8 @@ def export(workspace: Path, target: Path, parent: Path) -> Path:
                 continue
             raise ValueError("Choose an export directory outside all managed workspaces")
     result = read_result(str(workspace))
+    if expected_run_id is not None and result.run_id != expected_run_id:
+        raise ValueError("已保存的项目与当前显示结果不一致，请重新打开项目")
     channel = read_nuclei_input(str(target))
     labels = np.load(io.BytesIO(result.labels), allow_pickle=False)
     columns = ("nucleus_id", "area_px2", "mean_dn", "integrated_dn_px")

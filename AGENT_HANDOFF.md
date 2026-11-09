@@ -46,6 +46,8 @@
 
 ## Current Pointer
 
+当前：[P034 结果页逐核目标通道强度导出](work/tasks/P-034-intensity-ui.md)。
+
 最近完成：[P033 已提交核标签的目标通道强度导出](work/tasks/P-033-intensity-export.md)。
 
 最近完成：[P032 固定核实例双通道强度复验与 PR83 集成](work/tasks/P-032-nuclear-intensity.md)。
