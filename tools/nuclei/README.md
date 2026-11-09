@@ -1,6 +1,6 @@
 # 固定核分割研究工具
 
-唯一公开入口`nuclei_tool.api`。固定P014 StarDist0.9.2/2D_versatile_fluo研究方法，尚无科学准入。
+分割入口为 `nuclei_tool.api`，逐核强度计算入口为同一 wheel 的 `nuclei_intensity.api`。固定P014 StarDist0.9.2/2D_versatile_fluo研究方法，尚无科学准入。
 领域只验证数组和标签；输入/模型/输出I/O在适配层，宿主通过既有WorkflowSession运行独立worker。
 TensorFlow不属于本包默认依赖，不得在宿主导入时加载，也不运行时下载权重。
 
@@ -38,7 +38,17 @@ uv run --locked --no-sync python -m bioimage_app.nuclei_cli --source "C:/researc
 - 固定研究环境与默认桌面Pillow版本不同，工具兼容12.3..13但worker强验13.0及完整固定环境。默认导入不加载TensorFlow；`typings/`仅为固定外部API提供静态类型声明，未消除实际缺源码的三个Pyright警告；真实模型另行验证。
 - Windows本机真实模型证据、完整命令和限制见[P015任务](../../work/tasks/P-015-nuclei-research-adapter.md)和[证据](../../work/evidence/P-015/README.md)。Linux普通边界/隔离wheel检查不等于Linux真实模型验收。
 
-P014图像已经用于研究，当前对照仅证明工程封装一致性，**不是新独立科学验证**。训练数据重叠、患者独立性、真实实验室、学生使用和16bit适用性仍未知。没有IF强度、全细胞、统计或Agent能力，也没有发布安装器。
+P014图像已经用于研究，当前对照仅证明工程封装一致性，**不是新独立科学验证**。训练数据重叠、患者独立性、真实实验室、学生使用和16bit适用性仍未知。P015 核分割步骤仅产生实例标签与计数；配对目标通道的逐核强度导出见下节。
 
 
 P016增加公开 `NucleiDisplay`、`original_png`、`present_nuclei_result`：从宿主已验证提交的原图、标签、出处和冻结请求生成原坐标显示PNG，并交叉核对来源/标签摘要和核数。显示变换不回流推理；算法/参数/方法版本未变，新增源码使implementation digest自然变化。已有P015结果可只读重开，不要求历史worker仍安装。实际桌面入口见[单图操作指南](../../docs/runbooks/nuclei-single-image.md)。
+
+## 已有核结果的配对通道强度
+
+在项目根目录运行。先确认两张原图来自同一视野，方向、裁切和每个像素的位置一致。尺寸检查无法验证物理配准。将路径换为已完成的单图核计数项目、目标通道原 TIFF 和项目外已有的导出目录。
+
+```powershell
+uv run --locked --no-sync python -m bioimage_app.nuclei_intensity_cli --workspace "C:/research/nuclei-workspace" --target "C:/research/PH3.tif" --output-dir "C:/research/exports" --confirm-same-frame
+```
+
+命令输出新目录下的 CSV 路径。每个非零实例保留原 ID，面积为像素数（px²），均值为原始 DN，积分为像素 DN 之和（DN·px）。零核生成仅有表头的 CSV。相邻的 provenance.json 保存方法版本、项目运行、原核图、标签和目标图摘要，供复查。仅接收原坐标单页 uint8 灰度 TIFF，保留原背景和曝光标度。跨样本比较、背景校正及阳性判定均在此方法范围之外。

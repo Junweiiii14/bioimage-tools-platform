@@ -13,4 +13,4 @@ requires = ["uv_build==0.13.6"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
-module-name = "nuclei_tool"
+module-name = ["nuclei_tool", "nuclei_intensity"]

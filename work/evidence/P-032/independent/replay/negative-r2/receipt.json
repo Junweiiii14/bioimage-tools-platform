@@ -1,0 +1,11 @@
+{
+  "actual_replay_exit": 1,
+  "cp_done": "Complete",
+  "changed_reference_object": 289,
+  "column": "Intensity_IntegratedIntensity_PH3",
+  "original": "6.521568827331066",
+  "modified": "6.525490395958516980392156862745098039216",
+  "difference_in_raw_sum_dn": 1,
+  "assertion": "Mismatched elements: 1 / 289",
+  "final_csv_or_summary_written": false
+}

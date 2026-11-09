@@ -1,0 +1,50 @@
+{
+  "frozen_research": "cf91bc59b6708316664af78bae61fa8b0e1f347d",
+  "download": "https://cellprofiler-examples.s3.amazonaws.com/ExampleHuman.zip",
+  "archive_sha256": "7b35c66b775b5a25d0e39f917e0c52982ff2605017ded9c0cd0dc39a206b0138",
+  "label_sha256": "471fd7ff09b05aae6f72538b2f5c1f1ec8482f0bb95aebcbb274888c88e01a6b",
+  "new_and_old_unmodified_pipeline_nuclei_csv_sha256": "25f1c18542ca8a4fcc39afd3586fb9d0f552a61d403e30865d10c2eddc11cee7",
+  "object_ids": 289,
+  "unique_record_keys": 578,
+  "background_excluded": 225181,
+  "channels": {
+    "DNA": {
+      "field_peak": 255,
+      "field_ceiling_count": 2,
+      "nuclei_at_ceiling": {
+        "7": 2
+      },
+      "median_nucleus_mean": 54.01960784313726,
+      "max_abs_cp_residuals": {
+        "MeanIntensity": 1.1275969491464366e-08,
+        "IntegratedIntensity": 3.1380676688286258e-06
+      },
+      "nuclear_area_total_px": 36963,
+      "nucleus_1": {
+        "area": 131,
+        "x": 477.09923664122135,
+        "y": 7.580152671755725,
+        "sum": 6373,
+        "mean": 48.64885496183206
+      }
+    },
+    "PH3": {
+      "field_peak": 245,
+      "field_ceiling_count": 0,
+      "nuclei_at_ceiling": {},
+      "median_nucleus_mean": 10.245283018867925,
+      "max_abs_cp_residuals": {
+        "MeanIntensity": 1.0142285455927436e-08,
+        "IntegratedIntensity": 1.1949854723525277e-06
+      },
+      "nuclear_area_total_px": 36963,
+      "nucleus_1": {
+        "area": 131,
+        "x": 477.09923664122135,
+        "y": 7.580152671755725,
+        "sum": 1298,
+        "mean": 9.908396946564885
+      }
+    }
+  }
+}

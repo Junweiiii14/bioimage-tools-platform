@@ -1,0 +1,63 @@
+{
+  "review_head": "cf91bc59b6708316664af78bae61fa8b0e1f347d",
+  "official_cmd": [
+    "C:\\Program Files\\CellProfiler\\CellProfiler.exe",
+    "-c",
+    "-r",
+    "-p",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p014-research\\official-human\\ExampleHuman\\ExampleHuman.cppipe",
+    "-i",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\p014-research\\official-human\\ExampleHuman\\images",
+    "-o",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p032\\.local\\replay\\official-r2",
+    "-d",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p032\\.local\\replay\\official-r2\\done.txt"
+  ],
+  "official_exit": 0,
+  "original_cp_modules": 14,
+  "export_cp_modules": 16,
+  "shared_object_csv_sha256": "25f1c18542ca8a4fcc39afd3586fb9d0f552a61d403e30865d10c2eddc11cee7",
+  "archive_includes_no_nuclei_csv": true,
+  "error_rtol": 1.1920928955078125e-07,
+  "error_atol": 0,
+  "per_channel": {
+    "DNA": {
+      "objects": 289,
+      "integer_sum": 2067872,
+      "area_total": 36963,
+      "centroid_max_delta_px": 5.132743362831858e-14,
+      "max_abs_cp_units": {
+        "mean": 1.1275969498547567e-08,
+        "integral": 3.138067674509804e-06
+      },
+      "largest_fraction_of_relative_epsilon": {
+        "mean": 0.31334430229098587,
+        "integral": 0.3133443020440057
+      },
+      "saturation_labels": {
+        "7": 2
+      },
+      "full_image_max": 255,
+      "full_image_saturated": 2,
+      "median_equal_object_means": 54.01960784313726
+    },
+    "PH3": {
+      "objects": 289,
+      "integer_sum": 493169,
+      "area_total": 36963,
+      "centroid_max_delta_px": 5.132743362831858e-14,
+      "max_abs_cp_units": {
+        "mean": 1.0142285470364146e-08,
+        "integral": 1.1949854758823529e-06
+      },
+      "largest_fraction_of_relative_epsilon": {
+        "mean": 0.34280003148552,
+        "integral": 0.34280003209243237
+      },
+      "saturation_labels": {},
+      "full_image_max": 245,
+      "full_image_saturated": 0,
+      "median_equal_object_means": 10.245283018867925
+    }
+  }
+}

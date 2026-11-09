@@ -1,3 +1,3 @@
 # 当前恢复入口
 
-[P032 固定核实例双通道强度复验](../work/tasks/P-032-nuclear-intensity.md)已完成作者实验，下一步固定独审、CI 与集成；[结果与回放](../docs/research/2026-11-09-nuclear-intensity.md)。
+[P033 逐核强度导出](../work/tasks/P-033-intensity-export.md)实现与本机复验完成，待准确候选独审及必需 CI。功能使用说明见[核工具 README](../tools/nuclei/README.md)。

@@ -102,12 +102,16 @@ import numpy as np
 from PIL import Image
 import nuclei_tool.api
 from nuclei_tool.api import read_nuclei_input, nuclei_module_spec
+from nuclei_intensity import api as intensity
 assert Path(nuclei_tool.api.__file__).is_relative_to(Path(sys.prefix))
 for name in ('tensorflow', 'stardist', 'PySide6', 'platform_runtime', 'wb_tool'):
     assert importlib.util.find_spec(name) is None
     assert name not in sys.modules
 source = Path('nuclei-original.tif')
 Image.fromarray(np.arange(48, dtype=np.uint8).reshape(6, 8)).save(source)
+assert Path(intensity.__file__).is_relative_to(Path(sys.prefix))
+assert list(intensity.measure_intensity(np.array([[7]], dtype=np.uint32),
+                                        np.array([[9]], dtype=np.uint8))) == [(7, 1, 9.0, 9)]
 original = source.read_bytes()
 loaded = read_nuclei_input(str(source))
 np.testing.assert_array_equal(loaded.pixels, np.arange(48).reshape(6, 8))

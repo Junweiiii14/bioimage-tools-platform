@@ -1,0 +1,17 @@
+{
+  "exit": 0,
+  "done": "Complete",
+  "command": [
+    "C:\\Program Files\\CellProfiler\\CellProfiler.exe",
+    "-c",
+    "-r",
+    "-p",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p032\\.local\\quant\\official-run-2\\original.cppipe",
+    "-i",
+    "C:\\Users\\70236\\AppData\\Local\\Temp\\p032-independent-raw-c9o4suw6",
+    "-o",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p032\\.local\\quant\\official-run-2\\results",
+    "-d",
+    "C:\\Users\\70236\\ResearchVault\\Codex-Workbench\\bioimage-review-p032\\.local\\quant\\official-run-2\\results\\done.txt"
+  ]
+}

@@ -133,6 +133,10 @@
     {
       "id": "P-032",
       "path": "work/tasks/P-032-nuclear-intensity.md"
+    },
+    {
+      "id": "P-033",
+      "path": "work/tasks/P-033-intensity-export.md"
     }
   ],
   "work_packages": [
@@ -314,7 +318,8 @@
         "P-029",
         "P-030",
         "P-031",
-        "P-032"
+        "P-032",
+        "P-033"
       ]
     }
   ],

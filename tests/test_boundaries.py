@@ -1,8 +1,10 @@
 """Negative controls for the rules future product code will be subject to."""
 
+from pathlib import Path
+
 import pytest
 
-from tooling.boundaries import violations
+from tooling.boundaries import check_repository, violations
 
 
 @pytest.mark.parametrize(
@@ -34,3 +36,14 @@ def test_reject_invalid_dependencies(module: str, source: str) -> None:
 )
 def test_allow_declared_dependencies(module: str, source: str) -> None:
     assert violations(source, module) == []
+
+
+def test_shared_nuclei_src_only_accepts_registered_owners(tmp_path: Path) -> None:
+    src = tmp_path / "tools/nuclei/src"
+    for owner in ("nuclei_tool", "nuclei_intensity", "wb_tool", "unknown"):
+        (src / owner).mkdir(parents=True)
+        (src / owner / "__init__.py").touch()
+    count, errors = check_repository(tmp_path)
+    assert count == 4
+    assert len(errors) == 2
+    assert all(any(owner in error for error in errors) for owner in ("wb_tool", "unknown"))
